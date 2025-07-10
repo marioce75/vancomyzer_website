@@ -6,19 +6,55 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		B62E3F1C2E1E9D9A00D42D1A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B6F84EB02DE7A76C0053F88A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B6F84EB72DE7A76C0053F88A;
+			remoteInfo = vancomyzer;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		B62E3F182E1E9D9A00D42D1A /* vancomyzerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vancomyzerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6F84EB82DE7A76C0053F88A /* vancomyzer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vancomyzer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B62E3F232E1E9EC400D42D1A /* Exceptions for "vancomyzer" folder in "vancomyzer" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Package.swift,
+			);
+			target = B6F84EB72DE7A76C0053F88A /* vancomyzer */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		B62E3F192E1E9D9A00D42D1A /* vancomyzerTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = vancomyzerTests;
+			sourceTree = "<group>";
+		};
 		B6F84EBA2DE7A76C0053F88A /* vancomyzer */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B62E3F232E1E9EC400D42D1A /* Exceptions for "vancomyzer" folder in "vancomyzer" target */,
+			);
 			path = vancomyzer;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B62E3F152E1E9D9A00D42D1A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B6F84EB52DE7A76C0053F88A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -33,6 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				B6F84EBA2DE7A76C0053F88A /* vancomyzer */,
+				B62E3F192E1E9D9A00D42D1A /* vancomyzerTests */,
 				B6F84EB92DE7A76C0053F88A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				B6F84EB82DE7A76C0053F88A /* vancomyzer.app */,
+				B62E3F182E1E9D9A00D42D1A /* vancomyzerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,10 +86,34 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		B62E3F172E1E9D9A00D42D1A /* vancomyzerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B62E3F1E2E1E9D9A00D42D1A /* Build configuration list for PBXNativeTarget "vancomyzerTests" */;
+			buildPhases = (
+				B62E3F142E1E9D9A00D42D1A /* Sources */,
+				B62E3F152E1E9D9A00D42D1A /* Frameworks */,
+				B62E3F162E1E9D9A00D42D1A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B62E3F1D2E1E9D9A00D42D1A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B62E3F192E1E9D9A00D42D1A /* vancomyzerTests */,
+			);
+			name = vancomyzerTests;
+			packageProductDependencies = (
+			);
+			productName = vancomyzerTests;
+			productReference = B62E3F182E1E9D9A00D42D1A /* vancomyzerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		B6F84EB72DE7A76C0053F88A /* vancomyzer */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B6F84EC32DE7A76D0053F88A /* Build configuration list for PBXNativeTarget "vancomyzer" */;
 			buildPhases = (
+				B62E3F102E1E07CF00D42D1A /* ShellScript */,
 				B6F84EB42DE7A76C0053F88A /* Sources */,
 				B6F84EB52DE7A76C0053F88A /* Frameworks */,
 				B6F84EB62DE7A76C0053F88A /* Resources */,
@@ -77,9 +139,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1630;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
+					B62E3F172E1E9D9A00D42D1A = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = B6F84EB72DE7A76C0053F88A;
+					};
 					B6F84EB72DE7A76C0053F88A = {
 						CreatedOnToolsVersion = 16.3;
 					};
@@ -94,17 +160,27 @@
 			);
 			mainGroup = B6F84EAF2DE7A76C0053F88A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B6F84EB92DE7A76C0053F88A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				B6F84EB72DE7A76C0053F88A /* vancomyzer */,
+				B62E3F172E1E9D9A00D42D1A /* vancomyzerTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B62E3F162E1E9D9A00D42D1A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B6F84EB62DE7A76C0053F88A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -114,7 +190,34 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		B62E3F102E1E07CF00D42D1A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint autocorrect --format\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed; brew install swiftlint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		B62E3F142E1E9D9A00D42D1A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B6F84EB42DE7A76C0053F88A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,7 +227,53 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		B62E3F1D2E1E9D9A00D42D1A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B6F84EB72DE7A76C0053F88A /* vancomyzer */;
+			targetProxy = B62E3F1C2E1E9D9A00D42D1A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		B62E3F1F2E1E9D9A00D42D1A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VC4D87G822;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mariocardenas.vancomyzerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vancomyzer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/vancomyzer";
+			};
+			name = Debug;
+		};
+		B62E3F202E1E9D9A00D42D1A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VC4D87G822;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mariocardenas.vancomyzerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vancomyzer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/vancomyzer";
+			};
+			name = Release;
+		};
 		B6F84EC12DE7A76D0053F88A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -256,11 +405,13 @@
 				DEVELOPMENT_TEAM = VC4D87G822;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Vancomyzer;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -284,11 +435,13 @@
 				DEVELOPMENT_TEAM = VC4D87G822;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Vancomyzer;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -305,6 +458,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B62E3F1E2E1E9D9A00D42D1A /* Build configuration list for PBXNativeTarget "vancomyzerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B62E3F1F2E1E9D9A00D42D1A /* Debug */,
+				B62E3F202E1E9D9A00D42D1A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		B6F84EB32DE7A76C0053F88A /* Build configuration list for PBXProject "vancomyzer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

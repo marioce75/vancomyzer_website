@@ -1,0 +1,304 @@
+/* 
+   Localizable.strings (Arabic)
+   Vancomyzer
+   
+   Created by Vancomyzer Team.
+   Copyright © 2024 Vancomyzer. All rights reserved.
+*/
+
+// MARK: - App General
+"app_name" = "فانكومايزر";
+"app_tagline" = "جرعات الفانكومايسين المبنية على الأدلة";
+
+// MARK: - Navigation
+"tab_initial_dosing" = "الجرعة الأولية";
+"tab_bayesian" = "بايزي";
+"tab_guidelines" = "الإرشادات";
+"tab_history" = "التاريخ";
+"tab_about" = "حول";
+
+// MARK: - Onboarding
+"onboarding_welcome_title" = "مرحباً بك في فانكومايزر";
+"onboarding_welcome_subtitle" = "جرعات الفانكومايسين المبنية على الأدلة للمهنيين الصحيين";
+"onboarding_features_title" = "ميزات قوية";
+"onboarding_features_subtitle" = "كل ما تحتاجه لجرعات الفانكومايسين المثلى";
+"onboarding_setup_title" = "خصص تجربتك";
+"onboarding_setup_subtitle" = "اضبط اللغة والمظهر والتفضيلات";
+"onboarding_get_started" = "ابدأ";
+"onboarding_continue" = "متابعة";
+"onboarding_skip" = "تخطي";
+
+// MARK: - Patient Input
+"patient_information" = "معلومات المريض";
+"population_type" = "نوع السكان";
+"age" = "العمر";
+"weight" = "الوزن";
+"height" = "الطول";
+"gender" = "الجنس";
+"serum_creatinine" = "الكرياتينين في المصل";
+"indication" = "المؤشر";
+"severity" = "الشدة";
+"crcl_method" = "طريقة CrCl";
+
+// MARK: - Population Types
+"population_adult" = "بالغ";
+"population_pediatric" = "أطفال";
+"population_neonate" = "حديث الولادة";
+
+// MARK: - Gender
+"gender_male" = "ذكر";
+"gender_female" = "أنثى";
+
+// MARK: - Indications
+"indication_pneumonia" = "التهاب الرئة";
+"indication_bacteremia" = "تجرثم الدم";
+"indication_endocarditis" = "التهاب الشغاف";
+"indication_meningitis" = "التهاب السحايا";
+"indication_skin_soft_tissue" = "الجلد والأنسجة الرخوة";
+"indication_bone_joint" = "العظام والمفاصل";
+"indication_other" = "أخرى";
+
+// MARK: - Severity
+"severity_mild" = "خفيف";
+"severity_moderate" = "متوسط";
+"severity_severe" = "شديد";
+
+// MARK: - CrCl Methods
+"crcl_ibw" = "وزن الجسم المثالي";
+"crcl_tbw" = "وزن الجسم الكلي";
+"crcl_adjbw" = "وزن الجسم المعدل";
+"crcl_scr_1" = "SCr = 1 mg/dL";
+
+// MARK: - Dosing Results
+"dosing_recommendation" = "توصية الجرعة";
+"loading_dose" = "جرعة التحميل";
+"maintenance_dose" = "جرعة الصيانة";
+"predicted_auc" = "AUC₀₋₂₄ المتوقع";
+"predicted_trough" = "القاع المتوقع";
+"predicted_peak" = "الذروة المتوقعة";
+"pharmacokinetic_parameters" = "المعاملات الدوائية الحركية";
+"clearance" = "التصفية";
+"volume_distribution" = "حجم التوزيع";
+"half_life" = "نصف العمر";
+"elimination_rate" = "معدل الإزالة";
+
+// MARK: - Bayesian Dosing
+"bayesian_optimization" = "التحسين البايزي";
+"vancomycin_levels" = "مستويات الفانكومايسين";
+"add_level" = "إضافة مستوى";
+"level_value" = "قيمة المستوى";
+"time_after_dose" = "الوقت بعد الجرعة";
+"dose_number" = "رقم الجرعة";
+"optimize_dosing" = "تحسين الجرعة";
+"map_estimation" = "تقدير MAP";
+"confidence_intervals" = "فترات الثقة 95%";
+
+// MARK: - Clinical Guidance
+"clinical_guidance" = "الإرشاد السريري";
+"target_achievement" = "تحقيق الهدف";
+"dosing_rationale" = "مبرر الجرعة";
+"special_considerations" = "اعتبارات خاصة";
+"monitoring_recommendations" = "توصيات المراقبة";
+"level_monitoring" = "مراقبة مستوى الفانكومايسين";
+"safety_monitoring" = "مراقبة السلامة";
+"follow_up" = "توصيات المتابعة";
+
+// MARK: - Warnings
+"warning_high_dose" = "جرعة عالية - راقب السمية";
+"warning_low_clearance" = "تصفية منخفضة - فكر في تقليل الجرعة";
+"warning_renal_impairment" = "تم اكتشاف ضعف كلوي";
+"warning_elderly_patient" = "مريض مسن - يُنصح بمراقبة متزايدة";
+"warning_pediatric_weight" = "الوزن خارج النطاق الطبيعي للعمر";
+"warning_neonatal_maturation" = "اعتبر نضج الأعضاء في الجرعة";
+
+// MARK: - Validation Errors
+"error_required_field" = "هذا الحقل مطلوب";
+"error_invalid_age" = "يرجى إدخال عمر صحيح";
+"error_invalid_weight" = "يرجى إدخال وزن صحيح";
+"error_invalid_height" = "يرجى إدخال طول صحيح";
+"error_invalid_creatinine" = "يرجى إدخال قيمة كرياتينين صحيحة";
+"error_age_range" = "يجب أن يكون العمر بين %@ و %@";
+"error_weight_range" = "يجب أن يكون الوزن بين %@ و %@";
+"error_height_range" = "يجب أن يكون الطول بين %@ و %@";
+"error_creatinine_range" = "يجب أن يكون الكرياتينين بين %@ و %@";
+
+// MARK: - Units
+"unit_years" = "سنوات";
+"unit_months" = "أشهر";
+"unit_weeks" = "أسابيع";
+"unit_days" = "أيام";
+"unit_kg" = "كغ";
+"unit_lbs" = "رطل";
+"unit_cm" = "سم";
+"unit_inches" = "بوصة";
+"unit_mg_dl" = "مغ/دل";
+"unit_umol_l" = "μمول/ل";
+"unit_mg" = "مغ";
+"unit_mg_kg" = "مغ/كغ";
+"unit_hours" = "ساعات";
+"unit_ml_min" = "مل/دقيقة";
+"unit_l_h" = "ل/ساعة";
+"unit_l" = "ل";
+"unit_mg_l" = "مغ/ل";
+"unit_mg_h_l" = "مغ·ساعة/ل";
+
+// MARK: - Settings
+"settings" = "الإعدادات";
+"preferences" = "التفضيلات";
+"language" = "اللغة";
+"appearance" = "المظهر";
+"units" = "الوحدات";
+"clinical_preferences" = "التفضيلات السريرية";
+"default_population" = "السكان الافتراضي";
+"default_crcl_method" = "طريقة CrCl الافتراضية";
+"show_clinical_warnings" = "إظهار التحذيرات السريرية";
+"auto_save_calculations" = "حفظ الحسابات تلقائياً";
+"privacy_analytics" = "الخصوصية والتحليلات";
+"usage_analytics" = "تحليلات الاستخدام";
+"crash_reporting" = "تقرير الأعطال";
+"export_data" = "تصدير بياناتي";
+"delete_all_data" = "حذف جميع البيانات";
+"accessibility" = "إمكانية الوصول";
+"enhanced_voiceover" = "VoiceOver محسن";
+"high_contrast" = "وضع التباين العالي";
+"reduce_motion" = "تقليل الحركة";
+"text_size" = "حجم النص";
+
+// MARK: - Legal
+"privacy_policy" = "سياسة الخصوصية";
+"terms_of_use" = "شروط الاستخدام";
+"eula_title" = "اتفاقية ترخيص المستخدم النهائي";
+"eula_accept" = "أوافق";
+"eula_decline" = "رفض";
+"medical_disclaimer" = "إخلاء المسؤولية الطبية";
+
+// MARK: - Support
+"help_tutorial" = "المساعدة والدليل";
+"contact_support" = "اتصل بالدعم";
+"rate_app" = "قيم فانكومايزر";
+"share_app" = "شارك فانكومايزر";
+"open_source_licenses" = "تراخيص المصدر المفتوح";
+
+// MARK: - About
+"about_vancomyzer" = "حول فانكومايزر";
+"version" = "الإصدار";
+"build" = "البناء";
+"last_updated" = "آخر تحديث";
+"development_team" = "فريق التطوير";
+"clinical_references" = "المراجع السريرية";
+"credits" = "الاعتمادات";
+
+// MARK: - Actions
+"calculate" = "احسب";
+"calculate_dosing" = "احسب الجرعة";
+"recalculate" = "أعد الحساب";
+"reset" = "إعادة تعيين";
+"save" = "حفظ";
+"cancel" = "إلغاء";
+"done" = "تم";
+"close" = "إغلاق";
+"edit" = "تحرير";
+"delete" = "حذف";
+"export" = "تصدير";
+"share" = "مشاركة";
+"copy" = "نسخ";
+"retry" = "حاول مرة أخرى";
+"continue" = "متابعة";
+"back" = "رجوع";
+"next" = "التالي";
+"skip" = "تخطي";
+"learn_more" = "تعلم المزيد";
+
+// MARK: - Status Messages
+"calculating" = "جاري الحساب...";
+"optimizing" = "جاري التحسين...";
+"loading" = "جاري التحميل...";
+"saving" = "جاري الحفظ...";
+"exporting" = "جاري التصدير...";
+"calculation_complete" = "اكتمل الحساب";
+"optimization_complete" = "اكتمل التحسين";
+"data_saved" = "تم حفظ البيانات";
+"data_exported" = "تم تصدير البيانات";
+"copied_to_clipboard" = "تم النسخ إلى الحافظة";
+
+// MARK: - Error Messages
+"error_calculation_failed" = "فشل الحساب";
+"error_optimization_failed" = "فشل التحسين";
+"error_network_unavailable" = "الشبكة غير متاحة";
+"error_data_corrupted" = "البيانات تالفة";
+"error_export_failed" = "فشل التصدير";
+"error_generic" = "حدث خطأ. يرجى المحاولة مرة أخرى.";
+
+// MARK: - Guidelines
+"guidelines_adult" = "إرشادات البالغين";
+"guidelines_pediatric" = "إرشادات الأطفال";
+"guidelines_neonatal" = "إرشادات حديثي الولادة";
+"guidelines_monitoring" = "إرشادات المراقبة";
+"guidelines_safety" = "إرشادات السلامة";
+
+// MARK: - History
+"calculation_history" = "تاريخ الحسابات";
+"no_calculations" = "لا توجد حسابات";
+"no_calculations_message" = "سيظهر تاريخ حساباتك هنا";
+"clear_history" = "مسح التاريخ";
+"export_history" = "تصدير التاريخ";
+
+// MARK: - Accessibility Labels
+"accessibility_age_input" = "أدخل عمر المريض";
+"accessibility_weight_input" = "أدخل وزن المريض";
+"accessibility_height_input" = "أدخل طول المريض";
+"accessibility_creatinine_input" = "أدخل الكرياتينين في المصل";
+"accessibility_calculate_button" = "احسب جرعة الفانكومايسين";
+"accessibility_population_picker" = "اختر سكان المريض";
+"accessibility_gender_picker" = "اختر جنس المريض";
+"accessibility_indication_picker" = "اختر مؤشر العدوى";
+"accessibility_severity_picker" = "اختر شدة العدوى";
+
+// MARK: - Accessibility Hints
+"accessibility_hint_required" = "هذا الحقل مطلوب";
+"accessibility_hint_optional" = "هذا الحقل اختياري";
+"accessibility_hint_calculation" = "اضغط لحساب توصية الجرعة";
+"accessibility_hint_navigation" = "انتقل إلى %@";
+
+// MARK: - Clinical Content
+"clinical_note_auc_targeting" = "يُنصح بهدف AUC₀₋₂₄ على الجرعة المبنية على القاع";
+"clinical_note_loading_dose" = "جرعة التحميل مُنصح بها للعدوى الشديدة";
+"clinical_note_renal_adjustment" = "تعديل الجرعة مطلوب لضعف الكلى";
+"clinical_note_pediatric_weight" = "جرعة مبنية على الوزن للمرضى الأطفال";
+"clinical_note_neonatal_maturation" = "اعتبر نضج الأعضاء في جرعة حديثي الولادة";
+
+// MARK: - Tutorial
+"tutorial_welcome" = "مرحباً بك في دليل فانكومايزر";
+"tutorial_patient_input" = "إدخال معلومات المريض";
+"tutorial_calculation" = "حساب الجرعة";
+"tutorial_bayesian" = "التحسين البايزي";
+"tutorial_results" = "فهم النتائج";
+"tutorial_monitoring" = "إرشادات المراقبة";
+"tutorial_complete" = "اكتمل الدليل";
+
+// MARK: - Feature Descriptions
+"feature_evidence_based" = "خوارزميات مبنية على الأدلة";
+"feature_evidence_based_desc" = "مبني على إرشادات ASHP/IDSA 2020 لنتائج مثلى للمريض";
+"feature_bayesian" = "التحسين البايزي";
+"feature_bayesian_desc" = "جرعة شخصية باستخدام معاملات دوائية حركية خاصة بالمريض";
+"feature_multi_population" = "دعم متعدد السكان";
+"feature_multi_population_desc" = "خوارزميات متخصصة للمرضى البالغين والأطفال وحديثي الولادة";
+"feature_auc_targeting" = "هدف AUC₀₋₂₄";
+"feature_auc_targeting_desc" = "جرعة حديثة موجهة بـ AUC لتحسين الفعالية والسلامة";
+"feature_clinical_validation" = "التحقق السريري";
+"feature_clinical_validation_desc" = "فحوصات سلامة في الوقت الفعلي وتحقق من المعقولية السريرية";
+"feature_privacy" = "تصميم يركز على الخصوصية";
+"feature_privacy_desc" = "جميع بيانات المريض تبقى آمنة على جهازك";
+
+// MARK: - Confirmation Messages
+"confirm_delete_calculation" = "حذف هذا الحساب؟";
+"confirm_clear_history" = "مسح جميع تاريخ الحسابات؟";
+"confirm_delete_all_data" = "حذف جميع بيانات التطبيق؟ لا يمكن التراجع عن هذا.";
+"confirm_reset_settings" = "إعادة تعيين جميع الإعدادات للافتراضية؟";
+
+// MARK: - Success Messages
+"success_calculation_saved" = "تم حفظ الحساب بنجاح";
+"success_data_exported" = "تم تصدير البيانات بنجاح";
+"success_settings_saved" = "تم حفظ الإعدادات بنجاح";
+"success_feedback_sent" = "تم إرسال التعليقات بنجاح";
+

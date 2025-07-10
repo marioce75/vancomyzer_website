@@ -1,0 +1,10 @@
+excluded:
+  - Pods
+  - Carthage
+  - .build
+disabled_rules:
+  - type_body_length
+  - file_length
+line_length:
+  warning: 200
+  error: 300

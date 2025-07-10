@@ -1,0 +1,304 @@
+/* 
+   Localizable.strings (English)
+   Vancomyzer
+   
+   Created by Vancomyzer Team.
+   Copyright © 2024 Vancomyzer. All rights reserved.
+*/
+
+// MARK: - App General
+"app_name" = "Vancomyzer";
+"app_tagline" = "Evidence-Based Vancomycin Dosing";
+
+// MARK: - Navigation
+"tab_initial_dosing" = "Initial Dosing";
+"tab_bayesian" = "Bayesian";
+"tab_guidelines" = "Guidelines";
+"tab_history" = "History";
+"tab_about" = "About";
+
+// MARK: - Onboarding
+"onboarding_welcome_title" = "Welcome to Vancomyzer";
+"onboarding_welcome_subtitle" = "Evidence-based vancomycin dosing for healthcare professionals";
+"onboarding_features_title" = "Powerful Features";
+"onboarding_features_subtitle" = "Everything you need for optimal vancomycin dosing";
+"onboarding_setup_title" = "Personalize Your Experience";
+"onboarding_setup_subtitle" = "Configure language, theme, and preferences";
+"onboarding_get_started" = "Get Started";
+"onboarding_continue" = "Continue";
+"onboarding_skip" = "Skip";
+
+// MARK: - Patient Input
+"patient_information" = "Patient Information";
+"population_type" = "Population Type";
+"age" = "Age";
+"weight" = "Weight";
+"height" = "Height";
+"gender" = "Gender";
+"serum_creatinine" = "Serum Creatinine";
+"indication" = "Indication";
+"severity" = "Severity";
+"crcl_method" = "CrCl Method";
+
+// MARK: - Population Types
+"population_adult" = "Adult";
+"population_pediatric" = "Pediatric";
+"population_neonate" = "Neonate";
+
+// MARK: - Gender
+"gender_male" = "Male";
+"gender_female" = "Female";
+
+// MARK: - Indications
+"indication_pneumonia" = "Pneumonia";
+"indication_bacteremia" = "Bacteremia";
+"indication_endocarditis" = "Endocarditis";
+"indication_meningitis" = "Meningitis";
+"indication_skin_soft_tissue" = "Skin & Soft Tissue";
+"indication_bone_joint" = "Bone & Joint";
+"indication_other" = "Other";
+
+// MARK: - Severity
+"severity_mild" = "Mild";
+"severity_moderate" = "Moderate";
+"severity_severe" = "Severe";
+
+// MARK: - CrCl Methods
+"crcl_ibw" = "Ideal Body Weight";
+"crcl_tbw" = "Total Body Weight";
+"crcl_adjbw" = "Adjusted Body Weight";
+"crcl_scr_1" = "SCr = 1 mg/dL";
+
+// MARK: - Dosing Results
+"dosing_recommendation" = "Dosing Recommendation";
+"loading_dose" = "Loading Dose";
+"maintenance_dose" = "Maintenance Dose";
+"predicted_auc" = "Predicted AUC₀₋₂₄";
+"predicted_trough" = "Predicted Trough";
+"predicted_peak" = "Predicted Peak";
+"pharmacokinetic_parameters" = "Pharmacokinetic Parameters";
+"clearance" = "Clearance";
+"volume_distribution" = "Volume of Distribution";
+"half_life" = "Half-life";
+"elimination_rate" = "Elimination Rate";
+
+// MARK: - Bayesian Dosing
+"bayesian_optimization" = "Bayesian Optimization";
+"vancomycin_levels" = "Vancomycin Levels";
+"add_level" = "Add Level";
+"level_value" = "Level Value";
+"time_after_dose" = "Time After Dose";
+"dose_number" = "Dose Number";
+"optimize_dosing" = "Optimize Dosing";
+"map_estimation" = "MAP Estimation";
+"confidence_intervals" = "95% Confidence Intervals";
+
+// MARK: - Clinical Guidance
+"clinical_guidance" = "Clinical Guidance";
+"target_achievement" = "Target Achievement";
+"dosing_rationale" = "Dosing Rationale";
+"special_considerations" = "Special Considerations";
+"monitoring_recommendations" = "Monitoring Recommendations";
+"level_monitoring" = "Vancomycin Level Monitoring";
+"safety_monitoring" = "Safety Monitoring";
+"follow_up" = "Follow-up Recommendations";
+
+// MARK: - Warnings
+"warning_high_dose" = "High dose - monitor for toxicity";
+"warning_low_clearance" = "Low clearance - consider dose reduction";
+"warning_renal_impairment" = "Renal impairment detected";
+"warning_elderly_patient" = "Elderly patient - increased monitoring recommended";
+"warning_pediatric_weight" = "Weight outside normal range for age";
+"warning_neonatal_maturation" = "Consider organ maturation in dosing";
+
+// MARK: - Validation Errors
+"error_required_field" = "This field is required";
+"error_invalid_age" = "Please enter a valid age";
+"error_invalid_weight" = "Please enter a valid weight";
+"error_invalid_height" = "Please enter a valid height";
+"error_invalid_creatinine" = "Please enter a valid creatinine value";
+"error_age_range" = "Age must be between %@ and %@";
+"error_weight_range" = "Weight must be between %@ and %@";
+"error_height_range" = "Height must be between %@ and %@";
+"error_creatinine_range" = "Creatinine must be between %@ and %@";
+
+// MARK: - Units
+"unit_years" = "years";
+"unit_months" = "months";
+"unit_weeks" = "weeks";
+"unit_days" = "days";
+"unit_kg" = "kg";
+"unit_lbs" = "lbs";
+"unit_cm" = "cm";
+"unit_inches" = "inches";
+"unit_mg_dl" = "mg/dL";
+"unit_umol_l" = "μmol/L";
+"unit_mg" = "mg";
+"unit_mg_kg" = "mg/kg";
+"unit_hours" = "hours";
+"unit_ml_min" = "mL/min";
+"unit_l_h" = "L/h";
+"unit_l" = "L";
+"unit_mg_l" = "mg/L";
+"unit_mg_h_l" = "mg·h/L";
+
+// MARK: - Settings
+"settings" = "Settings";
+"preferences" = "Preferences";
+"language" = "Language";
+"appearance" = "Appearance";
+"units" = "Units";
+"clinical_preferences" = "Clinical Preferences";
+"default_population" = "Default Population";
+"default_crcl_method" = "Default CrCl Method";
+"show_clinical_warnings" = "Show Clinical Warnings";
+"auto_save_calculations" = "Auto-save Calculations";
+"privacy_analytics" = "Privacy & Analytics";
+"usage_analytics" = "Usage Analytics";
+"crash_reporting" = "Crash Reporting";
+"export_data" = "Export My Data";
+"delete_all_data" = "Delete All Data";
+"accessibility" = "Accessibility";
+"enhanced_voiceover" = "Enhanced VoiceOver";
+"high_contrast" = "High Contrast Mode";
+"reduce_motion" = "Reduce Motion";
+"text_size" = "Text Size";
+
+// MARK: - Legal
+"privacy_policy" = "Privacy Policy";
+"terms_of_use" = "Terms of Use";
+"eula_title" = "End User License Agreement";
+"eula_accept" = "I Accept";
+"eula_decline" = "Decline";
+"medical_disclaimer" = "Medical Disclaimer";
+
+// MARK: - Support
+"help_tutorial" = "Help & Tutorial";
+"contact_support" = "Contact Support";
+"rate_app" = "Rate Vancomyzer";
+"share_app" = "Share Vancomyzer";
+"open_source_licenses" = "Open Source Licenses";
+
+// MARK: - About
+"about_vancomyzer" = "About Vancomyzer";
+"version" = "Version";
+"build" = "Build";
+"last_updated" = "Last Updated";
+"development_team" = "Development Team";
+"clinical_references" = "Clinical References";
+"credits" = "Credits";
+
+// MARK: - Actions
+"calculate" = "Calculate";
+"calculate_dosing" = "Calculate Dosing";
+"recalculate" = "Recalculate";
+"reset" = "Reset";
+"save" = "Save";
+"cancel" = "Cancel";
+"done" = "Done";
+"close" = "Close";
+"edit" = "Edit";
+"delete" = "Delete";
+"export" = "Export";
+"share" = "Share";
+"copy" = "Copy";
+"retry" = "Try Again";
+"continue" = "Continue";
+"back" = "Back";
+"next" = "Next";
+"skip" = "Skip";
+"learn_more" = "Learn More";
+
+// MARK: - Status Messages
+"calculating" = "Calculating...";
+"optimizing" = "Optimizing...";
+"loading" = "Loading...";
+"saving" = "Saving...";
+"exporting" = "Exporting...";
+"calculation_complete" = "Calculation Complete";
+"optimization_complete" = "Optimization Complete";
+"data_saved" = "Data Saved";
+"data_exported" = "Data Exported";
+"copied_to_clipboard" = "Copied to Clipboard";
+
+// MARK: - Error Messages
+"error_calculation_failed" = "Calculation Failed";
+"error_optimization_failed" = "Optimization Failed";
+"error_network_unavailable" = "Network Unavailable";
+"error_data_corrupted" = "Data Corrupted";
+"error_export_failed" = "Export Failed";
+"error_generic" = "An error occurred. Please try again.";
+
+// MARK: - Guidelines
+"guidelines_adult" = "Adult Guidelines";
+"guidelines_pediatric" = "Pediatric Guidelines";
+"guidelines_neonatal" = "Neonatal Guidelines";
+"guidelines_monitoring" = "Monitoring Guidelines";
+"guidelines_safety" = "Safety Guidelines";
+
+// MARK: - History
+"calculation_history" = "Calculation History";
+"no_calculations" = "No Calculations";
+"no_calculations_message" = "Your calculation history will appear here";
+"clear_history" = "Clear History";
+"export_history" = "Export History";
+
+// MARK: - Accessibility Labels
+"accessibility_age_input" = "Enter patient age";
+"accessibility_weight_input" = "Enter patient weight";
+"accessibility_height_input" = "Enter patient height";
+"accessibility_creatinine_input" = "Enter serum creatinine";
+"accessibility_calculate_button" = "Calculate vancomycin dosing";
+"accessibility_population_picker" = "Select patient population";
+"accessibility_gender_picker" = "Select patient gender";
+"accessibility_indication_picker" = "Select infection indication";
+"accessibility_severity_picker" = "Select infection severity";
+
+// MARK: - Accessibility Hints
+"accessibility_hint_required" = "This field is required";
+"accessibility_hint_optional" = "This field is optional";
+"accessibility_hint_calculation" = "Tap to calculate dosing recommendation";
+"accessibility_hint_navigation" = "Navigate to %@";
+
+// MARK: - Clinical Content
+"clinical_note_auc_targeting" = "AUC₀₋₂₄ targeting is recommended over trough-based dosing";
+"clinical_note_loading_dose" = "Loading dose recommended for severe infections";
+"clinical_note_renal_adjustment" = "Dose adjustment required for renal impairment";
+"clinical_note_pediatric_weight" = "Weight-based dosing for pediatric patients";
+"clinical_note_neonatal_maturation" = "Consider organ maturation in neonatal dosing";
+
+// MARK: - Tutorial
+"tutorial_welcome" = "Welcome to Vancomyzer Tutorial";
+"tutorial_patient_input" = "Patient Information Entry";
+"tutorial_calculation" = "Dosing Calculation";
+"tutorial_bayesian" = "Bayesian Optimization";
+"tutorial_results" = "Understanding Results";
+"tutorial_monitoring" = "Monitoring Guidelines";
+"tutorial_complete" = "Tutorial Complete";
+
+// MARK: - Feature Descriptions
+"feature_evidence_based" = "Evidence-Based Algorithms";
+"feature_evidence_based_desc" = "Built on ASHP/IDSA 2020 guidelines for optimal patient outcomes";
+"feature_bayesian" = "Bayesian Optimization";
+"feature_bayesian_desc" = "Personalized dosing using patient-specific pharmacokinetic parameters";
+"feature_multi_population" = "Multi-Population Support";
+"feature_multi_population_desc" = "Specialized algorithms for adult, pediatric, and neonatal patients";
+"feature_auc_targeting" = "AUC₀₋₂₄ Targeting";
+"feature_auc_targeting_desc" = "Modern AUC-guided dosing for improved efficacy and safety";
+"feature_clinical_validation" = "Clinical Validation";
+"feature_clinical_validation_desc" = "Real-time safety checks and clinical plausibility validation";
+"feature_privacy" = "Privacy-First Design";
+"feature_privacy_desc" = "All patient data remains secure on your device";
+
+// MARK: - Confirmation Messages
+"confirm_delete_calculation" = "Delete this calculation?";
+"confirm_clear_history" = "Clear all calculation history?";
+"confirm_delete_all_data" = "Delete all app data? This cannot be undone.";
+"confirm_reset_settings" = "Reset all settings to defaults?";
+
+// MARK: - Success Messages
+"success_calculation_saved" = "Calculation saved successfully";
+"success_data_exported" = "Data exported successfully";
+"success_settings_saved" = "Settings saved successfully";
+"success_feedback_sent" = "Feedback sent successfully";
+
