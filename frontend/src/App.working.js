@@ -115,6 +115,12 @@ function App() {
                 disabled={!dosingResult}
               />
               <Tab 
+                icon={<Science />} 
+                label="PK Visualization" 
+                iconPosition="start"
+                disabled={!dosingResult}
+              />
+              <Tab 
                 icon={<Info />} 
                 label="Clinical Info" 
                 iconPosition="start"
