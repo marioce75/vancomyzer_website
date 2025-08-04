@@ -282,6 +282,23 @@ function App() {
 
           {activeTab === 2 && (
             <Box sx={{ p: 3 }}>
+              {dosingResult ? (
+                <PKVisualization
+                  dosingResult={dosingResult}
+                  bayesianResult={null}
+                  realTimeData={null}
+                  patient={patient}
+                />
+              ) : (
+                <Typography color="text.secondary" align="center">
+                  Please calculate dosing first to view visualizations.
+                </Typography>
+              )}
+            </Box>
+          )}
+
+          {activeTab === 3 && (
+            <Box sx={{ p: 3 }}>
               <Typography variant="h5" gutterBottom>
                 Clinical Information
               </Typography>
