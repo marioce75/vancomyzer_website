@@ -1,13 +1,16 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @EnvironmentObject var userPreferences: UserPreferences
-    @Environment(\.presentationMode) var presentationMode
-    @State private var showingPrivacyPolicy = false
-    @State private var showingEULA = false
-    @State private var showingAbout = false
+    @StateObject private var userPreferences = UserPreferences()
+    @StateObject private var analyticsManager = AnalyticsManager.shared
+    @StateObject private var featureFlags = FeatureFlagManager.shared
+    @StateObject private var tutorialManager = TutorialManager.shared
+    
+    @State private var showingResetAlert = false
     @State private var showingExportData = false
-    @State private var showingDeleteConfirmation = false
+    @State private var showingDeleteDataAlert = false
+    @State private var showingAbout = false
+    @State private var showingTutorial = false
     
     var body: some View {
         NavigationView {
