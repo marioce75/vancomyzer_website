@@ -157,13 +157,10 @@ class VancomyzerBackendTester:
         
         try:
             patient_data = self.get_sample_patient_data()
-            simulation_data = {
-                "patient": patient_data,
-                "dose": 1000.0,
-                "interval": 12.0
-            }
+            # The API expects patient data directly with dose and interval as query params
+            params = {"dose": 1000.0, "interval": 12.0}
             
-            response = self.session.post(f"{self.api_url}/pk-simulation", json=simulation_data)
+            response = self.session.post(f"{self.api_url}/pk-simulation", json=patient_data, params=params)
             
             if response.status_code == 200:
                 data = response.json()
