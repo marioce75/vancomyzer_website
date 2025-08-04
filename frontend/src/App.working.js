@@ -283,15 +283,17 @@ function App() {
           {activeTab === 2 && (
             <Box sx={{ p: 3 }}>
               {dosingResult ? (
-                <PKVisualization
+                <InteractiveAUCVisualization
                   dosingResult={dosingResult}
-                  bayesianResult={null}
-                  realTimeData={null}
                   patient={patient}
+                  onParameterChange={(params) => {
+                    console.log('Real-time parameter change:', params);
+                    // Could update state or trigger re-calculations here
+                  }}
                 />
               ) : (
                 <Typography color="text.secondary" align="center">
-                  Please calculate dosing first to view visualizations.
+                  Please calculate dosing first to view interactive AUC visualization.
                 </Typography>
               )}
             </Box>
