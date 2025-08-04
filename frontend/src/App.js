@@ -24,12 +24,12 @@ import {
 } from '@mui/icons-material';
 
 import PatientInputForm from './components/PatientInputForm';
-import PKVisualization from './components/PKVisualization';
+import PKVisualization from './components/PKVisualization.simple';
 import BayesianOptimization from './components/BayesianOptimization';
 import DosingResults from './components/DosingResults';
 import CalculationExplanation from './components/CalculationExplanation';
 import ClinicalGuidelines from './components/ClinicalGuidelines';
-import RealTimeCalculator from './components/RealTimeCalculator';
+import RealTimeCalculator from './components/RealTimeCalculator.simple';
 import { vancomyzerAPI } from './services/api';
 import './App.css';
 
