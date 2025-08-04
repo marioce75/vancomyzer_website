@@ -57,7 +57,7 @@ export const vancomyzerAPI = {
 
   // Calculate vancomycin dosing
   calculateDosing: async (patientData) => {
-    const response = await api.post('/api/calculate-dosing', patientData);
+    const response = await api.post('/api/calculate_dose', patientData);
     return response.data;
   },
 
