@@ -225,12 +225,13 @@ class VancomyzerBackendTester:
                 }
             ]
             
-            # The API expects patient data and levels as separate parameters
-            bayesian_data = patient_data.copy()
+            # FastAPI expects multiple body parameters in this format
+            bayesian_data = {
+                "patient": patient_data,
+                "levels": levels
+            }
             
-            response = self.session.post(f"{self.api_url}/bayesian-optimization", 
-                                       json=bayesian_data, 
-                                       params={"levels": json.dumps(levels)})
+            response = self.session.post(f"{self.api_url}/bayesian-optimization", json=bayesian_data)
             
             if response.status_code == 200:
                 data = response.json()
