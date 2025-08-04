@@ -116,7 +116,7 @@ function App() {
               />
               <Tab 
                 icon={<Science />} 
-                label="PK Visualization" 
+                label="Interactive AUC" 
                 iconPosition="start"
                 disabled={!dosingResult}
               />
