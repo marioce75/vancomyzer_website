@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1976d2" />
+    <meta
+      name="description"
+      content="Vancomyzer - Interactive evidence-based vancomycin dosing calculator following ASHP/IDSA 2020 guidelines. Real-time AUC visualization and Bayesian optimization for healthcare professionals."
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN for better performance -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <title>Vancomyzer - Interactive Vancomycin Dosing Calculator</title>
+    
+    <!-- SEO and Social Media Meta Tags -->
+    <meta property="og:title" content="Vancomyzer - Evidence-Based Vancomycin Dosing Calculator" />
+    <meta property="og:description" content="Interactive web application for calculating evidence-based vancomycin dosing following ASHP/IDSA 2020 guidelines. Features real-time AUC visualization and Bayesian optimization." />
+    <meta property="og:image" content="%PUBLIC_URL%/og-image.jpg" />
+    <meta property="og:url" content="https://vancomyzer.com" />
+    <meta property="og:type" content="website" />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Vancomyzer - Interactive Vancomycin Dosing Calculator" />
+    <meta name="twitter:description" content="Evidence-based vancomycin dosing with real-time visualization and Bayesian optimization." />
+    <meta name="twitter:image" content="%PUBLIC_URL%/twitter-image.jpg" />
+    
+    <!-- Medical App Specific Meta Tags -->
+    <meta name="keywords" content="vancomycin, dosing, calculator, ASHP, IDSA, 2020, guidelines, pharmacokinetics, AUC, Bayesian, optimization, healthcare, clinical, pharmacy, antimicrobial" />
+    <meta name="author" content="Vancomyzer Development Team" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="Vancomyzer" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Vancomyzer" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-config" content="%PUBLIC_URL%/browserconfig.xml" />
+    <meta name="msapplication-TileColor" content="#1976d2" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" />
+    
+    <!-- Structured Data for Medical Application -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Vancomyzer",
+      "description": "Interactive evidence-based vancomycin dosing calculator following ASHP/IDSA 2020 guidelines",
+      "url": "https://vancomyzer.com",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Vancomyzer Development Team"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Vancomyzer"
+      },
+      "medicalSpecialty": [
+        "Clinical Pharmacy",
+        "Infectious Diseases",
+        "Critical Care"
+      ]
+    }
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <div style="padding: 20px; text-align: center; background-color: #f8f9fa; border: 1px solid #dee2e6; margin: 20px; border-radius: 8px;">
+        <h2>JavaScript Required</h2>
+        <p>Vancomyzer requires JavaScript to function properly. Please enable JavaScript in your browser to use this clinical decision support tool.</p>
+        <p>This application provides evidence-based vancomycin dosing calculations following ASHP/IDSA 2020 guidelines and requires interactive features that depend on JavaScript.</p>
+      </div>
+    </noscript>
+    <div id="root"></div>
+    
+    <!-- Loading Indicator -->
+    <style>
+      .loading-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+        font-family: 'Roboto', sans-serif;
+      }
+      
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255,255,255,0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .loading-text {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      
+      .loading-subtitle {
+        font-size: 14px;
+        opacity: 0.8;
+      }
+      
+      /* Hide loading when app loads */
+      .app-loaded .loading-container {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+    </style>
+    
+    <div class="loading-container" id="loading-container">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading Vancomyzer</div>
+      <div class="loading-subtitle">Evidence-based vancomycin dosing calculator</div>
+    </div>
+    
+    <script>
+      // Hide loading screen when React app loads
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          document.body.classList.add('app-loaded');
+          setTimeout(function() {
+            const loadingContainer = document.getElementById('loading-container');
+            if (loadingContainer) {
+              loadingContainer.remove();
+            }
+          }, 500);
+        }, 1000);
+      });
+      
+      // Error handling for failed loads
+      window.addEventListener('error', function(e) {
+        console.error('Application error:', e.error);
+        // Could add error reporting here
+      });
+    </script>
+  </body>
+</html>
