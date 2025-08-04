@@ -22,6 +22,7 @@ import {
 } from '@mui/icons-material';
 
 import PatientInputForm from './components/PatientInputForm';
+import PKVisualization from './components/PKVisualization.enhanced';
 import { vancomyzerAPI, formatPatientForAPI } from './services/api';
 import './App.css';
 
