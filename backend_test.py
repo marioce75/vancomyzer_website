@@ -157,14 +157,10 @@ class VancomyzerBackendTester:
         
         try:
             patient_data = self.get_sample_patient_data()
-            # FastAPI expects multiple body parameters in this format
-            simulation_data = {
-                "patient": patient_data,
-                "dose": 1000.0,
-                "interval": 12.0
-            }
+            # Try with query parameters as the error suggests
+            params = {"dose": 1000.0, "interval": 12.0}
             
-            response = self.session.post(f"{self.api_url}/pk-simulation", json=simulation_data)
+            response = self.session.post(f"{self.api_url}/pk-simulation", json=patient_data, params=params)
             
             if response.status_code == 200:
                 data = response.json()
