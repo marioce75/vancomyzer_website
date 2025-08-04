@@ -221,12 +221,12 @@ class VancomyzerBackendTester:
                 }
             ]
             
-            bayesian_data = {
-                **patient_data,
-                "levels": levels
-            }
+            # The API expects patient data and levels as separate parameters
+            bayesian_data = patient_data.copy()
             
-            response = self.session.post(f"{self.api_url}/bayesian-optimization", json=bayesian_data)
+            response = self.session.post(f"{self.api_url}/bayesian-optimization", 
+                                       json=bayesian_data, 
+                                       params={"levels": json.dumps(levels)})
             
             if response.status_code == 200:
                 data = response.json()
