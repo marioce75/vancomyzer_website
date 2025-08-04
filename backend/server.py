@@ -92,7 +92,7 @@ class VancomycinLevel(BaseModel):
     time_after_dose_hours: float = Field(..., gt=0, le=72)
     dose_given_mg: float = Field(..., gt=0, le=4000)
     infusion_duration_hours: Optional[float] = Field(1.0, gt=0, le=24)
-    level_type: str = Field("trough", regex="^(trough|peak|random)$")
+    level_type: str = Field("trough", pattern="^(trough|peak|random)$")
     draw_time: datetime
     notes: Optional[str] = None
 
