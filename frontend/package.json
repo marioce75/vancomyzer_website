@@ -4,28 +4,28 @@
   "description": "Interactive web version of Vancomyzer - Evidence-based vancomycin dosing calculator",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4",
-    "axios": "^1.5.0",
-    "chart.js": "^4.4.0",
-    "react-chartjs-2": "^5.2.0",
-    "plotly.js": "^2.27.0",
-    "react-plotly.js": "^2.6.0",
-    "recharts": "^2.8.0",
-    "@mui/material": "^5.14.0",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.0",
     "@mui/lab": "^5.0.0-alpha.140",
+    "@mui/material": "^5.14.0",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.5.0",
+    "chart.js": "^4.4.0",
     "date-fns": "^2.30.0",
     "lodash": "^4.17.21",
+    "plotly.js": "^2.27.0",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.15.0",
-    "uuid": "^9.0.0"
+    "react-scripts": "5.0.1",
+    "recharts": "^2.8.0",
+    "uuid": "^9.0.0",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -51,5 +51,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:8001"
+  "proxy": "http://localhost:8001",
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
 }
