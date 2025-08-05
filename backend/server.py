@@ -28,7 +28,13 @@ app.add_middleware(
 )
 
 # Serve static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+import os
+from pathlib import Path
+
+# Path to backend/static relative to project root
+static_path = Path(__file__).parent / "static"
+
+app.mount("/static", StaticFiles(directory=static_path), name="static")
 
 # Data Models
 class PopulationType(str, Enum):
