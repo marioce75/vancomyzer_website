@@ -51,19 +51,19 @@ api.interceptors.response.use(
 export const vancomyzerAPI = {
   // Health check
   healthCheck: async () => {
-    const response = await api.get('/api/health');
+    const response = await api.get('/health');
     return response.data;
   },
 
   // Calculate vancomycin dosing
   calculateDosing: async (patientData) => {
-    const response = await api.post('/api/calculate_dose', patientData);
+    const response = await api.post('/calculate_dose', patientData);
     return response.data;
   },
 
   // Bayesian optimization
   bayesianOptimization: async (patientData, levels) => {
-    const response = await api.post('/api/bayesian-optimization', {
+    const response = await api.post('/bayesian-optimization', {
       ...patientData,
       levels
     });
@@ -72,7 +72,7 @@ export const vancomyzerAPI = {
 
   // PK simulation
   pkSimulation: async (patientData, dose, interval) => {
-    const response = await api.post('/api/pk-simulation', {
+    const response = await api.post('/pk-simulation', {
       patient: patientData,
       dose,
       interval
@@ -82,7 +82,7 @@ export const vancomyzerAPI = {
 
   // Real-time calculation (for fallback if WebSocket fails)
   realTimeCalculation: async (patientData, dose, interval) => {
-    const response = await api.post('/api/pk-simulation', {
+    const response = await api.post('/pk-simulation', {
       patient: patientData,
       dose,
       interval
