@@ -21,7 +21,6 @@ import {
 import {
   Person,
   Calculate,
-  Warning,
   Info,
   ExpandMore,
   ExpandLess
@@ -55,6 +54,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
   useEffect(() => {
     validateForm();
     calculateEstimatedCrCl();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patient]);
 
   const validateForm = () => {
