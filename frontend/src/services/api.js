@@ -16,25 +16,28 @@ function sanitizeForApi(payload) {
   const p = { ...payload };
 
   // Normalize enum-ish strings
-  ['population_type', 'sex', 'indication', 'infection_severity'].forEach((k) => {
+  ['population_type', 'sex', 'gender', 'indication', 'severity', 'infection_severity'].forEach((k) => {
     if (typeof p[k] === 'string') {
       p[k] = p[k].trim().toLowerCase();
       if (p[k] === '') delete p[k];
     }
   });
 
-  // Map legacy aliases if present
-  if (p.serum_creatinine != null && p.serum_creatinine_mgdl == null) {
-    const n = Number(p.serum_creatinine);
-    if (!Number.isNaN(n)) p.serum_creatinine_mgdl = n;
-    delete p.serum_creatinine;
+  // Map legacy aliases before numeric coercion
+  if (p.gender != null && p.sex == null) {
+    p.sex = String(p.gender).toLowerCase();
+    delete p.gender;
+  }
+  if (p.infection_severity != null && p.severity == null) {
+    p.severity = p.infection_severity;
+    delete p.infection_severity;
   }
 
   // Coerce numeric fields and drop blanks
   [
     'age_years','age_months','gestational_age_weeks','postnatal_age_days',
-    'weight_kg','height_cm','serum_creatinine_mgdl','creatinine_clearance',
-    'target_auc_min','target_auc_max'
+    'weight_kg','height_cm','serum_creatinine','custom_crcl',
+    'creatinine_clearance','target_auc_min','target_auc_max'
   ].forEach((k) => {
     if (p[k] === '' || p[k] == null) { delete p[k]; return; }
     const n = Number(p[k]);
