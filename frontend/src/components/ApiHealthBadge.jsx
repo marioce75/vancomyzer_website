@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Chip, Box } from "@mui/material";
+import { getHealth } from "../api";
 
 const ApiHealthBadge = () => {
   const [apiStatus, setApiStatus] = useState("checking");
 
   useEffect(() => {
-    const API_URL = process.env.REACT_APP_API_URL || "/api";
-    fetch(`${API_URL}/health`)
-      .then((res) => res.json())
+    getHealth()
       .then((data) => {
         if (data.status === "healthy") {
           setApiStatus("healthy");
