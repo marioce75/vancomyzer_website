@@ -1,10 +1,14 @@
 import axios from 'axios';
 
 // API configuration
-const API_BASE_URL = process.env.REACT_APP_API_BASE || '';
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL ||
+  (typeof window !== 'undefined' ? window.location.origin : '') ||
+  '';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: false,
   timeout: 30000,
   headers: { 'Content-Type': 'application/json' },
 });

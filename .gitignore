@@ -2,36 +2,70 @@
 .DS_Store
 
 # Python (backend)
+# Virtual environments
+.venv/
 backend/.venv/
 venv/
 ENV/
 env/
+
+# Byte-compiled / compiled / C extensions
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.egg-info/
-.eggs/
-pip-wheel-metadata/
-dist/
+*$py.class
+*.so
+
+# Distribution / packaging
 build/
-.mypy_cache/
+dist/
+.eggs/
+*.egg-info/
+pip-wheel-metadata/
+
+# Unit test / coverage reports
 .pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.hypothesis/
+
+# Type checkers
+.mypy_cache/
+.pyre/
+.pytype/
+
+# Logs and environment files
 *.log
 .env
+.env.*
 
 # Node / React (frontend)
+# Dependencies and build outputs
+node_modules/
 frontend/node_modules/
 frontend/build/
 frontend/.cache/
+
+# Logs
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files (keep production env for frontend tracked)
 frontend/.env*
 !frontend/.env.production
+
 # IMPORTANT: do NOT ignore the public folder so manifest.json can be tracked
 # (no rule for frontend/public or public should appear here)
 
 # IDE/Editor
 .vscode/
 .idea/
+*.swp
+*.swo

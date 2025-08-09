@@ -19,9 +19,20 @@ app = FastAPI(
 )
 
 # CORS middleware for web frontend
+origins = [
+    "https://vancomyzer.com",
+    "https://www.vancomyzer.com",
+    "https://vancomyzer-web.onrender.com",
+    "https://vancomyzer-static.onrender.com",
+    # existing local dev origins
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://vancomyzer.com", "http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
