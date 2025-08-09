@@ -33,6 +33,12 @@
   text-decoration:underline;
 }
 
+.clinical-disclaimer__header{
+  display:flex;
+  align-items:center;
+  margin-bottom:8px;
+}
+
 @media (prefers-contrast: more){
   .clinical-disclaimer{
     border-width:2px;
