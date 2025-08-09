@@ -10,42 +10,59 @@ const api = axios.create({
 });
 
 // --- helpers ---------------------------------------------------------------
-// Remove empty strings/nulls, coerce numbers, normalize enums,
+// Remove empty strings/nulls, coerce numbers/booleans, normalize enums,
 // and map any legacy field names to the backend’s schema.
 function sanitizeForApi(payload) {
   const p = { ...payload };
 
-  // Normalize enum-ish strings
-  ['population_type', 'sex', 'gender', 'indication', 'severity', 'infection_severity'].forEach((k) => {
+  // Bring common aliases/variants onto the expected keys
+  if (!p.gender) {
+    const g = (p.gender ?? p.sex ?? p.Gender ?? p.Sex ?? '')
+      .toString()
+      .trim()
+      .toLowerCase();
+    if (g) p.gender = g;
+  }
+  if (p.gender === 'm') p.gender = 'male';
+  if (p.gender === 'f') p.gender = 'female';
+
+  // Normalize string enums and drop empties
+  ['gender', 'severity', 'population_type', 'indication', 'crcl_method'].forEach((k) => {
     if (typeof p[k] === 'string') {
-      p[k] = p[k].trim().toLowerCase();
+      p[k] = p[k].trim();
       if (p[k] === '') delete p[k];
+      else p[k] = p[k].toLowerCase();
     }
   });
 
-  // Map legacy aliases before numeric coercion
-  if (p.gender != null && p.sex == null) {
-    p.sex = String(p.gender).toLowerCase();
-    delete p.gender;
-  }
-  if (p.infection_severity != null && p.severity == null) {
-    p.severity = p.infection_severity;
-    delete p.infection_severity;
-  }
+  // Coerce booleans that may arrive as strings
+  ['is_renal_stable', 'is_on_hemodialysis', 'is_on_crrt'].forEach((k) => {
+    if (typeof p[k] === 'string') {
+      p[k] = p[k].toLowerCase() === 'true';
+    }
+  });
 
-  // Coerce numeric fields and drop blanks
+  // Coerce numeric fields and drop blanks (include custom_crcl!)
   [
-    'age_years','age_months','gestational_age_weeks','postnatal_age_days',
-    'weight_kg','height_cm','serum_creatinine','custom_crcl',
-    'creatinine_clearance','target_auc_min','target_auc_max'
+    'age_years',
+    'age_months',
+    'gestational_age_weeks',
+    'postnatal_age_days',
+    'weight_kg',
+    'height_cm',
+    'serum_creatinine',
+    'custom_crcl',
   ].forEach((k) => {
     if (p[k] === '' || p[k] == null) { delete p[k]; return; }
     const n = Number(p[k]);
-    if (!Number.isNaN(n)) p[k] = n;
+    if (Number.isNaN(n)) delete p[k];
+    else p[k] = n;
   });
 
-  // Adults should not send age_months
-  if (p.population_type === 'adult') delete p.age_months;
+  // Final guard: backend needs a valid gender
+  if (!p.gender || !['male', 'female'].includes(p.gender)) {
+    throw new Error('Please select Gender (male or female).');
+  }
 
   return p;
 }
@@ -113,9 +130,14 @@ export const vancomyzerAPI = {
 
   // Calculate vancomycin dosing
   calculateDosing: async (patientData) => {
-    const payload = sanitizeForApi(formatPatientForAPI(patientData));
-    const response = await api.post('/api/calculate-dosing', payload);
-    return response.data;
+    try {
+      const payload = sanitizeForApi(formatPatientForAPI(patientData));
+      const response = await api.post('/api/calculate-dosing', payload);
+      return response.data;
+    } catch (error) {
+      console.error('Error in calculateDosing:', error);
+      throw error;
+    }
   },
 
   // Bayesian optimization

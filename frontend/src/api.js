@@ -21,7 +21,24 @@ async function postJSON(path, payload) {
   return body;
 }
 
+// Update calculateDosing to include gender normalization and validation
 export function calculateDosing(payload) {
+  // Normalize gender and severity
+  payload.gender = (payload.gender ?? payload.sex)?.toLowerCase().trim();
+  payload.severity = payload.severity?.toLowerCase().trim();
+
+  // Pre-submit guard for gender
+  if (!payload.gender) {
+    throw new Error('Gender is required and must be either "male" or "female".');
+  }
+
+  // Coerce numeric fields
+  ['age_years', 'weight_kg', 'height_cm', 'serum_creatinine'].forEach((key) => {
+    if (payload[key] !== undefined) {
+      payload[key] = Number(payload[key]);
+    }
+  });
+
   return postJSON('/api/calculate-dosing', payload);
 }
 
