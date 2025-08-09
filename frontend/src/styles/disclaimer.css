@@ -1,0 +1,40 @@
+:root{
+  --disc-bg:#F5FAFF;         /* calm blue */
+  --disc-border:#BFDBFE;
+  --disc-heading:#0F172A;    /* slate-900 */
+  --disc-text:#1F2937;       /* slate-800 */
+  --disc-icon:#2563EB;       /* blue-600 */
+}
+
+.clinical-disclaimer{
+  background:var(--disc-bg);
+  border:1px solid var(--disc-border);
+  color:var(--disc-text);
+  border-radius:12px;
+  padding:16px 20px;
+  line-height:1.45;
+}
+
+.clinical-disclaimer__title{
+  margin:0 0 8px 0;
+  color:var(--disc-heading);
+  font-weight:600;
+  font-size:1rem;
+}
+
+.clinical-disclaimer__icon{
+  color:var(--disc-icon);
+  margin-right:8px;
+  flex:0 0 auto;
+}
+
+.clinical-disclaimer a{
+  color:var(--disc-icon);
+  text-decoration:underline;
+}
+
+@media (prefers-contrast: more){
+  .clinical-disclaimer{
+    border-width:2px;
+  }
+}

@@ -11,6 +11,7 @@ import DosingResults from './components/DosingResults';
 import InteractiveAUCVisualization from './components/InteractiveAUCVisualization';
 import ClinicalInfo from './components/ClinicalInfo';
 import ApiHealthBadge from './components/ApiHealthBadge';
+import './styles/disclaimer.css';
 
 function App() {
   return (

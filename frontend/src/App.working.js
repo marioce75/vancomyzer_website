@@ -25,6 +25,7 @@ import PatientInputForm from './components/PatientInputForm';
 import InteractiveAUCVisualization from './components/InteractiveAUCVisualization';
 import { vancomyzerAPI, formatPatientForAPI } from './services/api';
 import './App.css';
+import './styles/disclaimer.css';
 
 function App() {
   const [activeTab, setActiveTab] = useState(0);
@@ -321,21 +322,17 @@ function App() {
         </Paper>
 
         {/* Clinical Disclaimer */}
-        <Card sx={{ mt: 3, bgcolor: 'warning.light' }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <Warning sx={{ mr: 1, color: 'warning.dark' }} />
-              <Typography variant="h6" color="warning.dark">
-                Clinical Disclaimer
-              </Typography>
-            </Box>
-            <Typography variant="body2" color="warning.dark">
-              Vancomyzer is intended for use by qualified healthcare professionals as a clinical 
-              decision support tool. All dosing recommendations should be reviewed by appropriate 
-              clinical staff and adjusted based on patient-specific factors and clinical judgment.
-            </Typography>
-          </CardContent>
-        </Card>
+        <div className="clinical-disclaimer" style={{ marginTop: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+            <Warning className="clinical-disclaimer__icon" />
+            <h4 className="clinical-disclaimer__title">Clinical Disclaimer</h4>
+          </div>
+          <p>
+            Vancomyzer is intended for use by qualified healthcare professionals as a clinical 
+            decision support tool. All dosing recommendations should be reviewed by appropriate 
+            clinical staff and adjusted based on patient-specific factors and clinical judgment.
+          </p>
+        </div>
 
         {/* Footer */}
         <Box sx={{ mt: 4, py: 3, textAlign: 'center', borderTop: 1, borderColor: 'divider' }}>
