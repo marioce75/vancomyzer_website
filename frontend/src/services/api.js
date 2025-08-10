@@ -1,5 +1,11 @@
 import axios from 'axios';
 
+// Define API base that works with Vite env, window override, and defaults to current origin /api
+const API_BASE =
+  (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_BASE_URL)
+    || (window?.VANCOMYZER_API_BASE_URL)
+    || `${window.location.origin.replace(/\/$/, "")}/api`;
+
 // API configuration
 const API_BASE_URL =
   process.env.REACT_APP_API_BASE_URL ||
@@ -128,7 +134,7 @@ api.interceptors.response.use(
 export const vancomyzerAPI = {
   // Health check
   healthCheck: async () => {
-    const response = await api.get('/api/health'); // fixed prefix
+    const response = await api.get(`${API_BASE}/health`);
     return response.data;
   },
 
@@ -136,7 +142,7 @@ export const vancomyzerAPI = {
   calculateDosing: async (patientData) => {
     try {
       const payload = sanitizeForApi(formatPatientForAPI(patientData));
-      const response = await api.post('/api/calculate-dosing', payload);
+      const response = await api.post(`${API_BASE}/calculate-dosing`, payload);
       return response.data;
     } catch (error) {
       console.error('Error in calculateDosing:', error);
@@ -147,21 +153,21 @@ export const vancomyzerAPI = {
   // Bayesian optimization
   bayesianOptimization: async (patientData, levels) => {
     const payload = sanitizeForApi({ ...formatPatientForAPI(patientData), levels });
-    const response = await api.post('/api/bayesian-optimization', payload);
+    const response = await api.post(`${API_BASE}/bayesian-optimization`, payload);
     return response.data;
   },
 
   // PK simulation
   pkSimulation: async (patientData, dose, interval) => {
     const payload = sanitizeForApi({ patient: formatPatientForAPI(patientData), dose, interval });
-    const response = await api.post('/api/pk-simulation', payload);
+    const response = await api.post(`${API_BASE}/pk-simulation`, payload);
     return response.data;
   },
 
   // Real-time calculation (fallback if WebSocket fails) — ensure /api prefix
   realTimeCalculation: async (patientData, dose, interval) => {
     const payload = sanitizeForApi({ patient: formatPatientForAPI(patientData), dose, interval });
-    const response = await api.post('/api/pk-simulation', payload);
+    const response = await api.post(`${API_BASE}/pk-simulation`, payload);
     return response.data;
   },
 };
