@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import InteractiveTutorial from './components/InteractiveTutorial';
 
 // Create custom theme for Vancomyzer
 const theme = createTheme({
@@ -135,7 +137,12 @@ root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <App />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/clinical-info/tutorial" element={<InteractiveTutorial />} />
+          <Route path="/*" element={<App />} />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   </React.StrictMode>
 );

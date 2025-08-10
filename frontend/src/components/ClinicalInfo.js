@@ -18,6 +18,9 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Alert from '@mui/material/Alert';
 import Tooltip from '@mui/material/Tooltip';
 import CircularProgress from '@mui/material/CircularProgress';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import { Link } from 'react-router-dom';
 
 // --- IMPORTANT: import the SAME API helpers the main app uses for dosing submissions.
 // Our app uses named exports { vancomyzerAPI, formatPatientForAPI } from '../services/api'
@@ -46,6 +49,21 @@ function bmi(kg, cm) {
 
 // ---------------- component ----------------
 export default function ClinicalInfo() {
+  // Tutorial entry card
+  const TutorialCard = (
+    <Card variant="outlined" sx={{ mb: 2, borderColor: 'primary.light' }}>
+      <CardContent>
+        <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>Interactive Tutorial</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Walk through vancomycin dosing concepts step-by-step with a self-contained, educational tutorial.
+        </Typography>
+        <Button component={Link} to="/clinical-info/tutorial" variant="contained" color="primary" aria-label="Open Interactive Tutorial">
+          Open Tutorial
+        </Button>
+      </CardContent>
+    </Card>
+  );
+
   // Patient demo inputs (kept simple for tutorial)
   const [sex, setSex] = useState('male');
   const [ageYears, setAgeYears] = useState(62);
@@ -151,6 +169,7 @@ export default function ClinicalInfo() {
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1100, mx: 'auto' }}>
+      {TutorialCard}
       <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
         Interactive Tutorial
       </Typography>
