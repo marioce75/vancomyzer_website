@@ -2,18 +2,16 @@ import axios from 'axios';
 
 // Define API base that works with Vite env, window override, and defaults to current origin /api
 const API_BASE =
-  (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_BASE_URL)
-    || (window?.VANCOMYZER_API_BASE_URL)
-    || `${window.location.origin.replace(/\/$/, "")}/api`;
+  (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
+  (window && window.VANCOMYZER_API_BASE_URL) ||
+  `${window.location.origin.replace(/\/$/, "")}/api`;
+// NOTE: VITE_API_BASE_URL MUST include "/api" and no trailing slash.
+
+console.info('API_BASE =', API_BASE);
 
 // API configuration
-const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL ||
-  (typeof window !== 'undefined' ? window.location.origin : '') ||
-  '';
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE,
   withCredentials: false,
   timeout: 30000,
   headers: { 'Content-Type': 'application/json' },
@@ -134,7 +132,7 @@ api.interceptors.response.use(
 export const vancomyzerAPI = {
   // Health check
   healthCheck: async () => {
-    const response = await api.get(`${API_BASE}/health`);
+    const response = await api.get(`/health`);
     return response.data;
   },
 
@@ -142,7 +140,7 @@ export const vancomyzerAPI = {
   calculateDosing: async (patientData) => {
     try {
       const payload = sanitizeForApi(formatPatientForAPI(patientData));
-      const response = await api.post(`${API_BASE}/calculate-dosing`, payload);
+      const response = await api.post(`/calculate-dosing`, payload);
       return response.data;
     } catch (error) {
       console.error('Error in calculateDosing:', error);
@@ -153,21 +151,21 @@ export const vancomyzerAPI = {
   // Bayesian optimization
   bayesianOptimization: async (patientData, levels) => {
     const payload = sanitizeForApi({ ...formatPatientForAPI(patientData), levels });
-    const response = await api.post(`${API_BASE}/bayesian-optimization`, payload);
+    const response = await api.post(`/bayesian-optimization`, payload);
     return response.data;
   },
 
   // PK simulation
   pkSimulation: async (patientData, dose, interval) => {
     const payload = sanitizeForApi({ patient: formatPatientForAPI(patientData), dose, interval });
-    const response = await api.post(`${API_BASE}/pk-simulation`, payload);
+    const response = await api.post(`/pk-simulation`, payload);
     return response.data;
   },
 
   // Real-time calculation (fallback if WebSocket fails) — ensure /api prefix
   realTimeCalculation: async (patientData, dose, interval) => {
     const payload = sanitizeForApi({ patient: formatPatientForAPI(patientData), dose, interval });
-    const response = await api.post(`${API_BASE}/pk-simulation`, payload);
+    const response = await api.post(`/pk-simulation`, payload);
     return response.data;
   },
 };
@@ -186,7 +184,9 @@ export class VancomyzerWebSocket {
   }
   connect() {
     try {
-      const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/realtime-calc`;
+      // Build WS URL from API_BASE so it works across domains
+      const wsBase = API_BASE.replace(/^http/i, "ws");
+      const wsUrl = `${wsBase}/ws/realtime-calc`;
       this.ws = new WebSocket(wsUrl);
       this.ws.onopen = () => { console.log('WebSocket connected'); this.reconnectAttempts = 0; this.onConnect?.(); };
       this.ws.onmessage = (event) => { try { const data = JSON.parse(event.data); this.onMessage?.(data); } catch (e) { console.error('WS parse error', e); } };
@@ -205,6 +205,9 @@ export class VancomyzerWebSocket {
     }
   }
 }
+
+// Debug/helper export
+export const getApiBase = () => API_BASE;
 
 // Error handling utilities (kept)
 export const handleAPIError = (error) => {
