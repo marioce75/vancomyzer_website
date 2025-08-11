@@ -1,11 +1,37 @@
 import axios from 'axios';
 
-// Define API base that works with Vite env, window override, and defaults to current origin /api
-const API_BASE =
-  (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
-  (window && window.VANCOMYZER_API_BASE_URL) ||
-  `${window.location.origin.replace(/\/$/, "")}/api`;
-// NOTE: VITE_API_BASE_URL MUST include "/api" and no trailing slash.
+// Define API base with priority and normalization
+// Priority:
+// 1) window.VANCOMYZER_API_BASE_URL
+// 2) process.env.REACT_APP_API_BASE
+// 3) import.meta.env.VITE_API_BASE_URL
+// 4) If hostname ends with "vancomyzer.com" => force Render URL
+// 5) Else => current origin
+const rawApiBase =
+  (typeof window !== 'undefined' && window.VANCOMYZER_API_BASE_URL) ||
+  (typeof process !== 'undefined' && process.env?.REACT_APP_API_BASE) ||
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) ||
+  (typeof window !== 'undefined' && window.location.hostname.endsWith('vancomyzer.com')
+    ? 'https://vancomyzer-web.onrender.com/api'
+    : (typeof window !== 'undefined' ? `${window.location.origin}` : ''));
+
+function normalizeApiBase(base) {
+  if (!base) return '';
+  let s = String(base).trim();
+  // Remove trailing slashes
+  s = s.replace(/\/+$/, '');
+  // Ensure it includes '/api' as a path segment
+  if (!/\/api(?:\/$|\/)/.test(s) && !s.endsWith('/api')) {
+    s = `${s}/api`;
+  }
+  // Remove any trailing slash after normalization
+  s = s.replace(/\/+$/, '');
+  return s;
+}
+
+const API_BASE = normalizeApiBase(rawApiBase);
+// NOTE: API_BASE MUST include "/api" and have no trailing slash.
+// Example: https://vancomyzer-web.onrender.com/api
 
 console.info('API_BASE =', API_BASE);
 
