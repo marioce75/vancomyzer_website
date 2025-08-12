@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, validator
@@ -133,6 +133,12 @@ class DosingResult(BaseModel):
     calculation_method: str
     pk_curve_data: List[Dict[str, float]]  # For visualization
     auc_breakdown: Dict[str, Any]  # Detailed AUC calculation
+    # Added anthropometrics
+    ibw_kg: Optional[float] = None
+    adjbw_kg: Optional[float] = None
+    bmi: Optional[float] = None
+    weight_for_cg_kg: Optional[float] = None
+    creatinine_clearance_ml_min: Optional[float] = None
 
 class BayesianResult(BaseModel):
     individual_clearance: float
@@ -145,11 +151,12 @@ class BayesianResult(BaseModel):
     predicted_auc_ci_upper: float
     predicted_trough_ci_lower: float
     predicted_trough_ci_upper: float
-    model_fit_r_squared: float
+    fit_r_squared: float = Field(..., alias="model_fit_r_squared")
     convergence_achieved: bool
     iterations_used: int
     individual_pk_curve: List[Dict[str, float]]
     population_pk_curve: List[Dict[str, float]]
+    model_config = {"populate_by_name": True}
 
 # Pharmacokinetic Calculation Engine
 class VancomycinPKCalculator:
@@ -242,11 +249,50 @@ class VancomycinPKCalculator:
             
         return max(gfr, 10.0)
     
+    # Anthropometric helpers
+    def cm_to_in(self, cm: float) -> float:
+        return cm / 2.54
+    def calc_ibw_kg(self, sex: Gender, height_cm: float) -> float:
+        inches_over_60 = max(0.0, self.cm_to_in(height_cm) - 60.0)
+        base = 45.5 if sex == Gender.female else 50.0
+        return base + 2.3 * inches_over_60
+    def calc_bmi(self, weight_kg: float, height_cm: float) -> float:
+        m = height_cm / 100.0
+        return weight_kg / (m*m)
+    def calc_adjbw_kg(self, tbw: float, ibw: float) -> float:
+        return ibw + 0.4 * (tbw - ibw)
+    def pick_weight_for_cg(self, tbw: float, ibw: float) -> float:
+        if tbw < ibw:
+            return tbw
+        if tbw >= 1.2 * ibw:
+            return self.calc_adjbw_kg(tbw, ibw)
+        return ibw
+    def cockcroft_gault(self, age_y: float, sex: Gender, scr_mg_dl: float, weight_for_cg_kg: float) -> float:
+        base = ((140.0 - age_y) * weight_for_cg_kg) / (72.0 * scr_mg_dl)
+        if sex == Gender.female:
+            base *= 0.85
+        return base
+    
     def calculate_pk_parameters(self, patient: PatientInput) -> Dict[str, float]:
-        """Calculate individual PK parameters"""
         params = self.population_params[patient.population_type]
+        # Compute anthropometrics for adults (height required earlier)
+        ibw_kg = None
+        bmi = None
+        weight_for_cg_kg = None
+        adjbw_kg = None
+        if patient.population_type == PopulationType.adult and patient.height_cm:
+            ibw_kg = self.calc_ibw_kg(patient.gender, patient.height_cm)
+            bmi = self.calc_bmi(patient.weight_kg, patient.height_cm)
+            weight_for_cg_kg = self.pick_weight_for_cg(patient.weight_kg, ibw_kg)
+            if patient.weight_kg >= 1.2 * ibw_kg:
+                adjbw_kg = self.calc_adjbw_kg(patient.weight_kg, ibw_kg)
+        # Use adjusted weight selection for CG regardless of selected method if adult & using CG
         crcl = self.calculate_creatinine_clearance(patient)
-        
+        if patient.population_type == PopulationType.adult and patient.crcl_method == CrClMethod.cockcroft_gault and patient.height_cm:
+            # Override with guideline-compliant weight selection
+            weight_for_cg = weight_for_cg_kg if weight_for_cg_kg else patient.weight_kg
+            crcl = self.cockcroft_gault(patient.age_years, patient.gender, patient.serum_creatinine, weight_for_cg)
+        # Calculate clearance and volume based on population type
         if patient.population_type == PopulationType.adult:
             # Adult calculations
             weight_factor = patient.weight_kg / 70.0
@@ -303,7 +349,11 @@ class VancomycinPKCalculator:
             'volume': max(volume, 10.0),
             'elimination_rate': elimination_rate,
             'half_life': half_life,
-            'creatinine_clearance': crcl
+            'creatinine_clearance': crcl,
+            'ibw_kg': ibw_kg,
+            'adjbw_kg': adjbw_kg,
+            'bmi': bmi,
+            'weight_for_cg_kg': weight_for_cg_kg
         }
     
     def calculate_dosing(self, patient: PatientInput) -> DosingResult:
@@ -377,7 +427,12 @@ class VancomycinPKCalculator:
             monitoring_recommendations=monitoring_recs,
             calculation_method=f"Population PK ({patient.population_type.value.title()})",
             pk_curve_data=pk_curve_data,
-            auc_breakdown=auc_breakdown
+            auc_breakdown=auc_breakdown,
+            ibw_kg=round(pk_params.get('ibw_kg'),1) if pk_params.get('ibw_kg') else None,
+            adjbw_kg=round(pk_params.get('adjbw_kg'),1) if pk_params.get('adjbw_kg') else None,
+            bmi=round(pk_params.get('bmi'),1) if pk_params.get('bmi') else None,
+            weight_for_cg_kg=round(pk_params.get('weight_for_cg_kg'),1) if pk_params.get('weight_for_cg_kg') else None,
+            creatinine_clearance_ml_min=round(pk_params.get('creatinine_clearance'),0) if pk_params.get('creatinine_clearance') else None
         )
     
     def _get_target_auc(self, patient: PatientInput) -> float:
@@ -642,7 +697,7 @@ class BayesianOptimizer:
             predicted_auc_ci_upper=auc_ci_upper,
             predicted_trough_ci_lower=trough_ci_lower,
             predicted_trough_ci_upper=trough_ci_upper,
-            model_fit_r_squared=r_squared,
+            fit_r_squared=r_squared,
             convergence_achieved=result.success,
             iterations_used=result.nit if hasattr(result, 'nit') else 0,
             individual_pk_curve=individual_pk_curve,
@@ -729,9 +784,21 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 # API Endpoints
+
+# HEAD handler for root
+@app.head("/")
+async def head_root():
+    return Response(status_code=200)
 @app.get("/")
 async def root():
     return {"message": "Vancomyzer API - Evidence-based vancomycin dosing calculator"}
+
+# Permissive OPTIONS handler for /api/* (for CORS preflight)
+@app.options("/api/{path:path}")
+async def options_preflight(path: str, request: Request):
+    # Let CORSMiddleware attach the proper headers; return 200 so platforms that
+    # require an explicit OPTIONS route don't emit 404/405 during preflight.
+    return Response(status_code=200)
 
 @app.get("/api/health")
 async def health_check():
@@ -739,10 +806,15 @@ async def health_check():
 
 @app.post("/api/calculate-dosing", response_model=DosingResult)
 async def calculate_dosing(patient: PatientInput):
-    """Calculate vancomycin dosing for a patient"""
+    # Enforce height for adults
+    if patient.population_type == PopulationType.adult:
+        if patient.height_cm is None or not (100 <= patient.height_cm <= 250):
+            raise HTTPException(status_code=422, detail="Height (cm) is required for adults (100–250 cm) to compute IBW/AdjBW and Cockcroft–Gault creatinine clearance.")
     try:
         result = pk_calculator.calculate_dosing(patient)
         return result
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -751,7 +823,7 @@ async def bayesian_optimization(patient: PatientInput, levels: List[VancomycinLe
     """Perform Bayesian optimization using measured vancomycin levels"""
     try:
         result = bayesian_optimizer.optimize_dosing(patient, levels)
-        return result
+        return result.model_dump(by_alias=True)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
