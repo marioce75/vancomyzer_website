@@ -101,6 +101,31 @@ function sanitizeForApi(payload) {
   return p;
 }
 
+// Anthropometric helper functions (client hints only; server authoritative)
+function cmToIn(cm){ return cm / 2.54; }
+function metersFromCm(cm){ return cm / 100; }
+function calcIBWkg(sex, height_cm){
+  if (!height_cm) return null;
+  const inchesOver60 = Math.max(0, cmToIn(height_cm) - 60);
+  const base = (sex || '').toLowerCase() === 'female' ? 45.5 : 50;
+  return base + 2.3 * inchesOver60;
+}
+function calcBMIkgm2(weight_kg, height_cm){
+  if (!weight_kg || !height_cm) return null;
+  const m = metersFromCm(height_cm);
+  return m > 0 ? weight_kg / (m*m) : null;
+}
+function calcAdjBWkg(tbw, ibw){
+  if (tbw == null || ibw == null) return null;
+  return ibw + 0.4 * (tbw - ibw);
+}
+function pickWeightForCG(tbw, ibw){
+  if (tbw == null || ibw == null) return null;
+  if (tbw < ibw) return tbw;
+  if (tbw >= 1.2 * ibw) return calcAdjBWkg(tbw, ibw);
+  return ibw;
+}
+
 // Convert form data to API format (kept from previous version, but we’ll still sanitize)
 export const formatPatientForAPI = (patient) => {
   const apiPatient = { ...patient };
@@ -113,6 +138,20 @@ export const formatPatientForAPI = (patient) => {
       apiPatient[field] = parseFloat(apiPatient[field]);
     }
   });
+
+  // Client-side anthropometrics (adult only, if valid height)
+  if (apiPatient.population_type === 'adult' && apiPatient.height_cm && apiPatient.height_cm >= 100 && apiPatient.height_cm <= 250) {
+    const ibw_kg = calcIBWkg(apiPatient.gender || apiPatient.sex, apiPatient.height_cm);
+    const bmi = calcBMIkgm2(apiPatient.weight_kg, apiPatient.height_cm);
+    const weight_for_cg_kg = pickWeightForCG(apiPatient.weight_kg, ibw_kg);
+    const adjbw_kg = (apiPatient.weight_kg && ibw_kg && apiPatient.weight_kg >= 1.2 * ibw_kg)
+      ? calcAdjBWkg(apiPatient.weight_kg, ibw_kg)
+      : null;
+    apiPatient.ibw_kg = ibw_kg ? +ibw_kg.toFixed(1) : null;
+    apiPatient.adjbw_kg = adjbw_kg ? +adjbw_kg.toFixed(1) : null;
+    apiPatient.weight_for_cg_kg = weight_for_cg_kg ? +weight_for_cg_kg.toFixed(1) : null;
+    apiPatient.bmi = bmi ? +bmi.toFixed(1) : null;
+  }
   return apiPatient;
 };
 

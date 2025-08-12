@@ -49,6 +49,8 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
   const [validation, setValidation] = useState({});
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [estimatedCrCl, setEstimatedCrCl] = useState(null);
+  const isAdult = patient.population_type === 'adult';
+  const [heightTouched, setHeightTouched] = useState(false);
 
   // Real-time validation
   useEffect(() => {
@@ -83,9 +85,18 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
       errors.weight_kg = 'Weight must be 0.1-300 kg';
     }
 
-    // Height validation (optional but if provided must be valid)
-    if (patient.height_cm && (patient.height_cm < 30 || patient.height_cm > 250)) {
-      errors.height_cm = 'Height must be 30-250 cm';
+    // Height validation – REQUIRED for adults
+    if (isAdult) {
+      if (patient.height_cm === '' || patient.height_cm === null || patient.height_cm === undefined) {
+        errors.height_cm = 'Required: 100-250 cm (adult)';
+      } else if (patient.height_cm < 100 || patient.height_cm > 250) {
+        errors.height_cm = 'Required: 100-250 cm (adult)';
+      }
+    } else if (patient.height_cm) {
+      // Non-adult: optional but must be reasonable if supplied
+      if (patient.height_cm < 30 || patient.height_cm > 250) {
+        errors.height_cm = 'Height must be 30-250 cm';
+      }
     }
 
     // Serum creatinine validation
@@ -126,6 +137,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
   };
 
   const handleInputChange = (field, value) => {
+    if (field === 'height_cm') setHeightTouched(true);
     setPatient(prev => ({
       ...prev,
       [field]: value
@@ -161,6 +173,11 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
   };
 
   const isFormValid = Object.keys(validation).length === 0;
+  const numericHeight = Number(patient.height_cm);
+  const numericWeight = Number(patient.weight_kg);
+  const bmi = (isFinite(numericHeight) && isFinite(numericWeight) && numericHeight >= 100 && numericHeight <= 250 && numericWeight > 0)
+    ? +(numericWeight / Math.pow(numericHeight / 100, 2)).toFixed(1)
+    : null;
 
   return (
     <div className="fade-in">
@@ -323,13 +340,17 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                   <Grid item xs={6}>
                     <TextField
                       fullWidth
-                      label="Height (cm, optional)"
+                      label={isAdult ? 'Height (cm)' : 'Height (cm, optional)'}
                       type="number"
                       value={patient.height_cm}
                       onChange={(e) => handleInputChange('height_cm', e.target.value)}
-                      error={!!validation.height_cm}
-                      helperText={validation.height_cm}
-                      inputProps={{ min: 30, max: 250 }}
+                      onBlur={() => setHeightTouched(true)}
+                      required={isAdult}
+                      error={!!validation.height_cm && (heightTouched || isAdult)}
+                      helperText={isAdult
+                        ? (validation.height_cm || 'Required for adults (IBW/AdjBW & CrCl). Enter 100–250 cm.')
+                        : (validation.height_cm || 'Enter height in cm.')}
+                      inputProps={{ min: isAdult ? 100 : 30, max: 250 }}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -346,6 +367,14 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                   </Grid>
                 </Grid>
 
+                {/* BMI Display */}
+                {bmi && (
+                  <Box sx={{ mt: 2, p: 1.5, bgcolor: 'secondary.light', borderRadius: 1 }}>
+                    <Typography variant="body2" color="secondary.dark">
+                      BMI: <strong>{bmi}</strong>
+                    </Typography>
+                  </Box>
+                )}
                 {/* Estimated CrCl Display */}
                 {estimatedCrCl && (
                   <Box sx={{ mt: 2, p: 1.5, bgcolor: 'info.light', borderRadius: 1 }}>
