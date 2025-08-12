@@ -21,10 +21,12 @@ import {
   Info,
   Warning
 } from '@mui/icons-material';
+import MenuBook from '@mui/icons-material/MenuBook';
 
 import PatientInputForm from './components/PatientInputForm';
 import InteractiveAUCVisualization from './components/InteractiveAUCVisualization';
 import ClinicalInfo from './components/ClinicalInfo';
+import Tutorial from './components/Tutorial';
 import { vancomyzerAPI, formatPatientForAPI } from './services/api';
 import './App.css';
 import './styles/disclaimer.css';
@@ -122,6 +124,11 @@ function App() {
                 label="Interactive AUC" 
                 iconPosition="start"
                 disabled={!dosingResult}
+              />
+              <Tab
+                icon={<MenuBook />}
+                label="Tutorial"
+                iconPosition="start"
               />
               <Tab 
                 icon={<Info />} 
@@ -303,6 +310,12 @@ function App() {
           )}
 
           {activeTab === 3 && (
+            <Box sx={{ p: 3 }}>
+              <Tutorial />
+            </Box>
+          )}
+
+          {activeTab === 4 && (
             <Box sx={{ p: 3 }}>
               <ClinicalInfo />
             </Box>
