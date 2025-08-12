@@ -18,16 +18,12 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# CORS middleware for web frontend
+# CORS middleware for web frontend (updated origins)
 origins = [
     "https://vancomyzer.com",
     "https://www.vancomyzer.com",
-    "https://vancomyzer-web.onrender.com",
-    "https://vancomyzer-static.onrender.com",
-    # existing local dev origins
     "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:3002",
+    "http://127.0.0.1:3000"
 ]
 
 app.add_middleware(
@@ -796,8 +792,6 @@ async def root():
 # Permissive OPTIONS handler for /api/* (for CORS preflight)
 @app.options("/api/{path:path}")
 async def options_preflight(path: str, request: Request):
-    # Let CORSMiddleware attach the proper headers; return 200 so platforms that
-    # require an explicit OPTIONS route don't emit 404/405 during preflight.
     return Response(status_code=200)
 
 @app.get("/api/health")
