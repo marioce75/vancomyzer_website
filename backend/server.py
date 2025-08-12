@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Response, Request
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any
@@ -18,29 +19,28 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# CORS middleware for web frontend (updated origins)
+# CORS configuration per requirements
 origins = [
     "https://vancomyzer.com",
     "https://www.vancomyzer.com",
+    "https://vancomyzer-web.onrender.com",
     "http://localhost:3000",
-    "http://127.0.0.1:3000"
+    "http://localhost:3001",
+    "http://localhost:3002",
 ]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],      # ensures POST, OPTIONS, etc.
+    allow_headers=["*"],      # lets the browser send Content-Type, etc.
+    expose_headers=["*"],
 )
 
 # Serve static files
 import os
 from pathlib import Path
-
-# Path to backend/static relative to project root
 static_path = Path(__file__).parent / "static"
-
 app.mount("/static", StaticFiles(directory=static_path), name="static")
 
 # Data Models
@@ -781,18 +781,21 @@ manager = ConnectionManager()
 
 # API Endpoints
 
-# HEAD handler for root
 @app.head("/")
 async def head_root():
     return Response(status_code=200)
+
 @app.get("/")
 async def root():
     return {"message": "Vancomyzer API - Evidence-based vancomycin dosing calculator"}
 
-# Permissive OPTIONS handler for /api/* (for CORS preflight)
-@app.options("/api/{path:path}")
-async def options_preflight(path: str, request: Request):
-    return Response(status_code=200)
+# Generic CORS preflight handler for any /api/* path
+@app.options("/api/{rest_of_path:path}")
+async def cors_preflight(rest_of_path: str, request: Request) -> Response:
+    # Starlette's CORSMiddleware should handle preflight automatically,
+    # but some platforms return 404 before middleware runs on OPTIONS.
+    # This ensures a 200 with the right CORS headers if the request reached the app.
+    return Response(status_code=status.HTTP_200_OK)
 
 @app.get("/api/health")
 async def health_check():
