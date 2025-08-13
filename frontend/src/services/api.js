@@ -1,21 +1,27 @@
 import axios from 'axios';
 
-// Safe API base resolution without import.meta
-const API_BASE =
-  (typeof window !== 'undefined' && window.VANCOMYZER_API_BASE_URL) ||
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_BASE) ||
-  (typeof window !== 'undefined' && window.location.hostname.endsWith('vancomyzer.com')
-    ? 'https://vancomyzer-web.onrender.com/api'
-    : `${window.location.origin.replace(/\/$/, '')}/api`);
+// --- API BASE --------------------------------------------------------------
+// Explicit Render backend URL as requested. Replace <your-backend-service> with the
+// actual Render service name (without -web unless that is truly the backend).
+// Keep a localhost fallback for local development.
+const RENDER_API_BASE = "https://<your-backend-service>.onrender.com/api"; // TODO: set real service name
+const LOCAL_API_BASE = (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+  ? `${window.location.origin.replace(/\/$/, '')}/api`
+  : null;
 
+// Final API_BASE (Render in production, localhost during local dev)
+const API_BASE = LOCAL_API_BASE || RENDER_API_BASE;
 console.info('API_BASE =', API_BASE);
 
-// API configuration
+// Axios configuration (include Accept header for CORS clarity)
 const api = axios.create({
   baseURL: API_BASE,
   withCredentials: false,
   timeout: 30000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
 });
 
 // --- helpers ---------------------------------------------------------------
@@ -168,7 +174,27 @@ api.interceptors.response.use(
   }
 );
 
-// API methods (all paths use /api/* on the backend)
+// --- Fetch helper (explicit CORS preflight example) ------------------------
+// This mirrors calculateDosing but uses fetch with mode: 'cors' per instructions.
+export async function calculateDosingFetch(samplePatient) {
+  const payload = sanitizeForApi(formatPatientForAPI(samplePatient));
+  const resp = await fetch(`${API_BASE}/calculate-dosing`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    mode: 'cors', // Ensures browser performs CORS preflight when needed
+    body: JSON.stringify(payload),
+  });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`API Error ${resp.status}: ${text}`);
+  }
+  return resp.json();
+}
+
+// --- API methods -----------------------------------------------------------
 export const vancomyzerAPI = {
   // Health check
   healthCheck: async () => {
@@ -210,7 +236,7 @@ export const vancomyzerAPI = {
   },
 };
 
-// WebSocket utilities (unchanged)
+// --- WebSocket utilities (fix base so it does NOT include /api prefix) -----
 export class VancomyzerWebSocket {
   constructor(onMessage, onError, onConnect, onDisconnect) {
     this.onMessage = onMessage;
@@ -224,8 +250,9 @@ export class VancomyzerWebSocket {
   }
   connect() {
     try {
-      // Build WS URL from API_BASE so it works across domains
-      const wsBase = API_BASE.replace(/^http/i, "ws");
+      // Remove trailing /api if present for WS root endpoint
+      const httpBase = API_BASE.replace(/\/?api\/?$/, '');
+      const wsBase = httpBase.replace(/^http/i, 'ws');
       const wsUrl = `${wsBase}/ws/realtime-calc`;
       this.ws = new WebSocket(wsUrl);
       this.ws.onopen = () => { console.log('WebSocket connected'); this.reconnectAttempts = 0; this.onConnect?.(); };
@@ -268,7 +295,6 @@ class APICache {
   clear() { this.cache.clear(); }
 }
 export const apiCache = new APICache();
-
 export const cachedVancomyzerAPI = {
   ...vancomyzerAPI,
   calculateDosing: async (patientData) => {
