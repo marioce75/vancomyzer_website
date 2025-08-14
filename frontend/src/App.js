@@ -30,15 +30,15 @@ import './styles/disclaimer.css';
 
 function AppInner() {
   const [activeTab, setActiveTab] = useState(0);
-  const { setPatient, result, loading, calculate } = useBayesian();
+  const { setPatient, result, loading, calculate, levels } = useBayesian();
   const [error, setError] = useState(null);
 
   const handlePatientSubmit = async (patientData) => {
     try {
       setError(null);
       setPatient(patientData);
-      // Defer calculate to next tick so state is committed; pass patientData as override to avoid race
-      setTimeout(() => { calculate(patientData).catch(e => setError(e.message || 'Calculation failed')); }, 0);
+      // Use context calculate which routes through submitDosing with current levels
+      setTimeout(() => { calculate(patientData); }, 0);
       setActiveTab(1);
     } catch (e) {
       setError(e.message || 'Submission failed');
@@ -125,23 +125,23 @@ function AppInner() {
                     Dosing Results
                   </Typography>
 
-                  {/* Indicate whether we used Bayesian optimization or population fallback */}
                   {(() => {
-                    const isBayesian = !!result.individual_clearance; // BayesianResult vs Population
-                    if (!isBayesian) {
+                    const inferredSource = result?.meta?.source || result?.source || result?.model_source || ((levels && levels.length > 0) ? 'bayesian' : 'population');
+                    if (inferredSource === 'population') {
                       return (
                         <Alert severity="info" sx={{ mb: 2 }}>
-                          No vancomycin levels were provided. The recommendation is based on the
-                          <strong> population PK model</strong>. Add one or more measured levels to enable
-                          Bayesian individualization.
+                          Population PK fallback—add levels to enable Bayesian individualization.
                         </Alert>
                       );
                     }
-                    return (
-                      <Alert severity="success" sx={{ mb: 2 }}>
-                        Results individualized using <strong>Bayesian optimization</strong>.
-                      </Alert>
-                    );
+                    if (inferredSource === 'bayesian') {
+                      return (
+                        <Alert severity="success" sx={{ mb: 2 }}>
+                          Results individualized using Bayesian optimization.
+                        </Alert>
+                      );
+                    }
+                    return null;
                   })()}
 
                   {/* Summary preview (match backend field names) */}
