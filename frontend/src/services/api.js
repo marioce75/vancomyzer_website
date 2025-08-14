@@ -153,8 +153,19 @@ api.interceptors.response.use(
     if (status === 400) {
       throw new Error(detail || 'Invalid request data');
     } else if (status === 422) {
-      // FastAPI validation errors come back as detail: [...]
-      throw new Error(JSON.stringify(detail || { message: 'Validation failed (422)' }));
+      const detail = error.response?.data?.detail;
+      try {
+        console.group('FastAPI 422 Validation Error');
+        console.log('Endpoint:', error.config?.url);
+        console.log('Payload:', error.config?.data);
+        console.log('Detail:', detail);
+        console.groupEnd();
+      } catch (_) {}
+      const friendly =
+        Array.isArray(detail)
+          ? detail.map((d) => `${d.loc?.join('.')}: ${d.msg}`).join('; ')
+          : (typeof detail === 'string' ? detail : 'Validation failed (422)');
+      throw new Error(friendly);
     } else if (status === 500) {
       throw new Error('Server error. Please try again later.');
     } else if (error.code === 'ECONNABORTED') {
@@ -209,6 +220,7 @@ export const vancomyzerAPI = {
   // Bayesian optimization
   bayesianOptimization: async (patientData, levels) => {
     const payload = sanitizeForApi({ ...formatPatientForAPI(patientData), levels });
+    console.debug('[bayesianOptimization] Payload:', payload);
     const response = await api.post(`/bayesian-optimization`, payload);
     return response.data;
   },
@@ -282,7 +294,7 @@ export const handleAPIError = (error) => {
 // Simple in-memory cache (kept)
 class APICache {
   constructor(maxSize = 50, ttl = 300000) { this.cache = new Map(); this.maxSize = maxSize; this.ttl = ttl; }
-  get(key) { const item = this.cache.get(key); if (!item) return null; if (Date.now() > item.expiry) { this.cache.delete(key); return null; } return item.data; }
+  get(key) { const item = this.cache.get(key); if (!item) return null; if (Date.now() > item.expiry) { this.cache.delete(item); return null; } return item.data; }
   set(key, data) { if (this.cache.size >= this.maxSize) { const firstKey = this.cache.keys().next().value; this.cache.delete(firstKey); } this.cache.set(key, { data, expiry: Date.now() + this.ttl }); }
   clear() { this.cache.clear(); }
 }
