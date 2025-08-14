@@ -15,10 +15,11 @@ export function BayesianProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef();
 
-  const calculate = useCallback(async () => {
+  const calculate = useCallback(async (patientOverride) => {
     setLoading(true);
     try {
-      const data = await vancomyzerAPI.calculateDosingSmart(patient, levels);
+      const targetPatient = patientOverride || patient;
+      const data = await vancomyzerAPI.calculateDosingSmart(targetPatient, levels);
       setResult(data);
     } finally {
       setLoading(false);

@@ -28,8 +28,12 @@ import {
 
 const PatientInputForm = ({ onSubmit, disabled = false }) => {
   // Helper to test numeric presence (updated per spec)
-  const isFiniteNumber = v => Number.isFinite(Number(v));
-  const toNumOrUndefined = v => { const n = Number(v); return Number.isFinite(n) ? n : undefined; };
+  const isFiniteNumber = v => v !== '' && v !== null && v !== undefined && Number.isFinite(Number(v));
+  const toNumOrUndefined = v => {
+    if (v === '' || v === null || v === undefined) return undefined;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : undefined;
+  };
 
   const [patient, setPatient] = useState({
     population_type: 'adult',
@@ -146,22 +150,25 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
 
   const handleInputChange = (field, value) => {
     if (field === 'height_cm') setHeightTouched(true);
-    setPatient(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    // If user fixes a previously missing required field, clear it from errorFields & possibly banner
-    if ((field === 'weight_kg' || field === 'serum_creatinine')) {
-      const numeric = isFiniteNumber(value);
-      if (numeric) {
-        setErrorFields(prev => prev.filter(f => f !== field));
-        // If both requireds now satisfied, clear banner
-        if ((field === 'weight_kg' ? isFiniteNumber(value) : isFiniteNumber(patient.weight_kg)) &&
-            (field === 'serum_creatinine' ? isFiniteNumber(value) : isFiniteNumber(patient.serum_creatinine))) {
-          setFormError('');
-        }
+    setPatient(prev => {
+      const newPatient = { ...prev, [field]: value };
+
+      // If user fixes a previously missing required field, clear it from errorFields & possibly banner
+      if (field === 'weight_kg' || field === 'serum_creatinine') {
+        const weightValid = isFiniteNumber(newPatient.weight_kg);
+        const scrValid = isFiniteNumber(newPatient.serum_creatinine);
+
+        setErrorFields(prevFields => prevFields.filter(f => {
+          if (f === 'weight_kg' && weightValid) return false;
+          if (f === 'serum_creatinine' && scrValid) return false;
+          return true;
+        }));
+
+        if (weightValid && scrValid) setFormError('');
       }
-    }
+
+      return newPatient;
+    });
   };
 
   const handleSubmit = (e) => {

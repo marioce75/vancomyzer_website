@@ -37,8 +37,8 @@ function AppInner() {
     try {
       setError(null);
       setPatient(patientData);
-      // Defer calculate to next tick so state is committed
-      setTimeout(() => { calculate().catch(e => setError(e.message || 'Calculation failed')); }, 0);
+      // Defer calculate to next tick so state is committed; pass patientData as override to avoid race
+      setTimeout(() => { calculate(patientData).catch(e => setError(e.message || 'Calculation failed')); }, 0);
       setActiveTab(1);
     } catch (e) {
       setError(e.message || 'Submission failed');
