@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useRef, useCallback } from 'react';
-import { BayesianAPI } from '../services/api';
+import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { calculateDose, interactiveUpdate } from '../services/api';
 
 /**
  * Shared Bayesian dosing context
@@ -14,11 +14,9 @@ export function BayesianProvider({ children }) {
   const [bayesResult, setBayesResult] = useState(null); // normalized result
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // Debounce timer for interactive updates
   const debounceRef = useRef(null);
 
-  /** Invoke interactive Bayesian update with debounce */
+  /** Debounced regimen update (Bayesian if levels else population with regimen overlay) */
   const updateRegimenDebounced = useCallback((dose_mg, interval_h) => {
     setRegimen({ dose_mg, interval_h });
     if (!patient) return;
@@ -26,27 +24,32 @@ export function BayesianProvider({ children }) {
     debounceRef.current = setTimeout(async () => {
       try {
         setLoading(true); setError(null);
-        const updated = await BayesianAPI.interactive(patient, levels, { dose_mg, interval_h });
+        const updated = await interactiveUpdate(patient, levels, { dose_mg, interval_h });
         setBayesResult(updated);
-      } catch (e) { console.error('[Bayes interactive] error', e); setError(e.message || 'Update failed'); }
+      } catch (e) { setError(e.message || 'Update failed'); }
       finally { setLoading(false); }
-    }, 400); // 400ms debounce
+    }, 400);
   }, [patient, levels]);
 
-  /** Perform initial Bayesian submission */
-  const submitInitial = useCallback(async (patientData, levelsInput, maybeRegimen) => {
+  /** Perform initial dosing submission (Bayesian if levels else population) */
+  const submitInitial = useCallback(async (patientData, levelsInput = [], maybeRegimen = null) => {
+    setError(null);
+    setLoading(true);
     try {
-      setLoading(true); setError(null);
       setPatient(patientData);
       setLevels(levelsInput || null);
-      const result = await BayesianAPI.initial(patientData, levelsInput || null, maybeRegimen || null);
+      const result = await calculateDose(patientData, levelsInput);
       setBayesResult(result);
       // Seed regimen from explicit param > recommendation > maybeRegimen fallback
       const recReg = maybeRegimen || result?.recommendation?.regimen || null;
       setRegimen(recReg);
+      setLoading(false);
       return result;
-    } catch (e) { setError(e.message || 'Bayesian optimization failed'); throw e; }
-    finally { setLoading(false); }
+    } catch (e) {
+      setLoading(false);
+      setError(e.message || 'Calculation failed');
+      throw e;
+    }
   }, []);
 
   const value = {
