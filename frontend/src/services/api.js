@@ -219,7 +219,11 @@ export const vancomyzerAPI = {
 
   // Bayesian optimization
   bayesianOptimization: async (patientData, levels) => {
-    const payload = sanitizeForApi({ ...formatPatientForAPI(patientData), levels });
+    const payload = {
+      patient: sanitizeForApi(formatPatientForAPI(patientData)),
+      // Backend requires the key to exist; send [] when no levels yet
+      levels: Array.isArray(levels) ? levels : [],
+    };
     console.debug('[bayesianOptimization] Payload:', payload);
     const response = await api.post(`/bayesian-optimization`, payload);
     return response.data;
