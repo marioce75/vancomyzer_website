@@ -74,19 +74,6 @@ function sanitizeForApi(payload) {
   return p;
 }
 
-// Build {patient, levels} from either a wrapped or flat payload
-function buildBayesBody(payload) {
-  if (!payload) return { patient: {}, levels: [] };
-  if (payload.patient) {
-    return {
-      patient: payload.patient,
-      levels: Array.isArray(payload.levels) ? payload.levels : [],
-    };
-  }
-  // flat object (age_years, weight_kg, etc.)
-  return { patient: payload, levels: [] };
-}
-
 // --- levels helper: normalize/validate levels for Bayesian fit ----------
 function normalizeLevels(levels) {
   if (!Array.isArray(levels)) return [];
@@ -229,12 +216,35 @@ export async function calculateDosingFetch(samplePatient) {
 }
 
 // --- API methods (updated) -------------------------------------------------
-export async function bayesianOptimization(payload) {
-  const body = buildBayesBody(payload);
-  const res = await api.post(`/bayesian-optimization`, body, {
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-  });
-  return res.data;
+export async function bayesianOptimization(patient, levels = []) {
+  // Ensure patient object exists
+  const safePatient = patient || {};
+  // Sanitize & format patient, normalize levels
+  let formattedPatient;
+  try {
+    formattedPatient = sanitizeForApi(formatPatientForAPI(safePatient));
+  } catch (e) {
+    // Surface local validation errors immediately
+    throw e;
+  }
+  const normalizedLevels = normalizeLevels(levels);
+  // Construct payload EXACTLY as required by FastAPI: { patient: {...}, levels: [...] }
+  const payload = { patient: formattedPatient, levels: normalizedLevels };
+  try {
+    const res = await api.post('/bayesian-optimization', payload, {
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    });
+    return res.data;
+  } catch (error) {
+    const status = error?.response?.status;
+    if (status >= 400 && status < 500) {
+      const detail = error?.response?.data?.detail;
+      if (detail) {
+        console.error('[bayesianOptimization] 4xx validation/detail:', detail);
+      }
+    }
+    throw error;
+  }
 }
 
 export async function calculateDosing(patient) {
@@ -360,7 +370,7 @@ let BAYES_REGIMEN_CAPABILITY = null;
 
 export async function bayesOptimize(patient, levels = null, regimen = null){
   const payloadPatient = sanitizeForApi(formatPatientForAPI(patient));
-  const body = buildBody({ ...payloadPatient, levels, regimen });
+  const body = buildBody({ patient: payloadPatient, levels: normalizeLevels(levels), regimen });
   try {
     const res = await api.post(`/bayesian-optimization`, body);
     BAYES_REGIMEN_CAPABILITY = BAYES_REGIMEN_CAPABILITY ?? !!regimen;
@@ -390,7 +400,7 @@ export const BayesianAPI = { initial: bayesOptimize, interactive: simulateWithBa
 
 export const _bayesianTest = async (patient, levels, regimen) => {
   const payloadPatient = sanitizeForApi(formatPatientForAPI(patient));
-  const body = buildBody({ ...payloadPatient, levels, regimen });
+  const body = buildBody({ patient: payloadPatient, levels: normalizeLevels(levels), regimen });
   const res = await api.post(`/bayesian-optimization`, body);
   return normalizeBayesResponse(res.data);
 };
