@@ -30,10 +30,19 @@ import './styles/disclaimer.css';
 
 function AppInner() {
   const [activeTab, setActiveTab] = useState(0);
-  const { submitInitial, bayesResult, loading, error } = useBayesian();
+  const { setPatient, result, loading, calculate } = useBayesian();
+  const [error, setError] = useState(null);
 
   const handlePatientSubmit = async (patientData) => {
-    try { await submitInitial(patientData, [], null); setActiveTab(1); } catch(_){}
+    try {
+      setError(null);
+      setPatient(patientData);
+      // Defer calculate to next tick so state is committed
+      setTimeout(() => { calculate().catch(e => setError(e.message || 'Calculation failed')); }, 0);
+      setActiveTab(1);
+    } catch (e) {
+      setError(e.message || 'Submission failed');
+    }
   };
   const handleTabChange = (event, newValue) => { setActiveTab(newValue); };
 
@@ -84,8 +93,8 @@ function AppInner() {
               scrollButtons="auto"
             >
               <Tab icon={<Calculate />} label="Patient Input" iconPosition="start" />
-              <Tab icon={<Timeline />} label="Dosing Results" iconPosition="start" disabled={!bayesResult} />
-              <Tab icon={<Science />} label="Interactive AUC" iconPosition="start" disabled={!bayesResult || (bayesResult?.meta?.source === 'population')} />
+              <Tab icon={<Timeline />} label="Dosing Results" iconPosition="start" disabled={!result} />
+              <Tab icon={<Science />} label="Interactive AUC" iconPosition="start" disabled={!result || (result?.meta?.source === 'population')} />
               <Tab icon={<MenuBook />} label="Tutorial" iconPosition="start" />
               <Tab icon={<Info />} label="Clinical Info" iconPosition="start" />
             </Tabs>
@@ -109,7 +118,7 @@ function AppInner() {
           )}
           {activeTab === 1 && (
             <Box sx={{ p: 3 }}>
-              {bayesResult ? (
+              {result ? (
                 <div>
                   <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <Timeline sx={{ mr: 1 }} />
@@ -118,13 +127,12 @@ function AppInner() {
 
                   {/* Indicate whether we used Bayesian optimization or population fallback */}
                   {(() => {
-                    // Try a few common shapes to detect the source; tolerate missing fields
-                    const meta = bayesResult.meta || {};
+                    const meta = result.meta || {};
                     const inferredSource =
                       meta.source ||
-                      bayesResult.source ||
-                      bayesResult.model_source ||
-                      (bayesResult.usedBayesian === false ? 'population' : (bayesResult.usedBayesian === true ? 'bayesian' : null));
+                      result.source ||
+                      result.model_source ||
+                      (result.usedBayesian === false ? 'population' : (result.usedBayesian === true ? 'bayesian' : null));
 
                     if (inferredSource === 'population') {
                       return (
@@ -149,10 +157,10 @@ function AppInner() {
                   <pre style={{ whiteSpace: 'pre-wrap' }}>
                     {JSON.stringify(
                       {
-                        auc24: bayesResult.auc24,
-                        cmin: bayesResult.cmin,
-                        cmax: bayesResult.cmax,
-                        recommendation: bayesResult.recommendation,
+                        auc24: result.auc24,
+                        cmin: result.cmin,
+                        cmax: result.cmax,
+                        recommendation: result.recommendation,
                       },
                       null,
                       2
@@ -168,7 +176,7 @@ function AppInner() {
           )}
           {activeTab === 2 && (
             <Box sx={{ p: 3 }}>
-              {bayesResult ? (
+              {result ? (
                 <InteractiveAUCVisualization />
               ) : (
                 <Typography color="text.secondary" align="center">

@@ -1,124 +1,131 @@
 import axios from 'axios';
 
-// ---- API BASE (Render) ----
-// Prefer environment variable (e.g., REACT_APP_API_BASE) and fallback by hostname
-const API_BASE = (
-  process.env.REACT_APP_API_BASE && process.env.REACT_APP_API_BASE.trim()
-) || (
-  typeof window !== 'undefined' && window.location?.host?.includes('localhost')
-    ? 'http://localhost:8001/api'
-    : 'https://vancomyzer.onrender.com/api'
-);
+// ---- API BASE (Render production backend)
+export const API_BASE = 'https://vancomyzer.onrender.com/api';
 
-console.info('API_BASE =', API_BASE);
-
-// Shared axios
+// Shared axios instance (adds CORS-friendly headers)
 const api = axios.create({
   baseURL: API_BASE,
-  withCredentials: false,
   timeout: 30000,
+  withCredentials: false,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
 });
 
-// ---- helpers ----
-function clean(obj) {
-  if (obj == null) return obj;
-  const out = Array.isArray(obj) ? [] : {};
-  for (const [k, v] of Object.entries(obj)) {
-    if (v === '' || v === null || typeof v === 'undefined') continue;
-    if (typeof v === 'object' && !Array.isArray(v)) out[k] = clean(v);
-    else out[k] = v;
+// ---- Helpers --------------------------------------------------
+
+function sanitizeNumber(n) {
+  if (n === '' || n === null || n === undefined) return undefined;
+  const v = Number(n);
+  return Number.isFinite(v) ? v : undefined;
+}
+
+export function normalizePatient(raw) {
+  if (!raw) throw new Error('Missing patient data');
+  return {
+    // enums must match backend: "adult" | "pediatric" | "neonate"
+    population_type: raw.population_type || 'adult',
+    age_years: sanitizeNumber(raw.age_years),
+    age_months: sanitizeNumber(raw.age_months),
+    gestational_age_weeks: sanitizeNumber(raw.gestational_age_weeks),
+    postnatal_age_days: sanitizeNumber(raw.postnatal_age_days),
+    gender: raw.gender || 'male', // "male" | "female" | "other"
+    weight_kg: sanitizeNumber(raw.weight_kg),
+    height_cm: sanitizeNumber(raw.height_cm),
+    serum_creatinine: sanitizeNumber(raw.serum_creatinine),
+    indication: raw.indication || 'other',
+    severity: raw.severity || 'moderate',
+    is_renal_stable: Boolean(raw.is_renal_stable ?? true),
+    is_on_hemodialysis: Boolean(raw.is_on_hemodialysis ?? false),
+    is_on_crrt: Boolean(raw.is_on_crrt ?? false),
+    crcl_method: raw.crcl_method || 'cockcroft_gault', // "cockcroft_gault" | "mdrd" | "ckd_epi" | "custom"
+    custom_crcl: sanitizeNumber(raw.custom_crcl),
+  };
+}
+
+export function normalizeLevels(list) {
+  if (!Array.isArray(list)) return [];
+  return list
+    .map(l => ({
+      concentration: sanitizeNumber(l.concentration),
+      time_after_dose_hours: sanitizeNumber(l.time_after_dose_hours),
+      dose_given_mg: sanitizeNumber(l.dose_given_mg),
+      infusion_duration_hours: sanitizeNumber(l.infusion_duration_hours) ?? 1.0,
+      level_type: l.level_type || 'trough', // "trough" | "peak" | "random"
+      draw_time: l.draw_time || new Date().toISOString(),
+      notes: l.notes || undefined,
+    }))
+    .filter(l => Number.isFinite(l.concentration) && Number.isFinite(l.time_after_dose_hours));
+}
+
+// ---- Core calls -----------------------------------------------
+
+// Population model (no levels)
+export async function calculateDose(patient) {
+  const payload = normalizePatient(patient);
+  try {
+    const { data } = await api.post('/calculate-dosing', payload);
+    return data;
+  } catch (err) {
+    throw formatAxiosError(err, 'Population model calculation failed');
   }
-  return out;
 }
 
-function normalizePatient(p) {
-  // Don’t mutate caller’s object
-  const c = clean({ ...(p || {}) });
-
-  // Common numeric coercions (tolerant)
-  const asNum = (x) => (x === '' || x == null ? undefined : Number(x));
-  if ('age_years' in c) c.age_years = asNum(c.age_years);
-  if ('weight_kg' in c) c.weight_kg = asNum(c.weight_kg);
-  if ('height_cm' in c) c.height_cm = asNum(c.height_cm);
-  if ('serum_creatinine' in c) c.serum_creatinine = asNum(c.serum_creatinine);
-
-  // ensure strings for enums if present
-  if (c.population_type) c.population_type = String(c.population_type);
-  if (c.gender) c.gender = String(c.gender);
-  if (c.indication) c.indication = String(c.indication);
-  if (c.infection_severity) c.infection_severity = String(c.infection_severity);
-
-  return c;
-}
-
-function formatError(err, fallback = 'Network error') {
+// Bayesian optimization (requires >=1 level)
+export async function bayesianOptimization(patient, levels) {
+  const payload = {
+    patient: normalizePatient(patient),
+    levels: normalizeLevels(levels),
+  };
   try {
-    if (err?.response?.data?.detail) {
-      const d = err.response.data.detail;
-      if (typeof d === 'string') return d;
-      if (Array.isArray(d)) {
-        // FastAPI/Pydantic list of issues
-        return d.map((x) => x?.msg || JSON.stringify(x)).join('; ');
-      }
-      return JSON.stringify(d);
-    }
-    if (err?.message) return err.message;
-  } catch (_) {}
-  return fallback;
-}
-
-// ---- endpoints ----
-export async function bayesianOptimization(patient, levels, regimen) {
-  try {
-    const payload = { patient: normalizePatient(patient), levels: levels || [] };
-    if (regimen && typeof regimen === 'object') payload.regimen = regimen; // optional regimen for exposure prediction
     const { data } = await api.post('/bayesian-optimization', payload);
-    return { ...data, meta: { ...(data.meta || {}), source: 'bayesian' } };
+    return data;
   } catch (err) {
-    const msg = formatError(err, 'Bayesian optimization failed');
-    throw new Error(msg);
+    throw formatAxiosError(err, 'Bayesian optimization failed');
   }
 }
 
-// Align with backend /api/population-model expecting a PatientInput body (no wrapper)
-export async function populationModelDose(patient) {
-  try {
-    const payload = normalizePatient(patient); // backend expects fields at root
-    const { data } = await api.post('/population-model', payload);
-    return { ...data, meta: { ...(data.meta || {}), source: 'population' } };
-  } catch (err) {
-    const msg = formatError(err, 'Population model calculation failed');
-    throw new Error(msg);
+// Smart wrapper: picks endpoint by levels count
+export async function calculateDosingSmart(patient, levels) {
+  const lvls = normalizeLevels(levels);
+  if (lvls.length > 0) {
+    return bayesianOptimization(patient, lvls);
   }
+  return calculateDose(patient);
 }
 
-/**
- * Decide which endpoint to use based on levels.
- * If >=1 levels -> Bayesian; else -> Population fallback.
- */
-export async function calculateDose(patient, levels) {
-  const n = Array.isArray(levels) ? levels.length : 0;
-  if (n > 0) return bayesianOptimization(patient, levels);
-  return populationModelDose(patient);
-}
-
-/**
- * Interactive regimen update
- * - If levels present → re-run Bayesian with regimen
- * - If no levels → use population output and overlay regimen
- */
+// Interactive regimen update (keeps UI snappy)
+// - If levels present -> re-run Bayesian with regimen context as a UI overlay
+// - If no levels -> call population model and overlay regimen in the component
 export async function interactiveUpdate(patient, levels, regimen) {
-  if (!patient) throw new Error('No patient in context');
-  const n = Array.isArray(levels) ? levels.length : 0;
-  if (n > 0) return bayesianOptimization(patient, levels, regimen);
-  const base = await populationModelDose(patient);
+  const lvls = normalizeLevels(levels);
+  if (lvls.length > 0) {
+    const result = await bayesianOptimization(patient, lvls);
+    // Return as-is; components can merge `regimen` into displayed recommendation
+    return result;
+  }
+  const base = await calculateDose(patient);
   if (regimen) {
     base.recommendation = base.recommendation || {};
     base.recommendation.regimen = regimen;
   }
   return base;
+}
+
+// ---- Error formatting ------------------------------------------
+
+function formatAxiosError(error, prefix) {
+  // Prefer backend detail if available (pydantic/fastapi 422/400)
+  const detail =
+    error?.response?.data?.detail ||
+    error?.response?.data?.message ||
+    error?.message ||
+    'Unknown error';
+  const status = error?.response?.status;
+  const out = new Error(`${prefix}${status ? ` (HTTP ${status})` : ''}: ${Array.isArray(detail) ? JSON.stringify(detail) : String(detail)}`);
+  out.status = status;
+  out.detail = detail;
+  return out;
 }
