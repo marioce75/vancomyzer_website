@@ -84,7 +84,7 @@ export async function bayesianOptimization(patient, levels, regimen) {
   }
 }
 
-// UPDATED: align with backend /api/population-model expecting a PatientInput body (no wrapper)
+// Align with backend /api/population-model expecting a PatientInput body (no wrapper)
 export async function populationModelDose(patient) {
   try {
     const payload = normalizePatient(patient); // backend expects fields at root
@@ -108,6 +108,8 @@ export async function calculateDose(patient, levels) {
 
 /**
  * Interactive regimen update
+ * - If levels present → re-run Bayesian with regimen
+ * - If no levels → use population output and overlay regimen
  */
 export async function interactiveUpdate(patient, levels, regimen) {
   if (!patient) throw new Error('No patient in context');
