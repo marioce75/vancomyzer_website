@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request, status
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request, status, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -108,6 +108,11 @@ class VancomycinLevel(BaseModel):
     level_type: str = Field("trough", pattern="^(trough|peak|random)$")
     draw_time: datetime
     notes: Optional[str] = None
+
+# Request model for Bayesian endpoint
+class BayesianRequest(BaseModel):
+    patient: PatientInput
+    levels: List[VancomycinLevel] = Field(default_factory=list)
 
 class DosingResult(BaseModel):
     recommended_dose_mg: float
@@ -747,6 +752,19 @@ class BayesianOptimizer:
         
         return curve_data
 
+
+# Helper to wrap legacy flat payloads into the new BayesianRequest schema
+def _wrap_legacy_bayes_payload(body: dict) -> BayesianRequest:
+    """
+    Accept legacy 'flat' payloads (patient fields at root) and wrap them into {patient, levels}.
+    If the body already looks like {"patient": {...}, "levels": [...]}, just validate and return it.
+    """
+    if "patient" in body:
+        return BayesianRequest(**body)
+    patient_fields = {k: v for k, v in body.items() if k != "levels"}
+    levels = body.get("levels", [])
+    return BayesianRequest(patient=PatientInput(**patient_fields), levels=levels)
+
 # Global instances
 pk_calculator = VancomycinPKCalculator()
 bayesian_optimizer = BayesianOptimizer(pk_calculator)
@@ -815,13 +833,41 @@ async def calculate_dosing(patient: PatientInput):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@app.post("/api/population-model", response_model=DosingResult)
+async def population_model(patient: PatientInput):
+    """Population PK dosing (alias of /api/calculate-dosing). Accepts PatientInput JSON body."""
+    return await calculate_dosing(patient)  # reuse logic
+
+
+# Compatibility endpoint for legacy flat payloads (not shown in OpenAPI schema)
+@app.post("/api/bayesian-optimization", include_in_schema=False)
+async def bayesian_optimization_compat(body: dict = Body(...)):
+    """
+    Compatibility handler: accepts legacy flat payloads and wraps them into {patient, levels}.
+    Delegates to the typed handler below.
+    """
+    try:
+        req = _wrap_legacy_bayes_payload(body)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=f"Invalid payload: {e}")
+    return await bayesian_optimization(req=req)  # type: ignore
+
+
+# Typed endpoint for Bayesian optimization (OpenAPI schema uses this signature)
 @app.post("/api/bayesian-optimization", response_model=BayesianResult)
-async def bayesian_optimization(patient: PatientInput, levels: List[VancomycinLevel]):
-    """Perform Bayesian optimization using measured vancomycin levels"""
+async def bayesian_optimization(req: BayesianRequest = Body(...)):
+    """Perform Bayesian optimization using measured vancomycin levels."""
+    # Extract from validated request
+    patient = req.patient
+    levels = req.levels or []
     try:
         result = bayesian_optimizer.optimize_dosing(patient, levels)
         return result.model_dump(by_alias=True)
+    except ValueError as e:
+        # Input-related issues (e.g., requires at least one level) -> 422
+        raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
+        # Other errors -> 400
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/pk-simulation")

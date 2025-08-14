@@ -1,10 +1,14 @@
 import axios from 'axios';
 
 // ---- API BASE (Render) ----
-const API_BASE =
-  (typeof window !== 'undefined' && window.location?.host?.includes('vancomyzer.com'))
-    ? 'https://vancomyzer.onrender.com/api'
-    : 'https://vancomyzer.onrender.com/api'; // same for now; keep overrideable if needed
+// Prefer environment variable (e.g., REACT_APP_API_BASE) and fallback by hostname
+const API_BASE = (
+  process.env.REACT_APP_API_BASE && process.env.REACT_APP_API_BASE.trim()
+) || (
+  typeof window !== 'undefined' && window.location?.host?.includes('localhost')
+    ? 'http://localhost:8001/api'
+    : 'https://vancomyzer.onrender.com/api'
+);
 
 console.info('API_BASE =', API_BASE);
 
@@ -80,10 +84,10 @@ export async function bayesianOptimization(patient, levels, regimen) {
   }
 }
 
+// UPDATED: align with backend /api/population-model expecting a PatientInput body (no wrapper)
 export async function populationModelDose(patient) {
   try {
-    const payload = { patient: normalizePatient(patient) };
-    // If your backend uses /calculate-dosing instead, swap the path here:
+    const payload = normalizePatient(patient); // backend expects fields at root
     const { data } = await api.post('/population-model', payload);
     return { ...data, meta: { ...(data.meta || {}), source: 'population' } };
   } catch (err) {
@@ -103,15 +107,12 @@ export async function calculateDose(patient, levels) {
 }
 
 /**
- * Interactive regimen update:
- *  - If levels present -> re-run Bayesian with regimen hint (backend may optimize / simulate)
- *  - If no levels -> reuse population output and override regimen in recommendation for UI continuity
+ * Interactive regimen update
  */
 export async function interactiveUpdate(patient, levels, regimen) {
   if (!patient) throw new Error('No patient in context');
   const n = Array.isArray(levels) ? levels.length : 0;
   if (n > 0) return bayesianOptimization(patient, levels, regimen);
-  // population path
   const base = await populationModelDose(patient);
   if (regimen) {
     base.recommendation = base.recommendation || {};
