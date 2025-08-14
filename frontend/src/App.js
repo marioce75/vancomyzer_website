@@ -33,7 +33,7 @@ function AppInner() {
   const { submitInitial, bayesResult, loading, error } = useBayesian();
 
   const handlePatientSubmit = async (patientData) => {
-    try { await submitInitial(patientData, null, null); setActiveTab(1); } catch(_){}
+    try { await submitInitial(patientData, [], null); setActiveTab(1); } catch(_){}
   };
   const handleTabChange = (event, newValue) => { setActiveTab(newValue); };
 
@@ -85,7 +85,7 @@ function AppInner() {
             >
               <Tab icon={<Calculate />} label="Patient Input" iconPosition="start" />
               <Tab icon={<Timeline />} label="Dosing Results" iconPosition="start" disabled={!bayesResult} />
-              <Tab icon={<Science />} label="Interactive AUC" iconPosition="start" disabled={!bayesResult} />
+              <Tab icon={<Science />} label="Interactive AUC" iconPosition="start" disabled={!bayesResult || (bayesResult?.meta?.source === 'population')} />
               <Tab icon={<MenuBook />} label="Tutorial" iconPosition="start" />
               <Tab icon={<Info />} label="Clinical Info" iconPosition="start" />
             </Tabs>
@@ -115,8 +115,49 @@ function AppInner() {
                     <Timeline sx={{ mr: 1 }} />
                     Dosing Results
                   </Typography>
-                  {/* Simplified placeholder now that dedicated component will read from context */}
-                  <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify({ auc24: bayesResult.auc24, cmin: bayesResult.cmin, cmax: bayesResult.cmax, recommendation: bayesResult.recommendation }, null, 2)}</pre>
+
+                  {/* Indicate whether we used Bayesian optimization or population fallback */}
+                  {(() => {
+                    // Try a few common shapes to detect the source; tolerate missing fields
+                    const meta = bayesResult.meta || {};
+                    const inferredSource =
+                      meta.source ||
+                      bayesResult.source ||
+                      bayesResult.model_source ||
+                      (bayesResult.usedBayesian === false ? 'population' : (bayesResult.usedBayesian === true ? 'bayesian' : null));
+
+                    if (inferredSource === 'population') {
+                      return (
+                        <Alert severity="info" sx={{ mb: 2 }}>
+                          No vancomycin levels were provided. The recommendation is based on the
+                          <strong> population PK model</strong>. Add one or more measured levels to enable
+                          Bayesian individualization.
+                        </Alert>
+                      );
+                    }
+                    if (inferredSource === 'bayesian') {
+                      return (
+                        <Alert severity="success" sx={{ mb: 2 }}>
+                          Results individualized using <strong>Bayesian optimization</strong>.
+                        </Alert>
+                      );
+                    }
+                    return null;
+                  })()}
+
+                  {/* Summary preview for quick verification */}
+                  <pre style={{ whiteSpace: 'pre-wrap' }}>
+                    {JSON.stringify(
+                      {
+                        auc24: bayesResult.auc24,
+                        cmin: bayesResult.cmin,
+                        cmax: bayesResult.cmax,
+                        recommendation: bayesResult.recommendation,
+                      },
+                      null,
+                      2
+                    )}
+                  </pre>
                 </div>
               ) : (
                 <Typography color="text.secondary" align="center">
