@@ -1,16 +1,8 @@
 import axios from 'axios';
 
 // --- API BASE --------------------------------------------------------------
-// Explicit Render backend URL as requested. Replace <your-backend-service> with the
-// actual Render service name (without -web unless that is truly the backend).
-// Keep a localhost fallback for local development.
-const RENDER_API_BASE = "https://<your-backend-service>.onrender.com/api"; // TODO: set real service name
-const LOCAL_API_BASE = (typeof window !== 'undefined' && window.location.hostname === 'localhost')
-  ? `${window.location.origin.replace(/\/$/, '')}/api`
-  : null;
-
-// Final API_BASE (Render in production, localhost during local dev)
-const API_BASE = LOCAL_API_BASE || RENDER_API_BASE;
+// Production backend API (Render)
+const API_BASE = "https://vancomyzer.onrender.com/api";
 console.info('API_BASE =', API_BASE);
 
 // Axios configuration (include Accept header for CORS clarity)
