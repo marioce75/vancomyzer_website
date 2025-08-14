@@ -27,8 +27,9 @@ import {
 } from '@mui/icons-material';
 
 const PatientInputForm = ({ onSubmit, disabled = false }) => {
-  // Helper to test numeric presence
-  function isFiniteNumber(v) { const n = Number(v); return Number.isFinite(n); }
+  // Helper to test numeric presence (updated per spec)
+  const isFiniteNumber = v => Number.isFinite(Number(v));
+  const toNumOrUndefined = v => { const n = Number(v); return Number.isFinite(n) ? n : undefined; };
 
   const [patient, setPatient] = useState({
     population_type: 'adult',
@@ -52,6 +53,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
   const [validation, setValidation] = useState({});
   // New form-level error banner
   const [formError, setFormError] = useState('');
+  const [errorFields, setErrorFields] = useState([]); // track missing requireds
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [estimatedCrCl, setEstimatedCrCl] = useState(null);
   const isAdult = patient.population_type === 'adult';
@@ -148,27 +150,61 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
       ...prev,
       [field]: value
     }));
+    // If user fixes a previously missing required field, clear it from errorFields & possibly banner
+    if ((field === 'weight_kg' || field === 'serum_creatinine')) {
+      const numeric = isFiniteNumber(value);
+      if (numeric) {
+        setErrorFields(prev => prev.filter(f => f !== field));
+        // If both requireds now satisfied, clear banner
+        if ((field === 'weight_kg' ? isFiniteNumber(value) : isFiniteNumber(patient.weight_kg)) &&
+            (field === 'serum_creatinine' ? isFiniteNumber(value) : isFiniteNumber(patient.serum_creatinine))) {
+          setFormError('');
+        }
+      }
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Required numeric presence check BEFORE expensive API call
+
+    // Build coerced patient object to guarantee numeric types or undefined
+    const patientForApi = {
+      ...patient,
+      weight_kg: toNumOrUndefined(patient.weight_kg),
+      serum_creatinine: toNumOrUndefined(patient.serum_creatinine),
+      height_cm: toNumOrUndefined(patient.height_cm),
+      age_years: toNumOrUndefined(patient.age_years),
+      age_months: toNumOrUndefined(patient.age_months),
+      gestational_age_weeks: toNumOrUndefined(patient.gestational_age_weeks),
+      postnatal_age_days: toNumOrUndefined(patient.postnatal_age_days),
+      custom_crcl: toNumOrUndefined(patient.custom_crcl),
+    };
+
     const missing = [];
-    if (!isFiniteNumber(patient.weight_kg)) missing.push('Weight (kg)');
-    if (!isFiniteNumber(patient.serum_creatinine)) missing.push('Serum creatinine');
+    if (!isFiniteNumber(patientForApi.weight_kg)) missing.push('weight_kg');
+    if (!isFiniteNumber(patientForApi.serum_creatinine)) missing.push('serum_creatinine');
+
     if (missing.length) {
-      setFormError(`Please enter: ${missing.join(', ')}`);
+      setErrorFields(missing);
+      setFormError('Please enter: ' + missing.map(k => k === 'weight_kg' ? 'Weight (kg)' : 'Serum creatinine').join(', '));
       // Focus first missing field
-      if (missing[0].startsWith('Weight') && weightRef.current) {
+      if (missing[0] === 'weight_kg' && weightRef.current) {
         weightRef.current.focus();
-      } else if (scrRef.current) {
+      } else if (missing[0] === 'serum_creatinine' && scrRef.current) {
         scrRef.current.focus();
       }
-      return; // Do NOT call onSubmit / API
+      return; // Do not proceed to API
     }
+
     setFormError('');
+    setErrorFields([]);
+
+    // Proceed with existing submit path (upstream caller handles API call)
     if (Object.keys(validation).length === 0) {
-      onSubmit(patient);
+      onSubmit(patientForApi);
+    } else {
+      // Still pass coerced object; upstream may further validate
+      onSubmit(patientForApi);
     }
   };
 
@@ -353,10 +389,11 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       type="number"
                       value={patient.weight_kg}
                       onChange={(e) => handleInputChange('weight_kg', e.target.value)}
-                      error={!!validation.weight_kg}
+                      error={!!validation.weight_kg || errorFields.includes('weight_kg')}
                       helperText={validation.weight_kg}
                       inputProps={{ min: 0.1, max: 300, step: 0.1 }}
                       inputRef={weightRef}
+                      className={errorFields.includes('weight_kg') ? 'input error' : undefined}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -379,10 +416,11 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       type="number"
                       value={patient.serum_creatinine}
                       onChange={(e) => handleInputChange('serum_creatinine', e.target.value)}
-                      error={!!validation.serum_creatinine}
+                      error={!!validation.serum_creatinine || errorFields.includes('serum_creatinine')}
                       helperText={validation.serum_creatinine}
                       inputProps={{ min: 0.1, max: 20, step: 0.1 }}
                       inputRef={scrRef}
+                      className={errorFields.includes('serum_creatinine') ? 'input error' : undefined}
                     />
                   </Grid>
                 </Grid>
@@ -544,9 +582,9 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
           {/* Submit Button */}
           <Grid item xs={12}>
             {formError && (
-              <Box sx={{ mb: 2 }}>
-                <Alert severity="error" role="alert">{formError}</Alert>
-              </Box>
+              <div role="alert" className="alert error" style={{ marginBottom: 12 }}>
+                {formError}
+              </div>
             )}
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
               <Button
