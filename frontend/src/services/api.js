@@ -74,6 +74,19 @@ function sanitizeForApi(payload) {
   return p;
 }
 
+// Build {patient, levels} from either a wrapped or flat payload
+function buildBayesBody(payload) {
+  if (!payload) return { patient: {}, levels: [] };
+  if (payload.patient) {
+    return {
+      patient: payload.patient,
+      levels: Array.isArray(payload.levels) ? payload.levels : [],
+    };
+  }
+  // flat object (age_years, weight_kg, etc.)
+  return { patient: payload, levels: [] };
+}
+
 // --- levels helper: normalize/validate levels for Bayesian fit ----------
 function normalizeLevels(levels) {
   if (!Array.isArray(levels)) return [];
@@ -215,62 +228,34 @@ export async function calculateDosingFetch(samplePatient) {
   return resp.json();
 }
 
-// --- API methods -----------------------------------------------------------
+// --- API methods (updated) -------------------------------------------------
+export async function bayesianOptimization(payload) {
+  const body = buildBayesBody(payload);
+  const res = await api.post(`/bayesian-optimization`, body, {
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+  });
+  return res.data;
+}
+
+export async function calculateDosing(patient) {
+  const res = await api.post(`/calculate-dosing`, patient, {
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+  });
+  return res.data;
+}
+
 export const vancomyzerAPI = {
-  // Health check
   healthCheck: async () => {
     const response = await api.get(`/health`);
     return response.data;
   },
-
-  // Calculate vancomycin dosing
-  calculateDosing: async (patientData) => {
-    try {
-      const payload = sanitizeForApi(formatPatientForAPI(patientData));
-      const response = await api.post(`/calculate-dosing`, payload);
-      return response.data;
-    } catch (error) {
-      console.error('Error in calculateDosing:', error);
-      throw error;
-    }
-  },
-
-  // Bayesian optimization (one-call path) – ALWAYS send { patient, levels }
-  bayesianOptimization: async (patientData, levels) => {
-    // Normalize patient
-    const patient = sanitizeForApi(formatPatientForAPI(patientData));
-    // Normalize/force array for levels
-    const normLevels = normalizeLevels(levels);
-
-    // Construct body exactly as backend expects
-    const body = { patient, levels: normLevels };
-
-    console.debug('[bayesianOptimization] POST body:', body);
-
-    try {
-      const response = await api.post(`/bayesian-optimization`, body);
-      return response.data;
-    } catch (error) {
-      // Surface FastAPI 422 reasons clearly
-      const detail = error?.response?.data?.detail;
-      if (error?.response?.status === 422) {
-        const friendly = Array.isArray(detail)
-          ? detail.map(d => `${(d.loc||[]).join('.')}: ${d.msg}`).join('; ')
-          : (typeof detail === 'string' ? detail : 'Validation failed (422)');
-        throw new Error(friendly);
-      }
-      throw error;
-    }
-  },
-
-  // PK simulation
+  calculateDosing,
+  bayesianOptimization,
   pkSimulation: async (patientData, dose, interval) => {
     const payload = sanitizeForApi({ patient: formatPatientForAPI(patientData), dose, interval });
     const response = await api.post(`/pk-simulation`, payload);
     return response.data;
   },
-
-  // Real-time calculation (fallback if WebSocket fails) — ensure /api prefix
   realTimeCalculation: async (patientData, dose, interval) => {
     const payload = sanitizeForApi({ patient: formatPatientForAPI(patientData), dose, interval });
     const response = await api.post(`/pk-simulation`, payload);
@@ -280,7 +265,6 @@ export const vancomyzerAPI = {
 
 // Convenience wrapper to accept either {patient, levels} or (patient, levels)
 export async function bayesOptimizeSafe(arg1, arg2) {
-  // If someone passes {patient, levels} forward it; else treat as (patient, levels)
   if (arg1 && typeof arg1 === 'object' && 'patient' in arg1) {
     const body = {
       patient: sanitizeForApi(formatPatientForAPI(arg1.patient)),
@@ -288,7 +272,6 @@ export async function bayesOptimizeSafe(arg1, arg2) {
     };
     return (await api.post(`/bayesian-optimization`, body)).data;
   }
-  // (patient, levels) form
   const patient = sanitizeForApi(formatPatientForAPI(arg1));
   const levels = normalizeLevels(arg2);
   return (await api.post(`/bayesian-optimization`, { patient, levels })).data;
@@ -308,7 +291,6 @@ export class VancomyzerWebSocket {
   }
   connect() {
     try {
-      // Remove trailing /api if present for WS root endpoint
       const httpBase = API_BASE.replace(/\/?api\/?$/, '');
       const wsBase = httpBase.replace(/^http/i, 'ws');
       const wsUrl = `${wsBase}/ws/realtime-calc`;
@@ -353,69 +335,48 @@ class APICache {
   clear() { this.cache.clear(); }
 }
 export const apiCache = new APICache();
-// Fit (model param) cache – keyed only by patient+levels for 10 min to avoid refits on slider moves
 const fitCache = new APICache(100, 10 * 60 * 1000);
 
-/** Simple stable hash for cache keys */
 function hashKey(obj){ try { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).slice(0,256); } catch { return JSON.stringify(obj); } }
 
-/** Normalize varied backend field names into a canonical shape */
 function normalizeBayesResponse(raw){ if(!raw || typeof raw !== 'object') return raw; const r = { ...raw };
-  // Accept auc keys
   r.auc24 = r.auc24 ?? r.auc_24 ?? r.auc_24h ?? r.predicted_auc_24 ?? r.AUC24;
   r.cmin = r.cmin ?? r.trough ?? r.predicted_trough ?? r.Cmin;
   r.cmax = r.cmax ?? r.peak ?? r.predicted_peak ?? r.Cmax;
-  // Recommendation regimen normalization
   if(r.recommendation && !r.recommendation.regimen && (r.recommendation.dose_mg && r.recommendation.interval_h)){
     r.recommendation = { ...r.recommendation, regimen: { dose_mg: r.recommendation.dose_mg, interval_h: r.recommendation.interval_h } };
   }
   return r;
 }
 
-/**
- * POST helper removing null/undefined keys.
- */
 function buildBody(base){ const b = {}; Object.entries(base).forEach(([k,v])=>{ if(v!==null && v!==undefined) b[k]=v; }); return b; }
 
-/** Detect if regimen not accepted by error */
 function isRegimenUnsupported(error){ const msg = error?.message || ''; const dataDetail = error?.response?.data?.detail; const detailStr = typeof dataDetail === 'string' ? dataDetail : JSON.stringify(dataDetail||'');
   const combined = (msg + ' ' + detailStr).toLowerCase();
   return (error?.response?.status === 400 || error?.response?.status === 422) && combined.includes('regimen');
 }
 
-let BAYES_REGIMEN_CAPABILITY = null; // tri-state: null unknown, true supports regimen, false needs 2-step
+let BAYES_REGIMEN_CAPABILITY = null;
 
-/**
- * Calls Bayesian fit (optionally with regimen if backend supports it).
- * @param {object} patient raw patient form data
- * @param {Array|null} levels optional measured levels
- * @param {{dose_mg:number, interval_h:number}|null} regimen optional regimen
- */
 export async function bayesOptimize(patient, levels = null, regimen = null){
   const payloadPatient = sanitizeForApi(formatPatientForAPI(patient));
   const body = buildBody({ ...payloadPatient, levels, regimen });
   try {
     const res = await api.post(`/bayesian-optimization`, body);
-    BAYES_REGIMEN_CAPABILITY = BAYES_REGIMEN_CAPABILITY ?? !!regimen; // if we succeeded w/ regimen assume support
+    BAYES_REGIMEN_CAPABILITY = BAYES_REGIMEN_CAPABILITY ?? !!regimen;
     console.log('[Bayes] one-call success');
     return normalizeBayesResponse(res.data);
   } catch (err){ if(regimen && isRegimenUnsupported(err)){ BAYES_REGIMEN_CAPABILITY = false; throw Object.assign(err, { _regimenUnsupported: true }); } throw err; }
 }
 
-/**
- * Fallback interactive simulation using cached fit params when regimen unsupported.
- * Tries one-call first (if capability unknown/true) then 2-step.
- */
 export async function simulateWithBayes(patient, levels = null, regimen){
   const key = hashKey({ p: sanitizeForApi(formatPatientForAPI(patient)), levels });
-  // Attempt single call path if we think supported
   if(BAYES_REGIMEN_CAPABILITY !== false){
-    try { return await bayesOptimize(patient, levels, regimen); } catch(err){ if(!err._regimenUnsupported) throw err; /* else fall through */ console.log('[Bayes] regimen unsupported, switching to 2-step'); }
+    try { return await bayesOptimize(patient, levels, regimen); } catch(err){ if(!err._regimenUnsupported) throw err; console.log('[Bayes] regimen unsupported, switching to 2-step'); }
   }
-  // Two-step path
   let fit = fitCache.get(key);
   if(!fit){ console.log('[Bayes] fetching new fit (2-step path)'); fit = await bayesOptimize(patient, levels, null); fitCache.set(key, fit); }
-  const model_params = fit.model_params || fit.params || fit.modelParams; // flexible
+  const model_params = fit.model_params || fit.params || fit.modelParams;
   const payloadPatient = sanitizeForApi(formatPatientForAPI(patient));
   const simBody = buildBody({ patient: payloadPatient, regimen, model_params });
   const simRes = await api.post(`/pk-simulation`, simBody);
@@ -423,12 +384,10 @@ export async function simulateWithBayes(patient, levels = null, regimen){
   return merged;
 }
 
-/** Optional probe to check regimen support ahead of time */
 export async function checkBayesRegimenSupport(samplePatient){ if(BAYES_REGIMEN_CAPABILITY !== null) return BAYES_REGIMEN_CAPABILITY; try { await bayesOptimize(samplePatient, null, { dose_mg: 1000, interval_h: 12 }); BAYES_REGIMEN_CAPABILITY = true; } catch(e){ BAYES_REGIMEN_CAPABILITY = e._regimenUnsupported ? false : true; } return BAYES_REGIMEN_CAPABILITY; }
 
 export const BayesianAPI = { initial: bayesOptimize, interactive: simulateWithBayes };
 
-// --- Debugging/experimental exports (not part of public API) ---------------
 export const _bayesianTest = async (patient, levels, regimen) => {
   const payloadPatient = sanitizeForApi(formatPatientForAPI(patient));
   const body = buildBody({ ...payloadPatient, levels, regimen });
@@ -436,7 +395,6 @@ export const _bayesianTest = async (patient, levels, regimen) => {
   return normalizeBayesResponse(res.data);
 };
 
-// For manual testing of regimen support detection
 export const _regimenSupportProbe = async (samplePatient) => {
   const key = hashKey({ p: sanitizeForApi(formatPatientForAPI(samplePatient)), levels: null });
   let fit = fitCache.get(key);
