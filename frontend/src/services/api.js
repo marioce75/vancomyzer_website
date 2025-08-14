@@ -219,6 +219,7 @@ export async function calculateDosingFetch(samplePatient) {
 export async function bayesianOptimization(patient, levels = []) {
   // Ensure patient object exists
   const safePatient = patient || {};
+
   // Sanitize & format patient, normalize levels
   let formattedPatient;
   try {
@@ -228,7 +229,16 @@ export async function bayesianOptimization(patient, levels = []) {
     throw e;
   }
   const normalizedLevels = normalizeLevels(levels);
-  // Construct payload EXACTLY as required by FastAPI: { patient: {...}, levels: [...] }
+
+  // --- NEW: if no levels, do initial population-based dosing instead
+  if (!normalizedLevels || normalizedLevels.length === 0) {
+    const res = await api.post('/calculate-dosing', formattedPatient, {
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    });
+    return res.data;
+  }
+
+  // Existing Bayesian call for when levels ARE present
   const payload = { patient: formattedPatient, levels: normalizedLevels };
   try {
     const res = await api.post('/bayesian-optimization', payload, {
@@ -276,15 +286,19 @@ export const vancomyzerAPI = {
 // Convenience wrapper to accept either {patient, levels} or (patient, levels)
 export async function bayesOptimizeSafe(arg1, arg2) {
   if (arg1 && typeof arg1 === 'object' && 'patient' in arg1) {
-    const body = {
-      patient: sanitizeForApi(formatPatientForAPI(arg1.patient)),
-      levels: normalizeLevels(arg1.levels)
-    };
-    return (await api.post(`/bayesian-optimization`, body)).data;
+    const patient = sanitizeForApi(formatPatientForAPI(arg1.patient));
+    const levels = normalizeLevels(arg1.levels);
+    if (!levels || levels.length === 0) {
+      return (await api.post('/calculate-dosing', patient)).data;
+    }
+    return (await api.post('/bayesian-optimization', { patient, levels })).data;
   }
   const patient = sanitizeForApi(formatPatientForAPI(arg1));
   const levels = normalizeLevels(arg2);
-  return (await api.post(`/bayesian-optimization`, { patient, levels })).data;
+  if (!levels || levels.length === 0) {
+    return (await api.post('/calculate-dosing', patient)).data;
+  }
+  return (await api.post('/bayesian-optimization', { patient, levels })).data;
 }
 
 // --- WebSocket utilities (fix base so it does NOT include /api prefix) -----
