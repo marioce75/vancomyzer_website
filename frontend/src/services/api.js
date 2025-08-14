@@ -74,6 +74,24 @@ function sanitizeForApi(payload) {
   return p;
 }
 
+// --- levels helper: normalize/validate levels for Bayesian fit ----------
+function normalizeLevels(levels) {
+  if (!Array.isArray(levels)) return [];
+  const out = [];
+  for (const lv of levels) {
+    if (!lv) continue;
+    // Accept {time, concentration} or {t, conc} or {hours, value}
+    const time = lv.time ?? lv.t ?? lv.hours ?? lv.sample_time ?? lv.at;
+    const concentration = lv.concentration ?? lv.conc ?? lv.value ?? lv.c;
+    const t = (time !== undefined && time !== null) ? time : null;
+    const c = (concentration !== undefined && concentration !== null) ? Number(concentration) : null;
+    if (t !== null && c !== null && Number.isFinite(c)) {
+      out.push({ time: t, concentration: c });
+    }
+  }
+  return out;
+}
+
 // Anthropometric helper functions (client hints only; server authoritative)
 function cmToIn(cm){ return cm / 2.54; }
 function metersFromCm(cm){ return cm / 100; }
@@ -217,16 +235,32 @@ export const vancomyzerAPI = {
     }
   },
 
-  // Bayesian optimization
+  // Bayesian optimization (one-call path) – ALWAYS send { patient, levels }
   bayesianOptimization: async (patientData, levels) => {
-    const payload = {
-      patient: sanitizeForApi(formatPatientForAPI(patientData)),
-      // Backend requires the key to exist; send [] when no levels yet
-      levels: Array.isArray(levels) ? levels : [],
-    };
-    console.debug('[bayesianOptimization] Payload:', payload);
-    const response = await api.post(`/bayesian-optimization`, payload);
-    return response.data;
+    // Normalize patient
+    const patient = sanitizeForApi(formatPatientForAPI(patientData));
+    // Normalize/force array for levels
+    const normLevels = normalizeLevels(levels);
+
+    // Construct body exactly as backend expects
+    const body = { patient, levels: normLevels };
+
+    console.debug('[bayesianOptimization] POST body:', body);
+
+    try {
+      const response = await api.post(`/bayesian-optimization`, body);
+      return response.data;
+    } catch (error) {
+      // Surface FastAPI 422 reasons clearly
+      const detail = error?.response?.data?.detail;
+      if (error?.response?.status === 422) {
+        const friendly = Array.isArray(detail)
+          ? detail.map(d => `${(d.loc||[]).join('.')}: ${d.msg}`).join('; ')
+          : (typeof detail === 'string' ? detail : 'Validation failed (422)');
+        throw new Error(friendly);
+      }
+      throw error;
+    }
   },
 
   // PK simulation
@@ -243,6 +277,22 @@ export const vancomyzerAPI = {
     return response.data;
   },
 };
+
+// Convenience wrapper to accept either {patient, levels} or (patient, levels)
+export async function bayesOptimizeSafe(arg1, arg2) {
+  // If someone passes {patient, levels} forward it; else treat as (patient, levels)
+  if (arg1 && typeof arg1 === 'object' && 'patient' in arg1) {
+    const body = {
+      patient: sanitizeForApi(formatPatientForAPI(arg1.patient)),
+      levels: normalizeLevels(arg1.levels)
+    };
+    return (await api.post(`/bayesian-optimization`, body)).data;
+  }
+  // (patient, levels) form
+  const patient = sanitizeForApi(formatPatientForAPI(arg1));
+  const levels = normalizeLevels(arg2);
+  return (await api.post(`/bayesian-optimization`, { patient, levels })).data;
+}
 
 // --- WebSocket utilities (fix base so it does NOT include /api prefix) -----
 export class VancomyzerWebSocket {
