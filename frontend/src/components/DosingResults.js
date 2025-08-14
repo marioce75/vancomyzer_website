@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { useBayesian } from '../context/BayesianContext';
 import {
   Grid,
   Card,
   CardContent,
   Typography,
   Box,
-  Chip,
   Alert,
   Paper,
   Divider,
@@ -26,34 +26,42 @@ import {
   LocalHospital,
   Speed,
   Functions,
-  Visibility,
   ExpandMore,
   ExpandLess
 } from '@mui/icons-material';
 
-const DosingResults = ({ result, patient }) => {
+const DosingResults = () => {
+  const { bayesResult, patient } = useBayesian();
+  const result = bayesResult;
   const [showDetails, setShowDetails] = useState(false);
   const [showMonitoring, setShowMonitoring] = useState(false);
 
   if (!result) {
     return (
       <Alert severity="info">
-        No dosing results available. Please calculate dosing first.
+        No Bayesian results yet. Submit patient first.
       </Alert>
     );
   }
 
+  // Map canonical names
+  const doseRec = result?.recommendation?.regimen?.dose_mg || result.recommended_dose_mg;
+  const intervalRec = result?.recommendation?.regimen?.interval_h || result.interval_hours;
+  const auc24 = result.auc24 || result.predicted_auc_24;
+  const trough = result.cmin || result.predicted_trough;
+  const peak = result.cmax || result.predicted_peak;
+
   // Determine safety status
   const getSafetyStatus = () => {
-    const auc = result.predicted_auc_24;
-    const trough = result.predicted_trough;
+    const auc = auc24;
+    const t = trough;
     
-    if (auc >= 400 && auc <= 600 && trough >= 10 && trough <= 20) {
-      return { status: 'safe', color: 'success', icon: CheckCircle, message: 'Optimal dosing parameters' };
-    } else if ((auc >= 350 && auc <= 650) || (trough >= 8 && trough <= 25)) {
+    if (auc >= 400 && auc <= 600 && t >= 10 && t <= 20) {
+      return { status: 'safe', color: 'success', icon: CheckCircle, message: 'Optimal Bayesian exposure' };
+    } else if ((auc >= 350 && auc <= 650) || (t >= 8 && t <= 25)) {
       return { status: 'caution', color: 'warning', icon: Warning, message: 'Acceptable with monitoring' };
     } else {
-      return { status: 'warning', color: 'error', icon: Error, message: 'Consider dose adjustment' };
+      return { status: 'warning', color: 'error', icon: Error, message: 'Consider regimen adjustment' };
     }
   };
 
@@ -80,12 +88,10 @@ const DosingResults = ({ result, patient }) => {
               </Box>
               
               <Typography variant="h4" color="primary" gutterBottom>
-                {result.recommended_dose_mg} mg every {result.interval_hours} hours
+                {doseRec} mg every {intervalRec} hours
               </Typography>
-              
               <Typography variant="body1" color="text.secondary" paragraph>
-                Daily dose: {result.daily_dose_mg.toFixed(0)} mg 
-                ({result.mg_per_kg_per_day.toFixed(1)} mg/kg/day)
+                AUC₀₋₂₄: {auc24?.toFixed?.(0) ?? '—'} mg·h/L | Trough: {trough?.toFixed?.(1) ?? '—'} mg/L | Peak: {peak?.toFixed?.(1) ?? '—'} mg/L
               </Typography>
 
               {result.loading_dose_mg && (
@@ -118,15 +124,15 @@ const DosingResults = ({ result, patient }) => {
                 <Grid item xs={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center' }}>
                     <Typography variant="h5" color="primary">
-                      {result.predicted_auc_24.toFixed(0)}
+                      {auc24?.toFixed?.(0) ?? '—'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       AUC₀₋₂₄ (mg·h/L)
                     </Typography>
                     <LinearProgress 
                       variant="determinate" 
-                      value={Math.min((result.predicted_auc_24 / 600) * 100, 100)}
-                      color={result.predicted_auc_24 >= 400 && result.predicted_auc_24 <= 600 ? 'success' : 'warning'}
+                      value={Math.min((auc24 / 600) * 100, 100)}
+                      color={auc24 >= 400 && auc24 <= 600 ? 'success' : 'warning'}
                       sx={{ mt: 1 }}
                     />
                     <Typography variant="caption" color="text.secondary">
@@ -138,15 +144,15 @@ const DosingResults = ({ result, patient }) => {
                 <Grid item xs={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center' }}>
                     <Typography variant="h5" color="secondary">
-                      {result.predicted_trough.toFixed(1)}
+                      {trough?.toFixed?.(1) ?? '—'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Trough (mg/L)
                     </Typography>
                     <LinearProgress 
                       variant="determinate" 
-                      value={Math.min((result.predicted_trough / 25) * 100, 100)}
-                      color={result.predicted_trough >= 10 && result.predicted_trough <= 20 ? 'success' : 'warning'}
+                      value={Math.min((trough / 25) * 100, 100)}
+                      color={trough >= 10 && trough <= 20 ? 'success' : 'warning'}
                       sx={{ mt: 1 }}
                     />
                     <Typography variant="caption" color="text.secondary">
@@ -158,7 +164,7 @@ const DosingResults = ({ result, patient }) => {
                 <Grid item xs={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center' }}>
                     <Typography variant="h5" color="info.main">
-                      {result.predicted_peak.toFixed(1)}
+                      {peak?.toFixed?.(1) ?? '—'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Peak (mg/L)
@@ -365,7 +371,7 @@ const DosingResults = ({ result, patient }) => {
                         Clearance
                       </Typography>
                       <Typography variant="h6">
-                        {result.clearance_l_per_h.toFixed(2)} L/h
+                        {result.clearance_l_per_h?.toFixed?.(2) ?? '—'} L/h
                       </Typography>
                     </Box>
                   </Grid>
@@ -375,7 +381,7 @@ const DosingResults = ({ result, patient }) => {
                         Volume of Distribution
                       </Typography>
                       <Typography variant="h6">
-                        {result.volume_distribution_l.toFixed(1)} L
+                        {result.volume_distribution_l?.toFixed?.(1) ?? '—'} L
                       </Typography>
                     </Box>
                   </Grid>
@@ -385,7 +391,7 @@ const DosingResults = ({ result, patient }) => {
                         Half-life
                       </Typography>
                       <Typography variant="h6">
-                        {result.half_life_hours.toFixed(1)} hours
+                        {result.half_life_hours?.toFixed?.(1) ?? '—'} hours
                       </Typography>
                     </Box>
                   </Grid>
@@ -395,7 +401,7 @@ const DosingResults = ({ result, patient }) => {
                         Creatinine Clearance
                       </Typography>
                       <Typography variant="h6">
-                        {result.creatinine_clearance.toFixed(0)} mL/min
+                        {result.creatinine_clearance?.toFixed?.(0) ?? '—'} mL/min
                       </Typography>
                     </Box>
                   </Grid>

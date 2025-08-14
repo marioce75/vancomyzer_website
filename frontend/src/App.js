@@ -6,13 +6,10 @@ import {
   Typography,
   Grid,
   Box,
-  Card,
-  CardContent,
   Tabs,
   Tab,
   Alert,
-  CircularProgress,
-  Chip,
+  CircularProgress
 } from '@mui/material';
 import {
   Science,
@@ -27,38 +24,18 @@ import PatientInputForm from './components/PatientInputForm';
 import InteractiveAUCVisualization from './components/InteractiveAUCVisualization';
 import ClinicalInfo from './components/ClinicalInfo';
 import Tutorial from './components/Tutorial';
-import { vancomyzerAPI, formatPatientForAPI } from './services/api';
+import { BayesianProvider, useBayesian } from './context/BayesianContext';
 import './App.css';
 import './styles/disclaimer.css';
 
-function App() {
+function AppInner() {
   const [activeTab, setActiveTab] = useState(0);
-  const [patient, setPatient] = useState(null);
-  const [dosingResult, setDosingResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { submitInitial, bayesResult, loading, error } = useBayesian();
 
   const handlePatientSubmit = async (patientData) => {
-    setPatient(patientData);
-    setLoading(true);
-    setError(null);
-
-    try {
-      const formattedPatient = formatPatientForAPI(patientData);
-      const result = await vancomyzerAPI.calculateDosing(formattedPatient);
-      setDosingResult(result);
-      setActiveTab(1); // Switch to results tab
-    } catch (err) {
-      setError(err.message || 'Failed to calculate dosing');
-      console.error('Dosing calculation error:', err);
-    } finally {
-      setLoading(false);
-    }
+    try { await submitInitial(patientData, null, null); setActiveTab(1); } catch(_){}
   };
-
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
+  const handleTabChange = (event, newValue) => { setActiveTab(newValue); };
 
   return (
     <div className="App">
@@ -92,9 +69,7 @@ function App() {
       {/* Error Display */}
       {error && (
         <Container maxWidth="lg" sx={{ mb: 2 }}>
-          <Alert severity="error" onClose={() => setError(null)}>
-            {error}
-          </Alert>
+          <Alert severity="error">{error}</Alert>
         </Container>
       )}
 
@@ -108,33 +83,11 @@ function App() {
               variant="scrollable"
               scrollButtons="auto"
             >
-              <Tab 
-                icon={<Calculate />} 
-                label="Patient Input" 
-                iconPosition="start"
-              />
-              <Tab 
-                icon={<Timeline />} 
-                label="Dosing Results" 
-                iconPosition="start"
-                disabled={!dosingResult}
-              />
-              <Tab 
-                icon={<Science />} 
-                label="Interactive AUC" 
-                iconPosition="start"
-                disabled={!dosingResult}
-              />
-              <Tab
-                icon={<MenuBook />}
-                label="Tutorial"
-                iconPosition="start"
-              />
-              <Tab 
-                icon={<Info />} 
-                label="Clinical Info" 
-                iconPosition="start"
-              />
+              <Tab icon={<Calculate />} label="Patient Input" iconPosition="start" />
+              <Tab icon={<Timeline />} label="Dosing Results" iconPosition="start" disabled={!bayesResult} />
+              <Tab icon={<Science />} label="Interactive AUC" iconPosition="start" disabled={!bayesResult} />
+              <Tab icon={<MenuBook />} label="Tutorial" iconPosition="start" />
+              <Tab icon={<Info />} label="Clinical Info" iconPosition="start" />
             </Tabs>
           </Box>
 
@@ -151,136 +104,19 @@ function App() {
           {/* Tab Panels */}
           {activeTab === 0 && (
             <Box sx={{ p: 3 }}>
-              <PatientInputForm 
-                onSubmit={handlePatientSubmit}
-                disabled={loading}
-              />
+              <PatientInputForm onSubmit={handlePatientSubmit} disabled={loading} />
             </Box>
           )}
-
           {activeTab === 1 && (
             <Box sx={{ p: 3 }}>
-              {dosingResult ? (
+              {bayesResult ? (
                 <div>
                   <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <Timeline sx={{ mr: 1 }} />
                     Dosing Results
                   </Typography>
-                  
-                  <Grid container spacing={3}>
-                    {/* Main Recommendation */}
-                    <Grid item xs={12}>
-                      <Card sx={{ bgcolor: 'primary.light', color: 'white' }}>
-                        <CardContent>
-                          <Typography variant="h4" gutterBottom>
-                            {dosingResult.recommended_dose_mg} mg every {dosingResult.interval_hours} hours
-                          </Typography>
-                          <Typography variant="body1">
-                            Daily dose: {(dosingResult.recommended_dose_mg * 24 / dosingResult.interval_hours).toFixed(0)} mg
-                            {patient && ` (${(dosingResult.recommended_dose_mg * 24 / dosingResult.interval_hours / patient.weight_kg).toFixed(1)} mg/kg/day)`}
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-
-                    {/* Key Metrics */}
-                    <Grid item xs={12} md={6}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h6" gutterBottom>
-                            Predicted Parameters
-                          </Typography>
-                          <Box sx={{ mb: 2 }}>
-                            <Chip 
-                              label={`AUC₀₋₂₄: ${dosingResult.predicted_auc_24?.toFixed(0) || 'N/A'} mg·h/L`}
-                              color={dosingResult.predicted_auc_24 >= 400 && dosingResult.predicted_auc_24 <= 600 ? 'success' : 'warning'}
-                              sx={{ mr: 1, mb: 1 }}
-                            />
-                            <Chip 
-                              label={`Trough: ${dosingResult.predicted_trough?.toFixed(1) || 'N/A'} mg/L`}
-                              color={dosingResult.predicted_trough >= 10 && dosingResult.predicted_trough <= 20 ? 'success' : 'warning'}
-                              sx={{ mr: 1, mb: 1 }}
-                            />
-                            <Chip 
-                              label={`Half-life: ${dosingResult.half_life_hours?.toFixed(1) || 'N/A'} h`}
-                              color="info"
-                              sx={{ mb: 1 }}
-                            />
-                          </Box>
-                          <Typography variant="body2" color="text.secondary">
-                            Target AUC: 400-600 mg·h/L | Target Trough: 10-20 mg/L
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-
-                    {/* Monitoring */}
-                    <Grid item xs={12} md={6}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h6" gutterBottom>
-                            Monitoring Guidelines
-                          </Typography>
-                          <Typography variant="body2" paragraph>
-                            • Draw levels before 4th dose (steady state)
-                          </Typography>
-                          <Typography variant="body2" paragraph>
-                            • Monitor renal function every 2-3 days
-                          </Typography>
-                          <Typography variant="body2">
-                            • Assess clinical response daily
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-
-                    {/* Warnings */}
-                    {dosingResult.safety_warnings && dosingResult.safety_warnings.length > 0 && (
-                      <Grid item xs={12}>
-                        <Alert severity="warning">
-                          <Typography variant="subtitle2" gutterBottom>
-                            Safety Warnings:
-                          </Typography>
-                          {dosingResult.safety_warnings.map((warning, idx) => (
-                            <Typography key={idx} variant="body2">
-                              • {warning}
-                            </Typography>
-                          ))}
-                        </Alert>
-                      </Grid>
-                    )}
-
-                    {/* Simple AUC Visualization */}
-                    <Grid item xs={12}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h6" gutterBottom>
-                            AUC Analysis
-                          </Typography>
-                          {dosingResult.predicted_auc_24 && (
-                            <Box>
-                              <Typography variant="body1" paragraph>
-                                Predicted AUC₀₋₂₄: <strong>{dosingResult.predicted_auc_24.toFixed(0)} mg·h/L</strong>
-                              </Typography>
-                              <Box sx={{ width: '100%', bgcolor: 'grey.200', borderRadius: 1, overflow: 'hidden', mb: 2 }}>
-                                <Box 
-                                  sx={{ 
-                                    width: `${Math.min((dosingResult.predicted_auc_24 / 600) * 100, 100)}%`,
-                                    height: 20,
-                                    bgcolor: dosingResult.predicted_auc_24 >= 400 && dosingResult.predicted_auc_24 <= 600 ? 'success.main' : 'warning.main',
-                                    transition: 'width 0.5s ease'
-                                  }} 
-                                />
-                              </Box>
-                              <Typography variant="body2" color="text.secondary">
-                                Target Range: 400-600 mg·h/L (shown as green zone)
-                              </Typography>
-                            </Box>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
+                  {/* Simplified placeholder now that dedicated component will read from context */}
+                  <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify({ auc24: bayesResult.auc24, cmin: bayesResult.cmin, cmax: bayesResult.cmax, recommendation: bayesResult.recommendation }, null, 2)}</pre>
                 </div>
               ) : (
                 <Typography color="text.secondary" align="center">
@@ -289,18 +125,10 @@ function App() {
               )}
             </Box>
           )}
-
           {activeTab === 2 && (
             <Box sx={{ p: 3 }}>
-              {dosingResult ? (
-                <InteractiveAUCVisualization
-                  dosingResult={dosingResult}
-                  patient={patient}
-                  onParameterChange={(params) => {
-                    console.log('Real-time parameter change:', params);
-                    // Could update state or trigger re-calculations here
-                  }}
-                />
+              {bayesResult ? (
+                <InteractiveAUCVisualization />
               ) : (
                 <Typography color="text.secondary" align="center">
                   Please calculate dosing first to view interactive AUC visualization.
@@ -308,13 +136,11 @@ function App() {
               )}
             </Box>
           )}
-
           {activeTab === 3 && (
             <Box sx={{ p: 3 }}>
               <Tutorial />
             </Box>
           )}
-
           {activeTab === 4 && (
             <Box sx={{ p: 3 }}>
               <ClinicalInfo />
@@ -343,6 +169,14 @@ function App() {
         </Box>
       </Container>
     </div>
+  );
+}
+
+function App(){
+  return (
+    <BayesianProvider>
+      <AppInner />
+    </BayesianProvider>
   );
 }
 

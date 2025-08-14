@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useBayesian } from '../context/BayesianContext';
 import {
   Grid,
   Card,
@@ -20,42 +21,17 @@ import {
   Speed
 } from '@mui/icons-material';
 
-const InteractiveAUCVisualization = ({ dosingResult, patient, onParameterChange }) => {
-  const [dose, setDose] = useState(dosingResult?.recommended_dose_mg || 1000);
-  const [interval, setInterval] = useState(dosingResult?.interval_hours || 12);
-  const [calculatedAuc, setCalculatedAuc] = useState(dosingResult?.predicted_auc_24 || 400);
-  const [calculatedTrough, setCalculatedTrough] = useState(dosingResult?.predicted_trough || 15);
+const InteractiveAUCVisualization = () => {
+  const { bayesResult, currentRegimen, updateRegimenDebounced, patient } = useBayesian();
+  const [dose, setDose] = useState(currentRegimen?.dose_mg || bayesResult?.recommendation?.regimen?.dose_mg || 1000);
+  const [interval, setInterval] = useState(currentRegimen?.interval_h || bayesResult?.recommendation?.regimen?.interval_h || 12);
+  const auc = bayesResult?.auc24 || 0;
+  const cmin = bayesResult?.cmin || 0;
+  const clearance = bayesResult?.clearance_l_per_h || 3.5;
 
-  // Simplified pharmacokinetic calculations
   useEffect(() => {
-    if (patient && dose && interval) {
-      // Simplified AUC calculation: AUC = (Dose * 24) / (Interval * Clearance)
-      const estimatedClearance = dosingResult?.clearance_l_per_h || 3.5; // L/h default
-      const newAuc = (dose * 24) / (interval * estimatedClearance);
-      
-      // Simplified trough calculation based on half-life
-      const halfLife = dosingResult?.half_life_hours || 6; // hours default
-      const ke = 0.693 / halfLife; // elimination constant
-      const concentrationAfterInfusion = dose / (dosingResult?.volume_distribution_l || 50); // mg/L
-      const newTrough = concentrationAfterInfusion * Math.exp(-ke * interval);
-      
-      setCalculatedAuc(newAuc);
-      setCalculatedTrough(Math.max(0, newTrough));
-      
-      // Notify parent component
-      if (onParameterChange) {
-        onParameterChange({ dose, interval, auc: newAuc, trough: newTrough });
-      }
-    }
-  }, [dose, interval, patient, dosingResult, onParameterChange]);
-
-  const handleDoseChange = (event, newValue) => {
-    setDose(newValue);
-  };
-
-  const handleIntervalChange = (event) => {
-    setInterval(event.target.value);
-  };
+    updateRegimenDebounced(dose, interval);
+  }, [dose, interval, updateRegimenDebounced]);
 
   // AUC status determination
   const getAucStatus = (auc) => {
@@ -78,15 +54,15 @@ const InteractiveAUCVisualization = ({ dosingResult, patient, onParameterChange 
     }
   };
 
-  const aucStatus = getAucStatus(calculatedAuc);
-  const troughStatus = getTroughStatus(calculatedTrough);
+  const aucStatus = getAucStatus(auc);
+  const troughStatus = getTroughStatus(cmin);
 
   // Generate concentration-time curve points (simplified)
   const generatePKCurve = () => {
     const points = [];
     const timePoints = 48; // 48 hours
-    const ke = 0.693 / (dosingResult?.half_life_hours || 6);
-    const vd = dosingResult?.volume_distribution_l || 50;
+    const ke = 0.693 / (bayesResult?.half_life_hours || 6);
+    const vd = bayesResult?.volume_distribution_l || 50;
     const infusionTime = 1; // 1 hour infusion
 
     for (let i = 0; i <= timePoints; i++) {
@@ -241,7 +217,7 @@ const InteractiveAUCVisualization = ({ dosingResult, patient, onParameterChange 
                 </Typography>
                 <Slider
                   value={dose}
-                  onChange={handleDoseChange}
+                  onChange={(event, newValue) => setDose(newValue)}
                   min={250}
                   max={2500}
                   step={125}
@@ -270,7 +246,7 @@ const InteractiveAUCVisualization = ({ dosingResult, patient, onParameterChange 
                   <Select
                     value={interval}
                     label="Dosing Interval"
-                    onChange={handleIntervalChange}
+                    onChange={(event) => setInterval(event.target.value)}
                   >
                     <MenuItem value={8}>Every 8 hours</MenuItem>
                     <MenuItem value={12}>Every 12 hours</MenuItem>
@@ -287,7 +263,7 @@ const InteractiveAUCVisualization = ({ dosingResult, patient, onParameterChange 
                 
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   <Typography variant="h4" sx={{ mr: 1, fontWeight: 'bold' }}>
-                    {calculatedAuc.toFixed(0)}
+                    {auc.toFixed(0)}
                   </Typography>
                   <Box>
                     <Typography variant="body2">mg·h/L AUC₀₋₂₄</Typography>
@@ -305,7 +281,7 @@ const InteractiveAUCVisualization = ({ dosingResult, patient, onParameterChange 
 
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <Typography variant="h5" sx={{ mr: 1 }}>
-                    {calculatedTrough.toFixed(1)}
+                    {cmin.toFixed(1)}
                   </Typography>
                   <Box>
                     <Typography variant="body2">mg/L Trough</Typography>
@@ -386,13 +362,13 @@ const InteractiveAUCVisualization = ({ dosingResult, patient, onParameterChange 
                   {/* Current AUC indicator */}
                   <Box sx={{ 
                     position: 'absolute',
-                    left: `${Math.min((calculatedAuc / 800) * 100, 100)}%`,
+                    left: `${Math.min((auc / 800) * 100, 100)}%`,
                     width: 6,
                     height: '100%',
                     bgcolor: aucStatus.color,
                     borderRadius: 1,
                     transition: 'all 0.5s ease',
-                    animation: calculatedAuc !== (dosingResult?.predicted_auc_24 || 400) ? 'slideIndicator 0.5s ease' : 'none',
+                    animation: 'none',
                     '&::after': {
                       content: '""',
                       position: 'absolute',
@@ -408,16 +384,16 @@ const InteractiveAUCVisualization = ({ dosingResult, patient, onParameterChange 
                 </Box>
                 
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Current AUC: <strong>{calculatedAuc.toFixed(0)} mg·h/L</strong> • 
+                  Current AUC: <strong>{auc.toFixed(0)} mg·h/L</strong> • 
                   Target: 400-600 mg·h/L • 
                   Status: <span style={{ color: aucStatus.color, fontWeight: 'bold' }}>{aucStatus.status}</span>
                 </Typography>
               </Box>
 
               <Typography variant="body2" color="text.secondary">
-                <strong>Formula:</strong> AUC₀₋₂₄ = (Dose × 24h) ÷ (Interval × Clearance) = 
-                ({dose} × 24) ÷ ({interval} × {(dosingResult?.clearance_l_per_h || 3.5).toFixed(2)}) = {' '}
-                <strong style={{ color: aucStatus.color }}>{calculatedAuc.toFixed(0)} mg·h/L</strong>
+                <strong>Formula:</strong> AUC₀₋₂₄ ≈ (Dose × 24h) ÷ (Interval × Clearance) = 
+                ({dose} × 24) ÷ ({interval} × {(clearance || 0).toFixed(2)}) = {' '}
+                <strong style={{ color: aucStatus.color }}>{auc.toFixed(0)} mg·h/L</strong>
               </Typography>
             </CardContent>
           </Card>

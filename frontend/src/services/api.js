@@ -287,24 +287,96 @@ class APICache {
   clear() { this.cache.clear(); }
 }
 export const apiCache = new APICache();
-export const cachedVancomyzerAPI = {
-  ...vancomyzerAPI,
-  calculateDosing: async (patientData) => {
-    const cacheKey = JSON.stringify(sanitizeForApi(formatPatientForAPI(patientData)));
-    const cached = apiCache.get(cacheKey);
-    if (cached) { console.log('Using cached dosing calculation'); return cached; }
-    const result = await vancomyzerAPI.calculateDosing(patientData);
-    apiCache.set(cacheKey, result);
-    return result;
-  },
-  pkSimulation: async (patientData, dose, interval) => {
-    const cacheKey = JSON.stringify(sanitizeForApi({ patientData, dose, interval }));
-    const cached = apiCache.get(cacheKey);
-    if (cached) { console.log('Using cached PK simulation'); return cached; }
-    const result = await vancomyzerAPI.pkSimulation(patientData, dose, interval);
-    apiCache.set(cacheKey, result);
-    return result;
-  },
+// Fit (model param) cache – keyed only by patient+levels for 10 min to avoid refits on slider moves
+const fitCache = new APICache(100, 10 * 60 * 1000);
+
+/** Simple stable hash for cache keys */
+function hashKey(obj){ try { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).slice(0,256); } catch { return JSON.stringify(obj); } }
+
+/** Normalize varied backend field names into a canonical shape */
+function normalizeBayesResponse(raw){ if(!raw || typeof raw !== 'object') return raw; const r = { ...raw };
+  // Accept auc keys
+  r.auc24 = r.auc24 ?? r.auc_24 ?? r.auc_24h ?? r.predicted_auc_24 ?? r.AUC24;
+  r.cmin = r.cmin ?? r.trough ?? r.predicted_trough ?? r.Cmin;
+  r.cmax = r.cmax ?? r.peak ?? r.predicted_peak ?? r.Cmax;
+  // Recommendation regimen normalization
+  if(r.recommendation && !r.recommendation.regimen && (r.recommendation.dose_mg && r.recommendation.interval_h)){
+    r.recommendation = { ...r.recommendation, regimen: { dose_mg: r.recommendation.dose_mg, interval_h: r.recommendation.interval_h } };
+  }
+  return r;
+}
+
+/**
+ * POST helper removing null/undefined keys.
+ */
+function buildBody(base){ const b = {}; Object.entries(base).forEach(([k,v])=>{ if(v!==null && v!==undefined) b[k]=v; }); return b; }
+
+/** Detect if regimen not accepted by error */
+function isRegimenUnsupported(error){ const msg = error?.message || ''; const dataDetail = error?.response?.data?.detail; const detailStr = typeof dataDetail === 'string' ? dataDetail : JSON.stringify(dataDetail||'');
+  const combined = (msg + ' ' + detailStr).toLowerCase();
+  return (error?.response?.status === 400 || error?.response?.status === 422) && combined.includes('regimen');
+}
+
+let BAYES_REGIMEN_CAPABILITY = null; // tri-state: null unknown, true supports regimen, false needs 2-step
+
+/**
+ * Calls Bayesian fit (optionally with regimen if backend supports it).
+ * @param {object} patient raw patient form data
+ * @param {Array|null} levels optional measured levels
+ * @param {{dose_mg:number, interval_h:number}|null} regimen optional regimen
+ */
+export async function bayesOptimize(patient, levels = null, regimen = null){
+  const payloadPatient = sanitizeForApi(formatPatientForAPI(patient));
+  const body = buildBody({ ...payloadPatient, levels, regimen });
+  try {
+    const res = await api.post(`/bayesian-optimization`, body);
+    BAYES_REGIMEN_CAPABILITY = BAYES_REGIMEN_CAPABILITY ?? !!regimen; // if we succeeded w/ regimen assume support
+    console.log('[Bayes] one-call success');
+    return normalizeBayesResponse(res.data);
+  } catch (err){ if(regimen && isRegimenUnsupported(err)){ BAYES_REGIMEN_CAPABILITY = false; throw Object.assign(err, { _regimenUnsupported: true }); } throw err; }
+}
+
+/**
+ * Fallback interactive simulation using cached fit params when regimen unsupported.
+ * Tries one-call first (if capability unknown/true) then 2-step.
+ */
+export async function simulateWithBayes(patient, levels = null, regimen){
+  const key = hashKey({ p: sanitizeForApi(formatPatientForAPI(patient)), levels });
+  // Attempt single call path if we think supported
+  if(BAYES_REGIMEN_CAPABILITY !== false){
+    try { return await bayesOptimize(patient, levels, regimen); } catch(err){ if(!err._regimenUnsupported) throw err; /* else fall through */ console.log('[Bayes] regimen unsupported, switching to 2-step'); }
+  }
+  // Two-step path
+  let fit = fitCache.get(key);
+  if(!fit){ console.log('[Bayes] fetching new fit (2-step path)'); fit = await bayesOptimize(patient, levels, null); fitCache.set(key, fit); }
+  const model_params = fit.model_params || fit.params || fit.modelParams; // flexible
+  const payloadPatient = sanitizeForApi(formatPatientForAPI(patient));
+  const simBody = buildBody({ patient: payloadPatient, regimen, model_params });
+  const simRes = await api.post(`/pk-simulation`, simBody);
+  const merged = normalizeBayesResponse({ ...simRes.data, model_params });
+  return merged;
+}
+
+/** Optional probe to check regimen support ahead of time */
+export async function checkBayesRegimenSupport(samplePatient){ if(BAYES_REGIMEN_CAPABILITY !== null) return BAYES_REGIMEN_CAPABILITY; try { await bayesOptimize(samplePatient, null, { dose_mg: 1000, interval_h: 12 }); BAYES_REGIMEN_CAPABILITY = true; } catch(e){ BAYES_REGIMEN_CAPABILITY = e._regimenUnsupported ? false : true; } return BAYES_REGIMEN_CAPABILITY; }
+
+export const BayesianAPI = { initial: bayesOptimize, interactive: simulateWithBayes };
+
+// --- Debugging/experimental exports (not part of public API) ---------------
+export const _bayesianTest = async (patient, levels, regimen) => {
+  const payloadPatient = sanitizeForApi(formatPatientForAPI(patient));
+  const body = buildBody({ ...payloadPatient, levels, regimen });
+  const res = await api.post(`/bayesian-optimization`, body);
+  return normalizeBayesResponse(res.data);
+};
+
+// For manual testing of regimen support detection
+export const _regimenSupportProbe = async (samplePatient) => {
+  const key = hashKey({ p: sanitizeForApi(formatPatientForAPI(samplePatient)), levels: null });
+  let fit = fitCache.get(key);
+  if(!fit){ console.log('[Bayes] fetching new fit for regimen support probe'); fit = await bayesOptimize(samplePatient, null, null); fitCache.set(key, fit); }
+  return fit;
 };
 
 export default api;
+export { sanitizeForApi };
