@@ -127,14 +127,8 @@ function AppInner() {
 
                   {/* Indicate whether we used Bayesian optimization or population fallback */}
                   {(() => {
-                    const meta = result.meta || {};
-                    const inferredSource =
-                      meta.source ||
-                      result.source ||
-                      result.model_source ||
-                      (result.usedBayesian === false ? 'population' : (result.usedBayesian === true ? 'bayesian' : null));
-
-                    if (inferredSource === 'population') {
+                    const isBayesian = !!result.individual_clearance; // BayesianResult vs Population
+                    if (!isBayesian) {
                       return (
                         <Alert severity="info" sx={{ mb: 2 }}>
                           No vancomycin levels were provided. The recommendation is based on the
@@ -143,29 +137,48 @@ function AppInner() {
                         </Alert>
                       );
                     }
-                    if (inferredSource === 'bayesian') {
+                    return (
+                      <Alert severity="success" sx={{ mb: 2 }}>
+                        Results individualized using <strong>Bayesian optimization</strong>.
+                      </Alert>
+                    );
+                  })()}
+
+                  {/* Summary preview (match backend field names) */}
+                  {(() => {
+                    if (result.recommended_dose_mg !== undefined) {
+                      const summary = {
+                        recommended_dose_mg: result.recommended_dose_mg,
+                        interval_hours: result.interval_hours,
+                        daily_dose_mg: result.daily_dose_mg,
+                        predicted_auc_24: result.predicted_auc_24,
+                        predicted_trough: result.predicted_trough,
+                        predicted_peak: result.predicted_peak,
+                        creatinine_clearance_ml_min: result.creatinine_clearance_ml_min,
+                        half_life_hours: result.half_life_hours,
+                        mg_per_kg_per_day: result.mg_per_kg_per_day,
+                      };
                       return (
-                        <Alert severity="success" sx={{ mb: 2 }}>
-                          Results individualized using <strong>Bayesian optimization</strong>.
-                        </Alert>
+                        <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(summary, null, 2)}</pre>
+                      );
+                    }
+                    if (result.individual_clearance !== undefined) {
+                      const summary = {
+                        individual_clearance: result.individual_clearance,
+                        individual_volume: result.individual_volume,
+                        clearance_ci: [result.clearance_ci_lower, result.clearance_ci_upper],
+                        volume_ci: [result.volume_ci_lower, result.volume_ci_upper],
+                        auc_ci: [result.predicted_auc_ci_lower, result.predicted_auc_ci_upper],
+                        trough_ci: [result.predicted_trough_ci_lower, result.predicted_trough_ci_upper],
+                        fit_r_squared: result.fit_r_squared,
+                        convergence_achieved: result.convergence_achieved,
+                      };
+                      return (
+                        <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(summary, null, 2)}</pre>
                       );
                     }
                     return null;
                   })()}
-
-                  {/* Summary preview for quick verification */}
-                  <pre style={{ whiteSpace: 'pre-wrap' }}>
-                    {JSON.stringify(
-                      {
-                        auc24: result.auc24,
-                        cmin: result.cmin,
-                        cmax: result.cmax,
-                        recommendation: result.recommendation,
-                      },
-                      null,
-                      2
-                    )}
-                  </pre>
                 </div>
               ) : (
                 <Typography color="text.secondary" align="center">
