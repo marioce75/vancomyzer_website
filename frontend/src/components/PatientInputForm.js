@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Grid,
   Card,
@@ -27,6 +27,9 @@ import {
 } from '@mui/icons-material';
 
 const PatientInputForm = ({ onSubmit, disabled = false }) => {
+  // Helper to test numeric presence
+  function isFiniteNumber(v) { const n = Number(v); return Number.isFinite(n); }
+
   const [patient, setPatient] = useState({
     population_type: 'adult',
     age_years: '',
@@ -47,10 +50,16 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
   });
 
   const [validation, setValidation] = useState({});
+  // New form-level error banner
+  const [formError, setFormError] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [estimatedCrCl, setEstimatedCrCl] = useState(null);
   const isAdult = patient.population_type === 'adult';
   const [heightTouched, setHeightTouched] = useState(false);
+
+  // Refs for focusing
+  const weightRef = useRef(null);
+  const scrRef = useRef(null);
 
   // Real-time validation
   useEffect(() => {
@@ -84,21 +93,18 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
     if (!patient.weight_kg || patient.weight_kg <= 0 || patient.weight_kg > 300) {
       errors.weight_kg = 'Weight must be 0.1-300 kg';
     }
-
-    // Height validation – REQUIRED for adults
-    if (isAdult) {
-      if (patient.height_cm === '' || patient.height_cm === null || patient.height_cm === undefined) {
-        errors.height_cm = 'Required: 100-250 cm (adult)';
-      } else if (patient.height_cm < 100 || patient.height_cm > 250) {
-        errors.height_cm = 'Required: 100-250 cm (adult)';
-      }
-    } else if (patient.height_cm) {
-      // Non-adult: optional but must be reasonable if supplied
-      if (patient.height_cm < 30 || patient.height_cm > 250) {
-        errors.height_cm = 'Height must be 30-250 cm';
+    // Height validation (optional for all populations now). Validate only if provided.
+    if (patient.height_cm !== '' && patient.height_cm !== null && patient.height_cm !== undefined) {
+      if (patient.population_type === 'adult') {
+        if (patient.height_cm < 100 || patient.height_cm > 250) {
+          errors.height_cm = 'Height must be 100-250 cm (adult)';
+        }
+      } else {
+        if (patient.height_cm < 30 || patient.height_cm > 250) {
+          errors.height_cm = 'Height must be 30-250 cm';
+        }
       }
     }
-
     // Serum creatinine validation
     if (!patient.serum_creatinine || patient.serum_creatinine <= 0 || patient.serum_creatinine > 20) {
       errors.serum_creatinine = 'SCr must be 0.1-20 mg/dL';
@@ -146,6 +152,21 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Required numeric presence check BEFORE expensive API call
+    const missing = [];
+    if (!isFiniteNumber(patient.weight_kg)) missing.push('Weight (kg)');
+    if (!isFiniteNumber(patient.serum_creatinine)) missing.push('Serum creatinine');
+    if (missing.length) {
+      setFormError(`Please enter: ${missing.join(', ')}`);
+      // Focus first missing field
+      if (missing[0].startsWith('Weight') && weightRef.current) {
+        weightRef.current.focus();
+      } else if (scrRef.current) {
+        scrRef.current.focus();
+      }
+      return; // Do NOT call onSubmit / API
+    }
+    setFormError('');
     if (Object.keys(validation).length === 0) {
       onSubmit(patient);
     }
@@ -172,7 +193,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
     return info[population];
   };
 
-  const isFormValid = Object.keys(validation).length === 0;
+  // const isFormValid = Object.keys(validation).length === 0; // no longer needed after submit gating change
   const numericHeight = Number(patient.height_cm);
   const numericWeight = Number(patient.weight_kg);
   const bmi = (isFinite(numericHeight) && isFinite(numericWeight) && numericHeight >= 100 && numericHeight <= 250 && numericWeight > 0)
@@ -335,21 +356,19 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       error={!!validation.weight_kg}
                       helperText={validation.weight_kg}
                       inputProps={{ min: 0.1, max: 300, step: 0.1 }}
+                      inputRef={weightRef}
                     />
                   </Grid>
                   <Grid item xs={6}>
                     <TextField
                       fullWidth
-                      label={isAdult ? 'Height (cm)' : 'Height (cm, optional)'}
+                      label={'Height (cm)' + (isAdult ? ' (optional)' : ' (optional)')}
                       type="number"
                       value={patient.height_cm}
                       onChange={(e) => handleInputChange('height_cm', e.target.value)}
                       onBlur={() => setHeightTouched(true)}
-                      required={isAdult}
-                      error={!!validation.height_cm && (heightTouched || isAdult)}
-                      helperText={isAdult
-                        ? (validation.height_cm || 'Required for adults (IBW/AdjBW & CrCl). Enter 100–250 cm.')
-                        : (validation.height_cm || 'Enter height in cm.')}
+                      error={!!validation.height_cm && (heightTouched)}
+                      helperText={validation.height_cm || 'Enter height if known to improve IBW/AdjBW calculations'}
                       inputProps={{ min: isAdult ? 100 : 30, max: 250 }}
                     />
                   </Grid>
@@ -363,6 +382,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       error={!!validation.serum_creatinine}
                       helperText={validation.serum_creatinine}
                       inputProps={{ min: 0.1, max: 20, step: 0.1 }}
+                      inputRef={scrRef}
                     />
                   </Grid>
                 </Grid>
@@ -523,12 +543,17 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
 
           {/* Submit Button */}
           <Grid item xs={12}>
+            {formError && (
+              <Box sx={{ mb: 2 }}>
+                <Alert severity="error" role="alert">{formError}</Alert>
+              </Box>
+            )}
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
               <Button
                 type="submit"
                 variant="contained"
                 size="large"
-                disabled={!isFormValid || disabled}
+                disabled={disabled} // no longer gate on full validation; banner handles required presence
                 startIcon={<Calculate />}
                 sx={{ minWidth: 200, py: 1.5 }}
               >
