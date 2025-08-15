@@ -25,28 +25,88 @@ import InteractiveAUCVisualization from './components/InteractiveAUCVisualizatio
 import ClinicalInfo from './components/ClinicalInfo';
 import Tutorial from './components/Tutorial';
 import { BayesianProvider, useBayesian } from './context/BayesianContext';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './components/LanguageSwitcher';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { CacheProvider } from '@emotion/react';
+import createCache from '@emotion/cache';
+import rtlPlugin from 'stylis-plugin-rtl';
+import { prefixer } from 'stylis';
+import CssBaseline from '@mui/material/CssBaseline';
+
 import './App.css';
 import './styles/disclaimer.css';
 
 function AppInner() {
   const { calculate, calculateInteractive, lastResult, error, isLoading } = useBayesian(); // new API
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
   const [validationMessage, setValidationMessage] = useState(null); // gentle banner for incomplete form
   const [lastPatient, setLastPatient] = useState(null); // keep for potential interactive recalcs
 
+  React.useEffect(() => {
+    if (lastResult && !error) {
+      setValidationMessage(null);
+    }
+  }, [lastResult, error]);
+
+  // Map whatever the form provides to the canonical keys App.js expects
+  function normalizePatientFields(p = {}) {
+    // Some callers may send shape { patient: {...} }
+    const src = p && typeof p === 'object' && p.patient ? p.patient : p;
+
+    const toNum = (v) => {
+      if (v === undefined || v === null) return undefined;
+      if (typeof v === 'string') {
+        const trimmed = v.trim();
+        if (trimmed === '') return undefined;
+        const n = parseFloat(trimmed);
+        return Number.isFinite(n) ? n : undefined;
+      }
+      return Number.isFinite(v) ? v : undefined;
+    };
+
+    const age = toNum(
+      src.age ?? src.age_years ?? src.ageYears ?? src.age_y ?? src.age_str
+    );
+
+    const weight_kg = toNum(
+      src.weight_kg ?? src.weight ?? src.total_body_weight_kg ?? src.tbw_kg ?? src.weight_str
+    );
+
+    const serum_creatinine_mg_dl = toNum(
+      src.serum_creatinine_mg_dl ??
+        src.serum_creatinine ??
+        src.scr ??
+        src.s_cr ??
+        src.sc ??
+        src.SCr ??
+        src.serum_creatinine_str
+    );
+
+    const height_cm = toNum(
+      src.height_cm ?? src.height ?? src.height_cm_str
+    );
+
+    // Return the normalized flat shape the rest of the app expects
+    return { ...src, age, weight_kg, serum_creatinine_mg_dl, height_cm };
+  }
+
   const handlePatientSubmit = async (patientData) => {
+    const normalized = normalizePatientFields(patientData);
+    console.debug('[App] normalized patient for submit:', normalized);
     // Validation guard (minimal required fields; adjust as needed)
-    const required = ['age', 'weight_kg', 'serum_creatinine_mg_dl'];
-    const missing = required.filter(f => patientData[f] === undefined || patientData[f] === null || patientData[f] === '');
+    const required = ['age', 'weight_kg', 'serum_creatinine_mg_dl', 'height_cm'];
+    const missing = required.filter((f) => normalized[f] === undefined);
     if (missing.length) {
-      setValidationMessage('Please complete all required fields before calculating: ' + missing.join(', '));
+      setValidationMessage(t('banners.validation.missingFields', { fields: missing.join(', ') }));
       return; // block calculate
     }
     setValidationMessage(null);
     try {
-      setLastPatient(patientData);
+      setLastPatient(normalized);
       // Old removed: setPatient(patientData); submitDosing / calculate(patientData) with implicit levels
-      await calculate({ patient: patientData, levels: patientData.levels || patientData.vancomycin_levels || [] });
+      await calculate({ patient: normalized, levels: normalized.levels || normalized.vancomycin_levels || [] });
       setActiveTab(1);
     } catch (e) {
       // Context should surface error; keep console for debugging
@@ -62,7 +122,8 @@ function AppInner() {
   const handleRegimenUpdate = async (regimen) => {
     if (!lastPatient || !lastResult) return;
     try {
-      await calculateInteractive({ patient: lastPatient, levels: lastPatient.levels || lastPatient.vancomycin_levels || [], regimen });
+      const normalizedPatient = normalizePatientFields(lastPatient);
+      await calculateInteractive({ patient: normalizedPatient, levels: normalizedPatient.levels || normalizedPatient.vancomycin_levels || [], regimen });
     } catch (e) {
       console.error('Interactive regimen update failed', e);
     }
@@ -75,7 +136,9 @@ function AppInner() {
         background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
         color: 'white',
         py: 4,
-        mb: 3
+        mb: 3,
+        display: 'flex',
+        flexDirection: 'column'
       }}>
         <Container maxWidth="lg">
           <Grid container alignItems="center" spacing={2}>
@@ -84,20 +147,23 @@ function AppInner() {
             </Grid>
             <Grid item xs>
               <Typography variant="h3" component="h1" fontWeight="bold">
-                Vancomyzer
+                {t('app.title')}
               </Typography>
               <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                Interactive Evidence-Based Vancomycin Dosing Calculator
+                {t('app.subtitle')}
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
-                Following ASHP/IDSA 2020 Guidelines • Real-time AUC Visualization • Bayesian Optimization
+                {t('app.tagline')}
               </Typography>
+            </Grid>
+            <Grid item>
+              <LanguageSwitcher />
             </Grid>
           </Grid>
         </Container>
       </Box>
 
-      {/* Error Display (now using context error) */}
+      {/* Error Display */}
       {error && (
         <Container maxWidth="lg" sx={{ mb: 2 }}>
           <Alert severity="error">{error}</Alert>
@@ -119,11 +185,11 @@ function AppInner() {
               variant="scrollable"
               scrollButtons="auto"
             >
-              <Tab icon={<Calculate />} label="Patient Input" iconPosition="start" />
-              <Tab icon={<Timeline />} label="Dosing Results" iconPosition="start" disabled={!lastResult} />
-              <Tab icon={<Science />} label="Interactive AUC" iconPosition="start" disabled={!lastResult || (lastResult?.meta?.source === 'population')} />
-              <Tab icon={<MenuBook />} label="Tutorial" iconPosition="start" />
-              <Tab icon={<Info />} label="Clinical Info" iconPosition="start" />
+              <Tab icon={<Calculate />} label={t('tabs.patientInput')} iconPosition="start" />
+              <Tab icon={<Timeline />} label={t('tabs.dosingResults')} iconPosition="start" disabled={!lastResult} />
+              <Tab icon={<Science />} label={t('tabs.interactiveAUC')} iconPosition="start" disabled={!lastResult || (lastResult?.meta?.source === 'population')} />
+              <Tab icon={<MenuBook />} label={t('tabs.tutorial')} iconPosition="start" />
+              <Tab icon={<Info />} label={t('tabs.clinicalInfo')} iconPosition="start" />
             </Tabs>
           </Box>
 
@@ -132,7 +198,7 @@ function AppInner() {
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
               <CircularProgress />
               <Typography sx={{ ml: 2 }}>
-                Calculating optimal vancomycin dosing...
+                {t('actions.calculating')}
               </Typography>
             </Box>
           )}
@@ -236,19 +302,15 @@ function AppInner() {
         <div className="clinical-disclaimer" role="note" aria-labelledby="clinical-disclaimer-title" style={{ marginTop: 24 }}>
           <div className="clinical-disclaimer__header">
             <Warning className="clinical-disclaimer__icon" aria-hidden="true" focusable="false" />
-            <h4 className="clinical-disclaimer__title" id="clinical-disclaimer-title">Clinical Disclaimer</h4>
+            <h4 className="clinical-disclaimer__title" id="clinical-disclaimer-title">{t('disclaimer.title')}</h4>
           </div>
-          <p>
-            Vancomyzer is intended for use by qualified healthcare professionals as a clinical 
-            decision support tool. All dosing recommendations should be reviewed by appropriate 
-            clinical staff and adjusted based on patient-specific factors and clinical judgment.
-          </p>
+          <p>{t('disclaimer.clinical')}</p>
         </div>
 
         {/* Footer */}
         <Box sx={{ mt: 4, py: 3, textAlign: 'center', borderTop: 1, borderColor: 'divider' }}>
           <Typography variant="body2" color="text.secondary">
-            © 2024 Vancomyzer • Evidence-based vancomycin dosing calculator
+            © 2024 Vancomyzer
           </Typography>
         </Box>
       </Container>
@@ -257,10 +319,20 @@ function AppInner() {
 }
 
 function App(){
+  const { i18n } = useTranslation();
+  const direction = i18n.language === 'ar' ? 'rtl' : 'ltr';
+  React.useEffect(()=>{ document.dir = direction; }, [direction]);
+  const cache = React.useMemo(() => createCache({ key: direction === 'rtl' ? 'mui-rtl' : 'mui', stylisPlugins: direction === 'rtl' ? [prefixer, rtlPlugin] : [prefixer] }), [direction]);
+  const theme = React.useMemo(()=>createTheme({ direction }), [direction]);
   return (
-    <BayesianProvider>
-      <AppInner />
-    </BayesianProvider>
+    <CacheProvider value={cache}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <BayesianProvider>
+          <AppInner />
+        </BayesianProvider>
+      </ThemeProvider>
+    </CacheProvider>
   );
 }
 

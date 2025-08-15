@@ -7,12 +7,14 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import References from './References';
+import { useTranslation } from 'react-i18next';
 
 export default function ClinicalInfo() {
+  const { t } = useTranslation();
   return (
     <Box component="main" sx={{ p: { xs: 2, md: 3 }, maxWidth: 1100, mx: 'auto' }}>
       <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 2 }}>
-        Vancomycin Vocabulary & Concepts
+        {t('tabs.clinicalInfo')}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
         Quick reference for core pharmacokinetic (PK) terms, therapeutic targets, renal considerations, and

@@ -20,8 +20,10 @@ import {
   Functions,
   Speed
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 const InteractiveAUCVisualization = () => {
+  const { t } = useTranslation();
   const { bayesResult, currentRegimen, updateRegimenDebounced, patient } = useBayesian();
   const [dose, setDose] = useState(currentRegimen?.dose_mg || bayesResult?.recommendation?.regimen?.dose_mg || 1000);
   const [interval, setInterval] = useState(currentRegimen?.interval_h || bayesResult?.recommendation?.regimen?.interval_h || 12);
@@ -197,7 +199,7 @@ const InteractiveAUCVisualization = () => {
     <div className="fade-in">
       <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
         <TrendingUp sx={{ mr: 1 }} />
-        Interactive AUC Visualization
+        {t('tabs.interactiveAUC')}
       </Typography>
 
       <Grid container spacing={3}>
@@ -207,13 +209,13 @@ const InteractiveAUCVisualization = () => {
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 <Speed sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Dosing Parameters
+                {t('interactiveAUC.dosingParameters')}
               </Typography>
 
               {/* Dose Slider */}
               <Box sx={{ mt: 3 }}>
                 <Typography gutterBottom>
-                  Dose: <strong>{dose} mg</strong>
+                  {t('interactiveAUC.dose')}: <strong>{dose} mg</strong>
                 </Typography>
                 <Slider
                   value={dose}
@@ -242,15 +244,15 @@ const InteractiveAUCVisualization = () => {
               {/* Interval Selection */}
               <Box sx={{ mt: 3 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Dosing Interval</InputLabel>
+                  <InputLabel>{t('interactiveAUC.dosingInterval')}</InputLabel>
                   <Select
                     value={interval}
-                    label="Dosing Interval"
+                    label={t('interactiveAUC.dosingInterval')}
                     onChange={(event) => setInterval(event.target.value)}
                   >
-                    <MenuItem value={8}>Every 8 hours</MenuItem>
-                    <MenuItem value={12}>Every 12 hours</MenuItem>
-                    <MenuItem value={24}>Every 24 hours</MenuItem>
+                    <MenuItem value={8}>{t('interactiveAUC.every8Hours')}</MenuItem>
+                    <MenuItem value={12}>{t('interactiveAUC.every12Hours')}</MenuItem>
+                    <MenuItem value={24}>{t('interactiveAUC.every24Hours')}</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
@@ -258,7 +260,7 @@ const InteractiveAUCVisualization = () => {
               {/* Live Results */}
               <Paper sx={{ mt: 3, p: 2, bgcolor: aucStatus.bgColor, transition: 'all 0.5s ease' }}>
                 <Typography variant="h6" gutterBottom>
-                  Live Results
+                  {t('interactiveAUC.liveResults')}
                 </Typography>
                 
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -266,7 +268,7 @@ const InteractiveAUCVisualization = () => {
                     {auc.toFixed(0)}
                   </Typography>
                   <Box>
-                    <Typography variant="body2">mg·h/L AUC₀₋₂₄</Typography>
+                    <Typography variant="body2">{t('interactiveAUC.mgH_L')}</Typography>
                     <Chip 
                       label={aucStatus.status} 
                       size="small" 
@@ -284,7 +286,7 @@ const InteractiveAUCVisualization = () => {
                     {cmin.toFixed(1)}
                   </Typography>
                   <Box>
-                    <Typography variant="body2">mg/L Trough</Typography>
+                    <Typography variant="body2">{t('interactiveAUC.mgL')}</Typography>
                     <Chip 
                       label={troughStatus.status} 
                       size="small" 
@@ -294,7 +296,7 @@ const InteractiveAUCVisualization = () => {
                 </Box>
 
                 <Typography variant="body2" sx={{ mt: 2 }} color="text.secondary">
-                  Daily dose: {((dose * 24) / interval).toFixed(0)} mg
+                  {t('interactiveAUC.dailyDose')}: {((dose * 24) / interval).toFixed(0)} mg
                   {patient && ` (${((dose * 24) / (interval * patient.weight_kg)).toFixed(1)} mg/kg/day)`}
                 </Typography>
               </Paper>
@@ -308,17 +310,17 @@ const InteractiveAUCVisualization = () => {
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 <Timeline sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Real-time Concentration-Time Curve
+                {t('interactiveAUC.realTimeConcentration')}
               </Typography>
               
               <CurveVisualization />
               
               <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>Green zone:</strong> Target trough range (10-20 mg/L)
+                  <strong>{t('interactiveAUC.greenZone')}:</strong> {t('interactiveAUC.targetTroughRange')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Updates automatically as you modify dose and interval
+                  {t('interactiveAUC.updatesAutomatically')}
                 </Typography>
               </Box>
             </CardContent>
@@ -329,7 +331,7 @@ const InteractiveAUCVisualization = () => {
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 <Functions sx={{ mr: 1, verticalAlign: 'middle' }} />
-                AUC Target Achievement
+                {t('interactiveAUC.aucTargetAchievement')}
               </Typography>
               
               <Box sx={{ mb: 2 }}>
@@ -384,14 +386,14 @@ const InteractiveAUCVisualization = () => {
                 </Box>
                 
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Current AUC: <strong>{auc.toFixed(0)} mg·h/L</strong> • 
-                  Target: 400-600 mg·h/L • 
-                  Status: <span style={{ color: aucStatus.color, fontWeight: 'bold' }}>{aucStatus.status}</span>
+                  {t('interactiveAUC.currentAUC')}: <strong>{auc.toFixed(0)} mg·h/L</strong> • 
+                  {t('interactiveAUC.target')}: 400-600 mg·h/L • 
+                  {t('interactiveAUC.status')}: <span style={{ color: aucStatus.color, fontWeight: 'bold' }}>{aucStatus.status}</span>
                 </Typography>
               </Box>
 
               <Typography variant="body2" color="text.secondary">
-                <strong>Formula:</strong> AUC₀₋₂₄ ≈ (Dose × 24h) ÷ (Interval × Clearance) = 
+                <strong>{t('interactiveAUC.formula')}:</strong> AUC₀₋₂₄ ≈ (Dose × 24h) ÷ (Interval × Clearance) = 
                 ({dose} × 24) ÷ ({interval} × {(clearance || 0).toFixed(2)}) = {' '}
                 <strong style={{ color: aucStatus.color }}>{auc.toFixed(0)} mg·h/L</strong>
               </Typography>

@@ -25,8 +25,11 @@ import {
   ExpandMore,
   ExpandLess
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 const PatientInputForm = ({ onSubmit, disabled = false }) => {
+  const { t } = useTranslation();
+
   // Helper to test numeric presence (updated per spec)
   const isFiniteNumber = v => v !== '' && v !== null && v !== undefined && Number.isFinite(Number(v));
   const toNumOrUndefined = v => {
@@ -247,7 +250,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
     <div className="fade-in">
       <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
         <Person sx={{ mr: 1 }} />
-        Patient Information
+        {t('tabs.patientInput')}
       </Typography>
 
       <form onSubmit={handleSubmit}>
@@ -257,7 +260,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
             <Card className="result-card">
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Population Type
+                  {t('fields.populationType')}
                 </Typography>
                 <Grid container spacing={2}>
                   {['adult', 'pediatric', 'neonate'].map(pop => {
@@ -299,7 +302,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Demographics
+                  {t('fields.age')}
                 </Typography>
                 <Grid container spacing={2}>
                   {/* Age fields based on population */}
@@ -307,7 +310,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                     <Grid item xs={12}>
                       <TextField
                         fullWidth
-                        label="Age (years)"
+                        label={t('fields.ageYears')}
                         type="number"
                         value={patient.age_years}
                         onChange={(e) => handleInputChange('age_years', e.target.value)}
@@ -322,7 +325,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                     <Grid item xs={12}>
                       <TextField
                         fullWidth
-                        label="Age (years)"
+                        label={t('fields.ageYears')}
                         type="number"
                         value={patient.age_years}
                         onChange={(e) => handleInputChange('age_years', e.target.value)}
@@ -338,7 +341,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       <Grid item xs={6}>
                         <TextField
                           fullWidth
-                          label="Gestational Age (weeks)"
+                          label={t('fields.gestationalAgeWeeks')}
                           type="number"
                           value={patient.gestational_age_weeks}
                           onChange={(e) => handleInputChange('gestational_age_weeks', e.target.value)}
@@ -350,7 +353,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       <Grid item xs={6}>
                         <TextField
                           fullWidth
-                          label="Postnatal Age (days)"
+                          label={t('fields.postnatalAgeDays')}
                           type="number"
                           value={patient.postnatal_age_days}
                           onChange={(e) => handleInputChange('postnatal_age_days', e.target.value)}
@@ -364,15 +367,15 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
 
                   <Grid item xs={12}>
                     <FormControl fullWidth>
-                      <InputLabel>Gender</InputLabel>
+                      <InputLabel>{t('fields.gender')}</InputLabel>
                       <Select
                         value={patient.gender}
-                        label="Gender"
+                        label={t('fields.gender')}
                         onChange={(e) => handleInputChange('gender', e.target.value)}
                       >
-                        <MenuItem value="male">Male</MenuItem>
-                        <MenuItem value="female">Female</MenuItem>
-                        <MenuItem value="other">Other</MenuItem>
+                        <MenuItem value="male">{t('genders.male')}</MenuItem>
+                        <MenuItem value="female">{t('genders.female')}</MenuItem>
+                        <MenuItem value="other">{t('genders.other')}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -386,13 +389,13 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Physical Parameters
+                  {t('fields.physicalParameters')}
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
                     <TextField
                       fullWidth
-                      label="Weight (kg)"
+                      label={t('fields.weightKg')}
                       type="number"
                       value={patient.weight_kg}
                       onChange={(e) => handleInputChange('weight_kg', e.target.value)}
@@ -406,7 +409,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                   <Grid item xs={6}>
                     <TextField
                       fullWidth
-                      label={'Height (cm)' + (isAdult ? ' (optional)' : ' (optional)')}
+                      label={t('fields.heightCm')}
                       type="number"
                       value={patient.height_cm}
                       onChange={(e) => handleInputChange('height_cm', e.target.value)}
@@ -419,7 +422,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Serum Creatinine (mg/dL)"
+                      label={t('fields.serumCreatinine')}
                       type="number"
                       value={patient.serum_creatinine}
                       onChange={(e) => handleInputChange('serum_creatinine', e.target.value)}
@@ -458,38 +461,38 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Clinical Information
+                  {t('fields.clinicalInformation')}
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <FormControl fullWidth>
-                      <InputLabel>Indication</InputLabel>
+                      <InputLabel>{t('fields.indication')}</InputLabel>
                       <Select
                         value={patient.indication}
-                        label="Indication"
+                        label={t('fields.indication')}
                         onChange={(e) => handleInputChange('indication', e.target.value)}
                       >
-                        <MenuItem value="pneumonia">Pneumonia</MenuItem>
-                        <MenuItem value="skin_soft_tissue">Skin/Soft Tissue</MenuItem>
-                        <MenuItem value="bacteremia">Bacteremia</MenuItem>
-                        <MenuItem value="endocarditis">Endocarditis</MenuItem>
-                        <MenuItem value="meningitis">Meningitis</MenuItem>
-                        <MenuItem value="osteomyelitis">Osteomyelitis</MenuItem>
-                        <MenuItem value="other">Other</MenuItem>
+                        <MenuItem value="pneumonia">{t('indications.pneumonia')}</MenuItem>
+                        <MenuItem value="skin_soft_tissue">{t('indications.skinSoftTissue')}</MenuItem>
+                        <MenuItem value="bacteremia">{t('indications.bacteremia')}</MenuItem>
+                        <MenuItem value="endocarditis">{t('indications.endocarditis')}</MenuItem>
+                        <MenuItem value="meningitis">{t('indications.meningitis')}</MenuItem>
+                        <MenuItem value="osteomyelitis">{t('indications.osteomyelitis')}</MenuItem>
+                        <MenuItem value="other">{t('indications.other')}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid item xs={12}>
                     <FormControl fullWidth>
-                      <InputLabel>Infection Severity</InputLabel>
+                      <InputLabel>{t('fields.infectionSeverity')}</InputLabel>
                       <Select
                         value={patient.severity}
-                        label="Infection Severity"
+                        label={t('fields.infectionSeverity')}
                         onChange={(e) => handleInputChange('severity', e.target.value)}
                       >
-                        <MenuItem value="mild">Mild</MenuItem>
-                        <MenuItem value="moderate">Moderate</MenuItem>
-                        <MenuItem value="severe">Severe</MenuItem>
+                        <MenuItem value="mild">{t('severities.mild')}</MenuItem>
+                        <MenuItem value="moderate">{t('severities.moderate')}</MenuItem>
+                        <MenuItem value="severe">{t('severities.severe')}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -504,13 +507,13 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                    Advanced Options
+                    {t('fields.advancedOptions')}
                   </Typography>
                   <Button
                     onClick={() => setShowAdvanced(!showAdvanced)}
                     endIcon={showAdvanced ? <ExpandLess /> : <ExpandMore />}
                   >
-                    {showAdvanced ? 'Hide' : 'Show'}
+                    {showAdvanced ? t('actions.hide') : t('actions.show')}
                   </Button>
                 </Box>
 
@@ -524,7 +527,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                             onChange={(e) => handleInputChange('is_renal_stable', e.target.checked)}
                           />
                         }
-                        label="Renal function is stable"
+                        label={t('fields.renalFunctionStable')}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -535,7 +538,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                             onChange={(e) => handleInputChange('is_on_hemodialysis', e.target.checked)}
                           />
                         }
-                        label="On hemodialysis"
+                        label={t('fields.onHemodialysis')}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -546,22 +549,22 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                             onChange={(e) => handleInputChange('is_on_crrt', e.target.checked)}
                           />
                         }
-                        label="On CRRT"
+                        label={t('fields.onCRRT')}
                       />
                     </Grid>
 
                     <Grid item xs={12}>
                       <FormControl fullWidth>
-                        <InputLabel>CrCl Method</InputLabel>
+                        <InputLabel>{t('fields.crclMethod')}</InputLabel>
                         <Select
                           value={patient.crcl_method}
-                          label="CrCl Method"
+                          label={t('fields.crclMethod')}
                           onChange={(e) => handleInputChange('crcl_method', e.target.value)}
                         >
-                          <MenuItem value="cockcroft_gault">Cockcroft-Gault</MenuItem>
-                          <MenuItem value="mdrd">MDRD</MenuItem>
-                          <MenuItem value="ckd_epi">CKD-EPI</MenuItem>
-                          <MenuItem value="custom">Custom</MenuItem>
+                          <MenuItem value="cockcroft_gault">{t('methods.cockcroftGault')}</MenuItem>
+                          <MenuItem value="mdrd">{t('methods.mdrd')}</MenuItem>
+                          <MenuItem value="ckd_epi">{t('methods.ckdEpi')}</MenuItem>
+                          <MenuItem value="custom">{t('methods.custom')}</MenuItem>
                         </Select>
                       </FormControl>
                     </Grid>
@@ -570,7 +573,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       <Grid item xs={12}>
                         <TextField
                           fullWidth
-                          label="Custom CrCl (mL/min)"
+                          label={t('fields.customCrcl')}
                           type="number"
                           value={patient.custom_crcl}
                           onChange={(e) => handleInputChange('custom_crcl', e.target.value)}
@@ -598,11 +601,11 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                 type="submit"
                 variant="contained"
                 size="large"
-                disabled={disabled} // no longer gate on full validation; banner handles required presence
+                disabled={disabled}
                 startIcon={<Calculate />}
                 sx={{ minWidth: 200, py: 1.5 }}
               >
-                {disabled ? 'Calculating...' : 'Calculate Dosing'}
+                {disabled ? t('actions.calculating') : t('actions.calculate')}
               </Button>
             </Box>
           </Grid>
