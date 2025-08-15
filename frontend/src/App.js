@@ -36,7 +36,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 import './App.css';
 import './styles/disclaimer.css';
-import i18n from './i18n';
 
 function AppInner() {
   const { calculate, calculateInteractive, lastResult, error, isLoading } = useBayesian(); // new API
@@ -159,16 +158,6 @@ function AppInner() {
             </Grid>
             <Grid item>
               <LanguageSwitcher />
-              <select
-                aria-label="Language"
-                value={i18n.language || 'en'}
-                onChange={(e) => i18n.changeLanguage(e.target.value)}
-                style={{ marginLeft: 12 }}
-              >
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="ar">العربية</option>
-              </select>
             </Grid>
           </Grid>
         </Container>

@@ -4,27 +4,21 @@ import { useTranslation } from 'react-i18next';
 
 export default function LanguageSwitcher() {
   const { i18n, t } = useTranslation();
-  const [lang, setLang] = React.useState(i18n.language);
+  const active = (i18n.language || 'en').split('-')[0];
 
   const handleChange = (event, newLang) => {
     if (!newLang) return;
-    setLang(newLang);
     i18n.changeLanguage(newLang);
     try { localStorage.setItem('lang', newLang); } catch {}
-    if (newLang === 'ar') {
-      document.dir = 'rtl';
-    } else {
-      document.dir = 'ltr';
-    }
   };
 
   return (
-    <Box sx={{ ml: 2 }}>
+    <Box sx={{ ml: 2 }} role="group" aria-label="Language selector">
       <Tooltip title={t('language.select')}>
-        <ToggleButtonGroup size="small" value={lang} exclusive onChange={handleChange} aria-label="language switcher">
+        <ToggleButtonGroup size="small" value={active} exclusive onChange={handleChange} aria-label="language switcher">
           <ToggleButton value="en" aria-label="English">EN</ToggleButton>
-            <ToggleButton value="es" aria-label="Español">ES</ToggleButton>
-            <ToggleButton value="ar" aria-label="العربية">ع</ToggleButton>
+          <ToggleButton value="es" aria-label="Español">ES</ToggleButton>
+          <ToggleButton value="ar" aria-label="العربية">ع</ToggleButton>
         </ToggleButtonGroup>
       </Tooltip>
     </Box>

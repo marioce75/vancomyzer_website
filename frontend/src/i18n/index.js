@@ -28,11 +28,20 @@ i18n
     }
   });
 
-// Flip document direction on language change (RTL for Arabic)
+// Flip document language and direction on language change (RTL for Arabic)
 i18n.on('languageChanged', (lng) => {
   if (typeof document !== 'undefined') {
-    document.documentElement.setAttribute('dir', lng === 'ar' ? 'rtl' : 'ltr');
+    const base = (lng || 'en').split('-')[0];
+    document.documentElement.setAttribute('lang', base);
+    document.documentElement.setAttribute('dir', base === 'ar' ? 'rtl' : 'ltr');
   }
 });
+
+// Set initial lang/dir attributes based on current language
+if (typeof document !== 'undefined') {
+  const base = (i18n.language || 'en').split('-')[0];
+  document.documentElement.setAttribute('lang', base);
+  document.documentElement.setAttribute('dir', base === 'ar' ? 'rtl' : 'ltr');
+}
 
 export default i18n;
