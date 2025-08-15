@@ -29,22 +29,44 @@ import './App.css';
 import './styles/disclaimer.css';
 
 function AppInner() {
+  const { calculate, calculateInteractive, lastResult, error, isLoading } = useBayesian(); // new API
   const [activeTab, setActiveTab] = useState(0);
-  const { setPatient, result, loading, calculate, levels } = useBayesian();
-  const [error, setError] = useState(null);
+  const [validationMessage, setValidationMessage] = useState(null); // gentle banner for incomplete form
+  const [lastPatient, setLastPatient] = useState(null); // keep for potential interactive recalcs
 
   const handlePatientSubmit = async (patientData) => {
+    // Validation guard (minimal required fields; adjust as needed)
+    const required = ['age', 'weight_kg', 'serum_creatinine_mg_dl'];
+    const missing = required.filter(f => patientData[f] === undefined || patientData[f] === null || patientData[f] === '');
+    if (missing.length) {
+      setValidationMessage('Please complete all required fields before calculating: ' + missing.join(', '));
+      return; // block calculate
+    }
+    setValidationMessage(null);
     try {
-      setError(null);
-      setPatient(patientData);
-      // Use context calculate which routes through submitDosing with current levels
-      setTimeout(() => { calculate(patientData); }, 0);
+      setLastPatient(patientData);
+      // Old removed: setPatient(patientData); submitDosing / calculate(patientData) with implicit levels
+      await calculate({ patient: patientData, levels: patientData.levels || patientData.vancomycin_levels || [] });
       setActiveTab(1);
     } catch (e) {
-      setError(e.message || 'Submission failed');
+      // Context should surface error; keep console for debugging
+      // Previously: setError(e.message || 'Submission failed');
+      // Leave silently; error banner will use context error
+      console.error('Calculation failed', e);
     }
   };
+
   const handleTabChange = (event, newValue) => { setActiveTab(newValue); };
+
+  // Placeholder for potential regimen adjustments routed through calculateInteractive
+  const handleRegimenUpdate = async (regimen) => {
+    if (!lastPatient || !lastResult) return;
+    try {
+      await calculateInteractive({ patient: lastPatient, levels: lastPatient.levels || lastPatient.vancomycin_levels || [], regimen });
+    } catch (e) {
+      console.error('Interactive regimen update failed', e);
+    }
+  };
 
   return (
     <div className="App">
@@ -75,10 +97,15 @@ function AppInner() {
         </Container>
       </Box>
 
-      {/* Error Display */}
+      {/* Error Display (now using context error) */}
       {error && (
         <Container maxWidth="lg" sx={{ mb: 2 }}>
           <Alert severity="error">{error}</Alert>
+        </Container>
+      )}
+      {validationMessage && (
+        <Container maxWidth="lg" sx={{ mb: 2 }}>
+          <Alert severity="warning">{validationMessage}</Alert>
         </Container>
       )}
 
@@ -93,15 +120,15 @@ function AppInner() {
               scrollButtons="auto"
             >
               <Tab icon={<Calculate />} label="Patient Input" iconPosition="start" />
-              <Tab icon={<Timeline />} label="Dosing Results" iconPosition="start" disabled={!result} />
-              <Tab icon={<Science />} label="Interactive AUC" iconPosition="start" disabled={!result || (result?.meta?.source === 'population')} />
+              <Tab icon={<Timeline />} label="Dosing Results" iconPosition="start" disabled={!lastResult} />
+              <Tab icon={<Science />} label="Interactive AUC" iconPosition="start" disabled={!lastResult || (lastResult?.meta?.source === 'population')} />
               <Tab icon={<MenuBook />} label="Tutorial" iconPosition="start" />
               <Tab icon={<Info />} label="Clinical Info" iconPosition="start" />
             </Tabs>
           </Box>
 
           {/* Loading Indicator */}
-          {loading && (
+          {isLoading && (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
               <CircularProgress />
               <Typography sx={{ ml: 2 }}>
@@ -113,40 +140,34 @@ function AppInner() {
           {/* Tab Panels */}
           {activeTab === 0 && (
             <Box sx={{ p: 3 }}>
-              <PatientInputForm onSubmit={handlePatientSubmit} disabled={loading} />
+              <PatientInputForm onSubmit={handlePatientSubmit} disabled={isLoading} />
             </Box>
           )}
           {activeTab === 1 && (
             <Box sx={{ p: 3 }}>
-              {result ? (
+              {lastResult ? (
                 <div>
                   <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <Timeline sx={{ mr: 1 }} />
                     Dosing Results
                   </Typography>
 
-                  {(() => {
-                    const inferredSource = result?.meta?.source || result?.source || result?.model_source || ((levels && levels.length > 0) ? 'bayesian' : 'population');
-                    if (inferredSource === 'population') {
-                      return (
-                        <Alert severity="info" sx={{ mb: 2 }}>
-                          Population PK fallback—add levels to enable Bayesian individualization.
-                        </Alert>
-                      );
-                    }
-                    if (inferredSource === 'bayesian') {
-                      return (
-                        <Alert severity="success" sx={{ mb: 2 }}>
-                          Results individualized using Bayesian optimization.
-                        </Alert>
-                      );
-                    }
-                    return null;
-                  })()}
+                  {/* Source path banners */}
+                  {lastResult?.meta?.source === 'population' && (
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      No vancomycin levels were provided. Recommendation is based on the population PK model.
+                    </Alert>
+                  )}
+                  {lastResult?.meta?.source === 'bayesian' && (
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                      Bayesian individualization was used{lastResult?.meta?.levels_count ? ` (n = ${lastResult.meta.levels_count} levels).` : '.'}
+                    </Alert>
+                  )}
 
                   {/* Summary preview (match backend field names) */}
                   {(() => {
-                    if (result.recommended_dose_mg !== undefined) {
+                    const result = lastResult; // alias for existing rendering logic
+                    if (result?.recommended_dose_mg !== undefined) {
                       const summary = {
                         recommended_dose_mg: result.recommended_dose_mg,
                         interval_hours: result.interval_hours,
@@ -162,7 +183,7 @@ function AppInner() {
                         <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(summary, null, 2)}</pre>
                       );
                     }
-                    if (result.individual_clearance !== undefined) {
+                    if (result?.individual_clearance !== undefined) {
                       const summary = {
                         individual_clearance: result.individual_clearance,
                         individual_volume: result.individual_volume,
@@ -189,8 +210,9 @@ function AppInner() {
           )}
           {activeTab === 2 && (
             <Box sx={{ p: 3 }}>
-              {result ? (
-                <InteractiveAUCVisualization />
+              {lastResult ? (
+                // Interactive component could be extended to accept handleRegimenUpdate
+                <InteractiveAUCVisualization onRegimenChange={handleRegimenUpdate} />
               ) : (
                 <Typography color="text.secondary" align="center">
                   Please calculate dosing first to view interactive AUC visualization.
