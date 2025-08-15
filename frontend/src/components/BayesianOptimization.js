@@ -24,8 +24,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-  Divider
+  DialogActions
 } from '@mui/material';
 import {
   Science,
@@ -36,7 +35,20 @@ import {
   Assessment,
   Info
 } from '@mui/icons-material';
-import { formatLevelForAPI } from '../services/api';
+
+// Minimal local formatter replicating prior behavior for level objects
+function formatLevelForAPI(level) {
+  const num = (v) => (v === '' || v == null ? undefined : Number(v));
+  return {
+    concentration: num(level.concentration),
+    time_after_dose_hours: num(level.time_after_dose_hours),
+    dose_given_mg: num(level.dose_given_mg),
+    infusion_duration_hours: num(level.infusion_duration_hours) ?? 1.0,
+    level_type: level.level_type || 'trough',
+    draw_time: level.draw_time || new Date().toISOString(),
+    notes: level.notes || undefined,
+  };
+}
 
 const BayesianOptimization = ({ patient, onOptimize, result, disabled = false }) => {
   const [levels, setLevels] = useState([]);

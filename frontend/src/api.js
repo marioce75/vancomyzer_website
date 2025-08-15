@@ -1,53 +1,39 @@
-const API_BASE = process.env.REACT_APP_API_BASE || '';
+const API_BASE = "https://vancomyzer.onrender.com/api";
 
-async function getHealth() {
-  const res = await fetch(`${API_BASE}/api/health`);
-  if (!res.ok) throw new Error(`Health check failed: ${res.status}`);
+async function jsonFetch(path, { method = "POST", body } = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+    credentials: "omit",
+  });
+  if (!res.ok) {
+    let msg = `${res.status} ${res.statusText}`;
+    try {
+      const err = await res.json();
+      if (err?.detail) msg = Array.isArray(err.detail) ? JSON.stringify(err.detail) : String(err.detail);
+    } catch {}
+    throw new Error(msg);
+  }
   return res.json();
 }
 
-async function postJSON(path, payload) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  let body;
-  try { body = await res.json(); } catch { body = null; }
-  if (!res.ok) {
-    const detail = body && (body.detail || body.message);
-    throw new Error(detail || `HTTP ${res.status}`);
+export async function submitDosing({ patient, levels = [] }) {
+  // Smart wrapper: if levels provided -> Bayesian; else -> population
+  if (Array.isArray(levels) && levels.length > 0) {
+    return bayesianOptimization({ patient, levels });
   }
-  return body;
+  return calculateDosing(patient);
 }
 
-// Update calculateDosing to include gender normalization and validation
-export function calculateDosing(payload) {
-  // Normalize gender and severity
-  payload.gender = (payload.gender ?? payload.sex)?.toLowerCase().trim();
-  payload.severity = payload.severity?.toLowerCase().trim();
-
-  // Pre-submit guard for gender
-  if (!payload.gender) {
-    throw new Error('Gender is required and must be either "male" or "female".');
-  }
-
-  // Coerce numeric fields
-  ['age_years', 'weight_kg', 'height_cm', 'serum_creatinine'].forEach((key) => {
-    if (payload[key] !== undefined) {
-      payload[key] = Number(payload[key]);
-    }
-  });
-
-  return postJSON('/api/calculate-dosing', payload);
+export async function calculateDosing(patient) {
+  return jsonFetch("/calculate-dosing", { body: { patient } });
 }
 
-export function bayesianOptimization(payload) {
-  return postJSON('/api/bayesian-optimization', payload);
+export async function bayesianOptimization({ patient, levels }) {
+  return jsonFetch("/bayesian-optimization", { body: { patient, levels } });
 }
 
-export function pkSimulation(payload) {
-  return postJSON('/api/pk-simulation', payload);
+export async function pkSimulation(payload) {
+  return jsonFetch("/pk-simulation", { body: payload });
 }
-
-export { getHealth, API_BASE };

@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useMemo, useState, useCallback } from 'react';
-import { submitDosing, calculateDosing, bayesianOptimization, pkSimulation } from '../api';
-// submitDosing intentionally imported for potential future advanced workflows
-void submitDosing;
+import { calculateDosing, bayesianOptimization, pkSimulation } from '../api';
 
 const BayesianContext = createContext(null);
 

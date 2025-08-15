@@ -35,7 +35,7 @@ import {
 
 import PatientInputForm from './components/PatientInputForm';
 import InteractiveAUCVisualization from './components/InteractiveAUCVisualization';
-import { vancomyzerAPI, formatPatientForAPI } from './services/api';
+import { calculateDosing } from './api';
 import './App.css';
 import './styles/disclaimer.css';
 
@@ -93,8 +93,7 @@ function App() {
     setError(null);
 
     try {
-      const formattedPatient = formatPatientForAPI(patientData);
-      const result = await vancomyzerAPI.calculateDosing(formattedPatient);
+      const result = await calculateDosing(patientData);
       setDosingResult(result);
       setActiveTab(1); // Switch to results tab
     } catch (err) {

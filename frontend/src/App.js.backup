@@ -1,46 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import './App.css';
-
-function App() {
-  const [health, setHealth] = useState(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get('/api/health')
-      .then(res => setHealth(res.data))
-      .catch(err => {
-        console.error('Health check failed:', err);
-        setError(err.toString());
-      });
-  }, []);
-
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Vancomyzer</h1>
-        {health ? (
-          <div>
-            <p>API status: <strong>{health.status}</strong></p>
-            <p>Timestamp: <strong>{new Date(health.timestamp).toLocaleString()}</strong></p>
-          </div>
-        ) : (
-          <p>Loading health check…</p>
-        )}
-        {error && (
-          <p style={{ color: 'salmon' }}>
-            Error fetching health: {error}
-          </p>
-        )}
-      </header>
-
-      {/* your existing components go below */}
-    </div>
-  );
-}
-
-export default App;import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container,
   Paper,
@@ -72,7 +30,7 @@ import DosingResults from './components/DosingResults';
 import CalculationExplanation from './components/CalculationExplanation';
 import ClinicalGuidelines from './components/ClinicalGuidelines';
 import RealTimeCalculator from './components/RealTimeCalculator.simple';
-import { vancomyzerAPI } from './services/api';
+import { calculateDosing, bayesianOptimization } from './api';
 import './App.css';
 import './styles/disclaimer.css';
 
@@ -96,7 +54,7 @@ function App() {
     setError(null);
 
     try {
-      const result = await vancomyzerAPI.calculateDosing(patientData);
+      const result = await calculateDosing(patientData);
       setDosingResult(result);
       setActiveTab(1); // Switch to results tab
     } catch (err) {
@@ -116,7 +74,7 @@ function App() {
     setError(null);
 
     try {
-      const result = await vancomyzerAPI.bayesianOptimization(patient, levels);
+      const result = await bayesianOptimization({ patient, levels });
       setBayesianResult(result);
       setActiveTab(2); // Switch to Bayesian tab
     } catch (err) {
