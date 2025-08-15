@@ -36,6 +36,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 import './App.css';
 import './styles/disclaimer.css';
+import i18n from './i18n';
 
 function AppInner() {
   const { calculate, calculateInteractive, lastResult, error, isLoading } = useBayesian(); // new API
@@ -99,7 +100,7 @@ function AppInner() {
     const required = ['age', 'weight_kg', 'serum_creatinine_mg_dl', 'height_cm'];
     const missing = required.filter((f) => normalized[f] === undefined);
     if (missing.length) {
-      setValidationMessage(t('banners.validation.missingFields', { fields: missing.join(', ') }));
+      setValidationMessage(t('notices.missingRequiredBanner'));
       return; // block calculate
     }
     setValidationMessage(null);
@@ -158,6 +159,16 @@ function AppInner() {
             </Grid>
             <Grid item>
               <LanguageSwitcher />
+              <select
+                aria-label="Language"
+                value={i18n.language || 'en'}
+                onChange={(e) => i18n.changeLanguage(e.target.value)}
+                style={{ marginLeft: 12 }}
+              >
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="ar">العربية</option>
+              </select>
             </Grid>
           </Grid>
         </Container>

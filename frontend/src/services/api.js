@@ -1,110 +1,142 @@
-// Single API base
-export const API_BASE = 'https://vancomyzer.onrender.com/api';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Collapse from '@mui/material/Collapse';
 
-// ---- Helpers --------------------------------------------------
-function clamp(value, min, max) {
-  if (value == null || !Number.isFinite(value)) return undefined;
-  return Math.min(Math.max(value, min), max);
+function PatientInputForm(props) {
+  const { t } = useTranslation();
+
+  return (
+    <form>
+      <div className="fieldBlock">
+        <div className="fieldLabel">{t('fields.ageYears')}</div>
+        <TextField
+          id="age_years"
+          name="age_years"
+          type="number"
+          aria-label={t('fields.ageYears')}
+          variant="outlined"
+          InputLabelProps={{ shrink: true }}
+          label=""
+          value={props.values.age_years}
+          onChange={props.handleChange}
+          error={!!props.errors.age_years}
+          helperText={props.errors.age_years || t('errors.ageAdultMin')}
+          inputProps={{ min: 0 }}
+        />
+      </div>
+
+      <div className="fieldBlock">
+        <div className="fieldLabel">{t('fields.gender')}</div>
+        <Select
+          id="gender"
+          name="gender"
+          value={props.values.gender}
+          onChange={props.handleChange}
+          aria-label={t('fields.gender')}
+        >
+          <MenuItem value="male">{t('genders.male')}</MenuItem>
+          <MenuItem value="female">{t('genders.female')}</MenuItem>
+        </Select>
+      </div>
+
+      <div className="fieldBlock">
+        <div className="fieldLabel">{t('fields.weightKg')}</div>
+        <TextField
+          id="weight_kg"
+          name="weight_kg"
+          type="number"
+          aria-label={t('fields.weightKg')}
+          variant="outlined"
+          InputLabelProps={{ shrink: true }}
+          label=""
+          value={props.values.weight_kg}
+          onChange={props.handleChange}
+          error={!!props.errors.weight_kg}
+          helperText={props.errors.weight_kg || t('errors.weightRange')}
+          inputProps={{ min: 0 }}
+        />
+      </div>
+
+      <div className="fieldBlock">
+        <div className="fieldLabel">{t('fields.heightCm')}</div>
+        <TextField
+          id="height_cm"
+          name="height_cm"
+          type="number"
+          aria-label={t('fields.heightCm')}
+          variant="outlined"
+          InputLabelProps={{ shrink: true }}
+          label=""
+          value={props.values.height_cm}
+          onChange={props.handleChange}
+          error={!!props.errors.height_cm}
+          helperText={props.errors.height_cm}
+          inputProps={{ min: 0 }}
+        />
+      </div>
+
+      <div className="fieldBlock">
+        <div className="fieldLabel">{t('fields.serumCreatinine')}</div>
+        <TextField
+          id="serum_creatinine"
+          name="serum_creatinine"
+          type="number"
+          aria-label={t('fields.serumCreatinine')}
+          variant="outlined"
+          InputLabelProps={{ shrink: true }}
+          label=""
+          value={props.values.serum_creatinine}
+          onChange={props.handleChange}
+          error={!!props.errors.serum_creatinine}
+          helperText={props.errors.serum_creatinine || t('errors.scrRange')}
+          inputProps={{ min: 0 }}
+        />
+      </div>
+
+      <div className="fieldLabel">{t('fields.physicalParameters')}</div>
+
+      <div className="fieldLabel">{t('fields.clinicalInformation')}</div>
+
+      <div className="fieldBlock">
+        <div className="fieldLabel">{t('fields.indication')}</div>
+        <Select
+          id="indication"
+          name="indication"
+          value={props.values.indication}
+          onChange={props.handleChange}
+          aria-label={t('fields.indication')}
+        >
+          <MenuItem value="pneumonia">{t('indications.pneumonia')}</MenuItem>
+          <MenuItem value="other">{t('indications.other')}</MenuItem>
+        </Select>
+      </div>
+
+      <div className="fieldBlock">
+        <div className="fieldLabel">{t('fields.infectionSeverity')}</div>
+        <Select
+          id="severity"
+          name="severity"
+          value={props.values.severity}
+          onChange={props.handleChange}
+          aria-label={t('fields.infectionSeverity')}
+        >
+          <MenuItem value="mild">{t('severities.mild')}</MenuItem>
+          <MenuItem value="moderate">{t('severities.moderate')}</MenuItem>
+          <MenuItem value="severe">{t('severities.severe')}</MenuItem>
+        </Select>
+      </div>
+
+      <div className="fieldLabel">{t('fields.advancedOptions')}</div>
+      <Collapse in={props.showAdvancedOptions}>
+        {/* Advanced options controls here without label props */}
+      </Collapse>
+    </form>
+  );
 }
 
-function toNumber(v) {
-  if (v === '' || v === null || v === undefined) return undefined;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : undefined;
-}
-
-// Map UI (camelCase) -> backend PatientInput (snake_case)
-export function normalizePatient(ui) {
-  if (!ui) return {};
-  const out = {
-    population_type: (ui.populationType || ui.population_type || 'adult'),
-    age_years: toNumber(ui.ageYears ?? ui.age_years),
-    gender: ui.gender || ui.gender?.toLowerCase?.() || undefined,
-    weight_kg: toNumber(ui.weightKg ?? ui.weight_kg),
-    height_cm: toNumber(ui.heightCm ?? ui.height_cm),
-    serum_creatinine: toNumber(ui.serum_creatinine ?? ui.serum_creatinine_mg_dl),
-    indication: ui.indication,
-    severity: ui.severity,
-    is_renal_stable: ui.isRenalStable ?? ui.is_renal_stable ?? true,
-    is_on_hemodialysis: ui.isOnHemodialysis ?? ui.is_on_hemodialysis ?? false,
-    is_on_crrt: ui.isOnCrrt ?? ui.is_on_crrt ?? false,
-    crcl_method: ui.crclMethod ?? ui.crcl_method ?? 'cockcroft_gault',
-  };
-
-  // Clamp/sanitize ranges
-  if (out.age_years != null) out.age_years = Math.max(0, out.age_years);
-  if (out.weight_kg != null) out.weight_kg = clamp(out.weight_kg, 0.1, 300);
-  if (out.height_cm != null) out.height_cm = clamp(out.height_cm, 40, 250);
-  if (out.serum_creatinine != null) out.serum_creatinine = clamp(out.serum_creatinine, 0.1, 20);
-
-  // Remove undefined keys
-  Object.keys(out).forEach(k => {
-    if (out[k] === undefined || out[k] === null || out[k] === '') delete out[k];
-  });
-  return out;
-}
-
-// ---- Small utilities -----------------------------------------
-async function safeJson(res) {
-  try { return await res.json(); } catch { return null; }
-}
-function formatApiError(prefix, detail) {
-  if (!detail) return `${prefix}.`;
-  if (detail.detail) return `${prefix} (HTTP ${detail.status ?? res?.status ?? 400}): ${JSON.stringify(detail.detail)}`;
-  return `${prefix}: ${JSON.stringify(detail)}`;
-}
-
-// ---- Core calls -----------------------------------------------
-export async function calculateDosing(patientLike) {
-  const patient = normalizePatient(patientLike);
-  const endpoint = '/calculate-dosing';
-  const payload = { patient };
-  if (process.env.NODE_ENV !== 'production') console.log('API payload', endpoint, payload);
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  if (!res.ok) {
-    const detail = await safeJson(res);
-    throw new Error(formatApiError('Population model calculation failed', detail));
-  }
-  return safeJson(res);
-}
-
-export async function bayesianOptimization(patientLike, levelsLike) {
-  const patient = normalizePatient(patientLike);
-  const levels = Array.isArray(levelsLike) ? levelsLike.filter(Boolean) : [];
-  if (levels.length < 1) {
-    throw new Error('At least one vancomycin level required for Bayesian optimization');
-  }
-  const endpoint = '/bayesian-optimization';
-  const payload = { patient, levels };
-  if (process.env.NODE_ENV !== 'production') console.log('API payload', endpoint, payload);
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  if (!res.ok) {
-    const detail = await safeJson(res);
-    throw new Error(formatApiError('Bayesian optimization failed', detail));
-  }
-  return safeJson(res);
-}
-
-// Optional convenience wrapper used by the UI
-export async function calculateOrBayes(patientLike, levelsLike) {
-  const n = Array.isArray(levelsLike) ? levelsLike.length : 0;
-  return n > 0
-    ? bayesianOptimization(patientLike, levelsLike)
-    : calculateDosing(patientLike);
-}
-
-// ---- Exports --------------------------------------------------
-export default {
-  calculateDosing,
-  bayesianOptimization,
-  calculateOrBayes,
-  normalizePatient,
-};
+export default PatientInputForm;

@@ -5,8 +5,6 @@ import {
   CardContent,
   Typography,
   TextField,
-  FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Button,
@@ -83,7 +81,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
     // Age validation
     if (patient.population_type === 'adult') {
       if (!patient.age_years || patient.age_years < 18) {
-        errors.age_years = 'Adults must be ≥18 years';
+        errors.age_years = t('errors.ageAdultMin');
       }
     } else if (patient.population_type === 'pediatric') {
       if (!patient.age_years || patient.age_years < 1/12 || patient.age_years >= 18) {
@@ -100,7 +98,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
 
     // Weight validation
     if (!patient.weight_kg || patient.weight_kg <= 0 || patient.weight_kg > 300) {
-      errors.weight_kg = 'Weight must be 0.1-300 kg';
+      errors.weight_kg = t('errors.weightRange');
     }
     // Height validation (optional for all populations now). Validate only if provided.
     if (patient.height_cm !== '' && patient.height_cm !== null && patient.height_cm !== undefined) {
@@ -116,7 +114,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
     }
     // Serum creatinine validation
     if (!patient.serum_creatinine || patient.serum_creatinine <= 0 || patient.serum_creatinine > 20) {
-      errors.serum_creatinine = 'SCr must be 0.1-20 mg/dL';
+      errors.serum_creatinine = t('errors.scrRange');
     }
 
     // Custom CrCl validation
@@ -308,30 +306,32 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                   {/* Age fields based on population */}
                   {patient.population_type === 'adult' && (
                     <Grid item xs={12}>
+                      <Typography variant="subtitle2" gutterBottom>{t('fields.ageYears')}</Typography>
                       <TextField
                         fullWidth
-                        label={t('fields.ageYears')}
                         type="number"
                         value={patient.age_years}
                         onChange={(e) => handleInputChange('age_years', e.target.value)}
                         error={!!validation.age_years}
                         helperText={validation.age_years}
                         inputProps={{ min: 18, max: 120 }}
+                        aria-label={t('fields.ageYears')}
                       />
                     </Grid>
                   )}
 
                   {patient.population_type === 'pediatric' && (
                     <Grid item xs={12}>
+                      <Typography variant="subtitle2" gutterBottom>{t('fields.ageYears')}</Typography>
                       <TextField
                         fullWidth
-                        label={t('fields.ageYears')}
                         type="number"
                         value={patient.age_years}
                         onChange={(e) => handleInputChange('age_years', e.target.value)}
                         error={!!validation.age_years}
                         helperText={validation.age_years || "Enter as decimal (e.g., 2.5 for 2.5 years)"}
                         inputProps={{ min: 0.08, max: 17.99, step: 0.1 }}
+                        aria-label={t('fields.ageYears')}
                       />
                     </Grid>
                   )}
@@ -339,45 +339,46 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                   {patient.population_type === 'neonate' && (
                     <>
                       <Grid item xs={6}>
+                        <Typography variant="subtitle2" gutterBottom>{t('fields.gestationalAgeWeeks')}</Typography>
                         <TextField
                           fullWidth
-                          label={t('fields.gestationalAgeWeeks')}
                           type="number"
                           value={patient.gestational_age_weeks}
                           onChange={(e) => handleInputChange('gestational_age_weeks', e.target.value)}
                           error={!!validation.gestational_age_weeks}
                           helperText={validation.gestational_age_weeks}
                           inputProps={{ min: 24, max: 44, step: 0.1 }}
+                          aria-label={t('fields.gestationalAgeWeeks')}
                         />
                       </Grid>
                       <Grid item xs={6}>
+                        <Typography variant="subtitle2" gutterBottom>{t('fields.postnatalAgeDays')}</Typography>
                         <TextField
                           fullWidth
-                          label={t('fields.postnatalAgeDays')}
                           type="number"
                           value={patient.postnatal_age_days}
                           onChange={(e) => handleInputChange('postnatal_age_days', e.target.value)}
                           error={!!validation.postnatal_age_days}
                           helperText={validation.postnatal_age_days}
                           inputProps={{ min: 0, max: 365 }}
+                          aria-label={t('fields.postnatalAgeDays')}
                         />
                       </Grid>
                     </>
                   )}
 
                   <Grid item xs={12}>
-                    <FormControl fullWidth>
-                      <InputLabel>{t('fields.gender')}</InputLabel>
-                      <Select
-                        value={patient.gender}
-                        label={t('fields.gender')}
-                        onChange={(e) => handleInputChange('gender', e.target.value)}
-                      >
-                        <MenuItem value="male">{t('genders.male')}</MenuItem>
-                        <MenuItem value="female">{t('genders.female')}</MenuItem>
-                        <MenuItem value="other">{t('genders.other')}</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Typography variant="subtitle2" gutterBottom>{t('fields.gender')}</Typography>
+                    <Select
+                      value={patient.gender}
+                      onChange={(e) => handleInputChange('gender', e.target.value)}
+                      aria-label={t('fields.gender')}
+                      sx={{ width: '100%' }}
+                    >
+                      <MenuItem value="male">{t('genders.male')}</MenuItem>
+                      <MenuItem value="female">{t('genders.female')}</MenuItem>
+                      <MenuItem value="other">{t('genders.other')}</MenuItem>
+                    </Select>
                   </Grid>
                 </Grid>
               </CardContent>
@@ -393,9 +394,9 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
+                    <Typography variant="subtitle2" gutterBottom>{t('fields.weightKg')}</Typography>
                     <TextField
                       fullWidth
-                      label={t('fields.weightKg')}
                       type="number"
                       value={patient.weight_kg}
                       onChange={(e) => handleInputChange('weight_kg', e.target.value)}
@@ -404,12 +405,13 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       inputProps={{ min: 0.1, max: 300, step: 0.1 }}
                       inputRef={weightRef}
                       className={errorFields.includes('weight_kg') ? 'input error' : undefined}
+                      aria-label={t('fields.weightKg')}
                     />
                   </Grid>
                   <Grid item xs={6}>
+                    <Typography variant="subtitle2" gutterBottom>{t('fields.heightCm')}</Typography>
                     <TextField
                       fullWidth
-                      label={t('fields.heightCm')}
                       type="number"
                       value={patient.height_cm}
                       onChange={(e) => handleInputChange('height_cm', e.target.value)}
@@ -417,12 +419,13 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       error={!!validation.height_cm && (heightTouched)}
                       helperText={validation.height_cm || 'Enter height if known to improve IBW/AdjBW calculations'}
                       inputProps={{ min: isAdult ? 100 : 30, max: 250 }}
+                      aria-label={t('fields.heightCm')}
                     />
                   </Grid>
                   <Grid item xs={12}>
+                    <Typography variant="subtitle2" gutterBottom>{t('fields.serumCreatinine')}</Typography>
                     <TextField
                       fullWidth
-                      label={t('fields.serumCreatinine')}
                       type="number"
                       value={patient.serum_creatinine}
                       onChange={(e) => handleInputChange('serum_creatinine', e.target.value)}
@@ -431,6 +434,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       inputProps={{ min: 0.1, max: 20, step: 0.1 }}
                       inputRef={scrRef}
                       className={errorFields.includes('serum_creatinine') ? 'input error' : undefined}
+                      aria-label={t('fields.serumCreatinine')}
                     />
                   </Grid>
                 </Grid>
@@ -465,36 +469,34 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    <FormControl fullWidth>
-                      <InputLabel>{t('fields.indication')}</InputLabel>
-                      <Select
-                        value={patient.indication}
-                        label={t('fields.indication')}
-                        onChange={(e) => handleInputChange('indication', e.target.value)}
-                      >
-                        <MenuItem value="pneumonia">{t('indications.pneumonia')}</MenuItem>
-                        <MenuItem value="skin_soft_tissue">{t('indications.skinSoftTissue')}</MenuItem>
-                        <MenuItem value="bacteremia">{t('indications.bacteremia')}</MenuItem>
-                        <MenuItem value="endocarditis">{t('indications.endocarditis')}</MenuItem>
-                        <MenuItem value="meningitis">{t('indications.meningitis')}</MenuItem>
-                        <MenuItem value="osteomyelitis">{t('indications.osteomyelitis')}</MenuItem>
-                        <MenuItem value="other">{t('indications.other')}</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Typography variant="subtitle2" gutterBottom>{t('fields.indication')}</Typography>
+                    <Select
+                      value={patient.indication}
+                      onChange={(e) => handleInputChange('indication', e.target.value)}
+                      aria-label={t('fields.indication')}
+                      sx={{ width: '100%' }}
+                    >
+                      <MenuItem value="pneumonia">{t('indications.pneumonia')}</MenuItem>
+                      <MenuItem value="skin_soft_tissue">{t('indications.skinSoftTissue')}</MenuItem>
+                      <MenuItem value="bacteremia">{t('indications.bacteremia')}</MenuItem>
+                      <MenuItem value="endocarditis">{t('indications.endocarditis')}</MenuItem>
+                      <MenuItem value="meningitis">{t('indications.meningitis')}</MenuItem>
+                      <MenuItem value="osteomyelitis">{t('indications.osteomyelitis')}</MenuItem>
+                      <MenuItem value="other">{t('indications.other')}</MenuItem>
+                    </Select>
                   </Grid>
                   <Grid item xs={12}>
-                    <FormControl fullWidth>
-                      <InputLabel>{t('fields.infectionSeverity')}</InputLabel>
-                      <Select
-                        value={patient.severity}
-                        label={t('fields.infectionSeverity')}
-                        onChange={(e) => handleInputChange('severity', e.target.value)}
-                      >
-                        <MenuItem value="mild">{t('severities.mild')}</MenuItem>
-                        <MenuItem value="moderate">{t('severities.moderate')}</MenuItem>
-                        <MenuItem value="severe">{t('severities.severe')}</MenuItem>
-                      </Select>
-                    </FormControl>
+                    <Typography variant="subtitle2" gutterBottom>{t('fields.infectionSeverity')}</Typography>
+                    <Select
+                      value={patient.severity}
+                      onChange={(e) => handleInputChange('severity', e.target.value)}
+                      aria-label={t('fields.infectionSeverity')}
+                      sx={{ width: '100%' }}
+                    >
+                      <MenuItem value="mild">{t('severities.mild')}</MenuItem>
+                      <MenuItem value="moderate">{t('severities.moderate')}</MenuItem>
+                      <MenuItem value="severe">{t('severities.severe')}</MenuItem>
+                    </Select>
                   </Grid>
                 </Grid>
               </CardContent>
@@ -554,32 +556,32 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                     </Grid>
 
                     <Grid item xs={12}>
-                      <FormControl fullWidth>
-                        <InputLabel>{t('fields.crclMethod')}</InputLabel>
-                        <Select
-                          value={patient.crcl_method}
-                          label={t('fields.crclMethod')}
-                          onChange={(e) => handleInputChange('crcl_method', e.target.value)}
-                        >
-                          <MenuItem value="cockcroft_gault">{t('methods.cockcroftGault')}</MenuItem>
-                          <MenuItem value="mdrd">{t('methods.mdrd')}</MenuItem>
-                          <MenuItem value="ckd_epi">{t('methods.ckdEpi')}</MenuItem>
-                          <MenuItem value="custom">{t('methods.custom')}</MenuItem>
-                        </Select>
-                      </FormControl>
+                      <Typography variant="subtitle2" gutterBottom>{t('fields.crclMethod')}</Typography>
+                      <Select
+                        value={patient.crcl_method}
+                        onChange={(e) => handleInputChange('crcl_method', e.target.value)}
+                        aria-label={t('fields.crclMethod')}
+                        sx={{ width: '100%' }}
+                      >
+                        <MenuItem value="cockcroft_gault">{t('methods.cockcroftGault')}</MenuItem>
+                        <MenuItem value="mdrd">{t('methods.mdrd')}</MenuItem>
+                        <MenuItem value="ckd_epi">{t('methods.ckdEpi')}</MenuItem>
+                        <MenuItem value="custom">{t('methods.custom')}</MenuItem>
+                      </Select>
                     </Grid>
 
                     {patient.crcl_method === 'custom' && (
                       <Grid item xs={12}>
+                        <Typography variant="subtitle2" gutterBottom>{t('fields.customCrcl')}</Typography>
                         <TextField
                           fullWidth
-                          label={t('fields.customCrcl')}
                           type="number"
                           value={patient.custom_crcl}
                           onChange={(e) => handleInputChange('custom_crcl', e.target.value)}
                           error={!!validation.custom_crcl}
                           helperText={validation.custom_crcl}
                           inputProps={{ min: 1, max: 200 }}
+                          aria-label={t('fields.customCrcl')}
                         />
                       </Grid>
                     )}
