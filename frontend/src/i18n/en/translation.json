@@ -69,5 +69,15 @@
   "language.select": "Language",
 
   "disclaimer.clinical": "Vancomyzer is intended for use by qualified healthcare professionals as a clinical decision support tool. All dosing recommendations should be reviewed by appropriate clinical staff and adjusted based on patient-specific factors and clinical judgment.",
-  "disclaimer.title": "Clinical Disclaimer"
+  "disclaimer.title": "Clinical Disclaimer",
+
+  "tutorial": {
+    "steps": {
+      "overview": "Overview",
+      "patientFields": "Patient Fields",
+      "clinicalOptions": "Clinical Options",
+      "dosingAuc": "Dosing (AUC)",
+      "tryIt": "Try It"
+    }
+  }
 }

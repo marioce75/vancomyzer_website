@@ -3,7 +3,7 @@ import { Box, Stepper, Step, StepLabel, Button, Typography, Grid, TextField, Pap
 import { useTranslation } from 'react-i18next';
 import { useBayesian } from '../context/BayesianContext';
 
-const steps = ['tutorial.steps.overview','tutorial.steps.patientFields','tutorial.steps.clinicalOptions','tutorial.steps.dosingAuc','tutorial.steps.tryIt'];
+const stepKeys = ['tutorial.steps.overview','tutorial.steps.patientFields','tutorial.steps.clinicalOptions','tutorial.steps.dosingAuc','tutorial.steps.tryIt'];
 
 const presets = [
   { label: 'Adult 70kg', patient: { population_type:'adult', age_years:45, gender:'male', weight_kg:70, height_cm:175, serum_creatinine:1.0, indication:'pneumonia', severity:'moderate' } },
@@ -32,7 +32,9 @@ export default function Tutorial({ onSubmit }) {
   return (
     <Box>
       <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3 }}>
-        {steps.map(key => <Step key={key}><StepLabel>{t(key)}</StepLabel></Step>)}
+        {stepKeys.map(key => (
+          <Step key={key}><StepLabel>{t(key)}</StepLabel></Step>
+        ))}
       </Stepper>
       {activeStep === 0 && (
         <Paper sx={{ p:2 }}>

@@ -63,5 +63,15 @@
   "disclaimer.title": "Descargo Clínico",
   "fields.weight_kg": "Peso (kg)",
   "fields.height_cm": "Talla (cm)",
-  "fields.serum_creatinine_mg_dl": "Creatinina sérica (mg/dL)"
+  "fields.serum_creatinine_mg_dl": "Creatinina sérica (mg/dL)",
+
+  "tutorial": {
+    "steps": {
+      "overview": "Resumen",
+      "patientFields": "Campos del Paciente",
+      "clinicalOptions": "Opciones Clínicas",
+      "dosingAuc": "Dosificación (AUC)",
+      "tryIt": "Pruébalo"
+    }
+  }
 }

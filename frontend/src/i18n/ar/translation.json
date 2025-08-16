@@ -63,5 +63,15 @@
   "disclaimer.title": "تنبيه سريري",
   "fields.weight_kg": "الوزن (كجم)",
   "fields.height_cm": "الطول (سم)",
-  "fields.serum_creatinine_mg_dl": "الكرياتينين (ملغ/دل)"
+  "fields.serum_creatinine_mg_dl": "الكرياتينين (ملغ/دل)",
+
+  "tutorial": {
+    "steps": {
+      "overview": "نظرة عامة",
+      "patientFields": "حقول المريض",
+      "clinicalOptions": "الخيارات السريرية",
+      "dosingAuc": "الجرعة (AUC)",
+      "tryIt": "جرّبها"
+    }
+  }
 }
