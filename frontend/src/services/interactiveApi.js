@@ -1,24 +1,89 @@
 import { normalizePatientFields } from './normalizePatient';
 
-async function fetchJson(path, init = {}) {
-  const res = await fetch(path, {
-    method: init.method || 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: init.body,
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || res.statusText);
-  }
-  return res.json();
+const CANDIDATE_ENDPOINTS = [
+  { path: '/api/dose/interactive', methods: ['POST', 'PUT'] },
+  { path: '/api/interactive',       methods: ['POST', 'PUT'] },
+  { path: '/api/dose/adjust',       methods: ['POST', 'PUT'] }
+];
+
+function getApiBase() {
+  // Safe access to env across CRA/Vite without using import.meta (which breaks in non-ESM)
+  const env = (typeof process !== 'undefined' && process?.env) ? process.env : {};
+  const w = (typeof window !== 'undefined') ? window : {};
+  return (
+    w.VANCOMYZER_API_BASE_URL ||
+    w.VITE_API_BASE ||
+    w.REACT_APP_API_BASE ||
+    env.VITE_API_BASE ||
+    env.REACT_APP_API_BASE ||
+    '' // same-origin by default
+  );
 }
 
-export async function calculateInteractive(patient, regimen) {
+async function tryOptions(url) {
+  try {
+    const r = await fetch(url, { method: 'OPTIONS' });
+    const allow = r.headers.get('Allow') || '';
+    return allow.split(',').map((s) => s.trim().toUpperCase());
+  } catch {
+    return [];
+  }
+}
+
+// Tries multiple (path,method) combos until one works (status < 400 and not 405/404)
+export async function calculateInteractiveAUC(patient, regimen) {
+  const base = getApiBase();
   const normalized = normalizePatientFields(patient);
   const body = {
     ...normalized,
     levels: normalized.levels || normalized.vancomycin_levels || [],
-    regimen,
+    regimen, // { dose_mg, interval_hours, infusion_minutes }
   };
-  return fetchJson('/api/dose/interactive', { method: 'POST', body: JSON.stringify(body) });
+
+  // Dev-only payload check
+  if (typeof process !== 'undefined' && process && process.env && process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.debug('[InteractiveAUC] payload', body);
+  }
+
+  let lastError;
+  for (const cand of CANDIDATE_ENDPOINTS) {
+    const url = base + cand.path;
+
+    // If OPTIONS responds with Allow, filter to allowed methods first
+    const allowed = await tryOptions(url);
+    const methods = allowed.length ? cand.methods.filter((m) => allowed.includes(m)) : cand.methods;
+
+    for (const method of methods) {
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (res.status === 405 || res.status === 404) {
+          lastError = new Error(`${res.status} on ${method} ${cand.path}`);
+          continue; // try next candidate
+        }
+        if (!res.ok) {
+          const detail = await res.text().catch(() => '');
+          const err = new Error(`Interactive ${res.status}: ${detail}`);
+          err.cause = new Error(`${res.status} on ${method} ${cand.path}`);
+          throw err;
+        }
+        const data = await res.json();
+        return data;
+      } catch (e) {
+        lastError = e?.cause || e;
+        // try next method/path
+      }
+    }
+  }
+
+  // If we reach here, no server interactive endpoint worked.
+  // Throw a typed error for the UI to switch to client-side fallback.
+  const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
+  err.cause = lastError;
+  throw err;
 }

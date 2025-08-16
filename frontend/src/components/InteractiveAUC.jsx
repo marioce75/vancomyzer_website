@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Box,
   Grid,
@@ -25,7 +25,7 @@ import {
   CategoryScale
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { calculateInteractive } from '../services/interactiveApi';
+import { calculateInteractiveAUC } from '../services/interactiveApi';
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Filler, Legend);
 
@@ -36,7 +36,7 @@ function toFixed(val, digits = 1) {
   return digits === 0 ? n.toFixed(0) : n.toFixed(digits);
 }
 
-// Simple one-compartment with infusion synthesis using peak/trough
+// Simple one-compartment with infusion synthesis using peak/trough (legacy fallback)
 function synthesizeFromSummary(summary, regimen, totalHours = 48, dt = 0.1) {
   try {
     const peak = Number(summary?.predicted_peak);
@@ -55,7 +55,7 @@ function synthesizeFromSummary(summary, regimen, totalHours = 48, dt = 0.1) {
     for (let t = 0; t <= tau + 1e-9; t = Number((t + dt).toFixed(10))) {
       let c;
       if (t <= tinf) {
-        // Steady-state during infusion
+        // Steady-state during infusion — approximate
         const term1 = (1 - Math.exp(-k * tau)) / (1 - Math.exp(-k * tinf)) * (1 - Math.exp(-k * t));
         const term2 = Math.exp(-k * (t + tau - tinf));
         c = peak * term1 + peak * term2;
@@ -83,6 +83,61 @@ function synthesizeFromSummary(summary, regimen, totalHours = 48, dt = 0.1) {
   } catch {
     return { time_hours: [], concentration_mg_L: [] };
   }
+}
+
+// New: local client-side model fallback when server endpoint is unavailable
+function estimateKFromPatient(patient) {
+  // Heuristic: use CLcr to estimate half-life. t1/2 ~ 0.693 * Vd / CL. Use coarse mapping: higher CLcr -> shorter t1/2
+  const clcr = Number(patient?.creatinine_clearance || patient?.clcr || patient?.estimated_clcr || patient?.estimated_crcl);
+  if (!isFinite(clcr) || clcr <= 0) return 0.1; // default k ~ 0.1 1/h (~6.9 h t1/2)
+  // Map CLcr (mL/min) to half-life hours roughly: 120 -> 4h, 60 -> 8h, 30 -> 16h
+  const t12 = Math.max(2, Math.min(24, 240 / Math.max(30, Math.min(120, clcr))));
+  return Math.log(2) / t12;
+}
+
+function synthesizeClientCurve(patient, regimen, priorK, totalHours = 48, dt = 0.25) {
+  const tau = Number(regimen?.interval_hours) || 12;
+  const tinf = (Number(regimen?.infusion_minutes) || 60) / 60;
+  const k = (isFinite(priorK) && priorK > 0) ? priorK : estimateKFromPatient(patient);
+  if (!(tau > 0) || !(tinf > 0) || tinf >= tau) return { time_hours: [], concentration_mg_L: [] };
+
+  // Scale peak roughly to dose and infusion; this is just to visualize shape if server is down
+  const dose = Number(regimen?.dose_mg) || 1000;
+  const scale = dose / 1000; // proportional scaling
+  const Cmax_ss = 25 * scale; // arbitrary nominal peak at SS for visualization
+
+  const times = [];
+  const conc = [];
+  for (let t = 0; t <= totalHours + 1e-9; t = Number((t + dt).toFixed(10))) {
+    const tInCycle = t % tau;
+    let c;
+    if (tInCycle <= tinf) {
+      // rising during infusion toward Cmax_ss
+      const frac = 1 - Math.exp(-k * tInCycle);
+      const carry = Math.exp(-k * (tau - tinf));
+      c = Cmax_ss * (frac + carry);
+    } else {
+      // elimination after infusion
+      c = Cmax_ss * Math.exp(-k * (tInCycle - tinf));
+    }
+    times.push(Number(t.toFixed(5)));
+    conc.push(Math.max(0, c));
+  }
+  return { time_hours: times, concentration_mg_L: conc };
+}
+
+function trapezoidalAUC(times, conc, end = 24) {
+  if (!Array.isArray(times) || !Array.isArray(conc) || times.length !== conc.length) return null;
+  let auc = 0;
+  for (let i = 1; i < times.length; i++) {
+    const t0 = times[i - 1];
+    const t1 = times[i];
+    if (t1 > end) break;
+    const y0 = conc[i - 1];
+    const y1 = conc[i];
+    auc += ((y0 + y1) / 2) * (t1 - t0);
+  }
+  return auc;
 }
 
 function EmptyState({ onGoPatient }) {
@@ -124,6 +179,7 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
   const [summary, setSummary] = useState(() => loadFromSS(keys.summary, null));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [fallbackWarn, setFallbackWarn] = useState(false);
 
   const [showAucFill, setShowAucFill] = useState(() => {
     const fromSS = loadFromSS(keys.toggles, null);
@@ -159,42 +215,61 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialRegimen?.dose_mg, initialRegimen?.interval_hours, initialRegimen?.infusion_minutes]);
 
-  // Debounced fetch on regimen change
-  useEffect(() => {
+  const runInteractive = useCallback(async () => {
     if (!patient) return;
-    const t = setTimeout(async () => {
-      setLoading(true); setError(null);
-      try {
-        const data = await calculateInteractive(patient, regimen);
-        setSummary({
-          auc_24: data.auc_24 ?? data.predicted_auc_24,
+    setLoading(true); setError(null); setFallbackWarn(false);
+    try {
+      const data = await calculateInteractiveAUC(patient, regimen);
+      setSummary({
+        auc_24: data.auc_24 ?? data.predicted_auc_24,
+        predicted_peak: data.predicted_peak,
+        predicted_trough: data.predicted_trough,
+      });
+      if (Array.isArray(data.time_hours) && Array.isArray(data.concentration_mg_L)) {
+        setSeries({ time_hours: data.time_hours, concentration_mg_L: data.concentration_mg_L });
+      } else {
+        // synthesize from summary (fallback)
+        const syn = synthesizeFromSummary({
           predicted_peak: data.predicted_peak,
           predicted_trough: data.predicted_trough,
-        });
-        if (Array.isArray(data.time_hours) && Array.isArray(data.concentration_mg_L)) {
-          setSeries({ time_hours: data.time_hours, concentration_mg_L: data.concentration_mg_L });
-        } else {
-          // synthesize from summary (fallback)
-          const syn = synthesizeFromSummary({
-            predicted_peak: data.predicted_peak,
-            predicted_trough: data.predicted_trough,
-          }, regimen, 48, 0.1);
-          setSeries(syn);
-        }
-      } catch (e) {
-        console.error(e);
-        setError('Interactive AUC request failed.');
-      } finally {
-        setLoading(false);
+        }, regimen, 48, 0.1);
+        setSeries(syn);
       }
-    }, 400);
-    return () => clearTimeout(t);
+    } catch (e) {
+      if (e?.message === 'INTERACTIVE_ENDPOINT_UNAVAILABLE') {
+        // client-side fallback curve
+        const priorK = undefined; // could be derived if prior summary exists with peaks/troughs
+        const syn = synthesizeClientCurve(patient, regimen, priorK, 48, 0.25);
+        const auc24 = trapezoidalAUC(syn.time_hours, syn.concentration_mg_L, 24);
+        setSummary((prev) => ({
+          ...(prev || {}),
+          auc_24: auc24 ?? prev?.auc_24 ?? null,
+        }));
+        setSeries(syn);
+        setFallbackWarn(true);
+        setError(null);
+      } else {
+        // Other network errors
+        const detail = e?.cause?.message || e?.message || 'Request failed';
+        setError(`Interactive error: ${detail}`);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [patient, regimen]);
+
+  // Debounced fetch on regimen change
+  useEffect(() => {
+    if (!patient) return undefined;
+    const t = setTimeout(() => { runInteractive(); }, 400);
+    return () => clearTimeout(t);
+  }, [patient, regimen, runInteractive]);
 
   // Derived chart arrays and points
   const labels = useMemo(() => (Array.isArray(series?.time_hours) ? series.time_hours : []), [series]);
   const conc = useMemo(() => (Array.isArray(series?.concentration_mg_L) ? series.concentration_mg_L : []), [series]);
   const points = useMemo(() => labels.map((t, i) => ({ x: t, y: conc[i] })), [labels, conc]);
+  const points24 = useMemo(() => points.filter((p) => p.x <= 24), [points]);
 
   // Plugins and chart options
   const doseMarkersPlugin = useMemo(() => ({
@@ -223,17 +298,28 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
 
   const chartData = useMemo(() => ({
     datasets: [
+      // Shaded 0–24h area (no border)
       {
-        label: 'Concentration (mg/L)',
-        data: points,
-        borderColor: '#1976d2',
+        label: 'AUC 0–24h',
+        data: points24,
+        borderColor: 'rgba(25, 118, 210, 0)',
         backgroundColor: showAucFill ? 'rgba(25, 118, 210, 0.15)' : 'rgba(25, 118, 210, 0.0)',
         pointRadius: 0,
         tension: 0.25,
         fill: showAucFill,
       },
+      // Main concentration curve (no fill)
+      {
+        label: 'Concentration (mg/L)',
+        data: points,
+        borderColor: '#1976d2',
+        backgroundColor: 'rgba(0,0,0,0)',
+        pointRadius: 0,
+        tension: 0.25,
+        fill: false,
+      },
     ],
-  }), [points, showAucFill]);
+  }), [points, points24, showAucFill]);
 
   const options = useMemo(() => ({
     responsive: true,
@@ -298,6 +384,13 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
         <EmptyState onGoPatient={onGoPatient} />
       ) : (
         <>
+          {/* Warning banner for local simulation */}
+          {fallbackWarn && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              Interactive server endpoint not available; showing simulated curve locally.
+            </Alert>
+          )}
+
           {/* Metrics Strip */}
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} md={4}>
@@ -381,7 +474,12 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
           {/* Chart */}
           <Paper variant="outlined" sx={{ p: 2 }}>
             {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+                <Box component="span" sx={{ ml: 1 }}>
+                  <Button size="small" onClick={() => runInteractive()}>Retry</Button>
+                </Box>
+              </Alert>
             )}
             <Box sx={{ height: 360 }}>
               <Line
