@@ -33,6 +33,7 @@ import createCache from '@emotion/cache';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { prefixer } from 'stylis';
 import CssBaseline from '@mui/material/CssBaseline';
+import { normalizePatientFields } from './services/normalizePatient';
 
 import './App.css';
 import './styles/disclaimer.css';
@@ -50,53 +51,11 @@ function AppInner() {
     }
   }, [lastResult, error]);
 
-  // Map whatever the form provides to the canonical keys App.js expects
-  function normalizePatientFields(p = {}) {
-    // Some callers may send shape { patient: {...} }
-    const src = p && typeof p === 'object' && p.patient ? p.patient : p;
-
-    const toNum = (v) => {
-      if (v === undefined || v === null) return undefined;
-      if (typeof v === 'string') {
-        const trimmed = v.trim();
-        if (trimmed === '') return undefined;
-        const n = parseFloat(trimmed);
-        return Number.isFinite(n) ? n : undefined;
-      }
-      return Number.isFinite(v) ? v : undefined;
-    };
-
-    const age = toNum(
-      src.age ?? src.age_years ?? src.ageYears ?? src.age_y ?? src.age_str
-    );
-
-    const weight_kg = toNum(
-      src.weight_kg ?? src.weight ?? src.total_body_weight_kg ?? src.tbw_kg ?? src.weight_str
-    );
-
-    const serum_creatinine_mg_dl = toNum(
-      src.serum_creatinine_mg_dl ??
-        src.serum_creatinine ??
-        src.scr ??
-        src.s_cr ??
-        src.sc ??
-        src.SCr ??
-        src.serum_creatinine_str
-    );
-
-    const height_cm = toNum(
-      src.height_cm ?? src.height ?? src.height_cm_str
-    );
-
-    // Return the normalized flat shape the rest of the app expects
-    return { ...src, age, weight_kg, serum_creatinine_mg_dl, height_cm };
-  }
-
   const handlePatientSubmit = async (patientData) => {
     const normalized = normalizePatientFields(patientData);
     console.debug('[App] normalized patient for submit:', normalized);
     // Validation guard (minimal required fields; adjust as needed)
-    const required = ['age', 'weight_kg', 'serum_creatinine_mg_dl', 'height_cm'];
+    const required = ['age_years', 'weight_kg', 'serum_creatinine', 'height_cm'];
     const missing = required.filter((f) => normalized[f] === undefined);
     if (missing.length) {
       setValidationMessage(t('notices.missingRequiredBanner'));
@@ -105,13 +64,9 @@ function AppInner() {
     setValidationMessage(null);
     try {
       setLastPatient(normalized);
-      // Old removed: setPatient(patientData); submitDosing / calculate(patientData) with implicit levels
-      await calculate({ patient: normalized, levels: normalized.levels || normalized.vancomycin_levels || [] });
+      await calculate({ ...normalized, levels: normalized.levels || normalized.vancomycin_levels || [] });
       setActiveTab(1);
     } catch (e) {
-      // Context should surface error; keep console for debugging
-      // Previously: setError(e.message || 'Submission failed');
-      // Leave silently; error banner will use context error
       console.error('Calculation failed', e);
     }
   };
@@ -123,7 +78,7 @@ function AppInner() {
     if (!lastPatient || !lastResult) return;
     try {
       const normalizedPatient = normalizePatientFields(lastPatient);
-      await calculateInteractive({ patient: normalizedPatient, levels: normalizedPatient.levels || normalizedPatient.vancomycin_levels || [], regimen });
+      await calculateInteractive({ ...normalizedPatient, levels: normalizedPatient.levels || normalizedPatient.vancomycin_levels || [], regimen });
     } catch (e) {
       console.error('Interactive regimen update failed', e);
     }

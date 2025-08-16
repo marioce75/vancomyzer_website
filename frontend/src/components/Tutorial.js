@@ -25,7 +25,7 @@ export default function Tutorial({ onSubmit }) {
     if (onSubmit) {
       onSubmit(patient);
     } else {
-      await calculate({ patient, levels: [] });
+      await calculate({ ...patient, levels: [] });
     }
   };
 
