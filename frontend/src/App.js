@@ -21,7 +21,6 @@ import {
 import MenuBook from '@mui/icons-material/MenuBook';
 
 import PatientInputForm from './components/PatientInputForm';
-import InteractiveAUCVisualization from './components/InteractiveAUCVisualization';
 import ClinicalInfo from './components/ClinicalInfo';
 import Tutorial from './components/Tutorial';
 import { BayesianProvider, useBayesian } from './context/BayesianContext';
@@ -37,13 +36,14 @@ import { normalizePatientFields } from './services/normalizePatient';
 
 import './App.css';
 import './styles/disclaimer.css';
+import DosingResults from './components/DosingResults.jsx';
+import InteractiveAUC from './components/InteractiveAUC.jsx';
 
 function AppInner() {
-  const { calculate, calculateInteractive, lastResult, error, isLoading } = useBayesian(); // new API
+  const { calculate, lastResult, error, isLoading, lastPatient, setInitialRegimen, initialRegimen } = useBayesian();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
-  const [validationMessage, setValidationMessage] = useState(null); // gentle banner for incomplete form
-  const [lastPatient, setLastPatient] = useState(null); // keep for potential interactive recalcs
+  const [validationMessage, setValidationMessage] = useState(null);
 
   React.useEffect(() => {
     if (lastResult && !error) {
@@ -63,7 +63,6 @@ function AppInner() {
     }
     setValidationMessage(null);
     try {
-      setLastPatient(normalized);
       await calculate({ ...normalized, levels: normalized.levels || normalized.vancomycin_levels || [] });
       setActiveTab(1);
     } catch (e) {
@@ -73,15 +72,16 @@ function AppInner() {
 
   const handleTabChange = (event, newValue) => { setActiveTab(newValue); };
 
-  // Placeholder for potential regimen adjustments routed through calculateInteractive
-  const handleRegimenUpdate = async (regimen) => {
+  // Jump to interactive with regimen from lastResult
+  const openInteractiveAUC = () => {
     if (!lastPatient || !lastResult) return;
-    try {
-      const normalizedPatient = normalizePatientFields(lastPatient);
-      await calculateInteractive({ ...normalizedPatient, levels: normalizedPatient.levels || normalizedPatient.vancomycin_levels || [], regimen });
-    } catch (e) {
-      console.error('Interactive regimen update failed', e);
-    }
+    const regimen = {
+      dose_mg: lastResult.recommended_dose_mg,
+      interval_hours: lastResult.interval_hours,
+      infusion_minutes: lastResult.infusion_minutes ?? 60
+    };
+    setInitialRegimen(regimen);
+    setActiveTab(2);
   };
 
   return (
@@ -142,7 +142,7 @@ function AppInner() {
             >
               <Tab icon={<Calculate />} label={t('tabs.patientInput')} iconPosition="start" />
               <Tab icon={<Timeline />} label={t('tabs.dosingResults')} iconPosition="start" disabled={!lastResult} />
-              <Tab icon={<Science />} label={t('tabs.interactiveAUC')} iconPosition="start" disabled={!lastResult || (lastResult?.meta?.source === 'population')} />
+              <Tab icon={<Science />} label={t('tabs.interactiveAUC')} iconPosition="start" disabled={!lastResult} />
               <Tab icon={<MenuBook />} label={t('tabs.tutorial')} iconPosition="start" />
               <Tab icon={<Info />} label={t('tabs.clinicalInfo')} iconPosition="start" />
             </Tabs>
@@ -167,61 +167,7 @@ function AppInner() {
           {activeTab === 1 && (
             <Box sx={{ p: 3 }}>
               {lastResult ? (
-                <div>
-                  <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                    <Timeline sx={{ mr: 1 }} />
-                    Dosing Results
-                  </Typography>
-
-                  {/* Source path banners */}
-                  {lastResult?.meta?.source === 'population' && (
-                    <Alert severity="info" sx={{ mb: 2 }}>
-                      No vancomycin levels were provided. Recommendation is based on the population PK model.
-                    </Alert>
-                  )}
-                  {lastResult?.meta?.source === 'bayesian' && (
-                    <Alert severity="success" sx={{ mb: 2 }}>
-                      Bayesian individualization was used{lastResult?.meta?.levels_count ? ` (n = ${lastResult.meta.levels_count} levels).` : '.'}
-                    </Alert>
-                  )}
-
-                  {/* Summary preview (match backend field names) */}
-                  {(() => {
-                    const result = lastResult; // alias for existing rendering logic
-                    if (result?.recommended_dose_mg !== undefined) {
-                      const summary = {
-                        recommended_dose_mg: result.recommended_dose_mg,
-                        interval_hours: result.interval_hours,
-                        daily_dose_mg: result.daily_dose_mg,
-                        predicted_auc_24: result.predicted_auc_24,
-                        predicted_trough: result.predicted_trough,
-                        predicted_peak: result.predicted_peak,
-                        creatinine_clearance_ml_min: result.creatinine_clearance_ml_min,
-                        half_life_hours: result.half_life_hours,
-                        mg_per_kg_per_day: result.mg_per_kg_per_day,
-                      };
-                      return (
-                        <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(summary, null, 2)}</pre>
-                      );
-                    }
-                    if (result?.individual_clearance !== undefined) {
-                      const summary = {
-                        individual_clearance: result.individual_clearance,
-                        individual_volume: result.individual_volume,
-                        clearance_ci: [result.clearance_ci_lower, result.clearance_ci_upper],
-                        volume_ci: [result.volume_ci_lower, result.volume_ci_upper],
-                        auc_ci: [result.predicted_auc_ci_lower, result.predicted_auc_ci_upper],
-                        trough_ci: [result.predicted_trough_ci_lower, result.predicted_trough_ci_upper],
-                        fit_r_squared: result.fit_r_squared,
-                        convergence_achieved: result.convergence_achieved,
-                      };
-                      return (
-                        <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(summary, null, 2)}</pre>
-                      );
-                    }
-                    return null;
-                  })()}
-                </div>
+                <DosingResults result={lastResult} onOpenInteractive={openInteractiveAUC} />
               ) : (
                 <Typography color="text.secondary" align="center">
                   Please calculate dosing from the Patient Input tab first.
@@ -232,8 +178,7 @@ function AppInner() {
           {activeTab === 2 && (
             <Box sx={{ p: 3 }}>
               {lastResult ? (
-                // Interactive component could be extended to accept handleRegimenUpdate
-                <InteractiveAUCVisualization onRegimenChange={handleRegimenUpdate} />
+                <InteractiveAUC patient={lastPatient} initialRegimen={initialRegimen} onGoPatient={() => setActiveTab(0)} />
               ) : (
                 <Typography color="text.secondary" align="center">
                   Please calculate dosing first to view interactive AUC visualization.
