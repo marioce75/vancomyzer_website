@@ -71,15 +71,28 @@ function interpConc(times, conc, t) {
   return y0 + f * (y1 - y0);
 }
 
-// Simple summaries from a simulated curve
+// Shared helper: steady-state peak/trough for zero-order infusion with accumulation
+export function ssPeakTrough({ CL, V, dose_mg, tau_h, tinf_min }) {
+  const k = CL / V;
+  const Tinf = Math.max(0.25, tinf_min/60);
+  const R0 = dose_mg / Tinf;
+  const denom = 1 - Math.exp(-k * tau_h);
+  const safeDenom = Math.abs(denom) > 1e-12 ? denom : 1e-12;
+  const Cmax = (R0 / (k * V)) * (1 - Math.exp(-k * Tinf)) / safeDenom;
+  const Cmin = Cmax * Math.exp(-k * (tau_h - Tinf));
+  return { Cmax, Cmin };
+}
+
+// Simple summaries from a simulated curve (use analytic peak/trough and AUC24 formula)
 export function summarizePK({ times, conc, doseTimes, Tinf, k, interval_hours, dose_mg, CL_L_per_h }) {
-  // peak near end of infusion of first interval
-  const tPeak = Math.min(Tinf + 1, interval_hours); // ~1h post-inf end
-  const predicted_peak = interpConc(times, conc, tPeak);
-  const tTrough = Math.max(interval_hours - 0.01, 0); // just before next dose
-  const predicted_trough = interpConc(times, conc, tTrough);
-  const auc_24 = aucTrapezoid(times, conc, 0, 24);
+  // Compute CL/V-derived peak & trough to avoid drift with backend
+  const V_L = CL_L_per_h / k;
+  const { Cmax, Cmin } = ssPeakTrough({ CL: CL_L_per_h, V: V_L, dose_mg, tau_h: interval_hours, tinf_min: Tinf * 60 });
+  const predicted_peak = Cmax;
+  const predicted_trough = Cmin;
+  // AUC24 consistent with backend formula
   const daily_dose_mg = (24 / interval_hours) * dose_mg;
+  const auc_24 = daily_dose_mg / CL_L_per_h;
   return { predicted_peak, predicted_trough, auc_24, daily_dose_mg };
 }
 

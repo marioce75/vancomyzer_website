@@ -127,3 +127,20 @@ def auc_trapezoid(t: np.ndarray, c: np.ndarray, t0: float = 0.0, t1: float = 24.
         yb = _interp(bb)
         auc += 0.5 * (ya + yb) * (bb - aa)
     return float(auc)
+
+
+def ss_peak_trough(CL: float, V: float, dose_mg: float, tau_h: float, tinf_min: float) -> Tuple[float, float]:
+    """
+    Steady-state peak and trough for zero-order infusion with accumulation.
+    Returns (Cmax_ss, Cmin_ss) where Cmax_ss is end-of-infusion concentration at steady state,
+    and Cmin_ss is immediately before the next dose (tau^-).
+    """
+    k = float(CL) / float(V)
+    Tinf = max(0.25, float(tinf_min) / 60.0)
+    R0 = float(dose_mg) / Tinf
+    # Avoid division issues when k is tiny (very long half-life)
+    denom = 1.0 - np.exp(-k * float(tau_h))
+    denom = denom if abs(denom) > _EPS else _EPS
+    Cmax_ss = (R0 / (k * float(V))) * (1.0 - np.exp(-k * Tinf)) / denom
+    Cmin_ss = Cmax_ss * np.exp(-k * (float(tau_h) - Tinf))
+    return float(Cmax_ss), float(Cmin_ss)

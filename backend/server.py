@@ -387,8 +387,22 @@ class VancomycinPKCalculator:
         
         # Calculate predictions
         predicted_auc = daily_dose / clearance
-        predicted_trough = self._calculate_trough(dose_per_interval, interval, pk_params)
-        predicted_peak = self._calculate_peak(dose_per_interval, pk_params, infusion_time=1.0)
+        # Use zero-order infusion with accumulation for peak/trough at steady state
+        try:
+            from .pk import ss_peak_trough
+            Cmax, Cmin = ss_peak_trough(
+                CL=float(clearance),
+                V=float(volume),
+                dose_mg=float(dose_per_interval),
+                tau_h=float(interval),
+                tinf_min=60.0,
+            )
+            predicted_peak = float(Cmax)
+            predicted_trough = float(Cmin)
+        except Exception:
+            # Fallback to legacy approximations if needed
+            predicted_trough = self._calculate_trough(dose_per_interval, interval, pk_params)
+            predicted_peak = self._calculate_peak(dose_per_interval, pk_params, infusion_time=1.0)
         
         # Generate PK curve data for visualization
         pk_curve_data = self._generate_pk_curve(dose_per_interval, interval, pk_params)
@@ -879,8 +893,20 @@ async def pk_simulation(patient: PatientInput, dose: float, interval: float):
         
         # Calculate key metrics
         predicted_auc = (dose * 24) / (interval * pk_params['clearance'])
-        predicted_trough = pk_calculator._calculate_trough(dose, interval, pk_params)
-        predicted_peak = pk_calculator._calculate_peak(dose, pk_params)
+        try:
+            from .pk import ss_peak_trough
+            Cmax, Cmin = ss_peak_trough(
+                CL=float(pk_params['clearance']),
+                V=float(pk_params['volume']),
+                dose_mg=float(dose),
+                tau_h=float(interval),
+                tinf_min=60.0,
+            )
+            predicted_peak = float(Cmax)
+            predicted_trough = float(Cmin)
+        except Exception:
+            predicted_trough = pk_calculator._calculate_trough(dose, interval, pk_params)
+            predicted_peak = pk_calculator._calculate_peak(dose, pk_params)
         
         return {
             'pk_curve': curve_data,
