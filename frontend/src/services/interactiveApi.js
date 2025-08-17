@@ -4,9 +4,9 @@ import { normalizePatientFields } from './normalizePatient';
 const BUILD_API_BASE = (typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_BASE : undefined;
 
 const CANDIDATE_ENDPOINTS = [
-  { path: '/api/dose/interactive', methods: ['POST', 'PUT'] },
-  { path: '/api/interactive',       methods: ['POST', 'PUT'] },
-  { path: '/api/dose/adjust',       methods: ['POST', 'PUT'] }
+  { path: '/api/dose/interactive', methods: ['POST'] },
+  { path: '/api/interactive',       methods: ['POST'] },
+  { path: '/api/dose/adjust',       methods: ['POST'] }
 ];
 
 function getApiBase() {
@@ -40,7 +40,8 @@ export async function calculateInteractiveAUC(patient, regimen) {
   const normalized = normalizePatientFields(patient);
   const body = {
     ...normalized,
-    levels: normalized.levels || normalized.vancomycin_levels || [],
+    // Send levels as-is; caller should already compute exact time_hr positions in first interval only
+    levels: Array.isArray(patient?.levels) ? patient.levels : [],
     regimen, // { dose_mg, interval_hours, infusion_minutes }
   };
 
@@ -77,6 +78,11 @@ export async function calculateInteractiveAUC(patient, regimen) {
           throw err;
         }
         const data = await res.json();
+        // Normalize shape for consumers
+        if (data?.series) return data;
+        if (Array.isArray(data?.time_hours) && Array.isArray(data?.concentration_mg_L)) {
+          return { series: { time_hours: data.time_hours, concentration_mg_L: data.concentration_mg_L } };
+        }
         return data;
       } catch (e) {
         lastError = e?.cause || e;
@@ -86,7 +92,6 @@ export async function calculateInteractiveAUC(patient, regimen) {
   }
 
   // If we reach here, no server interactive endpoint worked.
-  // Throw a typed error for the UI to switch to client-side fallback.
   const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
   err.cause = lastError;
   throw err;

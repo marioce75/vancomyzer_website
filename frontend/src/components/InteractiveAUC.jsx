@@ -85,6 +85,8 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fallbackWarn, setFallbackWarn] = useState(false);
+  const [serverBacked, setServerBacked] = useState(false);
+  const [posteriorN, setPosteriorN] = useState(null);
 
   const [showAucFill, setShowAucFill] = useState(() => {
     const fromSS = loadFromSS(keys.toggles, null);
@@ -150,7 +152,7 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
 
   const runInteractive = useCallback(async () => {
     if (!patient) return;
-    setLoading(true); setError(null); setFallbackWarn(false);
+    setLoading(true); setError(null); setFallbackWarn(false); setServerBacked(false);
     const flatPatient = { ...patient, levels: measuredLevels };
     try {
       const data = await calculateInteractiveAUC(flatPatient, regimen);
@@ -159,18 +161,31 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
         predicted_peak: data.predicted_peak,
         predicted_trough: data.predicted_trough,
       });
-      if (Array.isArray(data.time_hours) && Array.isArray(data.concentration_mg_L)) {
+      // Prefer server series shape
+      if (data?.series && Array.isArray(data.series.time_hours)) {
+        setSeries({
+          time_hours: data.series.time_hours,
+          concentration_mg_L: data.series.concentration_mg_L,
+          lower: data.series.lower,
+          upper: data.series.upper,
+        });
+        setServerBacked(true);
+      } else if (Array.isArray(data.time_hours) && Array.isArray(data.concentration_mg_L)) {
         setSeries({ time_hours: data.time_hours, concentration_mg_L: data.concentration_mg_L });
+        setServerBacked(true);
       } else {
         const { series: syn } = computeAll(flatPatient, regimen);
         setSeries(syn);
+        setServerBacked(false);
       }
+      setPosteriorN(data?.posterior?.n_draws ?? null);
     } catch (e) {
       if (e?.message === 'INTERACTIVE_ENDPOINT_UNAVAILABLE') {
         const { series: syn, summary: sum } = computeAll(flatPatient, regimen);
         setSeries(syn);
         setSummary((prev) => ({ ...(prev || {}), auc_24: sum.auc_24, predicted_peak: sum.predicted_peak, predicted_trough: sum.predicted_trough }));
         setFallbackWarn(true);
+        setServerBacked(false);
         setError(null);
       } else {
         const detail = e?.cause?.message || e?.message || 'Request failed';
@@ -240,6 +255,27 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
         tension: 0.25,
         fill: showAucFill,
       },
+      // CI band (90%) when provided by server
+      ...(Array.isArray(series?.lower) && Array.isArray(series?.upper) && series.lower.length === points.length && series.upper.length === points.length
+        ? [
+            {
+              label: '90% CI (lower)',
+              data: labels.map((t, i) => ({ x: t, y: series.lower[i] })),
+              borderColor: 'rgba(25,118,210,0)',
+              backgroundColor: 'rgba(25,118,210,0.10)',
+              pointRadius: 0,
+              fill: '+1',
+            },
+            {
+              label: '90% CI (upper)',
+              data: labels.map((t, i) => ({ x: t, y: series.upper[i] })),
+              borderColor: 'rgba(25,118,210,0)',
+              backgroundColor: 'rgba(25,118,210,0.10)',
+              pointRadius: 0,
+              fill: false,
+            },
+          ]
+        : []),
       {
         label: 'Concentration (mg/L)',
         data: points,
@@ -265,7 +301,7 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
         showLine: false,
       },
     ],
-  }), [points, levelMarkers, showAucFill]);
+  }), [points, levelMarkers, showAucFill, series?.lower, series?.upper, labels]);
 
   const options = useMemo(() => ({
     responsive: true,
@@ -312,6 +348,8 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
             fullWidth
             type="number"
             inputProps={{ min, max, step }}
+            // Make dose input wide enough for 4 digits per spec
+            {...(field === 'dose_mg' ? { InputProps: { inputProps: { step: 50, min: 100, max: 6000, style: { width: 96, textAlign: 'right' } } } } : {})}
             value={value}
             onChange={(e) => handleRegimenField(field)(Number(e.target.value))}
             label={unit}
@@ -459,6 +497,9 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
             <FormControlLabel control={<Switch checked={showAucFill} onChange={(e) => setShowAucFill(e.target.checked)} />} label="Shade 0–24h AUC" />
             <FormControlLabel control={<Switch checked={showDoseMarkers} onChange={(e) => setShowDoseMarkers(e.target.checked)} />} label="Show dose markers" />
+            {posteriorN ? (
+              <Chip size="small" color="primary" variant="outlined" label={`Bayesian (n=${posteriorN})`} />
+            ) : null}
             {process.env.NODE_ENV !== 'production' && (
               <Button size="small" variant="outlined" onClick={() => setDevOpen(true)}>Compare with Spreadsheet</Button>
             )}
@@ -490,24 +531,26 @@ export default function InteractiveAUC({ patient, initialRegimen, onGoPatient })
           </Paper>
 
           {/* Data Table */}
-          <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>Simulated points</Typography>
-            <Divider sx={{ mb: 1 }} />
-            {Array.isArray(labels) && labels.length > 0 ? (
-              <Grid container spacing={1}>
-                <Grid item xs={6} md={3}><Typography variant="caption" color="text.secondary">Time (h)</Typography></Grid>
-                <Grid item xs={6} md={3}><Typography variant="caption" color="text.secondary">Conc (mg/L)</Typography></Grid>
-                {labels.slice(0, 50).map((t, idx) => (
-                  <React.Fragment key={idx}>
-                    <Grid item xs={6} md={3}>{toFixed(t, 2)}</Grid>
-                    <Grid item xs={6} md={3}>{toFixed(conc[idx], 2)}</Grid>
-                  </React.Fragment>
-                ))}
-              </Grid>
-            ) : (
-              <Typography color="text.secondary">No time–concentration curve available yet.</Typography>
-            )}
-          </Paper>
+          {serverBacked ? null : (
+            <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>Simulated points</Typography>
+              <Divider sx={{ mb: 1 }} />
+              {Array.isArray(labels) && labels.length > 0 ? (
+                <Grid container spacing={1}>
+                  <Grid item xs={6} md={3}><Typography variant="caption" color="text.secondary">Time (h)</Typography></Grid>
+                  <Grid item xs={6} md={3}><Typography variant="caption" color="text.secondary">Conc (mg/L)</Typography></Grid>
+                  {labels.slice(0, 50).map((t, idx) => (
+                    <React.Fragment key={idx}>
+                      <Grid item xs={6} md={3}>{toFixed(t, 2)}</Grid>
+                      <Grid item xs={6} md={3}>{toFixed(conc[idx], 2)}</Grid>
+                    </React.Fragment>
+                  ))}
+                </Grid>
+              ) : (
+                <Typography color="text.secondary">No time–concentration curve available yet.</Typography>
+              )}
+            </Paper>
+          )}
 
           {/* Raw JSON (collapsible) */}
           <details style={{ marginTop: 16 }}>

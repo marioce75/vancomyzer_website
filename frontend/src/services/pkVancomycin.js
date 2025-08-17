@@ -138,6 +138,6 @@ export function computeAll(patient, regimen, pk) {
     doses_to_simulate: 16,
   });
   const summary = summarizePK({ ...sim, interval_hours: Number(regimen?.interval_hours) || 12, dose_mg: Number(regimen?.dose_mg) || 1000, CL_L_per_h: Number(CL_L_per_h) || 4 });
-  const series = { time_hours: sim.times, concentration_mg_L: sim.conc };
+  const series = { time_hours: sim.times, concentration_mg_L: sim.conc, lower: undefined, upper: undefined };
   return { series, summary, CL_L_per_h, V_L };
 }

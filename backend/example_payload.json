@@ -1,0 +1,12 @@
+{
+  "population_type": "adult",
+  "age_years": 62,
+  "gender": "male",
+  "weight_kg": 82,
+  "height_cm": 178,
+  "serum_creatinine": 1.1,
+  "levels": [
+    { "time_hr": 2.0, "concentration_mg_L": 21.0 }
+  ],
+  "regimen": { "dose_mg": 1000, "interval_hours": 12, "infusion_minutes": 60 }
+}
