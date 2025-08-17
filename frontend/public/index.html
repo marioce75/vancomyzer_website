@@ -4,25 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vancomyzer</title>
-    <script>
-      // Runtime API base override (executes before the bundle)
-      window.VANCOMYZER_API_BASE_URL = "https://vancomyzer-web.onrender.com/api";
-    </script>
-    <script>
-// Resolve API base: runtime override -> CRA env -> Vite env -> domain fallback -> same-origin /api
-const API_BASE =
-  (typeof window !== 'undefined' && window.VANCOMYZER_API_BASE_URL) ||
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_BASE) ||
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
-  (typeof window !== 'undefined' && /vancomyzer\.com$/.test(window.location.hostname)
-    ? 'https://vancomyzer-web.onrender.com/api'
-    : `${window.location.origin.replace(/\/$/, '')}/api`);
-
-if (typeof window !== 'undefined') {
-  // eslint-disable-next-line no-console
-  console.info('API_BASE =', API_BASE);
-}
-</script>
+    <!-- Removed runtime VANCOMYZER_API_BASE_URL override; use REACT_APP_API_BASE from env -->
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

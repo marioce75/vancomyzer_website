@@ -1,5 +1,8 @@
 import { normalizePatientFields } from './normalizePatient';
 
+// Force CRA to embed the production API base if provided via env
+const BUILD_API_BASE = (typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_BASE : undefined;
+
 const CANDIDATE_ENDPOINTS = [
   { path: '/api/dose/interactive', methods: ['POST', 'PUT'] },
   { path: '/api/interactive',       methods: ['POST', 'PUT'] },
@@ -14,6 +17,7 @@ function getApiBase() {
     w.VANCOMYZER_API_BASE_URL ||
     w.VITE_API_BASE ||
     w.REACT_APP_API_BASE ||
+    BUILD_API_BASE ||
     env.VITE_API_BASE ||
     env.REACT_APP_API_BASE ||
     '' // same-origin by default
