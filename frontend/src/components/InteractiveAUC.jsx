@@ -27,7 +27,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { calculateInteractiveAUC } from '../services/interactiveApi';
-import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin';
+import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 
 // Dev-only comparator
 const CompareSpreadsheet = process.env.NODE_ENV !== 'production' ? require('../dev/CompareSpreadsheet').default : () => null;
