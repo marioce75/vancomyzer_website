@@ -377,7 +377,6 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                     >
                       <MenuItem value="male">{t('genders.male')}</MenuItem>
                       <MenuItem value="female">{t('genders.female')}</MenuItem>
-                      <MenuItem value="other">{t('genders.other')}</MenuItem>
                     </Select>
                   </Grid>
                 </Grid>
