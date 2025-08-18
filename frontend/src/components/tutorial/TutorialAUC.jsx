@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Grid, Paper, Typography, Slider, TextField, InputAdornment } from '@mui/material';
 import 'chart.js/auto';
 import { Line } from 'react-chartjs-2';
+import HelpTooltip from '../../components/common/HelpTooltip';
 
 // Lightweight one-compartment IV infusion model (educational)
 function computeSeries({ dose_mg, interval_hours, infusion_minutes }) {
@@ -67,6 +68,21 @@ function computeSeries({ dose_mg, interval_hours, infusion_minutes }) {
   return { times, conc, auc24, peak, trough };
 }
 
+// Help mapping for labels and badges
+const help = {
+  dose:      { key: 'help.dose',      link: '/guideline/pk-basics-auc' },
+  interval:  { key: 'help.interval',  link: '/guideline/sampling-timing' },
+  infusion:  { key: 'help.infusion',  link: '/guideline/infusion-principles' },
+  mic:       { key: 'help.mic',       link: '/guideline/auc-targets' },
+  auc24:     { key: 'help.auc24',     link: '/guideline/auc-targets' },
+  peak:      { key: 'help.peak',      link: '/guideline/pk-basics-auc' },
+  trough:    { key: 'help.trough',    link: '/guideline/nephrotoxicity' },
+  scr:       { key: 'help.scr',       link: '/guideline/sampling-timing' },
+  weight:    { key: 'help.weight',    link: '/guideline/special-populations' },
+  height:    { key: 'help.height',    link: '/guideline/special-populations' },
+  levels:    { key: 'help.levels',    link: '/guideline/sampling-timing' },
+};
+
 export default function TutorialAUC() {
   const [dose, setDose] = useState(1000);
   const [tau, setTau] = useState(12);
@@ -93,7 +109,10 @@ export default function TutorialAUC() {
   // Control UI shared styling
   const Control = ({ ariaLabel, caption, value, min, max, step, onChange, onCommit, unit }) => (
     <Paper variant="outlined" sx={{ p: 2 }}>
-      <Typography variant="caption" color="text.secondary">{caption}</Typography>
+      <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center' }}>
+        <Typography variant="caption" color="text.secondary">{caption}</Typography>
+        <HelpTooltip titleKey={ariaLabel === 'Dose' ? help.dose.key : ariaLabel === 'Interval' ? help.interval.key : help.infusion.key} linkTo={ariaLabel === 'Dose' ? help.dose.link : ariaLabel === 'Interval' ? help.interval.link : help.infusion.link} />
+      </Box>
       <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
         <Grid item xs={8} md={9}>
           <Slider
@@ -217,14 +236,17 @@ export default function TutorialAUC() {
         </Box>
 
         <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
-          <Paper variant="outlined" sx={{ px: 1.25, py: 0.5, borderRadius: 3, bgcolor: 'warning.light' }}>
+          <Paper variant="outlined" sx={{ px: 1.25, py: 0.5, borderRadius: 3, bgcolor: 'warning.light', display: 'inline-flex', alignItems: 'center' }}>
             AUC24 ≈ {Math.round(series.auc24)} mg·h/L
+            <HelpTooltip titleKey={help.auc24.key} linkTo={help.auc24.link} />
           </Paper>
-          <Paper variant="outlined" sx={{ px: 1.25, py: 0.5, borderRadius: 3 }}>
+          <Paper variant="outlined" sx={{ px: 1.25, py: 0.5, borderRadius: 3, display: 'inline-flex', alignItems: 'center' }}>
             Peak ≈ {Number(series.peak).toFixed(1)} mg/L
+            <HelpTooltip titleKey={help.peak.key} linkTo={help.peak.link} />
           </Paper>
-          <Paper variant="outlined" sx={{ px: 1.25, py: 0.5, borderRadius: 3 }}>
+          <Paper variant="outlined" sx={{ px: 1.25, py: 0.5, borderRadius: 3, display: 'inline-flex', alignItems: 'center' }}>
             Trough ≈ {Number(series.trough).toFixed(1)} mg/L
+            <HelpTooltip titleKey={help.trough.key} linkTo={help.trough.link} />
           </Paper>
         </Box>
 

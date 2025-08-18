@@ -73,5 +73,18 @@
       "dosingAuc": "الجرعة (AUC)",
       "tryIt": "جرّبها"
     }
+  },
+  "help": {
+    "dose": "Amount of vancomycin per administration. Adjust with interval to reach AUC24/MIC goals while avoiding excessive peaks/troughs.",
+    "interval": "Time between doses (τ). Shorter intervals raise exposure and smooth peaks/troughs; longer intervals lower exposure and increase fluctuation.",
+    "infusion": "Duration of IV infusion. ≥60 min for 1 g; consider 90–120 min for larger doses to reduce infusion reactions.",
+    "mic": "Organism minimum inhibitory concentration. AUC24/MIC target is typically 400–600 when MIC=1 (ASHP/IDSA 2020).",
+    "auc24": "24-hour exposure (mg·h/L). Primary efficacy/safety metric. Typical target 400–600 when MIC=1.",
+    "peak": "Post-distribution maximum concentration. High peaks increase ototoxicity risk; not a primary target under AUC-guided dosing.",
+    "trough": "Concentration before the next dose. Avoid targeting high troughs routinely; values >20 mg/L increase nephrotoxicity risk.",
+    "scr": "Serum creatinine used to estimate renal function for initial dosing/interval selection.",
+    "weight": "Use actual body weight for loading doses; maintenance dosing considers renal function and clinical status.",
+    "height": "Used to derive BSA/IBW if needed; not always used in AUC models.",
+    "levels": "Observed concentrations. One-level Bayesian uses a post-distribution sample; two-level first-order uses peak + trough."
   }
 }

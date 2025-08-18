@@ -7,6 +7,7 @@ import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Toolti
 import { Line } from 'react-chartjs-2';
 import * as interactiveApi from '../services/interactiveApi';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
+import HelpTooltip from './common/HelpTooltip';
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Title, ChartTooltip, Filler, Legend);
 
@@ -31,6 +32,21 @@ function interp(xs, ys, x) {
   const f = (x - x0) / (x1 - x0);
   return y0 + f * (y1 - y0);
 }
+
+// Help mapping
+const help = {
+  dose:      { key: 'help.dose',      link: '/guideline/pk-basics-auc' },
+  interval:  { key: 'help.interval',  link: '/guideline/sampling-timing' },
+  infusion:  { key: 'help.infusion',  link: '/guideline/infusion-principles' },
+  mic:       { key: 'help.mic',       link: '/guideline/auc-targets' },
+  auc24:     { key: 'help.auc24',     link: '/guideline/auc-targets' },
+  peak:      { key: 'help.peak',      link: '/guideline/pk-basics-auc' },
+  trough:    { key: 'help.trough',    link: '/guideline/nephrotoxicity' },
+  scr:       { key: 'help.scr',       link: '/guideline/sampling-timing' },
+  weight:    { key: 'help.weight',    link: '/guideline/special-populations' },
+  height:    { key: 'help.height',    link: '/guideline/special-populations' },
+  levels:    { key: 'help.levels',    link: '/guideline/sampling-timing' },
+};
 
 export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const { t, i18n } = useTranslation();
@@ -205,7 +221,12 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
     return (
       <Paper variant="outlined" sx={{ p: 2 }}>
-        <Typography variant="caption" color="text.secondary">{t(label, label)}</Typography>
+        <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center' }}>
+          <Typography variant="caption" color="text.secondary">{t(label, label)}</Typography>
+          {field === 'dose_mg' && <HelpTooltip titleKey={help.dose.key} linkTo={help.dose.link} />}
+          {field === 'interval_hours' && <HelpTooltip titleKey={help.interval.key} linkTo={help.interval.link} />}
+          {field === 'infusion_minutes' && <HelpTooltip titleKey={help.infusion.key} linkTo={help.infusion.link} />}
+        </Box>
         <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
           <Grid item xs={8} md={9}>
             <Slider
@@ -336,12 +357,38 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Typography variant="h6" sx={{ mb: 1 }}>{t('patient', 'Patient')}</Typography>
         <Grid container spacing={2}>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={`${t('age','Age')} (y)`} type="number" value={patient.age} onChange={(e) => setPatient((p) => ({ ...p, age: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth select SelectProps={{ native: true }} label={t('gender','Gender')} value={patient.gender} onChange={(e) => setPatient((p) => ({ ...p, gender: e.target.value }))}><option value="male">{t('male','Male')}</option><option value="female">{t('female','Female')}</option></TextField></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={`${t('weight','Weight')} (kg)`} type="number" value={patient.weight_kg} onChange={(e) => setPatient((p) => ({ ...p, weight_kg: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={`${t('height','Height')} (cm)`} type="number" value={patient.height_cm} onChange={(e) => setPatient((p) => ({ ...p, height_cm: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={`${t('scr','SCr')} (mg/dL)`} type="number" value={patient.serum_creatinine_mg_dl} onChange={(e) => setPatient((p) => ({ ...p, serum_creatinine_mg_dl: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={`${t('mic','MIC')} (mg/L)`} type="number" value={patient.mic_mg_L} onChange={(e) => setPatient((p) => ({ ...p, mic_mg_L: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField size="small" fullWidth label={`${t('age','Age')} (y)`} type="number" value={patient.age} onChange={(e) => setPatient((p) => ({ ...p, age: Number(e.target.value) }))} />
+            </Box>
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <TextField size="small" fullWidth select SelectProps={{ native: true }} label={t('gender','Gender')} value={patient.gender} onChange={(e) => setPatient((p) => ({ ...p, gender: e.target.value }))}><option value="male">{t('male','Male')}</option><option value="female">{t('female','Female')}</option></TextField>
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField size="small" fullWidth label={`${t('weight','Weight')} (kg)`} type="number" value={patient.weight_kg} onChange={(e) => setPatient((p) => ({ ...p, weight_kg: Number(e.target.value) }))} />
+              <HelpTooltip titleKey={help.weight.key} linkTo={help.weight.link} />
+            </Box>
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField size="small" fullWidth label={`${t('height','Height')} (cm)`} type="number" value={patient.height_cm} onChange={(e) => setPatient((p) => ({ ...p, height_cm: Number(e.target.value) }))} />
+              <HelpTooltip titleKey={help.height.key} linkTo={help.height.link} />
+            </Box>
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField size="small" fullWidth label={`${t('scr','SCr')} (mg/dL)`} type="number" value={patient.serum_creatinine_mg_dl} onChange={(e) => setPatient((p) => ({ ...p, serum_creatinine_mg_dl: Number(e.target.value) }))} />
+              <HelpTooltip titleKey={help.scr.key} linkTo={help.scr.link} />
+            </Box>
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField size="small" fullWidth label={`${t('mic','MIC')} (mg/L)`} type="number" value={patient.mic_mg_L} onChange={(e) => setPatient((p) => ({ ...p, mic_mg_L: Number(e.target.value) }))} />
+              <HelpTooltip titleKey={help.mic.key} linkTo={help.mic.link} />
+            </Box>
+          </Grid>
         </Grid>
       </Paper>
 
@@ -349,7 +396,10 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       <Grid container spacing={2} sx={{ mb: 2 }}>
         <Grid item xs={12} md={4}>
           <Paper variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary">{t('auc24','AUC24')}</Typography>
+            <Box component="div" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="caption" color="text.secondary">{t('auc24','AUC24')}</Typography>
+              <HelpTooltip titleKey={help.auc24.key} linkTo={help.auc24.link} />
+            </Box>
             <Box sx={{ mt: 1 }}>
               <Chip label={`${toFixed(summary?.auc_24, 0)} mg·h/L`} color={summary?.auc_24 >= 400 && summary?.auc_24 <= 600 ? 'success' : 'warning'} variant={summary?.auc_24 >= 400 && summary?.auc_24 <= 600 ? 'filled' : 'outlined'} />
             </Box>
@@ -357,7 +407,10 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         </Grid>
         <Grid item xs={12} md={4}>
           <Paper variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary">{t('predicted_trough','Predicted trough')}</Typography>
+            <Box component="div" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="caption" color="text.secondary">{t('predicted_trough','Predicted trough')}</Typography>
+              <HelpTooltip titleKey={help.trough.key} linkTo={help.trough.link} />
+            </Box>
             <Box sx={{ mt: 1 }}>
               <Chip label={`${toFixed(summary?.predicted_trough, 1)} mg/L`} />
             </Box>
@@ -365,7 +418,10 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         </Grid>
         <Grid item xs={12} md={4}>
           <Paper variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary">{t('predicted_peak','Predicted peak')}</Typography>
+            <Box component="div" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="caption" color="text.secondary">{t('predicted_peak','Predicted peak')}</Typography>
+              <HelpTooltip titleKey={help.peak.key} linkTo={help.peak.link} />
+            </Box>
             <Box sx={{ mt: 1 }}>
               <Chip label={`${toFixed(summary?.predicted_peak, 1)} mg/L`} />
             </Box>
@@ -412,7 +468,10 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
       {/* Levels panel */}
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Typography variant="subtitle2">{t('measured_levels','Measured Levels')}</Typography>
+        <Box component="div" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+          <Typography variant="subtitle2">{t('measured_levels','Measured Levels')}</Typography>
+          <HelpTooltip titleKey={help.levels.key} linkTo={help.levels.link} />
+        </Box>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12} md={4}>
             <TextField select SelectProps={{ native: true }} fullWidth size="small" label={t('mode','Mode')} value={levelMode} onChange={(e) => setLevelMode(e.target.value)}>
