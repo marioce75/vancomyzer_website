@@ -1,32 +1,29 @@
 {
   "name": "vancomyzer-web",
   "version": "2.0.0",
-  "description": "Interactive web version of Vancomyzer - Evidence-based vancomycin dosing calculator",
   "private": true,
+  "description": "Interactive web version of Vancomyzer - Evidence-based vancomycin dosing calculator",
   "dependencies": {
-    "@emotion/react": "^11.11.0",
-    "@emotion/styled": "^11.11.0",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.14.0",
     "@mui/lab": "^5.0.0-alpha.140",
     "@mui/material": "^5.14.0",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "axios": "^1.11.0",
-    "chart.js": "^4.4.0",
+    "chart.js": "^4.4.4",
     "date-fns": "^2.30.0",
     "html2canvas": "^1.4.1",
     "i18next": "^23.10.0",
     "i18next-browser-languagedetector": "^8.0.0",
     "lodash": "^4.17.21",
     "plotly.js": "^2.27.0",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "^18.3.1",
     "react-i18next": "^13.5.0",
     "react-markdown": "^9.0.1",
     "react-plotly.js": "^2.6.0",
-    "react-router-dom": "^6.15.0",
+    "react-router-dom": "^6.26.2",
     "react-scripts": "5.0.1",
     "recharts": "^2.8.0",
     "remark-gfm": "^4.0.0",
@@ -40,30 +37,12 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
   "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "proxy": "http://localhost:8001",
-  "devDependencies": {
-    "typescript": "^4.9.5"
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
   },
   "engines": {
     "node": ">=18"
