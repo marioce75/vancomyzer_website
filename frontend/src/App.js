@@ -1,6 +1,6 @@
 // App.js
 import React from 'react';
-import { Container, Paper, Box } from '@mui/material';
+import { Container, Paper, Box, Typography } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
@@ -14,9 +14,20 @@ import InteractiveAUC from './pages/InteractiveAUC';
 import './App.css';
 
 function AppInner() {
-  // Interactive AUC is the only page now; patient context is managed within that flow
+  const { t } = useTranslation();
   return (
     <Container maxWidth="lg">
+      <Box sx={{ textAlign: 'center', my: { xs: 2, sm: 3 } }}>
+        <Typography variant="h3" component="h1" sx={{ fontWeight: 700 }}>
+          {t('app.title')}
+        </Typography>
+        <Typography variant="h6" sx={{ opacity: 0.9 }}>
+          {t('app.subtitle')}
+        </Typography>
+        <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
+          {t('app.tagline')}
+        </Typography>
+      </Box>
       <Paper elevation={2} sx={{ p: 2 }}>
         <InteractiveAUC />
       </Paper>
