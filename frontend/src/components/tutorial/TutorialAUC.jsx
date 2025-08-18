@@ -42,33 +42,38 @@ export default function TutorialAUC(){
   const sim = React.useMemo(()=> simulate({ dose_mg: dose, tau_h: tau, infusion_min: inf }), [dose, tau, inf]);
 
   const Control = ({ label, value, min, max, step, onChange, unit }) => {
-    const widthCh = Math.max(4, String(max ?? 4000).length) + 7;
+    const minFinal = Math.max(0, Number.isFinite(min) ? min : 0);
+    const maxFinal = Math.min(9999, Number.isFinite(max) ? max : 9999);
+    const stepFinal = unit === 'mg' ? 50 : unit === 'h' ? 1 : unit === 'min' ? 5 : (Number.isFinite(step) ? step : 1);
     return (
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Typography variant="caption" color="text.secondary">{label}</Typography>
         <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
           <Grid item xs={8} md={9}>
-            <Slider value={value} min={min} max={max} step={step} onChange={(_, v) => onChange(Number(v))} aria-label={label} />
+            <Slider value={value} min={min} max={max} step={stepFinal} onChange={(_, v) => onChange(Number(v))} aria-label={label} />
           </Grid>
           <Grid item xs={4} md={3}>
             <TextField
               variant="outlined"
               className="numericInputDense"
               size="small"
-              fullWidth
               type="number"
-              inputProps={{ min, max, step }}
               value={value}
               onChange={(e) => onChange(Number(e.target.value || 0))}
               label={label}
-              InputProps={{ endAdornment: <InputAdornment position="end">{unit}</InputAdornment> }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end" sx={{ minWidth: '3ch', justifyContent: 'flex-end' }}>{unit}</InputAdornment>
+                ),
+                inputProps: { min: minFinal, max: maxFinal, step: stepFinal }
+              }}
+              InputLabelProps={{ shrink: true }}
               sx={{
-                width: `${widthCh}ch`,
+                width: { xs: '16ch', sm: '18ch' },
                 '& .MuiOutlinedInput-input': {
-                  fontVariantNumeric: 'tabular-nums',
                   textAlign: 'right',
-                  paddingRight: '3.5ch',
-                  color: (theme) => theme.palette.text.primary,
+                  fontVariantNumeric: 'tabular-nums',
+                  paddingRight: '1ch',
                 }
               }}
             />

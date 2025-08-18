@@ -150,12 +150,17 @@ export default function InteractiveAUC() {
   const handleRegimenField = (field) => (value) => setRegimen((r) => ({ ...r, [field]: value }));
 
   const Control = ({ label, value, min, max, step, field, unit }) => {
+    // Respect stricter existing bounds, standardize steps per field
+    const minFinal = Math.max(0, Number.isFinite(min) ? min : 0);
+    const maxFinal = Math.min(9999, Number.isFinite(max) ? max : 9999);
+    const stepFinal = field === 'dose_mg' ? 50 : field === 'interval_hours' ? 1 : field === 'infusion_minutes' ? 5 : (Number.isFinite(step) ? step : 1);
+
     return (
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Typography variant="caption" color="text.secondary">{label}</Typography>
         <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
           <Grid item xs={8} md={9}>
-            <Slider value={value} min={min} max={max} step={step} onChange={(_, v) => handleRegimenField(field)(Number(v))} aria-label={label} />
+            <Slider value={value} min={min} max={max} step={stepFinal} onChange={(_, v) => handleRegimenField(field)(Number(v))} aria-label={label} />
           </Grid>
           <Grid item xs="auto" md="auto">
             <TextField
@@ -167,19 +172,19 @@ export default function InteractiveAUC() {
               value={value}
               onChange={(e) => handleRegimenField(field)(Number(e.target.value || 0))}
               InputProps={{
-                endAdornment: unit ? <InputAdornment position="end">{unit}</InputAdornment> : undefined,
-                inputProps: { min, max, step, inputMode: 'numeric', pattern: '[0-9]*' }
+                endAdornment: unit ? (
+                  <InputAdornment position="end" sx={{ minWidth: '3ch', justifyContent: 'flex-end' }}>{unit}</InputAdornment>
+                ) : undefined,
+                inputProps: { min: minFinal, max: maxFinal, step: stepFinal }
               }}
               InputLabelProps={{ shrink: true }}
               sx={{
-                width: { xs: '11ch', sm: '12ch' },
+                width: { xs: '16ch', sm: '18ch' },
                 '& .MuiOutlinedInput-input': {
                   textAlign: 'right',
                   fontVariantNumeric: 'tabular-nums',
-                  paddingRight: '3.75ch', // reserve space for adornment (mg/h/min)
-                  color: (theme) => theme.palette.text.primary,
-                },
-                '& .MuiInputAdornment-root': { ml: 0.5 },
+                  paddingRight: '1ch',
+                }
               }}
             />
           </Grid>
