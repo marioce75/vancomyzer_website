@@ -1,133 +1,239 @@
-import React from 'react';
-import { Box, Grid, Paper, Typography, Slider, TextField, Chip, InputAdornment } from '@mui/material';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Box, Grid, Paper, Typography, Slider, TextField, InputAdornment } from '@mui/material';
+import 'chart.js/auto';
+import { Line } from 'react-chartjs-2';
 
-// Lightweight one-compartment PK visualization without API
-function simulate({ dose_mg, tau_h, infusion_min }, hours = 48) {
-  const V = 45; // L
-  const CL = 3.8; // L/h
-  const k = CL / V; // 1/h
-  const tinf = infusion_min / 60; // h
-  const dt = 0.1; const t = []; const c = [];
-  for (let x = 0; x <= hours + 1e-9; x += dt) {
-    t.push(Number(x.toFixed(2)));
-    // sum contribution of each dose up to time x
-    let cx = 0;
-    for (let td = 0; td <= x + 1e-9; td += tau_h) {
-      const rel = x - td;
-      if (rel < 0) break;
-      const R0 = dose_mg / tinf; // mg/h during infusion
-      if (rel <= tinf) {
-        cx += (R0 / CL) * (1 - Math.exp(-k * rel));
-      } else {
-        const c_end = (R0 / CL) * (1 - Math.exp(-k * tinf));
-        cx += c_end * Math.exp(-k * (rel - tinf));
-      }
+// Lightweight one-compartment IV infusion model (educational)
+function computeSeries({ dose_mg, interval_hours, infusion_minutes }) {
+  const CL = 4.5;   // L/h (fixed tutorial default)
+  const V = 60;     // L
+  const ke = CL / V; // 1/h
+  const tau = Math.max(6, Number(interval_hours) || 12);
+  const Tinf = Math.max(0.25, (Number(infusion_minutes) || 60) / 60); // h
+  const Dose = Math.max(0, Number(dose_mg) || 0);
+
+  const T = 48; // hours
+  const steps = 400; // ~400 points
+  const dt = T / steps; // step size
+
+  const times = [];
+  const conc = [];
+
+  const R0 = Tinf > 0 ? Dose / Tinf : 0; // mg/h
+
+  function cFromDose(t, t0) {
+    const x = t - t0;
+    if (x < 0) return 0;
+    if (x <= Tinf) {
+      // During infusion: zero-order in, first-order out (simplified)
+      // Concentration (mg/L) ≈ (R0/CL) * (1 - e^{-ke x})
+      return (R0 / CL) * (1 - Math.exp(-ke * x)) / 1000 * 1000; // mg/L
     }
-    c.push(cx / 1000); // mg/L, since V in L and dose in mg handled via R0/CL term
+    const Cend = (R0 / CL) * (1 - Math.exp(-ke * Tinf));
+    return Cend * Math.exp(-ke * (x - Tinf));
   }
-  const auc24 = trapezoid(t.filter(x=>x<=24), c.slice(0, t.findIndex(x=>x>24)+1));
-  const peak = Math.max(...c);
-  const trough = c[t.findIndex(x=>x>=tau_h)];
-  return { t, c, auc24, peak, trough };
+
+  for (let t = 0; t <= T + 1e-9; t += dt) {
+    times.push(+t.toFixed(3));
+    let c = 0;
+    const maxK = Math.ceil(T / tau) + 2;
+    for (let k = 0; k <= maxK; k++) {
+      const t0 = k * tau;
+      if (t0 > T) break;
+      c += cFromDose(t, t0);
+    }
+    conc.push(c);
+  }
+
+  // AUC 0-24h (trapezoid)
+  let auc24 = 0;
+  for (let i = 1; i < times.length; i++) {
+    const a = times[i - 1], b = times[i];
+    if (b <= 0) continue;
+    if (a >= 24) break;
+    const clampedA = Math.max(a, 0);
+    const clampedB = Math.min(b, 24);
+    const ya = conc[i - 1];
+    const yb = conc[i];
+    const h = clampedB - clampedA;
+    if (h > 0) auc24 += 0.5 * (ya + yb) * h;
+  }
+
+  const idx24 = times.findIndex((x) => x > 24);
+  const peak = Math.max(...conc.slice(0, idx24 > 0 ? idx24 : conc.length));
+  const idxTau = Math.max(0, times.findIndex((x) => x >= tau) - 1);
+  const trough = conc[idxTau] ?? conc[0] ?? 0;
+
+  return { times, conc, auc24, peak, trough };
 }
 
-function trapezoid(ts, ys){
-  let area = 0; for (let i=1; i<ts.length; i++){ area += 0.5*(ys[i-1]+ys[i])*(ts[i]-ts[i-1]); } return area;
-}
+export default function TutorialAUC() {
+  const [dose, setDose] = useState(1000);
+  const [tau, setTau] = useState(12);
+  const [tinf, setTinf] = useState(60);
+  const [series, setSeries] = useState({ times: [], conc: [], auc24: 0, peak: 0, trough: 0 });
+  const timer = useRef(null);
 
-export default function TutorialAUC(){
-  const [dose, setDose] = React.useState(1000);
-  const [tau, setTau] = React.useState(12);
-  const [inf, setInf] = React.useState(60);
-  const sim = React.useMemo(()=> simulate({ dose_mg: dose, tau_h: tau, infusion_min: inf }), [dose, tau, inf]);
+  const recalc = useCallback((d = dose, h = tau, m = tinf) => {
+    const res = computeSeries({ dose_mg: d, interval_hours: h, infusion_minutes: m });
+    setSeries(res);
+  }, [dose, tau, tinf]);
 
-  const Control = ({ label, value, min, max, step, onChange, unit }) => {
-    const minFinal = Math.max(0, Number.isFinite(min) ? min : 0);
-    const maxFinal = Math.min(9999, Number.isFinite(max) ? max : 9999);
-    const stepFinal = unit === 'mg' ? 50 : unit === 'h' ? 1 : unit === 'min' ? 5 : (Number.isFinite(step) ? step : 1);
-    return (
-      <Paper variant="outlined" sx={{ p: 2 }}>
-        <Typography variant="caption" color="text.secondary">{label}</Typography>
-        <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
-          <Grid item xs={8} md={9}>
-            <Slider value={value} min={min} max={max} step={stepFinal} onChange={(_, v) => onChange(Number(v))} aria-label={label} />
-          </Grid>
-          <Grid item xs={4} md={3}>
-            <TextField
-              variant="outlined"
-              className="numericInputDense"
-              size="small"
-              type="number"
-              value={value}
-              onChange={(e) => onChange(Number(e.target.value || 0))}
-              label={label}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end" sx={{ minWidth: '3ch', justifyContent: 'flex-end' }}>{unit}</InputAdornment>
-                ),
-                inputProps: { min: minFinal, max: maxFinal, step: stepFinal }
-              }}
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                width: { xs: '16ch', sm: '18ch' },
-                '& .MuiOutlinedInput-input': {
-                  textAlign: 'right',
-                  fontVariantNumeric: 'tabular-nums',
-                  paddingRight: '1ch',
-                }
-              }}
-            />
-          </Grid>
+  // initial compute
+  useEffect(() => { recalc(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const debounced = useCallback((d, h, m) => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      // rAF to avoid jank while dragging
+      requestAnimationFrame(() => recalc(d, h, m));
+    }, 140);
+  }, [recalc]);
+
+  // Control UI shared styling
+  const Control = ({ ariaLabel, caption, value, min, max, step, onChange, onCommit, unit }) => (
+    <Paper variant="outlined" sx={{ p: 2 }}>
+      <Typography variant="caption" color="text.secondary">{caption}</Typography>
+      <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
+        <Grid item xs={8} md={9}>
+          <Slider
+            value={value}
+            min={min}
+            max={max}
+            step={step}
+            onChange={(_, v) => { const val = Number(Array.isArray(v) ? v[0] : v); onChange(val); debounced(
+              ariaLabel === 'Dose' ? val : dose,
+              ariaLabel === 'Interval' ? val : tau,
+              ariaLabel === 'Infusion' ? val : tinf
+            ); }}
+            onChangeCommitted={(_, v) => { const val = Number(Array.isArray(v) ? v[0] : v); onChange(val); onCommit(val); }}
+            aria-label={ariaLabel}
+          />
         </Grid>
-      </Paper>
-    );
-  };
+        <Grid item xs="auto" md="auto">
+          <TextField
+            size="small"
+            type="number"
+            value={value}
+            onChange={(e) => { const val = Number(e.target.value || 0); onChange(val); }}
+            onBlur={(e) => { const val = Number(e.target.value || 0); onCommit(val); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') { const val = Number(e.currentTarget.value || 0); onCommit(val); } }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">{unit}</InputAdornment>,
+              inputProps: { min, max, step },
+            }}
+            sx={{
+              width: { xs: '16ch', sm: '18ch' },
+              '& .MuiOutlinedInput-input': {
+                textAlign: 'right',
+                fontVariantNumeric: 'tabular-nums',
+                paddingRight: '1ch',
+              }
+            }}
+          />
+        </Grid>
+      </Grid>
+    </Paper>
+  );
+
+  const chartData = useMemo(() => {
+    const points = series.times.map((t, i) => ({ x: t, y: series.conc[i] }));
+    return {
+      datasets: [
+        { label: 'AUC 0–24h', data: points.filter(p => p.x <= 24), borderColor: 'rgba(25,118,210,0)', backgroundColor: 'rgba(25,118,210,0.15)', pointRadius: 0, tension: 0.25, fill: true },
+        { label: 'Concentration (mg/L)', data: points, borderColor: '#1976d2', backgroundColor: 'rgba(0,0,0,0)', pointRadius: 0, tension: 0.25, fill: false },
+      ]
+    };
+  }, [series]);
+
+  const ySuggestedMax = useMemo(() => {
+    const mx = Math.max(30, Math.max(0, ...series.conc) * 1.15);
+    return Number.isFinite(mx) ? mx : 40;
+  }, [series.conc]);
 
   return (
     <Box id="tutorial-auc">
       <Typography variant="h6" sx={{ mb: 1 }}>PK/AUC Concepts</Typography>
-      <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} md={4}><Control label="Dose (mg)" value={dose} min={250} max={3000} step={50} onChange={setDose} unit="mg" /></Grid>
-        <Grid item xs={12} md={4}><Control label="Interval (hours)" value={tau} min={6} max={48} step={1} onChange={setTau} unit="h" /></Grid>
-        <Grid item xs={12} md={4}><Control label="Infusion (minutes)" value={inf} min={15} max={240} step={5} onChange={setInf} unit="min" /></Grid>
+
+      {/* Controls aligned with main calculator */}
+      <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
+        <Grid item xs={12} md={4}>
+          <Control
+            ariaLabel="Dose"
+            caption="Dose (mg)"
+            value={dose}
+            min={250}
+            max={4000}
+            step={50}
+            unit="mg"
+            onChange={setDose}
+            onCommit={(v) => { setDose(v); recalc(v, tau, tinf); }}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Control
+            ariaLabel="Interval"
+            caption="Interval (hours)"
+            value={tau}
+            min={6}
+            max={48}
+            step={1}
+            unit="h"
+            onChange={setTau}
+            onCommit={(v) => { setTau(v); recalc(dose, v, tinf); }}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Control
+            ariaLabel="Infusion"
+            caption="Infusion (minutes)"
+            value={tinf}
+            min={15}
+            max={180}
+            step={5}
+            unit="min"
+            onChange={setTinf}
+            onCommit={(v) => { setTinf(v); recalc(dose, tau, v); }}
+          />
+        </Grid>
       </Grid>
+
+      {/* Chart */}
       <Paper variant="outlined" sx={{ p: 2 }}>
-        <MiniChart t={sim.t} c={sim.c} tau={tau} />
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 2 }}>
-          <Chip label={`AUC24 ≈ ${sim.auc24.toFixed(0)} mg·h/L`} color={sim.auc24>=400 && sim.auc24<=600 ? 'success':'warning'} />
-          <Chip label={`Peak ≈ ${sim.peak.toFixed(1)} mg/L`} />
-          <Chip label={`Trough ≈ ${sim.trough.toFixed(1)} mg/L`} />
+        <Box sx={{ height: 320 }}>
+          <Line
+            data={chartData}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: { mode: 'index', intersect: false },
+              plugins: { legend: { display: true } },
+              scales: {
+                x: { type: 'linear', title: { display: true, text: 'Hours' }, min: 0, max: 48, ticks: { maxTicksLimit: 12 } },
+                y: { title: { display: true, text: 'Concentration (mg/L)' }, beginAtZero: true, suggestedMax: ySuggestedMax }
+              }
+            }}
+          />
         </Box>
+
+        <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
+          <Paper variant="outlined" sx={{ px: 1.25, py: 0.5, borderRadius: 3, bgcolor: 'warning.light' }}>
+            AUC24 ≈ {Math.round(series.auc24)} mg·h/L
+          </Paper>
+          <Paper variant="outlined" sx={{ px: 1.25, py: 0.5, borderRadius: 3 }}>
+            Peak ≈ {Number(series.peak).toFixed(1)} mg/L
+          </Paper>
+          <Paper variant="outlined" sx={{ px: 1.25, py: 0.5, borderRadius: 3 }}>
+            Trough ≈ {Number(series.trough).toFixed(1)} mg/L
+          </Paper>
+        </Box>
+
         <Box sx={{ mt: 2 }}>
-          <Typography variant="body2">AUC24/MIC target 400–600 when MIC=1 (2020 ASHP/IDSA). One-level Bayesian uses a single post-distribution sample (1–2 h after infusion end). Two-level first-order PK uses a post-distribution peak + trough ≤1 h pre-dose.</Typography>
+          <Typography variant="body2" color="text.secondary">
+            AUC24/MIC target 400–600 when MIC=1 (2020 ASHP/IDSA). One-level Bayesian uses a single post-distribution sample (1–2 h after infusion end). Two-level first-order PK uses a post-distribution peak + trough ≤1 h pre-dose.
+          </Typography>
         </Box>
       </Paper>
     </Box>
   );
-}
-
-function MiniChart({ t, c, tau }){
-  const ref = React.useRef(null);
-  React.useEffect(()=>{
-    const canvas = ref.current; if (!canvas) return;
-    const dpi = window.devicePixelRatio || 1;
-    const ctx = canvas.getContext('2d');
-    const W = canvas.clientWidth * dpi; const H = 240 * dpi; canvas.width = W; canvas.height = H;
-    ctx.clearRect(0,0,W,H);
-    const pad = 40 * dpi; const w = W - pad*2; const h = H - pad*2;
-    // axes
-    ctx.strokeStyle = '#999'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pad, H-pad); ctx.lineTo(W-pad, H-pad); ctx.moveTo(pad, H-pad); ctx.lineTo(pad, pad); ctx.stroke();
-    // scale
-    const maxX = 48; const maxY = Math.max(30, Math.max(...c)*1.2);
-    const x2p = (x)=> pad + (x/maxX)*w; const y2p = (y)=> H - pad - (y/maxY)*h;
-    // tau markers
-    ctx.setLineDash([6,6]); ctx.strokeStyle = 'rgba(25,118,210,0.6)';
-    for(let x=0; x<=maxX+1e-6; x+=tau){ const X = x2p(x); ctx.beginPath(); ctx.moveTo(X, pad); ctx.lineTo(X, H-pad); ctx.stroke(); }
-    ctx.setLineDash([]);
-    // curve
-    ctx.strokeStyle = '#1976d2'; ctx.lineWidth = 2; ctx.beginPath();
-    t.forEach((x,i)=>{ const X = x2p(x); const Y = y2p(c[i]); if(i===0) ctx.moveTo(X,Y); else ctx.lineTo(X,Y); });
-    ctx.stroke();
-  }, [t,c,tau]);
-  return <canvas ref={ref} style={{ width: '100%', height: 240 }} aria-label="Educational concentration-time curve" role="img" />
 }

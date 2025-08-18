@@ -45,7 +45,9 @@ export default function ClinicalInfo() {
             <Box>
               <TutorialIntro />
               <Box sx={{ mt: 3 }}>
-                <TutorialAUC />
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                  <TutorialAUC />
+                </Paper>
               </Box>
               <Box sx={{ mt: 3 }}>
                 <TutorialWorkflow />
