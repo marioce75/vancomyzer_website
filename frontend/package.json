@@ -2,37 +2,17 @@
   "name": "vancomyzer-web",
   "version": "2.0.0",
   "private": true,
-  "description": "Interactive web version of Vancomyzer - Evidence-based vancomycin dosing calculator",
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2",
-    "react-scripts": "5.0.1",
-    "@emotion/react": "^11.13.0",
-    "@emotion/styled": "^11.13.0",
-    "@mui/material": "^6.0.0",
-    "@mui/icons-material": "^6.0.0",
-    "@mui/lab": "^6.0.0-alpha.0",
-    "axios": "^1.11.0",
-    "chart.js": "^4.4.4",
-    "date-fns": "^2.30.0",
-    "html2canvas": "^1.4.1",
-    "i18next": "^23.10.0",
-    "i18next-browser-languagedetector": "^8.0.0",
-    "jspdf": "^2.5.1",
-    "lodash": "^4.17.21",
-    "plotly.js": "^2.27.0",
-    "react-chartjs-2": "^5.2.0",
-    "react-i18next": "^13.5.0",
-    "react-markdown": "^9.0.1",
-    "react-plotly.js": "^2.6.0",
-    "recharts": "^2.8.0",
-    "remark-gfm": "^4.0.0",
-    "stylis": "^4.3.0",
-    "stylis-plugin-rtl": "^2.1.1",
-    "uuid": "^9.0.0",
-    "web-vitals": "^2.1.4",
-    "xlsx": "^0.18.5"
+    "@emotion/react": "11.13.0",
+    "@emotion/styled": "11.13.0",
+    "@mui/material": "6.5.0",
+    "@mui/system": "6.5.0",
+    "@mui/utils": "6.4.9",
+    "@mui/icons-material": "6.5.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.26.2",
+    "react-scripts": "5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -43,8 +23,5 @@
   "browserslist": {
     "production": [">0.2%", "not dead", "not op_mini all"],
     "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
-  },
-  "engines": {
-    "node": ">=18"
   }
 }
