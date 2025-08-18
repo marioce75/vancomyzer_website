@@ -1,7 +1,7 @@
 import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment, Tooltip, Link as MuiLink } from '@mui/material';
+import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
@@ -60,9 +60,32 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
     trough: levelInputs.trough?.conc ? { conc: Number(levelInputs.trough.conc) } : undefined,
   }, regimen), [levelMode, levelInputs, regimen]);
 
+  // Debounced per-field commit helper
+  const timersRef = useRef({});
+  const scheduleCommit = useCallback((field, val, delayMs = 150) => {
+    setDraftRegimen((r) => ({ ...r, [field]: val }));
+    const timers = timersRef.current;
+    if (timers[field]) clearTimeout(timers[field]);
+    timers[field] = setTimeout(() => {
+      setRegimen((r) => ({ ...r, [field]: val }));
+      timers[field] = undefined;
+    }, delayMs);
+  }, []);
+  useEffect(() => () => {
+    const timers = timersRef.current;
+    Object.keys(timers).forEach((k) => timers[k] && clearTimeout(timers[k]));
+  }, []);
+
   const runInteractive = useCallback(async () => {
     setLoading(true); setError(null);
     const flatPatient = { ...patient, levels: measuredLevels, population_mode: mode };
+    // Optimistic compute: show fast local PK while awaiting backend
+    try {
+      const { series: syn, summary: sum } = computeAll(flatPatient, regimen);
+      setSeries(syn); setSummary(sum);
+    } catch {
+      // ignore optimistic errors
+    }
     try {
       const data = await calculateInteractiveAUC(flatPatient, regimen);
       setSummary({
@@ -80,17 +103,17 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         });
       }
       setPosteriorN(data?.posterior?.n_draws ?? null);
+      setError(null);
     } catch (e) {
       setError(e?.message || 'Request failed');
-      const { series: syn, summary: sum } = computeAll(flatPatient, regimen);
-      setSeries(syn); setSummary(sum);
+      // keep optimistic result
     } finally {
       setLoading(false);
     }
   }, [patient, regimen, measuredLevels, mode]);
 
   useEffect(() => {
-    const t = setTimeout(() => { runInteractive(); }, 400); // debounce
+    const t = setTimeout(() => { runInteractive(); }, 150); // reduced debounce
     return () => clearTimeout(t);
   }, [runInteractive]);
 
@@ -153,7 +176,6 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
     }
   }), [levelMarkers, labels, conc]);
 
-  const setDraftField = (field) => (value) => setDraftRegimen((r) => ({ ...r, [field]: value }));
   const commitField = (field) => (value) => setRegimen((r) => ({ ...r, [field]: value }));
 
   const Control = ({ label, value, min, max, step, field, unit }) => {
@@ -169,10 +191,10 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
           <Grid item xs={8} md={9}>
             <Slider
               value={value}
-              min={min}
-              max={max}
+              min={minFinal}
+              max={maxFinal}
               step={stepFinal}
-              onChange={(_, v) => setDraftField(field)(Number(Array.isArray(v) ? v[0] : v))}
+              onChange={(_, v) => scheduleCommit(field, Number(Array.isArray(v) ? v[0] : v), 120)}
               onChangeCommitted={(_, v) => commitField(field)(Number(Array.isArray(v) ? v[0] : v))}
               aria-label={t(label, label)}
             />
@@ -185,7 +207,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
               type="number"
               size="small"
               value={value}
-              onChange={(e) => setDraftField(field)(Number(e.target.value || 0))}
+              onChange={(e) => scheduleCommit(field, Number(e.target.value || 0), 200)}
               onBlur={(e) => commitField(field)(Number(e.target.value || 0))}
               onKeyDown={(e) => { if (e.key === 'Enter') commitField(field)(Number(e.currentTarget.value || 0)); }}
               InputProps={{
