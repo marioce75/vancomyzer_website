@@ -61,5 +61,8 @@
   "proxy": "http://localhost:8001",
   "devDependencies": {
     "typescript": "^4.9.5"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
