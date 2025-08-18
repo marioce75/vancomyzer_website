@@ -43,6 +43,7 @@ export async function calculateInteractiveAUC(patient, regimen) {
     // Send levels as-is; caller should already compute exact time_hr positions in first interval only
     levels: Array.isArray(patient?.levels) ? patient.levels : [],
     regimen, // { dose_mg, interval_hours, infusion_minutes }
+    mic_mg_L: Number(normalized?.mic_mg_L) || 1.0,
   };
 
   // Dev-only payload check
@@ -78,8 +79,27 @@ export async function calculateInteractiveAUC(patient, regimen) {
           throw err;
         }
         const data = await res.json();
-        // Normalize shape for consumers
-        if (data?.series) return data;
+        // Normalize to a common shape expected by consumers
+        if (data?.series && Array.isArray(data.series.time_hours)) {
+          const series = data.series;
+          // Map median/p05/p95 to concentration_mg_L/lower/upper if needed
+          const concentration_mg_L = Array.isArray(series.concentration_mg_L) ? series.concentration_mg_L
+            : Array.isArray(series.median) ? series.median : [];
+          const lower = Array.isArray(series.lower) ? series.lower : (Array.isArray(series.p05) ? series.p05 : undefined);
+          const upper = Array.isArray(series.upper) ? series.upper : (Array.isArray(series.p95) ? series.p95 : undefined);
+          const metrics = data.metrics || {
+            auc_24: data.auc_24,
+            predicted_peak: data.predicted_peak,
+            predicted_trough: data.predicted_trough,
+            auc24_over_mic: data.auc24_over_mic,
+          };
+          return {
+            series: { time_hours: series.time_hours, concentration_mg_L, lower, upper },
+            metrics,
+            posterior: data.posterior,
+            diagnostics: data.diagnostics,
+          };
+        }
         if (Array.isArray(data?.time_hours) && Array.isArray(data?.concentration_mg_L)) {
           return { series: { time_hours: data.time_hours, concentration_mg_L: data.concentration_mg_L } };
         }

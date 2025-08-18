@@ -9,3 +9,4 @@ pandas
 pydantic
 orjson
 pytensor>=2.20.0
+pytest

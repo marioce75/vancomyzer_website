@@ -28,6 +28,8 @@ import { useTranslation } from 'react-i18next';
 const PatientInputForm = ({ onSubmit, disabled = false }) => {
   const { t } = useTranslation();
 
+  const ALLOWED_GENDERS = ['male', 'female'];
+
   // Helper to test numeric presence (updated per spec)
   const isFiniteNumber = v => v !== '' && v !== null && v !== undefined && Number.isFinite(Number(v));
   const toNumOrUndefined = v => {
@@ -124,6 +126,11 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
       }
     }
 
+    // Gender validation
+    if (!ALLOWED_GENDERS.includes(patient.gender)) {
+      errors.gender = t('errors.genderInvalid') || 'Invalid gender selection';
+    }
+
     setValidation(errors);
   };
 
@@ -152,7 +159,11 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
   const handleInputChange = (field, value) => {
     if (field === 'height_cm') setHeightTouched(true);
     setPatient(prev => {
-      const newPatient = { ...prev, [field]: value };
+      let nextValue = value;
+      if (field === 'gender') {
+        nextValue = ALLOWED_GENDERS.includes(value) ? value : 'male';
+      }
+      const newPatient = { ...prev, [field]: nextValue };
 
       // If user fixes a previously missing required field, clear it from errorFields & possibly banner
       if (field === 'weight_kg' || field === 'serum_creatinine') {
@@ -186,6 +197,7 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
       gestational_age_weeks: toNumOrUndefined(patient.gestational_age_weeks),
       postnatal_age_days: toNumOrUndefined(patient.postnatal_age_days),
       custom_crcl: toNumOrUndefined(patient.custom_crcl),
+      gender: ALLOWED_GENDERS.includes(patient.gender) ? patient.gender : 'male',
     };
 
     const missing = [];
@@ -374,10 +386,15 @@ const PatientInputForm = ({ onSubmit, disabled = false }) => {
                       onChange={(e) => handleInputChange('gender', e.target.value)}
                       aria-label={t('fields.gender')}
                       sx={{ width: '100%' }}
+                      error={!!validation.gender}
+                      displayEmpty
                     >
                       <MenuItem value="male">{t('genders.male')}</MenuItem>
                       <MenuItem value="female">{t('genders.female')}</MenuItem>
                     </Select>
+                    {validation.gender && (
+                      <Typography variant="caption" color="error">{validation.gender}</Typography>
+                    )}
                   </Grid>
                 </Grid>
               </CardContent>

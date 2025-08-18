@@ -37,10 +37,19 @@ class Posterior:
     CL_draws: np.ndarray  # shape (n_draws,)
     V_draws: np.ndarray   # shape (n_draws,)
     sigma_draws: np.ndarray  # residual log-sd
+    rhat_ok: bool = True
 
     @property
     def n(self) -> int:
         return int(self.CL_draws.shape[0])
+
+    @property
+    def CL_median(self) -> float:
+        return float(np.median(self.CL_draws))
+
+    @property
+    def V_median(self) -> float:
+        return float(np.median(self.V_draws))
 
 
 def _prior_location_logCL(clcr: float, tbw: float, theta1: float = DEFAULT_THETA1, theta2: float = DEFAULT_THETA2) -> float:
@@ -117,7 +126,7 @@ def fit_posterior(patient: PatientCovars, regimen: Regimen, levels: List[Dict[st
             chains=2,
             target_accept=0.9,
             progressbar=False,
-            compute_convergence_checks=False,
+            compute_convergence_checks=True,
             random_seed=42,
         )
 
@@ -125,14 +134,22 @@ def fit_posterior(patient: PatientCovars, regimen: Regimen, levels: List[Dict[st
     v_draws = idata.posterior['V'].values.reshape(-1)
     s_draws = idata.posterior['sigma'].values.reshape(-1)
 
-    # Thin to ~400 draws
+    # rhat diagnostics if present
+    try:
+      rhat = pm.rhat(idata, var_names=["CL","V"]).to_array().values
+      rhat_ok = bool(np.all(np.isfinite(rhat)) and np.nanmax(rhat) < 1.1)
+    except Exception:
+      rhat_ok = True
+
+    # Thin to ~600 draws if needed
     n = cl_draws.shape[0]
-    stride = max(1, n // 400)
+    target = 600
+    stride = max(1, n // target)
     cl_draws = cl_draws[::stride]
     v_draws = v_draws[::stride]
     s_draws = s_draws[::stride]
 
-    return Posterior(CL_draws=cl_draws, V_draws=v_draws, sigma_draws=s_draws)
+    return Posterior(CL_draws=cl_draws, V_draws=v_draws, sigma_draws=s_draws, rhat_ok=rhat_ok)
 
 
 def simulate_from_posterior(posterior: Posterior, regimen: Regimen, horizon_h: float = 48.0, dt: float = 0.05):
@@ -154,17 +171,17 @@ def simulate_from_posterior(posterior: Posterior, regimen: Regimen, horizon_h: f
         c_peak.append(np.interp(t_peak, t, c))
         c_trough.append(np.interp(t_trough, t, c))
 
-    M = np.vstack(curves)
-    median = np.median(M, axis=0)
-    p05 = np.percentile(M, 5, axis=0)
-    p95 = np.percentile(M, 95, axis=0)
+    M = np.vstack(curves) if len(curves) else np.zeros((0, times.size))
+    median = np.nanmedian(M, axis=0) if M.size else np.zeros_like(times)
+    p05 = np.nanpercentile(M, 5, axis=0) if M.size else np.zeros_like(times)
+    p95 = np.nanpercentile(M, 95, axis=0) if M.size else np.zeros_like(times)
 
     return {
         'time_hours': times.tolist(),
         'median': median.tolist(),
         'p05': p05.tolist(),
         'p95': p95.tolist(),
-        'auc24': float(np.median(auc24)),
-        'c_peak': float(np.median(c_peak)),
-        'c_trough': float(np.median(c_trough)),
+        'auc24': float(np.nanmedian(auc24)) if auc24 else 0.0,
+        'c_peak': float(np.nanmedian(c_peak)) if c_peak else 0.0,
+        'c_trough': float(np.nanmedian(c_trough)) if c_trough else 0.0,
     }

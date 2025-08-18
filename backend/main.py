@@ -11,7 +11,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
-from .schemas import InteractiveRequest, InteractiveResponse, Series, PosteriorInfo
+from .schemas import InteractiveRequest, InteractiveResponse
 from .bayes import PatientCovars, Regimen, fit_posterior, simulate_from_posterior
 from .pk import predict_at_times
 
@@ -51,7 +51,7 @@ def _key_for_cache(patient_flat: Dict, levels: list) -> str:
 
 
 # Simple in-proc cache for posterior by patient+levels
-_POSTERIOR_CACHE: Dict[str, Tuple] = {}
+_POSTERIOR_CACHE: Dict[str, tuple] = {}
 _MAX_CACHE = 16
 
 
@@ -62,7 +62,6 @@ def get_or_fit_posterior(key: str, patient: PatientCovars, regimen: Regimen, lev
     _POSTERIOR_CACHE[key] = post
     # LRU eviction
     if len(_POSTERIOR_CACHE) > _MAX_CACHE:
-        # pop arbitrary oldest by insertion order
         _POSTERIOR_CACHE.pop(next(iter(_POSTERIOR_CACHE)))
     return post
 
@@ -74,7 +73,6 @@ def _predicted_levels_debug(posterior, regimen: Regimen, levels: list):
     if not times:
         return None
     times_arr = np.array(times, dtype=float)
-    # For each draw, predict at all times, then take quantiles
     preds = []
     for cl, v in zip(posterior.CL_draws, posterior.V_draws):
         preds.append(predict_at_times(float(cl), float(v), regimen.dose_mg, regimen.interval_hours, regimen.infusion_minutes, times_arr))
@@ -83,7 +81,7 @@ def _predicted_levels_debug(posterior, regimen: Regimen, levels: list):
     for j, t in enumerate(times_arr):
         col = M[:, j] if M.size else np.array([np.nan])
         out.append({
-            'time_hr': float(t),
+            't': float(t),
             'median': float(np.nanmedian(col)),
             'p05': float(np.nanpercentile(col, 5)) if np.isfinite(col).any() else float('nan'),
             'p95': float(np.nanpercentile(col, 95)) if np.isfinite(col).any() else float('nan'),
@@ -104,6 +102,8 @@ def interactive(req: InteractiveRequest):
         infusion_minutes=float(req.regimen.infusion_minutes),
     )
 
+    levels_list = [l.dict() for l in req.levels]
+
     cache_key = _key_for_cache({
         'age_years': req.age_years,
         'gender': req.gender,
@@ -111,25 +111,33 @@ def interactive(req: InteractiveRequest):
         'height_cm': req.height_cm,
         'serum_creatinine': serum,
         'clcr_ml_min': clcr,
-    }, [l.dict() for l in req.levels])
+    }, levels_list)
 
-    posterior = get_or_fit_posterior(cache_key, patient, regimen, [l.dict() for l in req.levels])
+    posterior = get_or_fit_posterior(cache_key, patient, regimen, levels_list)
     sim = simulate_from_posterior(posterior, regimen, horizon_h=48.0, dt=0.05)
 
-    series = Series(
-        time_hours=sim['time_hours'],
-        concentration_mg_L=sim['median'],
-        lower=sim['p05'],
-        upper=sim['p95'],
-    )
+    response = {
+        'series': {
+            'time_hours': sim['time_hours'],
+            'median': sim['median'],
+            'p05': sim['p05'],
+            'p95': sim['p95'],
+        },
+        'metrics': {
+            'auc_24': sim['auc24'],
+            'predicted_peak': sim['c_peak'],
+            'predicted_trough': sim['c_trough'],
+            'auc24_over_mic': (sim['auc24'] / float(req.mic_mg_L or 1.0)),
+        },
+        'posterior': {
+            'n_draws': int(posterior.n),
+            'CL_median_L_per_h': float(posterior.CL_median),
+            'V_median_L': float(posterior.V_median),
+        },
+        'diagnostics': {
+            'predicted_levels': _predicted_levels_debug(posterior, regimen, levels_list),
+            'rhat_ok': bool(posterior.rhat_ok),
+        }
+    }
 
-    resp = InteractiveResponse(
-        series=series,
-        auc_24=sim['auc24'],
-        predicted_trough=sim['c_trough'],
-        predicted_peak=sim['c_peak'],
-        posterior=PosteriorInfo(n_draws=int(posterior.n)),
-        debug={'predicted_levels': _predicted_levels_debug(posterior, regimen, [l.dict() for l in req.levels])},
-    )
-
-    return resp
+    return response

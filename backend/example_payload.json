@@ -1,12 +1,15 @@
 {
   "population_type": "adult",
-  "age_years": 62,
+  "age": 56,
   "gender": "male",
-  "weight_kg": 82,
-  "height_cm": 178,
-  "serum_creatinine": 1.1,
+  "weight_kg": 79,
+  "height_cm": 170,
+  "serum_creatinine_mg_dl": 1.0,
+  "clcr_ml_min": null,
   "levels": [
-    { "time_hr": 2.0, "concentration_mg_L": 21.0 }
+    { "time_hr": 2.0, "concentration_mg_L": 22.0, "tag": "post" },
+    { "time_hr": 11.8, "concentration_mg_L": 12.3, "tag": "trough" }
   ],
-  "regimen": { "dose_mg": 1000, "interval_hours": 12, "infusion_minutes": 60 }
+  "regimen": { "dose_mg": 1000, "interval_hours": 12, "infusion_minutes": 60 },
+  "mic_mg_L": 1.0
 }
