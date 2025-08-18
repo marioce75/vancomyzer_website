@@ -1,118 +1,148 @@
-import { normalizePatientFields } from './normalizePatient';
+// Interactive AUC API client with availability probe and robust retries
+// Uses Vite env var VITE_INTERACTIVE_API_URL as base. If missing, API is disabled.
 
-// Force CRA to embed the production API base if provided via env
-const BUILD_API_BASE = (typeof process !== 'undefined' && process.env) ? process.env.REACT_APP_API_BASE : undefined;
+const BASE = (typeof import.meta !== 'undefined' && import.meta.env)
+  ? (import.meta.env.VITE_INTERACTIVE_API_URL || '')
+  : '';
 
-const CANDIDATE_ENDPOINTS = [
-  { path: '/api/dose/interactive', methods: ['POST'] },
-  { path: '/api/interactive',       methods: ['POST'] },
-  { path: '/api/dose/adjust',       methods: ['POST'] }
-];
+const BACKOFF_MS = [250, 500, 1000];
+const REQUEST_TIMEOUT_MS = 6000;
+const HEALTH_TIMEOUT_MS = 2000;
 
-function getApiBase() {
-  // Safe access to env across CRA/Vite without using import.meta (which breaks in non-ESM)
-  const env = (typeof process !== 'undefined' && process?.env) ? process.env : {};
-  const w = (typeof window !== 'undefined') ? window : {};
-  return (
-    w.VANCOMYZER_API_BASE_URL ||
-    w.VITE_API_BASE ||
-    w.REACT_APP_API_BASE ||
-    BUILD_API_BASE ||
-    env.VITE_API_BASE ||
-    env.REACT_APP_API_BASE ||
-    '' // same-origin by default
-  );
+function sleep(ms) {
+  return new Promise((res) => setTimeout(res, ms));
 }
 
-async function tryOptions(url) {
-  try {
-    const r = await fetch(url, { method: 'OPTIONS' });
-    const allow = r.headers.get('Allow') || '';
-    return allow.split(',').map((s) => s.trim().toUpperCase());
-  } catch {
-    return [];
-  }
-}
-
-// Tries multiple (path,method) combos until one works (status < 400 and not 405/404)
-export async function calculateInteractiveAUC(patient, regimen) {
-  const base = getApiBase();
-  const normalized = normalizePatientFields(patient);
-  const body = {
-    ...normalized,
-    // Send levels as-is; caller should already compute exact time_hr positions in first interval only
-    levels: Array.isArray(patient?.levels) ? patient.levels : [],
-    regimen, // { dose_mg, interval_hours, infusion_minutes }
-    mic_mg_L: Number(normalized?.mic_mg_L) || 1.0,
+function buildHeaders(extra) {
+  return {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    ...(extra || {}),
   };
+}
 
-  // Dev-only payload check
-  if (typeof process !== 'undefined' && process && process.env && process.env.NODE_ENV !== 'production') {
-    // eslint-disable-next-line no-console
-    console.debug('[InteractiveAUC] payload', body);
-  }
+function is4xx(status) {
+  return status >= 400 && status < 500;
+}
 
+async function fetchWithRetry(url, opts = {}, attempts = 3) {
   let lastError;
-  for (const cand of CANDIDATE_ENDPOINTS) {
-    const url = base + cand.path;
+  for (let i = 0; i < attempts; i++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(new DOMException('Timeout', 'AbortError')), REQUEST_TIMEOUT_MS);
 
-    // If OPTIONS responds with Allow, filter to allowed methods first
-    const allowed = await tryOptions(url);
-    const methods = allowed.length ? cand.methods.filter((m) => allowed.includes(m)) : cand.methods;
+    // If caller provided a signal, link it so either aborts the request
+    let abortHandler;
+    if (opts.signal) {
+      if (opts.signal.aborted) {
+        clearTimeout(timeout);
+        const err = new DOMException('Aborted', 'AbortError');
+        throw err;
+      }
+      abortHandler = () => {
+        controller.abort(opts.signal.reason || new DOMException('Aborted', 'AbortError'));
+      };
+      try { opts.signal.addEventListener('abort', abortHandler, { once: true }); } catch {}
+    }
 
-    for (const method of methods) {
-      try {
-        const res = await fetch(url, {
-          method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
+    try {
+      const res = await fetch(url, {
+        mode: 'cors',
+        ...opts,
+        headers: buildHeaders(opts.headers),
+        // Always use our controller to preserve timeout; caller abort is linked above
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
 
-        if (res.status === 405 || res.status === 404) {
-          lastError = new Error(`${res.status} on ${method} ${cand.path}`);
-          continue; // try next candidate
-        }
-        if (!res.ok) {
-          const detail = await res.text().catch(() => '');
-          const err = new Error(`Interactive ${res.status}: ${detail}`);
-          err.cause = new Error(`${res.status} on ${method} ${cand.path}`);
+      if (!res.ok) {
+        // Do not retry on 4xx
+        if (is4xx(res.status)) {
+          const err = new Error(`Bad response: ${res.status}`);
+          err.name = 'INTERACTIVE_BAD_RESPONSE';
+          err.status = res.status;
+          try { err.body = await res.text(); } catch {}
           throw err;
         }
-        const data = await res.json();
-        // Normalize to a common shape expected by consumers
-        if (data?.series && Array.isArray(data.series.time_hours)) {
-          const series = data.series;
-          // Map median/p05/p95 to concentration_mg_L/lower/upper if needed
-          const concentration_mg_L = Array.isArray(series.concentration_mg_L) ? series.concentration_mg_L
-            : Array.isArray(series.median) ? series.median : [];
-          const lower = Array.isArray(series.lower) ? series.lower : (Array.isArray(series.p05) ? series.p05 : undefined);
-          const upper = Array.isArray(series.upper) ? series.upper : (Array.isArray(series.p95) ? series.p95 : undefined);
-          const metrics = data.metrics || {
-            auc_24: data.auc_24,
-            predicted_peak: data.predicted_peak,
-            predicted_trough: data.predicted_trough,
-            auc24_over_mic: data.auc24_over_mic,
-          };
-          return {
-            series: { time_hours: series.time_hours, concentration_mg_L, lower, upper },
-            metrics,
-            posterior: data.posterior,
-            diagnostics: data.diagnostics,
-          };
+        // Retry on 5xx unless last attempt
+        if (i < attempts - 1) {
+          await sleep(BACKOFF_MS[Math.min(i, BACKOFF_MS.length - 1)]);
+          continue;
         }
-        if (Array.isArray(data?.time_hours) && Array.isArray(data?.concentration_mg_L)) {
-          return { series: { time_hours: data.time_hours, concentration_mg_L: data.concentration_mg_L } };
-        }
-        return data;
-      } catch (e) {
-        lastError = e?.cause || e;
-        // try next method/path
+        const err = new Error(`Bad response: ${res.status}`);
+        err.name = 'INTERACTIVE_BAD_RESPONSE';
+        err.status = res.status;
+        try { err.body = await res.text(); } catch {}
+        throw err;
+      }
+      return res;
+    } catch (e) {
+      clearTimeout(timeout);
+      lastError = e;
+      // If aborted (user interaction), do not retry; surface abort to caller
+      if (e?.name === 'AbortError') {
+        throw e;
+      }
+      // Only retry network/timeout; otherwise final attempt throws below
+      if (i === attempts - 1) {
+        const err = new Error('Interactive endpoint unavailable');
+        err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
+        err.cause = e;
+        throw err;
+      }
+      await sleep(BACKOFF_MS[Math.min(i, BACKOFF_MS.length - 1)]);
+      continue;
+    } finally {
+      // Best effort to remove listener (optional since once: true is used)
+      if (opts.signal && abortHandler) {
+        try { opts.signal.removeEventListener('abort', abortHandler); } catch {}
       }
     }
   }
-
-  // If we reach here, no server interactive endpoint worked.
-  const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
+  const err = new Error('Interactive endpoint unavailable');
+  err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
   err.cause = lastError;
   throw err;
+}
+
+export async function getInteractiveAvailability() {
+  if (!BASE) return false; // disabled by config
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(new DOMException('Timeout', 'AbortError')), HEALTH_TIMEOUT_MS);
+  try {
+    const res = await fetch(`${BASE}/health`, {
+      method: 'GET',
+      mode: 'cors',
+      headers: buildHeaders(),
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    return !!res.ok;
+  } catch {
+    clearTimeout(timeout);
+    return false;
+  }
+}
+
+export async function calculateInteractiveAUC(patient, regimen, { signal } = {}) {
+  if (!BASE) {
+    const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
+    err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
+    throw err;
+  }
+
+  const payload = {
+    ...patient,
+    // prefer backend schema property name for robustness
+    population_type: patient.population_mode || patient.population_type,
+    regimen,
+  };
+
+  const res = await fetchWithRetry(`${BASE}/interactive/auc`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    signal,
+  }, 3);
+
+  return res.json();
 }

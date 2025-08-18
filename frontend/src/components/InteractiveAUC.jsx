@@ -5,7 +5,7 @@ import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Swit
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { calculateInteractiveAUC } from '../services/interactiveApi';
+import * as interactiveApi from '../services/interactiveApi';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Title, ChartTooltip, Filler, Legend);
@@ -46,6 +46,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const [posteriorN, setPosteriorN] = useState(null);
   const [showAucFill, setShowAucFill] = useState(true);
   const [showDoseMarkers, setShowDoseMarkers] = useState(true);
+  const [apiAvailable, setApiAvailable] = useState(true);
 
   // Measured levels UI
   const [levelMode, setLevelMode] = useState('none');
@@ -76,6 +77,21 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
     Object.keys(timers).forEach((k) => timers[k] && clearTimeout(timers[k]));
   }, []);
 
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const ok = interactiveApi.getInteractiveAvailability
+          ? await interactiveApi.getInteractiveAvailability()
+          : false;
+        if (alive) setApiAvailable(!!ok);
+      } catch {
+        if (alive) setApiAvailable(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+
   const runInteractive = useCallback(async () => {
     setLoading(true); setError(null);
     const flatPatient = { ...patient, levels: measuredLevels, population_mode: mode };
@@ -87,7 +103,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       // ignore optimistic errors
     }
     try {
-      const data = await calculateInteractiveAUC(flatPatient, regimen);
+      const data = await interactiveApi.calculateInteractiveAUC(flatPatient, regimen);
       setSummary({
         auc_24: data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24,
         predicted_peak: data?.metrics?.predicted_peak ?? data.predicted_peak,
@@ -103,10 +119,10 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         });
       }
       setPosteriorN(data?.posterior?.n_draws ?? null);
+      setApiAvailable(true);
       setError(null);
     } catch (e) {
-      setError(e?.message || 'Request failed');
-      // keep optimistic result
+      setApiAvailable(false);
     } finally {
       setLoading(false);
     }
@@ -269,6 +285,35 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
   const guidelineUrl = 'https://www.ashp.org/-/media/assets/policy-guidelines/docs/therapeutic-guidelines/therapeutic-guidelines-monitoring-vancomycin-ASHP-IDSA-PIDS.pdf';
 
+  const onRetry = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await interactiveApi.calculateInteractiveAUC({ ...patient, levels: measuredLevels, population_mode: mode }, regimen);
+      setSummary({
+        auc_24: data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24,
+        predicted_peak: data?.metrics?.predicted_peak ?? data.predicted_peak,
+        predicted_trough: data?.metrics?.predicted_trough ?? data.predicted_trough,
+      });
+      if (data?.series) {
+        const s = data.series;
+        setSeries({
+          time_hours: s.time_hours,
+          concentration_mg_L: s.concentration_mg_L || s.median,
+          lower: s.lower || s.p05,
+          upper: s.upper || s.p95,
+        });
+      }
+      setPosteriorN(data?.posterior?.n_draws ?? null);
+      setApiAvailable(true);
+      setError(null);
+    } catch (e) {
+      setError(e?.message || 'Request failed');
+      setApiAvailable(false);
+    } finally {
+      setLoading(false);
+    }
+  }, [patient, regimen, measuredLevels, mode]);
+
   return (
     <Box dir={dir}>
       {/* Minimal patient form */}
@@ -331,7 +376,12 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         {posteriorN ? (
           <Chip size="small" color="primary" variant="outlined" label={`${t('bayesian','Bayesian')} (n=${posteriorN})`} />
         ) : (
-          <Chip size="small" variant="outlined" label={t('badges.bayesianOptimization','Bayesian optimization')} />
+          <Chip size="small" variant="outlined" label={apiAvailable ? t('badges.bayesianOptimization','Bayesian optimization') : t('badges.bayesianOptimizationOffline','Bayesian optimization (offline)')} />
+        )}
+        {!apiAvailable && (
+          <Button size="small" variant="text" onClick={onRetry} sx={{ textTransform: 'none' }}>
+            {t('retry','Retry')}
+          </Button>
         )}
 
         <Button size="small" variant="text" onClick={() => onOpenGuidelines && onOpenGuidelines()} sx={{ textTransform: 'none' }}>
@@ -370,10 +420,10 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         </Grid>
       </Paper>
 
-      {/* Chart */}
+      {/* Chart and error banner */}
       <Paper variant="outlined" sx={{ p: 2 }}>
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>{error} <Button size="small" onClick={() => runInteractive()}>{t('retry','Retry')}</Button></Alert>
+          <Alert severity="error" sx={{ mb: 2 }}>{error} <Button size="small" onClick={onRetry}>{t('retry','Retry')}</Button></Alert>
         )}
         <Box sx={{ height: 360 }}>
           <Line ref={chartRef} data={{ datasets: [

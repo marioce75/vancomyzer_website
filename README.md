@@ -64,3 +64,25 @@ Notes
 - Badge shows Bayesian (n=…) indicating posterior draw count; CI is 90% band.
 - Export PDF via toolbar, Copy JSON for payload/result.
 - For full backend docs see backend/README.md.
+
+Backend notes: Health route and CORS
+------------------------------------
+- Health endpoints:
+  - `/health` (existing in `backend/main.py`)
+  - `/api/health` (alias added for clients using a base URL ending with `/api`)
+- Interactive AUC endpoints:
+  - `/api/dose/interactive` (existing)
+  - `/api/interactive/auc` (alias added)
+- CORS: FastAPI app enables permissive CORS (allow_origins=['*']) in `backend/main.py` to simplify cross-origin requests from the Vite frontend.
+
+Frontend configuration
+----------------------
+- Set `VITE_INTERACTIVE_API_URL` in `frontend/.env` or environment at build time. Example in `frontend/.env.example`.
+- When `VITE_INTERACTIVE_API_URL` is unset or empty, the interactive Bayesian API is disabled and the app operates in offline mode using local PK computation.
+
+Client-side behavior
+--------------------
+- A health check runs on mount calling `${VITE_INTERACTIVE_API_URL}/health` with a 2s timeout.
+- All interactive requests use a 6s timeout, 3 attempts with backoff (250/500/1000ms), and `AbortController` cancellation.
+- On normal slider changes while the endpoint is down, no red error banner is shown; instead, a small chip indicates "Bayesian optimization (offline)" and local compute is used.
+- Only after the user explicitly presses Retry will a red error banner be displayed if the third attempt still fails.

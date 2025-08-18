@@ -31,6 +31,11 @@ app.add_middleware(
 def health():
     return {"status": "ok"}
 
+# Alias to support clients configured with base '/api'
+@app.get('/api/health')
+def health_api():
+    return {"status": "ok"}
+
 
 def cockcroft_gault(age_years: float, weight_kg: float, scr_mg_dl: float, gender: str | None) -> float:
     if not (age_years and weight_kg and scr_mg_dl):
@@ -141,3 +146,8 @@ def interactive(req: InteractiveRequest):
     }
 
     return response
+
+# Alias to support new client path
+@app.post('/api/interactive/auc', response_model=InteractiveResponse)
+def interactive_auc(req: InteractiveRequest):
+    return interactive(req)
