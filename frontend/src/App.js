@@ -14,6 +14,9 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import LanguageSelector from './components/LanguageSelector';
 import InteractiveAUC from './pages/InteractiveAUC';
 import ClinicalInfo from './pages/ClinicalInfo';
+import Legal from './pages/Legal';
+import { Link as RouterLink } from 'react-router-dom';
+import Link from '@mui/material/Link';
 import './App.css';
 
 // Brand theme palettes + rounded shapes (merged with RTL direction)
@@ -118,6 +121,14 @@ function HeroHeader(){
       >
         {t('slogan.secondary','AUC‑guided · Bayesian‑powered · Following ASHP/IDSA 2020 guidelines')}
       </Typography>
+
+      <Typography
+        variant="caption"
+        align="center"
+        sx={{ display: 'block', opacity: 0.8, mt: 1 }}
+      >
+        {t('disclaimers.hero','For healthcare professionals only. Educational purposes — not a substitute for clinical judgment.')}
+      </Typography>
     </Box>
   );
 }
@@ -217,6 +228,7 @@ function PopulationTabs({ initialPop = 0, initialSubByPop = {} }){
 }
 
 function AppInner() {
+  const { t } = useTranslation();
   return (
     <Container maxWidth="lg">
       <LanguageSelector />
@@ -224,21 +236,20 @@ function AppInner() {
       <Routes>
         <Route path="/" element={<PopulationTabs />} />
         <Route path="/clinical" element={<PopulationTabs initialPop={0} initialSubByPop={{ 0: 1 }} />} />
+        <Route path="/legal" element={<Legal />} />
         <Route path="*" element={<PopulationTabs />} />
       </Routes>
       <Box component="footer" sx={{ py: 3, textAlign: 'center' }}>
-        <Typography
-          variant="caption"
-          align="center"
-          sx={{ display: 'block', opacity: 0.75, mt: 2 }}
-        >
-          Vancomyzer
-          <Box component="sup"
-            sx={{ fontSize: '0.6em', lineHeight: 0, ml: 0.25, position: 'relative', top: '-0.5em' }}
-            aria-hidden
-          >
-            ®
-          </Box>
+        <Typography variant="caption" align="center" sx={{ display: 'block', opacity: 0.9 }}>
+          {t('disclaimers.footer', {
+            year: new Date().getFullYear(),
+            defaultValue: `© ${new Date().getFullYear()} Vancomyzer®. All rights reserved. Vancomyzer® is provided 'as-is' without any warranty. The developers are not liable for clinical outcomes. Consult ASHP/IDSA guidelines and your institution’s policies.`
+          })}
+        </Typography>
+        <Typography variant="caption" align="center" sx={{ display: 'block', mt: 0.5, opacity: 0.8 }}>
+          <Link component={RouterLink} to="/legal" underline="hover" color="inherit">
+            {t('legal.link','Terms & Privacy')}
+          </Link>
         </Typography>
       </Box>
     </Container>
