@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import os
 from typing import List, Optional, Tuple, Any, Dict
 
 import numpy as np
@@ -11,26 +12,36 @@ from pydantic import BaseModel, Field
 from scipy.optimize import minimize
 from scipy.stats import multivariate_normal
 
-from pk.model import (
-    crcl_cockcroft_gault,
-    superposition_conc,
-    auc_trapz,
-    peak_trough_from_series,
-)
-from pk.optimize import choose_dose_interval
+# Robust imports to support running as `backend.app` (package) and `app` (module in Docker)
+try:
+    from pk.model import (
+        crcl_cockcroft_gault,
+        superposition_conc,
+        auc_trapz,
+        peak_trough_from_series,
+    )
+    from pk.optimize import choose_dose_interval
+except Exception:  # pragma: no cover
+    from backend.pk.model import (  # type: ignore
+        crcl_cockcroft_gault,
+        superposition_conc,
+        auc_trapz,
+        peak_trough_from_series,
+    )
+    from backend.pk.optimize import choose_dose_interval  # type: ignore
 
 
-app = FastAPI(default_response_class=ORJSONResponse)
+# App with API root path
+app = FastAPI(root_path="/api", default_response_class=ORJSONResponse)
 
-# CORS
-ALLOWED_ORIGINS = [
+# CORS from env or defaults
+_default_origins = [
     "https://vancomyzer.com",
-    "http://localhost",
-    "http://localhost:3000",
-    "http://127.0.0.1",
-    "http://127.0.0.1:3000",
-    "http://0.0.0.0:3000",
+    "http://localhost:5173",
 ]
+_env_origins = os.getenv("ALLOWED_ORIGINS", ",".join(_default_origins))
+ALLOWED_ORIGINS = [o.strip() for o in _env_origins.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -102,7 +113,8 @@ def finite_diff_hessian(func, x0, eps=1e-4):
 
 # Schemas for documentation only
 class Level(BaseModel):
-    time_hr: float
+    time_hours: float | None = Field(default=None, description="Time since first dose (h)")
+    time_hr: float | None = Field(default=None, description="Alias of time_hours")
     concentration_mg_L: float
     tag: Optional[str] = None
 
@@ -115,9 +127,13 @@ class Regimen(BaseModel):
 
 class Patient(BaseModel):
     age: float
-    gender: str = Field(alias="sex", default="male")
+    sex: str | None = Field(default=None)
+    gender: str | None = Field(default=None)
     weight_kg: float
-    serum_creatinine_mg_dl: float = Field(default=1.0)
+    height_cm: float | None = None
+    scr_mg_dl: float | None = None
+    serum_creatinine_mg_dl: float | None = None
+    mic: float | None = 1.0
     levels: Optional[List[Level]] = None
 
 
@@ -128,7 +144,6 @@ def health():
 
 
 def _normalize_auc_payload(body: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any], List[Dict[str, Any]]]:
-    # Accept either { patient, regimen } or flat with regimen
     if not isinstance(body, dict):
         raise HTTPException(status_code=400, detail="Invalid JSON body")
     if "patient" in body and "regimen" in body:
@@ -137,11 +152,9 @@ def _normalize_auc_payload(body: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[s
         levels = patient.get("levels") or body.get("levels") or []
     else:
         # flat
-        patient_keys = {"age", "gender", "sex", "weight_kg", "serum_creatinine_mg_dl", "levels"}
-        patient = {k: body.get(k) for k in patient_keys if k in body}
-        # support sex->gender
-        if "sex" in patient and "gender" not in patient:
-            patient["gender"] = patient.pop("sex")
+        patient = {k: body.get(k) for k in (
+            "age", "gender", "sex", "weight_kg", "height_cm", "serum_creatinine_mg_dl", "scr_mg_dl", "mic", "levels"
+        ) if k in body}
         regimen = dict(body.get("regimen") or {})
         levels = body.get("levels") or patient.get("levels") or []
     return patient, regimen, levels
@@ -153,9 +166,9 @@ def interactive_auc(body: Dict[str, Any] = Body(...)):
     p_raw, r_raw, levels_raw = _normalize_auc_payload(body)
     try:
         age = float(p_raw.get("age"))
-        gender = str(p_raw.get("gender") or "male")
+        gender = str(p_raw.get("gender") or p_raw.get("sex") or "male")
         weight_kg = float(p_raw.get("weight_kg"))
-        scr = float(p_raw.get("serum_creatinine_mg_dl") or 1.0)
+        scr = float(p_raw.get("serum_creatinine_mg_dl") or p_raw.get("scr_mg_dl") or 1.0)
         dose_mg = int(r_raw.get("dose_mg"))
         interval_hours = int(r_raw.get("interval_hours"))
         infusion_minutes = int(r_raw.get("infusion_minutes"))
@@ -167,7 +180,10 @@ def interactive_auc(body: Dict[str, Any] = Body(...)):
     levels_list: List[Tuple[float, float]] = []
     for lv in levels_raw or []:
         try:
-            t = float(lv.get("time_hr"))
+            t = lv.get("time_hours")
+            if t is None:
+                t = lv.get("time_hr")
+            t = float(t)
             c = float(lv.get("concentration_mg_L"))
             if np.isfinite(t) and np.isfinite(c):
                 levels_list.append((t, c))
@@ -178,13 +194,15 @@ def interactive_auc(body: Dict[str, Any] = Body(...)):
     have_levels = len(levels_list) > 0
     if not have_levels:
         cl_map, v_map = mu_cl, mu_v
-        cov = np.diag([ (SIG_CL * cl_map) ** 2, (SIG_V * v_map) ** 2 ])
+        cov = np.diag([(SIG_CL * cl_map) ** 2, (SIG_V * v_map) ** 2])
     else:
         levels = sorted(levels_list, key=lambda x: x[0])
+
         def nlp_xy(x):
             cl = float(np.clip(x[0], 0.5, 15.0))
             v = float(np.clip(x[1], 20.0, 120.0))
-            return neg_log_posterior(np.array([cl, v]), levels, mu_cl, mu_v, dose_mg, interval_hours, infusion_minutes/60)
+            return neg_log_posterior(np.array([cl, v]), levels, mu_cl, mu_v, dose_mg, interval_hours, infusion_minutes / 60)
+
         x0 = np.array([mu_cl, mu_v], dtype=float)
         bounds = [(0.5, 15.0), (20.0, 120.0)]
         res = minimize(lambda x: nlp_xy(x), x0=x0, method="L-BFGS-B", bounds=bounds)
@@ -193,13 +211,13 @@ def interactive_auc(body: Dict[str, Any] = Body(...)):
         try:
             cov = np.linalg.inv(H)
         except np.linalg.LinAlgError:
-            cov = np.diag([ (SIG_CL * cl_map) ** 2, (SIG_V * v_map) ** 2 ])
+            cov = np.diag([(SIG_CL * cl_map) ** 2, (SIG_V * v_map) ** 2])
 
     # Simulate curve and uncertainty bands
     horizon = 48.0
-    dt = 0.05
+    dt = 0.1
     times = np.arange(0.0, horizon + 1e-9, dt)
-    conc = superposition_conc(times, dose_mg, interval_hours, infusion_minutes/60, cl_map, v_map)
+    conc = superposition_conc(times, dose_mg, interval_hours, infusion_minutes / 60, cl_map, v_map)
 
     # Posterior draws via Laplace approx
     n_draws = 200
@@ -209,19 +227,19 @@ def interactive_auc(body: Dict[str, Any] = Body(...)):
     for cl_d, v_d in draws:
         cl_d = float(np.clip(cl_d, 0.5, 15.0))
         v_d = float(np.clip(v_d, 20.0, 120.0))
-        conc_draws.append(superposition_conc(times, dose_mg, interval_hours, infusion_minutes/60, cl_d, v_d))
+        conc_draws.append(superposition_conc(times, dose_mg, interval_hours, infusion_minutes / 60, cl_d, v_d))
     conc_draws = np.array(conc_draws)
     lower = np.percentile(conc_draws, 5, axis=0)
     upper = np.percentile(conc_draws, 95, axis=0)
 
     auc24 = auc_trapz(times, conc, 0.0, 24.0)
-    peak, trough = peak_trough_from_series(times, conc, float(interval_hours))
+    pt = peak_trough_from_series(times, conc, float(interval_hours))
 
     return {
         "metrics": {
             "auc_24": float(auc24),
-            "predicted_trough": float(trough),
-            "predicted_peak": float(peak),
+            "predicted_peak": float(pt["peak"]),
+            "predicted_trough": float(pt["trough"]),
         },
         "series": {
             "time_hours": [float(t) for t in times],
@@ -250,10 +268,9 @@ def _normalize_opt_payload(body: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[s
         target = dict(body.get("target") or {})
         levels = patient.get("levels") or body.get("levels") or []
     else:
-        patient_keys = {"age", "gender", "sex", "weight_kg", "serum_creatinine_mg_dl", "levels"}
-        patient = {k: body.get(k) for k in patient_keys if k in body}
-        if "sex" in patient and "gender" not in patient:
-            patient["gender"] = patient.pop("sex")
+        patient = {k: body.get(k) for k in (
+            "age", "gender", "sex", "weight_kg", "height_cm", "serum_creatinine_mg_dl", "scr_mg_dl", "mic", "levels"
+        ) if k in body}
         regimen = dict(body.get("regimen") or {})
         target = dict(body.get("target") or {})
         levels = body.get("levels") or patient.get("levels") or []
@@ -266,9 +283,9 @@ def optimize(body: Dict[str, Any] = Body(...)):
     p_raw, r_raw, tgt_raw, levels_raw = _normalize_opt_payload(body)
     try:
         age = float(p_raw.get("age"))
-        gender = str(p_raw.get("gender") or "male")
+        gender = str(p_raw.get("gender") or p_raw.get("sex") or "male")
         weight_kg = float(p_raw.get("weight_kg"))
-        scr = float(p_raw.get("serum_creatinine_mg_dl") or 1.0)
+        scr = float(p_raw.get("serum_creatinine_mg_dl") or p_raw.get("scr_mg_dl") or 1.0)
         dose_mg = int(r_raw.get("dose_mg"))
         interval_hours = int(r_raw.get("interval_hours"))
         infusion_minutes = int(r_raw.get("infusion_minutes"))
@@ -282,7 +299,10 @@ def optimize(body: Dict[str, Any] = Body(...)):
     levels_list: List[Tuple[float, float]] = []
     for lv in levels_raw or []:
         try:
-            t = float(lv.get("time_hr"))
+            t = lv.get("time_hours")
+            if t is None:
+                t = lv.get("time_hr")
+            t = float(t)
             c = float(lv.get("concentration_mg_L"))
             if np.isfinite(t) and np.isfinite(c):
                 levels_list.append((t, c))
@@ -292,10 +312,12 @@ def optimize(body: Dict[str, Any] = Body(...)):
     # Fit MAP if levels provided, else use prior means
     if len(levels_list) > 0:
         levels = sorted(levels_list, key=lambda x: x[0])
+
         def nlp_xy(x):
             cl = float(np.clip(x[0], 0.5, 15.0))
             v = float(np.clip(x[1], 20.0, 120.0))
-            return neg_log_posterior(np.array([cl, v]), levels, mu_cl, mu_v, dose_mg, interval_hours, infusion_minutes/60)
+            return neg_log_posterior(np.array([cl, v]), levels, mu_cl, mu_v, dose_mg, interval_hours, infusion_minutes / 60)
+
         x0 = np.array([mu_cl, mu_v], dtype=float)
         bounds = [(0.5, 15.0), (20.0, 120.0)]
         res = minimize(lambda x: nlp_xy(x), x0=x0, method="L-BFGS-B", bounds=bounds)

@@ -156,9 +156,7 @@ export async function calculateInteractiveAUC(patient, regimen, { signal } = {})
   }
 
   const payload = {
-    ...patient,
-    // prefer backend schema property name for robustness
-    population_type: patient.population_mode || patient.population_type,
+    patient,
     regimen,
   };
 

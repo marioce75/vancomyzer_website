@@ -5,7 +5,7 @@ from typing import List, Tuple
 
 import numpy as np
 
-# Helpers
+# Cockcroft–Gault creatinine clearance in mL/min
 
 def crcl_cockcroft_gault(age: float, weight_kg: float, scr_mgdl: float, sex: str) -> float:
     scr = max(0.2, float(scr_mgdl))
@@ -14,22 +14,47 @@ def crcl_cockcroft_gault(age: float, weight_kg: float, scr_mgdl: float, sex: str
     sex = str(sex or "male").lower()
     sex_factor = 0.85 if sex.startswith("f") else 1.0
     crcl = ((140.0 - age) * wt) / (72.0 * scr)
-    return crcl * sex_factor
+    return float(crcl * sex_factor)
 
+
+# One-compartment IV infusion model (zero-order in, first-order out)
+# Returns concentration at time t (hours) after start of infusion
+
+def infusion_conc_single(t_h: float | np.ndarray, dose_mg: float, tinf_h: float, cl_L_h: float, v_L: float) -> np.ndarray:
+    t = np.array(t_h, dtype=float)
+    k = max(1e-9, cl_L_h / max(v_L, 1e-9))
+    tinf_h = max(1e-9, float(tinf_h))
+    R0 = dose_mg / tinf_h  # mg/h
+    conc = np.zeros_like(t, dtype=float)
+    # During infusion: 0 <= t <= Tinf
+    during = (t >= 0) & (t <= tinf_h)
+    if np.any(during):
+        conc[during] = (R0 / (k * v_L)) * (1.0 - np.exp(-k * t[during]))
+    # After infusion: t > Tinf
+    after = t > tinf_h
+    if np.any(after):
+        conc[after] = (R0 / (k * v_L)) * (1.0 - np.exp(-k * tinf_h)) * np.exp(-k * (t[after] - tinf_h))
+    return conc
+
+
+# Repeated dosing via superposition across times grid
 
 def superposition_conc(t_array: np.ndarray, dose_mg: float, tau_h: float, tinf_h: float, cl_L_h: float, v_L: float) -> np.ndarray:
-    k = cl_L_h / v_L
-    k = max(k, 1e-6)
-    R0 = dose_mg / max(tinf_h, 1e-6)
+    t_array = np.array(t_array, dtype=float)
+    tau_h = float(tau_h)
+    assert tau_h > 0
+    if len(t_array) == 0:
+        return np.zeros((0,), dtype=float)
     conc = np.zeros_like(t_array, dtype=float)
-    max_k = int(math.ceil((t_array[-1] + 1e-9) / tau_h)) + 1
-    dose_times = np.arange(0.0, max_k * tau_h + 1e-9, tau_h)
-    for t0 in dose_times:
+    horizon = float(t_array[-1])
+    n_doses = int(math.ceil((horizon + 1e-9) / tau_h)) + 1
+    for n in range(n_doses):
+        t0 = n * tau_h
         td = t_array - t0
-        during = (td >= 0) & (td <= tinf_h)
-        after = td > tinf_h
-        conc[during] += (R0 / (k * v_L)) * (1.0 - np.exp(-k * td[during]))
-        conc[after] += (R0 / (k * v_L)) * (1.0 - np.exp(-k * tinf_h)) * np.exp(-k * (td[after] - tinf_h))
+        mask = td >= 0
+        if not np.any(mask):
+            continue
+        conc[mask] += infusion_conc_single(td[mask], dose_mg, tinf_h, cl_L_h, v_L)
     return conc
 
 
@@ -38,16 +63,19 @@ def auc_trapz(t_array: np.ndarray, c_array: np.ndarray, t0: float = 0.0, t1: flo
         return 0.0
     t = np.array(t_array, dtype=float)
     y = np.array(c_array, dtype=float)
+    # Clip to [t0, t1] with linear interpolation at boundaries
     mask = (t >= t0) & (t <= t1)
     if not np.any(mask):
         return 0.0
+    # Ensure exact boundaries exist
     if t[mask][0] > t0:
-        y0 = np.interp(t0, t, y)
-        t = np.insert(t, np.argmax(mask), t0)
-        y = np.insert(y, np.argmax(mask), y0)
+        y0 = float(np.interp(t0, t, y))
+        insert_at = np.argmax(mask)
+        t = np.insert(t, insert_at, t0)
+        y = np.insert(y, insert_at, y0)
         mask = (t >= t0) & (t <= t1)
     if t[mask][-1] < t1:
-        y1 = np.interp(t1, t, y)
+        y1 = float(np.interp(t1, t, y))
         idx = np.where(mask)[0][-1] + 1
         t = np.insert(t, idx, t1)
         y = np.insert(y, idx, y1)
@@ -60,8 +88,10 @@ def auc_trapz(t_array: np.ndarray, c_array: np.ndarray, t0: float = 0.0, t1: flo
 def peak_trough_from_series(t_array: np.ndarray, c_array: np.ndarray, tau_h: float) -> dict:
     t = np.array(t_array, dtype=float)
     y = np.array(c_array, dtype=float)
+    # Peak within first 24h
     idx24 = np.searchsorted(t, 24.0, side="right")
-    peak = float(np.max(y[: max(1, idx24)]))
+    peak = float(np.max(y[: max(1, idx24)])) if len(y) else 0.0
+    # Trough: value just before tau
     idx_tau = np.searchsorted(t, tau_h, side="left")
     trough = float(y[max(0, idx_tau - 1)]) if len(y) else 0.0
     return {"peak": peak, "trough": trough}
@@ -96,3 +126,23 @@ def neg_log_post(cl: float, v: float, levels: List[Tuple[float, float]], mu_cl: 
         resid = (c_pred - np.array([lv[1] for lv in levels], dtype=float)) / SIGMA_RESID
         nlp += 0.5 * float(np.dot(resid, resid))
     return nlp
+
+
+# Spec-aligned helper aliases
+
+def cockcroft_gault(age: float, weight_kg: float, scr_mgdl: float, sex: str) -> float:
+    return crcl_cockcroft_gault(age, weight_kg, scr_mgdl, sex)
+
+
+def infusion_superposition(times: np.ndarray, dose_mg: float, tau_h: float, tinf_h: float, cl_L_h: float, v_L: float, horizon_h: float = 48.0) -> np.ndarray:
+    # horizon_h is unused here since times drives horizon, kept for signature compatibility
+    return superposition_conc(times, dose_mg, tau_h, tinf_h, cl_L_h, v_L)
+
+
+def trapezoid(x: np.ndarray, y: np.ndarray, a: float, b: float) -> float:
+    return auc_trapz(x, y, a, b)
+
+
+def peak_trough(times: np.ndarray, conc: np.ndarray, tau_h: float) -> tuple[float, float]:
+    pt = peak_trough_from_series(times, conc, tau_h)
+    return float(pt["peak"]), float(pt["trough"])  # (peak, trough)

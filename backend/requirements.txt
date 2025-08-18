@@ -1,6 +1,6 @@
-fastapi
-uvicorn[standard]
-pydantic
-numpy
-scipy
-orjson
+fastapi==0.112.0
+uvicorn[standard]==0.30.5
+pydantic==2.8.2
+numpy==1.26.4
+scipy==1.13.1
+orjson==3.10.7

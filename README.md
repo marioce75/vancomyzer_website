@@ -86,3 +86,16 @@ Client-side behavior
 - All interactive requests use a 6s timeout, 3 attempts with backoff (250/500/1000ms), and `AbortController` cancellation.
 - On normal slider changes while the endpoint is down, no red error banner is shown; instead, a small chip indicates "Bayesian optimization (offline)" and local compute is used.
 - Only after the user explicitly presses Retry will a red error banner be displayed if the third attempt still fails.
+
+## Bayesian backend (FastAPI) — local run
+- Python 3.11 recommended
+- Install deps:
+  python -m pip install -r backend/requirements.txt
+- Start API:
+  uvicorn backend.app:app --reload --port 8000
+- Health test:
+  curl https://<render-url>/api/health
+
+## Frontend env
+- Set VITE_INTERACTIVE_API_URL=https://<render-url>/api
+- Rebuild and redeploy frontend.

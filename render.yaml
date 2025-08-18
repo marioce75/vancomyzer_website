@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: vancomyzer-bayesian-api
+    env: docker
+    autoDeploy: true
+    plan: starter
+    healthCheckPath: /api/health
+    dockerfilePath: backend/Dockerfile
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: ALLOWED_ORIGINS
+        value: "https://vancomyzer.com,http://localhost:5173"
