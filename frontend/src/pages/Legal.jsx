@@ -1,11 +1,22 @@
 import React from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Paper, Typography, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { Link as RouterLink } from 'react-router-dom';
 
 export default function Legal(){
   const { t } = useTranslation();
   return (
     <Box sx={{ my: 3 }}>
+      {/* Back to Calculator button just under the header banner */}
+      <Button
+        variant="outlined"
+        component={RouterLink}
+        to="/"
+        sx={{ mb: 2, textTransform: 'none' }}
+      >
+        ← Back to Calculator
+      </Button>
+
       <Paper variant="outlined" sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom>{t('legal.title','Terms & Privacy')}</Typography>
 
