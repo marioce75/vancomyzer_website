@@ -1,6 +1,6 @@
 // App.js
 import React from 'react';
-import { Container, Paper, Box, Typography, useMediaQuery, Tabs, Tab } from '@mui/material';
+import { Container, Paper, Box, Typography, useMediaQuery, Tabs, Tab, Button } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
@@ -17,6 +17,7 @@ import ClinicalInfo from './pages/ClinicalInfo';
 import Legal from './pages/Legal';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@mui/material/Link';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import './App.css';
 
 // Brand theme palettes + rounded shapes (merged with RTL direction)
@@ -231,7 +232,19 @@ function AppInner() {
   const { t } = useTranslation();
   return (
     <Container maxWidth="lg">
-      <LanguageSelector />
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+        <LanguageSelector />
+        <Button
+          variant="text"
+          component={RouterLink}
+          to="/"
+          startIcon={<HomeRoundedIcon />}
+          sx={{ textTransform: 'none' }}
+          aria-label={t('nav.home','Home')}
+        >
+          {t('nav.home','Home')}
+        </Button>
+      </Box>
       <HeroHeader />
       <Routes>
         <Route path="/" element={<PopulationTabs />} />
