@@ -52,6 +52,7 @@
   "actions.hide": "إخفاء",
   "actions.calculate": "احسب الجرعة",
   "actions.calculating": "جاري الحساب...",
+  "actions.retry": "إعادة المحاولة",
   "errors.ageAdultMin": "البالغون يجب أن يكونوا ≥18 سنة",
   "errors.weightRange": "الوزن يجب أن يكون 0.1-300 كجم",
   "errors.scrRange": "الكرياتينين يجب أن يكون 0.1-20 ملغ/دل",

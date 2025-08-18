@@ -52,6 +52,7 @@
   "actions.hide": "Ocultar",
   "actions.calculate": "Calcular dosis",
   "actions.calculating": "Calculando...",
+  "actions.retry": "Reintentar",
   "errors.ageAdultMin": "Adultos deben ser ≥18 años",
   "errors.weightRange": "El peso debe ser 0.1-300 kg",
   "errors.scrRange": "La creatinina debe ser 0.1-20 mg/dL",

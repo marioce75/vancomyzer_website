@@ -170,3 +170,5 @@ export async function calculateInteractiveAUC(patient, regimen, { signal } = {})
 
   return res.json();
 }
+
+export const __BASE__ = BASE;

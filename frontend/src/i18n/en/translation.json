@@ -58,6 +58,7 @@
   "actions.hide": "Hide",
   "actions.calculate": "Calculate Dosing",
   "actions.calculating": "Calculating...",
+  "actions.retry": "Retry",
 
   "errors.ageAdultMin": "Adults must be ≥18 years",
   "errors.weightRange": "Weight must be 0.1-300 kg",
@@ -98,7 +99,7 @@
     "bayes": {
       "online": "Bayesian optimization (online)",
       "offline": "Bayesian optimization (offline)",
-      "tooltip": "Service unreachable. Check VITE_INTERACTIVE_API_URL, API /health, CORS, or server uptime."
+      "tooltip": "Interactive service unreachable. Check API URL, /health, CORS, or server uptime."
     }
   }
 }

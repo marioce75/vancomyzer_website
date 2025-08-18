@@ -8,6 +8,7 @@ import { Line } from 'react-chartjs-2';
 import * as interactiveApi from '../services/interactiveApi';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Title, ChartTooltip, Filler, Legend);
 
@@ -464,14 +465,14 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
           apiAvailable ? (
             <Chip size="small" color="primary" label={t('status.bayes.online', 'Bayesian optimization (online)')} />
           ) : (
-            <Tooltip title={t('status.bayes.tooltip', 'Service unreachable. Check API URL, /health, CORS, or server uptime.')}>
+            <Tooltip title={t('status.bayes.tooltip', 'Service unreachable. Check VITE_INTERACTIVE_API_URL, API /health, CORS, or server uptime.')}>
               <Chip size="small" variant="outlined" color="warning" label={t('status.bayes.offline', 'Bayesian optimization (offline)')} />
             </Tooltip>
           )
         )}
         {!apiAvailable && (
-          <Button size="small" variant="text" onClick={onRetry} sx={{ textTransform: 'none' }}>
-            {t('retry','Retry')}
+          <Button size="small" variant="text" startIcon={<RestartAltIcon />} onClick={onRetry} sx={{ textTransform: 'none' }}>
+            {t('actions.retry','Retry')}
           </Button>
         )}
 
@@ -517,7 +518,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       {/* Chart and error banner */}
       <Paper variant="outlined" sx={{ p: 2 }}>
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>{error} <Button size="small" onClick={onRetry}>{t('retry','Retry')}</Button></Alert>
+          <Alert severity="error" sx={{ mb: 2 }}>{error} <Button size="small" startIcon={<RestartAltIcon />} onClick={onRetry}>{t('actions.retry','Retry')}</Button></Alert>
         )}
         <Box sx={{ height: 360 }}>
           <Line ref={chartRef} data={{ datasets: [
