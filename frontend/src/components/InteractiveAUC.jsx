@@ -2,6 +2,7 @@ import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { calculateInteractiveAUC } from '../services/interactiveApi';
@@ -32,9 +33,12 @@ function interp(xs, ys, x) {
 }
 
 export default function InteractiveAUC() {
+  const { t, i18n } = useTranslation();
+  const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   // Minimal patient inputs to support Bayesian priors
   const [patient, setPatient] = useState({ age: 56, gender: 'male', weight_kg: 79, height_cm: 170, serum_creatinine_mg_dl: 1.0, mic_mg_L: 1.0, levels: [] });
   const [regimen, setRegimen] = useState({ dose_mg: 1000, interval_hours: 12, infusion_minutes: 60 });
+  const [draftRegimen, setDraftRegimen] = useState({ dose_mg: 1000, interval_hours: 12, infusion_minutes: 60 });
   const [series, setSeries] = useState({ time_hours: [], concentration_mg_L: [] });
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -46,6 +50,8 @@ export default function InteractiveAUC() {
   // Measured levels UI
   const [levelMode, setLevelMode] = useState('none');
   const [levelInputs, setLevelInputs] = useState({ peak: { conc: '', after_end_h: '' }, trough: { conc: '' } });
+  // Keep draftRegimen in sync with regimen when regimen changes externally
+  useEffect(() => { setDraftRegimen(regimen); }, [regimen]);
 
   const chartRef = useRef(null);
 
@@ -147,7 +153,8 @@ export default function InteractiveAUC() {
     }
   }), [levelMarkers, labels, conc]);
 
-  const handleRegimenField = (field) => (value) => setRegimen((r) => ({ ...r, [field]: value }));
+  const setDraftField = (field) => (value) => setDraftRegimen((r) => ({ ...r, [field]: value }));
+  const commitField = (field) => (value) => setRegimen((r) => ({ ...r, [field]: value }));
 
   const Control = ({ label, value, min, max, step, field, unit }) => {
     // Respect stricter existing bounds, standardize steps per field
@@ -157,23 +164,33 @@ export default function InteractiveAUC() {
 
     return (
       <Paper variant="outlined" sx={{ p: 2 }}>
-        <Typography variant="caption" color="text.secondary">{label}</Typography>
+        <Typography variant="caption" color="text.secondary">{t(label, label)}</Typography>
         <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
           <Grid item xs={8} md={9}>
-            <Slider value={value} min={min} max={max} step={stepFinal} onChange={(_, v) => handleRegimenField(field)(Number(v))} aria-label={label} />
+            <Slider
+              value={value}
+              min={min}
+              max={max}
+              step={stepFinal}
+              onChange={(_, v) => setDraftField(field)(Number(Array.isArray(v) ? v[0] : v))}
+              onChangeCommitted={(_, v) => commitField(field)(Number(Array.isArray(v) ? v[0] : v))}
+              aria-label={t(label, label)}
+            />
           </Grid>
           <Grid item xs="auto" md="auto">
             <TextField
               variant="outlined"
               className="numericInputDense"
-              label={label}
+              label={t(label, label)}
               type="number"
               size="small"
               value={value}
-              onChange={(e) => handleRegimenField(field)(Number(e.target.value || 0))}
+              onChange={(e) => setDraftField(field)(Number(e.target.value || 0))}
+              onBlur={(e) => commitField(field)(Number(e.target.value || 0))}
+              onKeyDown={(e) => { if (e.key === 'Enter') commitField(field)(Number(e.currentTarget.value || 0)); }}
               InputProps={{
                 endAdornment: unit ? (
-                  <InputAdornment position="end" sx={{ minWidth: '3ch', justifyContent: 'flex-end' }}>{unit}</InputAdornment>
+                  <InputAdornment position="end" sx={{ minWidth: '3ch', justifyContent: 'flex-end' }}>{t(unit, unit)}</InputAdornment>
                 ) : undefined,
                 inputProps: { min: minFinal, max: maxFinal, step: stepFinal }
               }}
@@ -229,18 +246,18 @@ export default function InteractiveAUC() {
   };
 
   return (
-    <Box>
+    <Box dir={dir}>
       {/* Removed GlobalStyles width override; per-field sx now handles width/padding/color */}
       {/* Minimal patient form */}
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Typography variant="h6" sx={{ mb: 1 }}>Patient</Typography>
+        <Typography variant="h6" sx={{ mb: 1 }}>{t('patient', 'Patient')}</Typography>
         <Grid container spacing={2}>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label="Age (y)" type="number" value={patient.age} onChange={(e) => setPatient((p) => ({ ...p, age: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth select SelectProps={{ native: true }} label="Gender" value={patient.gender} onChange={(e) => setPatient((p) => ({ ...p, gender: e.target.value }))}><option value="male">Male</option><option value="female">Female</option></TextField></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label="Weight (kg)" type="number" value={patient.weight_kg} onChange={(e) => setPatient((p) => ({ ...p, weight_kg: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label="Height (cm)" type="number" value={patient.height_cm} onChange={(e) => setPatient((p) => ({ ...p, height_cm: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label="SCr (mg/dL)" type="number" value={patient.serum_creatinine_mg_dl} onChange={(e) => setPatient((p) => ({ ...p, serum_creatinine_mg_dl: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label="MIC (mg/L)" type="number" value={patient.mic_mg_L} onChange={(e) => setPatient((p) => ({ ...p, mic_mg_L: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={`${t('age','Age')} (y)`} type="number" value={patient.age} onChange={(e) => setPatient((p) => ({ ...p, age: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth select SelectProps={{ native: true }} label={t('gender','Gender')} value={patient.gender} onChange={(e) => setPatient((p) => ({ ...p, gender: e.target.value }))}><option value="male">{t('male','Male')}</option><option value="female">{t('female','Female')}</option></TextField></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={`${t('weight','Weight')} (kg)`} type="number" value={patient.weight_kg} onChange={(e) => setPatient((p) => ({ ...p, weight_kg: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={`${t('height','Height')} (cm)`} type="number" value={patient.height_cm} onChange={(e) => setPatient((p) => ({ ...p, height_cm: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={`${t('scr','SCr')} (mg/dL)`} type="number" value={patient.serum_creatinine_mg_dl} onChange={(e) => setPatient((p) => ({ ...p, serum_creatinine_mg_dl: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={`${t('mic','MIC')} (mg/L)`} type="number" value={patient.mic_mg_L} onChange={(e) => setPatient((p) => ({ ...p, mic_mg_L: Number(e.target.value) }))} /></Grid>
         </Grid>
       </Paper>
 
@@ -248,7 +265,7 @@ export default function InteractiveAUC() {
       <Grid container spacing={2} sx={{ mb: 2 }}>
         <Grid item xs={12} md={4}>
           <Paper variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary">AUC24</Typography>
+            <Typography variant="caption" color="text.secondary">{t('auc24','AUC24')}</Typography>
             <Box sx={{ mt: 1 }}>
               <Chip label={`${toFixed(summary?.auc_24, 0)} mg·h/L`} color={summary?.auc_24 >= 400 && summary?.auc_24 <= 600 ? 'success' : 'warning'} variant={summary?.auc_24 >= 400 && summary?.auc_24 <= 600 ? 'filled' : 'outlined'} />
             </Box>
@@ -256,7 +273,7 @@ export default function InteractiveAUC() {
         </Grid>
         <Grid item xs={12} md={4}>
           <Paper variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary">Predicted trough</Typography>
+            <Typography variant="caption" color="text.secondary">{t('predicted_trough','Predicted trough')}</Typography>
             <Box sx={{ mt: 1 }}>
               <Chip label={`${toFixed(summary?.predicted_trough, 1)} mg/L`} />
             </Box>
@@ -264,7 +281,7 @@ export default function InteractiveAUC() {
         </Grid>
         <Grid item xs={12} md={4}>
           <Paper variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary">Predicted peak</Typography>
+            <Typography variant="caption" color="text.secondary">{t('predicted_peak','Predicted peak')}</Typography>
             <Box sx={{ mt: 1 }}>
               <Chip label={`${toFixed(summary?.predicted_peak, 1)} mg/L`} />
             </Box>
@@ -274,43 +291,43 @@ export default function InteractiveAUC() {
 
       {/* Regimen controls */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} md={4}><Control label="Dose" value={regimen.dose_mg} min={0} max={4000} step={50} field="dose_mg" unit="mg" /></Grid>
-        <Grid item xs={12} md={4}><Control label="Interval (hours)" value={regimen.interval_hours} min={6} max={48} step={1} field="interval_hours" unit="h" /></Grid>
-        <Grid item xs={12} md={4}><Control label="Infusion (minutes)" value={regimen.infusion_minutes} min={15} max={240} step={5} field="infusion_minutes" unit="min" /></Grid>
+        <Grid item xs={12} md={4}><Control label="dose" value={draftRegimen.dose_mg} min={0} max={4000} step={50} field="dose_mg" unit="mg" /></Grid>
+        <Grid item xs={12} md={4}><Control label="interval" value={draftRegimen.interval_hours} min={6} max={48} step={1} field="interval_hours" unit="h" /></Grid>
+        <Grid item xs={12} md={4}><Control label="infusion" value={draftRegimen.infusion_minutes} min={15} max={240} step={5} field="infusion_minutes" unit="min" /></Grid>
       </Grid>
 
       {/* Toggles & badge */}
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2, flexWrap: 'wrap' }}>
-        <FormControlLabel control={<Switch checked={showAucFill} onChange={(e) => setShowAucFill(e.target.checked)} />} label="Shade 0–24h AUC" />
-        <FormControlLabel control={<Switch checked={showDoseMarkers} onChange={(e) => setShowDoseMarkers(e.target.checked)} />} label="Show dose markers" />
-        {posteriorN ? (<Chip size="small" color="primary" variant="outlined" label={`Bayesian (n=${posteriorN})`} />) : null}
-        {loading && <Typography color="text.secondary">Updating…</Typography>}
+        <FormControlLabel control={<Switch checked={showAucFill} onChange={(e) => setShowAucFill(e.target.checked)} />} label={t('shade_auc','Shade 0–24h AUC')} />
+        <FormControlLabel control={<Switch checked={showDoseMarkers} onChange={(e) => setShowDoseMarkers(e.target.checked)} />} label={t('show_dose_markers','Show dose markers')} />
+        {posteriorN ? (<Chip size="small" color="primary" variant="outlined" label={`${t('bayesian','Bayesian')} (n=${posteriorN})`} />) : null}
+        {loading && <Typography color="text.secondary">{t('updating','Updating…')}</Typography>}
         <Box sx={{ flexGrow: 1 }} />
-        <Button size="small" variant="outlined" onClick={copyJson}>Copy JSON</Button>
-        <Button size="small" variant="contained" onClick={exportPdf}>Export PDF</Button>
+        <Button size="small" variant="outlined" onClick={copyJson}>{t('copy_json','Copy JSON')}</Button>
+        <Button size="small" variant="contained" onClick={exportPdf}>{t('export_pdf','Export PDF')}</Button>
       </Box>
 
       {/* Levels panel */}
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Typography variant="subtitle2">Measured Levels</Typography>
+        <Typography variant="subtitle2">{t('measured_levels','Measured Levels')}</Typography>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12} md={4}>
-            <TextField select SelectProps={{ native: true }} fullWidth size="small" label="Mode" value={levelMode} onChange={(e) => setLevelMode(e.target.value)}>
-              <option value="none">No levels</option>
-              <option value="one">One level (Bayesian)</option>
-              <option value="two">Two levels (peak + trough)</option>
+            <TextField select SelectProps={{ native: true }} fullWidth size="small" label={t('mode','Mode')} value={levelMode} onChange={(e) => setLevelMode(e.target.value)}>
+              <option value="none">{t('no_levels','No levels')}</option>
+              <option value="one">{t('one_level_bayesian','One level (Bayesian)')}</option>
+              <option value="two">{t('two_levels_peak_trough','Two levels (peak + trough)')}</option>
             </TextField>
           </Grid>
           {(levelMode === 'one' || levelMode === 'two') && (
             <>
-              <Grid item xs={12} md={3}><TextField size="small" type="number" label="Peak/random (mg/L)" fullWidth value={levelInputs.peak.conc} onChange={(e) => setLevelInputs((s) => ({ ...s, peak: { ...s.peak, conc: e.target.value } }))} /></Grid>
-              <Grid item xs={12} md={3}><TextField size="small" type="number" label="Hours after infusion end" fullWidth value={levelInputs.peak.after_end_h} onChange={(e) => setLevelInputs((s) => ({ ...s, peak: { ...s.peak, after_end_h: e.target.value } }))} /></Grid>
+              <Grid item xs={12} md={3}><TextField size="small" type="number" label={`${t('peak_random','Peak/random')} (mg/L)`} fullWidth value={levelInputs.peak.conc} onChange={(e) => setLevelInputs((s) => ({ ...s, peak: { ...s.peak, conc: e.target.value } }))} /></Grid>
+              <Grid item xs={12} md={3}><TextField size="small" type="number" label={t('hours_after_infusion_end','Hours after infusion end')} fullWidth value={levelInputs.peak.after_end_h} onChange={(e) => setLevelInputs((s) => ({ ...s, peak: { ...s.peak, after_end_h: e.target.value } }))} /></Grid>
             </>
           )}
           {levelMode === 'two' && (
             <>
-              <Grid item xs={12} md={3}><TextField size="small" type="number" label="Trough (mg/L)" fullWidth value={levelInputs.trough.conc} onChange={(e) => setLevelInputs((s) => ({ ...s, trough: { ...s.trough, conc: e.target.value } }))} /></Grid>
-              <Grid item xs={12} md={3}><TextField size="small" disabled label="Trough time (≈ τ)" fullWidth value={regimen.interval_hours} /></Grid>
+              <Grid item xs={12} md={3}><TextField size="small" type="number" label={`${t('trough','Trough')} (mg/L)`} fullWidth value={levelInputs.trough.conc} onChange={(e) => setLevelInputs((s) => ({ ...s, trough: { ...s.trough, conc: e.target.value } }))} /></Grid>
+              <Grid item xs={12} md={3}><TextField size="small" disabled label={`${t('trough_time','Trough time')} (≈ τ)`} fullWidth value={regimen.interval_hours} /></Grid>
             </>
           )}
         </Grid>
@@ -319,7 +336,7 @@ export default function InteractiveAUC() {
       {/* Chart */}
       <Paper variant="outlined" sx={{ p: 2 }}>
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>{error} <Button size="small" onClick={() => runInteractive()}>Retry</Button></Alert>
+          <Alert severity="error" sx={{ mb: 2 }}>{error} <Button size="small" onClick={() => runInteractive()}>{t('retry','Retry')}</Button></Alert>
         )}
         <Box sx={{ height: 360 }}>
           <Line ref={chartRef} data={{ datasets: [

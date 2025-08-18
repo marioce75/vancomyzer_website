@@ -14,6 +14,7 @@ import { Routes, Route, Link as RouterLink } from 'react-router-dom';
 import InteractiveAUC from './pages/InteractiveAUC';
 import ClinicalInfo from './pages/ClinicalInfo';
 import './App.css';
+import LanguageSelector from './components/LanguageSelector';
 
 // Brand theme palettes + rounded shapes (merged with RTL direction)
 const BRAND_COLORS = {
@@ -58,17 +59,17 @@ function Header() {
   return (
     <Box sx={{ textAlign: 'center', my: { xs: 2, sm: 3 } }}>
       <Typography variant="h3" component="h1" sx={{ fontWeight: 700 }}>
-        {t('app.title')}
+        {t('app.title', 'Vancomyzer Web')}
       </Typography>
       <Typography variant="h6" sx={{ opacity: 0.9 }}>
-        {t('app.subtitle')}
+        {t('app.subtitle', '')}
       </Typography>
       <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
-        {t('app.tagline')}
+        {t('app.tagline', '')}
       </Typography>
       <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', gap: 2 }}>
-        <Typography variant="body2" component={RouterLink} to="/" style={{ textDecoration: 'none' }}>Interactive AUC</Typography>
-        <Typography variant="body2" component={RouterLink} to="/clinical" style={{ textDecoration: 'none' }}>Clinical Info</Typography>
+        <Typography variant="body2" component={RouterLink} to="/" style={{ textDecoration: 'none' }}>{t('nav.interactive_auc', 'Interactive AUC')}</Typography>
+        <Typography variant="body2" component={RouterLink} to="/clinical" style={{ textDecoration: 'none' }}>{t('nav.clinical_info', 'Clinical Info')}</Typography>
       </Box>
     </Box>
   );
@@ -77,6 +78,7 @@ function Header() {
 function AppInner() {
   return (
     <Container maxWidth="lg">
+      <LanguageSelector />
       <Header />
       <Paper elevation={2} sx={{ p: 2 }}>
         <Routes>
