@@ -1,7 +1,8 @@
 import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert } from '@mui/material';
+import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment } from '@mui/material';
+import GlobalStyles from '@mui/material/GlobalStyles';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { calculateInteractiveAUC } from '../services/interactiveApi';
@@ -149,19 +150,38 @@ export default function InteractiveAUC() {
 
   const handleRegimenField = (field) => (value) => setRegimen((r) => ({ ...r, [field]: value }));
 
-  const Control = ({ label, value, min, max, step, field, unit }) => (
-    <Paper variant="outlined" sx={{ p: 2 }}>
-      <Typography variant="caption" color="text.secondary">{label}</Typography>
-      <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
-        <Grid item xs={8} md={9}>
-          <Slider value={value} min={min} max={max} step={step} onChange={(_, v) => handleRegimenField(field)(Number(v))} aria-label={label} />
+  const Control = ({ label, value, min, max, step, field, unit }) => {
+    const digits = String(max ?? 4000).length;
+    const ch = Math.max(4, digits) + 3; // extra for padding/adornment
+    return (
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <Typography variant="caption" color="text.secondary">{label}</Typography>
+        <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
+          <Grid item xs={8} md={9}>
+            <Slider value={value} min={min} max={max} step={step} onChange={(_, v) => handleRegimenField(field)(Number(v))} aria-label={label} />
+          </Grid>
+          <Grid item xs="auto" md="auto">
+            <TextField
+              className="numericInputDense"
+              label={label}
+              type="number"
+              size="small"
+              value={value}
+              onChange={(e) => handleRegimenField(field)(Number(e.target.value))}
+              InputProps={{
+                endAdornment: unit ? <InputAdornment position="end">{unit}</InputAdornment> : undefined,
+                inputProps: { min, max, step }
+              }}
+              sx={{
+                width: `${ch}ch`,
+                '& input': { fontVariantNumeric: 'tabular-nums', textAlign: 'right' }
+              }}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={4} md={3}>
-          <TextField size="small" fullWidth type="number" inputProps={{ min, max, step, style: { width: 96 } }} value={value} onChange={(e) => handleRegimenField(field)(Number(e.target.value))} label={unit} />
-        </Grid>
-      </Grid>
-    </Paper>
-  );
+      </Paper>
+    );
+  };
 
   const copyJson = async () => {
     const payload = { patient, regimen, summary, series };
@@ -200,6 +220,7 @@ export default function InteractiveAUC() {
 
   return (
     <Box>
+      <GlobalStyles styles={{ '.numericInputDense .MuiInputBase-input': { width: '9ch', fontVariantNumeric: 'tabular-nums', textAlign: 'right' } }} />
       {/* Minimal patient form */}
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Typography variant="h6" sx={{ mb: 1 }}>Patient</Typography>
@@ -243,7 +264,7 @@ export default function InteractiveAUC() {
 
       {/* Regimen controls */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} md={4}><Control label="Dose (mg)" value={regimen.dose_mg} min={250} max={3000} step={50} field="dose_mg" unit="mg" /></Grid>
+        <Grid item xs={12} md={4}><Control label="Dose" value={regimen.dose_mg} min={250} max={3000} step={50} field="dose_mg" unit="mg" /></Grid>
         <Grid item xs={12} md={4}><Control label="Interval (hours)" value={regimen.interval_hours} min={6} max={48} step={1} field="interval_hours" unit="h" /></Grid>
         <Grid item xs={12} md={4}><Control label="Infusion (minutes)" value={regimen.infusion_minutes} min={15} max={240} step={5} field="infusion_minutes" unit="min" /></Grid>
       </Grid>

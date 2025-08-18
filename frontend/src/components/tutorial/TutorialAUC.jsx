@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, Paper, Typography, Slider, TextField, Chip } from '@mui/material';
+import { Box, Grid, Paper, Typography, Slider, TextField, Chip, InputAdornment } from '@mui/material';
 
 // Lightweight one-compartment PK visualization without API
 function simulate({ dose_mg, tau_h, infusion_min }, hours = 48) {
@@ -49,7 +49,18 @@ export default function TutorialAUC(){
           <Slider value={value} min={min} max={max} step={step} onChange={(_, v) => onChange(Number(v))} aria-label={label} />
         </Grid>
         <Grid item xs={4} md={3}>
-          <TextField size="small" fullWidth type="number" inputProps={{ min, max, step, style: { width: 96 } }} value={value} onChange={(e) => onChange(Number(e.target.value))} label={unit} />
+          <TextField
+            className="numericInputDense"
+            size="small"
+            fullWidth
+            type="number"
+            inputProps={{ min, max, step }}
+            value={value}
+            onChange={(e) => onChange(Number(e.target.value))}
+            label={unit}
+            InputProps={{ endAdornment: <InputAdornment position="end">{unit}</InputAdornment> }}
+            sx={{ width: `${Math.max(4, String(max ?? 4000).length) + 3}ch`, '& input': { fontVariantNumeric: 'tabular-nums', textAlign: 'right' } }}
+          />
         </Grid>
       </Grid>
     </Paper>
