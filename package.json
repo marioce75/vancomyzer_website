@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "npm run --prefix ./frontend start",
+    "build": "npm run --prefix ./frontend build",
+    "test": "npm run --prefix ./frontend test",
+    "eject": "npm run --prefix ./frontend eject",
     "render:login": "npx render-cli@latest login",
     "render:services": "npx render-cli@latest services list",
     "render:logs:api": "npx render-cli@latest logs --service vancomyzer --follow",
@@ -18,12 +18,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
