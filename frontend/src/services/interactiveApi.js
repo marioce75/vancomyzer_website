@@ -171,4 +171,23 @@ export async function calculateInteractiveAUC(patient, regimen, { signal } = {})
   return res.json();
 }
 
+export async function optimizeDose(patient, regimen, target, { signal } = {}) {
+  if (!BASE) {
+    const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
+    err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
+    throw err;
+  }
+  const payload = {
+    patient,
+    regimen,
+    target,
+  };
+  const res = await fetchWithRetry(`${BASE}/optimize`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    signal,
+  }, 3);
+  return res.json();
+}
+
 export const __BASE__ = BASE;

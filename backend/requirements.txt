@@ -1,12 +1,6 @@
-setuptools>=58
-wheel
 fastapi
 uvicorn[standard]
+pydantic
 numpy
 scipy
-pymc>=5
-pandas
-pydantic
 orjson
-pytensor>=2.20.0
-pytest

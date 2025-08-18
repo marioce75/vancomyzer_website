@@ -484,6 +484,18 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         <Box sx={{ flexGrow: 1 }} />
         <Button size="small" variant="outlined" onClick={copyJson}>{t('copy_json','Copy JSON')}</Button>
         <Button size="small" variant="contained" onClick={exportPdf}>{t('export_pdf','Export PDF')}</Button>
+        <Button size="small" variant="contained" color="primary" disabled={!apiAvailable || !(['one','two'].includes(levelMode) && measuredLevels?.length)} onClick={async () => {
+          try {
+            const target = { auc_min: 400, auc_max: 600, mic: Number(patient?.mic_mg_L || 1) };
+            const data = await interactiveApi.optimizeDose({ ...patient, levels: measuredLevels, population_mode: mode }, regimen, target);
+            const rec = data?.recommendation;
+            if (rec) {
+              setRegimen((r) => ({ ...r, dose_mg: rec.dose_mg, interval_hours: rec.interval_hours, infusion_minutes: rec.infusion_minutes }));
+            }
+          } catch (e) {
+            setError(e?.message || 'Optimize failed');
+          }
+        }}>{t('actions.optimize','Optimize dose')}</Button>
       </Box>
 
       {/* Levels panel */}
