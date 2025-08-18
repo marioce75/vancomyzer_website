@@ -58,19 +58,65 @@ function HeroHeader(){
   const { t } = useTranslation();
   return (
     <Box sx={(theme) => ({
-      py: { xs: 4, md: 6 }, px: 2, textAlign: 'center',
+      py: { xs: 5, md: 7 }, px: 2, textAlign: 'center',
       background: 'linear-gradient(180deg,#1976d2,#1565c0)', color: '#fff',
       borderBottomLeftRadius: 16, borderBottomRightRadius: 16,
-      borderTopLeftRadius: 16, borderTopRightRadius: 16,
+      borderTopLeftRadius: 18, borderTopRightRadius: 18,
       boxShadow: theme.palette.mode === 'dark' ? 1 : 2,
       mb: 2
     })}>
-      <Typography variant="h3" component="h1" sx={{ fontWeight: 800, mb: 1 }}>{t('title','Vancomyzer®')}</Typography>
-      <Typography variant="subtitle1" sx={{ opacity: 0.95, letterSpacing: 0.2, mx: 'auto', maxWidth: 900 }}>
-        {t('slogan','Interactive Evidence-Based Vancomycin Dosing Calculator')}
+      <Typography
+        component="h1"
+        variant="h2"
+        align="center"
+        sx={{
+          fontWeight: 800,
+          letterSpacing: { xs: 0.2, md: 0.5 },
+          lineHeight: 1.05,
+          mb: 1,
+          // tighter on large screens, readable on small
+          fontSize: { xs: '2rem', sm: '2.6rem', md: '3.2rem', lg: '3.6rem' },
+        }}
+        aria-label="Vancomyzer"
+      >
+        Vancomyzer
+        <Box component="sup"
+          sx={{
+            fontSize: '0.55em',
+            lineHeight: 0,
+            ml: 0.25,
+            position: 'relative',
+            top: '-0.6em',
+            opacity: 0.9
+          }}
+          aria-hidden
+        >
+          ®
+        </Box>
       </Typography>
-      <Typography variant="caption" sx={{ display: 'block', mt: 1.5, opacity: 0.9 }}>
-        {t('bullets.guidelines','Following ASHP/IDSA 2020 Guidelines')} • {t('bullets.realtimeAuc','Real-time AUC Visualization')} • {t('bullets.bayesian','Bayesian Optimization')}
+
+      <Typography
+        variant="subtitle1"
+        align="center"
+        sx={{
+          fontWeight: 500,
+          opacity: 0.95,
+          mb: 0.5,
+          fontSize: { xs: '0.95rem', md: '1.05rem' }
+        }}
+      >
+        {t('slogan.primary','Interactive, evidence‑based vancomycin dosing')}
+      </Typography>
+
+      <Typography
+        variant="body2"
+        align="center"
+        sx={{
+          opacity: 0.9,
+          fontSize: { xs: '0.85rem', md: '0.95rem' }
+        }}
+      >
+        {t('slogan.secondary','AUC‑guided · Bayesian‑powered · Following ASHP/IDSA 2020 guidelines')}
       </Typography>
     </Box>
   );
@@ -181,7 +227,19 @@ function AppInner() {
         <Route path="*" element={<PopulationTabs />} />
       </Routes>
       <Box component="footer" sx={{ py: 3, textAlign: 'center' }}>
-        <Typography variant="caption" color="text.secondary">Vancomyzer®</Typography>
+        <Typography
+          variant="caption"
+          align="center"
+          sx={{ display: 'block', opacity: 0.75, mt: 2 }}
+        >
+          Vancomyzer
+          <Box component="sup"
+            sx={{ fontSize: '0.6em', lineHeight: 0, ml: 0.25, position: 'relative', top: '-0.5em' }}
+            aria-hidden
+          >
+            ®
+          </Box>
+        </Typography>
       </Box>
     </Container>
   );

@@ -22,7 +22,7 @@ export default function ClinicalInfo() {
   return (
     <Box>
       <Box sx={{ textAlign: 'center', my: { xs: 2, sm: 3 } }}>
-        <Typography variant="h3" component="h1" sx={{ fontWeight: 800 }}>Clinical Info</Typography>
+        <Typography variant="h3" component="h2" sx={{ fontWeight: 800 }}>Clinical Info</Typography>
         <Typography variant="h6" sx={{ opacity: 0.9 }}>Tutorials and guidelines for AUC-guided vancomycin dosing</Typography>
       </Box>
       <Paper elevation={1} sx={{ p: 2 }}>

@@ -13,7 +13,7 @@ export default function ClinicalInfo() {
   const { t } = useTranslation();
   return (
     <Box component="main" sx={{ p: { xs: 2, md: 3 }, maxWidth: 1100, mx: 'auto' }}>
-      <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 2 }}>
+      <Typography variant="h4" component="h2" sx={{ fontWeight: 700, mb: 2 }}>
         {t('tabs.clinicalInfo')}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
