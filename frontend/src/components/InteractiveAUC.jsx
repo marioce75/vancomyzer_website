@@ -264,7 +264,7 @@ export default function InteractiveAUC() {
 
       {/* Regimen controls */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} md={4}><Control label="Dose" value={regimen.dose_mg} min={250} max={3000} step={50} field="dose_mg" unit="mg" /></Grid>
+        <Grid item xs={12} md={4}><Control label="Dose" value={regimen.dose_mg} min={0} max={4000} step={50} field="dose_mg" unit="mg" /></Grid>
         <Grid item xs={12} md={4}><Control label="Interval (hours)" value={regimen.interval_hours} min={6} max={48} step={1} field="interval_hours" unit="h" /></Grid>
         <Grid item xs={12} md={4}><Control label="Infusion (minutes)" value={regimen.infusion_minutes} min={15} max={240} step={5} field="infusion_minutes" unit="min" /></Grid>
       </Grid>
