@@ -150,8 +150,6 @@ export default function InteractiveAUC() {
   const handleRegimenField = (field) => (value) => setRegimen((r) => ({ ...r, [field]: value }));
 
   const Control = ({ label, value, min, max, step, field, unit }) => {
-    // Size input based on max digits and reserve space for adornment
-    const widthCh = Math.max(4, String(max ?? 5000).length) + 7;
     return (
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Typography variant="caption" color="text.secondary">{label}</Typography>
@@ -170,16 +168,18 @@ export default function InteractiveAUC() {
               onChange={(e) => handleRegimenField(field)(Number(e.target.value || 0))}
               InputProps={{
                 endAdornment: unit ? <InputAdornment position="end">{unit}</InputAdornment> : undefined,
-                inputProps: { min, max, step }
+                inputProps: { min, max, step, inputMode: 'numeric', pattern: '[0-9]*' }
               }}
+              InputLabelProps={{ shrink: true }}
               sx={{
-                width: `${widthCh}ch`,
+                width: { xs: '11ch', sm: '12ch' },
                 '& .MuiOutlinedInput-input': {
                   textAlign: 'right',
                   fontVariantNumeric: 'tabular-nums',
-                  paddingRight: '3.5ch', // reserve space for adornment (mg/h/min)
+                  paddingRight: '3.75ch', // reserve space for adornment (mg/h/min)
                   color: (theme) => theme.palette.text.primary,
-                }
+                },
+                '& .MuiInputAdornment-root': { ml: 0.5 },
               }}
             />
           </Grid>
