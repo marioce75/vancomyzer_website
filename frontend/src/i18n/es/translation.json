@@ -81,10 +81,17 @@
     "mic": "Concentración mínima inhibitoria del organismo. El objetivo de AUC24/MIC es típicamente 400–600 cuando MIC=1 (ASHP/IDSA 2020).",
     "auc24": "Exposición de 24 horas (mg·h/L). Métrica primaria de eficacia/seguridad. Objetivo típico 400–600 cuando MIC=1.",
     "peak": "Concentración máxima post-distribución. Picos altos aumentan el riesgo de ototoxicidad; no es un objetivo primario bajo la dosificación guiada por AUC.",
-    "trough": "Concentración antes de la siguiente dosis. Evite apuntar a valles altos de forma rutinaria; valores >20 mg/L aumentan el riesgo de nefrotoxicidad.",
+    "trough": "Concentración antes de la siguiente dosis. Evite apuntar a valles altos de forma rutinaria; valores >20 mg/L aumentan el riesgo de nefrotoxidad.",
     "scr": "Creatinina sérica utilizada para estimar la función renal para la selección de dosis/intervalo inicial.",
     "weight": "Utilice el peso corporal real para las dosis de carga; la dosificación de mantenimiento considera la función renal y el estado clínico.",
     "height": "Utilizado para derivar BSA/IBW si es necesario; no siempre se utiliza en los modelos de AUC.",
     "levels": "Concentraciones observadas. Bayesian de un nivel utiliza una muestra post-distribución; de dos niveles, primer orden utiliza pico + valle."
+  },
+  "status": {
+    "bayes": {
+      "online": "Optimización bayesiana (en línea)",
+      "offline": "Optimización bayesiana (sin conexión)",
+      "tooltip": "Servicio inaccesible. Verifique VITE_INTERACTIVE_API_URL, /health del API, CORS o tiempo de actividad."
+    }
   }
 }

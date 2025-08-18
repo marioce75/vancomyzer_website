@@ -74,6 +74,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   useEffect(() => { setDraftRegimen(regimen); }, [regimen]);
 
   const chartRef = useRef(null);
+  const apiAbort = useRef(null);
 
   const measuredLevels = useMemo(() => buildMeasuredLevels(levelMode, {
     peak: levelInputs.peak?.conc && levelInputs.peak?.after_end_h ? { conc: Number(levelInputs.peak.conc), after_end_h: Number(levelInputs.peak.after_end_h) } : undefined,
@@ -112,6 +113,13 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   }, []);
 
   const runInteractive = useCallback(async () => {
+    // Abort any in-flight request to avoid false offline
+    if (apiAbort.current) {
+      try { apiAbort.current.abort('superseded'); } catch {}
+    }
+    const controller = new AbortController();
+    apiAbort.current = controller;
+
     setLoading(true); setError(null);
     const flatPatient = { ...patient, levels: measuredLevels, population_mode: mode };
     // Optimistic compute: show fast local PK while awaiting backend
@@ -122,7 +130,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       // ignore optimistic errors
     }
     try {
-      const data = await interactiveApi.calculateInteractiveAUC(flatPatient, regimen);
+      const data = await interactiveApi.calculateInteractiveAUC(flatPatient, regimen, { signal: controller.signal });
       setSummary({
         auc_24: data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24,
         predicted_peak: data?.metrics?.predicted_peak ?? data.predicted_peak,
@@ -141,6 +149,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       setApiAvailable(true);
       setError(null);
     } catch (e) {
+      if (e?.name === 'AbortError') return; // superseded
       setApiAvailable(false);
     } finally {
       setLoading(false);
@@ -315,6 +324,10 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const onRetry = useCallback(async () => {
     setLoading(true);
     try {
+      const ok = await interactiveApi.getInteractiveAvailability();
+      setApiAvailable(!!ok);
+    } catch {}
+    try {
       const data = await interactiveApi.calculateInteractiveAUC({ ...patient, levels: measuredLevels, population_mode: mode }, regimen);
       setSummary({
         auc_24: data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24,
@@ -448,7 +461,13 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         {posteriorN ? (
           <Chip size="small" color="primary" variant="outlined" label={`${t('bayesian','Bayesian')} (n=${posteriorN})`} />
         ) : (
-          <Chip size="small" variant="outlined" label={apiAvailable ? t('badges.bayesianOptimization','Bayesian optimization') : t('badges.bayesianOptimizationOffline','Bayesian optimization (offline)')} />
+          apiAvailable ? (
+            <Chip size="small" color="primary" label={t('status.bayes.online', 'Bayesian optimization (online)')} />
+          ) : (
+            <Tooltip title={t('status.bayes.tooltip', 'Service unreachable. Check API URL, /health, CORS, or server uptime.')}>
+              <Chip size="small" variant="outlined" color="warning" label={t('status.bayes.offline', 'Bayesian optimization (offline)')} />
+            </Tooltip>
+          )
         )}
         {!apiAvailable && (
           <Button size="small" variant="text" onClick={onRetry} sx={{ textTransform: 'none' }}>

@@ -86,5 +86,12 @@
     "weight": "Use actual body weight for loading doses; maintenance dosing considers renal function and clinical status.",
     "height": "Used to derive BSA/IBW if needed; not always used in AUC models.",
     "levels": "Observed concentrations. One-level Bayesian uses a post-distribution sample; two-level first-order uses peak + trough."
+  },
+  "status": {
+    "bayes": {
+      "online": "تحسين بايزي (متصل)",
+      "offline": "تحسين بايزي (غير متصل)",
+      "tooltip": "الخدمة غير متاحة. تحقق من عنوان واجهة البرمجة، /health، إعدادات CORS، أو جاهزية الخادم."
+    }
   }
 }

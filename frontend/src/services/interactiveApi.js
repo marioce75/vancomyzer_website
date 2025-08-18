@@ -5,6 +5,14 @@ const BASE = (typeof import.meta !== 'undefined' && import.meta.env)
   ? (import.meta.env.VITE_INTERACTIVE_API_URL || '')
   : '';
 
+// Diagnostics: warn once if URL missing
+let warnedMissingBase = false;
+if (!BASE && !warnedMissingBase) {
+  warnedMissingBase = true;
+  // eslint-disable-next-line no-console
+  console.warn('[Vancomyzer] Interactive API URL missing; running offline mode.');
+}
+
 const BACKOFF_MS = [250, 500, 1000];
 const REQUEST_TIMEOUT_MS = 6000;
 const HEALTH_TIMEOUT_MS = 2000;
@@ -105,6 +113,9 @@ async function fetchWithRetry(url, opts = {}, attempts = 3) {
   throw err;
 }
 
+// Deduplicate /health failure logs
+let loggedHealthFailure = false;
+
 export async function getInteractiveAvailability() {
   if (!BASE) return false; // disabled by config
   const controller = new AbortController();
@@ -117,9 +128,22 @@ export async function getInteractiveAvailability() {
       signal: controller.signal,
     });
     clearTimeout(timeout);
-    return !!res.ok;
-  } catch {
+    if (!res.ok) {
+      if (!loggedHealthFailure) {
+        loggedHealthFailure = true;
+        // eslint-disable-next-line no-console
+        console.warn('[Vancomyzer] /health check failed', { status: res.status });
+      }
+      return false;
+    }
+    return true;
+  } catch (e) {
     clearTimeout(timeout);
+    if (!loggedHealthFailure) {
+      loggedHealthFailure = true;
+      // eslint-disable-next-line no-console
+      console.warn('[Vancomyzer] /health check failed', e);
+    }
     return false;
   }
 }
