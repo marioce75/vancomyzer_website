@@ -61,10 +61,11 @@ function HeroHeader(){
       py: { xs: 4, md: 6 }, px: 2, textAlign: 'center',
       background: 'linear-gradient(180deg,#1976d2,#1565c0)', color: '#fff',
       borderBottomLeftRadius: 16, borderBottomRightRadius: 16,
+      borderTopLeftRadius: 16, borderTopRightRadius: 16,
       boxShadow: theme.palette.mode === 'dark' ? 1 : 2,
       mb: 2
     })}>
-      <Typography variant="h3" component="h1" sx={{ fontWeight: 800, mb: 1 }}>{t('title','Vancomyzer Web')}</Typography>
+      <Typography variant="h3" component="h1" sx={{ fontWeight: 800, mb: 1 }}>{t('title','Vancomyzer®')}</Typography>
       <Typography variant="subtitle1" sx={{ opacity: 0.95, letterSpacing: 0.2, mx: 'auto', maxWidth: 900 }}>
         {t('slogan','Interactive Evidence-Based Vancomycin Dosing Calculator')}
       </Typography>
@@ -179,6 +180,9 @@ function AppInner() {
         <Route path="/clinical" element={<PopulationTabs initialPop={0} initialSubByPop={{ 0: 1 }} />} />
         <Route path="*" element={<PopulationTabs />} />
       </Routes>
+      <Box component="footer" sx={{ py: 3, textAlign: 'center' }}>
+        <Typography variant="caption" color="text.secondary">Vancomyzer®</Typography>
+      </Box>
     </Container>
   );
 }

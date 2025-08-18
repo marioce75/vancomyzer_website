@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   en: {
     translation: {
-      title: 'Vancomyzer Web',
+      title: 'Vancomyzer®',
       slogan: 'Interactive Evidence-Based Vancomycin Dosing Calculator',
       bullets: {
         guidelines: 'Following ASHP/IDSA 2020 Guidelines',
@@ -24,7 +24,7 @@ const resources = {
         bayesianOptimization: 'Bayesian optimization'
       },
       buttons: { guidelines: 'Guidelines' },
-      app: { title: 'Vancomyzer Web', subtitle: '', tagline: '' },
+      app: { title: 'Vancomyzer®', subtitle: '', tagline: '' },
       nav: { interactive_auc: 'Interactive AUC', clinical_info: 'Clinical Info' },
       patient: 'Patient',
       age: 'Age',
@@ -62,7 +62,7 @@ const resources = {
   },
   es: {
     translation: {
-      title: 'Vancomyzer Web',
+      title: 'Vancomyzer®',
       slogan: 'Calculadora interactiva de dosificación de vancomicina basada en evidencia',
       bullets: {
         guidelines: 'Siguiendo las guías ASHP/IDSA 2020',
@@ -81,7 +81,7 @@ const resources = {
         bayesianOptimization: 'Optimización bayesiana'
       },
       buttons: { guidelines: 'Guías' },
-      app: { title: 'Vancomyzer Web', subtitle: '', tagline: '' },
+      app: { title: 'Vancomyzer®', subtitle: '', tagline: '' },
       nav: { interactive_auc: 'AUC interactivo', clinical_info: 'Información clínica' },
       patient: 'Paciente',
       age: 'Edad',
@@ -119,7 +119,7 @@ const resources = {
   },
   ar: {
     translation: {
-      title: 'فانكومايزر ويب',
+      title: 'فانكومايزر®',
       slogan: 'حاسبة تفاعلية لجرعات الفانكومايسين قائمة على الأدلة',
       bullets: {
         guidelines: 'وفق إرشادات ASHP/IDSA لعام 2020',
@@ -138,7 +138,7 @@ const resources = {
         bayesianOptimization: 'تحسين بايزي'
       },
       buttons: { guidelines: 'الإرشادات' },
-      app: { title: 'فانكومايزر ويب', subtitle: '', tagline: '' },
+      app: { title: 'فانكومايزر®', subtitle: '', tagline: '' },
       nav: { interactive_auc: 'AUC تفاعلي', clinical_info: 'معلومات سريرية' },
       patient: 'المريض',
       age: 'العمر',

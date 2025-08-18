@@ -231,7 +231,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       const img = chart?.toBase64Image ? chart.toBase64Image() : null;
       const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
       doc.setFontSize(14);
-      doc.text(`${t('title','Vancomyzer Web')} — ${t('tabs.interactiveAuc', t('tabs.interactiveAUC','Interactive AUC'))} [${mode}]`, 40, 40);
+      doc.text(`${t('title','Vancomyzer®')} — ${t('tabs.interactiveAuc', t('tabs.interactiveAUC','Interactive AUC'))} [${mode}]`, 40, 40);
       const meta = `Dose: ${regimen.dose_mg} mg  |  Interval: q${regimen.interval_hours}h  |  Infusion: ${regimen.infusion_minutes} min\nAUC24: ${toFixed(summary?.auc_24,0)}  |  Peak: ${toFixed(summary?.predicted_peak,1)} mg/L  |  Trough: ${toFixed(summary?.predicted_trough,1)} mg/L`;
       doc.setFontSize(10);
       doc.text(meta, 40, 60);
