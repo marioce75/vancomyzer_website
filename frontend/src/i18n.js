@@ -5,6 +5,25 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   en: {
     translation: {
+      title: 'Vancomyzer Web',
+      slogan: 'Interactive Evidence-Based Vancomycin Dosing Calculator',
+      bullets: {
+        guidelines: 'Following ASHP/IDSA 2020 Guidelines',
+        realtimeAuc: 'Real-time AUC Visualization',
+        bayesian: 'Bayesian Optimization'
+      },
+      tabs: {
+        adult: 'Adult',
+        pediatric: 'Pediatric',
+        neonate: 'Neonate',
+        interactiveAuc: 'Interactive AUC',
+        clinicalInfo: 'Clinical Info'
+      },
+      badges: {
+        evidenceBased: 'Evidence-based',
+        bayesianOptimization: 'Bayesian optimization'
+      },
+      buttons: { guidelines: 'Guidelines' },
       app: { title: 'Vancomyzer Web', subtitle: '', tagline: '' },
       nav: { interactive_auc: 'Interactive AUC', clinical_info: 'Clinical Info' },
       patient: 'Patient',
@@ -43,6 +62,25 @@ const resources = {
   },
   es: {
     translation: {
+      title: 'Vancomyzer Web',
+      slogan: 'Calculadora interactiva de dosificación de vancomicina basada en evidencia',
+      bullets: {
+        guidelines: 'Siguiendo las guías ASHP/IDSA 2020',
+        realtimeAuc: 'Visualización de AUC en tiempo real',
+        bayesian: 'Optimización bayesiana'
+      },
+      tabs: {
+        adult: 'Adulto',
+        pediatric: 'Pediátrico',
+        neonate: 'Neonato',
+        interactiveAuc: 'AUC Interactiva',
+        clinicalInfo: 'Información clínica'
+      },
+      badges: {
+        evidenceBased: 'Basado en evidencia',
+        bayesianOptimization: 'Optimización bayesiana'
+      },
+      buttons: { guidelines: 'Guías' },
       app: { title: 'Vancomyzer Web', subtitle: '', tagline: '' },
       nav: { interactive_auc: 'AUC interactivo', clinical_info: 'Información clínica' },
       patient: 'Paciente',
@@ -81,6 +119,25 @@ const resources = {
   },
   ar: {
     translation: {
+      title: 'فانكومايزر ويب',
+      slogan: 'حاسبة تفاعلية لجرعات الفانكومايسين قائمة على الأدلة',
+      bullets: {
+        guidelines: 'وفق إرشادات ASHP/IDSA لعام 2020',
+        realtimeAuc: 'تصوير فوري لمساحة تحت المنحنى',
+        bayesian: 'تحسين بايزي'
+      },
+      tabs: {
+        adult: 'بالغ',
+        pediatric: 'أطفال',
+        neonate: 'حديثو الولادة',
+        interactiveAuc: 'AUC تفاعلي',
+        clinicalInfo: 'معلومات سريرية'
+      },
+      badges: {
+        evidenceBased: 'قائم على الأدلة',
+        bayesianOptimization: 'تحسين بايزي'
+      },
+      buttons: { guidelines: 'الإرشادات' },
       app: { title: 'فانكومايزر ويب', subtitle: '', tagline: '' },
       nav: { interactive_auc: 'AUC تفاعلي', clinical_info: 'معلومات سريرية' },
       patient: 'المريض',

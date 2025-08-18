@@ -1,14 +1,14 @@
 import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment } from '@mui/material';
+import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment, Tooltip, Link as MuiLink } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip, Filler, Legend, CategoryScale } from 'chart.js';
+import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { calculateInteractiveAUC } from '../services/interactiveApi';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 
-ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Filler, Legend);
+ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Title, ChartTooltip, Filler, Legend);
 
 function toFixed(val, digits = 1) {
   if (val === undefined || val === null || Number.isNaN(val)) return '—';
@@ -32,7 +32,7 @@ function interp(xs, ys, x) {
   return y0 + f * (y1 - y0);
 }
 
-export default function InteractiveAUC() {
+export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   // Minimal patient inputs to support Bayesian priors
@@ -62,7 +62,7 @@ export default function InteractiveAUC() {
 
   const runInteractive = useCallback(async () => {
     setLoading(true); setError(null);
-    const flatPatient = { ...patient, levels: measuredLevels };
+    const flatPatient = { ...patient, levels: measuredLevels, population_mode: mode };
     try {
       const data = await calculateInteractiveAUC(flatPatient, regimen);
       setSummary({
@@ -87,7 +87,7 @@ export default function InteractiveAUC() {
     } finally {
       setLoading(false);
     }
-  }, [patient, regimen, measuredLevels]);
+  }, [patient, regimen, measuredLevels, mode]);
 
   useEffect(() => {
     const t = setTimeout(() => { runInteractive(); }, 400); // debounce
@@ -211,7 +211,7 @@ export default function InteractiveAUC() {
   };
 
   const copyJson = async () => {
-    const payload = { patient, regimen, summary, series };
+    const payload = { patient, regimen, summary, series, mode };
     try {
       await navigator.clipboard.writeText(JSON.stringify(payload));
       alert('Copied JSON to clipboard');
@@ -231,7 +231,7 @@ export default function InteractiveAUC() {
       const img = chart?.toBase64Image ? chart.toBase64Image() : null;
       const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
       doc.setFontSize(14);
-      doc.text('Vancomycin Interactive AUC Report', 40, 40);
+      doc.text(`${t('title','Vancomyzer Web')} — ${t('tabs.interactiveAuc', t('tabs.interactiveAUC','Interactive AUC'))} [${mode}]`, 40, 40);
       const meta = `Dose: ${regimen.dose_mg} mg  |  Interval: q${regimen.interval_hours}h  |  Infusion: ${regimen.infusion_minutes} min\nAUC24: ${toFixed(summary?.auc_24,0)}  |  Peak: ${toFixed(summary?.predicted_peak,1)} mg/L  |  Trough: ${toFixed(summary?.predicted_trough,1)} mg/L`;
       doc.setFontSize(10);
       doc.text(meta, 40, 60);
@@ -245,9 +245,10 @@ export default function InteractiveAUC() {
     }
   };
 
+  const guidelineUrl = 'https://www.ashp.org/-/media/assets/policy-guidelines/docs/therapeutic-guidelines/therapeutic-guidelines-monitoring-vancomycin-ASHP-IDSA-PIDS.pdf';
+
   return (
     <Box dir={dir}>
-      {/* Removed GlobalStyles width override; per-field sx now handles width/padding/color */}
       {/* Minimal patient form */}
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Typography variant="h6" sx={{ mb: 1 }}>{t('patient', 'Patient')}</Typography>
@@ -296,11 +297,25 @@ export default function InteractiveAUC() {
         <Grid item xs={12} md={4}><Control label="infusion" value={draftRegimen.infusion_minutes} min={15} max={240} step={5} field="infusion_minutes" unit="min" /></Grid>
       </Grid>
 
-      {/* Toggles & badge */}
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2, flexWrap: 'wrap' }}>
+      {/* Toggles & badges */}
+      <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', mb: 2, flexWrap: 'wrap' }}>
         <FormControlLabel control={<Switch checked={showAucFill} onChange={(e) => setShowAucFill(e.target.checked)} />} label={t('shade_auc','Shade 0–24h AUC')} />
         <FormControlLabel control={<Switch checked={showDoseMarkers} onChange={(e) => setShowDoseMarkers(e.target.checked)} />} label={t('show_dose_markers','Show dose markers')} />
-        {posteriorN ? (<Chip size="small" color="primary" variant="outlined" label={`${t('bayesian','Bayesian')} (n=${posteriorN})`} />) : null}
+
+        <Tooltip title={t('bullets.guidelines','Following ASHP/IDSA 2020 Guidelines')} placement="top">
+          <Chip size="small" color="primary" label={t('badges.evidenceBased','Evidence-based')} component="a" clickable href={guidelineUrl} target="_blank" rel="noopener noreferrer" />
+        </Tooltip>
+
+        {posteriorN ? (
+          <Chip size="small" color="primary" variant="outlined" label={`${t('bayesian','Bayesian')} (n=${posteriorN})`} />
+        ) : (
+          <Chip size="small" variant="outlined" label={t('badges.bayesianOptimization','Bayesian optimization')} />
+        )}
+
+        <Button size="small" variant="text" onClick={() => onOpenGuidelines && onOpenGuidelines()} sx={{ textTransform: 'none' }}>
+          {t('buttons.guidelines','Guidelines')}
+        </Button>
+
         {loading && <Typography color="text.secondary">{t('updating','Updating…')}</Typography>}
         <Box sx={{ flexGrow: 1 }} />
         <Button size="small" variant="outlined" onClick={copyJson}>{t('copy_json','Copy JSON')}</Button>
