@@ -1,3 +1,4 @@
+import 'chart.js/auto';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Grid,

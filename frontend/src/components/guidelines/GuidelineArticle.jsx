@@ -1,8 +1,8 @@
+import jsPDF from 'jspdf';
 import React from 'react';
 import { Box, Paper, Typography, IconButton, Tooltip } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
