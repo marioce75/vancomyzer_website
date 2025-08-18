@@ -1,0 +1,11 @@
+[
+  {"slug":"00_tutorial_overview","title":"Tutorial Overview","tags":["vancomycin","AUC"],"updated":"2025-08-17","preview":"How to navigate the tutorial and key PK concepts."},
+  {"slug":"01_pk_basics_auc","title":"PK Basics: AUC","tags":["PK","AUC","vancomycin"],"updated":"2025-08-17","preview":"Understand AUC24, MIC assumptions, and why 400–600."},
+  {"slug":"02_sampling_timing","title":"Sampling & Timing","tags":["levels","timing"],"updated":"2025-08-17","preview":"One-level Bayesian vs. two-level first-order PK; timing advice."},
+  {"slug":"03_infusion_principles","title":"Infusion Principles","tags":["infusion","safety"],"updated":"2025-08-17","preview":"Infusion durations and safety notes for larger doses."},
+  {"slug":"04_auc_targets","title":"AUC Targets","tags":["targets","IDSA"],"updated":"2025-08-17","preview":"Evidence-based target AUC24/MIC 400–600 (MIC=1)."},
+  {"slug":"05_nephrotoxicity_risk","title":"Nephrotoxicity Risk","tags":["safety","AKI"],"updated":"2025-08-17","preview":"Risk factors and monitoring considerations."},
+  {"slug":"06_special_populations","title":"Special Populations","tags":["obesity","elderly","renal"],"updated":"2025-08-17","preview":"Obesity, older adults, unstable renal function."},
+  {"slug":"07_rrt_crrt","title":"RRT/CRRT","tags":["CRRT","dialysis"],"updated":"2025-08-17","preview":"Approach outline (coming soon)."},
+  {"slug":"08_pediatrics","title":"Pediatrics","tags":["peds"],"updated":"2025-08-17","preview":"Considerations and caveats for children."}
+]
