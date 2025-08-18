@@ -2,7 +2,6 @@ import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment } from '@mui/material';
-import GlobalStyles from '@mui/material/GlobalStyles';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { calculateInteractiveAUC } from '../services/interactiveApi';
@@ -151,8 +150,8 @@ export default function InteractiveAUC() {
   const handleRegimenField = (field) => (value) => setRegimen((r) => ({ ...r, [field]: value }));
 
   const Control = ({ label, value, min, max, step, field, unit }) => {
-    const digits = String(max ?? 4000).length;
-    const ch = Math.max(4, digits) + 3; // extra for padding/adornment
+    // Size input based on max digits and reserve space for adornment
+    const widthCh = Math.max(4, String(max ?? 5000).length) + 7;
     return (
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Typography variant="caption" color="text.secondary">{label}</Typography>
@@ -162,19 +161,25 @@ export default function InteractiveAUC() {
           </Grid>
           <Grid item xs="auto" md="auto">
             <TextField
+              variant="outlined"
               className="numericInputDense"
               label={label}
               type="number"
               size="small"
               value={value}
-              onChange={(e) => handleRegimenField(field)(Number(e.target.value))}
+              onChange={(e) => handleRegimenField(field)(Number(e.target.value || 0))}
               InputProps={{
                 endAdornment: unit ? <InputAdornment position="end">{unit}</InputAdornment> : undefined,
                 inputProps: { min, max, step }
               }}
               sx={{
-                width: `${ch}ch`,
-                '& input': { fontVariantNumeric: 'tabular-nums', textAlign: 'right' }
+                width: `${widthCh}ch`,
+                '& .MuiOutlinedInput-input': {
+                  textAlign: 'right',
+                  fontVariantNumeric: 'tabular-nums',
+                  paddingRight: '3.5ch', // reserve space for adornment (mg/h/min)
+                  color: (theme) => theme.palette.text.primary,
+                }
               }}
             />
           </Grid>
@@ -220,7 +225,7 @@ export default function InteractiveAUC() {
 
   return (
     <Box>
-      <GlobalStyles styles={{ '.numericInputDense .MuiInputBase-input': { width: '9ch', fontVariantNumeric: 'tabular-nums', textAlign: 'right' } }} />
+      {/* Removed GlobalStyles width override; per-field sx now handles width/padding/color */}
       {/* Minimal patient form */}
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Typography variant="h6" sx={{ mb: 1 }}>Patient</Typography>

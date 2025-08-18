@@ -41,30 +41,42 @@ export default function TutorialAUC(){
   const [inf, setInf] = React.useState(60);
   const sim = React.useMemo(()=> simulate({ dose_mg: dose, tau_h: tau, infusion_min: inf }), [dose, tau, inf]);
 
-  const Control = ({ label, value, min, max, step, onChange, unit }) => (
-    <Paper variant="outlined" sx={{ p: 2 }}>
-      <Typography variant="caption" color="text.secondary">{label}</Typography>
-      <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
-        <Grid item xs={8} md={9}>
-          <Slider value={value} min={min} max={max} step={step} onChange={(_, v) => onChange(Number(v))} aria-label={label} />
+  const Control = ({ label, value, min, max, step, onChange, unit }) => {
+    const widthCh = Math.max(4, String(max ?? 4000).length) + 7;
+    return (
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <Typography variant="caption" color="text.secondary">{label}</Typography>
+        <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
+          <Grid item xs={8} md={9}>
+            <Slider value={value} min={min} max={max} step={step} onChange={(_, v) => onChange(Number(v))} aria-label={label} />
+          </Grid>
+          <Grid item xs={4} md={3}>
+            <TextField
+              variant="outlined"
+              className="numericInputDense"
+              size="small"
+              fullWidth
+              type="number"
+              inputProps={{ min, max, step }}
+              value={value}
+              onChange={(e) => onChange(Number(e.target.value || 0))}
+              label={label}
+              InputProps={{ endAdornment: <InputAdornment position="end">{unit}</InputAdornment> }}
+              sx={{
+                width: `${widthCh}ch`,
+                '& .MuiOutlinedInput-input': {
+                  fontVariantNumeric: 'tabular-nums',
+                  textAlign: 'right',
+                  paddingRight: '3.5ch',
+                  color: (theme) => theme.palette.text.primary,
+                }
+              }}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={4} md={3}>
-          <TextField
-            className="numericInputDense"
-            size="small"
-            fullWidth
-            type="number"
-            inputProps={{ min, max, step }}
-            value={value}
-            onChange={(e) => onChange(Number(e.target.value))}
-            label={unit}
-            InputProps={{ endAdornment: <InputAdornment position="end">{unit}</InputAdornment> }}
-            sx={{ width: `${Math.max(4, String(max ?? 4000).length) + 3}ch`, '& input': { fontVariantNumeric: 'tabular-nums', textAlign: 'right' } }}
-          />
-        </Grid>
-      </Grid>
-    </Paper>
-  );
+      </Paper>
+    );
+  };
 
   return (
     <Box id="tutorial-auc">
