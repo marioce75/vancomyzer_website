@@ -5,7 +5,7 @@ import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Swit
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import * as interactiveApi from '../services/interactiveApi';
+import { getInteractiveAvailability, calculateInteractiveAUC, optimizeDose } from '../services/interactiveApi';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -63,10 +63,10 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [posteriorN, setPosteriorN] = useState(null);
   const [showAucFill, setShowAucFill] = useState(true);
   const [showDoseMarkers, setShowDoseMarkers] = useState(true);
   const [apiAvailable, setApiAvailable] = useState(true);
+  const [apiOffline, setApiOffline] = useState(false);
 
   // Measured levels UI
   const [levelMode, setLevelMode] = useState('none');
@@ -101,61 +101,53 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   useEffect(() => {
     let alive = true;
     (async () => {
-      try {
-        const ok = interactiveApi.getInteractiveAvailability
-          ? await interactiveApi.getInteractiveAvailability()
-          : false;
-        if (alive) setApiAvailable(!!ok);
-      } catch {
-        if (alive) setApiAvailable(false);
-      }
+      const ok = await getInteractiveAvailability();
+      if (alive) { setApiAvailable(!!ok); setApiOffline(!ok); }
     })();
     return () => { alive = false; };
   }, []);
 
   const runInteractive = useCallback(async () => {
-    // Abort any in-flight request to avoid false offline
-    if (apiAbort.current) {
-      try { apiAbort.current.abort('superseded'); } catch {}
-    }
-    const controller = new AbortController();
-    apiAbort.current = controller;
-
     setLoading(true); setError(null);
-    const flatPatient = { ...patient, levels: measuredLevels, population_mode: mode };
-    // Optimistic compute: show fast local PK while awaiting backend
+
+    // optimistic local compute so chart moves immediately
     try {
-      const { series: syn, summary: sum } = computeAll(flatPatient, regimen);
-      setSeries(syn); setSummary(sum);
-    } catch {
-      // ignore optimistic errors
-    }
+      const { series: localSeries, summary: localSummary } = computeAll({ ...patient, population_mode: mode, levels: measuredLevels }, regimen);
+      setSeries(localSeries); setSummary(localSummary);
+    } catch {}
+
+    if (!apiAvailable) { setLoading(false); setApiOffline(true); return; }
+
+    if (apiAbort.current) apiAbort.current.abort();
+    apiAbort.current = new AbortController();
+
     try {
-      const data = await interactiveApi.calculateInteractiveAUC(flatPatient, regimen, { signal: controller.signal });
-      setSummary({
-        auc_24: data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24,
-        predicted_peak: data?.metrics?.predicted_peak ?? data.predicted_peak,
-        predicted_trough: data?.metrics?.predicted_trough ?? data.predicted_trough,
-      });
+      const data = await calculateInteractiveAUC(
+        { ...patient, levels: measuredLevels, population_mode: mode },
+        regimen,
+        { signal: apiAbort.current.signal }
+      );
+      const auc = data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24;
+      const peak = data?.metrics?.predicted_peak ?? data.predicted_peak;
+      const trough = data?.metrics?.predicted_trough ?? data.predicted_trough;
+
+      if (auc != null) setSummary(s => ({ ...s, auc_24: auc, predicted_peak: peak, predicted_trough: trough }));
       if (data?.series) {
         const s = data.series;
         setSeries({
           time_hours: s.time_hours,
           concentration_mg_L: s.concentration_mg_L || s.median,
           lower: s.lower || s.p05,
-          upper: s.upper || s.p95,
+          upper: s.upper || s.p95
         });
       }
-      setPosteriorN(data?.posterior?.n_draws ?? null);
-      setApiAvailable(true);
-      setError(null);
+      setApiOffline(false);
     } catch (e) {
-      if (e?.name === 'AbortError') return; // superseded
-      setApiAvailable(false);
+      if (e?.name !== 'AbortError') setApiOffline(true);
     } finally {
       setLoading(false);
     }
-  }, [patient, regimen, measuredLevels, mode]);
+  }, [patient, regimen, measuredLevels, mode, apiAvailable]);
 
   useEffect(() => {
     const t = setTimeout(() => { runInteractive(); }, 150); // reduced debounce
@@ -323,37 +315,11 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const guidelineUrl = 'https://www.ashp.org/-/media/assets/policy-guidelines/docs/therapeutic-guidelines/therapeutic-guidelines-monitoring-vancomycin-ASHP-IDSA-PIDS.pdf';
 
   const onRetry = useCallback(async () => {
-    setLoading(true);
-    try {
-      const ok = await interactiveApi.getInteractiveAvailability();
-      setApiAvailable(!!ok);
-    } catch {}
-    try {
-      const data = await interactiveApi.calculateInteractiveAUC({ ...patient, levels: measuredLevels, population_mode: mode }, regimen);
-      setSummary({
-        auc_24: data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24,
-        predicted_peak: data?.metrics?.predicted_peak ?? data.predicted_peak,
-        predicted_trough: data?.metrics?.predicted_trough ?? data.predicted_trough,
-      });
-      if (data?.series) {
-        const s = data.series;
-        setSeries({
-          time_hours: s.time_hours,
-          concentration_mg_L: s.concentration_mg_L || s.median,
-          lower: s.lower || s.p05,
-          upper: s.upper || s.p95,
-        });
-      }
-      setPosteriorN(data?.posterior?.n_draws ?? null);
-      setApiAvailable(true);
-      setError(null);
-    } catch (e) {
-      setError(e?.message || 'Request failed');
-      setApiAvailable(false);
-    } finally {
-      setLoading(false);
-    }
-  }, [patient, regimen, measuredLevels, mode]);
+    const ok = await getInteractiveAvailability();
+    setApiAvailable(!!ok);
+    setApiOffline(!ok);
+    runInteractive();
+  }, [runInteractive]);
 
   return (
     <Box dir={dir}>
@@ -459,19 +425,21 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
           <Chip size="small" color="primary" label={t('badges.evidenceBased','Evidence-based')} component="a" clickable href={guidelineUrl} target="_blank" rel="noopener noreferrer" />
         </Tooltip>
 
-        {posteriorN ? (
-          <Chip size="small" color="primary" variant="outlined" label={`${t('bayesian','Bayesian')} (n=${posteriorN})`} />
-        ) : (
-          apiAvailable ? (
-            <Chip size="small" color="primary" label={t('status.bayes.online', 'Bayesian optimization (online)')} />
-          ) : (
-            <Tooltip title={t('status.bayes.tooltip', 'Service unreachable. Check VITE_INTERACTIVE_API_URL, API /health, CORS, or server uptime.')}>
-              <Chip size="small" variant="outlined" color="warning" label={t('status.bayes.offline', 'Bayesian optimization (offline)')} />
-            </Tooltip>
-          )
-        )}
-        {!apiAvailable && (
-          <Button size="small" variant="text" startIcon={<RestartAltIcon />} onClick={onRetry} sx={{ textTransform: 'none' }}>
+        <Tooltip title={apiOffline ? t('status.bayes.tooltip') : t('status.bayes.online')}>
+          <Chip
+            size="small"
+            variant={apiOffline ? 'outlined' : 'filled'}
+            color={apiOffline ? 'warning' : 'primary'}
+            label={apiOffline ? t('status.bayes.offline') : t('status.bayes.online')}
+            sx={{ ml: 1 }}
+          />
+        </Tooltip>
+        {apiOffline && (
+          <Button size="small" startIcon={<RestartAltIcon />} onClick={async () => {
+            const ok = await getInteractiveAvailability();
+            setApiAvailable(ok); setApiOffline(!ok);
+            runInteractive();
+          }}>
             {t('actions.retry','Retry')}
           </Button>
         )}
@@ -484,16 +452,17 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         <Box sx={{ flexGrow: 1 }} />
         <Button size="small" variant="outlined" onClick={copyJson}>{t('copy_json','Copy JSON')}</Button>
         <Button size="small" variant="contained" onClick={exportPdf}>{t('export_pdf','Export PDF')}</Button>
-        <Button size="small" variant="contained" color="primary" disabled={!apiAvailable || !(['one','two'].includes(levelMode) && measuredLevels?.length)} onClick={async () => {
+        <Button size="small" variant="contained" color="primary" disabled={apiOffline} onClick={async () => {
           try {
             const target = { auc_min: 400, auc_max: 600, mic: Number(patient?.mic_mg_L || 1) };
-            const data = await interactiveApi.optimizeDose({ ...patient, levels: measuredLevels, population_mode: mode }, regimen, target);
+            const data = await optimizeDose({ ...patient, levels: measuredLevels, population_mode: mode }, regimen, target);
             const rec = data?.recommendation;
             if (rec) {
               setRegimen((r) => ({ ...r, dose_mg: rec.dose_mg, interval_hours: rec.interval_hours, infusion_minutes: rec.infusion_minutes }));
             }
           } catch (e) {
             setError(e?.message || 'Optimize failed');
+            setApiOffline(true);
           }
         }}>{t('actions.optimize','Optimize dose')}</Button>
       </Box>

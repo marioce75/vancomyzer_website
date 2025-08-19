@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Chip, Box } from "@mui/material";
 
-const API_HEALTH_URL = "https://vancomyzer.onrender.com/api/health";
+const API_HEALTH_URL = ((typeof import.meta !== 'undefined' && import.meta.env?.VITE_INTERACTIVE_API_URL) || '') + '/health';
 
 const ApiHealthBadge = () => {
   const [apiStatus, setApiStatus] = useState("checking");
 
   useEffect(() => {
+    if (!API_HEALTH_URL || API_HEALTH_URL === '/health') {
+      setApiStatus('offline');
+      return;
+    }
     fetch(API_HEALTH_URL, { headers: { Accept: "application/json" } })
       .then(async (res) => {
         if (!res.ok) throw new Error(`${res.status}`);

@@ -1,8 +1,12 @@
 import { normalizePatientFields } from './services/normalizePatient';
 
-const API_BASE = "https://vancomyzer.onrender.com/api";
+// Use Vite env for backend base, e.g., https://vancomyzer.onrender.com/api
+const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_INTERACTIVE_API_URL) || '';
 
 async function jsonFetch(path, { method = "POST", body } = {}) {
+  if (!API_BASE) {
+    throw new Error('Interactive API base is not configured (VITE_INTERACTIVE_API_URL).');
+  }
   const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers: { "Content-Type": "application/json", Accept: "application/json" },

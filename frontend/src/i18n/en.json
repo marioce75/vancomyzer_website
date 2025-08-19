@@ -1,0 +1,10 @@
+{
+  "status": {
+    "bayes": {
+      "online": "Bayesian optimization (online)",
+      "offline": "Bayesian optimization (offline)",
+      "tooltip": "Interactive service unreachable. Check API URL, /health, CORS, or server uptime."
+    }
+  },
+  "actions": { "retry": "Retry", "optimize": "Optimize dose" }
+}

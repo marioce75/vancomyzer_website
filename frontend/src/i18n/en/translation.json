@@ -59,6 +59,7 @@
   "actions.calculate": "Calculate Dosing",
   "actions.calculating": "Calculating...",
   "actions.retry": "Retry",
+  "actions.optimize": "Optimize dose",
 
   "errors.ageAdultMin": "Adults must be ≥18 years",
   "errors.weightRange": "Weight must be 0.1-300 kg",
