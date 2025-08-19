@@ -3,14 +3,13 @@
   "version": "2.0.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "11.13.0",
-    "@emotion/styled": "11.13.0",
-    "@mui/material": "6.5.0",
-    "@mui/system": "6.5.0",
-    "@mui/utils": "6.5.0",
-    "@mui/icons-material": "6.5.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/material": "^6.1.4",
+    "@mui/system": "^6.1.4",
+    "@mui/icons-material": "^6.1.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-router-dom": "6.26.2",
     "react-scripts": "5.0.1",
     "chart.js": "4.4.7",
@@ -39,7 +38,15 @@
     "typescript": "4.9.5"
   },
   "overrides": {
-    "typescript": "4.9.5"
+    "typescript": "4.9.5",
+    "@mui/material": "^6.1.4",
+    "@mui/system": "^6.1.4",
+    "@mui/icons-material": "^6.1.4",
+    "@mui/base": "^6.1.4",
+    "@mui/utils": "^6.1.4"
+  },
+  "engines": {
+    "node": "20.x"
   },
   "browserslist": {
     "production": [">0.2%", "not dead", "not op_mini all"],

@@ -11,3 +11,5 @@ services:
         value: "1"
       - key: ALLOWED_ORIGINS
         value: "https://vancomyzer.com,http://localhost:5173"
+      - key: NODE_VERSION
+        value: "20.13.1"
