@@ -1,11 +1,12 @@
 import React from 'react';
-import { Box, Tabs, Tab, Paper, Typography, Alert } from '@mui/material';
+import { Box, Tabs, Tab, Paper, Typography, Alert, Button, Stack } from '@mui/material';
 import TutorialIntro from '../components/tutorial/TutorialIntro';
 import TutorialAUC from '../components/tutorial/TutorialAUC';
 import TutorialWorkflow from '../components/tutorial/TutorialWorkflow';
 import GuidelinesIndex from '../components/guidelines/GuidelinesIndex';
 import GuidelineArticle from '../components/guidelines/GuidelineArticle';
 import { useTranslation } from 'react-i18next';
+import { Link as RouterLink } from 'react-router-dom';
 
 function usePersistedTab(key, initial) {
   const [value, setValue] = React.useState(() => {
@@ -34,6 +35,10 @@ export default function ClinicalInfo() {
       <Box sx={{ textAlign: 'center', my: { xs: 2, sm: 3 } }}>
         <Typography variant="h3" component="h2" sx={{ fontWeight: 800 }}>Clinical Info</Typography>
         <Typography variant="h6" sx={{ opacity: 0.9 }}>Tutorials and guidelines for AUC-guided vancomycin dosing</Typography>
+        <Stack direction="row" spacing={1} justifyContent="center" sx={{ mt: 1 }}>
+          <Button size="small" component={RouterLink} to="/pediatric" variant="outlined">{t('tabs.pediatric','Pediatric')}</Button>
+          <Button size="small" component={RouterLink} to="/neonate" variant="outlined">{t('tabs.neonate','Neonate')}</Button>
+        </Stack>
       </Box>
       <Paper elevation={1} sx={{ p: 2 }}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} aria-label="Clinical Info tabs" variant="scrollable" allowScrollButtonsMobile>

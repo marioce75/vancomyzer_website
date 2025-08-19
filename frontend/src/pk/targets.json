@@ -1,0 +1,4 @@
+{
+  "pediatric": { "auc_min": 400, "auc_max": 600, "mic": 1 },
+  "neonate":  { "auc_min": 400, "auc_max": 600, "mic": 1, "note": "Institution may adjust; ensure NICU policy override." }
+}

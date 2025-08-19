@@ -1,0 +1,6 @@
+{
+  "theta": { "CL": 1.5, "V": 0.7 },
+  "sigma": { "CL": 0.35, "V": 0.25 },
+  "maturation": { "usePMA": true, "thetaPMA": 1.2 },
+  "defaults": { "interval_hours": 12, "infusion_minutes": 60 }
+}

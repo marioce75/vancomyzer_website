@@ -1,0 +1,5 @@
+{
+  "theta": { "CL": 4.5, "V": 60, "thetaGFR": 0.65 },
+  "sigma": { "CL": 0.25, "V": 0.20 },
+  "monitoring": { "maxDailyMgPerKg": 80 }
+}

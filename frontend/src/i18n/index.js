@@ -22,7 +22,7 @@ function mergeNS(target, extra, ns) {
   if (!target || !extra || !extra[ns]) return;
   target[ns] = { ...(target[ns] || {}), ...extra[ns] };
 }
-['legal', 'status', 'actions'].forEach((ns) => {
+['legal', 'status', 'actions', 'peds', 'neo'].forEach((ns) => {
   mergeNS(resources.en.translation, enExtra, ns);
   mergeNS(resources.es.translation, esExtra, ns);
   mergeNS(resources.ar.translation, arExtra, ns);

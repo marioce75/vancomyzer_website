@@ -15,6 +15,8 @@ import LanguageSelector from './components/LanguageSelector';
 import InteractiveAUC from './pages/InteractiveAUC';
 import ClinicalInfo from './pages/ClinicalInfo';
 import Legal from './pages/Legal';
+import PediatricAUC from './pages/PediatricAUC';
+import NeonateAUC from './pages/NeonateAUC';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
@@ -236,21 +238,27 @@ function AppInner() {
     <Container maxWidth="lg">
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
         <LanguageSelector />
-        <Button
-          variant="text"
-          component={RouterLink}
-          to="/"
-          startIcon={<HomeRoundedIcon />}
-          sx={{ textTransform: 'none' }}
-          aria-label={t('nav.home','Home')}
-        >
-          {t('nav.home','Home')}
-        </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Button
+            variant="text"
+            component={RouterLink}
+            to="/"
+            startIcon={<HomeRoundedIcon />}
+            sx={{ textTransform: 'none' }}
+            aria-label={t('nav.home','Home')}
+          >
+            {t('nav.home','Home')}
+          </Button>
+          <Button variant="text" component={RouterLink} to="/pediatric" sx={{ textTransform: 'none' }}>{t('tabs.pediatric','Pediatric')}</Button>
+          <Button variant="text" component={RouterLink} to="/neonate" sx={{ textTransform: 'none' }}>{t('tabs.neonate','Neonate')}</Button>
+        </Box>
       </Box>
       <HeroHeader />
       <Routes>
         <Route path="/" element={<PopulationTabs />} />
         <Route path="/clinical" element={<PopulationTabs initialPop={0} initialSubByPop={{ 0: 1 }} />} />
+        <Route path="/pediatric" element={<PediatricAUC />} />
+        <Route path="/neonate" element={<NeonateAUC />} />
         <Route path="/legal" element={<Legal />} />
         <Route path="*" element={<PopulationTabs />} />
       </Routes>
