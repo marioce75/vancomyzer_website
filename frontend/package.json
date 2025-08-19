@@ -5,24 +5,24 @@
   "dependencies": {
     "@emotion/react": "11.13.0",
     "@emotion/styled": "11.13.0",
-    "@mui/icons-material": "6.5.0",
     "@mui/material": "6.5.0",
     "@mui/system": "6.5.0",
-    "@mui/utils": "6.4.9",
-    "chart.js": "^4.4.7",
-    "i18next": "^23.10.1",
-    "i18next-browser-languagedetector": "^7.2.0",
-    "jspdf": "^2.5.1",
+    "@mui/utils": "6.5.0",
+    "@mui/icons-material": "6.5.0",
     "react": "18.3.1",
-    "react-chartjs-2": "^5.3.0",
     "react-dom": "18.3.1",
-    "react-i18next": "^13.5.0",
-    "react-markdown": "^9.0.1",
     "react-router-dom": "6.26.2",
     "react-scripts": "5.0.1",
-    "remark-gfm": "^4.0.0",
-    "stylis": "^4.3.6",
-    "stylis-plugin-rtl": "^2.1.1"
+    "chart.js": "4.4.7",
+    "react-chartjs-2": "5.3.0",
+    "react-markdown": "9.0.1",
+    "remark-gfm": "4.0.0",
+    "jspdf": "2.5.1",
+    "stylis": "4.3.6",
+    "stylis-plugin-rtl": "2.1.1",
+    "i18next": "23.10.1",
+    "react-i18next": "13.5.0",
+    "i18next-browser-languagedetector": "7.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -30,19 +30,19 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
-    "typescript": "^4.9.5"
+    "@types/react": "18.3.23",
+    "@types/react-dom": "18.3.0",
+    "typescript": "4.9.5"
+  },
+  "peerDependencies": {
+    "typescript": "4.9.5"
+  },
+  "overrides": {
+    "typescript": "4.9.5"
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
   }
 }

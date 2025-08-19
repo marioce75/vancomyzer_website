@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useState, useCallback } from 'react';
-import { calculateInteractiveAUC, pkSimulation } from '../api';
+import { calculateInteractiveAUC, pkSimulation } from '../services/interactiveApi';
 import { normalizePatientFields } from '../services/normalizePatient';
 
 const BayesianContext = createContext(null);

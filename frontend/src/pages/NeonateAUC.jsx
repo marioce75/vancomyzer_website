@@ -4,7 +4,7 @@ import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import { useTranslation } from 'react-i18next';
-import { calculateInteractiveAUC, optimizeDose, health } from '../api';
+import { bayesAUC, optimize, health } from '../services/interactiveApi';
 import { computeSeriesNeo } from '../pk/pedsNeonate';
 import targets from '../pk/targets.json';
 import priorsNeo from '../pk/priorsNeo.json';
@@ -57,7 +57,7 @@ export default function NeonateAUC(){
         regimen: { dose_mg: doseMg, interval_hours: regimen.interval_hours, infusion_minutes: regimen.infusion_minutes },
         levels: measuredLevels
       };
-      const data = await calculateInteractiveAUC(payload, { signal: abortRef.current.signal });
+      const data = await bayesAUC(payload, { signal: abortRef.current.signal });
       const m = data?.metrics || data;
       setSummary((s)=>({ ...s, auc_24: m.auc_24 ?? s?.auc_24, predicted_peak: m.predicted_peak ?? s?.predicted_peak, predicted_trough: m.predicted_trough ?? s?.predicted_trough }));
       if (data?.series) setSeries(data.series);
@@ -197,13 +197,19 @@ export default function NeonateAUC(){
 
       <Box sx={{ display:'flex', alignItems:'center', gap:1, mb:2, flexWrap:'wrap' }}>
         <Tooltip title={t('status.bayesian.tooltip')}><Chip size="small" variant={apiOnline?'filled':'outlined'} color={apiOnline?'primary':'warning'} label={apiOnline?t('status.bayesian.online'):t('status.bayesian.offline')} /></Tooltip>
-        <Button size="small" variant="outlined" onClick={async()=>{ try{ await health(); setApiOnline(true);}catch{ setApiOnline(false);} }}>
+        <Button size="small" variant="outlined" onClick={async()=>{ 
+          try{ 
+            const ok = await health(); 
+            setApiOnline(!!ok);
+            if (ok) runBackend();
+          }catch{ setApiOnline(false);} 
+        }}>
           {t('actions.retry')}
         </Button>
         <Box sx={{ flexGrow: 1 }} />
         <Button size="small" variant="contained" color="primary" disabled={!apiOnline||loading} onClick={async ()=>{
           try{
-            const data = await optimizeDose({ patient: { ...patient, mic: Number(patient.mic||1), population: 'neonate' }, regimen: { dose_mg: doseMg, interval_hours: regimen.interval_hours, infusion_minutes: regimen.infusion_minutes }, target: targets.neonate });
+            const data = await optimize({ patient: { ...patient, mic: Number(patient.mic||1), population: 'neonate' }, regimen: { dose_mg: doseMg, interval_hours: regimen.interval_hours, infusion_minutes: regimen.infusion_minutes }, target: targets.neonate });
             const rec = data?.recommendation || data?.regimen || data?.optimized_regimen;
             if (rec) {
               const newMgPerKg = Math.max(5, Math.round((rec.dose_mg / Math.max(1, Number(patient.weight_kg)||1)) / 5) * 5);

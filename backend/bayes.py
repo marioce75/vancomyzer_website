@@ -7,7 +7,7 @@ import numpy as np
 import pymc as pm
 import pytensor.tensor as pt
 
-from .pk import predict_at_times, superposition_curve, auc_trapezoid
+from .pk import superposition_curve, auc_trapezoid
 
 # --------------------
 # Constants (tuneable)

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import InteractiveAUC from '../components/InteractiveAUC.jsx';
 
 // Mock react-chartjs-2 Line to inspect datasets easily
 jest.mock('react-chartjs-2', () => ({
@@ -26,9 +27,7 @@ const mockResponse = {
 };
 
 const calcMock = jest.fn().mockResolvedValue(mockResponse);
-jest.mock('../api', () => ({ calculateInteractiveAUC: (...args) => calcMock(...args), health: jest.fn().mockResolvedValue({ ok: true }) }));
-
-import InteractiveAUC from '../components/InteractiveAUC.jsx';
+jest.mock('../services/interactiveApi', () => ({ calculateInteractiveAUC: (...args) => calcMock(...args), health: jest.fn().mockResolvedValue(true) }));
 
 // Use fake timers to control the 400ms debounce in the component
 jest.useFakeTimers();

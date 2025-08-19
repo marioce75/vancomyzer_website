@@ -5,7 +5,7 @@ import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Swit
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { health, calculateInteractiveAUC, optimizeDose } from '../api';
+import { health, bayesAUC, optimize, __BASE__ } from '../services/interactiveApi';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -52,6 +52,7 @@ const help = {
 export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+  useEffect(() => { try { console.debug('[Vancomyzer] API base', __BASE__ || '(missing)'); } catch {} }, []);
   const [showDisclaimer, setShowDisclaimer] = useState(() => {
     try {
       const ts = Number(localStorage.getItem('calcDisclaimerTs') || 0);
@@ -103,12 +104,8 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   useEffect(() => {
     let alive = true;
     (async () => {
-      try {
-        await health();
-        if (alive) setApiOnline(true);
-      } catch {
-        if (alive) setApiOnline(false);
-      }
+      const ok = await health();
+      if (alive) setApiOnline(!!ok);
     })();
     return () => { alive = false; };
   }, []);
@@ -128,7 +125,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
     apiAbort.current = new AbortController();
 
     try {
-      const data = await calculateInteractiveAUC({ patient: { ...patient, population_mode: mode }, regimen, levels: measuredLevels }, { signal: apiAbort.current.signal });
+      const data = await bayesAUC({ patient: { ...patient, population_mode: mode }, regimen, levels: measuredLevels }, { signal: apiAbort.current.signal });
       const auc = data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24;
       const peak = data?.metrics?.predicted_peak ?? data.predicted_peak;
       const trough = data?.metrics?.predicted_trough ?? data.predicted_trough;
@@ -319,9 +316,10 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const guidelineUrl = 'https://www.ashp.org/-/media/assets/policy-guidelines/docs/therapeutic-guidelines/therapeutic-guidelines-monitoring-vancomycin-ASHP-IDSA-PIDS.pdf';
 
   const onRetry = useCallback(async () => {
-    try { await health(); setApiOnline(true); } catch { setApiOnline(false); }
-    if (apiOnline) runInteractive();
-  }, [runInteractive, apiOnline]);
+    const ok = await health();
+    setApiOnline(!!ok);
+    if (ok) runInteractive();
+  }, [runInteractive]);
 
   return (
     <Box dir={dir}>
@@ -447,8 +445,9 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         <Button size="small" variant="contained" onClick={exportPdf}>{t('export_pdf','Export PDF')}</Button>
         <Button size="small" variant="contained" color="primary" disabled={!apiOnline || loading} onClick={async () => {
           try {
+            setLoading(true);
             const target = { auc_min: 400, auc_max: 600, mic: Number(patient?.mic_mg_L || 1) };
-            const data = await optimizeDose({ patient: { ...patient, population_mode: mode }, regimen, target });
+            const data = await optimize({ patient: { ...patient, population_mode: mode }, regimen, target });
             const rec = data?.recommendation || data?.regimen || data?.optimized_regimen;
             if (rec) {
               setRegimen((r) => ({ ...r, dose_mg: rec.dose_mg, interval_hours: rec.interval_hours, infusion_minutes: rec.infusion_minutes }));
@@ -457,7 +456,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
           } catch (e) {
             setError(e?.message || 'Optimize failed');
             setApiOnline(false);
-          }
+          } finally { setLoading(false); }
         }}>{t('actions.optimize','Optimize dose')}</Button>
       </Box>
 

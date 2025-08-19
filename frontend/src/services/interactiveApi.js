@@ -5,12 +5,15 @@ const BASE = (typeof import.meta !== 'undefined' && import.meta.env)
   ? (import.meta.env.VITE_INTERACTIVE_API_URL || '')
   : '';
 
-// Diagnostics: warn once if URL missing
-let warnedMissingBase = false;
-if (!BASE && !warnedMissingBase) {
-  warnedMissingBase = true;
-  // eslint-disable-next-line no-console
-  console.warn('[Vancomyzer] Interactive API URL missing; running offline mode.');
+// One-time diagnostics
+let __loggedBase = false;
+if (!__loggedBase) {
+  __loggedBase = true;
+  try { /* eslint-disable no-console */ console.debug('[Vancomyzer] API base =', BASE || '(missing)'); } catch {}
+}
+// Warn if base doesn't look like it ends with /api (expected by backend routing)
+if (BASE && !BASE.endsWith('/api')) {
+  try { console.warn('[Vancomyzer] VITE_INTERACTIVE_API_URL should end with /api. Current:', BASE); } catch {}
 }
 
 const BACKOFF_MS = [250, 500, 1000];
@@ -113,10 +116,8 @@ async function fetchWithRetry(url, opts = {}, attempts = 3) {
   throw err;
 }
 
-// Deduplicate /health failure logs
-let loggedHealthFailure = false;
-
-export async function getInteractiveAvailability() {
+// --- Public API ---
+export async function health() {
   if (!BASE) return false; // disabled by config
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(new DOMException('Timeout', 'AbortError')), HEALTH_TIMEOUT_MS);
@@ -128,64 +129,63 @@ export async function getInteractiveAvailability() {
       signal: controller.signal,
     });
     clearTimeout(timeout);
-    if (!res.ok) {
-      if (!loggedHealthFailure) {
-        loggedHealthFailure = true;
-        // eslint-disable-next-line no-console
-        console.warn('[Vancomyzer] /health check failed', { status: res.status });
-      }
-      return false;
-    }
-    return true;
+    return !!res.ok;
   } catch (e) {
     clearTimeout(timeout);
-    if (!loggedHealthFailure) {
-      loggedHealthFailure = true;
-      // eslint-disable-next-line no-console
-      console.warn('[Vancomyzer] /health check failed', e);
-    }
     return false;
   }
 }
 
-export async function calculateInteractiveAUC(patient, regimen, { signal } = {}) {
+export async function bayesAUC({ patient, regimen, levels = [] }, { signal } = {}) {
   if (!BASE) {
     const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
     err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
     throw err;
   }
-
-  const payload = {
-    patient,
-    regimen,
-  };
-
+  const payload = { patient, regimen, levels: Array.isArray(levels) ? levels : [] };
   const res = await fetchWithRetry(`${BASE}/interactive/auc`, {
     method: 'POST',
     body: JSON.stringify(payload),
     signal,
   }, 3);
-
   return res.json();
 }
 
-export async function optimizeDose(patient, regimen, target, { signal } = {}) {
+export async function optimize({ patient, regimen, target }, { signal } = {}) {
   if (!BASE) {
     const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
     err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
     throw err;
   }
-  const payload = {
-    patient,
-    regimen,
-    target,
-  };
+  const payload = { patient, regimen, target: target ?? {} };
   const res = await fetchWithRetry(`${BASE}/optimize`, {
     method: 'POST',
     body: JSON.stringify(payload),
     signal,
   }, 3);
   return res.json();
+}
+
+export async function pkSimulation(payload, { signal } = {}) {
+  if (!BASE) {
+    const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
+    err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
+    throw err;
+  }
+  const res = await fetchWithRetry(`${BASE}/pk-simulation`, {
+    method: 'POST',
+    body: JSON.stringify(payload || {}),
+    signal,
+  }, 3);
+  return res.json();
+}
+
+// Back-compat (old imports)
+export async function calculateInteractiveAUC(payload, opts) {
+  return bayesAUC(payload, opts);
+}
+export async function optimizeDose(payload, opts) {
+  return optimize(payload, opts);
 }
 
 export const __BASE__ = BASE;

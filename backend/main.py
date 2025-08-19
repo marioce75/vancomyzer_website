@@ -3,17 +3,18 @@ from __future__ import annotations
 import hashlib
 import json
 from functools import lru_cache
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Any, List
 
 import numpy as np
 import orjson
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
 from .schemas import InteractiveRequest, InteractiveResponse
 from .bayes import PatientCovars, Regimen, fit_posterior, simulate_from_posterior
-from .pk import predict_at_times
+from .pk.model import superposition_conc
+from .pk.optimize import choose_dose_interval
 
 app = FastAPI(default_response_class=ORJSONResponse)
 
@@ -86,7 +87,16 @@ def _predicted_levels_debug(posterior, regimen: Regimen, levels: list):
     times_arr = np.array(times, dtype=float)
     preds = []
     for cl, v in zip(posterior.CL_draws, posterior.V_draws):
-        preds.append(predict_at_times(float(cl), float(v), regimen.dose_mg, regimen.interval_hours, regimen.infusion_minutes, times_arr))
+        # Predict directly at requested times using the infusion superposition model
+        conc = superposition_conc(
+            times_arr,
+            float(regimen.dose_mg),
+            float(regimen.interval_hours),
+            float(regimen.infusion_minutes) / 60.0,
+            float(cl),
+            float(v),
+        )
+        preds.append(np.asarray(conc, dtype=float))
     M = np.vstack(preds) if preds else np.zeros((0, len(times_arr)))
     out = []
     for j, t in enumerate(times_arr):
@@ -157,3 +167,74 @@ def interactive(req: InteractiveRequest):
 @app.post('/api/interactive/auc', response_model=InteractiveResponse)
 def interactive_auc(req: InteractiveRequest):
     return interactive(req)
+
+
+# --- Optimize endpoint to recommend dose/interval for AUC target ---
+@app.post('/api/optimize')
+@app.post('/optimize')
+def optimize(body: Dict[str, Any] = Body(...)):
+    if not isinstance(body, dict):
+        raise HTTPException(status_code=400, detail='Invalid JSON body')
+
+    # Nested payload support
+    patient = dict(body.get('patient') or {})
+    regimen_raw = dict(body.get('regimen') or {})
+    target = dict(body.get('target') or {})
+    levels = body.get('levels') or patient.get('levels') or []
+
+    try:
+        age = float(patient.get('age') or patient.get('age_years'))
+        gender = str(patient.get('gender') or patient.get('sex') or 'male')
+        weight_kg = float(patient.get('weight_kg'))
+        scr = float(patient.get('serum_creatinine_mg_dl') or patient.get('scr_mg_dl') or 1.0)
+
+        dose_mg = float(regimen_raw.get('dose_mg'))
+        interval_hours = float(regimen_raw.get('interval_hours'))
+        infusion_minutes = float(regimen_raw.get('infusion_minutes'))
+
+        auc_min = float(target.get('auc_min', 400.0))
+        auc_max = float(target.get('auc_max', 600.0))
+    except Exception:
+        raise HTTPException(status_code=400, detail='Missing or invalid fields')
+
+    # Estimate clearance (CL) and volume (V)
+    # If levels provided, fit posterior and use medians; else use simple priors
+    serum = scr
+    clcr = float(((140.0 - float(age)) * float(weight_kg)) / (72.0 * max(float(serum), 0.2)))
+    if (gender or '').lower().startswith('f'):
+        clcr *= 0.85
+    clcr = float(max(clcr, 5.0))
+
+    # Prior means consistent with backend.app
+    THETA_CL = 4.5
+    THETA_CRCL = 0.65
+    THETA_V = 60.0
+
+    mu_cl = THETA_CL * (clcr / 100.0) ** THETA_CRCL * (max(weight_kg, 20.0) / 70.0) ** 0.75
+    mu_v = THETA_V * (max(weight_kg, 20.0) / 70.0) ** 1.0
+
+    cl_map, v_map = float(mu_cl), float(mu_v)
+    try:
+        if isinstance(levels, list) and len(levels) > 0:
+            # Use Bayesian posterior medians if levels provided
+            patient_cov = PatientCovars(clcr_ml_min=clcr, tbw_kg=float(weight_kg))
+            reg = Regimen(dose_mg=dose_mg, interval_hours=interval_hours, infusion_minutes=infusion_minutes)
+            post = fit_posterior(patient_cov, reg, levels)
+            cl_map = float(post.CL_median)
+            v_map = float(post.V_median)
+    except Exception:
+        # Fallback to prior means on any failure
+        cl_map, v_map = float(mu_cl), float(mu_v)
+
+    target_mid = float(np.clip((auc_min + auc_max) / 2.0, 350.0, 700.0))
+    dose_rec, interval_rec, auc24_est = choose_dose_interval(cl_map, v_map, target_mid, int(infusion_minutes))
+    infusion_rec = 60 if dose_rec <= 1000 else 90
+
+    return {
+        'recommendation': {
+            'dose_mg': int(dose_rec),
+            'interval_hours': int(interval_rec),
+            'infusion_minutes': int(infusion_rec),
+            'expected_auc_24': float(auc24_est),
+        }
+    }
