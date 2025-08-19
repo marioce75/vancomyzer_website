@@ -18,7 +18,7 @@ export default function NavTabs(){
   return (
     <Tabs value={value} variant="scrollable" allowScrollButtonsMobile>
       <Tab value="/"          label={t('nav.adult','Adult')}         component={RouterLink} to="/" />
-      <Tab value="/pediatric" label={t('nav.pediatric','Pediatric')} component={RouterLink} to="/pediatric" />
+      <Tab value="/pediatric" label={t('nav.pediatric','Pediatrics')} component={RouterLink} to="/pediatric" />
       <Tab value="/neonate"   label={t('nav.neonate','Neonate')}     component={RouterLink} to="/neonate" />
     </Tabs>
   );

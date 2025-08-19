@@ -118,12 +118,12 @@ export default function NeonateAUC(){
       <Paper variant="outlined" sx={{ p:2, mb:2 }}>
         <Typography variant="h6" sx={{ mb: 1 }}>{t('neo.title')}</Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.gaWk')} type="number" value={patient.gestationalAge_wk} onChange={(e)=> setPatient(p=>({ ...p, gestationalAge_wk: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.pnaD')} type="number" value={patient.postnatalAge_d} onChange={(e)=> setPatient(p=>({ ...p, postnatalAge_d: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.pmaWk')} type="number" value={patient.postmenstrualAge_wk} onChange={(e)=> setPatient(p=>({ ...p, postmenstrualAge_wk: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.weightKg')} type="number" value={patient.weight_kg} onChange={(e)=> setPatient(p=>({ ...p, weight_kg: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.scr')} type="number" value={patient.scr_mg_dl} onChange={(e)=> setPatient(p=>({ ...p, scr_mg_dl: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.mic')} type="number" value={patient.mic} onChange={(e)=> setPatient(p=>({ ...p, mic: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.gaWk')} placeholder={t('neo.inputs.gaWk')} type="number" value={patient.gestationalAge_wk} onChange={(e)=> setPatient(p=>({ ...p, gestationalAge_wk: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.pnaD')} placeholder={t('neo.inputs.pnaD')} type="number" value={patient.postnatalAge_d} onChange={(e)=> setPatient(p=>({ ...p, postnatalAge_d: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.pmaWk')} placeholder={t('neo.inputs.pmaWk')} type="number" value={patient.postmenstrualAge_wk} onChange={(e)=> setPatient(p=>({ ...p, postmenstrualAge_wk: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.weightKg')} placeholder={t('neo.inputs.weightKg')} type="number" value={patient.weight_kg} onChange={(e)=> setPatient(p=>({ ...p, weight_kg: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.scr')} placeholder={t('neo.inputs.scr')} type="number" value={patient.scr_mg_dl} onChange={(e)=> setPatient(p=>({ ...p, scr_mg_dl: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={2}><TextField size="small" fullWidth label={t('neo.inputs.mic')} placeholder={t('neo.inputs.mic')} type="number" value={patient.mic} onChange={(e)=> setPatient(p=>({ ...p, mic: Number(e.target.value) }))} /></Grid>
         </Grid>
       </Paper>
 
@@ -156,9 +156,9 @@ export default function NeonateAUC(){
 
       <Paper variant="outlined" sx={{ p:2, mb:2 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('neo.doseMgKg')} value={regimen.dose_mg_per_kg} inputProps={{ step: 5 }} onChange={(e)=> setRegimen(r=>({ ...r, dose_mg_per_kg: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('neo.intervalH')} value={regimen.interval_hours} onChange={(e)=> setRegimen(r=>({ ...r, interval_hours: Number(e.target.value) }))} helperText={`${t('quick_pick','Quick-pick')}: ${intervalHints.join(' / ')} h`} /></Grid>
-          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('neo.infusionMin')} value={regimen.infusion_minutes} onChange={(e)=> setRegimen(r=>({ ...r, infusion_minutes: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('neo.controls.doseMgKg')} placeholder={t('neo.controls.doseMgKg')} value={regimen.dose_mg_per_kg} inputProps={{ step: 5 }} onChange={(e)=> setRegimen(r=>({ ...r, dose_mg_per_kg: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('neo.controls.intervalH')} placeholder={t('neo.controls.intervalH')} value={regimen.interval_hours} onChange={(e)=> setRegimen(r=>({ ...r, interval_hours: Number(e.target.value) }))} helperText={`${t('quick_pick','Quick-pick')}: ${intervalHints.join(' / ')} h`} /></Grid>
+          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('neo.controls.infusionMin')} placeholder={t('neo.controls.infusionMin')} value={regimen.infusion_minutes} onChange={(e)=> setRegimen(r=>({ ...r, infusion_minutes: Number(e.target.value) }))} /></Grid>
         </Grid>
         <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display:'block' }}>{t('neo.notes.monitor')}</Typography>
         {!patient.scr_mg_dl && (

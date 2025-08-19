@@ -15,19 +15,36 @@
   },
   "peds": {
     "title": "Pediatric AUC-Guided Vancomycin",
-    "doseMgKg": "Dose (mg/kg)",
-    "intervalH": "Interval (hours)",
-    "infusionMin": "Infusion (minutes)",
-    "inputs": { "ageYears": "Age (years)", "weightKg": "Weight (kg)", "scr": "SCr (mg/dL)", "mic": "MIC (mg/L)" },
+    "inputs": {
+      "ageYears": "Age (years)",
+      "weightKg": "Weight (kg)",
+      "heightCm": "Height (cm)",
+      "scr": "SCr (mg/dL)",
+      "mic": "MIC (mg/L)"
+    },
+    "controls": {
+      "doseMgKg": "Dose (mg/kg)",
+      "intervalH": "Interval (hours)",
+      "infusionMin": "Infusion (minutes)"
+    },
     "notes": { "maxDaily": "Do not exceed 80 mg/kg/day without specialist advice." },
     "disclaimer": "For educational use; verify dosing with institutional policy. AUC target 400–600 for MIC=1 unless otherwise specified by your site."
   },
   "neo": {
     "title": "Neonate AUC-Guided Vancomycin",
-    "doseMgKg": "Dose (mg/kg)",
-    "intervalH": "Interval (hours)",
-    "infusionMin": "Infusion (minutes)",
-    "inputs": { "gaWk": "Gestational age at birth (weeks)", "pnaD": "Postnatal age (days)", "pmaWk": "Postmenstrual age (weeks)", "weightKg": "Weight (kg)", "scr": "SCr (mg/dL)", "mic": "MIC (mg/L)" },
+    "inputs": {
+      "gaWk": "Gestational age at birth (weeks)",
+      "pnaD": "Postnatal age (days)",
+      "pmaWk": "Postmenstrual age (weeks)",
+      "weightKg": "Weight (kg)",
+      "scr": "SCr (mg/dL)",
+      "mic": "MIC (mg/L)"
+    },
+    "controls": {
+      "doseMgKg": "Dose (mg/kg)",
+      "intervalH": "Interval (hours)",
+      "infusionMin": "Infusion (minutes)"
+    },
     "notes": { "monitor": "Frequent reassessment of renal function and measured levels is recommended in neonates." },
     "disclaimer": "Model-based dosing with PMA/PNA; institutional NICU policies may differ. Verify before clinical use."
   }

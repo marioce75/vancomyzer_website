@@ -112,11 +112,11 @@ export default function PediatricAUC(){
       <Paper variant="outlined" sx={{ p:2, mb:2 }}>
         <Typography variant="h6" sx={{ mb: 1 }}>{t('peds.title')}</Typography>
         <Grid container spacing={2}>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={t('peds.inputs.ageYears')} type="number" value={patient.ageYears} onChange={(e)=> setPatient(p=>({ ...p, ageYears: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={t('peds.inputs.weightKg')} type="number" value={patient.weight_kg} onChange={(e)=> setPatient(p=>({ ...p, weight_kg: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={t('height','Height (cm)')} type="number" value={patient.height_cm} onChange={(e)=> setPatient(p=>({ ...p, height_cm: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={t('peds.inputs.scr')} type="number" value={patient.scr_mg_dl} onChange={(e)=> setPatient(p=>({ ...p, scr_mg_dl: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={t('peds.inputs.mic')} type="number" value={patient.mic} onChange={(e)=> setPatient(p=>({ ...p, mic: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={t('peds.inputs.ageYears')} placeholder={t('peds.inputs.ageYears')} type="number" value={patient.ageYears} onChange={(e)=> setPatient(p=>({ ...p, ageYears: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={t('peds.inputs.weightKg')} placeholder={t('peds.inputs.weightKg')} type="number" value={patient.weight_kg} onChange={(e)=> setPatient(p=>({ ...p, weight_kg: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={t('peds.inputs.heightCm')} placeholder={t('peds.inputs.heightCm')} type="number" value={patient.height_cm} onChange={(e)=> setPatient(p=>({ ...p, height_cm: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={t('peds.inputs.scr')} placeholder={t('peds.inputs.scr')} type="number" value={patient.scr_mg_dl} onChange={(e)=> setPatient(p=>({ ...p, scr_mg_dl: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={6} md={2}><TextField size="small" fullWidth label={t('peds.inputs.mic')} placeholder={t('peds.inputs.mic')} type="number" value={patient.mic} onChange={(e)=> setPatient(p=>({ ...p, mic: Number(e.target.value) }))} /></Grid>
         </Grid>
       </Paper>
 
@@ -149,9 +149,9 @@ export default function PediatricAUC(){
 
       <Paper variant="outlined" sx={{ p:2, mb:2 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('peds.doseMgKg')} value={regimen.dose_mg_per_kg} inputProps={{ step: 5 }} onChange={(e)=> setRegimen(r=>({ ...r, dose_mg_per_kg: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('peds.intervalH')} value={regimen.interval_hours} onChange={(e)=> setRegimen(r=>({ ...r, interval_hours: Number(e.target.value) }))} /></Grid>
-          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('peds.infusionMin')} value={regimen.infusion_minutes} onChange={(e)=> setRegimen(r=>({ ...r, infusion_minutes: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('peds.controls.doseMgKg')} placeholder={t('peds.controls.doseMgKg')} value={regimen.dose_mg_per_kg} inputProps={{ step: 5 }} onChange={(e)=> setRegimen(r=>({ ...r, dose_mg_per_kg: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('peds.controls.intervalH')} placeholder={t('peds.controls.intervalH')} value={regimen.interval_hours} onChange={(e)=> setRegimen(r=>({ ...r, interval_hours: Number(e.target.value) }))} /></Grid>
+          <Grid item xs={12} md={4}><TextField size="small" fullWidth type="number" label={t('peds.controls.infusionMin')} placeholder={t('peds.controls.infusionMin')} value={regimen.infusion_minutes} onChange={(e)=> setRegimen(r=>({ ...r, infusion_minutes: Number(e.target.value) }))} /></Grid>
         </Grid>
         {warning && <Typography variant="caption" color="warning.main" sx={{ mt: 1, display:'block' }}>{warning}</Typography>}
       </Paper>
