@@ -6,12 +6,27 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './en/translation.json';
 import es from './es/translation.json';
 import ar from './ar/translation.json';
+// Load scoped legal/status/actions overlays
+import enExtra from './en.json';
+import esExtra from './es.json';
+import arExtra from './ar.json';
 
 const resources = {
   en: { translation: en },
   es: { translation: es },
   ar: { translation: ar }
 };
+
+// Merge specific namespaces from extra files into base resources
+function mergeNS(target, extra, ns) {
+  if (!target || !extra || !extra[ns]) return;
+  target[ns] = { ...(target[ns] || {}), ...extra[ns] };
+}
+['legal', 'status', 'actions'].forEach((ns) => {
+  mergeNS(resources.en.translation, enExtra, ns);
+  mergeNS(resources.es.translation, esExtra, ns);
+  mergeNS(resources.ar.translation, arExtra, ns);
+});
 
 i18n
   .use(LanguageDetector)
@@ -25,7 +40,8 @@ i18n
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag', 'cookie'],
       caches: []
-    }
+    },
+    returnNull: false
   });
 
 // Flip document language and direction on language change (RTL for Arabic)
