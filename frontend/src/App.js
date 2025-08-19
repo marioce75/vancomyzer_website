@@ -193,20 +193,7 @@ function PopulationTabs({ initialPop = 0, initialSubByPop = {} }){
 
   return (
     <Paper elevation={2} sx={{ p: 2 }}>
-      <Tabs
-        value={displayPath}
-        aria-label="Population tabs"
-        centered
-        variant="scrollable"
-        allowScrollButtonsMobile
-        textColor="primary"
-        indicatorColor="primary"
-        TabIndicatorProps={{ sx: { backgroundColor: '#fff' } }}
-      >
-        <Tab value="/"          label={t('tabs.adult','Adult')}         component={RouterLink} to="/" {...a11yProps('pop',0)} />
-        <Tab value="/pediatric" label={t('nav.pediatric','Pediatrics')} component={RouterLink} to="/pediatric" {...a11yProps('pop',1)} />
-        <Tab value="/neonate"   label={t('tabs.neonate','Neonate')}     component={RouterLink} to="/neonate" {...a11yProps('pop',2)} />
-      </Tabs>
+      {/* Removed duplicate population Tabs. Population switching is handled by top nav (NavTabs). */}
 
       <TabPanel idBase="pop" index="/" value={displayPath}>
         <Tabs value={currentSub} onChange={(_, v) => setSubIndex((s)=>({ ...s, 0: v, '/': v }))} aria-label="Adult sub tabs" variant="scrollable" allowScrollButtonsMobile>
