@@ -60,6 +60,7 @@ const setStoredMode = (mode) => {
 
 function HeroHeader(){
   const { t } = useTranslation();
+  React.useEffect(() => { if (process.env.NODE_ENV !== 'production') console.debug('[Legal] disclaimers mounted'); }, []);
   return (
     <Box sx={(theme) => ({
       py: { xs: 5, md: 7 }, px: 2, textAlign: 'center',
@@ -67,7 +68,8 @@ function HeroHeader(){
       borderBottomLeftRadius: 16, borderBottomRightRadius: 16,
       borderTopLeftRadius: 18, borderTopRightRadius: 18,
       boxShadow: theme.palette.mode === 'dark' ? 1 : 2,
-      mb: 2
+      mb: 2,
+      overflow: 'visible'
     })}>
       <Typography
         component="h1"
@@ -126,9 +128,9 @@ function HeroHeader(){
       <Typography
         variant="caption"
         align="center"
-        sx={{ display: 'block', opacity: 0.8, mt: 1 }}
+        sx={{ display: 'block', opacity: 0.85, mt: 0.75 }}
       >
-        {t('disclaimers.hero','For healthcare professionals only. Educational purposes — not a substitute for clinical judgment.')}
+        {t('legal.shortHero')}
       </Typography>
     </Box>
   );
@@ -253,11 +255,8 @@ function AppInner() {
         <Route path="*" element={<PopulationTabs />} />
       </Routes>
       <Box component="footer" sx={{ py: 3, textAlign: 'center' }}>
-        <Typography variant="caption" align="center" sx={{ display: 'block', opacity: 0.9 }}>
-          {t('disclaimers.footer', {
-            year: new Date().getFullYear(),
-            defaultValue: `© ${new Date().getFullYear()} Vancomyzer®. All rights reserved. Vancomyzer® is provided 'as-is' without any warranty. The developers are not liable for clinical outcomes. Consult ASHP/IDSA guidelines and your institution’s policies.`
-          })}
+        <Typography variant="caption" align="center" sx={{ display: 'block', opacity: 0.8 }}>
+          © {new Date().getFullYear()} Vancomyzer®. {t('legal.footer')}
         </Typography>
         <Typography variant="caption" align="center" sx={{ display: 'block', mt: 0.5, opacity: 0.8 }}>
           <Link component={RouterLink} to="/legal" underline="hover" color="inherit">

@@ -1,12 +1,4 @@
 {
-  "status": {
-    "bayesian": {
-      "online": "Bayesian optimization",
-      "offline": "Bayesian optimization (offline)",
-      "tooltip": "Service unreachable. Check API URL, /health, CORS, or server uptime."
-    }
-  },
-  "actions": { "retry": "Retry", "optimize": "Optimize dose" },
   "legal": {
     "shortHero": "For healthcare professionals only. Educational purposes — not a substitute for clinical judgment.",
     "calcBanner": "Disclaimer: This tool is for informational and educational purposes only and does not replace independent clinical judgment. Always verify calculations and follow institutional policies.",

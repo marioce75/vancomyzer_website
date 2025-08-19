@@ -386,8 +386,8 @@ const CalculationExplanation = ({ dosingResult, patient }) => {
   return (
     <div className="fade-in">
       {showBanner && (
-        <Alert severity="info" variant="outlined" sx={{ mb: 2 }} onClose={() => { try { localStorage.setItem('calc_explain_disclaimer','1'); } catch {} setShowBanner(false); }}>
-          {t('disclaimers.calculator','Disclaimer: This tool is provided for informational and educational purposes only. It does not replace independent clinical judgment. Always verify calculations and follow institutional protocols.')}
+        <Alert role="note" severity="info" variant="outlined" sx={{ mb: 2 }} onClose={() => { try { localStorage.setItem('calc_explain_disclaimer','1'); } catch {} setShowBanner(false); }}>
+          {t('legal.calcBanner')}
         </Alert>
       )}
       <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>

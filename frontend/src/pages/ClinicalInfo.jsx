@@ -27,8 +27,8 @@ export default function ClinicalInfo() {
   return (
     <Box>
       {showNotice && (
-        <Alert severity="info" variant="outlined" sx={{ mb: 2 }} onClose={() => { try { localStorage.setItem('clinical_disclaimer_dismissed','1'); } catch {} setShowNotice(false); }}>
-          {t('disclaimers.calculator', 'Disclaimer: This tool is provided for informational and educational purposes only. It does not replace independent clinical judgment. Always verify calculations and follow institutional protocols.')}
+        <Alert role="note" severity="info" variant="outlined" sx={{ mb: 2 }} onClose={() => { try { localStorage.setItem('clinical_disclaimer_dismissed','1'); } catch {} setShowNotice(false); }}>
+          {t('legal.calcBanner')}
         </Alert>
       )}
       <Box sx={{ textAlign: 'center', my: { xs: 2, sm: 3 } }}>
