@@ -15,6 +15,7 @@ function toFixed(val, d=1){ if(val==null||Number.isNaN(Number(val))) return '—
 export default function NeonateAUC(){
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+  useEffect(() => { if (process.env.NODE_ENV !== 'production') console.debug('[NeonateAUC] mounted'); }, []);
   const [patient, setPatient] = useState({ gestationalAge_wk: 30, postnatalAge_d: 2, postmenstrualAge_wk: 32, weight_kg: 2.5, scr_mg_dl: 0.8, mic: 1 });
   const [regimen, setRegimen] = useState({ dose_mg_per_kg: 12.5, interval_hours: 12, infusion_minutes: 60 });
   const [series, setSeries] = useState({ time_hours: [], concentration_mg_L: [] });
@@ -109,7 +110,7 @@ export default function NeonateAUC(){
   }, [regimen.dose_mg_per_kg, regimen.interval_hours]);
 
   return (
-    <Box dir={dir}>
+    <Box dir={dir} data-testid="neo-root">
       <Alert role="note" severity="info" variant="outlined" sx={{ mb: 2 }}>
         {t('neo.disclaimer')}
       </Alert>

@@ -15,6 +15,7 @@ function toFixed(val, d=1){ if(val==null||Number.isNaN(Number(val))) return '—
 export default function PediatricAUC(){
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+  useEffect(() => { if (process.env.NODE_ENV !== 'production') console.debug('[PediatricAUC] mounted'); }, []);
   const [patient, setPatient] = useState({ ageYears: 8, weight_kg: 25, height_cm: '', scr_mg_dl: 0.5, mic: 1 });
   const [regimen, setRegimen] = useState({ dose_mg_per_kg: 15, interval_hours: 12, infusion_minutes: 60 });
   const [series, setSeries] = useState({ time_hours: [], concentration_mg_L: [] });
@@ -103,7 +104,7 @@ export default function PediatricAUC(){
   };
 
   return (
-    <Box dir={dir}>
+    <Box dir={dir} data-testid="peds-root">
       <Alert role="note" severity="info" variant="outlined" sx={{ mb: 2 }}>
         {t('peds.disclaimer','For educational use; verify dosing with institutional policy. AUC target 400–600 for MIC=1 unless otherwise specified by your site.')}
       </Alert>

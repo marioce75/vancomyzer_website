@@ -30,5 +30,6 @@
     "inputs": { "gaWk": "Gestational age at birth (weeks)", "pnaD": "Postnatal age (days)", "pmaWk": "Postmenstrual age (weeks)", "weightKg": "Weight (kg)", "scr": "SCr (mg/dL)", "mic": "MIC (mg/L)" },
     "notes": { "monitor": "Frequent reassessment of renal function and measured levels is recommended in neonates." },
     "disclaimer": "Model-based dosing with PMA/PNA; institutional NICU policies may differ. Verify before clinical use."
-  }
+  },
+  "nav": { "home": "Inicio", "adult": "Adulto", "pediatric": "Pediátrico", "neonate": "Neonato" }
 }

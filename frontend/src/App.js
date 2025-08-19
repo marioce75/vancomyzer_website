@@ -9,18 +9,20 @@ import { prefixer } from 'stylis';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useTranslation } from 'react-i18next';
 import { BayesianProvider } from './context/BayesianContext';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-
+import { Routes, Route, useNavigate, useLocation, Navigate, Link as RouterLink } from 'react-router-dom';
 import LanguageSelector from './components/LanguageSelector';
 import InteractiveAUC from './pages/InteractiveAUC';
 import ClinicalInfo from './pages/ClinicalInfo';
 import Legal from './pages/Legal';
-import PediatricAUC from './pages/PediatricAUC';
-import NeonateAUC from './pages/NeonateAUC';
-import { Link as RouterLink } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import './App.css';
+import ErrorBoundary from './components/ErrorBoundary';
+import NavTabs from './components/NavTabs';
+
+// Lazy-load pediatric and neonate routes to surface errors via Suspense/ErrorBoundary
+const PediatricAUC = React.lazy(() => import('./pages/PediatricAUC'));
+const NeonateAUC = React.lazy(() => import('./pages/NeonateAUC'));
 
 // Brand theme palettes + rounded shapes (merged with RTL direction)
 const BRAND_COLORS = {
@@ -153,11 +155,16 @@ function TabPanel({ idBase, index, value, children }){
 function PopulationTabs({ initialPop = 0, initialSubByPop = {} }){
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [popIndex, setPopIndex] = React.useState(initialPop); // 0 adult, 1 peds, 2 neonate
-  const [subIndex, setSubIndex] = React.useState(() => ({ 0: 0, 1: 0, 2: 0, ...initialSubByPop }));
+  const { pathname } = useLocation();
+  const routes = ['/', '/pediatric', '/neonate'];
+  // Treat non-mapped routes (e.g., /clinical) as adult ('/') for tab highlighting
+  const displayPath = routes.includes(pathname) ? pathname : '/';
+  const indexForPath = { '/': 0, '/pediatric': 1, '/neonate': 2 };
+  const [subIndex, setSubIndex] = React.useState(() => ({ '/': 0, '/pediatric': 0, '/neonate': 0, 0: 0, 1: 0, 2: 0, ...initialSubByPop }));
 
   const onOpenGuidelines = () => {
-    setSubIndex((s) => ({ ...s, [popIndex]: 1 }));
+    const key = displayPath;
+    setSubIndex((s) => ({ ...s, [key]: 1, [indexForPath[key] ?? 0]: 1 }));
     // keep route compatibility
     navigate('/clinical', { replace: false });
   };
@@ -182,13 +189,12 @@ function PopulationTabs({ initialPop = 0, initialSubByPop = {} }){
     </Box>
   );
 
-  const currentSub = subIndex[popIndex] || 0;
+  const currentSub = subIndex[displayPath] ?? subIndex[indexForPath[displayPath] ?? 0] ?? 0;
 
   return (
     <Paper elevation={2} sx={{ p: 2 }}>
       <Tabs
-        value={popIndex}
-        onChange={(_, v) => setPopIndex(v)}
+        value={displayPath}
         aria-label="Population tabs"
         centered
         variant="scrollable"
@@ -197,13 +203,13 @@ function PopulationTabs({ initialPop = 0, initialSubByPop = {} }){
         indicatorColor="primary"
         TabIndicatorProps={{ sx: { backgroundColor: '#fff' } }}
       >
-        <Tab label={t('tabs.adult','Adult')} {...a11yProps('pop',0)} />
-        <Tab label={t('tabs.pediatric','Pediatric')} {...a11yProps('pop',1)} />
-        <Tab label={t('tabs.neonate','Neonate')} {...a11yProps('pop',2)} />
+        <Tab value="/"          label={t('tabs.adult','Adult')}       component={RouterLink} to="/" {...a11yProps('pop',0)} />
+        <Tab value="/pediatric" label={t('tabs.pediatric','Pediatric')} component={RouterLink} to="/pediatric" {...a11yProps('pop',1)} />
+        <Tab value="/neonate"   label={t('tabs.neonate','Neonate')}     component={RouterLink} to="/neonate" {...a11yProps('pop',2)} />
       </Tabs>
 
-      <TabPanel idBase="pop" index={0} value={popIndex}>
-        <Tabs value={currentSub} onChange={(_, v) => setSubIndex((s)=>({ ...s, 0: v }))} aria-label="Adult sub tabs" variant="scrollable" allowScrollButtonsMobile>
+      <TabPanel idBase="pop" index="/" value={displayPath}>
+        <Tabs value={currentSub} onChange={(_, v) => setSubIndex((s)=>({ ...s, 0: v, '/': v }))} aria-label="Adult sub tabs" variant="scrollable" allowScrollButtonsMobile>
           <Tab label={t('tabs.interactiveAuc', t('tabs.interactiveAUC','Interactive AUC'))} {...a11yProps('adult',0)} />
           <Tab label={t('tabs.clinicalInfo','Clinical Info')} {...a11yProps('adult',1)} />
         </Tabs>
@@ -211,8 +217,8 @@ function PopulationTabs({ initialPop = 0, initialSubByPop = {} }){
         <TabPanel idBase="adult" index={1} value={currentSub}>{renderClinical('adult')}</TabPanel>
       </TabPanel>
 
-      <TabPanel idBase="pop" index={1} value={popIndex}>
-        <Tabs value={currentSub} onChange={(_, v) => setSubIndex((s)=>({ ...s, 1: v }))} aria-label="Pediatric sub tabs" variant="scrollable" allowScrollButtonsMobile>
+      <TabPanel idBase="pop" index="/pediatric" value={displayPath}>
+        <Tabs value={currentSub} onChange={(_, v) => setSubIndex((s)=>({ ...s, 1: v, '/pediatric': v }))} aria-label="Pediatric sub tabs" variant="scrollable" allowScrollButtonsMobile>
           <Tab label={t('tabs.interactiveAuc', t('tabs.interactiveAUC','Interactive AUC'))} {...a11yProps('peds',0)} />
           <Tab label={t('tabs.clinicalInfo','Clinical Info')} {...a11yProps('peds',1)} />
         </Tabs>
@@ -220,8 +226,8 @@ function PopulationTabs({ initialPop = 0, initialSubByPop = {} }){
         <TabPanel idBase="peds" index={1} value={currentSub}>{renderClinical('peds')}</TabPanel>
       </TabPanel>
 
-      <TabPanel idBase="pop" index={2} value={popIndex}>
-        <Tabs value={currentSub} onChange={(_, v) => setSubIndex((s)=>({ ...s, 2: v }))} aria-label="Neonate sub tabs" variant="scrollable" allowScrollButtonsMobile>
+      <TabPanel idBase="pop" index="/neonate" value={displayPath}>
+        <Tabs value={currentSub} onChange={(_, v) => setSubIndex((s)=>({ ...s, 2: v, '/neonate': v }))} aria-label="Neonate sub tabs" variant="scrollable" allowScrollButtonsMobile>
           <Tab label={t('tabs.interactiveAuc', t('tabs.interactiveAUC','Interactive AUC'))} {...a11yProps('neo',0)} />
           <Tab label={t('tabs.clinicalInfo','Clinical Info')} {...a11yProps('neo',1)} />
         </Tabs>
@@ -238,7 +244,7 @@ function AppInner() {
     <Container maxWidth="lg">
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
         <LanguageSelector />
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 320 }}>
           <Button
             variant="text"
             component={RouterLink}
@@ -249,19 +255,22 @@ function AppInner() {
           >
             {t('nav.home','Home')}
           </Button>
-          <Button variant="text" component={RouterLink} to="/pediatric" sx={{ textTransform: 'none' }}>{t('tabs.pediatric','Pediatric')}</Button>
-          <Button variant="text" component={RouterLink} to="/neonate" sx={{ textTransform: 'none' }}>{t('tabs.neonate','Neonate')}</Button>
+          <NavTabs />
         </Box>
       </Box>
       <HeroHeader />
-      <Routes>
-        <Route path="/" element={<PopulationTabs />} />
-        <Route path="/clinical" element={<PopulationTabs initialPop={0} initialSubByPop={{ 0: 1 }} />} />
-        <Route path="/pediatric" element={<PediatricAUC />} />
-        <Route path="/neonate" element={<NeonateAUC />} />
-        <Route path="/legal" element={<Legal />} />
-        <Route path="*" element={<PopulationTabs />} />
-      </Routes>
+      <ErrorBoundary>
+        <React.Suspense fallback={<div style={{ padding: 16 }}>Loading…</div>}>
+          <Routes>
+            <Route path="/" element={<PopulationTabs />} />
+            <Route path="/clinical" element={<PopulationTabs initialPop={0} initialSubByPop={{ 0: 1 }} />} />
+            <Route path="/pediatric" element={<PediatricAUC />} />
+            <Route path="/neonate" element={<NeonateAUC />} />
+            <Route path="/legal" element={<Legal />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </React.Suspense>
+      </ErrorBoundary>
       <Box component="footer" sx={{ py: 3, textAlign: 'center' }}>
         <Typography variant="caption" align="center" sx={{ display: 'block', opacity: 0.8 }}>
           © {new Date().getFullYear()} Vancomyzer®. {t('legal.footer')}
