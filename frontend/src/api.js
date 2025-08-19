@@ -1,75 +1,130 @@
 import { normalizePatientFields } from './services/normalizePatient';
 
-// Use Vite env for backend base, e.g., https://vancomyzer.onrender.com/api
-const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_INTERACTIVE_API_URL) || '';
+// Base URL from Vite env (e.g., https://vancomyzer.onrender.com/api)
+const API_BASE = (import.meta?.env?.VITE_INTERACTIVE_API_URL) || '';
 
-async function jsonFetch(path, { method = "POST", body } = {}) {
-  if (!API_BASE) {
-    throw new Error('Interactive API base is not configured (VITE_INTERACTIVE_API_URL).');
-  }
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: body ? JSON.stringify(body) : undefined,
-    credentials: "omit",
-  });
-  if (!res.ok) {
-    let msg = `${res.status} ${res.statusText}`;
-    try {
-      const err = await res.json();
-      if (err?.detail) msg = Array.isArray(err.detail) ? JSON.stringify(err.detail) : String(err.detail);
-    } catch {}
-    throw new Error(msg);
-  }
-  return res.json();
+// One-time diagnostics
+let __loggedBase = false;
+function debug(...args) {
+  if (process.env.NODE_ENV !== 'production') console.debug('[API]', ...args);
+}
+if (!__loggedBase) {
+  __loggedBase = true;
+  debug('BASE', API_BASE || '(empty)');
 }
 
-function assertFlatPayload(payload) {
-  if (payload && typeof payload === 'object' && 'patient' in payload) {
-    throw new Error('Payload must be flat. Do not wrap in { patient: ... }.');
+const REQUEST_TIMEOUT_MS = 6000;
+const RETRIES = 3;
+const BACKOFF_MS = [250, 500, 1000];
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function jsonFetch(path, { method = 'POST', body, signal } = {}) {
+  if (!API_BASE) {
+    const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
+    err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
+    throw err;
   }
-  const required = ['population_type', 'gender', 'weight_kg', 'serum_creatinine'];
-  for (const k of required) {
-    if (payload[k] === undefined) {
-      throw new Error(`Missing required field: ${k}`);
+  const url = `${API_BASE}${path}`;
+  debug('fetch', url);
+
+  let lastError;
+  for (let attempt = 0; attempt < RETRIES; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(new DOMException('Timeout', 'AbortError')), REQUEST_TIMEOUT_MS);
+
+    // Link external AbortSignal if provided
+    let abortHandler;
+    if (signal) {
+      if (signal.aborted) {
+        clearTimeout(timeout);
+        throw signal.reason || new DOMException('Aborted', 'AbortError');
+      }
+      abortHandler = () => controller.abort(signal.reason || new DOMException('Aborted', 'AbortError'));
+      try { signal.addEventListener('abort', abortHandler, { once: true }); } catch {}
+    }
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: body ? JSON.stringify(body) : undefined,
+        credentials: 'omit',
+        mode: 'cors',
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (!res.ok) {
+        // Do not retry on 4xx
+        if (res.status >= 400 && res.status < 500) {
+          let msg = `${res.status} ${res.statusText}`;
+          try { const err = await res.json(); if (err?.detail) msg = Array.isArray(err.detail) ? JSON.stringify(err.detail) : String(err.detail); } catch {}
+          const e = new Error(msg); e.status = res.status; e.name = 'INTERACTIVE_BAD_RESPONSE'; throw e;
+        }
+        // Retry on 5xx
+        if (attempt < RETRIES - 1) {
+          await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)]);
+          continue;
+        }
+        let msg = `${res.status} ${res.statusText}`;
+        try { const err = await res.json(); if (err?.detail) msg = Array.isArray(err.detail) ? JSON.stringify(err.detail) : String(err.detail); } catch {}
+        const e = new Error(msg); e.status = res.status; e.name = 'INTERACTIVE_BAD_RESPONSE'; throw e;
+      }
+      return res.json();
+    } catch (e) {
+      clearTimeout(timeout);
+      lastError = e;
+      if (e?.name === 'AbortError') throw e; // bubble user abort
+      if (attempt === RETRIES - 1) {
+        const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
+        err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
+        err.cause = e;
+        throw err;
+      }
+      await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)]);
+    } finally {
+      if (signal && abortHandler) {
+        try { signal.removeEventListener('abort', abortHandler); } catch {}
+      }
     }
   }
+  const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
+  err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
+  err.cause = lastError;
+  throw err;
 }
 
-export async function submitDosing({ patient, levels = [] }) {
-  // Backward compatibility: callers may pass either a flat object or { patient }
-  const base = normalizePatientFields(patient ?? {});
-  const payload = { ...base, levels: Array.isArray(levels) ? levels : [] };
-  assertFlatPayload(payload);
-  if (process.env.NODE_ENV !== 'production') {
-    console.debug('[DosingAPI] payload (submitDosing)', payload);
-  }
-  // If levels -> bayesian, else -> population
-  if (payload.levels.length > 0) return jsonFetch('/bayesian-optimization', { body: payload });
-  return jsonFetch('/calculate-dosing', { body: payload });
+// --- Health probe ---
+export async function health({ signal } = {}) {
+  return jsonFetch('/health', { method: 'GET', signal });
 }
 
-export async function calculateDosing(patientLike) {
-  const payload = normalizePatientFields(patientLike ?? {});
-  assertFlatPayload(payload);
-  if (process.env.NODE_ENV !== 'production') {
-    console.debug('[DosingAPI] payload (calculateDosing)', payload);
-  }
-  return jsonFetch("/calculate-dosing", { body: payload });
+function ensureNestedPatient(patientLike) {
+  const norm = normalizePatientFields(patientLike ?? {});
+  return norm; // keep nested fields; do not flatten or wrap further
 }
 
-export async function bayesianOptimization({ patient, levels }) {
-  const base = normalizePatientFields(patient ?? {});
-  const payload = { ...base, levels: Array.isArray(levels) ? levels : [] };
-  assertFlatPayload(payload);
-  if (process.env.NODE_ENV !== 'production') {
-    console.debug('[DosingAPI] payload (bayesianOptimization)', payload);
-  }
-  // Server accepts flat payload via compatibility wrapper
-  return jsonFetch("/bayesian-optimization", { body: payload });
+// Calculate AUC and series for interactive page
+export async function calculateInteractiveAUC({ patient, regimen, levels = [] }, { signal } = {}) {
+  const payload = {
+    patient: ensureNestedPatient(patient),
+    regimen: regimen ?? {},
+    levels: Array.isArray(levels) ? levels : [],
+  };
+  return jsonFetch('/interactive/auc', { method: 'POST', body: payload, signal });
 }
 
+// Optimize dose to target AUC range
+export async function optimizeDose({ patient, regimen, target }, { signal } = {}) {
+  const payload = {
+    patient: ensureNestedPatient(patient),
+    regimen: regimen ?? {},
+    target: target ?? {},
+  };
+  return jsonFetch('/optimize', { method: 'POST', body: payload, signal });
+}
+
+// Keep pkSimulation for other parts of the app (expects nested payload)
 export async function pkSimulation(payload) {
-  // pk-simulation expects nested { patient, dose, interval }
-  return jsonFetch("/pk-simulation", { body: payload });
+  return jsonFetch('/pk-simulation', { method: 'POST', body: payload });
 }

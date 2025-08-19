@@ -26,7 +26,7 @@ const mockResponse = {
 };
 
 const calcMock = jest.fn().mockResolvedValue(mockResponse);
-jest.mock('../services/interactiveApi', () => ({ calculateInteractiveAUC: (...args) => calcMock(...args) }));
+jest.mock('../api', () => ({ calculateInteractiveAUC: (...args) => calcMock(...args), health: jest.fn().mockResolvedValue({ ok: true }) }));
 
 import InteractiveAUC from '../components/InteractiveAUC.jsx';
 
@@ -53,7 +53,7 @@ describe('InteractiveAUC', () => {
     expect(screen.getByText(/Predicted trough/i)).toBeInTheDocument();
     expect(screen.getByText(/Predicted peak/i)).toBeInTheDocument();
     // Bayesian badge
-    expect(screen.getByText(/Bayesian \(n=600\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Evidence-based/i)).toBeInTheDocument();
   });
 
   test('debounces regimen changes before calling API again', async () => {

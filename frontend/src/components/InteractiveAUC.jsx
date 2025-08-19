@@ -5,7 +5,7 @@ import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Swit
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { getInteractiveAvailability, calculateInteractiveAUC, optimizeDose } from '../services/interactiveApi';
+import { health, calculateInteractiveAUC, optimizeDose } from '../api';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -65,8 +65,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const [error, setError] = useState(null);
   const [showAucFill, setShowAucFill] = useState(true);
   const [showDoseMarkers, setShowDoseMarkers] = useState(true);
-  const [apiAvailable, setApiAvailable] = useState(true);
-  const [apiOffline, setApiOffline] = useState(false);
+  const [apiOnline, setApiOnline] = useState(false);
 
   // Measured levels UI
   const [levelMode, setLevelMode] = useState('none');
@@ -101,8 +100,12 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const ok = await getInteractiveAvailability();
-      if (alive) { setApiAvailable(!!ok); setApiOffline(!ok); }
+      try {
+        await health();
+        if (alive) setApiOnline(true);
+      } catch {
+        if (alive) setApiOnline(false);
+      }
     })();
     return () => { alive = false; };
   }, []);
@@ -116,17 +119,13 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       setSeries(localSeries); setSummary(localSummary);
     } catch {}
 
-    if (!apiAvailable) { setLoading(false); setApiOffline(true); return; }
+    if (!apiOnline) { setLoading(false); return; }
 
     if (apiAbort.current) apiAbort.current.abort();
     apiAbort.current = new AbortController();
 
     try {
-      const data = await calculateInteractiveAUC(
-        { ...patient, levels: measuredLevels, population_mode: mode },
-        regimen,
-        { signal: apiAbort.current.signal }
-      );
+      const data = await calculateInteractiveAUC({ patient: { ...patient, population_mode: mode }, regimen, levels: measuredLevels }, { signal: apiAbort.current.signal });
       const auc = data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24;
       const peak = data?.metrics?.predicted_peak ?? data.predicted_peak;
       const trough = data?.metrics?.predicted_trough ?? data.predicted_trough;
@@ -141,13 +140,13 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
           upper: s.upper || s.p95
         });
       }
-      setApiOffline(false);
+      setApiOnline(true);
     } catch (e) {
-      if (e?.name !== 'AbortError') setApiOffline(true);
+      if (e?.name !== 'AbortError') setApiOnline(false);
     } finally {
       setLoading(false);
     }
-  }, [patient, regimen, measuredLevels, mode, apiAvailable]);
+  }, [patient, regimen, measuredLevels, mode, apiOnline]);
 
   useEffect(() => {
     const t = setTimeout(() => { runInteractive(); }, 150); // reduced debounce
@@ -315,11 +314,9 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const guidelineUrl = 'https://www.ashp.org/-/media/assets/policy-guidelines/docs/therapeutic-guidelines/therapeutic-guidelines-monitoring-vancomycin-ASHP-IDSA-PIDS.pdf';
 
   const onRetry = useCallback(async () => {
-    const ok = await getInteractiveAvailability();
-    setApiAvailable(!!ok);
-    setApiOffline(!ok);
-    runInteractive();
-  }, [runInteractive]);
+    try { await health(); setApiOnline(true); } catch { setApiOnline(false); }
+    if (apiOnline) runInteractive();
+  }, [runInteractive, apiOnline]);
 
   return (
     <Box dir={dir}>
@@ -425,44 +422,35 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
           <Chip size="small" color="primary" label={t('badges.evidenceBased','Evidence-based')} component="a" clickable href={guidelineUrl} target="_blank" rel="noopener noreferrer" />
         </Tooltip>
 
-        <Tooltip title={apiOffline ? t('status.bayes.tooltip') : t('status.bayes.online')}>
+        <Tooltip title={t(apiOnline ? 'status.bayesian.tooltip' : 'status.bayesian.tooltip')}>
           <Chip
             size="small"
-            variant={apiOffline ? 'outlined' : 'filled'}
-            color={apiOffline ? 'warning' : 'primary'}
-            label={apiOffline ? t('status.bayes.offline') : t('status.bayes.online')}
+            variant={apiOnline ? 'filled' : 'outlined'}
+            color={apiOnline ? 'primary' : 'warning'}
+            label={apiOnline ? t('status.bayesian.online') : t('status.bayesian.offline')}
             sx={{ ml: 1 }}
           />
         </Tooltip>
-        {apiOffline && (
-          <Button size="small" startIcon={<RestartAltIcon />} onClick={async () => {
-            const ok = await getInteractiveAvailability();
-            setApiAvailable(ok); setApiOffline(!ok);
-            runInteractive();
-          }}>
-            {t('actions.retry','Retry')}
-          </Button>
-        )}
-
-        <Button size="small" variant="text" onClick={() => onOpenGuidelines && onOpenGuidelines()} sx={{ textTransform: 'none' }}>
-          {t('buttons.guidelines','Guidelines')}
+        <Button size="small" startIcon={<RestartAltIcon />} onClick={onRetry}>
+          {t('actions.retry','Retry')}
         </Button>
 
         {loading && <Typography color="text.secondary">{t('updating','Updating…')}</Typography>}
         <Box sx={{ flexGrow: 1 }} />
         <Button size="small" variant="outlined" onClick={copyJson}>{t('copy_json','Copy JSON')}</Button>
         <Button size="small" variant="contained" onClick={exportPdf}>{t('export_pdf','Export PDF')}</Button>
-        <Button size="small" variant="contained" color="primary" disabled={apiOffline} onClick={async () => {
+        <Button size="small" variant="contained" color="primary" disabled={!apiOnline || loading} onClick={async () => {
           try {
             const target = { auc_min: 400, auc_max: 600, mic: Number(patient?.mic_mg_L || 1) };
-            const data = await optimizeDose({ ...patient, levels: measuredLevels, population_mode: mode }, regimen, target);
-            const rec = data?.recommendation;
+            const data = await optimizeDose({ patient: { ...patient, population_mode: mode }, regimen, target });
+            const rec = data?.recommendation || data?.regimen || data?.optimized_regimen;
             if (rec) {
               setRegimen((r) => ({ ...r, dose_mg: rec.dose_mg, interval_hours: rec.interval_hours, infusion_minutes: rec.infusion_minutes }));
+              await runInteractive();
             }
           } catch (e) {
             setError(e?.message || 'Optimize failed');
-            setApiOffline(true);
+            setApiOnline(false);
           }
         }}>{t('actions.optimize','Optimize dose')}</Button>
       </Box>
