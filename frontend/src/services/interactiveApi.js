@@ -9,7 +9,7 @@ const BASE = (typeof import.meta !== 'undefined' && import.meta.env)
 let __loggedBase = false;
 if (!__loggedBase) {
   __loggedBase = true;
-  try { /* eslint-disable no-console */ console.debug('[Vancomyzer] API base =', BASE || '(missing)'); } catch {}
+  try { /* eslint-disable no-console */ console.debug('[Vancomyzer] API base', BASE || '(missing)'); } catch {}
 }
 // Warn if base doesn't look like it ends with /api (expected by backend routing)
 if (BASE && !BASE.endsWith('/api')) {
@@ -119,10 +119,12 @@ async function fetchWithRetry(url, opts = {}, attempts = 3) {
 // --- Public API ---
 export async function health() {
   if (!BASE) return false; // disabled by config
+  const url = `${BASE}/health`;
+  try { console.debug('[Vancomyzer] GET', url); } catch {}
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(new DOMException('Timeout', 'AbortError')), HEALTH_TIMEOUT_MS);
   try {
-    const res = await fetch(`${BASE}/health`, {
+    const res = await fetch(url, {
       method: 'GET',
       mode: 'cors',
       headers: buildHeaders(),
@@ -132,6 +134,7 @@ export async function health() {
     return !!res.ok;
   } catch (e) {
     clearTimeout(timeout);
+    try { console.warn('[Vancomyzer] health error:', e?.message || e); } catch {}
     return false;
   }
 }
@@ -142,13 +145,32 @@ export async function bayesAUC({ patient, regimen, levels = [] }, { signal } = {
     err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
     throw err;
   }
+  const url = `${BASE}/interactive/auc`;
   const payload = { patient, regimen, levels: Array.isArray(levels) ? levels : [] };
-  const res = await fetchWithRetry(`${BASE}/interactive/auc`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    signal,
-  }, 3);
-  return res.json();
+  try {
+    console.debug('[Vancomyzer] POST', url, {
+      shape: {
+        patient: patient ? Object.keys(patient) : null,
+        regimen: regimen ? Object.keys(regimen) : null,
+        levels: Array.isArray(levels) ? levels.length : null,
+      }
+    });
+  } catch {}
+  try {
+    const res = await fetchWithRetry(url, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      signal,
+    }, 3);
+    return res.json();
+  } catch (e) {
+    try {
+      const msg = e?.message || String(e);
+      const status = e?.status;
+      console.warn('[Vancomyzer] bayesAUC error:', msg, status ? `(status: ${status})` : '', e?.body ? `body: ${String(e.body).slice(0, 200)}` : '');
+    } catch {}
+    throw e;
+  }
 }
 
 export async function optimize({ patient, regimen, target }, { signal } = {}) {
@@ -157,13 +179,32 @@ export async function optimize({ patient, regimen, target }, { signal } = {}) {
     err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
     throw err;
   }
+  const url = `${BASE}/optimize`;
   const payload = { patient, regimen, target: target ?? {} };
-  const res = await fetchWithRetry(`${BASE}/optimize`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    signal,
-  }, 3);
-  return res.json();
+  try {
+    console.debug('[Vancomyzer] POST', url, {
+      shape: {
+        patient: patient ? Object.keys(patient) : null,
+        regimen: regimen ? Object.keys(regimen) : null,
+        target: target ? Object.keys(target) : null,
+      }
+    });
+  } catch {}
+  try {
+    const res = await fetchWithRetry(url, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      signal,
+    }, 3);
+    return res.json();
+  } catch (e) {
+    try {
+      const msg = e?.message || String(e);
+      const status = e?.status;
+      console.warn('[Vancomyzer] optimize error:', msg, status ? `(status: ${status})` : '', e?.body ? `body: ${String(e.body).slice(0, 200)}` : '');
+    } catch {}
+    throw e;
+  }
 }
 
 export async function pkSimulation(payload, { signal } = {}) {

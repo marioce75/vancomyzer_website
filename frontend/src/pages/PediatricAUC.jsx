@@ -4,7 +4,7 @@ import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import { useTranslation } from 'react-i18next';
-import { bayesAUC, optimize, health } from '../services/interactiveApi';
+import { bayesAUC, optimize, health, __BASE__ } from '../services/interactiveApi';
 import { computeSeriesPeds } from '../pk/pedsNeonate';
 import priorsPeds from '../pk/priorsPeds.json';
 import targets from '../pk/targets.json';
@@ -31,7 +31,7 @@ export default function PediatricAUC(){
   const [levelMode, setLevelMode] = useState('none');
   const [levelInputs, setLevelInputs] = useState({ peak: { conc: '', after_end_h: '' }, trough: { conc: '' } });
 
-  useEffect(() => { let alive = true; (async()=>{ try{ await health(); if(alive) setApiOnline(true);}catch{ if(alive) setApiOnline(false);} })(); return ()=>{alive=false}; }, []);
+  useEffect(() => { let alive = true; (async()=>{ try{ const ok = await health(); if(alive) setApiOnline(!!ok);}catch{ if(alive) setApiOnline(false);} })(); return ()=>{alive=false}; }, []);
 
   const doseMg = useMemo(()=> Math.round((Number(regimen.dose_mg_per_kg)||0) * (Number(patient.weight_kg)||0)), [regimen, patient]);
   const dailyMgPerKg = useMemo(()=> (24/(Number(regimen.interval_hours)||12)) * (Number(regimen.dose_mg_per_kg)||0), [regimen]);
@@ -60,6 +60,10 @@ export default function PediatricAUC(){
 
   const runBackend = useCallback(async () => {
     if(!apiOnline) return;
+    // Only if Bayesian levels exist
+    const hasLevels = Array.isArray(measuredLevels) && measuredLevels.length > 0;
+    if (!hasLevels) return;
+
     setLoading(true); setError(null);
     if (abortRef.current) abortRef.current.abort();
     abortRef.current = new AbortController();
@@ -69,16 +73,17 @@ export default function PediatricAUC(){
         regimen: { dose_mg: doseMg, interval_hours: regimen.interval_hours, infusion_minutes: regimen.infusion_minutes },
         levels: measuredLevels
       };
+      try { console.debug('[Vancomyzer] POST', `${__BASE__}/interactive/auc`, { shape: { patient: Object.keys(payload.patient), regimen: Object.keys(payload.regimen), levels: payload.levels.length } }); } catch {}
       const data = await bayesAUC(payload, { signal: abortRef.current.signal });
       const m = data?.metrics || data;
       setSummary((s)=>({ ...s, auc_24: m.auc_24 ?? s?.auc_24, predicted_peak: m.predicted_peak ?? s?.predicted_peak, predicted_trough: m.predicted_trough ?? s?.predicted_trough }));
       if (data?.series) setSeries(data.series);
       setApiOnline(true);
-    } catch(e){ if(e?.name !== 'AbortError'){ setApiOnline(false); setError(e.message || 'Backend error'); } }
+    } catch(e){ if(e?.name !== 'AbortError'){ try { console.warn('[Vancomyzer] bayesAUC error:', e?.message || e, e?.status ? `(status: ${e.status})` : ''); } catch {} setApiOnline(false); setError(e.message || 'Backend error'); } }
     finally{ setLoading(false); }
   }, [apiOnline, patient, regimen, doseMg, measuredLevels]);
 
-  useEffect(()=>{ const id = setTimeout(()=>{ runBackend(); },150); return ()=> clearTimeout(id); }, [runBackend]);
+  useEffect(()=>{ const id = setTimeout(()=>{ runBackend(); },180); return ()=> clearTimeout(id); }, [runBackend]);
 
   const labels = useMemo(()=> (series?.time_hours || series?.time || []), [series]);
   const conc = useMemo(()=> (series?.concentration_mg_L || series?.median || []), [series]);
@@ -105,6 +110,13 @@ export default function PediatricAUC(){
 
   return (
     <Box dir={dir} data-testid="peds-root">
+      {/* Inline CORS/network hint when offline */}
+      {!apiOnline && (
+        <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>
+          Interactive service unreachable (CORS/Network). Check API base and backend CORS.
+        </Alert>
+      )}
+
       <Alert role="note" severity="info" variant="outlined" sx={{ mb: 2 }}>
         {t('peds.disclaimer','For educational use; verify dosing with institutional policy. AUC target 400–600 for MIC=1 unless otherwise specified by your site.')}
       </Alert>
@@ -184,7 +196,7 @@ export default function PediatricAUC(){
       </Paper>
 
       <Box sx={{ display:'flex', alignItems:'center', gap:1, mb:2, flexWrap:'wrap' }}>
-        <Tooltip title={t('status.bayesian.tooltip')}><Chip size="small" variant={apiOnline?'filled':'outlined'} color={apiOnline?'primary':'warning'} label={apiOnline?t('status.bayesian.online'):t('status.bayesian.offline')} /></Tooltip>
+        <Tooltip title={t('status.bayesian.tooltip')}><Chip size="small" variant={apiOnline?'filled':'outlined'} color={apiOnline?'primary':'warning'} label={apiOnline ? 'Bayesian optimization' : 'Bayesian optimization (offline)'} /></Tooltip>
         <Button size="small" variant="outlined" onClick={async()=>{ 
           try{ 
             const ok = await health(); 
@@ -197,11 +209,14 @@ export default function PediatricAUC(){
         <Box sx={{ flexGrow: 1 }} />
         <Button size="small" variant="contained" color="primary" disabled={!apiOnline||loading} onClick={async ()=>{
           try{
-            const data = await optimize({ patient: { ...patient, mic: Number(patient.mic||1), population: 'pediatric' }, regimen: { dose_mg: doseMg, interval_hours: regimen.interval_hours, infusion_minutes: regimen.infusion_minutes }, target: targets.pediatric });
+            const target = { auc_min: 400, auc_max: 600, mic: Number(patient?.mic ?? 1) };
+            try { console.debug('[Vancomyzer] POST', `${__BASE__}/optimize`, { target }); } catch {}
+            const data = await optimize({ patient: { ...patient, mic: Number(patient.mic||1), population: 'pediatric' }, regimen: { dose_mg: doseMg, interval_hours: regimen.interval_hours, infusion_minutes: regimen.infusion_minutes }, target });
             const rec = data?.recommendation || data?.regimen || data?.optimized_regimen;
             if (rec) {
               const newMgPerKg = Math.max(5, Math.round((rec.dose_mg / Math.max(1, Number(patient.weight_kg)||1)) / 5) * 5);
               setRegimen(r=>({ ...r, dose_mg_per_kg: newMgPerKg, interval_hours: rec.interval_hours, infusion_minutes: rec.infusion_minutes }));
+              await runBackend();
             }
           }catch(e){ setError(e.message || 'Optimize failed'); setApiOnline(false);}         
         }}>

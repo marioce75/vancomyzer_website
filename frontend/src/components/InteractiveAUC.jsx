@@ -119,10 +119,23 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       setSeries(localSeries); setSummary(localSummary);
     } catch {}
 
-    if (!apiOnline) { setLoading(false); return; }
+    // Only call backend when Bayesian level(s) exist
+    const hasLevels = Array.isArray(measuredLevels) && measuredLevels.length > 0;
+    if (!apiOnline || !hasLevels) { setLoading(false); return; }
 
     if (apiAbort.current) apiAbort.current.abort();
     apiAbort.current = new AbortController();
+
+    // debug URL and payload
+    try {
+      console.debug('[Vancomyzer] bayesAUC ->', `${__BASE__}/interactive/auc`, {
+        shape: {
+          patient: Object.keys({ ...patient, population_mode: mode }),
+          regimen: Object.keys(regimen),
+          levels: Array.isArray(measuredLevels) ? measuredLevels.length : 0,
+        }
+      });
+    } catch {}
 
     try {
       const data = await bayesAUC({ patient: { ...patient, population_mode: mode }, regimen, levels: measuredLevels }, { signal: apiAbort.current.signal });
@@ -142,14 +155,21 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       }
       setApiOnline(true);
     } catch (e) {
-      if (e?.name !== 'AbortError') setApiOnline(false);
+      if (e?.name === 'AbortError') {
+        // do nothing on user-initiated abort
+      } else {
+        try { console.warn('[Vancomyzer] bayesAUC failed:', e?.message || e); } catch {}
+        setApiOnline(false);
+        setError(e?.message || 'Interactive service unreachable');
+      }
     } finally {
       setLoading(false);
     }
   }, [patient, regimen, measuredLevels, mode, apiOnline]);
 
   useEffect(() => {
-    const t = setTimeout(() => { runInteractive(); }, 150); // reduced debounce
+    // Debounce 150–250ms
+    const t = setTimeout(() => { runInteractive(); }, 180);
     return () => clearTimeout(t);
   }, [runInteractive]);
 
@@ -323,6 +343,13 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
   return (
     <Box dir={dir}>
+      {/* CORS/Network inline hint when fetch fails with TypeError */}
+      {!apiOnline && (
+        <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>
+          Interactive service unreachable (CORS/Network). Check API base and backend CORS.
+        </Alert>
+      )}
+
       {showDisclaimer && (
         <Alert
           role="note"
@@ -426,12 +453,12 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
           <Chip size="small" color="primary" label={t('badges.evidenceBased','Evidence-based')} component="a" clickable href={guidelineUrl} target="_blank" rel="noopener noreferrer" />
         </Tooltip>
 
-        <Tooltip title={t(apiOnline ? 'status.bayesian.tooltip' : 'status.bayesian.tooltip')}>
+        <Tooltip title={t('status.bayesian.tooltip')}>
           <Chip
             size="small"
             variant={apiOnline ? 'filled' : 'outlined'}
             color={apiOnline ? 'primary' : 'warning'}
-            label={apiOnline ? t('status.bayesian.online') : t('status.bayesian.offline')}
+            label={apiOnline ? 'Bayesian optimization' : 'Bayesian optimization (offline)'}
             sx={{ ml: 1 }}
           />
         </Tooltip>
@@ -446,7 +473,9 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         <Button size="small" variant="contained" color="primary" disabled={!apiOnline || loading} onClick={async () => {
           try {
             setLoading(true);
-            const target = { auc_min: 400, auc_max: 600, mic: Number(patient?.mic_mg_L || 1) };
+            const target = { auc_min: 400, auc_max: 600, mic: (patient && (patient.mic ?? patient.mic_mg_L)) ?? 1 };
+            // debug
+            try { console.debug('[Vancomyzer] optimize ->', `${__BASE__}/optimize`, { target }); } catch {}
             const data = await optimize({ patient: { ...patient, population_mode: mode }, regimen, target });
             const rec = data?.recommendation || data?.regimen || data?.optimized_regimen;
             if (rec) {
@@ -454,6 +483,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
               await runInteractive();
             }
           } catch (e) {
+            try { console.warn('[Vancomyzer] optimize failed:', e?.message || e); } catch {}
             setError(e?.message || 'Optimize failed');
             setApiOnline(false);
           } finally { setLoading(false); }
