@@ -5,7 +5,7 @@ import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Swit
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { health, bayesAUC, optimize, __BASE__ } from '../services/interactiveApi';
+import { health, bayesAUC, optimize, __BASE__, API_BASE } from '../services/interactiveApi';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -53,12 +53,13 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   useEffect(() => { try { console.debug('[Vancomyzer] API base', __BASE__ || '(missing)'); } catch {} }, []);
-  const [showDisclaimer, setShowDisclaimer] = useState(() => {
+  const overrideInfo = useMemo(() => {
     try {
-      const ts = Number(localStorage.getItem('calcDisclaimerTs') || 0);
-      return !ts || (Date.now() - ts) > 24*60*60*1000;
-    } catch { return true; }
-  });
+      const qp = new URL(window.location.href).searchParams.get('api');
+      const ls = localStorage.getItem('apiBase') || '';
+      return qp || ls || '';
+    } catch { return ''; }
+  }, []);
   // Minimal patient inputs to support Bayesian priors
   const [patient, setPatient] = useState({ age: 56, gender: 'male', weight_kg: 79, height_cm: 170, serum_creatinine_mg_dl: 1.0, mic_mg_L: 1.0, levels: [] });
   const [regimen, setRegimen] = useState({ dose_mg: 1000, interval_hours: 12, infusion_minutes: 60 });
@@ -343,6 +344,17 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
   return (
     <Box dir={dir}>
+      {/* Config banners */}
+      {!API_BASE && (
+        <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>
+          Interactive service unreachable (no API base). Set REACT_APP_INTERACTIVE_API_URL or use ?api=https://vancomyzer.onrender.com/api
+        </Alert>
+      )}
+      {!!overrideInfo && (
+        <Alert severity="info" variant="outlined" sx={{ mb: 2 }}>
+          Using API override: {API_BASE}
+        </Alert>
+      )}
       {/* CORS/Network inline hint when fetch fails with TypeError */}
       {!apiOnline && (
         <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>

@@ -4,7 +4,7 @@ import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import { useTranslation } from 'react-i18next';
-import { bayesAUC, optimize, health, __BASE__ } from '../services/interactiveApi';
+import { bayesAUC, optimize, health, __BASE__, API_BASE } from '../services/interactiveApi';
 import { computeSeriesNeo } from '../pk/pedsNeonate';
 import targets from '../pk/targets.json';
 import priorsNeo from '../pk/priorsNeo.json';
@@ -116,6 +116,17 @@ export default function NeonateAUC(){
 
   return (
     <Box dir={dir} data-testid="neo-root">
+      {/* Config banners */}
+      {!API_BASE && (
+        <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>
+          Interactive service unreachable (no API base). Set REACT_APP_INTERACTIVE_API_URL or use ?api=https://vancomyzer.onrender.com/api
+        </Alert>
+      )}
+      {(()=>{ try { const qp = new URL(window.location.href).searchParams.get('api'); const ls = localStorage.getItem('apiBase')||''; return qp||ls; } catch { return ''; } })() && (
+        <Alert severity="info" variant="outlined" sx={{ mb: 2 }}>
+          Using API override: {API_BASE}
+        </Alert>
+      )}
       {/* Inline CORS/network hint when offline */}
       {!apiOnline && (
         <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>

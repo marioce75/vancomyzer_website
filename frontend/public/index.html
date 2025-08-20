@@ -4,7 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vancomyzer</title>
-    <!-- Removed runtime VANCOMYZER_API_BASE_URL override; use REACT_APP_API_BASE from env -->
+    <!-- Optional meta fallback for API base; replaced at build if supported -->
+    <meta name="vancomyzer-api-base" content="%VITE_INTERACTIVE_API_URL%" />
+    <script>
+      (function(){
+        try {
+          var api = new URL(location.href).searchParams.get('api');
+          if (api) console.log('[Vancomyzer] API override via ?api=', api);
+        } catch {}
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

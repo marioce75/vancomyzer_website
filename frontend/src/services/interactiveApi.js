@@ -1,19 +1,60 @@
 // Interactive AUC API client with availability probe and robust retries
 // Uses Vite env var VITE_INTERACTIVE_API_URL as base. If missing, API is disabled.
 
-const BASE = (typeof import.meta !== 'undefined' && import.meta.env)
-  ? (import.meta.env.VITE_INTERACTIVE_API_URL || '')
-  : '';
+// --- Base resolution with override ---
+function readMeta(name) {
+  try {
+    const el = typeof document !== 'undefined' ? document.querySelector(`meta[name="${name}"]`) : null;
+    return (el?.content || '').trim();
+  } catch { return ''; }
+}
+
+function computeBase() {
+  // URL override ?api=...
+  try {
+    if (typeof window !== 'undefined' && window.location) {
+      const url = new URL(window.location.href);
+      const qp = url.searchParams.get('api');
+      if (qp) {
+        try { localStorage.setItem('apiBase', qp); } catch {}
+        return qp;
+      }
+    }
+  } catch {}
+  // Persisted override
+  try {
+    const ls = typeof localStorage !== 'undefined' ? localStorage.getItem('apiBase') : '';
+    if (ls) return ls;
+  } catch {}
+  // Build-time env (Vite)
+  try {
+    const fromVite = (typeof import.meta !== 'undefined' && import.meta.env) ? (import.meta.env.VITE_INTERACTIVE_API_URL || '') : '';
+    if (fromVite) return fromVite;
+  } catch {}
+  // Build-time env (CRA)
+  try {
+    const fromCra = (typeof process !== 'undefined' && process.env) ? (process.env.REACT_APP_INTERACTIVE_API_URL || '') : '';
+    if (fromCra) return fromCra;
+  } catch {}
+  // Meta fallback from index.html
+  const fromMetaRaw = readMeta('vancomyzer-api-base');
+  const fromMeta = (fromMetaRaw && !/^%.*%$/.test(fromMetaRaw)) ? fromMetaRaw : '';
+  return fromMeta || '';
+}
+
+export const API_BASE = computeBase();
+export const __BASE__ = API_BASE; // back-compat
 
 // One-time diagnostics
-let __loggedBase = false;
-if (!__loggedBase) {
-  __loggedBase = true;
-  try { /* eslint-disable no-console */ console.debug('[Vancomyzer] API base', BASE || '(missing)'); } catch {}
-}
-// Warn if base doesn't look like it ends with /api (expected by backend routing)
-if (BASE && !BASE.endsWith('/api')) {
-  try { console.warn('[Vancomyzer] VITE_INTERACTIVE_API_URL should end with /api. Current:', BASE); } catch {}
+(function logBaseOnce() {
+  try { /* eslint-disable no-console */ console.debug('[Vancomyzer] API base =', API_BASE || '(missing)'); } catch {}
+  if (API_BASE && !API_BASE.endsWith('/api')) {
+    try { console.warn('[Vancomyzer] API base should end with /api. Current:', API_BASE); } catch {}
+  }
+})();
+
+export function clearApiOverride() {
+  try { localStorage.removeItem('apiBase'); } catch {}
 }
 
 const BACKOFF_MS = [250, 500, 1000];
@@ -118,8 +159,8 @@ async function fetchWithRetry(url, opts = {}, attempts = 3) {
 
 // --- Public API ---
 export async function health() {
-  if (!BASE) return false; // disabled by config
-  const url = `${BASE}/health`;
+  if (!API_BASE) return false; // disabled by config
+  const url = `${API_BASE}/health`;
   try { console.debug('[Vancomyzer] GET', url); } catch {}
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(new DOMException('Timeout', 'AbortError')), HEALTH_TIMEOUT_MS);
@@ -140,12 +181,12 @@ export async function health() {
 }
 
 export async function bayesAUC({ patient, regimen, levels = [] }, { signal } = {}) {
-  if (!BASE) {
+  if (!API_BASE) {
     const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
     err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
     throw err;
   }
-  const url = `${BASE}/interactive/auc`;
+  const url = `${API_BASE}/interactive/auc`;
   const payload = { patient, regimen, levels: Array.isArray(levels) ? levels : [] };
   try {
     console.debug('[Vancomyzer] POST', url, {
@@ -174,12 +215,12 @@ export async function bayesAUC({ patient, regimen, levels = [] }, { signal } = {
 }
 
 export async function optimize({ patient, regimen, target }, { signal } = {}) {
-  if (!BASE) {
+  if (!API_BASE) {
     const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
     err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
     throw err;
   }
-  const url = `${BASE}/optimize`;
+  const url = `${API_BASE}/optimize`;
   const payload = { patient, regimen, target: target ?? {} };
   try {
     console.debug('[Vancomyzer] POST', url, {
@@ -208,12 +249,12 @@ export async function optimize({ patient, regimen, target }, { signal } = {}) {
 }
 
 export async function pkSimulation(payload, { signal } = {}) {
-  if (!BASE) {
+  if (!API_BASE) {
     const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
     err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
     throw err;
   }
-  const res = await fetchWithRetry(`${BASE}/pk-simulation`, {
+  const res = await fetchWithRetry(`${API_BASE}/pk-simulation`, {
     method: 'POST',
     body: JSON.stringify(payload || {}),
     signal,
@@ -228,5 +269,3 @@ export async function calculateInteractiveAUC(payload, opts) {
 export async function optimizeDose(payload, opts) {
   return optimize(payload, opts);
 }
-
-export const __BASE__ = BASE;
