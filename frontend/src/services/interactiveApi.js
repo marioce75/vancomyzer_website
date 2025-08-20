@@ -90,6 +90,27 @@ async function fetchJSON(url, init = {}) {
   return res.json();
 }
 
+// New: POST helper with 405 fallback to alternate base (switching with/without /api)
+async function postWithFallback(path, body, opts = {}) {
+  const base = await getApiBase();
+  if (!base) throw new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
+  const primary = `${base}${path}`;
+  try {
+    return await fetchJSON(primary, { method: 'POST', body: JSON.stringify(body), ...opts });
+  } catch (e) {
+    if (e && e.status === 405) {
+      const altBase = base.endsWith('/api') ? base.replace(/\/api$/, '') : `${base}/api`;
+      const alt = `${altBase}${path}`;
+      try { console.debug('[Vancomyzer] 405 retry ->', alt); } catch {}
+      const result = await fetchJSON(alt, { method: 'POST', body: JSON.stringify(body), ...opts });
+      // Cache the working base for future calls
+      try { localStorage.setItem(LS_RESOLVED, altBase); } catch {}
+      return result;
+    }
+    throw e;
+  }
+}
+
 // Public API
 export async function health() {
   const base = await getApiBase();
@@ -98,19 +119,11 @@ export async function health() {
 }
 
 export async function bayesAUC({ patient, regimen, levels = [] }, opts = {}) {
-  const base = await getApiBase();
-  if (!base) throw new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
-  const url = `${base}/interactive/auc`;
-  try { console.debug('[Vancomyzer] POST', url, { patient, regimen, levels }); } catch {}
-  return fetchJSON(url, { method: 'POST', body: JSON.stringify({ patient, regimen, levels }), ...opts });
+  return postWithFallback('/interactive/auc', { patient, regimen, levels }, opts);
 }
 
 export async function optimize({ patient, regimen, target }, opts = {}) {
-  const base = await getApiBase();
-  if (!base) throw new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
-  const url = `${base}/optimize`;
-  try { console.debug('[Vancomyzer] POST', url, { patient, regimen, target }); } catch {}
-  return fetchJSON(url, { method: 'POST', body: JSON.stringify({ patient, regimen, target }), ...opts });
+  return postWithFallback('/optimize', { patient, regimen, target }, opts);
 }
 
 // Back-compat utilities and exports

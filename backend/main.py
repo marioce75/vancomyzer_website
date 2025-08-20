@@ -165,6 +165,7 @@ def interactive(req: InteractiveRequest):
 
 # Alias to support new client path
 @app.post('/api/interactive/auc', response_model=InteractiveResponse)
+@app.post('/interactive/auc', response_model=InteractiveResponse)
 def interactive_auc(req: InteractiveRequest):
     return interactive(req)
 
