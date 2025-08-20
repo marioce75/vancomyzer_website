@@ -71,7 +71,13 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const [showAucFill, setShowAucFill] = useState(true);
   const [showDoseMarkers, setShowDoseMarkers] = useState(true);
   const [apiOnline, setApiOnline] = useState(false);
-
+  const [showDisclaimer, setShowDisclaimer] = useState(() => {
+    try {
+      const ts = Number(localStorage.getItem('calcDisclaimerTs') || 0);
+      return !ts || (Date.now() - ts) > 24 * 60 * 60 * 1000;
+    } catch { return true; }
+  });
+  
   // Measured levels UI
   const [levelMode, setLevelMode] = useState('none');
   const [levelInputs, setLevelInputs] = useState({ peak: { conc: '', after_end_h: '' }, trough: { conc: '' } });

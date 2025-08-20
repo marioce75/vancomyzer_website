@@ -26,15 +26,15 @@ function computeBase() {
     const ls = typeof localStorage !== 'undefined' ? localStorage.getItem('apiBase') : '';
     if (ls) return ls;
   } catch {}
-  // Build-time env (Vite)
-  try {
-    const fromVite = (typeof import.meta !== 'undefined' && import.meta.env) ? (import.meta.env.VITE_INTERACTIVE_API_URL || '') : '';
-    if (fromVite) return fromVite;
-  } catch {}
-  // Build-time env (CRA)
+  // Build-time env (CRA) FIRST
   try {
     const fromCra = (typeof process !== 'undefined' && process.env) ? (process.env.REACT_APP_INTERACTIVE_API_URL || '') : '';
     if (fromCra) return fromCra;
+  } catch {}
+  // Build-time env (Vite) SECOND
+  try {
+    const fromVite = (typeof import.meta !== 'undefined' && import.meta.env) ? (import.meta.env.VITE_INTERACTIVE_API_URL || '') : '';
+    if (fromVite) return fromVite;
   } catch {}
   // Meta fallback from index.html
   const fromMetaRaw = readMeta('vancomyzer-api-base');
