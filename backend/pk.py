@@ -144,3 +144,53 @@ def ss_peak_trough(CL: float, V: float, dose_mg: float, tau_h: float, tinf_min: 
     Cmax_ss = (R0 / (k * float(V))) * (1.0 - np.exp(-k * Tinf)) / denom
     Cmin_ss = Cmax_ss * np.exp(-k * (float(tau_h) - Tinf))
     return float(Cmax_ss), float(Cmin_ss)
+
+
+def auc24_ss(daily_dose_mg: float, CL_L_h: float) -> float:
+    """
+    Analytical steady-state AUC over 24 hours (mg*h/L).
+    AUC24_ss = DailyDose_mg / CL_L_h
+    """
+    dose = float(daily_dose_mg)
+    CL = float(CL_L_h)
+    return float(dose / max(CL, _EPS))
+
+
+def ss_auc_crosscheck(
+    CL: float,
+    V: float,
+    dose_mg: float,
+    tau_h: float,
+    tinf_min: float,
+) -> Tuple[float, float]:
+    """
+    Return (auc24_formula, auc24_numeric) at steady state.
+      - auc24_formula = (dose_mg * 24 / tau_h) / CL
+      - auc24_numeric = trapezoidal AUC over a 24 h window after warm-up using superposition_curve
+    """
+    CL = float(CL)
+    V = float(V)
+    tau = float(tau_h)
+
+    daily_dose = float(dose_mg) * (24.0 / tau)
+    auc_formula = auc24_ss(daily_dose, CL)
+
+    # Numeric SS AUC over 24h after warm-up
+    warmup_doses = 10
+    t0 = warmup_doses * tau
+    horizon = t0 + 24.0
+    dt = 0.02
+    n_doses = warmup_doses + int(np.ceil(24.0 / tau)) + 2
+
+    t, c = superposition_curve(
+        CL=CL,
+        V=V,
+        dose_mg=dose_mg,
+        tau_h=tau,
+        tinf_min=tinf_min,
+        horizon_h=horizon,
+        dt=dt,
+        n_doses=n_doses,
+    )
+    auc_numeric = auc_trapezoid(t, c, t0=t0, t1=t0 + 24.0)
+    return float(auc_formula), float(auc_numeric)
