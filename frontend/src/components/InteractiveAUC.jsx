@@ -78,6 +78,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       return !ts || (Date.now() - ts) > 24 * 60 * 60 * 1000;
     } catch { return true; }
   });
+  const [retryTs, setRetryTs] = useState(0);
   
   // Measured levels UI
   const [levelMode, setLevelMode] = useState('none');
@@ -134,17 +135,6 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
     if (apiAbort.current) apiAbort.current.abort();
     apiAbort.current = new AbortController();
 
-    // debug URL and payload
-    try {
-      console.debug('[Vancomyzer] bayesAUC ->', `${__BASE__}/interactive/auc`, {
-        shape: {
-          patient: Object.keys({ ...patient, population_mode: mode }),
-          regimen: Object.keys(regimen),
-          levels: Array.isArray(measuredLevels) ? measuredLevels.length : 0,
-        }
-      });
-    } catch {}
-
     try {
       const data = await bayesAUC({ patient: { ...patient, population_mode: mode }, regimen, levels: measuredLevels }, { signal: apiAbort.current.signal });
       const auc = data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24;
@@ -163,21 +153,23 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       }
       setApiOnline(true);
     } catch (e) {
-      if (e?.name === 'AbortError') {
-        // do nothing on user-initiated abort
-      } else {
-        try { console.warn('[Vancomyzer] bayesAUC failed:', e?.message || e); } catch {}
-        setApiOnline(false);
-        setError(e?.message || 'Interactive service unreachable');
-      }
+      const msg = (e?.status === 405)
+        ? 'Method not allowed at endpoint — check POST path /api/interactive/auc'
+        : (e?.status === 404)
+          ? 'Endpoint not found — verify base URL and /api prefix'
+          : (e?.message || 'Interactive service unreachable');
+      setApiOnline(false);
+      setError(msg);
+      // Backoff once to avoid spamming
+      const now = Date.now();
+      if (!retryTs || (now - retryTs) > 2000) setRetryTs(now);
     } finally {
       setLoading(false);
     }
-  }, [patient, regimen, measuredLevels, mode, apiOnline]);
+  }, [patient, regimen, measuredLevels, mode, apiOnline, retryTs]);
 
   useEffect(() => {
-    // Debounce 150–250ms
-    const t = setTimeout(() => { runInteractive(); }, 180);
+    const t = setTimeout(() => { runInteractive(); }, 220);
     return () => clearTimeout(t);
   }, [runInteractive]);
 
@@ -354,7 +346,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       {/* Config banners */}
       {!API_BASE && (
         <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>
-          Interactive service unreachable (no API base). Set REACT_APP_INTERACTIVE_API_URL or use ?api=https://vancomyzer.onrender.com/api
+          Interactive service unreachable (no API base). Set VITE_API_BASE or REACT_APP_INTERACTIVE_API_URL or use ?api=https://vancomyzer.onrender.com/api
         </Alert>
       )}
       {!!overrideInfo && (
@@ -365,7 +357,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       {/* CORS/Network inline hint when fetch fails with TypeError */}
       {!apiOnline && (
         <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>
-          Interactive service unreachable (CORS/Network). Check API base and backend CORS.
+          Interactive service unreachable (CORS/Network). Verify API base and backend CORS. Expected POST {`/api/interactive/auc`}.
         </Alert>
       )}
 

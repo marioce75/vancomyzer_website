@@ -14,10 +14,11 @@ function readMeta(name) {
 }
 
 function readEnv() {
-  const cra = (typeof process !== 'undefined' && process.env?.REACT_APP_INTERACTIVE_API_URL) || '';
+  const craInteractive = (typeof process !== 'undefined' && process.env?.REACT_APP_INTERACTIVE_API_URL) || '';
+  const craGeneric = (typeof process !== 'undefined' && process.env?.REACT_APP_API_URL) || '';
   let vite = '';
-  try { vite = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_INTERACTIVE_API_URL) || ''; } catch {}
-  return cra || vite || readMeta('vancomyzer-api-base') || '';
+  try { vite = (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_INTERACTIVE_API_URL || import.meta.env?.VITE_API_BASE || '')) || ''; } catch {}
+  return craInteractive || craGeneric || vite || readMeta('vancomyzer-api-base') || '';
 }
 
 // 1) Get RAW base (may include /api), honoring query param and localStorage override
@@ -40,31 +41,31 @@ function getRawBase() {
 // 2) Normalize trailing slashes
 function trimSlash(s) { return (s || '').replace(/\/+$/, ''); }
 
-// 3) Resolve final base by probing endpoints and caching in localStorage
+// 3) Resolve final base; prefer "/api" variant when available
 async function resolveBase() {
   try { const cached = (typeof localStorage !== 'undefined') ? localStorage.getItem(LS_RESOLVED) : ''; if (cached) return cached; } catch {}
 
   const raw = trimSlash(getRawBase());
   if (!raw) { try { console.warn('[Vancomyzer] API base missing'); } catch {} return ''; }
 
-  const rawHasApi = /\/api$/.test(raw);
-  const candidates = [ `${raw}/health` ];
-  if (!rawHasApi) candidates.push(`${raw}/api/health`);
+  const hasApi = /\/api$/.test(raw);
+  const candidates = hasApi
+    ? [ { url: `${raw}/health`, base: raw } ]
+    : [ { url: `${raw}/api/health`, base: `${raw}/api` }, { url: `${raw}/health`, base: raw } ];
 
-  for (const url of candidates) {
+  for (const c of candidates) {
     try {
-      const res = await fetch(url, { mode: 'cors' });
+      const res = await fetch(c.url, { mode: 'cors' });
       if (res.ok) {
-        const resolved = url.replace(/\/health$/, '');
-        try { localStorage.setItem(LS_RESOLVED, resolved); } catch {}
-        try { console.debug('[Vancomyzer] Resolved API base =', resolved); } catch {}
-        return resolved;
+        try { localStorage.setItem(LS_RESOLVED, c.base); } catch {}
+        try { console.debug('[Vancomyzer] Resolved API base =', c.base); } catch {}
+        return c.base;
       }
     } catch { /* try next */ }
   }
 
-  // Fallback: if RAW has /api keep it, else append /api for clearer errors
-  const fallback = rawHasApi ? raw : `${raw}/api`;
+  // Fallback to prefer /api variant
+  const fallback = hasApi ? raw : `${raw}/api`;
   try { localStorage.setItem(LS_RESOLVED, fallback); } catch {}
   try { console.warn('[Vancomyzer] Using fallback API base =', fallback); } catch {}
   return fallback;
@@ -90,20 +91,27 @@ async function fetchJSON(url, init = {}) {
   return res.json();
 }
 
-// New: POST helper with 405 fallback to alternate base (switching with/without /api)
+// New: POST helper with 405 fallback and one transient retry
 async function postWithFallback(path, body, opts = {}) {
   const base = await getApiBase();
   if (!base) throw new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
   const primary = `${base}${path}`;
+  const doPost = (u) => fetchJSON(u, { method: 'POST', body: JSON.stringify(body), ...opts });
+
   try {
-    return await fetchJSON(primary, { method: 'POST', body: JSON.stringify(body), ...opts });
+    return await doPost(primary);
   } catch (e) {
+    // Retry once for transient errors
+    const transient = (e && (e.status === 502 || e.status === 503 || e.status === 504)) || (e && e.name === 'TypeError');
+    if (transient) {
+      await new Promise(r => setTimeout(r, 350));
+      try { return await doPost(primary); } catch (_) { /* fall through */ }
+    }
     if (e && e.status === 405) {
       const altBase = base.endsWith('/api') ? base.replace(/\/api$/, '') : `${base}/api`;
       const alt = `${altBase}${path}`;
       try { console.debug('[Vancomyzer] 405 retry ->', alt); } catch {}
-      const result = await fetchJSON(alt, { method: 'POST', body: JSON.stringify(body), ...opts });
-      // Cache the working base for future calls
+      const result = await doPost(alt);
       try { localStorage.setItem(LS_RESOLVED, altBase); } catch {}
       return result;
     }
@@ -119,6 +127,7 @@ export async function health() {
 }
 
 export async function bayesAUC({ patient, regimen, levels = [] }, opts = {}) {
+  // Canonical path (backend mounted under "/api"); resolveBase prefers base with "/api"
   return postWithFallback('/interactive/auc', { patient, regimen, levels }, opts);
 }
 
