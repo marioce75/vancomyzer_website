@@ -15,6 +15,7 @@ from .schemas import InteractiveRequest, InteractiveResponse
 from .bayes import PatientCovars, Regimen, fit_posterior, simulate_from_posterior
 from .pk.model import superposition_conc
 from .pk.optimize import choose_dose_interval
+from .api_loading_dose import router as ld_router
 
 app = FastAPI(default_response_class=ORJSONResponse)
 
@@ -32,6 +33,8 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
 )
+
+app.include_router(ld_router, prefix="/api")
 
 
 @app.get('/health')

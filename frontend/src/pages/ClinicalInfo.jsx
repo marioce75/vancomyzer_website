@@ -7,6 +7,7 @@ import GuidelinesIndex from '../components/guidelines/GuidelinesIndex';
 import GuidelineArticle from '../components/guidelines/GuidelineArticle';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
+import LoadingDoseCard from '../components/LoadingDoseCard.jsx';
 
 function usePersistedTab(key, initial) {
   const [value, setValue] = React.useState(() => {
@@ -24,6 +25,9 @@ export default function ClinicalInfo() {
   });
   const [tab, setTab] = usePersistedTab('clinical-tab', 0);
   const [activeSlug, setActiveSlug] = React.useState(null);
+  const [weightInput] = React.useState(() => {
+    try { return Number(localStorage.getItem('clinical_weight_kg') || 70); } catch { return 70; }
+  });
 
   return (
     <Box>
@@ -56,6 +60,15 @@ export default function ClinicalInfo() {
               </Box>
               <Box sx={{ mt: 3 }}>
                 <TutorialWorkflow />
+              </Box>
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="h6" sx={{ mb: 1 }}>Practical tools</Typography>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Loading dose quick calculator</Typography>
+                    <LoadingDoseCard weightKg={Number(weightInput || 0)} />
+                  </Box>
+                </Box>
               </Box>
             </Box>
           )}

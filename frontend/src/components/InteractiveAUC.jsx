@@ -9,6 +9,7 @@ import { health, bayesAUC, optimize, __BASE__, API_BASE } from '../services/inte
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import LoadingDoseCard from './LoadingDoseCard.jsx';
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Title, ChartTooltip, Filler, Legend);
 
@@ -420,7 +421,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
       {/* Metrics strip */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={3}>
           <Paper variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
             <Box component="div" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
               <Typography variant="caption" color="text.secondary">{t('auc24','AUC24')}</Typography>
@@ -431,7 +432,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
             </Box>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={3}>
           <Paper variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
             <Box component="div" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
               <Typography variant="caption" color="text.secondary">{t('predicted_trough','Predicted trough')}</Typography>
@@ -442,7 +443,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
             </Box>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={3}>
           <Paper variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
             <Box component="div" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
               <Typography variant="caption" color="text.secondary">{t('predicted_peak','Predicted peak')}</Typography>
@@ -452,6 +453,9 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
               <Chip label={`${toFixed(summary?.predicted_peak, 1)} mg/L`} />
             </Box>
           </Paper>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <LoadingDoseCard weightKg={Number(patient?.weight_kg || 0)} />
         </Grid>
       </Grid>
 

@@ -12,6 +12,25 @@ import numpy as np
 _EPS = 1e-12
 
 
+def calculate_loading_dose(weight_kg: float, per_kg_mg: float = 25.0, max_mg: float = 3000.0, round_to_mg: float = 250.0) -> dict:
+    """Calculate loading dose per TBW, capped and rounded.
+    Returns dict with keys: ld_mg, raw_mg, per_kg_mg, max_mg, round_to_mg, warning
+    """
+    w = max(0.0, float(weight_kg or 0.0))
+    perkg = max(0.0, float(per_kg_mg or 0.0))
+    raw = float(w * perkg)
+    capped = float(min(float(max_mg), raw))
+    rounded = float(np.round(capped / float(round_to_mg)) * float(round_to_mg))
+    return {
+        'ld_mg': float(rounded),
+        'raw_mg': float(raw),
+        'per_kg_mg': float(perkg),
+        'max_mg': float(max_mg),
+        'round_to_mg': float(round_to_mg),
+        'warning': 'capped_at_max' if capped < raw else None,
+    }
+
+
 def _ensure_1d(a: Iterable[float]) -> np.ndarray:
     x = np.asarray(list(a), dtype=float)
     return x.reshape(-1)
