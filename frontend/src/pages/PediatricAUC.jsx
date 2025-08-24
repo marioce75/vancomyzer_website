@@ -73,7 +73,7 @@ export default function PediatricAUC(){
         regimen: { dose_mg: doseMg, interval_hours: regimen.interval_hours, infusion_minutes: regimen.infusion_minutes },
         levels: measuredLevels
       };
-      try { console.debug('[Vancomyzer] POST', `${__BASE__}/interactive/auc`, { shape: { patient: Object.keys(payload.patient), regimen: Object.keys(payload.regimen), levels: payload.levels.length } }); } catch {}
+      try { console.debug('[Vancomyzer] POST', `${__BASE__}/api/interactive/auc`, { shape: { patient: Object.keys(payload.patient), regimen: Object.keys(payload.regimen), levels: payload.levels.length } }); } catch {}
       const data = await bayesAUC(payload, { signal: abortRef.current.signal });
       const m = data?.metrics || data;
       setSummary((s)=>({ ...s, auc_24: m.auc_24 ?? s?.auc_24, predicted_peak: m.predicted_peak ?? s?.predicted_peak, predicted_trough: m.predicted_trough ?? s?.predicted_trough }));
@@ -113,7 +113,7 @@ export default function PediatricAUC(){
       {/* Config banners */}
       {!API_BASE && (
         <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>
-          Interactive service unreachable (no API base). Set REACT_APP_INTERACTIVE_API_URL or use ?api=https://vancomyzer.onrender.com/api
+          Interactive service unreachable (no API base). Set VITE_API_BASE or use ?api=https://vancomyzer.onrender.com
         </Alert>
       )}
       {(()=>{ try { const qp = new URL(window.location.href).searchParams.get('api'); const ls = localStorage.getItem('apiBase')||''; return qp||ls; } catch { return ''; } })() && (
@@ -221,7 +221,7 @@ export default function PediatricAUC(){
         <Button size="small" variant="contained" color="primary" disabled={!apiOnline||loading} onClick={async ()=>{
           try{
             const target = { auc_min: 400, auc_max: 600, mic: Number(patient?.mic ?? 1) };
-            try { console.debug('[Vancomyzer] POST', `${__BASE__}/optimize`, { target }); } catch {}
+            try { console.debug('[Vancomyzer] POST', `${__BASE__}/api/optimize`, { target }); } catch {}
             const data = await optimize({ patient: { ...patient, mic: Number(patient.mic||1), population: 'pediatric' }, regimen: { dose_mg: doseMg, interval_hours: regimen.interval_hours, infusion_minutes: regimen.infusion_minutes }, target });
             const rec = data?.recommendation || data?.regimen || data?.optimized_regimen;
             if (rec) {

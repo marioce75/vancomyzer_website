@@ -1,17 +1,11 @@
 import { normalizePatientFields } from './services/normalizePatient';
 
-// Base URL from Vite env (e.g., https://vancomyzer.onrender.com/api)
-const API_BASE = (import.meta?.env?.VITE_INTERACTIVE_API_URL) || '';
+// Base URL from Vite env (no trailing slash)
+const API_BASE = (import.meta?.env?.VITE_API_BASE) || '';
 
-// One-time diagnostics
 let __loggedBase = false;
-function debug(...args) {
-  if (process.env.NODE_ENV !== 'production') console.debug('[API]', ...args);
-}
-if (!__loggedBase) {
-  __loggedBase = true;
-  debug('BASE', API_BASE || '(empty)');
-}
+function debug(...args) { if (process.env.NODE_ENV !== 'production') console.debug('[API]', ...args); }
+if (!__loggedBase) { __loggedBase = true; debug('BASE', API_BASE || '(empty)'); }
 
 const REQUEST_TIMEOUT_MS = 6000;
 const RETRIES = 3;
@@ -20,11 +14,7 @@ const BACKOFF_MS = [250, 500, 1000];
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function jsonFetch(path, { method = 'POST', body, signal } = {}) {
-  if (!API_BASE) {
-    const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
-    err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
-    throw err;
-  }
+  if (!API_BASE) { const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE'); err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE'; throw err; }
   const url = `${API_BASE}${path}`;
   debug('fetch', url);
 
@@ -33,98 +23,48 @@ async function jsonFetch(path, { method = 'POST', body, signal } = {}) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(new DOMException('Timeout', 'AbortError')), REQUEST_TIMEOUT_MS);
 
-    // Link external AbortSignal if provided
     let abortHandler;
     if (signal) {
-      if (signal.aborted) {
-        clearTimeout(timeout);
-        throw signal.reason || new DOMException('Aborted', 'AbortError');
-      }
+      if (signal.aborted) { clearTimeout(timeout); throw signal.reason || new DOMException('Aborted', 'AbortError'); }
       abortHandler = () => controller.abort(signal.reason || new DOMException('Aborted', 'AbortError'));
       try { signal.addEventListener('abort', abortHandler, { once: true }); } catch {}
     }
 
     try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: body ? JSON.stringify(body) : undefined,
-        credentials: 'omit',
-        mode: 'cors',
-        signal: controller.signal,
-      });
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: body ? JSON.stringify(body) : undefined, credentials: 'omit', mode: 'cors', signal: controller.signal });
       clearTimeout(timeout);
       if (!res.ok) {
-        // Do not retry on 4xx
         if (res.status >= 400 && res.status < 500) {
-          let msg = `${res.status} ${res.statusText}`;
-          try { const err = await res.json(); if (err?.detail) msg = Array.isArray(err.detail) ? JSON.stringify(err.detail) : String(err.detail); } catch {}
+          let msg = `${res.status} ${res.statusText}`; try { const err = await res.json(); if (err?.detail) msg = Array.isArray(err.detail) ? JSON.stringify(err.detail) : String(err.detail); } catch {}
           const e = new Error(msg); e.status = res.status; e.name = 'INTERACTIVE_BAD_RESPONSE'; throw e;
         }
-        // Retry on 5xx
-        if (attempt < RETRIES - 1) {
-          await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)]);
-          continue;
-        }
-        let msg = `${res.status} ${res.statusText}`;
-        try { const err = await res.json(); if (err?.detail) msg = Array.isArray(err.detail) ? JSON.stringify(err.detail) : String(err.detail); } catch {}
+        if (attempt < RETRIES - 1) { await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)]); continue; }
+        let msg = `${res.status} ${res.statusText}`; try { const err = await res.json(); if (err?.detail) msg = Array.isArray(err.detail) ? JSON.stringify(err.detail) : String(err.detail); } catch {}
         const e = new Error(msg); e.status = res.status; e.name = 'INTERACTIVE_BAD_RESPONSE'; throw e;
       }
       return res.json();
     } catch (e) {
-      clearTimeout(timeout);
-      lastError = e;
-      if (e?.name === 'AbortError') throw e; // bubble user abort
-      if (attempt === RETRIES - 1) {
-        const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
-        err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
-        err.cause = e;
-        throw err;
-      }
-      await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)]);
+      clearTimeout(timeout); lastError = e; if (e?.name === 'AbortError') throw e; if (attempt === RETRIES - 1) { const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE'); err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE'; err.cause = e; throw err; } await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)]);
     } finally {
-      if (signal && abortHandler) {
-        try { signal.removeEventListener('abort', abortHandler); } catch {}
-      }
+      if (signal && abortHandler) { try { signal.removeEventListener('abort', abortHandler); } catch {} }
     }
   }
-  const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE');
-  err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE';
-  err.cause = lastError;
-  throw err;
+  const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE'); err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE'; err.cause = lastError; throw err;
 }
 
 // --- Health probe ---
-export async function health({ signal } = {}) {
-  return jsonFetch('/health', { method: 'GET', signal });
-}
+export async function health({ signal } = {}) { return jsonFetch('/api/health', { method: 'GET', signal }); }
 
-function ensureNestedPatient(patientLike) {
-  const norm = normalizePatientFields(patientLike ?? {});
-  return norm; // keep nested fields; do not flatten or wrap further
-}
+function ensureNestedPatient(patientLike) { const norm = normalizePatientFields(patientLike ?? {}); return norm; }
 
-// Calculate AUC and series for interactive page
 export async function calculateInteractiveAUC({ patient, regimen, levels = [] }, { signal } = {}) {
-  const payload = {
-    patient: ensureNestedPatient(patient),
-    regimen: regimen ?? {},
-    levels: Array.isArray(levels) ? levels : [],
-  };
-  return jsonFetch('/interactive/auc', { method: 'POST', body: payload, signal });
+  const payload = { patient: ensureNestedPatient(patient), regimen: regimen ?? {}, levels: Array.isArray(levels) ? levels : [] };
+  return jsonFetch('/api/interactive/auc', { method: 'POST', body: payload, signal });
 }
 
-// Optimize dose to target AUC range
 export async function optimizeDose({ patient, regimen, target }, { signal } = {}) {
-  const payload = {
-    patient: ensureNestedPatient(patient),
-    regimen: regimen ?? {},
-    target: target ?? {},
-  };
-  return jsonFetch('/optimize', { method: 'POST', body: payload, signal });
+  const payload = { patient: ensureNestedPatient(patient), regimen: regimen ?? {}, target: target ?? {} };
+  return jsonFetch('/api/optimize', { method: 'POST', body: payload, signal });
 }
 
-// Keep pkSimulation for other parts of the app (expects nested payload)
-export async function pkSimulation(payload) {
-  return jsonFetch('/pk-simulation', { method: 'POST', body: payload });
-}
+export async function pkSimulation(payload) { return jsonFetch('/api/pk-simulation', { method: 'POST', body: payload }); }

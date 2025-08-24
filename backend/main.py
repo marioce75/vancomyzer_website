@@ -19,7 +19,7 @@ from .api_loading_dose import router as ld_router
 
 app = FastAPI(default_response_class=ORJSONResponse)
 
-# Allow CORS for frontend dev and production
+# CORS must be added before routers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -27,7 +27,6 @@ app.add_middleware(
         "https://www.vancomyzer.com",
         "https://vancomyzer.onrender.com",
         "https://api.vancomyzer.com",
-        "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
     ],
@@ -36,6 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount routers under /api
 app.include_router(ld_router, prefix="/api")
 
 
@@ -115,8 +115,11 @@ def _predicted_levels_debug(posterior, regimen: Regimen, levels: list):
     return out
 
 
-@app.post('/api/dose/interactive', response_model=InteractiveResponse)
-def interactive(req: InteractiveRequest):
+# Canonical Interactive AUC endpoint
+@app.post('/api/interactive/auc', response_model=InteractiveResponse)
+# Back-compat alias without /api (not advertised)
+@app.post('/interactive/auc', response_model=InteractiveResponse)
+def interactive_auc(req: InteractiveRequest):
     # Flatten and normalize
     serum = req.serum_creatinine if req.serum_creatinine is not None else req.serum_creatinine_mg_dl
     clcr = req.clcr_ml_min or cockcroft_gault(req.age_years or 60, req.weight_kg or 70, serum or 1.0, req.gender or 'm')
@@ -167,12 +170,6 @@ def interactive(req: InteractiveRequest):
     }
 
     return response
-
-# Alias to support new client path
-@app.post('/api/interactive/auc', response_model=InteractiveResponse)
-@app.post('/interactive/auc', response_model=InteractiveResponse)
-def interactive_auc(req: InteractiveRequest):
-    return interactive(req)
 
 
 # --- Optimize endpoint to recommend dose/interval for AUC target ---

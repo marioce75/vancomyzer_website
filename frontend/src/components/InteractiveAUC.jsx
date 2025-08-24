@@ -346,7 +346,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       {/* Config banners */}
       {!API_BASE && (
         <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>
-          Interactive service unreachable (no API base). Set VITE_API_BASE or REACT_APP_INTERACTIVE_API_URL or use ?api=https://vancomyzer.onrender.com/api
+          Interactive service unreachable (no API base). Set VITE_API_BASE or use ?api=https://vancomyzer.onrender.com
         </Alert>
       )}
       {!!overrideInfo && (
@@ -489,7 +489,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
             setLoading(true);
             const target = { auc_min: 400, auc_max: 600, mic: (patient && (patient.mic ?? patient.mic_mg_L)) ?? 1 };
             // debug
-            try { console.debug('[Vancomyzer] optimize ->', `${__BASE__}/optimize`, { target }); } catch {}
+            try { console.debug('[Vancomyzer] optimize ->', `${__BASE__}/api/optimize`, { target }); } catch {}
             const data = await optimize({ patient: { ...patient, population_mode: mode }, regimen, target });
             const rec = data?.recommendation || data?.regimen || data?.optimized_regimen;
             if (rec) {
