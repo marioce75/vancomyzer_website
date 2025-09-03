@@ -9,7 +9,7 @@ export default function NavTabs(){
   const routes = ['/', '/pediatric', '/neonate'];
   const value = routes.includes(pathname) ? pathname : '/';
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (import.meta?.env?.DEV) {
     // diagnostics
     // eslint-disable-next-line no-console
     console.debug('[Router] pathname=', pathname);

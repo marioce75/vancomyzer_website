@@ -58,6 +58,12 @@ Frontend (Static Site)
 - Publish dir: build
 - Environment: REACT_APP_API_BASE=https://<your-backend>.onrender.com
 
+## Deployment notes
+
+- In Render → Static Site, set `VITE_API_BASE` (no trailing `/api`).
+- Clear build cache & redeploy after changing environment variables.
+- You can temporarily override the backend in the browser using `?api=https://host[:port]`.
+
 Notes
 -----
 - Interactive AUC page debounces regimen changes (400 ms) and reuses posterior across same patient+levels (server cache).

@@ -1,10 +1,8 @@
 import { normalizePatientFields } from './services/normalizePatient';
-
-// Base URL from Vite env (no trailing slash)
-const API_BASE = (import.meta?.env?.VITE_API_BASE) || '';
+import { apiPath, API_BASE } from './lib/apiBase';
 
 let __loggedBase = false;
-function debug(...args) { if (process.env.NODE_ENV !== 'production') console.debug('[API]', ...args); }
+function debug(...args) { if (import.meta?.env?.DEV) console.debug('[API]', ...args); }
 if (!__loggedBase) { __loggedBase = true; debug('BASE', API_BASE || '(empty)'); }
 
 const REQUEST_TIMEOUT_MS = 6000;
@@ -14,8 +12,7 @@ const BACKOFF_MS = [250, 500, 1000];
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function jsonFetch(path, { method = 'POST', body, signal } = {}) {
-  if (!API_BASE) { const err = new Error('INTERACTIVE_ENDPOINT_UNAVAILABLE'); err.name = 'INTERACTIVE_ENDPOINT_UNAVAILABLE'; throw err; }
-  const url = `${API_BASE}${path}`;
+  const url = path.startsWith('http') ? path : apiPath(path);
   debug('fetch', url);
 
   let lastError;
@@ -59,12 +56,10 @@ function ensureNestedPatient(patientLike) { const norm = normalizePatientFields(
 
 export async function calculateInteractiveAUC({ patient, regimen, levels = [] }, { signal } = {}) {
   const payload = { patient: ensureNestedPatient(patient), regimen: regimen ?? {}, levels: Array.isArray(levels) ? levels : [] };
-  return jsonFetch('/api/interactive/auc', { method: 'POST', body: payload, signal });
-}
+  return jsonFetch('/api/interactive/auc', { method: 'POST', body: payload, signal }); }
 
 export async function optimizeDose({ patient, regimen, target }, { signal } = {}) {
   const payload = { patient: ensureNestedPatient(patient), regimen: regimen ?? {}, target: target ?? {} };
-  return jsonFetch('/api/optimize', { method: 'POST', body: payload, signal });
-}
+  return jsonFetch('/api/optimize', { method: 'POST', body: payload, signal }); }
 
 export async function pkSimulation(payload) { return jsonFetch('/api/pk-simulation', { method: 'POST', body: payload }); }

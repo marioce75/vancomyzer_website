@@ -4,7 +4,8 @@ import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import { useTranslation } from 'react-i18next';
-import { bayesAUC, optimize, health, __BASE__, API_BASE } from '../services/interactiveApi';
+import { bayesAUC, optimize, health } from '../services/interactiveApi';
+import { API_BASE } from '../lib/apiBase';
 import { computeSeriesNeo } from '../pk/pedsNeonate';
 import targets from '../pk/targets.json';
 import priorsNeo from '../pk/priorsNeo.json';
@@ -15,7 +16,7 @@ function toFixed(val, d=1){ if(val==null||Number.isNaN(Number(val))) return '—
 export default function NeonateAUC(){
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
-  useEffect(() => { if (process.env.NODE_ENV !== 'production') console.debug('[NeonateAUC] mounted'); }, []);
+  useEffect(() => { if (import.meta?.env?.DEV) console.debug('[NeonateAUC] mounted'); }, []);
   const [patient, setPatient] = useState({ gestationalAge_wk: 30, postnatalAge_d: 2, postmenstrualAge_wk: 32, weight_kg: 2.5, scr_mg_dl: 0.8, mic: 1 });
   const [regimen, setRegimen] = useState({ dose_mg_per_kg: 12.5, interval_hours: 12, infusion_minutes: 60 });
   const [series, setSeries] = useState({ time_hours: [], concentration_mg_L: [] });
@@ -61,7 +62,7 @@ export default function NeonateAUC(){
         regimen: { dose_mg: doseMg, interval_hours: regimen.interval_hours, infusion_minutes: regimen.infusion_minutes },
         levels: measuredLevels
       };
-      try { console.debug('[Vancomyzer] POST', `${__BASE__}/api/interactive/auc`, { shape: { patient: Object.keys(payload.patient), regimen: Object.keys(payload.regimen), levels: payload.levels.length } }); } catch {}
+      try { console.debug('[Vancomyzer] POST /api/interactive/auc', { shape: { patient: Object.keys(payload.patient), regimen: Object.keys(payload.regimen), levels: payload.levels.length } }); } catch {}
       const data = await bayesAUC(payload, { signal: abortRef.current.signal });
       const m = data?.metrics || data;
       setSummary((s)=>({ ...s, auc_24: m.auc_24 ?? s?.auc_24, predicted_peak: m.predicted_peak ?? s?.predicted_peak, predicted_trough: m.predicted_trough ?? s?.predicted_trough }));
@@ -233,7 +234,7 @@ export default function NeonateAUC(){
         <Button size="small" variant="contained" color="primary" disabled={!apiOnline||loading} onClick={async ()=>{
           try{
             const target = { auc_min: 400, auc_max: 600, mic: Number(patient?.mic ?? 1) };
-            try { console.debug('[Vancomyzer] POST', `${__BASE__}/api/optimize`, { target }); } catch {}
+            try { console.debug('[Vancomyzer] POST /api/optimize', { target }); } catch {}
             const data = await optimize({ patient: { ...patient, mic: Number(patient.mic||1), population: 'neonate' }, regimen: { dose_mg: doseMg, interval_hours: regimen.interval_hours, infusion_minutes: regimen.infusion_minutes }, target });
             const rec = data?.recommendation || data?.regimen || data?.optimized_regimen;
             if (rec) {

@@ -64,7 +64,7 @@ const setStoredMode = (mode) => {
 
 function HeroHeader(){
   const { t } = useTranslation();
-  React.useEffect(() => { if (process.env.NODE_ENV !== 'production') console.debug('[Legal] disclaimers mounted'); }, []);
+  React.useEffect(() => { if (import.meta?.env?.DEV) console.debug('[Legal] disclaimers mounted'); }, []);
   return (
     <Box sx={(theme) => ({
       py: { xs: 5, md: 7 }, px: 2, textAlign: 'center',

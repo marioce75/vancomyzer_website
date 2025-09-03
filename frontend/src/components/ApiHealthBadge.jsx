@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Chip, Box } from "@mui/material";
+import { apiPath, API_BASE } from '../lib/apiBase';
 
-const BASE = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE) || '';
-const API_HEALTH_URL = BASE ? `${BASE}/api/health` : '';
+const API_HEALTH_URL = API_BASE ? apiPath('/health') : '';
 
 const ApiHealthBadge = () => {
   const [apiStatus, setApiStatus] = useState("checking");

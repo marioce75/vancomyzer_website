@@ -5,7 +5,8 @@ import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Swit
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { health, bayesAUC, optimize, __BASE__, API_BASE } from '../services/interactiveApi';
+import { health, bayesAUC, optimize } from '../services/interactiveApi';
+import { API_BASE } from '../lib/apiBase';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -53,7 +54,7 @@ const help = {
 export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
-  useEffect(() => { try { console.debug('[Vancomyzer] API base', __BASE__ || '(missing)'); } catch {} }, []);
+  useEffect(() => { try { console.debug('[Vancomyzer] API base', API_BASE || '(missing)'); } catch {} }, []);
   const overrideInfo = useMemo(() => {
     try {
       const qp = new URL(window.location.href).searchParams.get('api');
@@ -489,7 +490,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
             setLoading(true);
             const target = { auc_min: 400, auc_max: 600, mic: (patient && (patient.mic ?? patient.mic_mg_L)) ?? 1 };
             // debug
-            try { console.debug('[Vancomyzer] optimize ->', `${__BASE__}/api/optimize`, { target }); } catch {}
+            try { console.debug('[Vancomyzer] optimize -> /api/optimize', { target }); } catch {}
             const data = await optimize({ patient: { ...patient, population_mode: mode }, regimen, target });
             const rec = data?.recommendation || data?.regimen || data?.optimized_regimen;
             if (rec) {
