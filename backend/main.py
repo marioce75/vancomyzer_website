@@ -7,7 +7,7 @@ from typing import Dict, Tuple, Any, List
 
 import numpy as np
 import orjson
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException, Body, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
@@ -19,21 +19,30 @@ from .api_loading_dose import router as ld_router
 
 app = FastAPI(default_response_class=ORJSONResponse)
 
+ALLOWED_ORIGINS = [
+    "https://vancomyzer.com",
+    "https://www.vancomyzer.com",
+    "https://vancomyzer.onrender.com",
+    "https://api.vancomyzer.com",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 # CORS must be added before routers
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://vancomyzer.com",
-        "https://www.vancomyzer.com",
-        "https://vancomyzer.onrender.com",
-        "https://api.vancomyzer.com",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.options('/api/interactive/auc')
+@app.options('/interactive/auc')
+def options_interactive_auc() -> Response:
+    return Response(status_code=200)
 
 # Mount routers under /api
 app.include_router(ld_router, prefix="/api")
@@ -47,6 +56,10 @@ def health():
 @app.get('/api/health')
 def health_api():
     return {"status": "ok"}
+
+@app.get('/api/config')
+def api_config():
+    return {"base": "/api", "cors": ALLOWED_ORIGINS}
 
 
 def cockcroft_gault(age_years: float, weight_kg: float, scr_mg_dl: float, gender: str | None) -> float:
@@ -142,7 +155,10 @@ def interactive_auc(req: InteractiveRequest):
         'clcr_ml_min': clcr,
     }, levels_list)
 
-    posterior = get_or_fit_posterior(cache_key, patient, regimen, levels_list)
+    try:
+        posterior = get_or_fit_posterior(cache_key, patient, regimen, levels_list)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=f"Posterior fit failed: {type(e).__name__}: {e}")
     sim = simulate_from_posterior(posterior, regimen, horizon_h=48.0, dt=0.05)
 
     response = {

@@ -1,42 +1,39 @@
 // src/lib/apiBase.js
 const qp = new URLSearchParams(window.location.search);
 const fromQuery = qp.get("api");
+const DEFAULT_API_BASE = "https://vancomyzer.onrender.com"; // safe fallback for prod
 
 const trim = (s) => (s || "").replace(/\/+$/, "");
-
 const envBase =
   (typeof import.meta !== "undefined" &&
     import.meta.env &&
     import.meta.env.VITE_API_BASE) || "";
 
-export const API_BASE = trim(fromQuery || envBase);
+// Priority: ?api -> env -> default
+export const API_BASE = trim(fromQuery || envBase || DEFAULT_API_BASE);
 
+// Build URLs ensuring we add `/api` only once
 export function apiPath(path = "") {
   const p = path.startsWith("/api") ? path : `/api${path.startsWith("/") ? path : `/${path}`}`;
-  return API_BASE ? `${API_BASE}${p}` : p; // allows relative path in local proxy
+  return `${API_BASE}${p}`;
 }
 
+// Non-blocking health probe (GET). Logs results, never throws.
 export async function checkHealth() {
-  // Try GET {API_BASE}/api/health, then GET {API_BASE}/health as a fallback.
-  const targets = [apiPath("/health"), API_BASE ? `${API_BASE}/health` : "/health"];
-  const errors = [];
-  for (const url of targets) {
+  const urls = [`${API_BASE}/api/health`, `${API_BASE}/health`];
+  for (const u of urls) {
     try {
-      const res = await fetch(url, { method: "GET" });
-      if (res.ok) return { ok: true, url, status: res.status };
-      errors.push({ url, status: res.status });
+      const r = await fetch(u, { method: "GET" });
+      if (r.ok) {
+        console.info("[Vancomyzer] API health OK:", u, r.status);
+        return { ok: true, url: u, status: r.status };
+      }
+      console.warn("[Vancomyzer] API health non-OK:", u, r.status);
     } catch (e) {
-      errors.push({ url, error: e?.message || String(e) });
+      console.warn("[Vancomyzer] API health error:", u, e?.message || e);
     }
   }
-  return { ok: false, errors };
+  return { ok: false };
 }
 
-// Only warn if truly missing (neither ?api nor VITE_API_BASE).
-if (!API_BASE) {
-  // eslint-disable-next-line no-console
-  console.warn("[Vancomyzer] Missing VITE_API_BASE; set it in .env or pass ?api=https://your-api");
-}
-
-// Expose for quick inspection
 if (typeof window !== "undefined") window.__VANCOMYZER_API_BASE__ = API_BASE;

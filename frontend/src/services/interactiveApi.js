@@ -1,7 +1,7 @@
 // Interactive AUC API client using canonical /api prefix
 // Endpoints: POST /api/interactive/auc, POST /api/optimize, GET /api/health
 
-import { API_BASE, apiPath, checkHealth } from '../lib/apiBase';
+import { apiPath, checkHealth } from '../lib/apiBase';
 
 function jsonHeaders(h) { return { 'Content-Type': 'application/json', Accept: 'application/json', ...(h || {}) }; }
 
@@ -17,6 +17,9 @@ async function fetchJSON(url, init = {}) {
   return res.json();
 }
 
+// Kick off a non-blocking health probe at startup
+try { checkHealth(); } catch {}
+
 // Generic POST helper with one transient retry
 async function postJSON(path, body, opts = {}) {
   const url = apiPath(path);
@@ -31,52 +34,25 @@ async function postJSON(path, body, opts = {}) {
   }
 }
 
-let __healthErrorLogged = false;
-export async function ensureApiReady() {
-  const res = await checkHealth();
-  if (!res.ok) {
-    if (!__healthErrorLogged) {
-      __healthErrorLogged = true;
-      // eslint-disable-next-line no-console
-      console.error('[Vancomyzer] API health check failed:', res);
-    }
-    return false;
-  }
-  return true;
-}
-
 // Public API
 export async function health() {
   try {
     const res = await checkHealth();
-    if (!res.ok && !__healthErrorLogged) {
-      __healthErrorLogged = true;
-      // eslint-disable-next-line no-console
-      console.error('[Vancomyzer] API health check failed:', res);
-    }
     return !!res.ok;
   } catch {
-    if (!__healthErrorLogged) {
-      __healthErrorLogged = true;
-      // eslint-disable-next-line no-console
-      console.error('[Vancomyzer] API health check failed: network error');
-    }
     return false;
   }
 }
 
 export async function bayesAUC({ patient, regimen, levels = [] }, opts = {}) {
-  if (!(await ensureApiReady())) throw new Error('API not ready');
   return postJSON('/interactive/auc', { patient, regimen, levels }, opts);
 }
 
 export async function optimize({ patient, regimen, target }, opts = {}) {
-  if (!(await ensureApiReady())) throw new Error('API not ready');
   return postJSON('/optimize', { patient, regimen, target }, opts);
 }
 
 export async function pkSimulation(payload, opts = {}) {
-  if (!(await ensureApiReady())) throw new Error('API not ready');
   return fetchJSON(apiPath('/pk-simulation'), { method: 'POST', body: JSON.stringify(payload || {}), ...opts });
 }
 
@@ -85,4 +61,4 @@ export async function calculateInteractiveAUC(payload, opts = {}) { return bayes
 
 // Debug export of base
 export { API_BASE } from '../lib/apiBase';
-export const __BASE__ = API_BASE;
+export { API_BASE as __BASE__ } from '../lib/apiBase';
