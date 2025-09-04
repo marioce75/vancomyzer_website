@@ -61,3 +61,12 @@ curl -i https://vancomyzer.onrender.com/api/health
 curl -i -X POST https://vancomyzer.onrender.com/api/interactive/auc \
   -H "Content-Type: application/json" \
   -d '{"age_years":55,"weight_kg":72,"scr_mg_dl":1.0,"dose_mg":1500,"interval_hr":24}'
+
+Quick tests
+-----------
+
+curl -s https://vancomyzer.onrender.com/api/health
+curl -s -X POST https://vancomyzer.onrender.com/api/interactive/auc \
+  -H "Content-Type: application/json" \
+  -d '{"age_years":60,"weight_kg":80,"scr_mg_dl":1.1,"dose_mg":1500,"interval_hr":24,"infusion_minutes":60}'
+# Expect HTTP 200 and JSON with ok: true and result.auc_24 present.

@@ -215,28 +215,153 @@ def _interactive_auc_core(req: InteractiveRequest):
 
 # Public compute wrapper per requirements. If business logic is unavailable, return stub.
 def compute_auc(req: AucRequest) -> Dict[str, Any]:
+    """Compute AUC and curve using Bayesian engine when available, with robust input normalization.
+
+    Returns a dict with keys:
+      - auc_24, predicted_peak, predicted_trough
+      - series: { time_hours, concentration_mg_L, p05, p95 }
+      - params_used: echo of normalized inputs
+    """
+    # Normalization helpers
+    def _f(x):
+        return None if x is None else float(x)
+
+    age = _f(req.age_years)
+    wt = _f(req.weight_kg)
+    ht = _f(req.height_cm)
+    scr = _f(req.scr_mg_dl)
+    dose = _f(req.dose_mg)
+    tau = _f(req.interval_hr)
+    inf = _f(req.infusion_minutes) or 60.0
+    gender = (req.gender or "").lower() or None
+    levels = req.levels or None
+
+    logger.info(
+        "AUC normalized inputs: age=%s, weight_kg=%s, height_cm=%s, scr_mg_dl=%s, gender=%s, dose_mg=%s, interval_hr=%s, infusion_min=%s, levels=%s",
+        age, wt, ht, scr, gender, dose, tau, inf, "yes" if levels else "no",
+    )
+
+    # Input checks
+    if dose is None or tau is None:
+        raise HTTPException(status_code=400, detail="dose_mg and interval_hr are required")
+    if scr is None and not levels:
+        raise HTTPException(status_code=400, detail="Provide scr_mg_dl or levels for Bayesian update")
+
+    # Time grid per spec
+    horizon = float(max(24.0, tau))
+    dt = 0.25
+    times = np.arange(0.0, horizon + 1e-9, dt, dtype=float)
+
+    result_model: Dict[str, Any] | None = None
+
+    # Try Bayesian path first
     try:
-        # Map to InteractiveRequest used by the existing implementation
-        regimen = {
-            'dose_mg': float(req.dose_mg) if req.dose_mg is not None else 1000.0,
-            'interval_hours': float(req.interval_hr) if req.interval_hr is not None else 24.0,
-            'infusion_minutes': float(req.infusion_minutes) if req.infusion_minutes is not None else 60.0,
-        }
-        ir = InteractiveRequest(
-            age_years=req.age_years,
-            gender=req.gender,
-            weight_kg=req.weight_kg,
-            height_cm=req.height_cm,
-            serum_creatinine_mg_dl=req.scr_mg_dl,
-            mic_mg_L=1.0,
-            levels=[],
-            regimen=regimen,  # type: ignore
-        )
-        return _interactive_auc_core(ir)
-    except Exception as e:
-        logger.exception("AUC compute failed")
-        # Stub fallback to guarantee a 200 from the endpoint wrapper (unless raised)
-        return {"auc": 0, "note": "stub", "echo": req.model_dump() if hasattr(req, 'model_dump') else req.__dict__}
+        try:
+            from .bayes import PatientCovars as _PC, Regimen as _RG, fit_posterior as _fit, simulate_from_posterior as _sim
+            bayes_ok = True
+        except Exception:
+            bayes_ok = False
+            _PC = _RG = _fit = _sim = None  # type: ignore
+
+        if bayes_ok:
+            # Cockcroft–Gault for CrCl if available inputs; otherwise default
+            clcr = cockcroft_gault(age or 60.0, wt or 70.0, scr or 1.0, gender or 'm')
+            patient = _PC(clcr_ml_min=float(clcr), tbw_kg=float(wt or 70.0))
+            regimen = _RG(dose_mg=float(dose), interval_hours=float(tau), infusion_minutes=float(inf))
+
+            # Normalize levels to list[{time_hr, concentration_mg_L}]
+            lvl_list: List[Dict[str, float]] = []
+            if isinstance(levels, list):
+                for lv in levels:
+                    if isinstance(lv, dict):
+                        t = lv.get('time_hr') or lv.get('time_hours')
+                        c = lv.get('concentration_mg_L') or lv.get('conc') or lv.get('value')
+                        try:
+                            if t is not None and c is not None:
+                                lvl_list.append({'time_hr': float(t), 'concentration_mg_L': float(c)})
+                        except Exception:
+                            continue
+            logger.info("AUC path: bayesian (%s)", "with-levels" if len(lvl_list) > 0 else "prior-only")
+
+            posterior = _fit(patient, regimen, lvl_list)
+            sim = _sim(posterior, regimen, horizon_h=horizon, dt=min(dt, 0.05))
+            # Resample onto 0.25 h grid per requirements
+            t_src = np.asarray(sim.get('time_hours') or [], dtype=float)
+            m_src = np.asarray(sim.get('median') or [], dtype=float)
+            p05_src = np.asarray(sim.get('p05') or [], dtype=float) if sim.get('p05') is not None else None
+            p95_src = np.asarray(sim.get('p95') or [], dtype=float) if sim.get('p95') is not None else None
+            t_grid = np.arange(0.0, horizon + 1e-9, 0.25, dtype=float)
+            if t_src.size and m_src.size:
+                m_grid = np.interp(t_grid, t_src, m_src)
+                p05_grid = np.interp(t_grid, t_src, p05_src) if p05_src is not None and p05_src.size else None
+                p95_grid = np.interp(t_grid, t_src, p95_src) if p95_src is not None and p95_src.size else None
+            else:
+                m_grid = np.zeros_like(t_grid)
+                p05_grid = None
+                p95_grid = None
+            result_model = {
+                'auc_24': sim.get('auc24'),
+                'peak': sim.get('c_peak'),
+                'trough': sim.get('c_trough'),
+                'time': t_grid.tolist(),
+                'conc': m_grid.tolist(),
+                'p05': p05_grid.tolist() if isinstance(p05_grid, np.ndarray) else None,
+                'p95': p95_grid.tolist() if isinstance(p95_grid, np.ndarray) else None,
+            }
+    except HTTPException:
+        raise
+    except Exception as e:  # Log and continue to fallback
+        logger.exception("Bayesian engine failed; falling back to CL estimate: %s", e)
+        result_model = None
+
+    # Fallback: deterministic PK using CL/V prior means
+    if result_model is None:
+        try:
+            # Estimate CL and V from simple priors
+            clcr = cockcroft_gault(age or 60.0, wt or 70.0, scr or 1.0, gender or 'm')
+            mu_cl = 4.5 * (max(clcr, 5.0) / 100.0) ** 0.65 * (max(wt or 70.0, 20.0) / 70.0) ** 0.75
+            mu_v = 60.0 * (max(wt or 70.0, 20.0) / 70.0) ** 1.0
+            from .pk.model import auc_trapz as _auc_trapz, peak_trough_from_series as _pt
+            conc = superposition_conc(times, float(dose), float(tau), float(inf) / 60.0, float(mu_cl), float(mu_v))
+            auc24 = _auc_trapz(times, conc, 0.0, 24.0)
+            pt = _pt(times, conc, float(tau))
+            result_model = {
+                'auc_24': float(auc24),
+                'peak': float(pt.get('peak', np.nan)),
+                'trough': float(pt.get('trough', np.nan)),
+                'time': [float(x) for x in times.tolist()],
+                'conc': [float(x) for x in conc.tolist()],
+                'p05': None,
+                'p95': None,
+            }
+            logger.info("AUC path: deterministic prior CL/V")
+        except Exception as e:
+            logger.exception("AUC fallback failed: %s", e)
+            raise HTTPException(status_code=500, detail="Bayesian engine not available")
+
+    # Output mapping per spec
+    out = {
+        'auc_24': float(result_model.get('auc_24')) if result_model.get('auc_24') is not None else None,
+        'predicted_peak': float(result_model.get('peak')) if result_model.get('peak') is not None else None,
+        'predicted_trough': float(result_model.get('trough')) if result_model.get('trough') is not None else None,
+        'series': {
+            'time_hours': [float(x) for x in (result_model.get('time') or [])],
+            'concentration_mg_L': [float(x) for x in (result_model.get('conc') or [])],
+            'p05': result_model.get('p05'),
+            'p95': result_model.get('p95'),
+        },
+        'params_used': {
+            'age_years': age,
+            'weight_kg': wt,
+            'height_cm': ht,
+            'scr_mg_dl': scr,
+            'gender': gender,
+            'dose_mg': dose,
+            'interval_hr': tau,
+            'infusion_minutes': float(inf),
+        },
+    }
+    return out
 
 
 # Canonical Interactive AUC endpoint (POST primary) — registered only on router to avoid duplicates
