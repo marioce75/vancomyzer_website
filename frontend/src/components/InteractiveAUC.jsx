@@ -5,7 +5,7 @@ import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Swit
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { health, bayesAUC, optimize } from '../services/interactiveApi';
+import { health, optimize, postAuc } from '../services/interactiveApi';
 import { API_BASE } from '../lib/apiBase';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
@@ -50,6 +50,20 @@ const help = {
   height:    { key: 'help.height',    link: '/guideline/special-populations' },
   levels:    { key: 'help.levels',    link: '/guideline/sampling-timing' },
 };
+
+function formToPayload(s) {
+  return {
+    age_years: s.ageYears ?? null,
+    weight_kg: s.weightKg ?? null,
+    height_cm: s.heightCm ?? null,
+    scr_mg_dl: s.scr ?? null,
+    gender: s.gender ?? null,
+    dose_mg: s.doseMg ?? null,
+    interval_hr: s.intervalHr ?? null,
+    infusion_minutes: s.infusionMin ?? 60,
+    levels: s.levels ?? null,
+  };
+}
 
 export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const { t, i18n } = useTranslation();
@@ -129,15 +143,28 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       setSeries(localSeries); setSummary(localSummary);
     } catch {}
 
-    // Only call backend when Bayesian level(s) exist
-    const hasLevels = Array.isArray(measuredLevels) && measuredLevels.length > 0;
-    if (!apiOnline || !hasLevels) { setLoading(false); return; }
-
     if (apiAbort.current) apiAbort.current.abort();
     apiAbort.current = new AbortController();
 
+    // Build flat payload matching backend AucRequest
+    const formState = {
+      ageYears: patient?.age,
+      weightKg: patient?.weight_kg,
+      heightCm: patient?.height_cm,
+      scr: patient?.serum_creatinine_mg_dl,
+      gender: patient?.gender,
+      doseMg: regimen?.dose_mg,
+      intervalHr: regimen?.interval_hours,
+      infusionMin: regimen?.infusion_minutes,
+      levels: null,
+    };
+    const payload = formToPayload(formState);
+
     try {
-      const data = await bayesAUC({ patient: { ...patient, population_mode: mode }, regimen, levels: measuredLevels }, { signal: apiAbort.current.signal });
+      try { console.debug('[Vancomyzer] POST /api/interactive/auc', payload); } catch {}
+      const res = await postAuc(payload);
+      const data = res?.result || res;
+
       const auc = data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24;
       const peak = data?.metrics?.predicted_peak ?? data.predicted_peak;
       const trough = data?.metrics?.predicted_trough ?? data.predicted_trough;
@@ -154,20 +181,16 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       }
       setApiOnline(true);
     } catch (e) {
-      const msg = (e?.status === 405)
-        ? 'Method not allowed at endpoint — check POST path /api/interactive/auc'
-        : (e?.status === 404)
-          ? 'Endpoint not found — verify base URL and /api prefix'
-          : (e?.message || 'Interactive service unreachable');
+      console.error('[Vancomyzer] AUC error:', e);
+      setError(String(e?.message || e));
       setApiOnline(false);
-      setError(msg);
       // Backoff once to avoid spamming
       const now = Date.now();
       if (!retryTs || (now - retryTs) > 2000) setRetryTs(now);
     } finally {
       setLoading(false);
     }
-  }, [patient, regimen, measuredLevels, mode, apiOnline, retryTs]);
+  }, [patient, regimen, measuredLevels, mode, retryTs]);
 
   useEffect(() => {
     const t = setTimeout(() => { runInteractive(); }, 220);

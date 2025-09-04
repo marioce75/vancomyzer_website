@@ -48,6 +48,25 @@ export async function bayesAUC({ patient, regimen, levels = [] }, opts = {}) {
   return postJSON('/interactive/auc', { patient, regimen, levels }, opts);
 }
 
+// New: Flat POST helper using apiPath and friendly error messages
+export async function postAuc(payload) {
+  const resp = await fetch(apiPath('/interactive/auc'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const text = await resp.text();
+  let data;
+  try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
+  if (!resp.ok) {
+    const reason = (data && (data.detail || data.message)) || resp.statusText || `HTTP ${resp.status}`;
+    const err = new Error(`AUC request failed: ${reason}`);
+    err.status = resp.status; err.data = data; err.url = apiPath('/interactive/auc');
+    throw err;
+  }
+  return data;
+}
+
 export async function optimize({ patient, regimen, target }, opts = {}) {
   return postJSON('/optimize', { patient, regimen, target }, opts);
 }
