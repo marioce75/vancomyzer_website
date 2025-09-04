@@ -53,3 +53,11 @@ Smoke test
 curl -s -X POST http://127.0.0.1:8000/api/dose/interactive \
   -H 'Content-Type: application/json' \
   -d @backend/example_payload.json | jq . | head
+
+Quick remote checks
+-------------------
+
+curl -i https://vancomyzer.onrender.com/api/health
+curl -i -X POST https://vancomyzer.onrender.com/api/interactive/auc \
+  -H "Content-Type: application/json" \
+  -d '{"age_years":55,"weight_kg":72,"scr_mg_dl":1.0,"dose_mg":1500,"interval_hr":24}'

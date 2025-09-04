@@ -8,7 +8,7 @@ from typing import Dict, Tuple, Any, List, Optional
 
 import numpy as np
 import orjson
-from fastapi import FastAPI, HTTPException, Body, Response, Query, APIRouter
+from fastapi import FastAPI, HTTPException, Body, Query, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
@@ -42,19 +42,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Router for /api endpoints
-router = APIRouter()
+# Router for /api endpoints (single prefix to avoid /api/api)
+router = APIRouter(prefix="/api")
 
-@app.options('/api/interactive/auc')
-@app.options('/api/interactive/auc/')
-@app.options('/interactive/auc')
-@app.options('/interactive/auc/')
-def options_interactive_auc() -> Response:
-    return Response(status_code=200)
-
-# Mount routers under /api
+# Mount existing loading-dose router under /api as well
 app.include_router(ld_router, prefix="/api")
-app.include_router(router, prefix="/api")
 
 
 @app.get('/health')
@@ -247,11 +239,9 @@ def compute_auc(req: AucRequest) -> Dict[str, Any]:
         return {"auc": 0, "note": "stub", "echo": req.model_dump() if hasattr(req, 'model_dump') else req.__dict__}
 
 
-# Canonical Interactive AUC endpoint (POST primary) — accepts either legacy shape or flat AucRequest
+# Canonical Interactive AUC endpoint (POST primary) — registered only on router to avoid duplicates
 @router.post('/interactive/auc')
 @router.post('/interactive/auc/')
-@app.post('/interactive/auc')  # back-compat alias without /api
-@app.post('/interactive/auc/')
 def interactive_auc_post(body: Dict[str, Any] = Body(...)):
     logger.info("AUC POST payload: %s", body)
     try:
@@ -380,3 +370,6 @@ def optimize(body: Dict[str, Any] = Body(...)):
             'expected_auc_24': float(auc24_est),
         }
     }
+
+# include router once at the end
+app.include_router(router)

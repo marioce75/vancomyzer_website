@@ -6,6 +6,7 @@ from typing import List, Optional, Tuple, Any, Dict
 
 import numpy as np
 from fastapi import FastAPI, Body, HTTPException
+from fastapi.routing import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel, Field
@@ -31,8 +32,10 @@ except Exception:  # pragma: no cover
     from backend.pk.optimize import choose_dose_interval  # type: ignore
 
 
-# App with API root path
-app = FastAPI(root_path="/api", default_response_class=ORJSONResponse)
+# App without root_path; we'll mount routes under '/api' via a router
+app = FastAPI(default_response_class=ORJSONResponse)
+router = APIRouter(prefix="/api")
+
 
 # CORS from env or defaults
 _default_origins = [
@@ -138,8 +141,12 @@ class Patient(BaseModel):
 
 
 @app.get("/health")
-@app.get("/api/health")
 def health():
+    return {"status": "ok"}
+
+
+@router.get("/health")
+def api_health():
     return {"status": "ok"}
 
 
@@ -160,8 +167,7 @@ def _normalize_auc_payload(body: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[s
     return patient, regimen, levels
 
 
-@app.post("/interactive/auc")
-@app.post("/api/interactive/auc")
+@router.post("/interactive/auc")
 def interactive_auc(body: Dict[str, Any] = Body(...)):
     p_raw, r_raw, levels_raw = _normalize_auc_payload(body)
     try:
@@ -235,7 +241,7 @@ def interactive_auc(body: Dict[str, Any] = Body(...)):
     auc24 = auc_trapz(times, conc, 0.0, 24.0)
     pt = peak_trough_from_series(times, conc, float(interval_hours))
 
-    return {
+    result = {
         "metrics": {
             "auc_24": float(auc24),
             "predicted_peak": float(pt["peak"]),
@@ -257,6 +263,7 @@ def interactive_auc(body: Dict[str, Any] = Body(...)):
             "n_draws": int(n_draws),
         },
     }
+    return {"ok": True, "result": result}
 
 
 def _normalize_opt_payload(body: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], List[Dict[str, Any]]]:
@@ -278,7 +285,7 @@ def _normalize_opt_payload(body: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[s
 
 
 @app.post("/optimize")
-@app.post("/api/optimize")
+@router.post("/optimize")
 def optimize(body: Dict[str, Any] = Body(...)):
     p_raw, r_raw, tgt_raw, levels_raw = _normalize_opt_payload(body)
     try:
@@ -338,3 +345,44 @@ def optimize(body: Dict[str, Any] = Body(...)):
             "expected_auc_24": float(auc24_est),
         }
     }
+
+
+# Backward-compat GET wrapper for quick manual tests; returns stubbed compute if params are flat
+try:
+    from pydantic import ConfigDict  # type: ignore
+    _HAS_CONFIGDICT = True
+except Exception:
+    ConfigDict = None  # type: ignore
+    _HAS_CONFIGDICT = False
+
+class AucRequest(BaseModel):
+    age_years: Optional[float] = None
+    weight_kg: Optional[float] = None
+    height_cm: Optional[float] = None
+    scr_mg_dl: Optional[float] = None
+    gender: Optional[str] = None
+    dose_mg: Optional[float] = None
+    interval_hr: Optional[float] = None
+    infusion_minutes: Optional[float] = 60.0
+    levels: Optional[List[Dict[str, Any]]] = None
+    other: Optional[Dict[str, Any]] = None
+    if _HAS_CONFIGDICT:
+        model_config = ConfigDict(extra="allow")  # type: ignore
+    else:
+        class Config:
+            extra = "allow"
+
+def compute_auc_stub(req: AucRequest) -> Dict[str, Any]:
+    return {"auc": 0, "note": "stub", "echo": req.dict() if hasattr(req, 'dict') else {}}
+
+@router.get("/interactive/auc")
+def interactive_auc_get(**params):
+    # simple stubbed GET for compatibility
+    try:
+        req = AucRequest(**params)
+    except Exception:
+        req = AucRequest()
+    return {"ok": True, "result": compute_auc_stub(req)}
+
+# include the API router once
+app.include_router(router)
