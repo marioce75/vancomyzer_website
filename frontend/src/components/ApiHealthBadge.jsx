@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Chip, Box } from "@mui/material";
-import { apiPath, API_BASE } from '../lib/apiBase';
-
-const API_HEALTH_URL = API_BASE ? apiPath('/health') : '';
+import { checkHealth } from '../lib/apiBase';
 
 const ApiHealthBadge = () => {
   const [apiStatus, setApiStatus] = useState("checking");
 
   useEffect(() => {
-    if (!API_HEALTH_URL) { setApiStatus('offline'); return; }
-    fetch(API_HEALTH_URL, { headers: { Accept: "application/json" } })
-      .then(async (res) => { if (!res.ok) throw new Error(`${res.status}`); return res.json(); })
-      .then((data) => { setApiStatus(data?.status === "ok" ? "healthy" : "unhealthy"); })
-      .catch(() => setApiStatus("offline"));
+    (async () => {
+      const res = await checkHealth();
+      setApiStatus(res.ok ? 'healthy' : 'offline');
+    })();
   }, []);
 
   const statusColor = { healthy: "success", unhealthy: "warning", offline: "error", checking: "default" };

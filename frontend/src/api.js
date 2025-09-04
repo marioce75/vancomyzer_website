@@ -1,5 +1,5 @@
 import { normalizePatientFields } from './services/normalizePatient';
-import { apiPath, API_BASE } from './lib/apiBase';
+import { apiPath, API_BASE, checkHealth } from './lib/apiBase';
 
 let __loggedBase = false;
 function debug(...args) { if (import.meta?.env?.DEV) console.debug('[API]', ...args); }
@@ -50,16 +50,20 @@ async function jsonFetch(path, { method = 'POST', body, signal } = {}) {
 }
 
 // --- Health probe ---
-export async function health({ signal } = {}) { return jsonFetch('/api/health', { method: 'GET', signal }); }
+export async function health({ signal } = {}) {
+  const res = await checkHealth();
+  if (!res.ok) { const e = new Error('API health check failed'); e.details = res; throw e; }
+  return { status: 'ok', url: res.url, statusCode: res.status };
+}
 
 function ensureNestedPatient(patientLike) { const norm = normalizePatientFields(patientLike ?? {}); return norm; }
 
 export async function calculateInteractiveAUC({ patient, regimen, levels = [] }, { signal } = {}) {
   const payload = { patient: ensureNestedPatient(patient), regimen: regimen ?? {}, levels: Array.isArray(levels) ? levels : [] };
-  return jsonFetch('/api/interactive/auc', { method: 'POST', body: payload, signal }); }
+  return jsonFetch('/interactive/auc', { method: 'POST', body: payload, signal }); }
 
 export async function optimizeDose({ patient, regimen, target }, { signal } = {}) {
   const payload = { patient: ensureNestedPatient(patient), regimen: regimen ?? {}, target: target ?? {} };
-  return jsonFetch('/api/optimize', { method: 'POST', body: payload, signal }); }
+  return jsonFetch('/optimize', { method: 'POST', body: payload, signal }); }
 
-export async function pkSimulation(payload) { return jsonFetch('/api/pk-simulation', { method: 'POST', body: payload }); }
+export async function pkSimulation(payload) { return jsonFetch('/pk-simulation', { method: 'POST', body: payload }); }

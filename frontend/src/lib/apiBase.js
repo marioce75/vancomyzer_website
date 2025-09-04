@@ -1,36 +1,42 @@
 // src/lib/apiBase.js
-// In Render → Static Site, set VITE_API_BASE (no trailing /api). Clear build cache & redeploy after changes.
-const fromQuery = new URLSearchParams(window.location.search).get("api");
+const qp = new URLSearchParams(window.location.search);
+const fromQuery = qp.get("api");
 
-// Normalize: trim trailing slashes
-function normalize(url) {
-  return (url || "").replace(/\/+$/, "");
-}
+const trim = (s) => (s || "").replace(/\/+$/, "");
 
-// Priority: ?api => VITE_API_BASE => ""
-export const API_BASE = normalize(
-  fromQuery ||
+const envBase =
   (typeof import.meta !== "undefined" &&
     import.meta.env &&
-    import.meta.env.VITE_API_BASE) ||
-  ""
-);
+    import.meta.env.VITE_API_BASE) || "";
 
-// Helper to build endpoints ensuring we only add `/api` once
+export const API_BASE = trim(fromQuery || envBase);
+
 export function apiPath(path = "") {
-  const base = API_BASE;
-  // If the provided path already starts with '/api', just join once
   const p = path.startsWith("/api") ? path : `/api${path.startsWith("/") ? path : `/${path}`}`;
-  return base ? `${base}${p}` : p; // if no base (local dev proxy), return relative path
+  return API_BASE ? `${API_BASE}${p}` : p; // allows relative path in local proxy
 }
 
-// Single warning emitted once if base is missing
+export async function checkHealth() {
+  // Try GET {API_BASE}/api/health, then GET {API_BASE}/health as a fallback.
+  const targets = [apiPath("/health"), API_BASE ? `${API_BASE}/health` : "/health"];
+  const errors = [];
+  for (const url of targets) {
+    try {
+      const res = await fetch(url, { method: "GET" });
+      if (res.ok) return { ok: true, url, status: res.status };
+      errors.push({ url, status: res.status });
+    } catch (e) {
+      errors.push({ url, error: e?.message || String(e) });
+    }
+  }
+  return { ok: false, errors };
+}
+
+// Only warn if truly missing (neither ?api nor VITE_API_BASE).
 if (!API_BASE) {
   // eslint-disable-next-line no-console
   console.warn("[Vancomyzer] Missing VITE_API_BASE; set it in .env or pass ?api=https://your-api");
 }
 
-// Helpful debug in dev
-if (typeof window !== "undefined") {
-  window.__VANCOMYZER_API_BASE__ = API_BASE;
-}
+// Expose for quick inspection
+if (typeof window !== "undefined") window.__VANCOMYZER_API_BASE__ = API_BASE;
