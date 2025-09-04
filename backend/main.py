@@ -8,7 +8,7 @@ from typing import Dict, Tuple, Any, List, Optional
 
 import numpy as np
 import orjson
-from fastapi import FastAPI, HTTPException, Body, Response, Query
+from fastapi import FastAPI, HTTPException, Body, Response, Query, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
@@ -20,7 +20,7 @@ from .pk.optimize import choose_dose_interval
 from .api_loading_dose import router as ld_router
 
 # Lightweight logger
-logger = logging.getLogger("vancomyzer.api")
+logger = logging.getLogger("vancomyzer")
 if not logger.handlers:
     logging.basicConfig(level=logging.INFO)
 
@@ -42,6 +42,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Router for /api endpoints
+router = APIRouter()
+
 @app.options('/api/interactive/auc')
 @app.options('/api/interactive/auc/')
 @app.options('/interactive/auc')
@@ -51,15 +54,16 @@ def options_interactive_auc() -> Response:
 
 # Mount routers under /api
 app.include_router(ld_router, prefix="/api")
+app.include_router(router, prefix="/api")
 
 
 @app.get('/health')
 def health():
     return {"status": "ok"}
 
-# Alias to support clients configured with base '/api'
-@app.get('/api/health')
-def health_api():
+# Router-scoped health for /api
+@router.get('/health')
+async def health_api():
     return {"status": "ok"}
 
 @app.get('/api/config')
@@ -76,12 +80,15 @@ except Exception:  # pragma: no cover
     _HAS_CONFIGDICT = False
 
 class AucRequest(BaseModel):
-    age: Optional[float] = None
+    age_years: Optional[float] = None
     weight_kg: Optional[float] = None
     height_cm: Optional[float] = None
     scr_mg_dl: Optional[float] = None
+    gender: Optional[str] = None
     dose_mg: Optional[float] = None
     interval_hr: Optional[float] = None
+    infusion_minutes: Optional[float] = 60.0
+    levels: Optional[list[float]] = None
     other: Optional[Dict[str, Any]] = None
     # Accept legacy/nested shapes without rejecting
     if _HAS_CONFIGDICT:
@@ -221,11 +228,11 @@ def compute_auc(req: AucRequest) -> Dict[str, Any]:
         regimen = {
             'dose_mg': float(req.dose_mg) if req.dose_mg is not None else 1000.0,
             'interval_hours': float(req.interval_hr) if req.interval_hr is not None else 24.0,
-            'infusion_minutes': 60.0,
+            'infusion_minutes': float(req.infusion_minutes) if req.infusion_minutes is not None else 60.0,
         }
         ir = InteractiveRequest(
-            age_years=req.age,
-            gender=None,
+            age_years=req.age_years,
+            gender=req.gender,
             weight_kg=req.weight_kg,
             height_cm=req.height_cm,
             serum_creatinine_mg_dl=req.scr_mg_dl,
@@ -241,17 +248,19 @@ def compute_auc(req: AucRequest) -> Dict[str, Any]:
 
 
 # Canonical Interactive AUC endpoint (POST primary) — accepts either legacy shape or flat AucRequest
-@app.post('/api/interactive/auc')
-@app.post('/api/interactive/auc/')
+@router.post('/interactive/auc')
+@router.post('/interactive/auc/')
 @app.post('/interactive/auc')  # back-compat alias without /api
 @app.post('/interactive/auc/')
 def interactive_auc_post(body: Dict[str, Any] = Body(...)):
+    logger.info("AUC POST payload: %s", body)
     try:
         # Try legacy/full payload first (has regimen/levels etc)
         if isinstance(body, dict) and ("regimen" in body or "levels" in body or "serum_creatinine_mg_dl" in body or "serum_creatinine" in body or "age" in body or "age_years" in body):
             try:
                 req_full = InteractiveRequest(**body)
                 result = _interactive_auc_core(req_full)
+                logger.info("AUC result: %s", result)
                 return {"ok": True, "result": result}
             except Exception:
                 # fall through to flat request
@@ -259,6 +268,7 @@ def interactive_auc_post(body: Dict[str, Any] = Body(...)):
         # Flat/minimal request
         req = AucRequest(**body)
         result = compute_auc(req)
+        logger.info("AUC result: %s", result)
         return {"ok": True, "result": result}
     except HTTPException:
         raise
@@ -268,24 +278,29 @@ def interactive_auc_post(body: Dict[str, Any] = Body(...)):
 
 
 # GET thin wrapper for backward compatibility and easy testing
-@app.get('/api/interactive/auc')
-@app.get('/api/interactive/auc/')
+@router.get('/interactive/auc')
+@router.get('/interactive/auc/')
 def interactive_auc_get(
     age: float | None = Query(default=None),
+    age_years: float | None = Query(default=None),
     weight_kg: float | None = Query(default=None),
     height_cm: float | None = Query(default=None),
     scr_mg_dl: float | None = Query(default=None),
     dose_mg: float | None = Query(default=None),
     interval_hr: float | None = Query(default=None),
+    infusion_minutes: float | None = Query(default=None),
+    gender: str | None = Query(default=None),
 ):
     try:
         req = AucRequest(
-            age=age,
+            age_years=age_years if age_years is not None else age,
             weight_kg=weight_kg,
             height_cm=height_cm,
             scr_mg_dl=scr_mg_dl,
             dose_mg=dose_mg,
             interval_hr=interval_hr,
+            infusion_minutes=infusion_minutes,
+            gender=gender,
         )
         result = compute_auc(req)
         return {"ok": True, "result": result}

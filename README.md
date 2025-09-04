@@ -41,7 +41,7 @@ API contract (summary)
 ----------------------
 - GET /health → {"status":"ok"}
 - POST /api/dose/interactive
-  Request: flat patient (age, gender, weight_kg, height_cm, serum_creatinine[_mg_dl], optional clcr_ml_min), levels[{time_hr, concentration_mg_L, tag?}], regimen{dose_mg, interval_hours, infusion_minutes}, mic_mg_L
+  Request: flat patient (age, gender, weight_kg, height_cm, serum_creatinine
   Response: { series{time_hours, median, p05, p95}, metrics{auc_24, predicted_peak, predicted_trough, auc24_over_mic}, posterior{n_draws, CL_median_L_per_h, V_median_L}, diagnostics{predicted_levels[{t, median, p05, p95}], rhat_ok} }
 
 Deployment (Render)
@@ -116,3 +116,13 @@ Quick verification (production)
        -H "Content-Type: application/json" \
        -d '{"age":55,"weight_kg":70,"scr_mg_dl":1.0,"dose_mg":1500,"interval_hr":24}'
   # Expect HTTP/200 and JSON body with {"ok": true, "result": {...}}
+
+---
+
+Concise curl examples
+- Health
+  curl -i https://vancomyzer.onrender.com/api/health
+- Interactive AUC (POST JSON)
+  curl -i -X POST https://vancomyzer.onrender.com/api/interactive/auc \
+       -H "Content-Type: application/json" \
+       -d '{"age_years":55,"weight_kg":72,"scr_mg_dl":1.0,"dose_mg":1500,"interval_hr":24}'
