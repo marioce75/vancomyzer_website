@@ -105,3 +105,14 @@ Client-side behavior
 ## Frontend env
 - Set VITE_INTERACTIVE_API_URL=https://<render-url>/api
 - Rebuild and redeploy frontend.
+
+---
+
+Quick verification (production)
+- Health
+  curl -i https://vancomyzer.onrender.com/api/health
+- Interactive AUC (POST JSON)
+  curl -i -X POST https://vancomyzer.onrender.com/api/interactive/auc \
+       -H "Content-Type: application/json" \
+       -d '{"age":55,"weight_kg":70,"scr_mg_dl":1.0,"dose_mg":1500,"interval_hr":24}'
+  # Expect HTTP/200 and JSON body with {"ok": true, "result": {...}}

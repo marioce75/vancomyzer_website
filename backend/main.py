@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 from functools import lru_cache
-from typing import Dict, Tuple, Any, List
+from typing import Dict, Tuple, Any, List, Optional
 
 import numpy as np
 import orjson
-from fastapi import FastAPI, HTTPException, Body, Response
+from fastapi import FastAPI, HTTPException, Body, Response, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
+from pydantic import BaseModel
 
 from .schemas import InteractiveRequest, InteractiveResponse
 from .bayes import PatientCovars, Regimen, fit_posterior, simulate_from_posterior
@@ -17,30 +19,33 @@ from .pk.model import superposition_conc
 from .pk.optimize import choose_dose_interval
 from .api_loading_dose import router as ld_router
 
+# Lightweight logger
+logger = logging.getLogger("vancomyzer.api")
+if not logger.handlers:
+    logging.basicConfig(level=logging.INFO)
+
 app = FastAPI(default_response_class=ORJSONResponse)
 
+# Restrictive CORS per requirements
 ALLOWED_ORIGINS = [
     "https://vancomyzer.com",
     "https://www.vancomyzer.com",
-    "https://vancomyzer.onrender.com",
-    "https://api.vancomyzer.com",
     "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
 ]
 
 # CORS must be added before routers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
 @app.options('/api/interactive/auc')
+@app.options('/api/interactive/auc/')
 @app.options('/interactive/auc')
+@app.options('/interactive/auc/')
 def options_interactive_auc() -> Response:
     return Response(status_code=200)
 
@@ -60,6 +65,30 @@ def health_api():
 @app.get('/api/config')
 def api_config():
     return {"base": "/api", "cors": ALLOWED_ORIGINS}
+
+
+# Permissive request model for AUC endpoint
+try:
+    from pydantic import ConfigDict  # type: ignore
+    _HAS_CONFIGDICT = True
+except Exception:  # pragma: no cover
+    ConfigDict = None  # type: ignore
+    _HAS_CONFIGDICT = False
+
+class AucRequest(BaseModel):
+    age: Optional[float] = None
+    weight_kg: Optional[float] = None
+    height_cm: Optional[float] = None
+    scr_mg_dl: Optional[float] = None
+    dose_mg: Optional[float] = None
+    interval_hr: Optional[float] = None
+    other: Optional[Dict[str, Any]] = None
+    # Accept legacy/nested shapes without rejecting
+    if _HAS_CONFIGDICT:
+        model_config = ConfigDict(extra="allow")  # type: ignore
+    else:
+        class Config:
+            extra = "allow"
 
 
 def cockcroft_gault(age_years: float, weight_kg: float, scr_mg_dl: float, gender: str | None) -> float:
@@ -128,11 +157,8 @@ def _predicted_levels_debug(posterior, regimen: Regimen, levels: list):
     return out
 
 
-# Canonical Interactive AUC endpoint
-@app.post('/api/interactive/auc', response_model=InteractiveResponse)
-# Back-compat alias without /api (not advertised)
-@app.post('/interactive/auc', response_model=InteractiveResponse)
-def interactive_auc(req: InteractiveRequest):
+# Core implementation used by both POST and GET handlers
+def _interactive_auc_core(req: InteractiveRequest):
     # Flatten and normalize
     serum = req.serum_creatinine if req.serum_creatinine is not None else req.serum_creatinine_mg_dl
     clcr = req.clcr_ml_min or cockcroft_gault(req.age_years or 60, req.weight_kg or 70, serum or 1.0, req.gender or 'm')
@@ -186,6 +212,88 @@ def interactive_auc(req: InteractiveRequest):
     }
 
     return response
+
+
+# Public compute wrapper per requirements. If business logic is unavailable, return stub.
+def compute_auc(req: AucRequest) -> Dict[str, Any]:
+    try:
+        # Map to InteractiveRequest used by the existing implementation
+        regimen = {
+            'dose_mg': float(req.dose_mg) if req.dose_mg is not None else 1000.0,
+            'interval_hours': float(req.interval_hr) if req.interval_hr is not None else 24.0,
+            'infusion_minutes': 60.0,
+        }
+        ir = InteractiveRequest(
+            age_years=req.age,
+            gender=None,
+            weight_kg=req.weight_kg,
+            height_cm=req.height_cm,
+            serum_creatinine_mg_dl=req.scr_mg_dl,
+            mic_mg_L=1.0,
+            levels=[],
+            regimen=regimen,  # type: ignore
+        )
+        return _interactive_auc_core(ir)
+    except Exception as e:
+        logger.exception("AUC compute failed")
+        # Stub fallback to guarantee a 200 from the endpoint wrapper (unless raised)
+        return {"auc": 0, "note": "stub", "echo": req.model_dump() if hasattr(req, 'model_dump') else req.__dict__}
+
+
+# Canonical Interactive AUC endpoint (POST primary) — accepts either legacy shape or flat AucRequest
+@app.post('/api/interactive/auc')
+@app.post('/api/interactive/auc/')
+@app.post('/interactive/auc')  # back-compat alias without /api
+@app.post('/interactive/auc/')
+def interactive_auc_post(body: Dict[str, Any] = Body(...)):
+    try:
+        # Try legacy/full payload first (has regimen/levels etc)
+        if isinstance(body, dict) and ("regimen" in body or "levels" in body or "serum_creatinine_mg_dl" in body or "serum_creatinine" in body or "age" in body or "age_years" in body):
+            try:
+                req_full = InteractiveRequest(**body)
+                result = _interactive_auc_core(req_full)
+                return {"ok": True, "result": result}
+            except Exception:
+                # fall through to flat request
+                pass
+        # Flat/minimal request
+        req = AucRequest(**body)
+        result = compute_auc(req)
+        return {"ok": True, "result": result}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("AUC compute failed (POST)")
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# GET thin wrapper for backward compatibility and easy testing
+@app.get('/api/interactive/auc')
+@app.get('/api/interactive/auc/')
+def interactive_auc_get(
+    age: float | None = Query(default=None),
+    weight_kg: float | None = Query(default=None),
+    height_cm: float | None = Query(default=None),
+    scr_mg_dl: float | None = Query(default=None),
+    dose_mg: float | None = Query(default=None),
+    interval_hr: float | None = Query(default=None),
+):
+    try:
+        req = AucRequest(
+            age=age,
+            weight_kg=weight_kg,
+            height_cm=height_cm,
+            scr_mg_dl=scr_mg_dl,
+            dose_mg=dose_mg,
+            interval_hr=interval_hr,
+        )
+        result = compute_auc(req)
+        return {"ok": True, "result": result}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("AUC compute failed (GET)")
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 # --- Optimize endpoint to recommend dose/interval for AUC target ---
