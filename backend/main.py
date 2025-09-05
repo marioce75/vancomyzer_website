@@ -13,11 +13,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
 
-from .schemas import InteractiveRequest, InteractiveResponse
-from .bayes import PatientCovars, Regimen, fit_posterior, simulate_from_posterior
-from .pk.model import superposition_conc
-from .pk.optimize import choose_dose_interval
-from .api_loading_dose import router as ld_router
+# Updated to package-qualified imports
+from backend.schemas import InteractiveRequest, InteractiveResponse
+from backend.bayes import PatientCovars, Regimen, fit_posterior, simulate_from_posterior
+from backend.pk.model import superposition_conc
+from backend.pk.optimize import choose_dose_interval
+from backend.api_loading_dose import router as ld_router
 
 # Lightweight logger
 logger = logging.getLogger("vancomyzer")
@@ -257,7 +258,7 @@ def compute_auc(req: AucRequest) -> Dict[str, Any]:
     # Try Bayesian path first
     try:
         try:
-            from .bayes import PatientCovars as _PC, Regimen as _RG, fit_posterior as _fit, simulate_from_posterior as _sim
+            from backend.bayes import PatientCovars as _PC, Regimen as _RG, fit_posterior as _fit, simulate_from_posterior as _sim
             bayes_ok = True
         except Exception:
             bayes_ok = False
@@ -321,7 +322,7 @@ def compute_auc(req: AucRequest) -> Dict[str, Any]:
             clcr = cockcroft_gault(age or 60.0, wt or 70.0, scr or 1.0, gender or 'm')
             mu_cl = 4.5 * (max(clcr, 5.0) / 100.0) ** 0.65 * (max(wt or 70.0, 20.0) / 70.0) ** 0.75
             mu_v = 60.0 * (max(wt or 70.0, 20.0) / 70.0) ** 1.0
-            from .pk.model import auc_trapz as _auc_trapz, peak_trough_from_series as _pt
+            from backend.pk.model import auc_trapz as _auc_trapz, peak_trough_from_series as _pt
             conc = superposition_conc(times, float(dose), float(tau), float(inf) / 60.0, float(mu_cl), float(mu_v))
             auc24 = _auc_trapz(times, conc, 0.0, 24.0)
             pt = _pt(times, conc, float(tau))

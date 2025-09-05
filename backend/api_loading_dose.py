@@ -1,6 +1,11 @@
+# NOTE: imports converted from relative to absolute for uvicorn main:app
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
-from . import pk
+
+try:
+    from backend import pk
+except Exception:  # pragma: no cover
+    import pk  # type: ignore
 
 router = APIRouter()
 

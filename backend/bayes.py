@@ -1,3 +1,7 @@
+# NOTE: imports converted from relative to absolute for uvicorn main:app
+"""
+Bayesian engine wrappers and posterior simulation utilities.
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -7,7 +11,7 @@ import numpy as np
 import pymc as pm
 import pytensor.tensor as pt
 
-from .pk import superposition_curve, auc_trapezoid
+from backend.pk import superposition_curve, auc_trapezoid
 
 # --------------------
 # Constants (tuneable)

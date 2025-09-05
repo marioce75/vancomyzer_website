@@ -1,10 +1,11 @@
+# NOTE: imports converted from relative to absolute for uvicorn main:app
 from __future__ import annotations
 
 from typing import Dict, Tuple
 
 # Local import that works whether backend is a package or run as a script
 try:
-    from . import pk
+    from backend import pk
 except Exception:  # pragma: no cover
     import pk  # type: ignore
 

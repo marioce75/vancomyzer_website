@@ -1,3 +1,4 @@
+# NOTE: imports converted from relative to absolute for uvicorn main:app
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request, status, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
@@ -389,7 +390,7 @@ class VancomycinPKCalculator:
         predicted_auc = daily_dose / clearance
         # Use zero-order infusion with accumulation for peak/trough at steady state
         try:
-            from .pk import ss_peak_trough
+            from pk import ss_peak_trough
             Cmax, Cmin = ss_peak_trough(
                 CL=float(clearance),
                 V=float(volume),
@@ -894,7 +895,7 @@ async def pk_simulation(patient: PatientInput, dose: float, interval: float):
         # Calculate key metrics
         predicted_auc = (dose * 24) / (interval * pk_params['clearance'])
         try:
-            from .pk import ss_peak_trough
+            from pk import ss_peak_trough
             Cmax, Cmin = ss_peak_trough(
                 CL=float(pk_params['clearance']),
                 V=float(pk_params['volume']),

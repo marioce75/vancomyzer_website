@@ -1,8 +1,9 @@
+# NOTE: imports converted from relative to absolute for uvicorn main:app
 from __future__ import annotations
 
 import numpy as np
 
-from .model import superposition_conc, auc_trapz
+from backend.pk.model import superposition_conc, auc_trapz
 
 
 def superposition_curve(CL_L_per_h: float, V_L: float, dose_mg: float, tau_h: float, tinf_min: float,

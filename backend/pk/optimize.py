@@ -1,9 +1,12 @@
+# NOTE: imports converted from relative to absolute for uvicorn main:app
 from __future__ import annotations
 
-import numpy as np
+import math
 from typing import Tuple
 
-from .model import superposition_conc, auc_trapz
+import numpy as np
+
+from backend.pk.model import superposition_conc, auc_trapz
 
 
 def choose_dose_interval(cl_map: float, v_map: float, target_mid: float, infusion_minutes: int) -> Tuple[int, int, float]:
