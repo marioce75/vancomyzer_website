@@ -285,105 +285,105 @@ def _normalize_opt_payload(body: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[s
     return patient, regimen, target, levels
 
 
-@app.post("/optimize")
-@router.post("/optimize")
-def optimize(body: Dict[str, Any] = Body(...)):
-    p_raw, r_raw, tgt_raw, levels_raw = _normalize_opt_payload(body)
-    try:
-        age = float(p_raw.get("age"))
-        gender = str(p_raw.get("gender") or p_raw.get("sex") or "male")
-        weight_kg = float(p_raw.get("weight_kg"))
-        scr = float(p_raw.get("serum_creatinine_mg_dl") or p_raw.get("scr_mg_dl") or 1.0)
-        dose_mg = int(r_raw.get("dose_mg"))
-        interval_hours = int(r_raw.get("interval_hours"))
-        infusion_minutes = int(r_raw.get("infusion_minutes"))
-        auc_min = float(tgt_raw.get("auc_min", 400.0))
-        auc_max = float(tgt_raw.get("auc_max", 600.0))
-    except Exception:
-        raise HTTPException(status_code=400, detail="Missing or invalid fields")
-
-    mu_cl, mu_v = prior_means(age, gender, weight_kg, scr)
-
-    levels_list: List[Tuple[float, float]] = []
-    for lv in levels_raw or []:
-        try:
-            t = lv.get("time_hours")
-            if t is None:
-                t = lv.get("time_hr")
-            t = float(t)
-            c = float(lv.get("concentration_mg_L"))
-            if np.isfinite(t) and np.isfinite(c):
-                levels_list.append((t, c))
-        except Exception:
-            continue
-
-    # Fit MAP if levels provided, else use prior means
-    if len(levels_list) > 0:
-        levels = sorted(levels_list, key=lambda x: x[0])
-
-        def nlp_xy(x):
-            cl = float(np.clip(x[0], 0.5, 15.0))
-            v = float(np.clip(x[1], 20.0, 120.0))
-            return neg_log_posterior(np.array([cl, v]), levels, mu_cl, mu_v, dose_mg, interval_hours, infusion_minutes / 60)
-
-        x0 = np.array([mu_cl, mu_v], dtype=float)
-        bounds = [(0.5, 15.0), (20.0, 120.0)]
-        res = minimize(lambda x: nlp_xy(x), x0=x0, method="L-BFGS-B", bounds=bounds)
-        cl_map, v_map = float(res.x[0]), float(res.x[1])
-    else:
-        cl_map, v_map = mu_cl, mu_v
-
-    target_mid = float(np.clip((auc_min + auc_max) / 2.0, 350.0, 700.0))
-
-    dose_mg_rec, interval_hours_rec, auc24_est = choose_dose_interval(cl_map, v_map, target_mid, infusion_minutes)
-    infusion_minutes_rec = 60 if dose_mg_rec <= 1000 else 90
-
-    return {
-        "recommendation": {
-            "dose_mg": int(dose_mg_rec),
-            "interval_hours": int(interval_hours_rec),
-            "infusion_minutes": int(infusion_minutes_rec),
-            "expected_auc_24": float(auc24_est),
-        }
-    }
+# @app.post("/optimize")
+# @router.post("/optimize")
+# def optimize(body: Dict[str, Any] = Body(...)):
+#     p_raw, r_raw, tgt_raw, levels_raw = _normalize_opt_payload(body)
+#     try:
+#         age = float(p_raw.get("age"))
+#         gender = str(p_raw.get("gender") or p_raw.get("sex") or "male")
+#         weight_kg = float(p_raw.get("weight_kg"))
+#         scr = float(p_raw.get("serum_creatinine_mg_dl") or p_raw.get("scr_mg_dl") or 1.0)
+#         dose_mg = int(r_raw.get("dose_mg"))
+#         interval_hours = int(r_raw.get("interval_hours"))
+#         infusion_minutes = int(r_raw.get("infusion_minutes"))
+#         auc_min = float(tgt_raw.get("auc_min", 400.0))
+#         auc_max = float(tgt_raw.get("auc_max", 600.0))
+#     except Exception:
+#         raise HTTPException(status_code=400, detail="Missing or invalid fields")
+# 
+#     mu_cl, mu_v = prior_means(age, gender, weight_kg, scr)
+# 
+#     levels_list: List[Tuple[float, float]] = []
+#     for lv in levels_raw or []:
+#     try:
+#         t = lv.get("time_hours")
+#         if t is None:
+#             t = lv.get("time_hr")
+#         t = float(t)
+#         c = float(lv.get("concentration_mg_L"))
+#         if np.isfinite(t) and np.isfinite(c):
+#             levels_list.append((t, c))
+#     except Exception:
+#         continue
+# 
+#     # Fit MAP if levels provided, else use prior means
+#     if len(levels_list) > 0:
+#         levels = sorted(levels_list, key=lambda x: x[0])
+# 
+#         def nlp_xy(x):
+#             cl = float(np.clip(x[0], 0.5, 15.0))
+#             v = float(np.clip(x[1], 20.0, 120.0))
+#             return neg_log_posterior(np.array([cl, v]), levels, mu_cl, mu_v, dose_mg, interval_hours, infusion_minutes / 60)
+# 
+#         x0 = np.array([mu_cl, mu_v], dtype=float)
+#         bounds = [(0.5, 15.0), (20.0, 120.0)]
+#         res = minimize(lambda x: nlp_xy(x), x0=x0, method="L-BFGS-B", bounds=bounds)
+#         cl_map, v_map = float(res.x[0]), float(res.x[1])
+#     else:
+#         cl_map, v_map = mu_cl, mu_v
+# 
+#     target_mid = float(np.clip((auc_min + auc_max) / 2.0, 350.0, 700.0))
+# 
+#     dose_mg_rec, interval_hours_rec, auc24_est = choose_dose_interval(cl_map, v_map, target_mid, infusion_minutes)
+#     infusion_minutes_rec = 60 if dose_mg_rec <= 1000 else 90
+# 
+#     return {
+#         "recommendation": {
+#             "dose_mg": int(dose_mg_rec),
+#             "interval_hours": int(interval_hours_rec),
+#             "infusion_minutes": int(infusion_minutes_rec),
+#             "expected_auc_24": float(auc24_est),
+#         }
+#     }
 
 
 # Backward-compat GET wrapper for quick manual tests; returns stubbed compute if params are flat
-try:
-    from pydantic import ConfigDict  # type: ignore
-    _HAS_CONFIGDICT = True
-except Exception:
-    ConfigDict = None  # type: ignore
-    _HAS_CONFIGDICT = False
+# try:
+#     from pydantic import ConfigDict  # type: ignore
+#     _HAS_CONFIGDICT = True
+# except Exception:
+#     ConfigDict = None  # type: ignore
+#     _HAS_CONFIGDICT = False
 
-class AucRequest(BaseModel):
-    age_years: Optional[float] = None
-    weight_kg: Optional[float] = None
-    height_cm: Optional[float] = None
-    scr_mg_dl: Optional[float] = None
-    gender: Optional[str] = None
-    dose_mg: Optional[float] = None
-    interval_hr: Optional[float] = None
-    infusion_minutes: Optional[float] = 60.0
-    levels: Optional[List[Dict[str, Any]]] = None
-    other: Optional[Dict[str, Any]] = None
-    if _HAS_CONFIGDICT:
-        model_config = ConfigDict(extra="allow")  # type: ignore
-    else:
-        class Config:
-            extra = "allow"
+# class AucRequest(BaseModel):
+#     age_years: Optional[float] = None
+#     weight_kg: Optional[float] = None
+#     height_cm: Optional[float] = None
+#     scr_mg_dl: Optional[float] = None
+#     gender: Optional[str] = None
+#     dose_mg: Optional[float] = None
+#     interval_hr: Optional[float] = None
+#     infusion_minutes: Optional[float] = 60.0
+#     levels: Optional[List[Dict[str, Any]]] = None
+#     other: Optional[Dict[str, Any]] = None
+#     if _HAS_CONFIGDICT:
+#         model_config = ConfigDict(extra="allow")  # type: ignore
+#     else:
+#         class Config:
+#             extra = "allow"
 
-def compute_auc_stub(req: AucRequest) -> Dict[str, Any]:
-    return {"auc": 0, "note": "stub", "echo": req.dict() if hasattr(req, 'dict') else {}}
+# def compute_auc_stub(req: AucRequest) -> Dict[str, Any]:
+#     return {"auc": 0, "note": "stub", "echo": req.dict() if hasattr(req, 'dict') else {}}
 
-@router.get("/interactive/auc")
-def interactive_auc_get(**params):
-    # simple stubbed GET for compatibility
-    try:
-        req = AucRequest(**params)
-    except Exception:
-        req = AucRequest()
-    return {"ok": True, "result": compute_auc_stub(req)}
+# @router.get("/interactive/auc")
+# def interactive_auc_get(**params):
+#     # simple stubbed GET for compatibility
+#     try:
+#         req = AucRequest(**params)
+#     except Exception:
+#         req = AucRequest()
+#     return {"ok": True, "result": compute_auc_stub(req)}
 
 # include the API router once
-app.include_router(router)
+# app.include_router(router)

@@ -812,146 +812,147 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# API Endpoints
+# API Endpoints - COMMENTED OUT to avoid conflicts with main.py router
+# These routes are now handled by the unified router in main.py
 
-@app.head("/")
-async def head_root():
-    return Response(status_code=200)
+# @app.head("/")
+# async def head_root():
+#     return Response(status_code=200)
 
-@app.get("/")
-async def root():
-    return {"message": "Vancomyzer API - Evidence-based vancomycin dosing calculator"}
+# @app.get("/")
+# async def root():
+#     return {"message": "Vancomyzer API - Evidence-based vancomycin dosing calculator"}
 
 # Generic CORS preflight handler for any /api/* path
-@app.options("/api/{rest_of_path:path}")
-async def cors_preflight(rest_of_path: str, request: Request) -> Response:
-    # Starlette's CORSMiddleware should handle preflight automatically,
-    # but some platforms return 404 before middleware runs on OPTIONS.
-    # This ensures a 200 with the right CORS headers if the request reached the app.
-    return Response(status_code=status.HTTP_200_OK)
+# @app.options("/api/{rest_of_path:path}")
+# async def cors_preflight(rest_of_path: str, request: Request) -> Response:
+#     # Starlette's CORSMiddleware should handle preflight automatically,
+#     # but some platforms return 404 before middleware runs on OPTIONS.
+#     # This ensures a 200 with the right CORS headers if the request reached the app.
+#     return Response(status_code=status.HTTP_200_OK)
 
-@app.get("/api/health")
-async def health_check():
-    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
+# @app.get("/api/health")
+# async def health_check():
+#     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
-@app.post("/api/calculate-dosing", response_model=DosingResult)
-async def calculate_dosing(patient: PatientInput):
-    # Enforce height for adults
-    if patient.population_type == PopulationType.adult:
-        if patient.height_cm is None or not (100 <= patient.height_cm <= 250):
-            raise HTTPException(status_code=422, detail="Height (cm) is required for adults (100–250 cm) to compute IBW/AdjBW and Cockcroft–Gault creatinine clearance.")
-    try:
-        result = pk_calculator.calculate_dosing(patient)
-        return result
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+# @app.post("/api/calculate-dosing", response_model=DosingResult)
+# async def calculate_dosing(patient: PatientInput):
+#     # Enforce height for adults
+#     if patient.population_type == PopulationType.adult:
+#         if patient.height_cm is None or not (100 <= patient.height_cm <= 250):
+#             raise HTTPException(status_code=422, detail="Height (cm) is required for adults (100–250 cm) to compute IBW/AdjBW and Cockcroft–Gault creatinine clearance.")
+#     try:
+#         result = pk_calculator.calculate_dosing(patient)
+#         return result
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         raise HTTPException(status_code=400, detail=str(e))
 
-@app.post("/api/population-model", response_model=DosingResult)
-async def population_model(patient: PatientInput):
-    """Population PK dosing (alias of /api/calculate-dosing). Accepts PatientInput JSON body."""
-    return await calculate_dosing(patient)  # reuse logic
+# @app.post("/api/population-model", response_model=DosingResult)
+# async def population_model(patient: PatientInput):
+#     """Population PK dosing (alias of /api/calculate-dosing). Accepts PatientInput JSON body."""
+#     return await calculate_dosing(patient)  # reuse logic
 
 
 # Compatibility endpoint for legacy flat payloads (not shown in OpenAPI schema)
-@app.post("/api/bayesian-optimization", include_in_schema=False)
-async def bayesian_optimization_compat(body: dict = Body(...)):
-    """
-    Compatibility handler: accepts legacy flat payloads and wraps them into {patient, levels}.
-    Delegates to the typed handler below.
-    """
-    try:
-        req = _wrap_legacy_bayes_payload(body)
-    except Exception as e:
-        raise HTTPException(status_code=422, detail=f"Invalid payload: {e}")
-    return await bayesian_optimization(req=req)  # type: ignore
+# @app.post("/api/bayesian-optimization", include_in_schema=False)
+# async def bayesian_optimization_compat(body: dict = Body(...)):
+#     """
+#     Compatibility handler: accepts legacy flat payloads and wraps them into {patient, levels}.
+#     Delegates to the typed handler below.
+#     """
+#     try:
+#         req = _wrap_legacy_bayes_payload(body)
+#     except Exception as e:
+#         raise HTTPException(status_code=422, detail=f"Invalid payload: {e}")
+#     return await bayesian_optimization(req=req)  # type: ignore
 
 
 # Typed endpoint for Bayesian optimization (OpenAPI schema uses this signature)
-@app.post("/api/bayesian-optimization", response_model=BayesianResult)
-async def bayesian_optimization(req: BayesianRequest = Body(...)):
-    """Perform Bayesian optimization using measured vancomycin levels."""
-    # Extract from validated request
-    patient = req.patient
-    levels = req.levels or []
-    try:
-        result = bayesian_optimizer.optimize_dosing(patient, levels)
-        return result.model_dump(by_alias=True)
-    except ValueError as e:
-        # Input-related issues (e.g., requires at least one level) -> 422
-        raise HTTPException(status_code=422, detail=str(e))
-    except Exception as e:
-        # Other errors -> 400
-        raise HTTPException(status_code=400, detail=str(e))
+# @app.post("/api/bayesian-optimization", response_model=BayesianResult)
+# async def bayesian_optimization(req: BayesianRequest = Body(...)):
+#     """Perform Bayesian optimization using measured vancomycin levels."""
+#     # Extract from validated request
+#     patient = req.patient
+#     levels = req.levels or []
+#     try:
+#         result = bayesian_optimizer.optimize_dosing(patient, levels)
+#         return result.model_dump(by_alias=True)
+#     except ValueError as e:
+#         # Input-related issues (e.g., requires at least one level) -> 422
+#         raise HTTPException(status_code=422, detail=str(e))
+#     except Exception as e:
+#         # Other errors -> 400
+#         raise HTTPException(status_code=400, detail=str(e))
 
-@app.post("/api/pk-simulation")
-async def pk_simulation(patient: PatientInput, dose: float, interval: float):
-    """Simulate PK curve for given dose and interval"""
-    try:
-        pk_params = pk_calculator.calculate_pk_parameters(patient)
-        curve_data = pk_calculator._generate_pk_curve(dose, interval, pk_params)
-        
-        # Calculate key metrics
-        predicted_auc = (dose * 24) / (interval * pk_params['clearance'])
-        try:
-            from pk import ss_peak_trough
-            Cmax, Cmin = ss_peak_trough(
-                CL=float(pk_params['clearance']),
-                V=float(pk_params['volume']),
-                dose_mg=float(dose),
-                tau_h=float(interval),
-                tinf_min=60.0,
-            )
-            predicted_peak = float(Cmax)
-            predicted_trough = float(Cmin)
-        except Exception:
-            predicted_trough = pk_calculator._calculate_trough(dose, interval, pk_params)
-            predicted_peak = pk_calculator._calculate_peak(dose, pk_params)
-        
-        return {
-            'pk_curve': curve_data,
-            'predicted_auc': predicted_auc,
-            'predicted_trough': predicted_trough,
-            'predicted_peak': predicted_peak,
-            'pk_parameters': pk_params
-        }
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+# @app.post("/api/pk-simulation")
+# async def pk_simulation(patient: PatientInput, dose: float, interval: float):
+#     """Simulate PK curve for given dose and interval"""
+#     try:
+#         pk_params = pk_calculator.calculate_pk_parameters(patient)
+#         curve_data = pk_calculator._generate_pk_curve(dose, interval, pk_params)
+#        
+#         # Calculate key metrics
+#         predicted_auc = (dose * 24) / (interval * pk_params['clearance'])
+#         try:
+#             from pk import ss_peak_trough
+#             Cmax, Cmin = ss_peak_trough(
+#                 CL=float(pk_params['clearance']),
+#                 V=float(pk_params['volume']),
+#                 dose_mg=float(dose),
+#                 tau_h=float(interval),
+#                 tinf_min=60.0,
+#             )
+#             predicted_peak = float(Cmax)
+#             predicted_trough = float(Cmin)
+#         except Exception:
+#             predicted_trough = pk_calculator._calculate_trough(dose, interval, pk_params)
+#             predicted_peak = pk_calculator._calculate_peak(dose, pk_params)
+#        
+#         return {
+#             'pk_curve': curve_data,
+#             'predicted_auc': predicted_auc,
+#             'predicted_trough': predicted_trough,
+#             'predicted_peak': predicted_peak,
+#             'pk_parameters': pk_params
+#         }
+#     except Exception as e:
+#         raise HTTPException(status_code=400, detail=str(e))
 
 # WebSocket endpoint for real-time calculations
-@app.websocket("/ws/realtime-calc")
-async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
-    try:
-        while True:
-            data = await websocket.receive_text()
-            request = json.loads(data)
-            
-            # Parse patient data
-            patient = PatientInput(**request['patient'])
-            dose = request.get('dose', 1000)
-            interval = request.get('interval', 12)
-            
-            # Calculate real-time
-            pk_params = pk_calculator.calculate_pk_parameters(patient)
-            curve_data = pk_calculator._generate_pk_curve(dose, interval, pk_params)
-            
-            predicted_auc = (dose * 24) / (interval * pk_params['clearance'])
-            predicted_trough = pk_calculator._calculate_trough(dose, interval, pk_params)
-            
-            response = {
-                'pk_curve': curve_data,
-                'predicted_auc': predicted_auc,
-                'predicted_trough': predicted_trough,
-                'pk_parameters': pk_params,
-                'timestamp': datetime.now().isoformat()
-            }
-            
-            await manager.send_personal_message(json.dumps(response), websocket)
-            
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
+# @app.websocket("/ws/realtime-calc")
+# async def websocket_endpoint(websocket: WebSocket):
+#     await manager.connect(websocket)
+#     try:
+#         while True:
+#             data = await websocket.receive_text()
+#             request = json.loads(data)
+#            
+#             # Parse patient data
+#             patient = PatientInput(**request['patient'])
+#             dose = request.get('dose', 1000)
+#             interval = request.get('interval', 12)
+#            
+#             # Calculate real-time
+#             pk_params = pk_calculator.calculate_pk_parameters(patient)
+#             curve_data = pk_calculator._generate_pk_curve(dose, interval, pk_params)
+#            
+#             predicted_auc = (dose * 24) / (interval * pk_params['clearance'])
+#             predicted_trough = pk_calculator._calculate_trough(dose, interval, pk_params)
+#            
+#             response = {
+#                 'pk_curve': curve_data,
+#                 'predicted_auc': predicted_auc,
+#                 'predicted_trough': predicted_trough,
+#                 'pk_parameters': pk_params,
+#                 'timestamp': datetime.now().isoformat()
+#             }
+#            
+#             await manager.send_personal_message(json.dumps(response), websocket)
+#            
+#     except WebSocketDisconnect:
+#         manager.disconnect(websocket)
 
 if __name__ == "__main__":
     import uvicorn

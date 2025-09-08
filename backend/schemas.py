@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class Level(BaseModel):
@@ -79,3 +79,18 @@ class InteractiveResponse(BaseModel):
     metrics: MetricsOut
     posterior: PosteriorInfo
     diagnostics: Optional[DiagnosticsOut] = None
+
+
+class AucRequest(BaseModel):
+    age_years: Optional[float] = None
+    weight_kg: Optional[float] = None
+    height_cm: Optional[float] = None
+    scr_mg_dl: Optional[float] = None
+    gender: Optional[str] = None
+    dose_mg: Optional[float] = None
+    interval_hr: Optional[float] = None
+    infusion_minutes: Optional[float] = 60.0
+    levels: Optional[List[float]] = None
+
+    class Config:
+        extra = "allow"
