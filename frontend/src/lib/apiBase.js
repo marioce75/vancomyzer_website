@@ -1,39 +1,64 @@
 // src/lib/apiBase.js
-const qp = new URLSearchParams(window.location.search);
-const fromQuery = qp.get("api");
-const DEFAULT_API_BASE = "https://vancomyzer.onrender.com"; // safe fallback for prod
+// Centralized API base + path helpers
 
-const trim = (s) => (s || "").replace(/\/+$/, "");
-const envBase =
-  (typeof import.meta !== "undefined" &&
-    import.meta.env &&
-    import.meta.env.VITE_API_BASE) || "";
-
-// Priority: ?api -> env -> default
-export const API_BASE = trim(fromQuery || envBase || DEFAULT_API_BASE);
-
-// Build URLs ensuring we add `/api` only once
-export function apiPath(path = "") {
-  const p = path.startsWith("/api") ? path : `/api${path.startsWith("/") ? path : `/${path}`}`;
-  return `${API_BASE}${p}`;
+function trimEndSlashes(s) {
+  return String(s || '').replace(/\/+$/, '');
 }
 
-// Non-blocking health probe (GET). Logs results, never throws.
+function ensureApiBase(s) {
+  const base = trimEndSlashes(s);
+  if (!base) return '';
+  return base.endsWith('/api') ? base : `${base}/api`;
+}
+
+export function apiBase() {
+  // 1) query param ?api=
+  try {
+    const u = new URL(window.location.href);
+    const q = u.searchParams.get('api');
+    if (q) return ensureApiBase(q);
+  } catch {}
+  // 2) meta tag
+  const m = document.querySelector('meta[name="vancomyzer-api-base"]');
+  if (m?.content) return ensureApiBase(m.content);
+  // 3) Vite env
+  if (import.meta?.env?.VITE_API_BASE) return ensureApiBase(String(import.meta.env.VITE_API_BASE));
+  return '';
+}
+
+export function apiPath(p) {
+  const base = apiBase();
+  const path = String(p || '').replace(/^\/+/, '');
+  const full = base ? `${base}/${path}` : `/${path}`;
+  // Collapse accidental // (but keep protocol //)
+  return full.replace(/(?<!:)\/{2,}/g, '/');
+}
+
+// Back-compat constant for places importing API_BASE
+export const API_BASE = apiBase();
+
+// Non-throwing health probe for legacy callers
 export async function checkHealth() {
-  const urls = [`${API_BASE}/api/health`, `${API_BASE}/health`];
+  const base = apiBase();
+  const urls = base ? [`${base}/health`] : ['/api/health', '/health'];
   for (const u of urls) {
     try {
-      const r = await fetch(u, { method: "GET" });
+      const r = await fetch(u, { method: 'GET' });
       if (r.ok) {
-        console.info("[Vancomyzer] API health OK:", u, r.status);
+        try { console.info('[Vancomyzer] API health OK:', u, r.status); } catch {}
         return { ok: true, url: u, status: r.status };
       }
-      console.warn("[Vancomyzer] API health non-OK:", u, r.status);
+      try { console.warn('[Vancomyzer] API health non-OK:', u, r.status); } catch {}
     } catch (e) {
-      console.warn("[Vancomyzer] API health error:", u, e?.message || e);
+      try { console.warn('[Vancomyzer] API health error:', u, e?.message || e); } catch {}
     }
   }
   return { ok: false };
 }
 
-if (typeof window !== "undefined") window.__VANCOMYZER_API_BASE__ = API_BASE;
+// Log once on load
+(function once() {
+  const base = apiBase();
+  if (!base) console.warn('[Vancomyzer] Missing VITE_API_BASE; set .env or meta tag');
+  else console.info('[Vancomyzer] API base =', base);
+})();

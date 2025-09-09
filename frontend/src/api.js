@@ -60,7 +60,14 @@ function ensureNestedPatient(patientLike) { const norm = normalizePatientFields(
 
 export async function calculateInteractiveAUC({ patient, regimen, levels = [] }, { signal } = {}) {
   const payload = { patient: ensureNestedPatient(patient), regimen: regimen ?? {}, levels: Array.isArray(levels) ? levels : [] };
-  return jsonFetch('/interactive/auc', { method: 'POST', body: payload, signal }); }
+  // Delegate to services/interactiveApi to build correct flat body and POST to /api/interactive/auc
+  try {
+    const { calculateInteractiveAUC: svcCalc } = await import('./services/interactiveApi');
+    return svcCalc(payload, { signal });
+  } catch {
+    return jsonFetch('/interactive/auc', { method: 'POST', body: payload, signal });
+  }
+}
 
 export async function optimizeDose({ patient, regimen, target }, { signal } = {}) {
   const payload = { patient: ensureNestedPatient(patient), regimen: regimen ?? {}, target: target ?? {} };

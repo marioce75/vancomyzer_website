@@ -1,83 +1,65 @@
 // Interactive AUC API client using canonical /api prefix
-// Endpoints: POST /api/interactive/auc, POST /api/optimize, GET /api/health
+// Endpoints: POST /api/interactive/auc and GET /api/health
 
-import { apiPath, checkHealth } from '../lib/apiBase';
+import { apiPath } from '../lib/apiBase';
 
-function jsonHeaders(h) { return { 'Content-Type': 'application/json', Accept: 'application/json', ...(h || {}) }; }
-
-async function fetchJSON(url, init = {}) {
-  const res = await fetch(url, { mode: 'cors', headers: jsonHeaders(init.headers), ...init });
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    const err = new Error(`HTTP_${res.status}`);
-    err.status = res.status; err.url = url; err.body = body;
-    try { console.warn('[Vancomyzer] Request failed', err.status, url, body); } catch {}
-    throw err;
-  }
-  return res.json();
-}
-
-// Kick off a non-blocking health probe at startup
-try { checkHealth(); } catch {}
-
-// Generic POST helper with one transient retry
-async function postJSON(path, body, opts = {}) {
-  const url = apiPath(path);
-  try { return await fetchJSON(url, { method: 'POST', body: JSON.stringify(body), ...opts }); }
-  catch (e) {
-    const transient = (e && (e.status === 502 || e.status === 503 || e.status === 504)) || (e && e.name === 'TypeError');
-    if (transient) {
-      await new Promise(r => setTimeout(r, 350));
-      return fetchJSON(url, { method: 'POST', body: JSON.stringify(body), ...opts });
-    }
-    throw e;
-  }
-}
-
-// Public API
 export async function health() {
-  try {
-    const res = await checkHealth();
-    return !!res.ok;
-  } catch {
-    return false;
-  }
+  const url = apiPath('/health');
+  const r = await fetch(url, { method: 'GET' });
+  if (!r.ok) throw new Error(`Health check failed: HTTP ${r.status}`);
+  return r.json().catch(() => ({}));
 }
 
-export async function bayesAUC({ patient, regimen, levels = [] }, opts = {}) {
-  return postJSON('/interactive/auc', { patient, regimen, levels }, opts);
-}
-
-// New: Flat POST helper using apiPath and friendly error messages
 export async function postAuc(payload) {
-  const resp = await fetch(apiPath('/interactive/auc'), {
+  const url = apiPath('/interactive/auc');
+  const r = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(payload ?? {}),
   });
-  const text = await resp.text();
-  let data;
+  const text = await r.text();
+  let data = {};
   try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
-  if (!resp.ok) {
-    const reason = (data && (data.detail || data.message)) || resp.statusText || `HTTP ${resp.status}`;
-    const err = new Error(`AUC request failed: ${reason}`);
-    err.status = resp.status; err.data = data; err.url = apiPath('/interactive/auc');
-    throw err;
+  if (!r.ok) {
+    const reason = data?.detail || r.statusText || `HTTP ${r.status}`;
+    throw new Error(`AUC request failed: ${reason}`);
   }
   return data;
 }
 
+// Back-compat: accept nested payload and convert to flat AucRequest
+export async function calculateInteractiveAUC({ patient = {}, regimen = {}, levels = [] } = {}, opts = {}) {
+  const flat = {
+    age_years: patient.age_years ?? patient.age ?? null,
+    weight_kg: patient.weight_kg ?? null,
+    height_cm: patient.height_cm ?? null,
+    scr_mg_dl: patient.scr_mg_dl ?? patient.serum_creatinine_mg_dl ?? patient.serum_creatinine ?? null,
+    gender: patient.gender ?? null,
+    dose_mg: regimen.dose_mg ?? null,
+    interval_hr: regimen.interval_hours ?? null,
+    infusion_minutes: regimen.infusion_minutes ?? 60,
+    levels: Array.isArray(levels)
+      ? levels.map((v) => (typeof v === 'number' ? v : (v?.concentration_mg_L ?? v?.conc ?? null))).filter((x) => x != null)
+      : null,
+  };
+  return postAuc(flat, opts);
+}
+
+// Optional: best-effort optimize; resolves to {} on failure
 export async function optimize({ patient, regimen, target }, opts = {}) {
-  return postJSON('/optimize', { patient, regimen, target }, opts);
+  const url = apiPath('/optimize');
+  try {
+    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ patient, regimen, target } || {}), ...(opts || {}) });
+    if (!r.ok) return {};
+    return r.json().catch(() => ({}));
+  } catch {
+    return {};
+  }
 }
 
 export async function pkSimulation(payload, opts = {}) {
-  return fetchJSON(apiPath('/pk-simulation'), { method: 'POST', body: JSON.stringify(payload || {}), ...opts });
+  const url = apiPath('/pk-simulation');
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload || {}), ...(opts || {}) });
+  if (!r.ok) throw new Error(`pk-simulation failed: HTTP ${r.status}`);
+  return r.json();
 }
-
-// Back-compat aliases used in some app modules
-export async function calculateInteractiveAUC(payload, opts = {}) { return bayesAUC(payload, opts); }
-
-// Debug export of base
-export { API_BASE } from '../lib/apiBase';
-export { API_BASE as __BASE__ } from '../lib/apiBase';
