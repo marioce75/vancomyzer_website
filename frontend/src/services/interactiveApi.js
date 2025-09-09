@@ -45,6 +45,23 @@ export async function calculateInteractiveAUC({ patient = {}, regimen = {}, leve
   return postAuc(flat, opts);
 }
 
+// Legacy export expected by pages: returns an object with { metrics, series, ... }
+export async function bayesAUC(payload, opts = {}) {
+  const res = await calculateInteractiveAUC(payload, opts);
+  const body = res?.result ?? res ?? {};
+  const hasMetrics = body && typeof body === 'object' && 'metrics' in body;
+  if (hasMetrics) return body; // already normalized
+  const normalized = { ...body };
+  if (!normalized.metrics) {
+    normalized.metrics = {
+      auc_24: body?.auc_24 ?? null,
+      predicted_peak: body?.predicted_peak ?? null,
+      predicted_trough: body?.predicted_trough ?? null,
+    };
+  }
+  return normalized;
+}
+
 // Optional: best-effort optimize; resolves to {} on failure
 export async function optimize({ patient, regimen, target }, opts = {}) {
   const url = apiPath('/optimize');
