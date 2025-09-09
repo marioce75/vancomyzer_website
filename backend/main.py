@@ -3,25 +3,32 @@ from fastapi import FastAPI, APIRouter, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from schemas import AucRequest
 
-logger = logging.getLogger("vancomyzer")
+log = logging.getLogger("vancomyzer")
 logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(title="Vancomyzer API")
-router = APIRouter(prefix="/api")
 
-# CORS
-origins = ["*"]
+# CORS (explicit origins as requested)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=False,
-    allow_methods=["*"],
+    allow_origins=[
+        "https://vancomyzer.com",
+        "https://www.vancomyzer.com",
+        "https://vancomyzer.onrender.com",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
+# Routers
+api_router = APIRouter(prefix="/api")
+root_router = APIRouter()
 
-@router.get("/health")
-async def health():
+
+@api_router.get("/health")
+async def health_api():
     return {"status": "ok"}
 
 
@@ -35,22 +42,38 @@ def compute_auc_stub(req: AucRequest) -> dict:
     }
 
 
-@router.post("/interactive/auc")
-async def interactive_auc_post(req: AucRequest = Body(...)):
+@api_router.post("/interactive/auc")
+async def auc_api(req: AucRequest = Body(...)):
     try:
-        logger.info("AUC POST payload: %s", req.model_dump())
+        log.info("AUC POST payload: %s", req.model_dump())
         result = compute_auc_stub(req)  # TODO: swap in real engine
         return {"ok": True, "result": result}
     except Exception as e:
-        logger.exception("AUC compute failed")
+        log.exception("AUC compute failed")
         raise HTTPException(status_code=400, detail=str(e))
 
 
-app.include_router(router)
+# ----- Root aliases (no prefix) -----
+@root_router.get("/health")
+async def health_root():
+    return await health_api()
 
-# Debug: print which methods are registered for /api/interactive/auc
+
+@root_router.post("/interactive/auc")
+async def auc_root(req: AucRequest = Body(...)):
+    return await auc_api(req)
+
+
+# Include routers once
+app.include_router(api_router)
+app.include_router(root_router)
+
+
+# Startup: log registered methods for both prefixed and root paths
 @app.on_event("startup")
-async def _print_routes_on_start():
+async def _debug_routes():
+    paths = {"/api/health", "/api/interactive/auc", "/health", "/interactive/auc"}
     for r in app.router.routes:
-        if getattr(r, "path", "") == "/api/interactive/auc":
-            logger.info("REGISTERED METHODS for /api/interactive/auc: %s", getattr(r, "methods", None))
+        p = getattr(r, "path", "")
+        if p in paths:
+            log.info("ROUTE %s -> methods=%s name=%s", p, getattr(r, "methods", None), getattr(r, "name", None))
