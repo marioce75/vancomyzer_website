@@ -6,25 +6,25 @@ const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 const PROBE_TIMEOUT_MS = 1200; // Per-attempt timeout
 
 // Robust URL joining that preserves scheme and normalizes slashes
-function joinUrl(base, path) {
+export function joinUrl(base, path) {
   const b = String(base || '').replace(/\/+$/, '');
   const p = String(path || '').replace(/^\/+/, '');
   return (b ? `${b}/${p}` : `/${p}`).replace(/(?<!:)\/+/g, '/');
 }
 
 // Fetch wrapper that treats network failures as status 0
-async function safeFetch(url, options = {}) {
+export async function safeFetch(url, options = {}) {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
-    
+
     const response = await fetch(url, {
       ...options,
       signal: controller.signal,
     });
-    
+
     clearTimeout(timeoutId);
-    
+
     return {
       ok: response.ok,
       status: response.status,
