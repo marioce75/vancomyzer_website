@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { health, optimize, postAuc } from '../services/interactiveApi';
-import { API_BASE } from '../lib/apiBase';
+import { discoverApiBase } from '../lib/apiDiscovery';
 import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -68,14 +68,27 @@ function formToPayload(s) {
 export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
-  useEffect(() => { try { console.debug('[Vancomyzer] API base', API_BASE || '(missing)'); } catch {} }, []);
-  const overrideInfo = useMemo(() => {
-    try {
-      const qp = new URL(window.location.href).searchParams.get('api');
-      const ls = localStorage.getItem('apiBase') || '';
-      return qp || ls || '';
-    } catch { return ''; }
+  
+  // API discovery state
+  const [apiBase, setApiBase] = useState(null);
+  const [apiDiscoveryError, setApiDiscoveryError] = useState(null);
+  
+  useEffect(() => {
+    // Initialize API discovery on mount
+    const initApi = async () => {
+      try {
+        const base = await discoverApiBase();
+        setApiBase(base);
+        console.log('[Vancomyzer] API discovered:', base);
+      } catch (error) {
+        console.error('[Vancomyzer] API discovery failed:', error);
+        setApiDiscoveryError(error.message);
+      }
+    };
+    initApi();
   }, []);
+
+
   // Minimal patient inputs to support Bayesian priors
   const [patient, setPatient] = useState({ age: 56, gender: 'male', weight_kg: 79, height_cm: 170, serum_creatinine_mg_dl: 1.0, mic_mg_L: 1.0, levels: [] });
   const [regimen, setRegimen] = useState({ dose_mg: 1000, interval_hours: 12, infusion_minutes: 60 });
@@ -128,11 +141,12 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   useEffect(() => {
     let alive = true;
     (async () => {
+      // Health check will be handled by the discovery layer
       const ok = await health();
       if (alive) setApiOnline(!!ok);
     })();
     return () => { alive = false; };
-  }, []);
+  }, [apiBase]); // Re-run when API base changes
 
   const runInteractive = useCallback(async () => {
     setLoading(true); setError(null);
@@ -360,22 +374,61 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const guidelineUrl = 'https://www.ashp.org/-/media/assets/policy-guidelines/docs/therapeutic-guidelines/therapeutic-guidelines-monitoring-vancomycin-ASHP-IDSA-PIDS.pdf';
 
   const onRetry = useCallback(async () => {
-    const ok = await health();
-    setApiOnline(!!ok);
-    if (ok) runInteractive();
+    try {
+      // Force API rediscovery
+      const base = await discoverApiBase(true);
+      setApiBase(base);
+      setApiDiscoveryError(null);
+      console.log('[Vancomyzer] API rediscovered:', base);
+      
+      // Test health and run interactive
+      const ok = await health();
+      setApiOnline(!!ok);
+      if (ok) runInteractive();
+    } catch (error) {
+      console.error('[Vancomyzer] Retry failed:', error);
+      setApiDiscoveryError(error.message);
+    }
   }, [runInteractive]);
 
   return (
     <Box dir={dir}>
       {/* Config banners */}
-      {!API_BASE && (
-        <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>
-          Interactive service unreachable (no API base). Set VITE_API_BASE or use ?api=https://vancomyzer.onrender.com
+      {apiDiscoveryError && (
+        <Alert 
+          severity="error" 
+          variant="outlined" 
+          sx={{ mb: 2 }}
+          action={
+            <Button size="small" onClick={async () => {
+              try {
+                const base = await discoverApiBase(true);
+                setApiBase(base);
+                setApiDiscoveryError(null);
+                console.log('[Vancomyzer] API rediscovered:', base);
+              } catch (error) {
+                console.error('[Vancomyzer] API rediscovery failed:', error);
+                setApiDiscoveryError(error.message);
+              }
+            }}>
+              {t('actions.retry', 'Retry')}
+            </Button>
+          }
+        >
+          Interactive service unreachable. {apiDiscoveryError} Click to retry.
         </Alert>
       )}
-      {!!overrideInfo && (
+      {!apiDiscoveryError && apiBase && (
         <Alert severity="info" variant="outlined" sx={{ mb: 2 }}>
-          Using API override: {API_BASE}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2">API active:</Typography>
+            <Chip 
+              size="small" 
+              label={apiBase.length > 40 ? `${apiBase.slice(0, 20)}...${apiBase.slice(-17)}` : apiBase}
+              title={apiBase}
+              sx={{ maxWidth: 200 }}
+            />
+          </Box>
         </Alert>
       )}
       {/* CORS/Network inline hint when fetch fails with TypeError */}
@@ -500,6 +553,19 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
             sx={{ ml: 1 }}
           />
         </Tooltip>
+
+        {/* API Base Status Chip */}
+        {apiBase && (
+          <Tooltip title={`Active API base: ${apiBase}`} placement="top">
+            <Chip 
+              size="small" 
+              variant="outlined" 
+              color="info"
+              label={`API: ${apiBase.length > 25 ? `${apiBase.slice(0, 12)}...${apiBase.slice(-10)}` : apiBase}`}
+            />
+          </Tooltip>
+        )}
+
         <Button size="small" startIcon={<RestartAltIcon />} onClick={onRetry}>
           {t('actions.retry','Retry')}
         </Button>

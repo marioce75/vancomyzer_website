@@ -1,64 +1,64 @@
-// src/lib/apiBase.js
-// Centralized API base + path helpers
+// Compatibility shim - redirects to new discovery system
+// DEPRECATED: Use ../lib/apiDiscovery.ts instead
 
-function trimEndSlashes(s) {
-  return String(s || '').replace(/\/+$/, '');
-}
+import { discoverApiBase, getCachedApiBase, apiPath as newApiPath } from './apiDiscovery';
 
-function ensureApiBase(s) {
-  const base = trimEndSlashes(s);
-  if (!base) return '';
-  return base.endsWith('/api') ? base : `${base}/api`;
-}
-
+// Legacy function - now just returns cached base or empty string
 export function apiBase() {
-  // 1) query param ?api=
   try {
+    // 1) query param ?api=
     const u = new URL(window.location.href);
     const q = u.searchParams.get('api');
-    if (q) return ensureApiBase(q);
+    if (q) return q;
   } catch {}
+  
   // 2) meta tag
   const m = document.querySelector('meta[name="vancomyzer-api-base"]');
-  if (m?.content) return ensureApiBase(m.content);
-  // 3) Vite env
-  if (import.meta?.env?.VITE_API_BASE) return ensureApiBase(String(import.meta.env.VITE_API_BASE));
+  if (m?.content) return m.content;
+  
+  // 3) Cached from discovery
+  const cached = getCachedApiBase();
+  if (cached) return cached;
+  
+  // 4) Vite env (fallback)
+  try {
+    if (import.meta?.env?.VITE_API_BASE) return String(import.meta.env.VITE_API_BASE);
+  } catch {}
+  
   return '';
 }
 
+// Legacy path helper - now uses discovery system when available
 export function apiPath(p) {
-  const base = apiBase();
-  const path = String(p || '').replace(/^\/+/, '');
-  const full = base ? `${base}/${path}` : `/${path}`;
-  // Collapse accidental // (but keep protocol //)
-  return full.replace(/(?<!:)\/{2,}/g, '/');
+  try {
+    return newApiPath(p);
+  } catch {
+    // Fallback to legacy behavior
+    const base = apiBase();
+    const path = String(p || '').replace(/^\/+/, '');
+    const full = base ? `${base}/${path}` : `/${path}`;
+    return full.replace(/(?<!:)\/{2,}/g, '/');
+  }
 }
 
-// Back-compat constant for places importing API_BASE
+// Back-compat constant - will be empty until discovery runs
 export const API_BASE = apiBase();
 
-// Non-throwing health probe for legacy callers
+// Legacy health check - now integrates with discovery
 export async function checkHealth() {
-  const base = apiBase();
-  const urls = base ? [`${base}/health`] : ['/api/health', '/health'];
-  for (const u of urls) {
-    try {
-      const r = await fetch(u, { method: 'GET' });
-      if (r.ok) {
-        try { console.info('[Vancomyzer] API health OK:', u, r.status); } catch {}
-        return { ok: true, url: u, status: r.status };
-      }
-      try { console.warn('[Vancomyzer] API health non-OK:', u, r.status); } catch {}
-    } catch (e) {
-      try { console.warn('[Vancomyzer] API health error:', u, e?.message || e); } catch {}
-    }
+  try {
+    // Trigger discovery if not already done
+    await discoverApiBase();
+    return { ok: true };
+  } catch (error) {
+    console.warn('[Vancomyzer] Legacy health check failed:', error);
+    return { ok: false };
   }
-  return { ok: false };
 }
 
 // Log once on load
 (function once() {
   const base = apiBase();
-  if (!base) console.warn('[Vancomyzer] Missing VITE_API_BASE; set .env or meta tag');
-  else console.info('[Vancomyzer] API base =', base);
+  if (!base) console.warn('[Vancomyzer] Using legacy API base - consider upgrading to apiDiscovery.ts');
+  else console.info('[Vancomyzer] Legacy API base =', base);
 })();

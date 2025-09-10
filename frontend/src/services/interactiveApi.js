@@ -1,30 +1,110 @@
-// Interactive AUC API client using canonical /api prefix
-// Endpoints: POST /api/interactive/auc and GET /api/health
+// Interactive AUC API service using self-healing discovery layer
 
-import { apiPath } from '../lib/apiBase';
+import { discoverApiBase, apiPath, ensureHealthy } from '../lib/apiDiscovery';
 
-export async function health() {
-  const url = apiPath('/health');
-  const r = await fetch(url, { method: 'GET' });
-  if (!r.ok) throw new Error(`Health check failed: HTTP ${r.status}`);
-  return r.json().catch(() => ({}));
+// Robust fetch wrapper that handles network failures and auto-recovery
+async function robustFetch(url, options) {
+  try {
+    const response = await fetch(url, options);
+    return {
+      ok: response.ok,
+      status: response.status,
+      json: async () => response.json(),
+      text: async () => response.text(),
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      status: 0, // Network failure
+      json: async () => ({}),
+      text: async () => error?.toString() || 'Network error',
+    };
+  }
 }
 
-export async function postAuc(payload) {
-  const url = apiPath('/interactive/auc');
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload ?? {}),
-  });
-  const text = await r.text();
-  let data = {};
-  try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
-  if (!r.ok) {
-    const reason = data?.detail || r.statusText || `HTTP ${r.status}`;
-    throw new Error(`AUC request failed: ${reason}`);
+// Health check
+export async function health() {
+  try {
+    await ensureHealthy();
+    return true;
+  } catch (error) {
+    console.warn('[Vancomyzer] Health check failed:', error);
+    return false;
   }
-  return data;
+}
+
+// Main AUC calculation with auto-recovery retry logic
+export async function postAuc(payload) {
+  const makeRequest = async (url) => {
+    return robustFetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload ?? {}),
+    });
+  };
+
+  // Build initial URL
+  let url = apiPath('/interactive/auc');
+  let response = await makeRequest(url);
+
+  // Auto-recovery logic for 404/405/0 errors
+  if (!response.ok && [404, 405, 0].includes(response.status)) {
+    console.log(`[Vancomyzer] Initial request failed (${response.status}), trying alternate path...`);
+    
+    // Determine alternate path
+    let alternateUrl;
+    if (url.includes('/api/interactive/auc')) {
+      // Original was /api/interactive/auc, try /interactive/auc
+      alternateUrl = url.replace('/api/interactive/auc', '/interactive/auc');
+    } else {
+      // Original was /interactive/auc, try /api/interactive/auc  
+      alternateUrl = url.replace('/interactive/auc', '/api/interactive/auc');
+    }
+
+    response = await makeRequest(alternateUrl);
+
+    // If alternate also fails, force rediscovery and try one final time
+    if (!response.ok && [404, 405, 0].includes(response.status)) {
+      console.log(`[Vancomyzer] Alternate path failed (${response.status}), forcing API rediscovery...`);
+      
+      try {
+        await discoverApiBase(true); // Force rediscovery
+        url = apiPath('/interactive/auc');
+        response = await makeRequest(url);
+      } catch (error) {
+        console.error('[Vancomyzer] Final retry after rediscovery failed:', error);
+      }
+    }
+  }
+
+  // Process response
+  if (!response.ok) {
+    let errorMessage = `AUC request failed (HTTP ${response.status})`;
+    
+    try {
+      const errorData = await response.json();
+      if (errorData?.detail) {
+        errorMessage = `AUC request failed: ${errorData.detail}`;
+      }
+    } catch {
+      try {
+        const errorText = await response.text();
+        if (errorText) {
+          errorMessage = `AUC request failed: ${errorText}`;
+        }
+      } catch {}
+    }
+    
+    throw new Error(errorMessage);
+  }
+
+  // Parse successful response
+  try {
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error('Failed to parse AUC response as JSON');
+  }
 }
 
 // Back-compat: accept nested payload and convert to flat AucRequest
@@ -42,7 +122,7 @@ export async function calculateInteractiveAUC({ patient = {}, regimen = {}, leve
       ? levels.map((v) => (typeof v === 'number' ? v : (v?.concentration_mg_L ?? v?.conc ?? null))).filter((x) => x != null)
       : null,
   };
-  return postAuc(flat, opts);
+  return postAuc(flat);
 }
 
 // Legacy export expected by pages: returns an object with { metrics, series, ... }
@@ -64,11 +144,17 @@ export async function bayesAUC(payload, opts = {}) {
 
 // Optional: best-effort optimize; resolves to {} on failure
 export async function optimize({ patient, regimen, target }, opts = {}) {
-  const url = apiPath('/optimize');
   try {
-    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ patient, regimen, target } || {}), ...(opts || {}) });
-    if (!r.ok) return {};
-    return r.json().catch(() => ({}));
+    const url = apiPath('/optimize');
+    const response = await robustFetch(url, { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify({ patient, regimen, target }),
+      ...opts
+    });
+    
+    if (!response.ok) return {};
+    return response.json();
   } catch {
     return {};
   }
@@ -76,7 +162,16 @@ export async function optimize({ patient, regimen, target }, opts = {}) {
 
 export async function pkSimulation(payload, opts = {}) {
   const url = apiPath('/pk-simulation');
-  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload || {}), ...(opts || {}) });
-  if (!r.ok) throw new Error(`pk-simulation failed: HTTP ${r.status}`);
-  return r.json();
+  const response = await robustFetch(url, { 
+    method: 'POST', 
+    headers: { 'Content-Type': 'application/json' }, 
+    body: JSON.stringify(payload || {}), 
+    ...opts 
+  });
+  
+  if (!response.ok) {
+    throw new Error(`pk-simulation failed: HTTP ${response.status}`);
+  }
+  
+  return response.json();
 }
