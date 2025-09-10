@@ -60,23 +60,14 @@ function getCandidateBases() {
     candidates.push(metaTag.getAttribute('content'));
   }
 
-  // 3. import.meta.env.VITE_API_BASE
-  try {
-    if (import.meta?.env?.VITE_API_BASE) {
-      candidates.push(String(import.meta.env.VITE_API_BASE));
-    }
-  } catch {}
+  // 3. Environment variable fallback
+  const envBase = process.env.REACT_APP_API_BASE || process.env.NEXT_PUBLIC_API_BASE;
+  if (envBase) {
+    candidates.push(envBase);
+  }
 
-  // 4. Derived from origin
-  try {
-    const origin = window.location.origin;
-    candidates.push(`${origin}/api`);
-    candidates.push(origin);
-  } catch {}
-
-  // 5. Fallback production endpoints
+  // 4. Fallback production endpoint
   candidates.push('https://vancomyzer.onrender.com/api');
-  candidates.push('https://vancomyzer.onrender.com');
 
   // Remove duplicates while preserving order
   return [...new Set(candidates)];
@@ -108,27 +99,18 @@ async function probeApiBase() {
   const candidates = getCandidateBases();
   console.log('[Vancomyzer] Probing API candidates:', candidates);
 
-  // Race all candidates
-  const promises = candidates.map(candidate => testHealthPaths(candidate));
-  
-  try {
-    // Use Promise.allSettled to get all results, then find first successful one
-    const results = await Promise.allSettled(promises);
-    
-    for (let i = 0; i < results.length; i++) {
-      const result = results[i];
-      if (result.status === 'fulfilled' && result.value) {
-        console.log(`[Vancomyzer] API discovered: ${result.value}`);
-        return result.value;
+  for (const candidate of candidates) {
+    try {
+      const base = await testHealthPaths(candidate);
+      if (base) {
+        return base;
       }
+    } catch (error) {
+      console.error(`[Vancomyzer] Failed to probe candidate: ${candidate}`, error);
     }
-    
-    console.error('[Vancomyzer] No working API base found among candidates:', candidates);
-    return null;
-  } catch (error) {
-    console.error('[Vancomyzer] API discovery failed:', error);
-    return null;
   }
+
+  throw new Error('Backend API not reachable at any candidate base.');
 }
 
 // Get cached API base if still valid

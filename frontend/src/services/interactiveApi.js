@@ -1,6 +1,6 @@
 // Interactive AUC API service using self-healing discovery layer
 
-import { discoverApiBase, apiPath, ensureHealthy } from '../lib/apiDiscovery';
+import { apiPath, ensureHealthy } from '../lib/apiDiscovery';
 
 // Robust fetch wrapper that handles network failures and auto-recovery
 async function robustFetch(url, options) {
@@ -33,78 +33,26 @@ export async function health() {
   }
 }
 
-// Main AUC calculation with auto-recovery retry logic
+// Updated AUC request to use `/api/interactive/auc` and log requests/responses
 export async function postAuc(payload) {
-  const makeRequest = async (url) => {
-    return robustFetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload ?? {}),
-    });
-  };
+  const url = apiPath('/interactive/auc');
+  console.log('[Vancomyzer] Sending AUC request to:', url, 'with payload:', payload);
 
-  // Build initial URL
-  let url = apiPath('/interactive/auc');
-  let response = await makeRequest(url);
+  const response = await robustFetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
 
-  // Auto-recovery logic for 404/405/0 errors
-  if (!response.ok && [404, 405, 0].includes(response.status)) {
-    console.log(`[Vancomyzer] Initial request failed (${response.status}), trying alternate path...`);
-    
-    // Determine alternate path
-    let alternateUrl;
-    if (url.includes('/api/interactive/auc')) {
-      // Original was /api/interactive/auc, try /interactive/auc
-      alternateUrl = url.replace('/api/interactive/auc', '/interactive/auc');
-    } else {
-      // Original was /interactive/auc, try /api/interactive/auc  
-      alternateUrl = url.replace('/interactive/auc', '/api/interactive/auc');
-    }
+  console.log('[Vancomyzer] Received response:', response);
 
-    response = await makeRequest(alternateUrl);
-
-    // If alternate also fails, force rediscovery and try one final time
-    if (!response.ok && [404, 405, 0].includes(response.status)) {
-      console.log(`[Vancomyzer] Alternate path failed (${response.status}), forcing API rediscovery...`);
-      
-      try {
-        await discoverApiBase(true); // Force rediscovery
-        url = apiPath('/interactive/auc');
-        response = await makeRequest(url);
-      } catch (error) {
-        console.error('[Vancomyzer] Final retry after rediscovery failed:', error);
-      }
-    }
-  }
-
-  // Process response
   if (!response.ok) {
-    let errorMessage = `AUC request failed (HTTP ${response.status})`;
-    
-    try {
-      const errorData = await response.json();
-      if (errorData?.detail) {
-        errorMessage = `AUC request failed: ${errorData.detail}`;
-      }
-    } catch {
-      try {
-        const errorText = await response.text();
-        if (errorText) {
-          errorMessage = `AUC request failed: ${errorText}`;
-        }
-      } catch {}
-    }
-    
-    throw new Error(errorMessage);
+    const errorText = await response.text();
+    console.error('[Vancomyzer] AUC request failed:', errorText);
+    throw new Error(`AUC request failed: ${errorText}`);
   }
 
-  // Parse successful response
-  try {
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    throw new Error('Failed to parse AUC response as JSON');
-  }
+  return response.json();
 }
 
 // Back-compat: accept nested payload and convert to flat AucRequest

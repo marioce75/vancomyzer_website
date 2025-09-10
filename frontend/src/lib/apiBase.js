@@ -1,7 +1,7 @@
 // Compatibility shim - redirects to new discovery system
 // DEPRECATED: Use ../lib/apiDiscovery.ts instead
 
-import { discoverApiBase, getCachedApiBase, apiPath as newApiPath } from './apiDiscovery';
+import { discoverApiBase, getCachedApiBase, apiPath as newApiPath, joinUrl, safeFetch } from './apiDiscovery';
 
 // Legacy function - now just returns cached base or empty string
 export function apiBase() {
@@ -44,14 +44,20 @@ export function apiPath(p) {
 // Back-compat constant - will be empty until discovery runs
 export const API_BASE = apiBase();
 
-// Legacy health check - now integrates with discovery
+// Updated health check to use `/api/health`
 export async function checkHealth() {
   try {
-    // Trigger discovery if not already done
-    await discoverApiBase();
+    const base = await discoverApiBase();
+    const healthUrl = joinUrl(base, '/api/health');
+    const response = await safeFetch(healthUrl, { method: 'GET' });
+
+    if (!response.ok) {
+      throw new Error(`Health check failed: ${healthUrl} (HTTP ${response.status})`);
+    }
+
     return { ok: true };
   } catch (error) {
-    console.warn('[Vancomyzer] Legacy health check failed:', error);
+    console.warn('[Vancomyzer] Health check failed:', error);
     return { ok: false };
   }
 }
