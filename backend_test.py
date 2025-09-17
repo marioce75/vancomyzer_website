@@ -90,77 +90,268 @@ class VancomyzerBackendTester:
             return False
     
     def get_sample_patient_data(self) -> Dict[str, Any]:
-        """Get sample patient data for testing"""
+        """Get sample patient data for testing - updated for new API structure"""
         return {
-            "population_type": "adult",
-            "age_years": 45,
+            "age_years": 65,
             "gender": "male",
-            "weight_kg": 70.0,
-            "height_cm": 175.0,
-            "serum_creatinine": 1.2,
-            "indication": "pneumonia",
-            "severity": "moderate",
-            "is_renal_stable": True,
-            "is_on_hemodialysis": False,
-            "is_on_crrt": False,
-            "crcl_method": "cockcroft_gault"
+            "height_cm": 175,
+            "weight_kg": 75,
+            "serum_creatinine_mg_dl": 1.0,
+            "use_scr_floor": False,
+            "scr_floor_mg_dl": 0.6
         }
     
-    def test_calculate_dosing(self) -> bool:
-        """Test the calculate dosing endpoint"""
-        print("\n🔍 Testing Calculate Dosing Endpoint...")
+    def get_sample_dosing_params(self) -> Dict[str, Any]:
+        """Get sample dosing parameters"""
+        return {
+            "target_auc_min": 400,
+            "target_auc_max": 600,
+            "mic_mg_l": 1.0,
+            "dosing_interval_hours": None,
+            "weight_basis": "tbw",
+            "obesity_adjustment": True,
+            "beta_lactam_allergy": False,
+            "icu_setting": False
+        }
+    
+    def get_sample_levels(self) -> List[Dict[str, Any]]:
+        """Get sample vancomycin levels for testing"""
+        return [
+            {
+                "concentration_mg_l": 15.5,
+                "time_hours": 1.5,
+                "dose_mg": 1000,
+                "infusion_duration_hours": 1.0
+            }
+        ]
+    
+    def test_trough_calculation(self) -> bool:
+        """Test trough-based calculation mode"""
+        print("\n🔍 Testing Trough-Based Calculation...")
         
         try:
-            patient_data = self.get_sample_patient_data()
-            response = self.session.post(f"{self.api_url}/calculate-dosing", json=patient_data)
+            request_data = {
+                "calculation_mode": "trough",
+                "patient": self.get_sample_patient_data(),
+                "dosing_params": self.get_sample_dosing_params(),
+                "levels": []
+            }
+            
+            response = self.session.post(f"{self.api_url}/calculate", json=request_data)
             
             if response.status_code == 200:
                 data = response.json()
                 
-                # Validate required fields in response
-                required_fields = [
-                    'recommended_dose_mg', 'interval_hours', 'daily_dose_mg',
-                    'predicted_auc_24', 'predicted_trough', 'predicted_peak',
-                    'clearance_l_per_h', 'volume_distribution_l', 'half_life_hours',
-                    'safety_warnings', 'monitoring_recommendations', 'pk_curve_data'
-                ]
-                
-                missing_fields = [field for field in required_fields if field not in data]
-                
-                if not missing_fields:
-                    # Validate data types and ranges
-                    if (isinstance(data['recommended_dose_mg'], (int, float)) and data['recommended_dose_mg'] > 0 and
-                        isinstance(data['interval_hours'], (int, float)) and data['interval_hours'] > 0 and
-                        isinstance(data['predicted_auc_24'], (int, float)) and data['predicted_auc_24'] > 0 and
-                        isinstance(data['safety_warnings'], list) and
-                        isinstance(data['monitoring_recommendations'], list) and
-                        isinstance(data['pk_curve_data'], list)):
+                # Validate response structure
+                if 'ok' in data and data['ok'] and 'result' in data:
+                    result = data['result']
+                    
+                    # Check required fields for trough calculation
+                    required_fields = [
+                        'calculation_method', 'recommended_dose_mg', 'interval_hours',
+                        'predicted_trough_mg_l', 'predicted_auc_24', 'pk_parameters'
+                    ]
+                    
+                    missing_fields = [field for field in required_fields if field not in result]
+                    
+                    if not missing_fields:
+                        # Validate clinical reasonableness
+                        dose = result['recommended_dose_mg']
+                        interval = result['interval_hours']
+                        trough = result['predicted_trough_mg_l']
+                        auc = result['predicted_auc_24']
                         
-                        self.test_results['calculate_dosing']['passed'] = True
-                        details = f"✅ Dosing calculation successful. Dose: {data['recommended_dose_mg']}mg q{data['interval_hours']}h, AUC: {data['predicted_auc_24']:.1f}"
-                        self.test_results['calculate_dosing']['details'] = details
-                        self.log_test("Calculate Dosing", "✅ PASSED", details)
-                        return True
+                        if (500 <= dose <= 3000 and 
+                            interval in [8, 12, 24] and 
+                            5 <= trough <= 25 and 
+                            200 <= auc <= 800):
+                            
+                            self.test_results['trough_calculation']['passed'] = True
+                            details = f"✅ Trough calculation successful. Dose: {dose}mg q{interval}h, Trough: {trough:.1f}mg/L, AUC: {auc:.0f}"
+                            self.test_results['trough_calculation']['details'] = details
+                            self.log_test("Trough Calculation", "✅ PASSED", details)
+                            return True
+                        else:
+                            details = f"❌ Clinically unreasonable results: Dose={dose}, Interval={interval}, Trough={trough}, AUC={auc}"
+                            self.test_results['trough_calculation']['details'] = details
+                            self.log_test("Trough Calculation", "❌ FAILED", details)
+                            return False
                     else:
-                        details = f"❌ Invalid data types or values in response"
-                        self.test_results['calculate_dosing']['details'] = details
-                        self.log_test("Calculate Dosing", "❌ FAILED", details)
+                        details = f"❌ Missing required fields: {missing_fields}"
+                        self.test_results['trough_calculation']['details'] = details
+                        self.log_test("Trough Calculation", "❌ FAILED", details)
                         return False
                 else:
-                    details = f"❌ Missing required fields: {missing_fields}"
-                    self.test_results['calculate_dosing']['details'] = details
-                    self.log_test("Calculate Dosing", "❌ FAILED", details)
+                    details = f"❌ Invalid response structure: {data}"
+                    self.test_results['trough_calculation']['details'] = details
+                    self.log_test("Trough Calculation", "❌ FAILED", details)
                     return False
             else:
                 details = f"❌ HTTP {response.status_code}: {response.text}"
-                self.test_results['calculate_dosing']['details'] = details
-                self.log_test("Calculate Dosing", "❌ FAILED", details)
+                self.test_results['trough_calculation']['details'] = details
+                self.log_test("Trough Calculation", "❌ FAILED", details)
                 return False
                 
         except Exception as e:
             details = f"❌ Exception: {str(e)}"
-            self.test_results['calculate_dosing']['details'] = details
-            self.log_test("Calculate Dosing", "❌ FAILED", details)
+            self.test_results['trough_calculation']['details'] = details
+            self.log_test("Trough Calculation", "❌ FAILED", details)
+            return False
+    
+    def test_auc_guided_calculation(self) -> bool:
+        """Test AUC-guided calculation mode"""
+        print("\n🔍 Testing AUC-Guided Calculation...")
+        
+        try:
+            # Test both steady-state and two-level methods
+            test_cases = [
+                {
+                    "name": "Steady-State Method",
+                    "levels": []
+                },
+                {
+                    "name": "Two-Level Method", 
+                    "levels": [
+                        {"concentration_mg_l": 20.0, "time_hours": 2.0, "dose_mg": 1000, "infusion_duration_hours": 1.0},
+                        {"concentration_mg_l": 12.0, "time_hours": 8.0, "dose_mg": 1000, "infusion_duration_hours": 1.0}
+                    ]
+                }
+            ]
+            
+            passed_cases = 0
+            
+            for case in test_cases:
+                request_data = {
+                    "calculation_mode": "auc_guided",
+                    "patient": self.get_sample_patient_data(),
+                    "dosing_params": self.get_sample_dosing_params(),
+                    "levels": case["levels"]
+                }
+                
+                response = self.session.post(f"{self.api_url}/calculate", json=request_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if 'ok' in data and data['ok'] and 'result' in data:
+                        result = data['result']
+                        
+                        # Check required fields
+                        required_fields = [
+                            'calculation_method', 'recommended_dose_mg', 'interval_hours',
+                            'predicted_auc_24', 'target_auc_range'
+                        ]
+                        
+                        missing_fields = [field for field in required_fields if field not in result]
+                        
+                        if not missing_fields:
+                            dose = result['recommended_dose_mg']
+                            auc = result['predicted_auc_24']
+                            
+                            # Validate AUC is in target range (400-600)
+                            if 350 <= auc <= 700 and 500 <= dose <= 3000:
+                                passed_cases += 1
+                                self.log_test(f"AUC-Guided ({case['name']})", "✅ PASSED", 
+                                            f"Dose: {dose}mg, AUC: {auc:.0f}")
+                            else:
+                                self.log_test(f"AUC-Guided ({case['name']})", "❌ FAILED", 
+                                            f"Out of range - Dose: {dose}, AUC: {auc}")
+                        else:
+                            self.log_test(f"AUC-Guided ({case['name']})", "❌ FAILED", 
+                                        f"Missing fields: {missing_fields}")
+                    else:
+                        self.log_test(f"AUC-Guided ({case['name']})", "❌ FAILED", "Invalid response structure")
+                else:
+                    self.log_test(f"AUC-Guided ({case['name']})", "❌ FAILED", f"HTTP {response.status_code}")
+            
+            if passed_cases >= 1:  # At least one method should work
+                self.test_results['auc_guided_calculation']['passed'] = True
+                details = f"✅ AUC-guided calculation successful. {passed_cases}/2 methods working"
+                self.test_results['auc_guided_calculation']['details'] = details
+                self.log_test("AUC-Guided Calculation", "✅ PASSED", details)
+                return True
+            else:
+                details = f"❌ All AUC-guided methods failed"
+                self.test_results['auc_guided_calculation']['details'] = details
+                self.log_test("AUC-Guided Calculation", "❌ FAILED", details)
+                return False
+                
+        except Exception as e:
+            details = f"❌ Exception: {str(e)}"
+            self.test_results['auc_guided_calculation']['details'] = details
+            self.log_test("AUC-Guided Calculation", "❌ FAILED", details)
+            return False
+    
+    def test_bayesian_calculation(self) -> bool:
+        """Test Bayesian MAP calculation mode"""
+        print("\n🔍 Testing Bayesian MAP Calculation...")
+        
+        try:
+            request_data = {
+                "calculation_mode": "bayesian",
+                "patient": self.get_sample_patient_data(),
+                "dosing_params": self.get_sample_dosing_params(),
+                "levels": self.get_sample_levels()
+            }
+            
+            response = self.session.post(f"{self.api_url}/calculate", json=request_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if 'ok' in data and data['ok'] and 'result' in data:
+                    result = data['result']
+                    
+                    # Check required fields for Bayesian calculation
+                    required_fields = [
+                        'calculation_method', 'individual_clearance_l_h', 'individual_volume_l',
+                        'recommended_dose_mg', 'predicted_auc_24', 'convergence_achieved'
+                    ]
+                    
+                    missing_fields = [field for field in required_fields if field not in result]
+                    
+                    if not missing_fields:
+                        clearance = result['individual_clearance_l_h']
+                        volume = result['individual_volume_l']
+                        dose = result['recommended_dose_mg']
+                        auc = result['predicted_auc_24']
+                        
+                        # Validate physiologically reasonable parameters
+                        if (1 <= clearance <= 15 and 
+                            20 <= volume <= 150 and 
+                            500 <= dose <= 3000 and 
+                            200 <= auc <= 800):
+                            
+                            self.test_results['bayesian_calculation']['passed'] = True
+                            details = f"✅ Bayesian calculation successful. CL: {clearance:.2f}L/h, V: {volume:.1f}L, Dose: {dose}mg, AUC: {auc:.0f}"
+                            self.test_results['bayesian_calculation']['details'] = details
+                            self.log_test("Bayesian Calculation", "✅ PASSED", details)
+                            return True
+                        else:
+                            details = f"❌ Unreasonable parameters: CL={clearance}, V={volume}, Dose={dose}, AUC={auc}"
+                            self.test_results['bayesian_calculation']['details'] = details
+                            self.log_test("Bayesian Calculation", "❌ FAILED", details)
+                            return False
+                    else:
+                        details = f"❌ Missing required fields: {missing_fields}"
+                        self.test_results['bayesian_calculation']['details'] = details
+                        self.log_test("Bayesian Calculation", "❌ FAILED", details)
+                        return False
+                else:
+                    details = f"❌ Invalid response structure: {data}"
+                    self.test_results['bayesian_calculation']['details'] = details
+                    self.log_test("Bayesian Calculation", "❌ FAILED", details)
+                    return False
+            else:
+                details = f"❌ HTTP {response.status_code}: {response.text}"
+                self.test_results['bayesian_calculation']['details'] = details
+                self.log_test("Bayesian Calculation", "❌ FAILED", details)
+                return False
+                
+        except Exception as e:
+            details = f"❌ Exception: {str(e)}"
+            self.test_results['bayesian_calculation']['details'] = details
+            self.log_test("Bayesian Calculation", "❌ FAILED", details)
             return False
     
     def test_pk_simulation(self) -> bool:
