@@ -1,27 +1,39 @@
-.App {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+/* Modern Healthcare CSS for Vancomyzer Calculator Suite */
+
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
 }
 
-/* number input spinner normalization */
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
+body {
   margin: 0;
-}
-input[type="number"] {
-  appearance: textfield;
-  -moz-appearance: textfield;
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
 }
 
-/* Custom scrollbar */
+/* Smooth transitions for interactive elements */
+.MuiPaper-root,
+.MuiCard-root,
+.MuiButton-root {
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Enhanced card hover effects */
+.MuiCard-root:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(25, 118, 210, 0.15) !important;
+}
+
+/* Custom scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f1f5f9;
   border-radius: 4px;
 }
 
@@ -34,273 +46,279 @@ input[type="number"] {
   background: #1565c0;
 }
 
-/* Interactive elements */
-.interactive-chart {
-  transition: all 0.3s ease;
+/* Firefox scrollbar styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1976d2 #f1f5f9;
 }
 
-.interactive-chart:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(25, 118, 210, 0.15);
+/* Input field enhancements */
+.MuiTextField-root .MuiOutlinedInput-root {
+  transition: all 0.2s ease-in-out;
 }
 
-/* Animation classes */
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
+.MuiTextField-root .MuiOutlinedInput-root:hover {
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.MuiTextField-root .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 2px 12px rgba(25, 118, 210, 0.2);
 }
 
-.slide-in {
-  animation: slideIn 0.6s ease-out;
+/* Number input spinner normalization */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-30px); }
-  to { opacity: 1; transform: translateX(0); }
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
 }
 
-/* Chart animations */
-.chart-container {
-  position: relative;
-  overflow: hidden;
+/* Tab styling enhancements */
+.MuiTabs-root .MuiTab-root {
+  transition: all 0.2s ease-in-out;
 }
 
-.auc-highlight {
-  fill: rgba(25, 118, 210, 0.1);
-  stroke: #1976d2;
-  stroke-width: 2;
-  animation: pulse 2s infinite;
+.MuiTabs-root .MuiTab-root:hover {
+  background-color: rgba(25, 118, 210, 0.04);
 }
 
+.MuiTabs-root .MuiTab-root.Mui-selected {
+  background-color: rgba(25, 118, 210, 0.08);
+}
+
+/* Button enhancements */
+.MuiButton-root {
+  border-radius: 8px !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.025em;
+}
+
+.MuiButton-contained {
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3) !important;
+}
+
+.MuiButton-contained:hover {
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+/* Loading animation */
 @keyframes pulse {
-  0%, 100% { opacity: 0.1; }
-  50% { opacity: 0.3; }
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
-/* Real-time indicators */
-.real-time-indicator {
-  position: relative;
+.loading-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
-.real-time-indicator::before {
-  content: '';
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 10px;
-  height: 10px;
-  background: #4caf50;
-  border-radius: 50%;
-  animation: blink 1s infinite;
+/* Result display enhancements */
+.result-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease-in-out;
 }
 
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0.3; }
-}
-
-/* Interactive sliders */
-.dose-slider {
-  transition: all 0.2s ease;
-}
-
-.dose-slider:hover {
-  transform: scale(1.02);
-}
-
-/* Result cards */
-.result-card {
-  transition: all 0.3s ease;
-  border-left: 4px solid transparent;
-}
-
-.result-card.safe {
-  border-left-color: #4caf50;
-}
-
-.result-card.caution {
-  border-left-color: #ff9800;
-}
-
-.result-card.warning {
-  border-left-color: #f44336;
-}
-
-.result-card:hover {
+.result-metric:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* PK curve styling */
-.pk-curve {
-  stroke: #1976d2;
-  stroke-width: 3;
-  fill: none;
-  filter: drop-shadow(0 2px 4px rgba(25, 118, 210, 0.2));
+.result-metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1976d2;
+  margin-bottom: 4px;
 }
 
-.auc-area {
-  fill: url(#aucGradient);
-  opacity: 0.6;
-}
-
-.target-range {
-  fill: rgba(76, 175, 80, 0.1);
-  stroke: #4caf50;
-  stroke-dasharray: 5,5;
-}
-
-/* Bayesian visualization */
-.confidence-interval {
-  fill: rgba(25, 118, 210, 0.2);
-  stroke: #1976d2;
-  stroke-width: 1;
-  stroke-dasharray: 3,3;
-}
-
-.individual-curve {
-  stroke: #e91e63;
-  stroke-width: 2;
-  fill: none;
-}
-
-.population-curve {
-  stroke: #9e9e9e;
-  stroke-width: 2;
-  fill: none;
-  stroke-dasharray: 5,5;
-}
-
-/* Interactive calculation display */
-.calculation-step {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-left: 3px solid #1976d2;
-  padding: 15px;
-  margin: 10px 0;
-  border-radius: 5px;
-  transition: all 0.3s ease;
-}
-
-.calculation-step:hover {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  transform: translateX(5px);
-}
-
-.formula {
-  font-family: 'Courier New', monospace;
-  background: #263238;
-  color: #4fc3f7;
-  padding: 10px;
-  border-radius: 5px;
-  margin: 10px 0;
-  font-size: 14px;
-  overflow-x: auto;
-}
-
-/* Validation & error styling */
-.input.error {
-  animation: pulseErrorBorder 0.6s ease;
-}
-
-.input.error .MuiOutlinedInput-notchedOutline {
-  border-color: #d32f2f !important;
-  box-shadow: 0 0 0 1px rgba(211,47,47,0.3);
-}
-
-.input.error.Mui-focused .MuiOutlinedInput-notchedOutline,
-.input.error .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #b71c1c !important;
-  box-shadow: 0 0 0 2px rgba(183,28,28,0.25);
-}
-
-.input.error label, .input.error .MuiInputLabel-root {
-  color: #d32f2f !important;
-}
-
-.input.error .MuiInputBase-input {
-  animation: pulseErrorBg 1s ease;
-}
-
-@keyframes pulseErrorBorder {
-  0% { box-shadow: 0 0 0 0 rgba(211,47,47,0.5); }
-  70% { box-shadow: 0 0 0 6px rgba(211,47,47,0); }
-  100% { box-shadow: 0 0 0 0 rgba(211,47,47,0); }
-}
-
-@keyframes pulseErrorBg {
-  0% { background-color: rgba(211,47,47,0.08); }
-  100% { background-color: transparent; }
-}
-
-.alert.error {
-  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-  color: #b71c1c;
-  border: 1px solid #f44336;
-  border-left: 5px solid #f44336;
-  padding: 12px 16px;
-  border-radius: 6px;
+.result-metric-label {
+  font-size: 0.875rem;
+  color: #64748b;
   font-weight: 500;
-  font-size: 0.95rem;
 }
 
-.alert.error:focus-within {
-  outline: 2px solid #f44336;
-  outline-offset: 2px;
+/* Status indicators */
+.status-safe {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #16a34a;
 }
 
-/* High contrast mode support */
-@media (prefers-contrast: more) {
-  .input.error .MuiOutlinedInput-notchedOutline {
-    border-width: 2px;
-  }
-  .alert.error {
-    background: #ffebee;
-  }
+.status-caution {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #d97706;
 }
 
-/* Reduced motion accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .input.error { animation: none; }
-  .input.error .MuiInputBase-input { animation: none; }
+.status-warning {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: #dc2626;
 }
 
-/* Mobile responsiveness */
+/* Alert styling enhancements */
+.MuiAlert-root {
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.MuiAlert-standardInfo {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+  border-left: 4px solid #3b82f6 !important;
+}
+
+.MuiAlert-standardSuccess {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
+  border-left: 4px solid #16a34a !important;
+}
+
+.MuiAlert-standardWarning {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+  border-left: 4px solid #d97706 !important;
+}
+
+.MuiAlert-standardError {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
+  border-left: 4px solid #dc2626 !important;
+}
+
+/* Accordion enhancements */
+.MuiAccordion-root {
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  margin-bottom: 8px !important;
+}
+
+.MuiAccordion-root:before {
+  display: none !important;
+}
+
+.MuiAccordionSummary-root {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px 12px 0 0;
+}
+
+.MuiAccordionSummary-root:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+/* List enhancements */
+.MuiListItem-root {
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.MuiListItem-root:hover {
+  background-color: rgba(25, 118, 210, 0.04);
+}
+
+/* Chip enhancements */
+.MuiChip-root {
+  font-weight: 500 !important;
+  letter-spacing: 0.025em;
+}
+
+/* Form control enhancements */
+.MuiFormControlLabel-root .MuiFormControlLabel-label {
+  font-weight: 500;
+  color: #374151;
+}
+
+.MuiSwitch-root .MuiSwitch-track {
+  background-color: #d1d5db !important;
+}
+
+.MuiSwitch-root .Mui-checked + .MuiSwitch-track {
+  background-color: #1976d2 !important;
+}
+
+/* Responsive design */
 @media (max-width: 768px) {
-  .App {
-    padding: 0;
+  .result-metric-value {
+    font-size: 1.5rem;
   }
   
-  .chart-container {
-    height: 250px !important;
+  .MuiContainer-root {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
   
-  .result-card {
-    margin-bottom: 10px;
-  }
-  
-  .calculation-step {
-    padding: 10px;
-    font-size: 14px;
+  .MuiPaper-root {
+    margin: 8px 0 !important;
   }
 }
 
 /* Print styles */
 @media print {
-  .App {
+  body {
     background: white !important;
   }
   
-  .interactive-chart,
-  .result-card {
-    box-shadow: none !important;
-    transform: none !important;
+  .MuiButton-root,
+  .MuiTabs-root {
+    display: none !important;
   }
   
-  .chart-container {
-    height: 300px !important;
+  .MuiPaper-root {
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb !important;
   }
+  
+  .result-metric {
+    background: white !important;
+    border: 1px solid #d1d5db !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .MuiPaper-root {
+    border: 2px solid #1f2937 !important;
+  }
+  
+  .MuiButton-contained {
+    background-color: #1f2937 !important;
+    color: white !important;
+  }
+  
+  .result-metric {
+    border: 2px solid #374151 !important;
+  }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus enhancements for accessibility */
+.MuiButton-root:focus-visible,
+.MuiTextField-root:focus-within,
+.MuiSelect-root:focus-within {
+  outline: 2px solid #1976d2 !important;
+  outline-offset: 2px !important;
+}
+
+/* Dark mode support (future enhancement) */
+@media (prefers-color-scheme: dark) {
+  /* Dark mode styles can be added here when needed */
 }
