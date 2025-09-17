@@ -158,7 +158,8 @@ class BayesianResult(BaseModel):
     iterations_used: int
     individual_pk_curve: List[Dict[str, float]]
     population_pk_curve: List[Dict[str, float]]
-    model_config = {"populate_by_name": True}
+    class Config:
+        populate_by_name = True
 
 # Pharmacokinetic Calculation Engine
 class VancomycinPKCalculator:
