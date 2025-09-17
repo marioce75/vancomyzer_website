@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Vancomyzer FastAPI Backend Test Suite
-====================================
+Vancomyzer Calculator Suite Backend Test Suite
+==============================================
 
 Comprehensive testing for the Vancomyzer web application backend API endpoints.
-Tests all core functionality including dosing calculations, health checks, and data validation.
+Tests all three calculation modes: Trough-Based, AUC-Guided, and Bayesian MAP.
 """
 
 import requests
@@ -13,20 +13,32 @@ import sys
 from datetime import datetime, timedelta
 from typing import Dict, Any, List
 import time
+import os
 
 class VancomyzerBackendTester:
     def __init__(self):
-        # Use localhost since we're testing internally
-        self.base_url = "http://localhost:8001"
+        # Use the public endpoint from frontend .env for testing
+        frontend_env_path = "/app/frontend/.env"
+        backend_url = "http://localhost:8001"  # Default fallback
+        
+        # Try to read the actual backend URL from frontend .env
+        if os.path.exists(frontend_env_path):
+            with open(frontend_env_path, 'r') as f:
+                for line in f:
+                    if line.startswith('REACT_APP_BACKEND_URL='):
+                        backend_url = line.split('=', 1)[1].strip()
+                        break
+        
+        self.base_url = backend_url
         self.api_url = f"{self.base_url}/api"
         self.test_results = {
             'health_check': {'passed': False, 'details': ''},
-            'calculate_dosing': {'passed': False, 'details': ''},
-            'bayesian_optimization': {'passed': False, 'details': ''},
-            'pk_simulation': {'passed': False, 'details': ''},
-            'websocket_test': {'passed': False, 'details': ''},
-            'error_handling': {'passed': False, 'details': ''},
-            'data_validation': {'passed': False, 'details': ''}
+            'trough_calculation': {'passed': False, 'details': ''},
+            'auc_guided_calculation': {'passed': False, 'details': ''},
+            'bayesian_calculation': {'passed': False, 'details': ''},
+            'data_validation': {'passed': False, 'details': ''},
+            'patient_scenarios': {'passed': False, 'details': ''},
+            'clinical_validation': {'passed': False, 'details': ''}
         }
         self.session = requests.Session()
         self.session.timeout = 30
