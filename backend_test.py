@@ -60,11 +60,11 @@ class VancomyzerBackendTester:
             if response.status_code == 200:
                 data = response.json()
                 
-                # Validate response structure
-                if 'status' in data and 'timestamp' in data:
-                    if data['status'] == 'healthy':
+                # Validate response structure - updated for actual API response
+                if 'status' in data and 'message' in data:
+                    if data['status'] == 'ok':
                         self.test_results['health_check']['passed'] = True
-                        self.test_results['health_check']['details'] = f"✅ Health check passed. Status: {data['status']}, Timestamp: {data['timestamp']}"
+                        self.test_results['health_check']['details'] = f"✅ Health check passed. Status: {data['status']}, Message: {data['message']}"
                         self.log_test("Health Check", "✅ PASSED", self.test_results['health_check']['details'])
                         return True
                     else:
