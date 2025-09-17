@@ -354,146 +354,29 @@ class VancomyzerBackendTester:
             self.log_test("Bayesian Calculation", "❌ FAILED", details)
             return False
     
-    def test_pk_simulation(self) -> bool:
-        """Test the PK simulation endpoint"""
-        print("\n🔍 Testing PK Simulation Endpoint...")
-        
-        try:
-            patient_data = self.get_sample_patient_data()
-            # Try with query parameters as the error suggests
-            params = {"dose": 1000.0, "interval": 12.0}
-            
-            response = self.session.post(f"{self.api_url}/pk-simulation", json=patient_data, params=params)
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Validate required fields
-                required_fields = ['pk_curve', 'predicted_auc', 'predicted_trough', 'predicted_peak', 'pk_parameters']
-                missing_fields = [field for field in required_fields if field not in data]
-                
-                if not missing_fields:
-                    # Validate pk_curve data structure
-                    if (isinstance(data['pk_curve'], list) and len(data['pk_curve']) > 0 and
-                        'time' in data['pk_curve'][0] and 'concentration' in data['pk_curve'][0]):
-                        
-                        self.test_results['pk_simulation']['passed'] = True
-                        details = f"✅ PK simulation successful. Curve points: {len(data['pk_curve'])}, AUC: {data['predicted_auc']:.1f}"
-                        self.test_results['pk_simulation']['details'] = details
-                        self.log_test("PK Simulation", "✅ PASSED", details)
-                        return True
-                    else:
-                        details = f"❌ Invalid pk_curve data structure"
-                        self.test_results['pk_simulation']['details'] = details
-                        self.log_test("PK Simulation", "❌ FAILED", details)
-                        return False
-                else:
-                    details = f"❌ Missing required fields: {missing_fields}"
-                    self.test_results['pk_simulation']['details'] = details
-                    self.log_test("PK Simulation", "❌ FAILED", details)
-                    return False
-            else:
-                details = f"❌ HTTP {response.status_code}: {response.text}"
-                self.test_results['pk_simulation']['details'] = details
-                self.log_test("PK Simulation", "❌ FAILED", details)
-                return False
-                
-        except Exception as e:
-            details = f"❌ Exception: {str(e)}"
-            self.test_results['pk_simulation']['details'] = details
-            self.log_test("PK Simulation", "❌ FAILED", details)
-            return False
-    
-    def test_bayesian_optimization(self) -> bool:
-        """Test the Bayesian optimization endpoint"""
-        print("\n🔍 Testing Bayesian Optimization Endpoint...")
-        
-        try:
-            patient_data = self.get_sample_patient_data()
-            
-            # Sample vancomycin levels for Bayesian optimization
-            levels = [
-                {
-                    "concentration": 15.5,
-                    "time_after_dose_hours": 12.0,
-                    "dose_given_mg": 1000.0,
-                    "infusion_duration_hours": 1.0,
-                    "level_type": "trough",
-                    "draw_time": (datetime.now() - timedelta(hours=12)).isoformat(),
-                    "notes": "Steady state trough level"
-                }
-            ]
-            
-            # FastAPI expects multiple body parameters in this format
-            bayesian_data = {
-                "patient": patient_data,
-                "levels": levels
-            }
-            
-            response = self.session.post(f"{self.api_url}/bayesian-optimization", json=bayesian_data)
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Validate required fields
-                required_fields = [
-                    'individual_clearance', 'individual_volume', 'clearance_ci_lower', 'clearance_ci_upper',
-                    'model_fit_r_squared', 'convergence_achieved', 'individual_pk_curve', 'population_pk_curve'
-                ]
-                missing_fields = [field for field in required_fields if field not in data]
-                
-                if not missing_fields:
-                    if (isinstance(data['individual_clearance'], (int, float)) and data['individual_clearance'] > 0 and
-                        isinstance(data['individual_volume'], (int, float)) and data['individual_volume'] > 0 and
-                        isinstance(data['individual_pk_curve'], list) and len(data['individual_pk_curve']) > 0):
-                        
-                        self.test_results['bayesian_optimization']['passed'] = True
-                        details = f"✅ Bayesian optimization successful. CL: {data['individual_clearance']:.2f} L/h, V: {data['individual_volume']:.1f} L"
-                        self.test_results['bayesian_optimization']['details'] = details
-                        self.log_test("Bayesian Optimization", "✅ PASSED", details)
-                        return True
-                    else:
-                        details = f"❌ Invalid parameter values in response"
-                        self.test_results['bayesian_optimization']['details'] = details
-                        self.log_test("Bayesian Optimization", "❌ FAILED", details)
-                        return False
-                else:
-                    details = f"❌ Missing required fields: {missing_fields}"
-                    self.test_results['bayesian_optimization']['details'] = details
-                    self.log_test("Bayesian Optimization", "❌ FAILED", details)
-                    return False
-            else:
-                details = f"❌ HTTP {response.status_code}: {response.text}"
-                self.test_results['bayesian_optimization']['details'] = details
-                self.log_test("Bayesian Optimization", "❌ FAILED", details)
-                return False
-                
-        except Exception as e:
-            details = f"❌ Exception: {str(e)}"
-            self.test_results['bayesian_optimization']['details'] = details
-            self.log_test("Bayesian Optimization", "❌ FAILED", details)
-            return False
-    
     def test_data_validation(self) -> bool:
         """Test data validation and error handling"""
         print("\n🔍 Testing Data Validation...")
         
         try:
             # Test with invalid patient data
-            invalid_data = {
-                "population_type": "adult",
-                "age_years": -5,  # Invalid age
-                "gender": "invalid_gender",  # Invalid gender
-                "weight_kg": -10,  # Invalid weight
-                "serum_creatinine": 0,  # Invalid creatinine
-                "indication": "pneumonia",
-                "severity": "moderate"
+            invalid_request = {
+                "calculation_mode": "trough",
+                "patient": {
+                    "age_years": -5,  # Invalid age
+                    "gender": "invalid_gender",  # Invalid gender
+                    "height_cm": 50,  # Invalid height
+                    "weight_kg": -10,  # Invalid weight
+                    "serum_creatinine_mg_dl": 0  # Invalid creatinine
+                },
+                "dosing_params": self.get_sample_dosing_params(),
+                "levels": []
             }
             
-            response = self.session.post(f"{self.api_url}/calculate-dosing", json=invalid_data)
+            response = self.session.post(f"{self.api_url}/calculate", json=invalid_request)
             
-            # Should return 400 or 422 for validation errors
-            if response.status_code in [400, 422]:
+            # Should return 422 for validation errors
+            if response.status_code == 422:
                 self.test_results['data_validation']['passed'] = True
                 details = f"✅ Data validation working correctly. Rejected invalid data with HTTP {response.status_code}"
                 self.test_results['data_validation']['details'] = details
@@ -511,45 +394,45 @@ class VancomyzerBackendTester:
             self.log_test("Data Validation", "❌ FAILED", details)
             return False
     
-    def test_different_patient_scenarios(self) -> bool:
+    def test_patient_scenarios(self) -> bool:
         """Test different patient scenarios"""
         print("\n🔍 Testing Different Patient Scenarios...")
         
         scenarios = [
             {
-                "name": "Adult Male",
-                "data": {
-                    "population_type": "adult",
+                "name": "Standard Adult Male",
+                "patient": {
                     "age_years": 35,
                     "gender": "male",
-                    "weight_kg": 80.0,
-                    "serum_creatinine": 1.0,
-                    "indication": "bacteremia",
-                    "severity": "severe"
+                    "height_cm": 180,
+                    "weight_kg": 80,
+                    "serum_creatinine_mg_dl": 1.0,
+                    "use_scr_floor": False,
+                    "scr_floor_mg_dl": 0.6
                 }
             },
             {
-                "name": "Adult Female",
-                "data": {
-                    "population_type": "adult",
-                    "age_years": 28,
+                "name": "Elderly Female",
+                "patient": {
+                    "age_years": 80,
                     "gender": "female",
-                    "weight_kg": 65.0,
-                    "serum_creatinine": 0.8,
-                    "indication": "skin_soft_tissue",
-                    "severity": "mild"
+                    "height_cm": 160,
+                    "weight_kg": 60,
+                    "serum_creatinine_mg_dl": 1.5,
+                    "use_scr_floor": False,
+                    "scr_floor_mg_dl": 0.6
                 }
             },
             {
-                "name": "Pediatric Patient",
-                "data": {
-                    "population_type": "pediatric",
-                    "age_years": 8,
+                "name": "Obese Patient",
+                "patient": {
+                    "age_years": 45,
                     "gender": "male",
-                    "weight_kg": 25.0,
-                    "serum_creatinine": 0.5,
-                    "indication": "pneumonia",
-                    "severity": "moderate"
+                    "height_cm": 175,
+                    "weight_kg": 120,
+                    "serum_creatinine_mg_dl": 1.2,
+                    "use_scr_floor": False,
+                    "scr_floor_mg_dl": 0.6
                 }
             }
         ]
@@ -559,16 +442,27 @@ class VancomyzerBackendTester:
         
         for scenario in scenarios:
             try:
-                response = self.session.post(f"{self.api_url}/calculate-dosing", json=scenario["data"])
+                request_data = {
+                    "calculation_mode": "auc_guided",
+                    "patient": scenario["patient"],
+                    "dosing_params": self.get_sample_dosing_params(),
+                    "levels": []
+                }
+                
+                response = self.session.post(f"{self.api_url}/calculate", json=request_data)
                 
                 if response.status_code == 200:
                     data = response.json()
-                    if 'recommended_dose_mg' in data and data['recommended_dose_mg'] > 0:
-                        passed_scenarios += 1
-                        self.log_test(f"Scenario: {scenario['name']}", "✅ PASSED", 
-                                    f"Dose: {data['recommended_dose_mg']}mg q{data['interval_hours']}h")
+                    if 'ok' in data and data['ok'] and 'result' in data:
+                        result = data['result']
+                        if 'recommended_dose_mg' in result and result['recommended_dose_mg'] > 0:
+                            passed_scenarios += 1
+                            self.log_test(f"Scenario: {scenario['name']}", "✅ PASSED", 
+                                        f"Dose: {result['recommended_dose_mg']}mg q{result['interval_hours']}h")
+                        else:
+                            self.log_test(f"Scenario: {scenario['name']}", "❌ FAILED", "Invalid response data")
                     else:
-                        self.log_test(f"Scenario: {scenario['name']}", "❌ FAILED", "Invalid response data")
+                        self.log_test(f"Scenario: {scenario['name']}", "❌ FAILED", "Invalid response structure")
                 else:
                     self.log_test(f"Scenario: {scenario['name']}", "❌ FAILED", f"HTTP {response.status_code}")
                     
@@ -578,40 +472,132 @@ class VancomyzerBackendTester:
         success_rate = passed_scenarios / total_scenarios
         if success_rate >= 0.8:  # 80% success rate
             details = f"✅ Patient scenarios test passed. {passed_scenarios}/{total_scenarios} scenarios successful"
-            self.test_results['error_handling']['passed'] = True
-            self.test_results['error_handling']['details'] = details
+            self.test_results['patient_scenarios']['passed'] = True
+            self.test_results['patient_scenarios']['details'] = details
             self.log_test("Patient Scenarios", "✅ PASSED", details)
             return True
         else:
             details = f"❌ Patient scenarios test failed. Only {passed_scenarios}/{total_scenarios} scenarios successful"
-            self.test_results['error_handling']['details'] = details
+            self.test_results['patient_scenarios']['details'] = details
             self.log_test("Patient Scenarios", "❌ FAILED", details)
             return False
     
-    def test_websocket_connectivity(self) -> bool:
-        """Test WebSocket connectivity (basic check)"""
-        print("\n🔍 Testing WebSocket Connectivity...")
+    def test_clinical_validation(self) -> bool:
+        """Test clinical validation of results"""
+        print("\n🔍 Testing Clinical Validation...")
         
         try:
-            # For now, just mark as passed since WebSocket testing requires more complex setup
-            # In a real scenario, we'd use websocket-client library
-            self.test_results['websocket_test']['passed'] = True
-            details = "✅ WebSocket endpoint available (basic connectivity check)"
-            self.test_results['websocket_test']['details'] = details
-            self.log_test("WebSocket Test", "✅ PASSED", details)
-            return True
+            # Test with sample patient from the review request
+            sample_patient = {
+                "age_years": 65,
+                "gender": "male",
+                "height_cm": 175,
+                "weight_kg": 75,
+                "serum_creatinine_mg_dl": 1.0,
+                "use_scr_floor": False,
+                "scr_floor_mg_dl": 0.6
+            }
             
+            request_data = {
+                "calculation_mode": "auc_guided",
+                "patient": sample_patient,
+                "dosing_params": self.get_sample_dosing_params(),
+                "levels": []
+            }
+            
+            response = self.session.post(f"{self.api_url}/calculate", json=request_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if 'ok' in data and data['ok'] and 'result' in data:
+                    result = data['result']
+                    
+                    # Clinical validation checks
+                    auc = result.get('predicted_auc_24', 0)
+                    dose = result.get('recommended_dose_mg', 0)
+                    interval = result.get('interval_hours', 0)
+                    
+                    clinical_checks = []
+                    
+                    # AUC should be in therapeutic range (400-600 mg·h/L)
+                    if 400 <= auc <= 600:
+                        clinical_checks.append("✅ AUC in therapeutic range")
+                    elif 350 <= auc < 400 or 600 < auc <= 700:
+                        clinical_checks.append("⚠️ AUC near therapeutic range")
+                    else:
+                        clinical_checks.append("❌ AUC outside therapeutic range")
+                    
+                    # Dose should be reasonable
+                    if 500 <= dose <= 2500:
+                        clinical_checks.append("✅ Dose clinically reasonable")
+                    else:
+                        clinical_checks.append("❌ Dose outside reasonable range")
+                    
+                    # Interval should be standard
+                    if interval in [8, 12, 24]:
+                        clinical_checks.append("✅ Standard dosing interval")
+                    else:
+                        clinical_checks.append("❌ Non-standard dosing interval")
+                    
+                    # Check for safety warnings and monitoring recommendations
+                    if 'safety_warnings' in result and isinstance(result['safety_warnings'], list):
+                        clinical_checks.append("✅ Safety warnings provided")
+                    else:
+                        clinical_checks.append("❌ Missing safety warnings")
+                    
+                    if 'monitoring_recommendations' in result and isinstance(result['monitoring_recommendations'], list):
+                        clinical_checks.append("✅ Monitoring recommendations provided")
+                    else:
+                        clinical_checks.append("❌ Missing monitoring recommendations")
+                    
+                    # Count passed checks
+                    passed_checks = sum(1 for check in clinical_checks if check.startswith("✅"))
+                    total_checks = len(clinical_checks)
+                    
+                    if passed_checks >= 4:  # At least 4/5 checks should pass
+                        self.test_results['clinical_validation']['passed'] = True
+                        details = f"✅ Clinical validation passed. {passed_checks}/{total_checks} checks passed. AUC: {auc:.0f}, Dose: {dose}mg q{interval}h"
+                        self.test_results['clinical_validation']['details'] = details
+                        self.log_test("Clinical Validation", "✅ PASSED", details)
+                        
+                        # Print detailed clinical checks
+                        for check in clinical_checks:
+                            print(f"    {check}")
+                        
+                        return True
+                    else:
+                        details = f"❌ Clinical validation failed. Only {passed_checks}/{total_checks} checks passed"
+                        self.test_results['clinical_validation']['details'] = details
+                        self.log_test("Clinical Validation", "❌ FAILED", details)
+                        
+                        # Print failed checks
+                        for check in clinical_checks:
+                            print(f"    {check}")
+                        
+                        return False
+                else:
+                    details = f"❌ Invalid response structure"
+                    self.test_results['clinical_validation']['details'] = details
+                    self.log_test("Clinical Validation", "❌ FAILED", details)
+                    return False
+            else:
+                details = f"❌ HTTP {response.status_code}: {response.text}"
+                self.test_results['clinical_validation']['details'] = details
+                self.log_test("Clinical Validation", "❌ FAILED", details)
+                return False
+                
         except Exception as e:
             details = f"❌ Exception: {str(e)}"
-            self.test_results['websocket_test']['details'] = details
-            self.log_test("WebSocket Test", "❌ FAILED", details)
+            self.test_results['clinical_validation']['details'] = details
+            self.log_test("Clinical Validation", "❌ FAILED", details)
             return False
     
     def run_all_tests(self) -> Dict[str, Any]:
         """Run all backend tests"""
-        print("=" * 60)
-        print("🏥 VANCOMYZER BACKEND API TEST SUITE")
-        print("=" * 60)
+        print("=" * 70)
+        print("🏥 VANCOMYZER CALCULATOR SUITE - BACKEND API TEST SUITE")
+        print("=" * 70)
         print(f"📅 Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"🌐 Testing URL: {self.base_url}")
         print()
@@ -619,12 +605,12 @@ class VancomyzerBackendTester:
         # Run all tests
         tests = [
             ("Health Check", self.test_health_check),
-            ("Calculate Dosing", self.test_calculate_dosing),
-            ("PK Simulation", self.test_pk_simulation),
-            ("Bayesian Optimization", self.test_bayesian_optimization),
+            ("Trough Calculation", self.test_trough_calculation),
+            ("AUC-Guided Calculation", self.test_auc_guided_calculation),
+            ("Bayesian Calculation", self.test_bayesian_calculation),
             ("Data Validation", self.test_data_validation),
-            ("Patient Scenarios", self.test_different_patient_scenarios),
-            ("WebSocket Connectivity", self.test_websocket_connectivity)
+            ("Patient Scenarios", self.test_patient_scenarios),
+            ("Clinical Validation", self.test_clinical_validation)
         ]
         
         passed_tests = 0
@@ -638,9 +624,9 @@ class VancomyzerBackendTester:
                 print(f"❌ {test_name} failed with exception: {str(e)}")
         
         # Generate summary
-        print("\n" + "=" * 60)
-        print("📊 TEST SUMMARY")
-        print("=" * 60)
+        print("\n" + "=" * 70)
+        print("📊 BACKEND TEST SUMMARY")
+        print("=" * 70)
         
         success_rate = passed_tests / total_tests
         
@@ -664,7 +650,7 @@ class VancomyzerBackendTester:
 
 def main():
     """Main test execution function"""
-    print("Starting Vancomyzer Backend API Tests...")
+    print("Starting Vancomyzer Calculator Suite Backend API Tests...")
     
     # Create and run test suite
     tester = VancomyzerBackendTester()
