@@ -737,6 +737,7 @@ function App() {
   };
 
   const handleTabChange = (event, newValue) => {
+    console.log('Tab change triggered:', newValue, 'Mode will be:', calculationModes[newValue]); // Debug log
     setActiveTab(newValue);
     setResult(null); // Clear results when switching tabs
     setError(null);
