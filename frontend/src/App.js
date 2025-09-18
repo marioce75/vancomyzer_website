@@ -700,23 +700,28 @@ function App() {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       console.log('Using backend URL:', backendUrl); // Debug log
       
+      const requestData = {
+        calculation_mode: calculationModes[activeTab],
+        patient,
+        dosing_params: dosingParams,
+        levels: levels.filter(l => l.concentration_mg_l && l.time_hours && l.dose_mg)
+      };
+      
+      console.log('Request data being sent:', JSON.stringify(requestData, null, 2)); // Debug log
+      
       const response = await fetch(`${backendUrl}/api/calculate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          calculation_mode: calculationModes[activeTab],
-          patient,
-          dosing_params: dosingParams,
-          levels: levels.filter(l => l.concentration_mg_l && l.time_hours && l.dose_mg)
-        }),
+        body: JSON.stringify(requestData),
       });
 
       console.log('Response status:', response.status); // Debug log
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ detail: 'Network error' }));
+        console.log('Error response data:', errorData); // Debug log
         throw new Error(errorData.detail || `HTTP ${response.status}`);
       }
 
