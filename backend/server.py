@@ -1,5 +1,11 @@
 # Simple wrapper to import the main application
-from main import app
+try:
+    from main import app
+except ImportError:
+    try:
+        from backend.main import app
+    except ImportError:
+        from .main import app
 
 if __name__ == "__main__":
     import uvicorn
