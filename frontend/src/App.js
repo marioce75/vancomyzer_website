@@ -696,7 +696,10 @@ function App() {
     setError(null);
     
     try {
+      // Use environment variable if available, otherwise fallback to localhost
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      console.log('Using backend URL:', backendUrl); // Debug log
+      
       const response = await fetch(`${backendUrl}/api/calculate`, {
         method: 'POST',
         headers: {
@@ -710,12 +713,15 @@ function App() {
         }),
       });
 
+      console.log('Response status:', response.status); // Debug log
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ detail: 'Network error' }));
         throw new Error(errorData.detail || `HTTP ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('Response data:', data); // Debug log
       setResult(data.result);
     } catch (err) {
       setError(err.message);
