@@ -669,6 +669,11 @@ async def health_root():
 app.include_router(api_router)
 app.include_router(root_router)
 
+# Health endpoint
+@app.get("/health")
+def health():
+    return {"ok": True}
+
 # Startup event
 @app.on_event("startup")
 async def startup_event():
