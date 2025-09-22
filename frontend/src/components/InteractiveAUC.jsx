@@ -28,6 +28,12 @@ const help = {
   levels:    { key: 'help.levels',    link: '/guideline/sampling-timing' },
 };
 
+// Utility function for safe number formatting
+const toFixed = (val, digits) => {
+  if (val == null || !Number.isFinite(val)) return '—';
+  return Number(val).toFixed(digits);
+};
+
 function formToPayload(s) {
   return {
     age_years: s.ageYears ?? null,
