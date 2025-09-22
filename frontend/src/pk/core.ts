@@ -1,26 +1,53 @@
 // Core PK Functions
 // Published equations; no proprietary code
 
-// Creatinine clearance (Cockcroft–Gault; round choices configurable)
+// Enhanced Creatinine clearance (Cockcroft–Gault) with weight strategy support
 export function crclCG(params: {
-  ageY: number; sex: 'Male'|'Female'; weightKg: number; scrMgDl: number;
-  useAdjBW?: boolean; heightCm?: number; rounding?: 'none'|'floor0.1'|'round0.1';
+  ageY: number; 
+  sex: 'Male'|'Female'; 
+  weightKg: number; 
+  scrMgDl: number;
+  heightCm?: number; 
+  weightStrategy?: 'TBW'|'IBW'|'AdjBW';
+  scrRounding?: 'none'|'floor0.7';
 }): number {
-  const { ageY, sex, weightKg, scrMgDl, heightCm, useAdjBW, rounding } = params;
+  const { ageY, sex, weightKg, scrMgDl, heightCm, weightStrategy = 'TBW', scrRounding = 'none' } = params;
 
-  let adjustedWeight = weightKg;
-  if (useAdjBW && heightCm) {
-    const ibw = sex === 'Male'
-      ? 50 + 0.91 * (heightCm - 152.4)
-      : 45.5 + 0.91 * (heightCm - 152.4);
-    adjustedWeight = ibw + 0.4 * (weightKg - ibw);
+  // Calculate IBW using inches-based Devine formula (per spec)
+  let weightForCG = weightKg; // Default TBW
+  
+  if (heightCm && (weightStrategy === 'IBW' || weightStrategy === 'AdjBW')) {
+    const heightInches = heightCm / 2.54;
+    const inchesOver60 = Math.max(0, heightInches - 60);
+    
+    const ibw = sex === 'Male' 
+      ? 50 + 2.3 * inchesOver60
+      : 45.5 + 2.3 * inchesOver60;
+    
+    if (weightStrategy === 'IBW') {
+      weightForCG = ibw;
+    } else if (weightStrategy === 'AdjBW') {
+      // Calculate BMI to determine if AdjBW should be used
+      const bmi = weightKg / ((heightCm / 100) ** 2);
+      if (bmi >= 30) {
+        weightForCG = ibw + 0.4 * (weightKg - ibw);
+      } else {
+        weightForCG = weightKg; // Use TBW if BMI < 30
+      }
+    }
   }
 
-  let crcl = ((140 - ageY) * adjustedWeight) / (72 * scrMgDl);
+  // Apply SCr rounding if specified (optional floor for frail patients)
+  let adjustedScr = scrMgDl;
+  if (scrRounding === 'floor0.7') {
+    adjustedScr = Math.max(scrMgDl, 0.7);
+  }
+
+  // Cockcroft-Gault calculation
+  let crcl = ((140 - ageY) * weightForCG) / (72 * adjustedScr);
   if (sex === 'Female') crcl *= 0.85;
-  if (rounding === 'floor0.1') return Math.floor(crcl * 10) / 10;
-  if (rounding === 'round0.1') return Math.round(crcl * 10) / 10;
-  return crcl;
+  
+  return Math.max(crcl, 10); // Minimum physiological limit
 }
 
 // Volume of distribution (Vd) and elimination rate constant (k)
