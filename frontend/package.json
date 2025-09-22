@@ -21,13 +21,15 @@
     "stylis-plugin-rtl": "2.1.1",
     "i18next": "23.10.1",
     "react-i18next": "13.5.0",
-    "i18next-browser-languagedetector": "7.2.0"
+    "i18next-browser-languagedetector": "7.2.0",
+    "recharts": "2.12.7"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "tune:medcalc": "node -e \"console.log('Tuning scaffold; integrate as needed')\""
   },
   "devDependencies": {
     "@types/react": "18.3.23",
