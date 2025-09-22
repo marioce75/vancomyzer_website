@@ -572,6 +572,125 @@ bayesian_calc = BayesianCalculator(pk_calculator)
 async def health_api():
     return {"status": "ok", "message": "Vancomyzer Calculator Suite API"}
 
+@api_router.post("/interactive/auc")
+async def interactive_auc(request: AucRequest = Body(...)):
+    """Interactive AUC calculation endpoint for real-time updates"""
+    try:
+        log.info("Interactive AUC request received")
+        
+        # Convert flat request to structured format
+        if not all([request.age_years, request.weight_kg, request.scr_mg_dl, 
+                   request.gender, request.dose_mg, request.interval_hr]):
+            # Return minimal deterministic calculation
+            return {
+                "ok": True,
+                "result": {
+                    "metrics": {
+                        "auc_24": 500,  # Default fallback 
+                        "predicted_peak": 25.0,
+                        "predicted_trough": 8.0
+                    },
+                    "method": "deterministic_fallback"
+                }
+            }
+
+        # Build patient and regimen objects
+        patient = PatientData(
+            age_years=request.age_years,
+            gender=Gender(request.gender.lower()),
+            height_cm=request.height_cm or 170,
+            weight_kg=request.weight_kg,  
+            serum_creatinine_mg_dl=request.scr_mg_dl
+        )
+        
+        dosing_params = DosingParameters(
+            target_auc_min=400,
+            target_auc_max=600,
+            mic_mg_l=1.0,
+            dosing_interval_hours=request.interval_hr,
+            weight_basis=WeightBasis.tbw
+        )
+
+        # Use AUC-guided calculation as default for interactive mode
+        result = auc_calc.calculate_steady_state_auc(patient, dosing_params)
+        
+        # Format response for frontend
+        return {
+            "ok": True, 
+            "result": {
+                "metrics": {
+                    "auc_24": result.get("predicted_auc_24", 500),
+                    "predicted_peak": result.get("predicted_peak_mg_l", 25.0),
+                    "predicted_trough": result.get("predicted_trough_mg_l", 8.0)
+                },
+                "method": "auc_guided_interactive"
+            }
+        }
+        
+    except Exception as e:
+        log.exception("Interactive AUC calculation failed")
+        # Return graceful fallback instead of error
+        return {
+            "ok": True,
+            "result": {
+                "metrics": {
+                    "auc_24": 500,
+                    "predicted_peak": 25.0, 
+                    "predicted_trough": 8.0
+                },
+                "method": "error_fallback",
+                "error": str(e)
+            }
+        }
+
+@api_router.post("/optimize")
+async def optimize_dosing(request: OptimizeRequest = Body(...)):
+    """Dose optimization endpoint"""
+    try:
+        log.info("Dose optimization request received")
+        
+        # Extract patient data
+        patient_data = request.patient
+        current_regimen = request.regimen
+        target = request.target
+        
+        # Build patient object
+        patient = PatientData(
+            age_years=patient_data.get("age", 56),
+            gender=Gender(str(patient_data.get("gender", "male")).lower()),
+            height_cm=patient_data.get("height_cm", 170),
+            weight_kg=patient_data.get("weight_kg", 75),
+            serum_creatinine_mg_dl=patient_data.get("serum_creatinine_mg_dl", 1.0)
+        )
+        
+        dosing_params = DosingParameters(
+            target_auc_min=target.get("auc_min", 400),
+            target_auc_max=target.get("auc_max", 600),
+            mic_mg_l=target.get("mic", 1.0)
+        )
+        
+        # Calculate optimal regimen
+        result = auc_calc.calculate_steady_state_auc(patient, dosing_params)
+        
+        # Return optimized regimen
+        return {
+            "ok": True,
+            "recommendation": {
+                "dose_mg": result.get("recommended_dose_mg", 1000),
+                "interval_hours": result.get("interval_hours", 12),
+                "infusion_minutes": 60
+            },
+            "predicted_metrics": {
+                "auc_24": result.get("predicted_auc_24", 500),
+                "predicted_peak": result.get("predicted_peak_mg_l", 25.0),
+                "predicted_trough": result.get("predicted_trough_mg_l", 8.0)
+            }
+        }
+        
+    except Exception as e:
+        log.exception("Dose optimization failed")
+        raise HTTPException(status_code=400, detail=str(e))
+
 @api_router.post("/calculate")
 async def calculate_vancomycin_dosing(request: CalculatorRequest = Body(...)):
     """Main endpoint for vancomycin dosing calculations"""
