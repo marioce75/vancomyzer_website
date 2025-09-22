@@ -1,7 +1,7 @@
 // Deterministic "MedCalc-compatible" mode
 // Uses published equations only. Not affiliated with MedCalc. No proprietary code.
 
-import { aucTrapz, clFromCrcl, crclCG, kFromCLV, superpose, vd } from './core';
+import { aucTrapz, clFromCrcl, crclCG, kFromCLV, superpose, vd } from './core.ts';
 import type { Patient, Regimen } from './types';
 
 export const medcalcConfig = {
