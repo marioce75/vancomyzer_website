@@ -608,7 +608,14 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
           <Alert severity="error" sx={{ mb: 2 }}>{error} <Button size="small" startIcon={<RestartAltIcon />} onClick={onRetry}>{t('actions.retry','Retry')}</Button></Alert>
         )}
         <Box sx={{ height: 360 }}>
-          <ConcTimeChart times={labels} conc={conc} lower={Array.isArray(series?.lower) ? series.lower : undefined} upper={Array.isArray(series?.upper) ? series.upper : undefined} />
+          <ConcTimeChart
+            times={labels}
+            conc={conc}
+            lower={Array.isArray(series?.lower) ? series.lower : undefined}
+            upper={Array.isArray(series?.upper) ? series.upper : undefined}
+            levels={levelMarkers}
+            shadeAuc
+          />
         </Box>
       </Paper>
     </Box>
