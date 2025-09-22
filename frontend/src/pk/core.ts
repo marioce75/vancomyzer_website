@@ -50,8 +50,8 @@ export function crclCG(params: {
   return Math.max(crcl, 10); // Minimum physiological limit
 }
 
-// Volume of distribution (Vd) and elimination rate constant (k)
-export function vd(weightKg: number, vdPerKg: number): number {
+// Enhanced volume and clearance calculations
+export function vd(weightKg: number, vdPerKg: number = 0.7): number {
   return vdPerKg * weightKg;
 }
 
@@ -59,9 +59,11 @@ export function kFromCLV(CL_L_h: number, V_L: number): number {
   return CL_L_h / V_L;
 }
 
-export function clFromCrcl(crcl_mL_min: number, theta: { a: number; b: number; scale?: number }): number {
-  const { a, b, scale = 1 } = theta;
-  return a + b * (crcl_mL_min / 60) * scale;
+// Enhanced clearance from CrCl with configurable scale factor
+export function clFromCrcl(crcl_mL_min: number, opts: { scale?: number } = {}): number {
+  const { scale = 1.0 } = opts;
+  // Default formula: CL (L/h) = scale * (CrCl_mL_min / 60)
+  return scale * (crcl_mL_min / 60);
 }
 
 // Infusion model (one compartment, zero-order in, first-order out)
