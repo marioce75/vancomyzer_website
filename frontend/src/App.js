@@ -619,74 +619,11 @@ function ResultsDisplay({ result, loading }) {
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState(0);
-  const [patient, setPatient] = useState({
-    age_years: 65,
-    gender: 'male',
-    height_cm: 175,
-    weight_kg: 75,
-    serum_creatinine_mg_dl: 1.0,
-    use_scr_floor: false,
-    scr_floor_mg_dl: 0.6
-  });
-  
-  const [dosingParams, setDosingParams] = useState({
-    target_auc_min: 400,
-    target_auc_max: 600,
-    mic_mg_l: 1.0,
-    dosing_interval_hours: null,
-    weight_basis: 'tbw',
-    obesity_adjustment: true,
-    beta_lactam_allergy: false,
-    icu_setting: false
-  });
-  
-  const [levels, setLevels] = useState([]);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const calculationModes = ['trough', 'auc_guided', 'bayesian'];
-  const tabLabels = ['Trough-Based', 'AUC-Guided', 'Bayesian MAP'];
-  const tabIcons = [TimelineIcon, CalculateIcon, ScienceIcon];
-
-  const handleCalculate = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const requestData = {
-        calculation_mode: calculationModes[activeTab],
-        patient,
-        dosing_params: dosingParams,
-        levels: levels.filter(l => l.concentration_mg_l && l.time_hours && l.dose_mg)
-      };
-
-      console.log('Request data being sent:', JSON.stringify(requestData, null, 2)); // Debug log
-
-      const data = await calculate(requestData);
-      console.log('Response data:', data); // Debug log
-      setResult(data.result);
-    } catch (err) {
-      setError(err.message);
-      console.error('Calculation error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleTabChange = (event, newValue) => {
-    console.log('Tab change triggered:', newValue, 'Mode will be:', calculationModes[newValue]); // Debug log
-    setActiveTab(newValue);
-    setResult(null); // Clear results when switching tabs
-    setError(null);
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-        {/* Header */}
+        {/* Header - keep existing beautiful design */}
         <Box sx={{ 
           bgcolor: 'primary.main', 
           color: 'white', 
@@ -712,93 +649,12 @@ function App() {
           </Container>
         </Box>
 
+        {/* Main Content - Enhanced InteractiveAUC Component */}
         <Container maxWidth="lg" sx={{ py: 4 }}>
-          {/* Calculator Tabs */}
-          <Paper sx={{ mb: 3 }}>
-            <Tabs
-              value={activeTab}
-              onChange={handleTabChange}
-              variant="fullWidth"
-              sx={{ borderBottom: 1, borderColor: 'divider' }}
-            >
-              {tabLabels.map((label, index) => {
-                const IconComponent = tabIcons[index];
-                return (
-                  <Tab
-                    key={label}
-                    label={label}
-                    icon={<IconComponent />}
-                    iconPosition="start"
-                    {...a11yProps(index)}
-                    sx={{ textTransform: 'none', fontWeight: 500 }}
-                  />
-                );
-              })}
-            </Tabs>
-
-            {/* Tab Content */}
-            <Box sx={{ p: 3 }}>
-              <TabPanel value={activeTab} index={0}>
-                <Alert severity="info" sx={{ mb: 3 }}>
-                  <strong>Trough-Based Method:</strong> Traditional steady-state calculations targeting trough concentrations of 10-20 mg/L. 
-                  This legacy approach is being phased out in favor of AUC-guided dosing per ASHP/IDSA 2020 guidelines.
-                </Alert>
-              </TabPanel>
-              
-              <TabPanel value={activeTab} index={1}>
-                <Alert severity="info" sx={{ mb: 3 }}>
-                  <strong>AUC-Guided Method:</strong> Recommended approach targeting AUC₂₄ of 400-600 mg·h/L. 
-                  Uses steady-state calculations or two-level trapezoid method when levels are available.
-                </Alert>
-              </TabPanel>
-              
-              <TabPanel value={activeTab} index={2}>
-                <Alert severity="info" sx={{ mb: 3 }}>
-                  <strong>Bayesian MAP:</strong> Advanced method using measured levels to estimate individual pharmacokinetic parameters 
-                  and optimize dosing. Requires at least one measured vancomycin level.
-                </Alert>
-              </TabPanel>
-
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <PatientInputForm
-                  patient={patient}
-                  setPatient={setPatient}
-                  dosingParams={dosingParams}
-                  setDosingParams={setDosingParams}
-                />
-                
-                <LevelsInput
-                  levels={levels}
-                  setLevels={setLevels}
-                  calculationMode={calculationModes[activeTab]}
-                />
-                
-                <Box sx={{ textAlign: 'center' }}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={handleCalculate}
-                    disabled={loading}
-                    startIcon={loading ? <CircularProgress size={20} /> : <CalculateIcon />}
-                    sx={{ minWidth: 200, py: 1.5 }}
-                  >
-                    {loading ? 'Calculating...' : 'Calculate Dosing'}
-                  </Button>
-                </Box>
-
-                {error && (
-                  <Alert severity="error">
-                    <strong>Calculation Error:</strong> {error}
-                  </Alert>
-                )}
-
-                <ResultsDisplay result={result} loading={loading} />
-              </Box>
-            </Box>
-          </Paper>
+          <InteractiveAUC mode="adult" />
         </Container>
 
-        {/* Footer */}
+        {/* Footer - keep existing */}
         <Box sx={{ bgcolor: 'grey.100', py: 3, mt: 4 }}>
           <Container maxWidth="lg">
             <Typography variant="body2" align="center" color="text.secondary">
