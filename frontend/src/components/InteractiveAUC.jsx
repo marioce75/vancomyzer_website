@@ -8,10 +8,10 @@ import { buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import LoadingDoseCard from './LoadingDoseCard.jsx';
-import { deterministicSummary, crclCG, clFromCrcl } from '../pk/core'; // Use enhanced version
-import { medcalcConfig } from '../pk/medcalcMode'; // Keep config
-import DoseInput from './controls/DoseInput';
-import ConcTimeChart from './chart/ConcTimeChart';
+import { deterministicSummary, crclCG, clFromCrcl } from '../pk/core.ts'; // Use enhanced version
+import { medcalcConfig } from '../pk/medcalcMode.ts'; // Keep config
+import DoseInput from './controls/DoseInput.tsx';
+import ConcTimeChart from './chart/ConcTimeChart.tsx';
 
 // Help mapping
 const help = {
