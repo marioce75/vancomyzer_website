@@ -1,10 +1,7 @@
-import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment, Tooltip, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
-import { Line } from 'react-chartjs-2';
 import { health, optimize, postAuc } from '../services/interactiveApi';
 import { discoverApiBase } from '../lib/apiDiscovery';
 import { buildMeasuredLevels } from '../services/pkVancomycin'
@@ -13,31 +10,7 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import LoadingDoseCard from './LoadingDoseCard.jsx';
 import { deterministicSummary, medcalcConfig } from '../pk/medcalcMode';
 import DoseInput from './controls/DoseInput';
-import { crclCG, clFromCrcl } from '../pk/core';
-
-ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Title, ChartTooltip, Filler, Legend);
-
-function toFixed(val, digits = 1) {
-  if (val === undefined || val === null || Number.isNaN(val)) return '—';
-  const n = Number(val);
-  if (!Number.isFinite(n)) return String(val);
-  return digits === 0 ? n.toFixed(0) : n.toFixed(digits);
-}
-
-function interp(xs, ys, x) {
-  if (!xs?.length) return 0;
-  let lo = 0, hi = xs.length - 1;
-  if (x <= xs[lo]) return ys[lo];
-  if (x >= xs[hi]) return ys[hi];
-  while (hi - lo > 1) {
-     const mid = (hi + lo) >> 1;
-     if (xs[mid] < x) lo = mid; else hi = mid;
-  }
-  const x0 = xs[lo], x1 = xs[hi];
-  const y0 = ys[lo], y1 = ys[hi];
-  const f = (x - x0) / (x1 - x0);
-  return y0 + f * (y1 - y0);
-}
+import ConcTimeChart from './chart/ConcTimeChart';
 
 // Help mapping
 const help = {
@@ -72,8 +45,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   
-  // New: UI mode toggle and API-online state determine Bayesian vs Deterministic
-  const [engineMode, setEngineMode] = useState('deterministic'); // 'bayesian' | 'deterministic'
+  const [engineMode, setEngineMode] = useState('deterministic');
 
   // API discovery state
   const [apiBase, setApiBase] = useState(null);
@@ -103,8 +75,6 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showAucFill, setShowAucFill] = useState(true);
-  const [showDoseMarkers, setShowDoseMarkers] = useState(true);
   const [apiOnline, setApiOnline] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(() => {
     try {
@@ -120,7 +90,6 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   // Keep draftRegimen in sync with regimen when regimen changes externally
   useEffect(() => { setDraftRegimen(regimen); }, [regimen]);
 
-  const chartRef = useRef(null);
   const apiAbort = useRef(null);
 
   const measuredLevels = useMemo(() => buildMeasuredLevels(levelMode, {
@@ -236,7 +205,6 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
   const labels = useMemo(() => (Array.isArray(series?.time_hours) ? series.time_hours : []), [series]);
   const conc = useMemo(() => (Array.isArray(series?.concentration_mg_L) ? series.concentration_mg_L : []), [series]);
-  const points = useMemo(() => labels.map((t, i) => ({ x: t, y: conc[i] })), [labels, conc]);
 
   const levelMarkers = useMemo(() => {
     const tau = Number(regimen.interval_hours) || 12;
@@ -244,54 +212,6 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       .filter((lv) => lv.time_hr >= 0 && lv.time_hr <= tau + 1e-9)
       .map((lv) => ({ x: lv.time_hr, y: Number(lv.concentration_mg_L), tag: lv.tag }));
   }, [measuredLevels, regimen.interval_hours]);
-
-  const doseMarkersPlugin = useMemo(() => ({
-    id: 'doseMarkers',
-    afterDatasetsDraw: (chart) => {
-      if (!showDoseMarkers) return;
-      const { ctx, chartArea, scales } = chart;
-      if (!scales.x || !scales.y) return;
-      const xScale = scales.x;
-      const maxX = Math.min(48, xScale.max);
-      const interval = Number(regimen.interval_hours) || 12;
-      for (let t = 0; t <= maxX + 1e-6; t += interval) {
-        const x = xScale.getPixelForValue(t);
-        ctx.save();
-        ctx.strokeStyle = 'rgba(25, 118, 210, 0.6)';
-        ctx.setLineDash([6, 6]);
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(x, chartArea.top);
-        ctx.lineTo(x, chartArea.bottom);
-        ctx.stroke();
-        ctx.restore();
-      }
-    }
-  }), [regimen.interval_hours, showDoseMarkers]);
-
-  // Residual connectors plugin
-  const residualsPlugin = useMemo(() => ({
-    id: 'residualConnectors',
-    afterDatasetsDraw: (chart) => {
-      if (!levelMarkers?.length || !labels?.length) return;
-      const { ctx, scales } = chart;
-      const xScale = scales.x; const yScale = scales.y;
-      ctx.save();
-      ctx.strokeStyle = 'rgba(220,0,78,0.6)';
-      ctx.setLineDash([3, 3]);
-      for (const m of levelMarkers) {
-        const yPred = interp(labels, conc, m.x);
-        const x = xScale.getPixelForValue(m.x);
-        const yObs = yScale.getPixelForValue(m.y);
-        const yMed = yScale.getPixelForValue(yPred);
-        ctx.beginPath();
-        ctx.moveTo(x, yObs);
-        ctx.lineTo(x, yMed);
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-  }), [levelMarkers, labels, conc]);
 
   const commitField = (field) => (value) => setRegimen((r) => ({ ...r, [field]: value }));
 
@@ -371,8 +291,6 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
   const exportPdf = () => {
     try {
-      const chart = chartRef.current;
-      const img = chart?.toBase64Image ? chart.toBase64Image() : null;
       const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
       doc.setFontSize(14);
       doc.text(`${t('title','Vancomyzer®')} — ${t('tabs.interactiveAuc', t('tabs.interactiveAUC','Interactive AUC'))} [${mode}]`, 40, 40);
@@ -384,10 +302,6 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       doc.setTextColor(110);
       doc.text(t('legal.pdf'), 40, 75, { maxWidth: 515 });
       doc.setTextColor(0);
-      if (img) {
-        const w = 760; const h = 360;
-        doc.addImage(img, 'PNG', 40, 80, w, h, undefined, 'FAST');
-      }
       doc.save('vancomycin_interactive_auc.pdf');
     } catch (e) {
       alert('PDF export failed');
@@ -439,6 +353,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
           <ToggleButton value="bayesian" disabled={!apiOnline}>Bayesian</ToggleButton>
         </ToggleButtonGroup>
       </Box>
+
       {/* Config banners */}
       {apiDiscoveryError && (
         <Alert 
@@ -605,13 +520,9 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
       {/* Toggles & badges */}
       <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', mb: 2, flexWrap: 'wrap' }}>
-        <FormControlLabel control={<Switch checked={showAucFill} onChange={(e) => setShowAucFill(e.target.checked)} />} label={t('shade_auc','Shade 0–24h AUC')} />
-        <FormControlLabel control={<Switch checked={showDoseMarkers} onChange={(e) => setShowDoseMarkers(e.target.checked)} />} label={t('show_dose_markers','Show dose markers')} />
-
         <Tooltip title={t('bullets.guidelines','Following ASHP/IDSA 2020 Guidelines')} placement="top">
           <Chip size="small" color="primary" label={t('badges.evidenceBased','Evidence-based')} component="a" clickable href={guidelineUrl} target="_blank" rel="noopener noreferrer" />
         </Tooltip>
-
         <Tooltip title={t('status.bayesian.tooltip')}>
           <Chip
             size="small"
@@ -697,17 +608,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
           <Alert severity="error" sx={{ mb: 2 }}>{error} <Button size="small" startIcon={<RestartAltIcon />} onClick={onRetry}>{t('actions.retry','Retry')}</Button></Alert>
         )}
         <Box sx={{ height: 360 }}>
-          <Line ref={chartRef} data={{ datasets: [
-            { label: 'AUC 0–24h', data: points.filter((p) => p.x <= 24), borderColor: 'rgba(25,118,210,0)', backgroundColor: showAucFill ? 'rgba(25,118,210,0.15)' : 'rgba(25,118,210,0.0)', pointRadius: 0, tension: 0.25, fill: showAucFill },
-            ...(Array.isArray(series?.lower) && Array.isArray(series?.upper) && series.lower?.length === points.length && series.upper?.length === points.length
-              ? [
-                  { label: '90% CI (lower)', data: labels.map((t, i) => ({ x: t, y: series.lower[i] })), borderColor: 'rgba(0,0,0,0)', backgroundColor: 'rgba(25,118,210,0.10)', pointRadius: 0, fill: '+1' },
-                  { label: '90% CI (upper)', data: labels.map((t, i) => ({ x: t, y: series.upper[i] })), borderColor: 'rgba(0,0,0,0)', backgroundColor: 'rgba(25,118,210,0.10)', pointRadius: 0, fill: false },
-                ]
-              : []),
-            { label: 'Concentration (mg/L)', data: points, borderColor: '#1976d2', backgroundColor: 'rgba(0,0,0,0)', pointRadius: 0, tension: 0.25, fill: false },
-            { label: 'Measured level(s)', data: levelMarkers.map((m) => ({ x: m.x, y: m.y })), borderColor: 'rgba(220, 0, 78, 0.8)', backgroundColor: 'rgba(220, 0, 78, 0.8)', pointRadius: 4, showLine: false },
-          ]}} options={{ responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: true }, tooltip: { callbacks: { label: (ctx) => (ctx.dataset.label === 'Measured level(s)') ? `Level ${toFixed(ctx.parsed.y, 2)} mg/L @ ${toFixed(ctx.parsed.x, 2)} h` : `${toFixed(ctx.parsed.y, 2)} mg/L @ ${toFixed(ctx.parsed.x, 1)} h` } } }, scales: { x: { type: 'linear', title: { display: true, text: 'Hours' }, ticks: { maxTicksLimit: 12 }, min: 0, max: 48 }, y: { title: { display: true, text: 'Concentration (mg/L)' }, beginAtZero: true } } }} plugins={[doseMarkersPlugin, residualsPlugin]} />
+          <ConcTimeChart times={labels} conc={conc} lower={Array.isArray(series?.lower) ? series.lower : undefined} upper={Array.isArray(series?.upper) ? series.upper : undefined} />
         </Box>
       </Paper>
     </Box>
