@@ -1,16 +1,19 @@
 import 'chart.js/auto';
 import jsPDF from 'jspdf';
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment, Tooltip } from '@mui/material';
+import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment, Tooltip, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip as ChartTooltip, Filler, Legend, CategoryScale } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { health, optimize, postAuc } from '../services/interactiveApi';
 import { discoverApiBase } from '../lib/apiDiscovery';
-import { computeAll, buildMeasuredLevels } from '../services/pkVancomycin'
+import { buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import LoadingDoseCard from './LoadingDoseCard.jsx';
+import { deterministicSummary, medcalcConfig } from '../pk/medcalcMode';
+import DoseInput from './controls/DoseInput';
+import { crclCG, clFromCrcl } from '../pk/core';
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Title, ChartTooltip, Filler, Legend);
 
@@ -69,6 +72,9 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const { t, i18n } = useTranslation();
   const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   
+  // New: UI mode toggle and API-online state determine Bayesian vs Deterministic
+  const [engineMode, setEngineMode] = useState('deterministic'); // 'bayesian' | 'deterministic'
+
   // API discovery state
   const [apiBase, setApiBase] = useState(null);
   const [apiDiscoveryError, setApiDiscoveryError] = useState(null);
@@ -151,14 +157,31 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const runInteractive = useCallback(async () => {
     setLoading(true); setError(null);
 
-    // optimistic local compute so chart moves immediately
+    // optimistic deterministic compute so chart moves immediately
     try {
-      const { series: localSeries, summary: localSummary } = computeAll({ ...patient, population_mode: mode, levels: measuredLevels }, regimen);
-      setSeries(localSeries); setSummary(localSummary);
+      const p = {
+        ageY: Number(patient?.age || patient?.age_years || 0),
+        sex: (String(patient?.gender || 'male').toLowerCase() === 'female') ? 'Female' : 'Male',
+        weightKg: Number(patient?.weight_kg || 0),
+        heightCm: Number(patient?.height_cm || 0) || undefined,
+        scrMgDl: Number(patient?.serum_creatinine_mg_dl || patient?.scr_mg_dl || 0),
+        mic: Number(patient?.mic_mg_L || patient?.mic || medcalcConfig.defaultMIC)
+      };
+      const r = { doseMg: Number(regimen?.dose_mg || 0), intervalH: Number(regimen?.interval_hours || 12), infusionMin: Number(regimen?.infusion_minutes || 60) };
+      const det = deterministicSummary(p, r, 48, 0.1);
+      setSeries(det.series); setSummary((s) => ({ ...(det.metrics ? { ...s, ...det.metrics } : s), auc_24: det.metrics.auc_24, predicted_peak: det.metrics.predicted_peak, predicted_trough: det.metrics.predicted_trough }));
     } catch {}
 
     if (apiAbort.current) apiAbort.current.abort();
     apiAbort.current = new AbortController();
+
+    const hasLevels = Array.isArray(measuredLevels) && measuredLevels.length > 0;
+
+    // If user selected deterministic and no levels, or API is offline, stop here
+    if ((engineMode !== 'bayesian' && !hasLevels) || !apiOnline) {
+      setLoading(false);
+      return;
+    }
 
     // Build flat payload matching backend AucRequest
     const formState = {
@@ -176,7 +199,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
     try {
       try { console.debug('[Vancomyzer] POST /api/interactive/auc', payload); } catch {}
-      const res = await postAuc(payload);
+      const res = await postAuc(payload, { signal: apiAbort.current.signal });
       const data = res?.result || res;
 
       const auc = data?.metrics?.auc_24 ?? data.auc_24 ?? data.predicted_auc_24;
@@ -195,16 +218,16 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       }
       setApiOnline(true);
     } catch (e) {
+      if (e?.name === 'AbortError') return;
       console.error('[Vancomyzer] AUC error:', e);
       setError(String(e?.message || e));
       setApiOnline(false);
-      // Backoff once to avoid spamming
       const now = Date.now();
       if (!retryTs || (now - retryTs) > 2000) setRetryTs(now);
     } finally {
       setLoading(false);
     }
-  }, [patient, regimen, measuredLevels, mode, retryTs]);
+  }, [patient, regimen, measuredLevels, retryTs, engineMode, apiOnline]);
 
   useEffect(() => {
     const t = setTimeout(() => { runInteractive(); }, 220);
@@ -391,8 +414,31 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
     }
   }, [runInteractive]);
 
+  // Helper: compute CL quickly to reset dose to target AUC
+  const computeCL_L_h = useCallback(() => {
+    try {
+      const p = {
+        ageY: Number(patient?.age || patient?.age_years || 0),
+        sex: (String(patient?.gender || 'male').toLowerCase() === 'female') ? 'Female' : 'Male',
+        weightKg: Number(patient?.weight_kg || 0),
+        heightCm: Number(patient?.height_cm || 0) || undefined,
+        scrMgDl: Number(patient?.serum_creatinine_mg_dl || patient?.scr_mg_dl || 0),
+      };
+      const crcl = crclCG({ ageY: p.ageY, sex: p.sex, weightKg: p.weightKg, scrMgDl: p.scrMgDl, heightCm: p.heightCm, rounding: medcalcConfig.scrRounding });
+      const CL = clFromCrcl(crcl, medcalcConfig.clFromCrcl);
+      return Number(CL) || 0;
+    } catch { return 0; }
+  }, [patient]);
+
   return (
     <Box dir={dir}>
+      {/* Mode toggle */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+        <ToggleButtonGroup size="small" value={engineMode} exclusive onChange={(_, v) => v && setEngineMode(v)}>
+          <ToggleButton value="deterministic">Deterministic</ToggleButton>
+          <ToggleButton value="bayesian" disabled={!apiOnline}>Bayesian</ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
       {/* Config banners */}
       {apiDiscoveryError && (
         <Alert 
@@ -530,10 +576,32 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
 
       {/* Regimen controls */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} md={4}><Control label="dose" value={draftRegimen.dose_mg} min={0} max={4000} step={50} field="dose_mg" unit="mg" /></Grid>
-        <Grid item xs={12} md={4}><Control label="interval" value={draftRegimen.interval_hours} min={6} max={48} step={1} field="interval_hours" unit="h" /></Grid>
-        <Grid item xs={12} md={4}><Control label="infusion" value={draftRegimen.infusion_minutes} min={15} max={240} step={5} field="infusion_minutes" unit="min" /></Grid>
+        <Grid item xs={12} md={4}>
+          <DoseInput label={t('dose','Dose')} value={draftRegimen.dose_mg} unit="mg" min={0} max={4000} step={250} onChange={(v) => scheduleCommit('dose_mg', Math.round(v/250)*250, 180)} />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <DoseInput label={t('interval','Interval')} value={draftRegimen.interval_hours} unit="h" min={8} max={24} step={null} marks={[8,12,24]} onChange={(v) => scheduleCommit('interval_hours', v, 180)} />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <DoseInput label={t('infusion','Infusion')} value={draftRegimen.infusion_minutes} unit="min" min={60} max={120} step={null} marks={[60,90,120]} onChange={(v) => scheduleCommit('infusion_minutes', v, 180)} />
+        </Grid>
       </Grid>
+
+      <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+        <Button size="small" variant="outlined" onClick={() => {
+          const CL = computeCL_L_h();
+          if (!CL) return;
+          const targetMid = 500; // mg·h/L
+          const dailyDose = targetMid * CL; // mg/day
+          // snap to nearest 250mg and allowed intervals
+          const intervals = [8,12,24];
+          const best = intervals.map((tau) => ({ tau, dose: Math.round((dailyDose * tau / 24) / 250) * 250 }));
+          // choose the one closest to current interval
+          const choice = best.reduce((a,b) => (Math.abs(b.tau - (regimen.interval_hours||12)) < Math.abs(a.tau - (regimen.interval_hours||12)) ? b : a));
+          scheduleCommit('dose_mg', choice.dose, 0);
+          scheduleCommit('interval_hours', choice.tau, 0);
+        }}>{t('reset_to_target','Reset to target AUC 400–600')}</Button>
+      </Box>
 
       {/* Toggles & badges */}
       <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', mb: 2, flexWrap: 'wrap' }}>
