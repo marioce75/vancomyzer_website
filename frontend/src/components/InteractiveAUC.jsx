@@ -8,7 +8,7 @@ import { buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import LoadingDoseCard from './LoadingDoseCard.jsx';
-import { deterministicSummary, medcalcConfig } from '../pk/medcalcMode';
+import { deterministicSummary } from '../pk/core'; // Use enhanced version
 import DoseInput from './controls/DoseInput';
 import ConcTimeChart from './chart/ConcTimeChart';
 
