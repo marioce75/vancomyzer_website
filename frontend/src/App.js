@@ -1,51 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  Paper,
-  Box,
-  Typography,
-  Tabs,
-  Tab,
-  Card,
-  CardContent,
-  TextField,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Switch,
-  FormControlLabel,
-  Alert,
-  CircularProgress,
-  Chip,
-  Divider,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Tooltip,
-  IconButton
-} from '@mui/material';
-import {
-  ExpandMore as ExpandMoreIcon,
-  Calculate as CalculateIcon,
-  Science as ScienceIcon,
-  Timeline as TimelineIcon,
-  Warning as WarningIcon,
-  CheckCircle as CheckCircleIcon,
-  Info as InfoIcon,
-  MonitorHeart as MonitorIcon,
-  LocalHospital as HospitalIcon,
-  Assignment as AssignmentIcon
-} from '@mui/icons-material';
+import React from 'react';
+import { Container, Box, Typography, Chip } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import './App.css';
-import { calculate } from "./lib/apiClient";
+import InteractiveAUC from './components/InteractiveAUC.jsx';
 
 // Healthcare Blue Theme
 const theme = createTheme({
