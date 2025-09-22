@@ -358,7 +358,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
     }
   }, [runInteractive]);
 
-  // Helper: compute CL quickly to reset dose to target AUC
+  // Helper: compute CL quickly to reset dose to target AUC using enhanced functions
   const computeCL_L_h = useCallback(() => {
     try {
       const p = {
@@ -368,8 +368,16 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         heightCm: Number(patient?.height_cm || 0) || undefined,
         scrMgDl: Number(patient?.serum_creatinine_mg_dl || patient?.scr_mg_dl || 0),
       };
-      const crcl = crclCG({ ageY: p.ageY, sex: p.sex, weightKg: p.weightKg, scrMgDl: p.scrMgDl, heightCm: p.heightCm, rounding: medcalcConfig.scrRounding });
-      const CL = clFromCrcl(crcl, medcalcConfig.clFromCrcl);
+      const crcl = crclCG({ 
+        ageY: p.ageY, 
+        sex: p.sex, 
+        weightKg: p.weightKg, 
+        scrMgDl: p.scrMgDl, 
+        heightCm: p.heightCm, 
+        weightStrategy: 'TBW',
+        scrRounding: medcalcConfig.scrRounding || 'none' 
+      });
+      const CL = clFromCrcl(crcl, { scale: medcalcConfig.clFromCrcl?.scale || 1.0 });
       return Number(CL) || 0;
     } catch { return 0; }
   }, [patient]);
