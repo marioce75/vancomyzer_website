@@ -60,6 +60,24 @@ class WeightBasis(str, Enum):
     ibw = "ibw"  # Ideal Body Weight  
     adjbw = "adjbw"  # Adjusted Body Weight
 
+# Flat request model for /api/interactive/auc endpoint
+class AucRequest(BaseModel):
+    age_years: Optional[float] = Field(None, gt=0, le=120)
+    weight_kg: Optional[float] = Field(None, gt=0.5, le=300)
+    height_cm: Optional[float] = Field(None, gt=100, le=250)
+    scr_mg_dl: Optional[float] = Field(None, gt=0.1, le=20)
+    gender: Optional[str] = Field(None)
+    dose_mg: Optional[float] = Field(None, gt=0, le=4000)
+    interval_hr: Optional[float] = Field(None, gt=4, le=48)
+    infusion_minutes: Optional[float] = Field(60, gt=0, le=720)
+    levels: Optional[List[float]] = Field(None, description="Measured vancomycin levels")
+
+# Optimization request model  
+class OptimizeRequest(BaseModel):
+    patient: Dict[str, Any] = Field(..., description="Patient data")
+    regimen: Dict[str, Any] = Field(..., description="Current regimen")
+    target: Dict[str, Any] = Field(..., description="Target parameters")
+
 class VancomycinLevel(BaseModel):
     concentration_mg_l: float = Field(..., gt=0, le=200, description="Vancomycin concentration in mg/L")
     time_hours: float = Field(..., gt=0, le=72, description="Time after dose start in hours")
