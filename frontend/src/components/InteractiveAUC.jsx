@@ -133,7 +133,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const runInteractive = useCallback(async () => {
     setLoading(true); setError(null);
 
-    // optimistic deterministic compute so chart moves immediately
+    // Enhanced deterministic compute with immediate UI updates  
     try {
       const p = {
         ageY: Number(patient?.age || patient?.age_years || 0),
@@ -143,10 +143,33 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         scrMgDl: Number(patient?.serum_creatinine_mg_dl || patient?.scr_mg_dl || 0),
         mic: Number(patient?.mic_mg_L || patient?.mic || medcalcConfig.defaultMIC)
       };
-      const r = { doseMg: Number(regimen?.dose_mg || 0), intervalH: Number(regimen?.interval_hours || 12), infusionMin: Number(regimen?.infusion_minutes || 60) };
-      const det = deterministicSummary(p, r, 48, 0.1);
-      setSeries(det.series); setSummary((s) => ({ ...(det.metrics ? { ...s, ...det.metrics } : s), auc_24: det.metrics.auc_24, predicted_peak: det.metrics.predicted_peak, predicted_trough: det.metrics.predicted_trough }));
-    } catch {}
+      const r = { 
+        doseMg: Number(regimen?.dose_mg || 0), 
+        intervalH: Number(regimen?.interval_hours || 12), 
+        infusionMin: Number(regimen?.infusion_minutes || 60) 
+      };
+      
+      // Use enhanced deterministic summary with configurable options
+      const det = deterministicSummary(p, r, {
+        vdPerKg: medcalcConfig.vdPerKg,
+        clScale: medcalcConfig.clFromCrcl.scale || 1.0,
+        useDoseOverCL: medcalcConfig.useDoseOverCL,
+        weightStrategy: 'TBW', // Can be made configurable later
+        scrRounding: medcalcConfig.scrRounding
+      });
+      
+      // Update UI immediately (optimistic)
+      setSeries(det.series); 
+      setSummary((s) => ({ 
+        ...(det.metrics ? { ...s, ...det.metrics } : s), 
+        auc_24: det.metrics.auc_24, 
+        predicted_peak: det.metrics.predicted_peak, 
+        predicted_trough: det.metrics.predicted_trough 
+      }));
+    } catch (err) {
+      console.warn('[Vancomyzer] Deterministic calculation failed:', err);
+      // Continue with API call even if deterministic fails
+    }
 
     if (apiAbort.current) apiAbort.current.abort();
     apiAbort.current = new AbortController();
