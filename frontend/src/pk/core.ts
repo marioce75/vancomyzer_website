@@ -106,15 +106,127 @@ export function aucTrapz(timesH: number[], conc: number[], a=0, b=24): number {
   return auc;
 }
 
-// Peak and trough calculations
+// Peak and trough calculations - enhanced to work with steady-state superposition
 export function peakTroughFromSeries(timesH: number[], conc: number[], tauH: number): { peak: number; trough: number } {
-  const peaks: number[] = [];
-  const troughs: number[] = [];
-  for (let t = 0; t < timesH.length; t++) {
-    if (t > 0 && timesH[t] % tauH < 1e-9) {
-      peaks.push(conc[t]);
-      troughs.push(conc[t - 1]);
+  let peak = 0;
+  let trough = Infinity;
+  
+  // Look for peaks just after infusion ends (t = n*τ + tinf) and troughs just before next dose (t = n*τ - ε)
+  for (let i = 0; i < timesH.length; i++) {
+    const t = timesH[i];
+    const cyclePos = t % tauH;
+    
+    // Peak: look for concentrations shortly after infusion end (assuming 1h infusion typically)
+    if (cyclePos >= 1.0 && cyclePos <= 2.0) {
+      peak = Math.max(peak, conc[i]);
+    }
+    
+    // Trough: look for concentrations just before next dose (last 10% of interval)
+    if (cyclePos >= tauH * 0.9) {
+      trough = Math.min(trough, conc[i]);
     }
   }
-  return { peak: Math.max(...peaks), trough: Math.min(...troughs) };
+  
+  // Fallback if no valid points found
+  if (!Number.isFinite(trough)) {
+    trough = conc[conc.length - 1] || 0;
+  }
+  
+  return { peak, trough };
+}
+
+// Enhanced deterministic summary function
+export function deterministicSummary(
+  patient: { 
+    ageY: number; 
+    sex: 'Male'|'Female'; 
+    weightKg: number; 
+    heightCm?: number; 
+    scrMgDl: number; 
+    mic?: number 
+  },
+  regimen: { 
+    doseMg: number; 
+    intervalH: number; 
+    infusionMin: number 
+  },
+  opts: {
+    vdPerKg?: number;
+    clScale?: number;
+    useDoseOverCL?: boolean;
+    weightStrategy?: 'TBW'|'IBW'|'AdjBW';
+    scrRounding?: 'none'|'floor0.7';
+  } = {}
+): {
+  metrics: {
+    auc_24: number;
+    predicted_peak: number;
+    predicted_trough: number;
+    CL: number;
+    V: number;
+    k: number;
+    crcl: number;
+  };
+  series: {
+    time_hours: number[];
+    concentration_mg_L: number[];
+  };
+} {
+  const { 
+    vdPerKg = 0.7, 
+    clScale = 1.0, 
+    useDoseOverCL = true,
+    weightStrategy = 'TBW',
+    scrRounding = 'none'
+  } = opts;
+
+  // Calculate patient-specific parameters
+  const crcl = crclCG({ 
+    ageY: patient.ageY, 
+    sex: patient.sex, 
+    weightKg: patient.weightKg, 
+    scrMgDl: patient.scrMgDl, 
+    heightCm: patient.heightCm,
+    weightStrategy,
+    scrRounding
+  });
+  
+  const V = vd(patient.weightKg, vdPerKg);
+  const CL = clFromCrcl(crcl, { scale: clScale });
+  const k = kFromCLV(CL, V);
+  const tinfH = regimen.infusionMin / 60;
+
+  // Generate time series (48h horizon, 0.1h steps as specified)
+  const times: number[] = [];
+  for (let t = 0; t <= 48; t += 0.1) {
+    times.push(+t.toFixed(1));
+  }
+  
+  // Calculate concentrations using superposition
+  const conc = superpose(times, regimen.doseMg, regimen.intervalH, tinfH, V, k);
+
+  // Calculate AUC24 
+  const dailyDose = regimen.doseMg * (24 / regimen.intervalH);
+  const auc_24 = useDoseOverCL && CL > 0 
+    ? (dailyDose / CL) 
+    : aucTrapz(times, conc, 0, 24);
+
+  // Calculate peak and trough
+  const { peak, trough } = peakTroughFromSeries(times, conc, regimen.intervalH);
+
+  return {
+    metrics: {
+      auc_24,
+      predicted_peak: peak,
+      predicted_trough: trough,
+      CL,
+      V,
+      k,
+      crcl
+    },
+    series: {
+      time_hours: times,
+      concentration_mg_L: conc
+    }
+  };
 }
