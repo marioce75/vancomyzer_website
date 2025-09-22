@@ -12,6 +12,7 @@ import { deterministicSummary, crclCG, clFromCrcl } from '../pk/core.ts'; // Use
 import { medcalcConfig } from '../pk/medcalcMode.ts'; // Keep config
 import DoseInput from './controls/DoseInput.tsx';
 import ConcTimeChart from './chart/ConcTimeChart.tsx';
+import GuidancePanel from './GuidancePanel.tsx';
 
 // Help mapping
 const help = {
