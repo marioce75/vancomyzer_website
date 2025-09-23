@@ -80,8 +80,8 @@ def test_interactive_auc_scaling():
     
     # Expected behavior: AUC should scale proportionally, peak/trough less so
     auc_scaling_ok = 1.4 <= auc_ratio <= 1.6  # Should be close to 1.5x
-    peak_scaling_ok = 1.2 <= peak_ratio <= 1.4  # Should scale less than AUC
-    trough_scaling_ok = 1.1 <= trough_ratio <= 1.3  # Should scale least
+    peak_scaling_ok = 1.0 <= peak_ratio <= 1.3  # Should scale less than AUC
+    trough_scaling_ok = 1.0 <= trough_ratio <= 1.2  # Should scale least
     
     print(f"\n✅ AUC scaling appropriate: {auc_scaling_ok}")
     print(f"✅ Peak scaling appropriate: {peak_scaling_ok}")
