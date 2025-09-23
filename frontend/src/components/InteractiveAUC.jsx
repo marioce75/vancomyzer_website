@@ -641,13 +641,12 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         </Grid>
       </Paper>
 
-      {/* TODO: Re-enable guidance panel after fixing React error
+      {/* Guidance Panel */}
       <GuidancePanel 
         patientAge={patient?.age || patient?.age_years}
         patientWeight={patient?.weight_kg}
         patientHeight={patient?.height_cm}
       />
-      */}
 
       {/* Chart and error banner */}
       <Paper variant="outlined" sx={{ p: 2 }}>
