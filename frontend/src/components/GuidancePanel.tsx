@@ -6,23 +6,12 @@ import {
   Typography,
   Box,
   Alert,
-  Divider,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
   Chip
 } from '@mui/material';
-import {
-  ExpandMore as ExpandMoreIcon,
-  Science as ScienceIcon,
-  Timeline as TimelineIcon,
-  Elderly as ElderlyIcon,
-  Monitor as MonitorIcon,
-  Info as InfoIcon,
-  Warning as WarningIcon
-} from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
+import { ExpandMore as ExpandMoreIcon, Info as InfoIcon } from '@mui/icons-material';
 
 interface GuidancePanelProps {
   patientAge?: number;
@@ -31,18 +20,16 @@ interface GuidancePanelProps {
 }
 
 export default function GuidancePanel({ patientAge = 0, patientWeight = 0, patientHeight = 0 }: GuidancePanelProps) {
-  const { t } = useTranslation();
   const [expanded, setExpanded] = useState<string | false>(false);
 
   const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
   };
 
-  // Calculate BMI and determine if patient has special considerations
+  // Calculate BMI and determine special considerations
   const bmi = patientHeight > 0 ? patientWeight / ((patientHeight / 100) ** 2) : 0;
   const isGeriatric = patientAge >= 65;
   const isObese = bmi >= 30;
-  const isUnderweight = bmi > 0 && bmi < 18.5;
 
   return (
     <Box sx={{ mb: 2 }}>
@@ -53,177 +40,95 @@ export default function GuidancePanel({ patientAge = 0, patientWeight = 0, patie
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
-          sx={{ bgcolor: 'primary.50', '&:hover': { bgcolor: 'primary.100' } }}
+          sx={{ bgcolor: 'primary.50' }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <InfoIcon color="primary" />
-            <Typography variant="h6">How to Choose a Method & Clinical Guidance</Typography>
-            {(isGeriatric || isObese || isUnderweight) && (
-              <Chip 
-                size="small" 
-                label="Special Considerations" 
-                color="warning" 
-                variant="outlined" 
-              />
+            <Typography variant="h6">Clinical Guidance & Method Selection</Typography>
+            {(isGeriatric || isObese) && (
+              <Chip size="small" label="Special Considerations" color="warning" />
             )}
           </Box>
         </AccordionSummary>
         
         <AccordionDetails>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             
-            {/* Method Selection Guide */}
-            <Box>
-              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <ScienceIcon color="primary" />
-                Choosing a Calculation Method
+            {/* Method Selection */}
+            <Alert severity="info">
+              <Typography variant="subtitle2" gutterBottom>
+                <strong>Choosing a Method:</strong>
               </Typography>
-              
               <List dense>
                 <ListItem>
-                  <ListItemIcon>
-                    <Timeline color="success" />
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary="Start with Deterministic (Population PK)"
-                    secondary="Use when no measured levels are available. Targets AUC₂₄ 400–600 mg·h/L at MIC=1 (adjust per institutional policy)."
-                  />
+                  <ListItemText primary="• Start with Deterministic when no levels available (targets AUC₂₄ 400–600 mg·h/L)" />
                 </ListItem>
-                
                 <ListItem>
-                  <ListItemIcon>
-                    <ScienceIcon color="info" />
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary="Switch to Bayesian after measuring levels"
-                    secondary="Use after at least one level (preferably post-distribution sample ≥1h after infusion end). Bayesian fits patient-specific CL/V and refines AUC predictions."
-                  />
+                  <ListItemText primary="• Switch to Bayesian after obtaining measured levels (≥1 post-distribution sample)" />
                 </ListItem>
               </List>
-            </Box>
+            </Alert>
 
-            <Divider />
-
-            {/* Patient-Specific Considerations */}
+            {/* Patient-specific alerts */}
             {isGeriatric && (
-              <Alert severity="warning" variant="outlined">
-                <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ElderlyIcon />
-                  Geriatric Considerations (Age ≥65 years)
+              <Alert severity="warning">
+                <Typography variant="subtitle2" gutterBottom>
+                  <strong>Geriatric Considerations (Age ≥65):</strong>
                 </Typography>
-                <List dense sx={{ pl: 2 }}>
-                  <ListItem sx={{ py: 0 }}>
-                    <ListItemText primary="• Expect reduced renal function; verify SCr trends rather than rounding" />
+                <List dense>
+                  <ListItem>
+                    <ListItemText primary="• Expect reduced renal function; verify SCr trends" />
                   </ListItem>
-                  <ListItem sx={{ py: 0 }}>
-                    <ListItemText primary="• Consider starting intervals at q12–24h depending on CrCl and clinical severity" />
+                  <ListItem>
+                    <ListItemText primary="• Consider starting with q12-24h intervals" />
                   </ListItem>
-                  <ListItem sx={{ py: 0 }}>
-                    <ListItemText primary="• Monitor levels early (after 3–4 doses) and switch to Bayesian ASAP" />
+                  <ListItem>
+                    <ListItemText primary="• Monitor levels early (after 3-4 doses)" />
                   </ListItem>
                 </List>
               </Alert>
             )}
 
-            {(isObese || isUnderweight) && (
-              <Alert severity="info" variant="outlined">
-                <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <WarningIcon />
-                  Weight Considerations {bmi > 0 && `(BMI: ${bmi.toFixed(1)})`}
+            {isObese && (
+              <Alert severity="info">
+                <Typography variant="subtitle2" gutterBottom>
+                  <strong>Obesity Considerations (BMI ≥30):</strong>
                 </Typography>
-                
-                {isObese && (
-                  <Box sx={{ mb: 1 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      <strong>Obesity (BMI ≥ 30):</strong>
-                    </Typography>
-                    <List dense sx={{ pl: 2 }}>
-                      <ListItem sx={{ py: 0 }}>
-                        <ListItemText primary="• Use AdjBW for CrCl: AdjBW = IBW + 0.4×(TBW–IBW)" />
-                      </ListItem>
-                      <ListItem sx={{ py: 0 }}>
-                        <ListItemText primary="• Vd often higher (consider vdPerKg 0.7–0.9 L/kg)" />
-                      </ListItem>
-                      <ListItem sx={{ py: 0 }}>
-                        <ListItemText primary="• Consider loading dose 20–25 mg/kg (TBW), rounded to 250 mg" />
-                      </ListItem>
-                    </List>
-                  </Box>
-                )}
-
-                {isUnderweight && (
-                  <Box>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      <strong>Underweight/Cachectic:</strong>
-                    </Typography>
-                    <List dense sx={{ pl: 2 }}>
-                      <ListItem sx={{ py: 0 }}>
-                        <ListItemText primary="• Use IBW or TBW if TBW < IBW" />
-                      </ListItem>
-                      <ListItem sx={{ py: 0 }}>
-                        <ListItemText primary="• Consider lower vdPerKg (0.6–0.7 L/kg)" />
-                      </ListItem>
-                      <ListItem sx={{ py: 0 }}>
-                        <ListItemText primary="• Requires close monitoring due to increased variability" />
-                      </ListItem>
-                    </List>
-                  </Box>
-                )}
+                <List dense>
+                  <ListItem>
+                    <ListItemText primary="• Use AdjBW for CrCl: AdjBW = IBW + 0.4×(TBW–IBW)" />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary="• Consider higher Vd (0.7–0.9 L/kg)" />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary="• Loading dose: 20–25 mg/kg (TBW)" />
+                  </ListItem>
+                </List>
               </Alert>
             )}
 
-            <Divider />
-
-            {/* Practical Tips */}
-            <Box>
-              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <MonitorIcon color="primary" />
-                Practical Dosing Tips
+            {/* Practical tips */}
+            <Alert severity="success">
+              <Typography variant="subtitle2" gutterBottom>
+                <strong>Practical Tips:</strong>
               </Typography>
-              
-              <Alert severity="info" variant="outlined" sx={{ mb: 2 }}>
-                <Typography variant="body2">
-                  <strong>AUC Adjustment:</strong>
-                </Typography>
-                <List dense sx={{ mt: 1 }}>
-                  <ListItem sx={{ py: 0 }}>
-                    <ListItemText primary="• If AUC < 400: ↑dose or ↓interval" />
-                  </ListItem>
-                  <ListItem sx={{ py: 0 }}>
-                    <ListItemText primary="• If AUC > 600: ↓dose or ↑interval" />
-                  </ListItem>
-                  <ListItem sx={{ py: 0 }}>
-                    <ListItemText primary="• Always cross-check with institutional policies" />
-                  </ListItem>
-                </List>
-              </Alert>
+              <List dense>
+                <ListItem>
+                  <ListItemText primary="• If AUC < 400: ↑dose or ↓interval" />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="• If AUC > 600: ↓dose or ↑interval" />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="• Always cross-check institutional policies" />
+                </ListItem>
+              </List>
+            </Alert>
 
-              <Alert severity="warning" variant="outlined">
-                <Typography variant="body2">
-                  <strong>Monitoring Schedule:</strong>
-                </Typography>
-                <List dense sx={{ mt: 1 }}>
-                  <ListItem sx={{ py: 0 }}>
-                    <ListItemText primary="• Obtain levels before 4th dose (steady-state achieved)" />
-                  </ListItem>
-                  <ListItem sx={{ py: 0 }}>
-                    <ListItemText primary="• Trough: 30 minutes before next dose" />
-                  </ListItem>
-                  <ListItem sx={{ py: 0 }}>
-                    <ListItemText primary="• Peak: 1-2 hours after infusion end (if q8h dosing)" />
-                  </ListItem>
-                </List>
-              </Alert>
-            </Box>
-
-            <Divider />
-
-            {/* Clinical References */}
-            <Box>
-              <Typography variant="body2" color="text.secondary">
-                <strong>Evidence Base:</strong> Based on ASHP/IDSA/SIDP 2020 Vancomycin Therapeutic Guidelines and current pharmacokinetic literature. Always consult local protocols and infectious disease specialists for complex cases.
-              </Typography>
-            </Box>
+            <Typography variant="body2" color="text.secondary">
+              <strong>Evidence Base:</strong> Based on ASHP/IDSA 2020 Guidelines. Always consult local protocols.
+            </Typography>
           </Box>
         </AccordionDetails>
       </Accordion>
