@@ -1,6 +1,12 @@
 // Interactive AUC API service using self-healing discovery layer
 
-import { apiPath, ensureHealthy } from '../lib/apiDiscovery';
+import { apiPath, ensureHealthy, joinUrl, discoverApiBase } from '../lib/apiDiscovery';
+
+// Resolve BASE from env for direct calls; discovery layer still available
+function getBase() {
+  const env = process.env.REACT_APP_INTERACTIVE_API_URL || process.env.VITE_INTERACTIVE_API_URL || process.env.REACT_APP_API_BASE || process.env.NEXT_PUBLIC_API_BASE || '';
+  return String(env || '').replace(/\/$/, '');
+}
 
 // Remove null/undefined/NaN from payload to reduce backend validation noise
 function sanitizePayload(obj) {
@@ -16,7 +22,7 @@ function sanitizePayload(obj) {
 
 // Small sleep helper (abort-aware)
 function delay(ms, signal) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (!ms || ms <= 0) return resolve();
     const t = setTimeout(resolve, ms);
     if (signal) {
@@ -108,6 +114,36 @@ async function fetchJsonWithRetry(url, options = {}, retryOpts = {}) {
   }
 }
 
+// Toggle '/api' prefix once upon 404/405
+async function tryWithApiToggle(path, options) {
+  const base = getBase() || await discoverApiBase().catch(() => '');
+  const bases = [];
+  if (base) bases.push(base);
+  const cachedBase = base;
+  // If discovery is in use, apiPath already has '/api' often; we attempt both
+  const direct = joinUrl(base || '', path);
+  const alt = joinUrl(base || '', path.startsWith('/api/') ? path.replace(/^\/api\//, '/') : `/api${path.startsWith('/') ? '' : '/'}${path}`);
+
+  // First attempt
+  let res, status, bodyText;
+  try {
+    res = await robustFetch(direct, options);
+    status = res.status;
+    if (res.ok) return res.json();
+    bodyText = await res.text();
+    if (status === 404 || status === 405) {
+      const res2 = await robustFetch(alt, options);
+      if (res2.ok) return res2.json();
+      const body2 = await res2.text();
+      console.warn('[Vancomyzer] API alt failed', { direct: { url: direct, status, bodyText }, alt: { url: alt, status: res2.status, body2 } });
+      throw new Error(`HTTP ${res2.status}: ${body2 || 'Request failed'}`);
+    }
+    throw new Error(`HTTP ${status}: ${bodyText || 'Request failed'}`);
+  } catch (e) {
+    throw e;
+  }
+}
+
 // Health check
 export async function health() {
   try {
@@ -119,82 +155,49 @@ export async function health() {
   }
 }
 
-// Updated AUC request to use `/api/interactive/auc` and log requests/responses
+// Updated AUC request to use `/interactive/auc` with parity payload shape
 export async function postAuc(payload, opts = {}) {
-  const url = apiPath('/interactive/auc');
-  const body = JSON.stringify(sanitizePayload(payload));
-  try { console.log('[Vancomyzer] Sending AUC request to:', url, 'payload:', payload); } catch {}
-
-  const request = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body,
-    ...opts,
-  };
-
-  const json = await fetchJsonWithRetry(url, request, { retries: opts.retries ?? 0 });
+  const base = getBase();
+  // Accept both flat AucRequest and nested {patient,regimen,levels}
+  let bodyObj = payload;
+  if (!payload?.patient && (payload?.age_years != null || payload?.dose_mg != null)) {
+    const patient = {
+      age_years: payload.age_years ?? payload.ageYears ?? null,
+      weight_kg: payload.weight_kg ?? payload.weightKg ?? null,
+      height_cm: payload.height_cm ?? payload.heightCm ?? null,
+      scr_mg_dl: payload.scr_mg_dl ?? payload.scr ?? payload.serum_creatinine_mg_dl ?? null,
+      gender: payload.gender ?? null,
+      mic_mg_L: payload.mic ?? payload.mic_mg_L ?? 1,
+    };
+    const regimen = {
+      dose_mg: payload.dose_mg ?? payload.doseMg ?? null,
+      interval_hours: payload.interval_hr ?? payload.interval_hours ?? payload.intervalH ?? null,
+      infusion_minutes: payload.infusion_minutes ?? payload.infusionMin ?? 60,
+    };
+    const levels = Array.isArray(payload.levels) ? payload.levels : [];
+    bodyObj = { patient, regimen, levels };
+  }
+  const body = JSON.stringify(sanitizePayload(bodyObj));
+  const request = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, ...opts };
+  const path = '/interactive/auc';
+  try { console.log('[Vancomyzer] Sending AUC', { base, path, body: bodyObj }); } catch {}
+  const json = await tryWithApiToggle(path, request);
   try { console.log('[Vancomyzer] AUC response OK'); } catch {}
   return json;
 }
 
-// Back-compat: accept nested payload and convert to flat AucRequest
-export async function calculateInteractiveAUC({ patient = {}, regimen = {}, levels = [] } = {}, opts = {}) {
-  const flat = {
-    age_years: patient.age_years ?? patient.age ?? null,
-    weight_kg: patient.weight_kg ?? null,
-    height_cm: patient.height_cm ?? null,
-    scr_mg_dl: patient.scr_mg_dl ?? patient.serum_creatinine_mg_dl ?? patient.serum_creatinine ?? null,
-    gender: patient.gender ?? null,
-    dose_mg: regimen.dose_mg ?? null,
-    interval_hr: regimen.interval_hours ?? null,
-    infusion_minutes: regimen.infusion_minutes ?? 60,
-    levels: Array.isArray(levels)
-      ? levels.map((v) => (typeof v === 'number' ? v : (v?.concentration_mg_L ?? v?.conc ?? null))).filter((x) => x != null)
-      : null,
-  };
-  return postAuc(flat, opts);
-}
-
-// Legacy export expected by pages: returns an object with { metrics, series, ... }
-export async function bayesAUC(payload, opts = {}) {
-  const res = await calculateInteractiveAUC(payload, opts);
-  const body = res?.result ?? res ?? {};
-  const hasMetrics = body && typeof body === 'object' && 'metrics' in body;
-  if (hasMetrics) return body; // already normalized
-  const normalized = { ...body };
-  if (!normalized.metrics) {
-    normalized.metrics = {
-      auc_24: body?.auc_24 ?? null,
-      predicted_peak: body?.predicted_peak ?? null,
-      predicted_trough: body?.predicted_trough ?? null,
-    };
-  }
-  return normalized;
-}
-
-// Optional: best-effort optimize; resolves to {} on failure
 export async function optimize({ patient, regimen, target }, opts = {}) {
-  try {
-    const url = apiPath('/optimize');
-    const request = { 
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' }, 
-      body: JSON.stringify(sanitizePayload({ patient, regimen, target })),
-      ...opts
-    };
-    return await fetchJsonWithRetry(url, request, { retries: opts.retries ?? 0 });
-  } catch {
-    return {};
-  }
+  const base = getBase();
+  const body = JSON.stringify(sanitizePayload({ patient, regimen, target }));
+  const request = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, ...opts };
+  const path = '/optimize';
+  return tryWithApiToggle(path, request);
 }
 
 export async function pkSimulation(payload, opts = {}) {
-  const url = apiPath('/pk-simulation');
-  const request = { 
-    method: 'POST', 
-    headers: { 'Content-Type': 'application/json' }, 
-    body: JSON.stringify(sanitizePayload(payload || {})), 
-    ...opts 
-  };
-  return fetchJsonWithRetry(url, request, { retries: opts.retries ?? 0 });
+  const base = getBase();
+  const body = JSON.stringify(sanitizePayload(payload || {}));
+  const path = '/pk-simulation';
+  const request = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, ...opts };
+  return tryWithApiToggle(path, request);
 }

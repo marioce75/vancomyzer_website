@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { Box, Grid, Paper, Typography, Slider, TextField, FormControlLabel, Switch, Button, Chip, Alert, InputAdornment, Tooltip, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, Grid, Paper, Typography, TextField, Button, Chip, Alert, Tooltip, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { health, optimize, postAuc } from '../services/interactiveApi';
 import { discoverApiBase } from '../lib/apiDiscovery';
@@ -8,11 +8,14 @@ import { buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import LoadingDoseCard from './LoadingDoseCard.jsx';
-import { deterministicSummary, crclCG, clFromCrcl } from '../pk/core.ts'; // Use enhanced version
-import { medcalcConfig } from '../pk/medcalcMode.ts'; // Keep config
-import DoseInput from './controls/DoseInput.tsx';
-import ConcTimeChart from './chart/ConcTimeChart.tsx';
-import GuidancePanel from './GuidancePanel.tsx';
+import { deterministicSummary, medcalcConfig } from '../pk/medcalcMode';
+import { crclCG, clFromCrcl } from '../pk/core';
+import { applyClinParity, clinParity } from '../pk/parity.config';
+import { fitFromLevels } from '../pk/levels';
+import DoseInput from './controls/DoseInput';
+import ConcTimeChart from './chart/ConcTimeChart';
+
+function toFixed(val, d=1){ if(val==null||Number.isNaN(Number(val))) return '—'; return Number(val).toFixed(d); }
 
 // Help mapping
 const help = {
@@ -27,12 +30,6 @@ const help = {
   weight:    { key: 'help.weight',    link: '/guideline/special-populations' },
   height:    { key: 'help.height',    link: '/guideline/special-populations' },
   levels:    { key: 'help.levels',    link: '/guideline/sampling-timing' },
-};
-
-// Utility function for safe number formatting
-const toFixed = (val, digits) => {
-  if (val == null || !Number.isFinite(val)) return '—';
-  return Number(val).toFixed(digits);
 };
 
 function formToPayload(s) {
@@ -134,51 +131,47 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   const runInteractive = useCallback(async () => {
     setLoading(true); setError(null);
 
-    // Enhanced deterministic compute with immediate UI updates  
+    // Prepare normalized patient/regimen
+    const p = {
+      ageY: Number(patient?.age || patient?.age_years || 0),
+      sex: (String(patient?.gender || 'male').toLowerCase() === 'female') ? 'Female' : 'Male',
+      weightKg: Number(patient?.weight_kg || 0),
+      heightCm: Number(patient?.height_cm || 0) || undefined,
+      scrMgDl: Number(patient?.serum_creatinine_mg_dl || patient?.scr_mg_dl || 0),
+      mic: Number(patient?.mic_mg_L || patient?.mic || clinParity.micDefault)
+    };
+    const r = { doseMg: Number(regimen?.dose_mg || 0), intervalH: Number(regimen?.interval_hours || 12), infusionMin: Number(regimen?.infusion_minutes || 60) };
+
+    // 1) Optimistic deterministic via ClinCalc-parity for immediate feedback
     try {
-      const p = {
-        ageY: Number(patient?.age || patient?.age_years || 0),
-        sex: (String(patient?.gender || 'male').toLowerCase() === 'female') ? 'Female' : 'Male',
-        weightKg: Number(patient?.weight_kg || 0),
-        heightCm: Number(patient?.height_cm || 0) || undefined,
-        scrMgDl: Number(patient?.serum_creatinine_mg_dl || patient?.scr_mg_dl || 0),
-        mic: Number(patient?.mic_mg_L || patient?.mic || medcalcConfig.defaultMIC)
-      };
-      const r = { 
-        doseMg: Number(regimen?.dose_mg || 0), 
-        intervalH: Number(regimen?.interval_hours || 12), 
-        infusionMin: Number(regimen?.infusion_minutes || 60) 
-      };
-      
-      // Use enhanced deterministic summary with configurable options
-      const det = deterministicSummary(p, r, {
-        vdPerKg: medcalcConfig.vdPerKg,
-        clScale: medcalcConfig.clFromCrcl.scale || 1.0,
-        useDoseOverCL: medcalcConfig.useDoseOverCL,
-        weightStrategy: 'TBW', // Can be made configurable later
-        scrRounding: medcalcConfig.scrRounding
-      });
-      
-      // Update UI immediately (optimistic)
-      setSeries(det.series); 
-      setSummary((s) => ({ 
-        ...(det.metrics ? { ...s, ...det.metrics } : s), 
-        auc_24: det.metrics.auc_24, 
-        predicted_peak: det.metrics.predicted_peak, 
-        predicted_trough: det.metrics.predicted_trough 
-      }));
-    } catch (err) {
-      console.warn('[Vancomyzer] Deterministic calculation failed:', err);
-      // Continue with API call even if deterministic fails
+      const det0 = applyClinParity(p, r);
+      setSeries(det0.series);
+      setSummary((s) => ({ ...(det0.metrics ? { ...s, ...det0.metrics } : s), auc_24: det0.metrics.auc_24, predicted_peak: det0.metrics.predicted_peak, predicted_trough: det0.metrics.predicted_trough }));
+    } catch {}
+
+    // Levels mode: fit k/CL non-Bayesian and recompute
+    const hasLevels = Array.isArray(measuredLevels) && measuredLevels.length > 0;
+    if (engineMode === 'levels' && hasLevels) {
+      try {
+        const lv = [...measuredLevels].sort((a,b)=>a.time_hr-b.time_hr);
+        const level1 = lv[0];
+        const level2 = lv.length>1 ? lv[1] : undefined;
+        const fit = fitFromLevels({ level1, level2, regimen: r, patient: { weightKg: p.weightKg }, prior: { vdPerKg: clinParity.vdPerKg, clScale: clinParity.clScale } });
+        const det = deterministicSummary(p, r, { overrideCL: fit.CL, overrideV: fit.V, horizonH: 48, dtH: 0.1, vdPerKg: clinParity.vdPerKg, clScale: clinParity.clScale, clOffset: clinParity.clOffset, weightStrategy: clinParity.weightStrategy, scrPolicy: clinParity.scrPolicy, aucMethod: clinParity.aucMethod });
+        setSeries(det.series);
+        setSummary((s) => ({ ...(det.metrics ? { ...s, ...det.metrics } : s), auc_24: det.metrics.auc_24, predicted_peak: det.metrics.predicted_peak, predicted_trough: det.metrics.predicted_trough }));
+      } catch (e) {
+        console.warn('[Vancomyzer] Levels fit failed:', e?.message || e);
+      }
+      setLoading(false);
+      return;
     }
 
     if (apiAbort.current) apiAbort.current.abort();
     apiAbort.current = new AbortController();
 
-    const hasLevels = Array.isArray(measuredLevels) && measuredLevels.length > 0;
-
-    // If user selected deterministic and no levels, or API is offline, stop here
-    if ((engineMode !== 'bayesian' && !hasLevels) || !apiOnline) {
+    // If user selected deterministic or API is offline, stop here
+    if (engineMode !== 'bayesian' || !apiOnline) {
       setLoading(false);
       return;
     }
@@ -198,7 +191,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
     const payload = formToPayload(formState);
 
     try {
-      try { console.debug('[Vancomyzer] POST /api/interactive/auc', payload); } catch {}
+      try { console.debug('[Vancomyzer] POST /interactive/auc', payload); } catch {}
       const res = await postAuc(payload, { signal: apiAbort.current.signal });
       const data = res?.result || res;
 
@@ -230,7 +223,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
   }, [patient, regimen, measuredLevels, retryTs, engineMode, apiOnline]);
 
   useEffect(() => {
-    const t = setTimeout(() => { runInteractive(); }, 220);
+    const t = setTimeout(() => { runInteractive(); }, 180);
     return () => clearTimeout(t);
   }, [runInteractive]);
 
@@ -243,67 +236,6 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       .filter((lv) => lv.time_hr >= 0 && lv.time_hr <= tau + 1e-9)
       .map((lv) => ({ x: lv.time_hr, y: Number(lv.concentration_mg_L), tag: lv.tag }));
   }, [measuredLevels, regimen.interval_hours]);
-
-  const commitField = (field) => (value) => setRegimen((r) => ({ ...r, [field]: value }));
-
-  const Control = ({ label, value, min, max, step, field, unit }) => {
-    // Respect stricter existing bounds, standardize steps per field
-    const minFinal = Math.max(0, Number.isFinite(min) ? min : 0);
-    const maxFinal = Math.min(9999, Number.isFinite(max) ? max : 9999);
-    const stepFinal = field === 'dose_mg' ? 50 : field === 'interval_hours' ? 1 : field === 'infusion_minutes' ? 5 : (Number.isFinite(step) ? step : 1);
-
-    return (
-      <Paper variant="outlined" sx={{ p: 2 }}>
-        <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center' }}>
-          <Typography variant="caption" color="text.secondary">{t(label, label)}</Typography>
-          {field === 'dose_mg' && <HelpTooltip titleKey={help.dose.key} linkTo={help.dose.link} />}
-          {field === 'interval_hours' && <HelpTooltip titleKey={help.interval.key} linkTo={help.interval.link} />}
-          {field === 'infusion_minutes' && <HelpTooltip titleKey={help.infusion.key} linkTo={help.infusion.link} />}
-        </Box>
-        <Grid container spacing={2} alignItems="center" sx={{ mt: 1 }}>
-          <Grid item xs={8} md={9}>
-            <Slider
-              value={value}
-              min={minFinal}
-              max={maxFinal}
-              step={stepFinal}
-              onChange={(_, v) => scheduleCommit(field, Number(Array.isArray(v) ? v[0] : v), 120)}
-              onChangeCommitted={(_, v) => commitField(field)(Number(Array.isArray(v) ? v[0] : v))}
-              aria-label={t(label, label)}
-            />
-          </Grid>
-          <Grid item xs="auto" md="auto">
-            <TextField
-              variant="outlined"
-              className="numericInputDense"
-              label={t(label, label)}
-              type="number"
-              size="small"
-              value={value}
-              onChange={(e) => scheduleCommit(field, Number(e.target.value || 0), 200)}
-              onBlur={(e) => commitField(field)(Number(e.target.value || 0))}
-              onKeyDown={(e) => { if (e.key === 'Enter') commitField(field)(Number(e.currentTarget.value || 0)); }}
-              InputProps={{
-                endAdornment: unit ? (
-                  <InputAdornment position="end" sx={{ minWidth: '3ch', justifyContent: 'flex-end' }}>{t(unit, unit)}</InputAdornment>
-                ) : undefined,
-                inputProps: { min: minFinal, max: maxFinal, step: stepFinal }
-              }}
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                width: { xs: '16ch', sm: '18ch' },
-                '& .MuiOutlinedInput-input': {
-                  textAlign: 'right',
-                  fontVariantNumeric: 'tabular-nums',
-                  paddingRight: '1ch',
-                }
-              }}
-            />
-          </Grid>
-        </Grid>
-      </Paper>
-    );
-  };
 
   const copyJson = async () => {
     const payload = { patient, regimen, summary, series, mode };
@@ -369,16 +301,8 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         heightCm: Number(patient?.height_cm || 0) || undefined,
         scrMgDl: Number(patient?.serum_creatinine_mg_dl || patient?.scr_mg_dl || 0),
       };
-      const crcl = crclCG({ 
-        ageY: p.ageY, 
-        sex: p.sex, 
-        weightKg: p.weightKg, 
-        scrMgDl: p.scrMgDl, 
-        heightCm: p.heightCm, 
-        weightStrategy: 'TBW',
-        scrRounding: medcalcConfig.scrRounding || 'none' 
-      });
-      const CL = clFromCrcl(crcl, { scale: medcalcConfig.clFromCrcl?.scale || 1.0 });
+      const crcl = crclCG({ ageY: p.ageY, sex: p.sex, weightKg: p.weightKg, scrMgDl: p.scrMgDl, heightCm: p.heightCm, weightStrategy: medcalcConfig.weightStrategy, scrPolicy: medcalcConfig.scrPolicy });
+      const CL = clFromCrcl(crcl, medcalcConfig.clScale, medcalcConfig.clOffset);
       return Number(CL) || 0;
     } catch { return 0; }
   }, [patient]);
@@ -389,6 +313,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
         <ToggleButtonGroup size="small" value={engineMode} exclusive onChange={(_, v) => v && setEngineMode(v)}>
           <ToggleButton value="deterministic">Deterministic</ToggleButton>
+          <ToggleButton value="levels">Levels (EoIP)</ToggleButton>
           <ToggleButton value="bayesian" disabled={!apiOnline}>Bayesian</ToggleButton>
         </ToggleButtonGroup>
       </Box>
@@ -434,7 +359,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
       {/* CORS/Network inline hint when fetch fails with TypeError */}
       {!apiOnline && (
         <Alert severity="warning" variant="outlined" sx={{ mb: 2 }}>
-          Interactive service unreachable (CORS/Network). Verify API base and backend CORS. Expected POST {`/api/interactive/auc`}.
+          Interactive service unreachable (CORS/Network). Verify API base and backend CORS. Expected POST /interactive/auc (or /api/interactive/auc).
         </Alert>
       )}
 
@@ -567,7 +492,7 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
             size="small"
             variant={apiOnline ? 'filled' : 'outlined'}
             color={apiOnline ? 'primary' : 'warning'}
-            label={apiOnline ? 'Bayesian optimization' : 'Bayesian optimization (offline)'}
+            label={apiOnline ? t('status.bayesian.online') : t('status.bayesian.offline')}
             sx={{ ml: 1 }}
           />
         </Tooltip>
@@ -612,7 +537,43 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
         }}>{t('actions.optimize','Optimize dose')}</Button>
       </Box>
 
-      {/* Levels panel */}
+      {/* Guidance panel */}
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('guidance.methods.title','Choosing a method')}</Typography>
+        <ul style={{ marginTop: 0 }}>
+          <li><Typography variant="body2">{t('guidance.methods.deterministic')}</Typography></li>
+          <li><Typography variant="body2">{t('guidance.methods.levels')}</Typography></li>
+          <li><Typography variant="body2">{t('guidance.methods.bayesian')}</Typography></li>
+        </ul>
+        <Typography variant="subtitle2" sx={{ mt: 1 }}>{t('guidance.geriatrics.title','Geriatrics (≥65y)')}</Typography>
+        <ul>
+          <li><Typography variant="body2">{t('guidance.geriatrics.bullet1')}</Typography></li>
+        </ul>
+        <Typography variant="subtitle2" sx={{ mt: 1 }}>{t('guidance.weight.title','Weight')}</Typography>
+        <ul>
+          <li><Typography variant="body2">{t('guidance.weight.bullet1')}</Typography></li>
+          <li><Typography variant="body2">{t('guidance.weight.bullet2')}</Typography></li>
+        </ul>
+      </Paper>
+
+      {/* Chart and error banner */}
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>{error} <Button size="small" startIcon={<RestartAltIcon />} onClick={onRetry}>{t('actions.retry','Retry')}</Button></Alert>
+        )}
+        <Box sx={{ height: 360 }}>
+          <ConcTimeChart
+            times={labels}
+            conc={conc}
+            lower={Array.isArray(series?.lower) ? series.lower : undefined}
+            upper={Array.isArray(series?.upper) ? series.upper : undefined}
+            levels={levelMarkers}
+            shadeAuc
+          />
+        </Box>
+      </Paper>
+
+      {/* Measured levels config */}
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Box component="div" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
           <Typography variant="subtitle2">{t('measured_levels','Measured Levels')}</Typography>
@@ -639,30 +600,6 @@ export default function InteractiveAUC({ mode = 'adult', onOpenGuidelines }) {
             </>
           )}
         </Grid>
-      </Paper>
-
-      {/* Guidance Panel */}
-      <GuidancePanel 
-        patientAge={patient?.age || patient?.age_years}
-        patientWeight={patient?.weight_kg}
-        patientHeight={patient?.height_cm}
-      />
-
-      {/* Chart and error banner */}
-      <Paper variant="outlined" sx={{ p: 2 }}>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>{error} <Button size="small" startIcon={<RestartAltIcon />} onClick={onRetry}>{t('actions.retry','Retry')}</Button></Alert>
-        )}
-        <Box sx={{ height: 360 }}>
-          <ConcTimeChart
-            times={labels}
-            conc={conc}
-            lower={Array.isArray(series?.lower) ? series.lower : undefined}
-            upper={Array.isArray(series?.upper) ? series.upper : undefined}
-            levels={levelMarkers}
-            shadeAuc
-          />
-        </Box>
       </Paper>
     </Box>
   );

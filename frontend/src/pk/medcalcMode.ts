@@ -1,30 +1,56 @@
-// Deterministic "MedCalc-compatible" mode
-// Uses published equations only. Not affiliated with MedCalc. No proprietary code.
+// Deterministic "MedCalc/ClinCalc-compatible" mode
+// Uses published equations only. Configurable to match external calculators within tolerance.
 
-import { aucTrapz, clFromCrcl, crclCG, kFromCLV, superpose, vd } from './core.ts';
-import type { Patient, Regimen } from './types';
+import { aucTrapz, clFromCrcl, crclCG, kFromCLV, superpose, vd, WeightStrategy } from './core';
 
 export const medcalcConfig = {
   vdPerKg: 0.7, // L/kg (tunable)
-  clFromCrcl: { a: 0.0, b: 1.0, scale: 1.0 },
-  scrRounding: 'none' as const,
+  clScale: 1.0,
+  clOffset: 0.0,
+  weightStrategy: 'Auto' as WeightStrategy,
+  scrPolicy: { floor: null as number|null, round: 'none' as const },
   defaultMIC: 1.0,
-  useDoseOverCL: true,
+  aucMethod: 'doseOverCL' as 'doseOverCL'|'trapezoid',
+};
+
+export type DeterministicOpts = {
+  vdPerKg?: number;
+  clScale?: number;
+  clOffset?: number;
+  weightStrategy?: WeightStrategy;
+  scrPolicy?: { floor?: number|null; round?: 'none'|'floor0.1'|'round0.1' };
+  aucMethod?: 'doseOverCL'|'trapezoid';
+  horizonH?: number;
+  dtH?: number;
+  overrideCL?: number;
+  overrideV?: number;
 };
 
 export function deterministicSummary(
   patient: { ageY:number; sex:'Male'|'Female'; weightKg:number; heightCm?:number; scrMgDl:number; mic?:number },
   regimen: { doseMg:number; intervalH:number; infusionMin:number },
-  horizonH = 48,
-  dtH = 0.1
+  opts: DeterministicOpts = {}
 ){
-  const mic = patient.mic ?? medcalcConfig.defaultMIC;
-  const crcl = crclCG({ ageY: patient.ageY, sex: patient.sex, weightKg: patient.weightKg, scrMgDl: patient.scrMgDl, heightCm: patient.heightCm, rounding: medcalcConfig.scrRounding });
-  const V = vd(patient.weightKg, medcalcConfig.vdPerKg);
-  const CL = clFromCrcl(crcl, medcalcConfig.clFromCrcl);
-  const k = kFromCLV(CL, V);
+  const cfg = { ...medcalcConfig, ...opts };
+  const mic = patient.mic ?? cfg.defaultMIC;
+  const crcl = crclCG({
+    ageY: patient.ageY,
+    sex: patient.sex,
+    weightKg: patient.weightKg,
+    heightCm: patient.heightCm,
+    scrMgDl: patient.scrMgDl,
+    weightStrategy: cfg.weightStrategy,
+    scrPolicy: cfg.scrPolicy,
+  });
+
+  let V = cfg.overrideV ?? vd(patient.weightKg, cfg.vdPerKg);
+  let CL = cfg.overrideCL ?? clFromCrcl(crcl, cfg.clScale, cfg.clOffset);
+  let k = kFromCLV(CL, V);
+
   const tinfH = regimen.infusionMin / 60;
 
+  const horizonH = cfg.horizonH ?? 48;
+  const dtH = cfg.dtH ?? 0.1;
   // time grid
   const times: number[] = [];
   for (let t = 0; t <= horizonH + 1e-9; t += dtH) times.push(+t.toFixed(10));
@@ -32,17 +58,20 @@ export function deterministicSummary(
 
   // AUC
   const dailyDose = regimen.doseMg * (24 / regimen.intervalH);
-  const auc24 = medcalcConfig.useDoseOverCL && CL > 0 ? (dailyDose / CL) : aucTrapz(times, conc, 0, 24);
+  const auc24 = cfg.aucMethod === 'doseOverCL' && CL > 0 ? (dailyDose / CL) : aucTrapz(times, conc, 0, 24);
 
-  // peak/trough from series
+  // Peak/trough from series at EoIP and pre-dose
   let peak = 0; let trough = Infinity;
   const tau = regimen.intervalH;
+  const eps = 1e-6;
   for (let i = 1; i < times.length; i++) {
     const t = times[i];
-    if (Math.abs(t - Math.round(t / tau) * tau) < 1e-9) {
-      peak = Math.max(peak, conc[i]);
-      trough = Math.min(trough, conc[i-1]);
-    }
+    const nTau = Math.round((t - tinfH) / tau);
+    const tPeak = nTau * tau + tinfH;
+    if (Math.abs(t - tPeak) < eps) peak = Math.max(peak, conc[i]);
+    const nTau2 = Math.round(t / tau);
+    const tTrough = nTau2 * tau;
+    if (Math.abs(t - tTrough) < eps) trough = Math.min(trough, conc[i-1]);
   }
   if (!Number.isFinite(trough)) trough = conc[0] ?? 0;
 

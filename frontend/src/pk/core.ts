@@ -1,53 +1,62 @@
 // Core PK Functions
 // Published equations; no proprietary code
 
-// Enhanced Creatinine clearance (Cockcroft–Gault) with weight strategy support
+// Types for toggles
+export type WeightStrategy = 'TBW'|'IBW'|'AdjBW'|'Auto';
+export type ScrRoundPolicy = 'none'|'floor0.1'|'round0.1';
+
+// Utility: height cm -> inches
+function cmToIn(cm?: number) { return (Number(cm) || 0) / 2.54; }
+
+// Ideal body weight (kg) using Devine: M=50+2.3*(in-60), F=45.5+2.3*(in-60)
+export function ibwKg(sex: 'Male'|'Female', heightCm?: number): number {
+  const inches = cmToIn(heightCm);
+  const base = sex === 'Male' ? 50 : 45.5;
+  const over60 = Math.max(0, inches - 60);
+  return base + 2.3 * over60;
+}
+
+// Adjusted body weight when obese
+export function adjbwKg(tbwKg: number, ibw: number): number {
+  return ibw + 0.4 * (tbwKg - ibw);
+}
+
+// Choose weight per strategy
+export function chooseWeightKg(tbwKg: number, sex: 'Male'|'Female', heightCm?: number, strategy: WeightStrategy = 'Auto'): number {
+  const ibw = ibwKg(sex, heightCm);
+  if (strategy === 'TBW') return tbwKg;
+  if (strategy === 'IBW') return ibw;
+  if (strategy === 'AdjBW') return adjbwKg(tbwKg, ibw);
+  // Auto: TBW if TBW < IBW; AdjBW if BMI ≥ 30; else IBW
+  const hM = (Number(heightCm) || 0) / 100;
+  const bmi = hM > 0 ? tbwKg / (hM * hM) : NaN;
+  if (tbwKg < ibw) return tbwKg;
+  if (Number.isFinite(bmi) && bmi >= 30) return adjbwKg(tbwKg, ibw);
+  return ibw;
+}
+
+// SCr policy application
+function applyScrPolicy(scr: number, policy?: { floor?: number|null, round?: ScrRoundPolicy }) {
+  let x = Number(scr) || 0;
+  const floorVal = policy?.floor;
+  if (typeof floorVal === 'number' && Number.isFinite(floorVal)) x = Math.max(x, floorVal);
+  const round = policy?.round || 'none';
+  if (round === 'floor0.1') x = Math.floor(x * 10) / 10;
+  if (round === 'round0.1') x = Math.round(x * 10) / 10;
+  return x;
+}
+
+// Creatinine clearance (Cockcroft–Gault)
 export function crclCG(params: {
-  ageY: number; 
-  sex: 'Male'|'Female'; 
-  weightKg: number; 
-  scrMgDl: number;
-  heightCm?: number; 
-  weightStrategy?: 'TBW'|'IBW'|'AdjBW';
-  scrRounding?: 'none'|'floor0.7';
+  ageY: number; sex: 'Male'|'Female'; weightKg: number; heightCm?: number; scrMgDl: number;
+  weightStrategy?: WeightStrategy; scrPolicy?: { floor?: number|null, round?: ScrRoundPolicy };
 }): number {
-  const { ageY, sex, weightKg, scrMgDl, heightCm, weightStrategy = 'TBW', scrRounding = 'none' } = params;
-
-  // Calculate IBW using inches-based Devine formula (per spec)
-  let weightForCG = weightKg; // Default TBW
-  
-  if (heightCm && (weightStrategy === 'IBW' || weightStrategy === 'AdjBW')) {
-    const heightInches = heightCm / 2.54;
-    const inchesOver60 = Math.max(0, heightInches - 60);
-    
-    const ibw = sex === 'Male' 
-      ? 50 + 2.3 * inchesOver60
-      : 45.5 + 2.3 * inchesOver60;
-    
-    if (weightStrategy === 'IBW') {
-      weightForCG = ibw;
-    } else if (weightStrategy === 'AdjBW') {
-      // Calculate BMI to determine if AdjBW should be used
-      const bmi = weightKg / ((heightCm / 100) ** 2);
-      if (bmi >= 30) {
-        weightForCG = ibw + 0.4 * (weightKg - ibw);
-      } else {
-        weightForCG = weightKg; // Use TBW if BMI < 30
-      }
-    }
-  }
-
-  // Apply SCr rounding if specified (optional floor for frail patients)
-  let adjustedScr = scrMgDl;
-  if (scrRounding === 'floor0.7') {
-    adjustedScr = Math.max(scrMgDl, 0.7);
-  }
-
-  // Cockcroft-Gault calculation
-  let crcl = ((140 - ageY) * weightForCG) / (72 * adjustedScr);
+  const { ageY, sex, weightKg, heightCm, scrMgDl } = params;
+  const wt = chooseWeightKg(weightKg, sex, heightCm, params.weightStrategy || 'Auto');
+  const scr = applyScrPolicy(scrMgDl, params.scrPolicy);
+  let crcl = ((140 - Number(ageY)) * wt) / (72 * scr);
   if (sex === 'Female') crcl *= 0.85;
-  
-  return Math.max(crcl, 10); // Minimum physiological limit
+  return crcl; // mL/min
 }
 
 // Enhanced volume and clearance calculations
@@ -59,11 +68,9 @@ export function kFromCLV(CL_L_h: number, V_L: number): number {
   return CL_L_h / V_L;
 }
 
-// Enhanced clearance from CrCl with configurable scale factor
-export function clFromCrcl(crcl_mL_min: number, opts: { scale?: number } = {}): number {
-  const { scale = 1.0 } = opts;
-  // Default formula: CL (L/h) = scale * (CrCl_mL_min / 60)
-  return scale * (crcl_mL_min / 60);
+// Convenience clearance mapping from CrCl (mL/min) to CL (L/h): CL = offset + scale*(CrCl/60)
+export function clFromCrcl(crcl_mL_min: number, scale = 1.0, offset = 0): number {
+  return offset + scale * (crcl_mL_min / 60);
 }
 
 // Infusion model (one compartment, zero-order in, first-order out)
@@ -82,9 +89,10 @@ export function concAfterInfusion(t: number, doseMg: number, tinfH: number, V_L:
 export function superpose(timesH: number[], doseMg: number, tauH: number, tinfH: number, V_L: number, k_h: number): number[] {
   return timesH.map(t => {
     let conc = 0;
-    for (let n = 0; n <= Math.floor(t / tauH); n++) {
+    const nMax = Math.floor(t / tauH);
+    for (let n = 0; n <= nMax; n++) {
       const tn = t - n * tauH;
-      if (tn <= tinfH) {
+      if (tn <= tinfH + 1e-12) {
         conc += concDuringInfusion(tn, doseMg, tinfH, V_L, k_h);
       } else {
         conc += concAfterInfusion(tn, doseMg, tinfH, V_L, k_h);
@@ -98,135 +106,34 @@ export function superpose(timesH: number[], doseMg: number, tauH: number, tinfH:
 export function aucTrapz(timesH: number[], conc: number[], a=0, b=24): number {
   let auc = 0;
   for (let i = 1; i < timesH.length; i++) {
-    if (timesH[i] > b) break;
-    if (timesH[i - 1] >= a) {
-      auc += 0.5 * (conc[i] + conc[i - 1]) * (timesH[i] - timesH[i - 1]);
-    }
+    const t0 = timesH[i - 1];
+    const t1 = timesH[i];
+    if (t1 <= a) continue;
+    if (t0 >= b) break;
+    const dt = Math.min(t1, b) - Math.max(t0, a);
+    if (dt > 0) auc += 0.5 * (conc[i] + conc[i - 1]) * dt;
   }
   return auc;
 }
 
-// Peak and trough calculations - enhanced to work with steady-state superposition
-export function peakTroughFromSeries(timesH: number[], conc: number[], tauH: number): { peak: number; trough: number } {
+// Peak and trough calculations at EoIP and just before next dose
+export function peakTroughFromSeries(timesH: number[], conc: number[], tauH: number, tinfH: number): { peak: number; trough: number } {
   let peak = 0;
-  let trough = Infinity;
-  
-  // Look for peaks just after infusion ends (t = n*τ + tinf) and troughs just before next dose (t = n*τ - ε)
-  for (let i = 0; i < timesH.length; i++) {
+  let trough = Number.POSITIVE_INFINITY;
+  const eps = 1e-6;
+  for (let i = 1; i < timesH.length; i++) {
     const t = timesH[i];
-    const cyclePos = t % tauH;
-    
-    // Peak: look for concentrations shortly after infusion end (assuming 1h infusion typically)
-    if (cyclePos >= 1.0 && cyclePos <= 2.0) {
+    const nTau = Math.round((t - tinfH) / tauH);
+    const tPeak = nTau * tauH + tinfH;
+    if (Math.abs(t - tPeak) < eps) {
       peak = Math.max(peak, conc[i]);
     }
-    
-    // Trough: look for concentrations just before next dose (last 10% of interval)
-    if (cyclePos >= tauH * 0.9) {
-      trough = Math.min(trough, conc[i]);
+    const nTau2 = Math.round(t / tauH);
+    const tTrough = nTau2 * tauH;
+    if (Math.abs(t - tTrough) < eps) {
+      trough = Math.min(trough, conc[i - 1]); // just before next dose starts
     }
   }
-  
-  // Fallback if no valid points found
-  if (!Number.isFinite(trough)) {
-    trough = conc[conc.length - 1] || 0;
-  }
-  
+  if (!Number.isFinite(trough)) trough = conc[0] ?? 0;
   return { peak, trough };
-}
-
-// Enhanced deterministic summary function
-export function deterministicSummary(
-  patient: { 
-    ageY: number; 
-    sex: 'Male'|'Female'; 
-    weightKg: number; 
-    heightCm?: number; 
-    scrMgDl: number; 
-    mic?: number 
-  },
-  regimen: { 
-    doseMg: number; 
-    intervalH: number; 
-    infusionMin: number 
-  },
-  opts: {
-    vdPerKg?: number;
-    clScale?: number;
-    useDoseOverCL?: boolean;
-    weightStrategy?: 'TBW'|'IBW'|'AdjBW';
-    scrRounding?: 'none'|'floor0.7';
-  } = {}
-): {
-  metrics: {
-    auc_24: number;
-    predicted_peak: number;
-    predicted_trough: number;
-    CL: number;
-    V: number;
-    k: number;
-    crcl: number;
-  };
-  series: {
-    time_hours: number[];
-    concentration_mg_L: number[];
-  };
-} {
-  const { 
-    vdPerKg = 0.7, 
-    clScale = 1.0, 
-    useDoseOverCL = true,
-    weightStrategy = 'TBW',
-    scrRounding = 'none'
-  } = opts;
-
-  // Calculate patient-specific parameters
-  const crcl = crclCG({ 
-    ageY: patient.ageY, 
-    sex: patient.sex, 
-    weightKg: patient.weightKg, 
-    scrMgDl: patient.scrMgDl, 
-    heightCm: patient.heightCm,
-    weightStrategy,
-    scrRounding
-  });
-  
-  const V = vd(patient.weightKg, vdPerKg);
-  const CL = clFromCrcl(crcl, { scale: clScale });
-  const k = kFromCLV(CL, V);
-  const tinfH = regimen.infusionMin / 60;
-
-  // Generate time series (48h horizon, 0.1h steps as specified)
-  const times: number[] = [];
-  for (let t = 0; t <= 48; t += 0.1) {
-    times.push(+t.toFixed(1));
-  }
-  
-  // Calculate concentrations using superposition
-  const conc = superpose(times, regimen.doseMg, regimen.intervalH, tinfH, V, k);
-
-  // Calculate AUC24 
-  const dailyDose = regimen.doseMg * (24 / regimen.intervalH);
-  const auc_24 = useDoseOverCL && CL > 0 
-    ? (dailyDose / CL) 
-    : aucTrapz(times, conc, 0, 24);
-
-  // Calculate peak and trough
-  const { peak, trough } = peakTroughFromSeries(times, conc, regimen.intervalH);
-
-  return {
-    metrics: {
-      auc_24,
-      predicted_peak: peak,
-      predicted_trough: trough,
-      CL,
-      V,
-      k,
-      crcl
-    },
-    series: {
-      time_hours: times,
-      concentration_mg_L: conc
-    }
-  };
 }

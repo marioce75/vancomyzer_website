@@ -1,0 +1,19 @@
+{
+  "guidance": {
+    "methods": {
+      "title": "Choosing a method",
+      "deterministic": "Deterministic (population PK) for initial estimates (AUC target 400–600 at MIC 1).",
+      "levels": "Levels/EoIP method when 1–2 measured levels available; adjusts patient-specific k/CL.",
+      "bayesian": "Bayesian when service online; best with ≥1 level."
+    },
+    "geriatrics": {
+      "title": "Geriatrics (≥65y)",
+      "bullet1": "Avoid routine SCr rounding; monitor trends; consider longer intervals (q12–24h) with reduced CL."
+    },
+    "weight": {
+      "title": "Weight",
+      "bullet1": "BMI≥30: use AdjBW for CrCl; Vd often larger — consider vdPerKg 0.7–0.9 and loading 20–25 mg/kg (rounded to 250 mg).",
+      "bullet2": "Underweight: IBW or TBW if TBW<IBW; consider vdPerKg 0.6–0.7."
+    }
+  }
+}
