@@ -14,5 +14,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/dev/**",
+    "src/**/*.test.*",
+    "src/**/*.spec.*",
+    "src/**/__tests__/**"
+  ]
 }
