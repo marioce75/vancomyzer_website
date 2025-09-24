@@ -80,3 +80,5 @@ export function deterministicSummary(
     series: { time_hours: times, concentration_mg_L: conc }
   } as const;
 }
+
+export { deterministicSummary as default };

@@ -8,10 +8,10 @@ import { buildMeasuredLevels } from '../services/pkVancomycin'
 import HelpTooltip from './common/HelpTooltip';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import LoadingDoseCard from './LoadingDoseCard.jsx';
-import { deterministicSummary, medcalcConfig } from '../pk/medcalcMode';
-import { crclCG, clFromCrcl } from '../pk/core';
-import { applyClinParity, clinParity } from '../pk/parity.config';
-import { fitFromLevels } from '../pk/levels';
+import { deterministicSummary, medcalcConfig } from '../pk/medcalcMode.ts';
+import { crclCG, clFromCrcl } from '../pk/core.ts';
+import { applyClinParity, clinParity } from '../pk/parity.config.ts';
+import { fitFromLevels } from '../pk/levels.ts';
 import DoseInput from './controls/DoseInput';
 import ConcTimeChart from './chart/ConcTimeChart';
 
