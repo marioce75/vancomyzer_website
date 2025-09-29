@@ -57,11 +57,10 @@ class InteractiveApiService {
   }
 
   private resolveBaseUrl(): string {
-    // Check both Vite and CRA environment variable patterns
-    const viteUrl = import.meta.env?.VITE_INTERACTIVE_API_URL;
-    const craUrl = process.env.REACT_APP_INTERACTIVE_API_URL;
+    // Use Vite environment variable pattern
+    const apiUrl = import.meta.env?.VITE_INTERACTIVE_API_URL;
     
-    let baseUrl = viteUrl || craUrl || 'https://api.vancomyzer.com';
+    let baseUrl = apiUrl || 'https://api.vancomyzer.com';
     
     // Remove trailing slash and avoid double /api
     baseUrl = baseUrl.replace(/\/$/, '');
