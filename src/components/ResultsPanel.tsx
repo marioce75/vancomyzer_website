@@ -1,13 +1,23 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PKMetrics } from "@/pk/core";
+import { CalculationMethod } from "./MethodSelector";
 
 interface ResultsPanelProps {
   metrics: PKMetrics;
   targetAUC?: { min: number; max: number };
+  method?: CalculationMethod;
+  isLoadingBayesian?: boolean;
+  levelsCount?: number;
 }
 
-export function ResultsPanel({ metrics, targetAUC = { min: 400, max: 600 } }: ResultsPanelProps) {
+export function ResultsPanel({ 
+  metrics, 
+  targetAUC = { min: 400, max: 600 },
+  method = 'deterministic',
+  isLoadingBayesian = false,
+  levelsCount = 0
+}: ResultsPanelProps) {
   const formatNumber = (value: number, decimals: number = 1) => {
     return value.toFixed(decimals);
   };
@@ -27,7 +37,13 @@ export function ResultsPanel({ metrics, targetAUC = { min: 400, max: 600 } }: Re
           Pharmacokinetic Results
         </CardTitle>
         <CardDescription>
-          Steady-state predictions based on population pharmacokinetics
+          {method === 'bayesian' 
+            ? 'Bayesian predictions with uncertainty quantification'
+            : method === 'levels' 
+            ? `Individual PK fitting from ${levelsCount} measured level${levelsCount !== 1 ? 's' : ''}`
+            : 'Steady-state predictions based on population pharmacokinetics'
+          }
+          {isLoadingBayesian && ' (Computing...)'}
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -5,9 +5,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 interface ConcentrationChartProps {
   data: TimeConcentrationPoint[];
   regimen: { interval: number; infusionTime: number };
+  showUncertainty?: any; // Bayesian result with CI data
 }
 
-export function ConcentrationChart({ data, regimen }: ConcentrationChartProps) {
+export function ConcentrationChart({ data, regimen, showUncertainty }: ConcentrationChartProps) {
   // Custom tooltip component
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {

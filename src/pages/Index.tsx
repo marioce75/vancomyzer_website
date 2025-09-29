@@ -1,5 +1,7 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Patient, Regimen, PKOptions, calculatePK, calculateLoadingDose } from "@/pk/core";
+import { Level, calculateFromLevels, LevelsResult } from "@/pk/levels";
+import { interactiveApi, BayesianResult } from "@/services/interactiveApi";
 import { Header } from "@/components/Header";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { PatientForm } from "@/components/PatientForm";
@@ -7,10 +9,12 @@ import { DosingForm } from "@/components/DosingForm";
 import { OptionsPanel } from "@/components/OptionsPanel";
 import { ResultsPanel } from "@/components/ResultsPanel";
 import { ConcentrationChart } from "@/components/ConcentrationChart";
+import { MethodSelector, CalculationMethod } from "@/components/MethodSelector";
+import { LevelsInput } from "@/components/LevelsInput";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calculator, Info } from "lucide-react";
+import { Calculator, Info, Brain, Activity } from "lucide-react";
 
 const Index = () => {
   // Default patient
@@ -40,8 +44,24 @@ const Index = () => {
     clScale: 1.0
   });
 
-  // Calculate results with memoization for performance
-  const pkResult = useMemo(() => {
+  // Method selection and levels
+  const [method, setMethod] = useState<CalculationMethod>('deterministic');
+  const [levels, setLevels] = useState<Level[]>([]);
+  const [isBayesianOnline, setIsBayesianOnline] = useState(false);
+  const [bayesianResult, setBayesianResult] = useState<BayesianResult | null>(null);
+  const [isLoadingBayesian, setIsLoadingBayesian] = useState(false);
+
+  // Check Bayesian API status
+  useEffect(() => {
+    const checkApi = async () => {
+      const isOnline = await interactiveApi.checkHealth();
+      setIsBayesianOnline(isOnline);
+    };
+    checkApi();
+  }, []);
+
+  // Calculate deterministic results with memoization for performance
+  const deterministicResult = useMemo(() => {
     try {
       return calculatePK(patient, regimen, options);
     } catch (error) {
@@ -50,14 +70,76 @@ const Index = () => {
     }
   }, [patient, regimen, options]);
 
+  // Calculate levels-based results
+  const levelsResult = useMemo((): LevelsResult | null => {
+    if (levels.length === 0) return null;
+    try {
+      return calculateFromLevels(patient, regimen, levels, options.vdPerKg);
+    } catch (error) {
+      console.error('Levels calculation error:', error);
+      return null;
+    }
+  }, [patient, regimen, levels, options.vdPerKg]);
+
+  // Get current result based on method
+  const currentResult = useMemo(() => {
+    switch (method) {
+      case 'bayesian':
+        return bayesianResult || deterministicResult;
+      case 'levels':
+        return levelsResult || deterministicResult;
+      case 'deterministic':
+      default:
+        return deterministicResult;
+    }
+  }, [method, bayesianResult, levelsResult, deterministicResult]);
+
   // Calculate loading dose suggestion
   const loadingDose = useMemo(() => {
     return calculateLoadingDose(patient);
   }, [patient]);
 
+  // Handle Bayesian calculation
+  const handleBayesianCalculation = useCallback(async () => {
+    if (!isBayesianOnline || isLoadingBayesian) return;
+    
+    setIsLoadingBayesian(true);
+    try {
+      const result = await interactiveApi.calculateBayesian(patient, regimen, levels);
+      setBayesianResult(result);
+    } catch (error) {
+      console.error('Bayesian calculation failed:', error);
+      setBayesianResult(null);
+    } finally {
+      setIsLoadingBayesian(false);
+    }
+  }, [patient, regimen, levels, isBayesianOnline, isLoadingBayesian]);
+
+  // Auto-run Bayesian when method selected and online
+  useEffect(() => {
+    if (method === 'bayesian' && isBayesianOnline) {
+      handleBayesianCalculation();
+    }
+  }, [method, patient, regimen, levels, handleBayesianCalculation]);
+
   const handleLoadingDoseApply = useCallback(() => {
     setRegimen(prev => ({ ...prev, dose: loadingDose }));
   }, [loadingDose]);
+
+  // Handle method change
+  const handleMethodChange = useCallback((newMethod: CalculationMethod) => {
+    setMethod(newMethod);
+    
+    // Auto-switch to deterministic if levels/bayesian not available
+    if (newMethod === 'levels' && levels.length === 0) {
+      setMethod('deterministic');
+      return;
+    }
+    if (newMethod === 'bayesian' && !isBayesianOnline) {
+      setMethod('deterministic');
+      return;
+    }
+  }, [levels.length, isBayesianOnline]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,16 +197,40 @@ const Index = () => {
           </div>
         </div>
 
+        {/* Method Selection and Levels */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <MethodSelector 
+            method={method}
+            onChange={handleMethodChange}
+            isBayesianOnline={isBayesianOnline}
+            hasLevels={levels.length > 0}
+          />
+          
+          <LevelsInput 
+            levels={levels}
+            onChange={setLevels}
+          />
+        </div>
+
         {/* Options Panel */}
         <div className="mb-8">
           <OptionsPanel options={options} onChange={setOptions} />
         </div>
 
         {/* Results and Chart */}
-        {pkResult && (
+        {currentResult && (
           <div className="space-y-8">
-            <ResultsPanel metrics={pkResult.metrics} />
-            <ConcentrationChart data={pkResult.timeCourse} regimen={regimen} />
+            <ResultsPanel 
+              metrics={currentResult.metrics} 
+              method={method}
+              isLoadingBayesian={isLoadingBayesian}
+              levelsCount={levels.length}
+            />
+            <ConcentrationChart 
+              data={currentResult.timeCourse} 
+              regimen={regimen}
+              showUncertainty={method === 'bayesian' && bayesianResult}
+            />
           </div>
         )}
 
@@ -134,7 +240,8 @@ const Index = () => {
             <div className="flex items-center gap-3">
               <Badge variant="outline" className="text-xs">
                 <Info className="h-3 w-3 mr-1" />
-                Population PK Model
+                {method === 'bayesian' ? 'Bayesian PK' : 
+                 method === 'levels' ? 'Individual PK Fit' : 'Population PK Model'}
               </Badge>
               <Badge variant="secondary" className="text-xs">
                 One-Compartment IV
@@ -142,6 +249,18 @@ const Index = () => {
               <Badge variant="secondary" className="text-xs">
                 Steady State
               </Badge>
+              {isLoadingBayesian && (
+                <Badge variant="outline" className="text-xs animate-pulse">
+                  <Brain className="h-3 w-3 mr-1" />
+                  Computing...
+                </Badge>
+              )}
+              {method === 'levels' && levels.length > 0 && (
+                <Badge variant="default" className="text-xs">
+                  <Activity className="h-3 w-3 mr-1" />
+                  {levels.length} Level{levels.length !== 1 ? 's' : ''}
+                </Badge>
+              )}
             </div>
             
             <div className="text-sm text-muted-foreground">
