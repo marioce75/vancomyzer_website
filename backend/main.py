@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+from pathlib import Path
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -13,6 +16,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+# Serve static assets
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Serve compiled index.html at root
+@app.get("/", response_class=HTMLResponse)
+async def serve_index():
+    return Path("static/index.html").read_text()
 
 @app.get("/api/health")
 def health():
