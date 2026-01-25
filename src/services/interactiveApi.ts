@@ -51,58 +51,35 @@ class InteractiveApiService {
   private isOnline: boolean = false;
 
   constructor() {
-    // Resolve base URL from environment variables
+    // Resolve base URL from meta tag
     this.baseUrl = this.resolveBaseUrl();
     this.checkHealth();
   }
 
   private resolveBaseUrl(): string {
-    // Use Vite environment variable pattern
-    const apiUrl = import.meta.env?.VITE_INTERACTIVE_API_URL;
-    
-    let baseUrl = apiUrl || 'https://api.vancomyzer.com';
-    
-    // Remove trailing slash and avoid double /api
-    baseUrl = baseUrl.replace(/\/$/, '');
-    if (!baseUrl.endsWith('/api') && !baseUrl.includes('/api/')) {
-      // Try /api first, fallback to base URL
-      return baseUrl;
-    }
-    
-    return baseUrl;
+    // Read from <meta name="vancomyzer-api-base" content="..." />
+    const meta = document.querySelector('meta[name="vancomyzer-api-base"]') as HTMLMetaElement | null;
+    const apiUrl = meta?.content?.trim();
+    const baseUrl = apiUrl || 'https://vancomyzer.onrender.com/api';
+    return baseUrl.replace(/\/$/, '');
   }
 
   private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const urls = [
-      `${this.baseUrl}/api${endpoint}`,
-      `${this.baseUrl}${endpoint}`
-    ];
+    const url = `${this.baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
-    let lastError: Error | null = null;
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
 
-    for (const url of urls) {
-      try {
-        const response = await fetch(url, {
-          ...options,
-          headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        return await response.json();
-      } catch (error) {
-        lastError = error as Error;
-        console.warn(`Request failed for ${url}:`, error);
-        continue;
-      }
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    throw lastError || new Error('All API endpoints failed');
+    return response.json();
   }
 
   async checkHealth(): Promise<boolean> {

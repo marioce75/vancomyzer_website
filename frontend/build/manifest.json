@@ -1,0 +1,60 @@
+{
+  "short_name": "Vancomyzer",
+  "name": "Vancomyzer - Interactive Vancomycin Dosing Calculator",
+  "description": "Evidence-based vancomycin dosing calculator following ASHP/IDSA 2020 guidelines with real-time AUC visualization and Bayesian optimization.",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./",
+  "display": "standalone",
+  "theme_color": "#1976d2",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "categories": ["medical", "health", "productivity", "utilities"],
+  "lang": "en",
+  "dir": "ltr",
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "New Patient Calculation",
+      "short_name": "New Calc",
+      "description": "Start a new vancomycin dosing calculation",
+      "url": "./",
+      "icons": [
+        {
+          "src": "favicon.ico",
+          "sizes": "32x32"
+        }
+      ]
+    },
+    {
+      "name": "Bayesian Optimization",
+      "short_name": "Bayesian",
+      "description": "Optimize dosing with measured levels",
+      "url": "./bayesian",
+      "icons": [
+        {
+          "src": "favicon.ico",
+          "sizes": "32x32"
+        }
+      ]
+    }
+  ]
+}
