@@ -25,6 +25,46 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def serve_index():
     return Path("static/index.html").read_text()
 
+# PK Models
+class PKRequest(BaseModel):
+    age: float
+    sex: str
+    weight: float
+    height: float
+    scr: float
+    infusionH: float = 1.0
+
+class PKResponse(BaseModel):
+    crcl: float
+    ke: float
+    vd: float
+    regimen: dict
+    auc24: float
+    warnings: List[str] = []
+
+@app.post("/api/pk/calculate", response_model=PKResponse)
+def pk_calculate(req: PKRequest):
+    from backend.utils.pk import Patient as PKPatient, recommend_regimen, calc_crcl, calc_ke, calc_vd, calc_auc
+    p = PKPatient(age=req.age, sex=req.sex, weight=req.weight, height=req.height, scr=req.scr)
+    crcl = calc_crcl(p)
+    ke = calc_ke(crcl)
+    vd = calc_vd(p.weight)
+    regimen = recommend_regimen(p)
+    auc24 = calc_auc(regimen.doseMg, regimen.intervalH, ke, vd, req.infusionH)
+    warnings: List[str] = []
+    if auc24 > 800:
+        warnings.append("Predicted AUC >800 mg·h/L: high nephrotoxicity risk.")
+    elif auc24 > 600:
+        warnings.append("Predicted AUC >600 mg·h/L: consider dose/interval reduction.")
+    return PKResponse(
+        crcl=crcl,
+        ke=ke,
+        vd=vd,
+        regimen={"doseMg": regimen.doseMg, "intervalH": regimen.intervalH, "infusionH": regimen.infusionH},
+        auc24=auc24,
+        warnings=warnings,
+    )
+
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
@@ -118,3 +158,13 @@ def optimize(req: OptimizeRequest):
 def calculate(req: InteractiveRequest):
     # Legacy non-bayesian calculation endpoint mirroring original
     return interactive_auc(req)
+
+class PKBayesianRequest(BaseModel):
+    patient: Patient
+    regimen: Regimen
+    levels: Optional[List[Level]] = []
+
+@app.post("/api/pk/bayesian", response_model=BayesianResult)
+def pk_bayesian(req: PKBayesianRequest):
+    # Delegate to existing Bayesian interactive logic
+    return interactive_auc(InteractiveRequest(patient=req.patient, regimen=req.regimen, levels=req.levels or []))
