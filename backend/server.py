@@ -7,6 +7,8 @@ app = FastAPI()
 
 # Serve built frontend from backend/static
 app.mount("/static", StaticFiles(directory="backend/static"), name="static")
+# Serve Vite assets under /assets
+app.mount("/assets", StaticFiles(directory="backend/static/assets"), name="assets")
 
 @app.get("/", response_class=HTMLResponse)
 def serve_frontend():
