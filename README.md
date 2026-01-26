@@ -71,3 +71,15 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+# Vancomyzer Website
+
+This project deploys as a single Render Web Service (FastAPI + Vite). Build the frontend once and serve it via FastAPI from `backend/static`.
+
+Deployment (Render Web Service) Build Command:
+
+```
+pip install -r requirements.txt && npm ci && npm run build && mkdir -p backend/static && rm -rf backend/static/* && cp -R dist/* backend/static/
+```
+
+Do not change the Start Command; APIs remain under `/api/*`.
