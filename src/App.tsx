@@ -7,7 +7,7 @@ import AucDoseSliderChart from "@/components/AucDoseSliderChart";
 import ConcentrationTimeChart from "@/components/ConcentrationTimeChart";
 import { Alert } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { PkCalculateResponse } from "@/lib/api";
+import { PkCalculateResponse, getVersion, type VersionResponse } from "@/lib/api";
 import RoundsModeBar from "@/components/RoundsModeBar";
 import PearlsPanel from "@/components/PearlsPanel";
 import TimingHelperMini from "@/components/TimingHelperMini";
@@ -43,6 +43,7 @@ function HomePage() {
     }
   });
   const [sharedRegimenText, setSharedRegimenText] = useState<string | null>(null);
+  const [version, setVersion] = useState<VersionResponse | null>(null);
 
   useEffect(() => {
     try {
@@ -61,6 +62,20 @@ function HomePage() {
     if (!state?.result) return;
     const text = `Opened shared regimen: ${Math.round(state.result.maintenanceDoseMg ?? 0)} mg q${state.result.intervalHr ?? 12}h (AUC24 ~ ${Math.round(state.result.auc24 ?? 0)}).`;
     setSharedRegimenText(text);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    getVersion()
+      .then((v) => {
+        if (!cancelled) setVersion(v);
+      })
+      .catch(() => {
+        // ignore; footer will just omit version
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function onAdjust(update: { dose?: number; interval?: number }) {
@@ -149,7 +164,11 @@ function HomePage() {
               <button className="underline" onClick={() => navigate("/references")}>References</button>
               <button className="underline" onClick={() => navigate("/disclaimer")}>Disclaimer</button>
               <button className="underline" onClick={() => navigate("/about")}>About</button>
-              <span className="text-muted-foreground">v1 • Updated {trustDate}</span>
+              <span className="text-muted-foreground">
+                v1 • Updated {trustDate}
+                {version?.git ? ` • ${version.git}` : ""}
+                {version?.built_at ? ` • ${new Date(version.built_at).toISOString().slice(0, 19)}Z` : ""}
+              </span>
             </div>
           </div>
         </footer>

@@ -1,11 +1,15 @@
 from pathlib import Path
 import traceback
 import math
-from typing import List, Optional
+import os
+import subprocess
+from datetime import datetime, timezone
+from typing import List, Optional, Any
 
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
 import numpy as np
 
@@ -47,6 +51,32 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
     if request.url.path.startswith(("/api", "/pk", "/meta", "/health", "/healthz")):
         return JSONResponse(status_code=500, content={"detail": "Internal server error"})
     return HTMLResponse("<h1>Internal server error</h1>", status_code=500)
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_error_handler(request: Request, exc: RequestValidationError):
+    """Return rich validation errors for frontends.
+
+    Render-safe: never crashes on non-serializable request bodies.
+    """
+    path = request.url.path
+    if not path.startswith(("/api", "/pk")):
+        return JSONResponse(status_code=422, content={"detail": "Validation error", "errors": exc.errors()})
+
+    received_body: Any = None
+    try:
+        received_body = await request.json()
+    except Exception:
+        received_body = None
+
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": "Validation error",
+            "errors": exc.errors(),
+            "received_body": received_body,
+        },
+    )
 
 
 # -------- API models --------
@@ -248,6 +278,23 @@ def meta_disclaimer():
             "Do not enter PHI.",
         ],
     }
+
+
+@app.get("/api/meta/version")
+@app.get("/meta/version")
+def meta_version():
+    """Expose deploy/version info to confirm latest static build is being served."""
+    built_at = datetime.now(timezone.utc).isoformat()
+
+    # Prefer Render env var, then try git.
+    git_sha = os.environ.get("RENDER_GIT_COMMIT")
+    if not git_sha:
+        try:
+            git_sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=str(BASE_DIR.parent)).decode().strip()
+        except Exception:
+            git_sha = None
+
+    return {"git": git_sha, "built_at": built_at}
 
 
 # -------- SPA serving (MUST be mounted after API routes) --------

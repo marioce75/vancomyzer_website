@@ -6,8 +6,8 @@ set -euo pipefail
 # - Builds frontend into dist/
 # - Copies dist/* into backend/static/ so FastAPI can serve it
 
-python -m pip install --upgrade pip
-python -m pip install -r backend/requirements.txt
+python3 -m pip install --upgrade pip
+python3 -m pip install -r backend/requirements.txt
 
 npm ci
 npm run build

@@ -5,12 +5,19 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { calculatePk, bayesianEstimate, PkCalculatePayload, PkCalculateResponse } from "@/lib/api";
+import { calculatePk, bayesianEstimate, PkCalculateResponse, ApiError, type PkCalculatePayload } from "@/lib/api";
 
 export type CalculatorFormProps = {
   onResult: (result: PkCalculateResponse | undefined) => void;
   onLoadingChange?: (loading: boolean) => void;
 };
+
+type UiError = { message: string; issues?: Array<{ path: string; message: string }> };
+
+function formatValidationLoc(loc: Array<string | number>): string {
+  // FastAPI locs look like ["body", "fieldName", 0, "subField"]
+  return loc.filter((p) => p !== "body").join(".");
+}
 
 export default function CalculatorForm({ onResult, onLoadingChange }: CalculatorFormProps) {
   const [age, setAge] = useState(60);
@@ -29,7 +36,7 @@ export default function CalculatorForm({ onResult, onLoadingChange }: Calculator
   const [levels, setLevels] = useState<Array<{ timeHr: number; concentration: number }>>([]);
   const [doseHistory, setDoseHistory] = useState<Array<{ timeHr: number; doseMg: number }>>([]);
   const [useBayesian, setUseBayesian] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<UiError | null>(null);
 
   useEffect(() => {
     // Reset Bayesian when no levels
@@ -40,19 +47,31 @@ export default function CalculatorForm({ onResult, onLoadingChange }: Calculator
   const weightKg = useMemo(() => (weightUnit === "kg" ? weight : Math.round(weight * 0.453592)), [weight, weightUnit]);
 
   async function onSubmit() {
+    // Backend expects these exact keys (camelCase):
+    // - serumCreatinine (NOT scrMgDl)
+    // - levels[] uses timeHoursFromDoseStart
+    // - doseHistory[] uses startTimeHours
     const payload: PkCalculatePayload = {
-      age,
+      age: Number(age),
       sex,
-      heightCm,
-      weightKg,
-      scrMgDl: scr,
-      icu,
+      heightCm: Number(heightCm),
+      weightKg: Number(weightKg),
+      serumCreatinine: Number(scr),
+      icu: Boolean(icu),
       infectionSeverity: severity,
-      mic,
-      aucTargetLow: aucLow,
-      aucTargetHigh: aucHigh,
-      levels: haveLevels ? levels : undefined,
-      doseHistory: haveLevels ? doseHistory : undefined,
+      mic: Number(mic),
+      aucTargetLow: Number(aucLow),
+      aucTargetHigh: Number(aucHigh),
+      levels: haveLevels
+        ? levels
+            .filter((lv) => Number.isFinite(lv.concentration) && Number.isFinite(lv.timeHr))
+            .map((lv) => ({ concentration: Number(lv.concentration), timeHoursFromDoseStart: Number(lv.timeHr) }))
+        : undefined,
+      doseHistory: haveLevels
+        ? doseHistory
+            .filter((d) => Number.isFinite(d.doseMg) && Number.isFinite(d.timeHr))
+            .map((d) => ({ doseMg: Number(d.doseMg), startTimeHours: Number(d.timeHr), infusionHours: 1 }))
+        : undefined,
     };
 
     onLoadingChange?.(true);
@@ -60,9 +79,17 @@ export default function CalculatorForm({ onResult, onLoadingChange }: Calculator
     try {
       const result = await (useBayesian ? bayesianEstimate(payload) : calculatePk(payload));
       onResult(result);
-    } catch (err) {
-      console.error(err);
-      setError("Calculator service unavailable (API route mismatch).");
+    } catch (e) {
+      console.error(e);
+      const err = e as unknown;
+      if (err instanceof ApiError) {
+        const issues = err.errors?.map((x) => ({ path: formatValidationLoc(x.loc), message: x.msg }));
+        setError({ message: err.detail || err.message, issues });
+      } else if (err instanceof Error) {
+        setError({ message: err.message });
+      } else {
+        setError({ message: "Request failed" });
+      }
       onResult(undefined);
     } finally {
       onLoadingChange?.(false);
@@ -185,7 +212,21 @@ export default function CalculatorForm({ onResult, onLoadingChange }: Calculator
       </Accordion>
 
       {error && (
-        <div className="text-sm text-red-600" role="alert">{error}</div>
+        <div className="text-sm text-red-600" role="alert">
+          <div className="font-medium">{error.message}</div>
+          {error.issues && error.issues.length > 0 && (
+            <div className="mt-2">
+              <div className="text-xs font-medium">Validation issues</div>
+              <ul className="list-disc ml-5 text-xs space-y-1">
+                {error.issues.slice(0, 10).map((iss, i) => (
+                  <li key={i}>
+                    <span className="font-mono">{iss.path || "(body)"}</span>: {iss.message}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       )}
 
       <Button className="w-full" onClick={onSubmit}>Calculate regimen</Button>

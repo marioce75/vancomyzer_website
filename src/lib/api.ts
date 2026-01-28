@@ -4,14 +4,14 @@ export type PkCalculatePayload = {
   sex: "male" | "female";
   heightCm: number;
   weightKg: number;
-  scrMgDl: number;
+  serumCreatinine: number;
   icu: boolean;
   infectionSeverity: "standard" | "serious";
-  mic: number; // default 1.0
-  aucTargetLow?: number; // default 400
-  aucTargetHigh?: number; // default 600
-  levels?: Array<{ timeHr: number; concentration: number }>;
-  doseHistory?: Array<{ timeHr: number; doseMg: number }>;
+  mic: number;
+  aucTargetLow?: number;
+  aucTargetHigh?: number;
+  levels?: Array<{ concentration: number; timeHoursFromDoseStart: number }>;
+  doseHistory?: Array<{ doseMg: number; startTimeHours: number; infusionHours: number }>;
 };
 
 export type PkCalculateResponse = {
@@ -32,25 +32,49 @@ export type PkCalculateResponse = {
 export type ReferenceEntry = { title: string; org: string; year: number; note?: string };
 export type ReferencesResponse = { references: ReferenceEntry[] };
 export type DisclaimerResponse = { short: string; full: string[] };
+export type VersionResponse = { git: string | null; built_at: string };
 
-const API_BASE = ""; // same origin
+const API_BASE = "";
 
-type ApiErrorBody = { detail?: string };
+export type ApiValidationError = {
+  loc: Array<string | number>;
+  msg: string;
+  type: string;
+};
 
-async function readErrorDetail(res: Response): Promise<string> {
+export class ApiError extends Error {
+  status: number;
+  detail?: string;
+  errors?: ApiValidationError[];
+  received_body?: unknown;
+
+  constructor(message: string, status: number, opts?: { detail?: string; errors?: ApiValidationError[]; received_body?: unknown }) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.detail = opts?.detail;
+    this.errors = opts?.errors;
+    this.received_body = opts?.received_body;
+  }
+}
+
+async function readErrorBody(
+  res: Response,
+): Promise<{ detail?: string; errors?: ApiValidationError[]; received_body?: unknown } | null> {
   try {
-    const body = (await res.json()) as ApiErrorBody;
-    if (body?.detail) return body.detail;
+    const body: unknown = await res.json();
+    if (body && typeof body === "object") {
+      const maybe = body as { detail?: unknown; errors?: unknown; received_body?: unknown };
+      return {
+        detail: typeof maybe.detail === "string" ? maybe.detail : undefined,
+        errors: Array.isArray(maybe.errors) ? (maybe.errors as ApiValidationError[]) : undefined,
+        received_body: maybe.received_body,
+      };
+    }
   } catch {
     // ignore
   }
-  try {
-    const text = await res.text();
-    if (text) return text;
-  } catch {
-    // ignore
-  }
-  return `Service error: ${res.status}`;
+  return null;
 }
 
 async function postJSON<T>(url: string, body: unknown): Promise<T> {
@@ -59,9 +83,16 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+
   if (!res.ok) {
-    throw new Error(await readErrorDetail(res));
+    const parsed = await readErrorBody(res);
+    const detail = parsed?.detail;
+    const errors = parsed?.errors;
+    const received_body = parsed?.received_body;
+    const message = detail || `Service error: ${res.status}`;
+    throw new ApiError(message, res.status, { detail, errors, received_body });
   }
+
   return res.json();
 }
 
@@ -75,12 +106,27 @@ export async function bayesianEstimate(payload: PkCalculatePayload): Promise<PkC
 
 export async function getReferences(): Promise<ReferencesResponse> {
   const res = await fetch(`${API_BASE}/api/meta/references`);
-  if (!res.ok) throw new Error(await readErrorDetail(res));
+  if (!res.ok) {
+    const parsed = await readErrorBody(res);
+    throw new ApiError(parsed?.detail || `Service error: ${res.status}`, res.status, parsed ?? undefined);
+  }
   return res.json();
 }
 
 export async function getDisclaimer(): Promise<DisclaimerResponse> {
   const res = await fetch(`${API_BASE}/api/meta/disclaimer`);
-  if (!res.ok) throw new Error(await readErrorDetail(res));
+  if (!res.ok) {
+    const parsed = await readErrorBody(res);
+    throw new ApiError(parsed?.detail || `Service error: ${res.status}`, res.status, parsed ?? undefined);
+  }
+  return res.json();
+}
+
+export async function getVersion(): Promise<VersionResponse> {
+  const res = await fetch(`${API_BASE}/api/meta/version`);
+  if (!res.ok) {
+    const parsed = await readErrorBody(res);
+    throw new ApiError(parsed?.detail || `Service error: ${res.status}`, res.status, parsed ?? undefined);
+  }
   return res.json();
 }
