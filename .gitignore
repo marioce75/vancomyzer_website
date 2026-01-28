@@ -7,10 +7,11 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Render build artifacts (DO NOT COMMIT)
+backend/static/
+!backend/static/.gitkeep
+dist/
+node_modules/
 
 # Editor directories and files
 .vscode/*
@@ -26,3 +27,6 @@ dist-ssr
 # Python
 __pycache__/
 *.py[cod]
+
+# Local env
+frontend/.env.local
