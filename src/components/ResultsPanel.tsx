@@ -1,15 +1,18 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import SafetyFlags from "@/components/SafetyFlags";
-import CopyNoteButton from "@/components/CopyNoteButton";
+import SafetyFlags from "./SafetyFlags";
+import CopyNoteButton from "./CopyNoteButton";
 import type { PkCalculateResponse } from "@/lib/api";
+import ShareButtons from "./ShareButtons";
 
 function ResultsPanel({ result, onAdjustDose }: { result?: PkCalculateResponse; onAdjustDose: (delta: { dose?: number; interval?: number }) => void; }) {
-  const maintenance = useMemo(() => {
-    if (!result) return "—";
-    return `${Math.round(result.maintenanceDoseMg)} mg q${result.intervalHr}h`;
-  }, [result]);
+  if (!result) {
+    return (
+      <div className="text-sm text-muted-foreground">No results yet.</div>
+    );
+  }
+  const maintenance = `${Math.round(result.maintenanceDoseMg)} mg q${result.intervalHr}h`;
 
   return (
     <div className="space-y-4">
@@ -41,6 +44,9 @@ function ResultsPanel({ result, onAdjustDose }: { result?: PkCalculateResponse; 
             <Button variant="secondary" onClick={() => onAdjustDose({ dose: (result?.maintenanceDoseMg || 0) - 250 })}>-250 mg</Button>
             <Button variant="secondary" onClick={() => onAdjustDose({ interval: (result?.intervalHr || 12) + 2 })}>+2h interval</Button>
             <Button variant="secondary" onClick={() => onAdjustDose({ interval: (result?.intervalHr || 12) - 2 })}>-2h interval</Button>
+          </div>
+          <div className="mt-3">
+            <ShareButtons result={result} />
           </div>
         </CardContent>
       </Card>

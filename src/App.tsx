@@ -8,6 +8,10 @@ import ConcentrationTimeChart from "@/components/ConcentrationTimeChart";
 import { Alert } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { PkCalculateResponse } from "@/lib/api";
+import RoundsModeBar from "@/components/RoundsModeBar";
+import PearlsPanel from "@/components/PearlsPanel";
+import TimingHelperMini from "@/components/TimingHelperMini";
+import { copyToClipboard, decodeShareState } from "@/lib/shareLink";
 
 const ReferencesPageLazy = React.lazy(() => import("@/pages/References"));
 const DisclaimerPageLazy = React.lazy(() => import("@/pages/Disclaimer"));
@@ -29,9 +33,35 @@ function navigate(to: string) {
 }
 
 function HomePage() {
-  const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PkCalculateResponse | undefined>(undefined);
   const [trustDate] = useState<string>(new Date().toISOString().slice(0, 10));
+  const [roundsMode, setRoundsMode] = useState<boolean>(() => {
+    try {
+      return window.localStorage.getItem("vancomyzer.roundsMode") === "1";
+    } catch {
+      return false;
+    }
+  });
+  const [sharedRegimenText, setSharedRegimenText] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("vancomyzer.roundsMode", roundsMode ? "1" : "0");
+    } catch {
+      // ignore
+    }
+  }, [roundsMode]);
+
+  // If a share link was opened, show a tiny non-PHI summary banner.
+  useEffect(() => {
+    const hash = window.location.hash || "";
+    const m = hash.match(/(?:^#|&)s=([^&]+)/);
+    if (!m) return;
+    const state = decodeShareState(m[1]);
+    if (!state?.result) return;
+    const text = `Opened shared regimen: ${Math.round(state.result.maintenanceDoseMg ?? 0)} mg q${state.result.intervalHr ?? 12}h (AUC24 ~ ${Math.round(state.result.auc24 ?? 0)}).`;
+    setSharedRegimenText(text);
+  }, []);
 
   async function onAdjust(update: { dose?: number; interval?: number }) {
     if (!result) return;
@@ -41,26 +71,40 @@ function HomePage() {
     setResult(updated);
   }
 
+  async function onCopyRoundsSummary() {
+    if (!result) return;
+    const line = `Rounding summary: vanc ${Math.round(result.maintenanceDoseMg)} mg q${result.intervalHr}h (AUC24 ~ ${Math.round(result.auc24)}). Verify w/ protocol; no PHI.`;
+    await copyToClipboard(line);
+  }
+
   const targets = useMemo(() => ({ low: 400, high: 600 }), []);
 
   return (
     <DisclaimerGate>
       <div className="min-h-screen pb-24">
         <header className="px-4 py-3 border-b bg-background sticky top-0 z-30">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="font-semibold">Vancomyzer</span>
               <div className="text-xs text-muted-foreground hidden sm:block">Built for rounds</div>
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <span className="px-2 py-1 rounded bg-green-100 text-green-700">AUC-based</span>
-              <span className="px-2 py-1 rounded bg-blue-100 text-blue-700">Guideline-aligned</span>
-              <span className="px-2 py-1 rounded bg-neutral-100 text-neutral-700">No PHI stored</span>
+            <div className="flex items-center gap-3">
+              <RoundsModeBar enabled={roundsMode} onChange={setRoundsMode} onCopyRoundsSummary={onCopyRoundsSummary} />
+              <div className="hidden md:flex items-center gap-2 text-xs">
+                <span className="px-2 py-1 rounded bg-green-100 text-green-700">AUC-based</span>
+                <span className="px-2 py-1 rounded bg-blue-100 text-blue-700">Guideline-aligned</span>
+                <span className="px-2 py-1 rounded bg-neutral-100 text-neutral-700">No PHI stored</span>
+              </div>
             </div>
           </div>
         </header>
 
         <main className="max-w-6xl mx-auto p-4">
+          {sharedRegimenText && (
+            <Alert className="mb-4">
+              <div className="text-xs">{sharedRegimenText}</div>
+            </Alert>
+          )}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h1 className="text-xl font-semibold mb-3">Hit the AUC target—fast.</h1>
@@ -68,7 +112,7 @@ function HomePage() {
                 <AlertTriangle className="h-4 w-4 text-warning" />
                 <div className="text-xs">Clinical decision support only. Verify with institutional protocols.</div>
               </Alert>
-              <CalculatorForm onResult={setResult} onLoadingChange={setLoading} />
+              <CalculatorForm onResult={setResult} />
             </div>
             <div>
               <ResultsPanel result={result} onAdjustDose={onAdjust} />
@@ -83,6 +127,12 @@ function HomePage() {
                     onChange={({ doseMg, intervalHr }) => onAdjust({ dose: doseMg, interval: intervalHr })}
                   />
                   <ConcentrationTimeChart curve={result.concentrationCurve} levels={undefined} showBand={false} />
+                  {roundsMode && (
+                    <div className="grid gap-4">
+                      <PearlsPanel />
+                      <TimingHelperMini />
+                    </div>
+                  )}
                 </div>
               )}
             </div>

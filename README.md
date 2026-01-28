@@ -1,3 +1,29 @@
+# Vancomyzer Website
+
+This project deploys as a single Render Web Service (FastAPI backend + Vite-built static frontend).
+
+## Render commands
+
+**Build Command**
+
+Use the script:
+
+- `bash scripts/render_build.sh`
+
+Equivalent one-liner:
+
+- `python -m pip install -r backend/requirements.txt && npm ci && npm run build && mkdir -p backend/static && rm -rf backend/static/* && cp -R dist/* backend/static/`
+
+**Start Command**
+
+- `python -m uvicorn backend.server:app --host 0.0.0.0 --port $PORT`
+
+**Health check**
+
+- `GET /health` returns `{ "status": "ok" }`
+
+---
+
 # Welcome to your Lovable project
 
 ## Project info
@@ -62,7 +88,7 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/ea33932d-e7d6-4de6-99b5-de5427ed716b) and click on Share -> Publish.
+Use Render as described above (single Web Service).
 
 ## Can I connect a custom domain to my Lovable project?
 
@@ -71,15 +97,3 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
-
-# Vancomyzer Website
-
-This project deploys as a single Render Web Service (FastAPI + Vite). Build the frontend once and serve it via FastAPI from `backend/static`.
-
-Deployment (Render Web Service) Build Command:
-
-```
-pip install -r requirements.txt && npm ci && npm run build && mkdir -p backend/static && rm -rf backend/static/* && cp -R dist/* backend/static/
-```
-
-Do not change the Start Command; APIs remain under `/api/*`.

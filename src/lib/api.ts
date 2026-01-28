@@ -29,8 +29,29 @@ export type PkCalculateResponse = {
   concentrationCurve?: Array<{ t: number; c: number }>;
 };
 
-const API_BASE = 
-  (document.querySelector('meta[name="vancomyzer-api-base"]') as HTMLMetaElement)?.content || "";
+export type ReferenceEntry = { title: string; org: string; year: number; note?: string };
+export type ReferencesResponse = { references: ReferenceEntry[] };
+export type DisclaimerResponse = { short: string; full: string[] };
+
+const API_BASE = ""; // same origin
+
+type ApiErrorBody = { detail?: string };
+
+async function readErrorDetail(res: Response): Promise<string> {
+  try {
+    const body = (await res.json()) as ApiErrorBody;
+    if (body?.detail) return body.detail;
+  } catch {
+    // ignore
+  }
+  try {
+    const text = await res.text();
+    if (text) return text;
+  } catch {
+    // ignore
+  }
+  return `Service error: ${res.status}`;
+}
 
 async function postJSON<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, {
@@ -39,16 +60,27 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `Request failed: ${res.status}`);
+    throw new Error(await readErrorDetail(res));
   }
   return res.json();
 }
 
 export async function calculatePk(payload: PkCalculatePayload): Promise<PkCalculateResponse> {
-  return postJSON<PkCalculateResponse>(`${API_BASE}/pk/calculate`, payload);
+  return postJSON<PkCalculateResponse>(`${API_BASE}/api/pk/calculate`, payload);
 }
 
 export async function bayesianEstimate(payload: PkCalculatePayload): Promise<PkCalculateResponse> {
-  return postJSON<PkCalculateResponse>(`${API_BASE}/pk/bayesian`, payload);
+  return postJSON<PkCalculateResponse>(`${API_BASE}/api/pk/bayesian`, payload);
+}
+
+export async function getReferences(): Promise<ReferencesResponse> {
+  const res = await fetch(`${API_BASE}/api/meta/references`);
+  if (!res.ok) throw new Error(await readErrorDetail(res));
+  return res.json();
+}
+
+export async function getDisclaimer(): Promise<DisclaimerResponse> {
+  const res = await fetch(`${API_BASE}/api/meta/disclaimer`);
+  if (!res.ok) throw new Error(await readErrorDetail(res));
+  return res.json();
 }

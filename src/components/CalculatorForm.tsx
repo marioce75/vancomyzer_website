@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { calculatePk, bayesianEstimate, PkCalculatePayload, PkCalculateResponse } from "@/lib/api";
 
 export type CalculatorFormProps = {
-  onResult: (result: PkCalculateResponse) => void;
+  onResult: (result: PkCalculateResponse | undefined) => void;
   onLoadingChange?: (loading: boolean) => void;
 };
 
@@ -29,6 +29,7 @@ export default function CalculatorForm({ onResult, onLoadingChange }: Calculator
   const [levels, setLevels] = useState<Array<{ timeHr: number; concentration: number }>>([]);
   const [doseHistory, setDoseHistory] = useState<Array<{ timeHr: number; doseMg: number }>>([]);
   const [useBayesian, setUseBayesian] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Reset Bayesian when no levels
@@ -55,17 +56,14 @@ export default function CalculatorForm({ onResult, onLoadingChange }: Calculator
     };
 
     onLoadingChange?.(true);
+    setError(null);
     try {
       const result = await (useBayesian ? bayesianEstimate(payload) : calculatePk(payload));
       onResult(result);
     } catch (err) {
       console.error(err);
-      onResult({
-        maintenanceDoseMg: 0,
-        intervalHr: 0,
-        auc24: 0,
-        safety: { messages: ["Error calculating regimen. Please review inputs." ] }
-      });
+      setError("Calculator service unavailable (API route mismatch).");
+      onResult(undefined);
     } finally {
       onLoadingChange?.(false);
     }
@@ -185,6 +183,10 @@ export default function CalculatorForm({ onResult, onLoadingChange }: Calculator
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+
+      {error && (
+        <div className="text-sm text-red-600" role="alert">{error}</div>
+      )}
 
       <Button className="w-full" onClick={onSubmit}>Calculate regimen</Button>
     </div>
