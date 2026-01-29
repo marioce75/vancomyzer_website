@@ -97,19 +97,11 @@ function HomePage() {
   return (
     <DisclaimerGate>
       <div className="min-h-screen pb-24">
-        <header className="px-4 py-3 border-b bg-background sticky top-0 z-30">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold">Vancomyzer</span>
-              <div className="text-xs text-muted-foreground hidden sm:block">Built for rounds</div>
-            </div>
-            <div className="flex items-center gap-3">
-              <RoundsModeBar enabled={roundsMode} onChange={setRoundsMode} onCopyRoundsSummary={onCopyRoundsSummary} />
-              <div className="hidden md:flex items-center gap-2 text-xs">
-                <span className="px-2 py-1 rounded bg-green-100 text-green-700">AUC-based</span>
-                <span className="px-2 py-1 rounded bg-blue-100 text-blue-700">Guideline-aligned</span>
-                <span className="px-2 py-1 rounded bg-neutral-100 text-neutral-700">No PHI stored</span>
-              </div>
+        <header className="px-4 py-4 border-b bg-sky-50 sticky top-0 z-30">
+          <div className="flex flex-col gap-3">
+            <div className="text-center">
+              <span className="font-semibold text-2xl sm:text-3xl tracking-tight">Vancomyzer®</span>
+              <div className="text-xs text-muted-foreground mt-1">Aligned with current IDSA/ASHP vancomycin monitoring guidelines</div>
             </div>
           </div>
         </header>
@@ -122,7 +114,7 @@ function HomePage() {
           )}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h1 className="text-xl font-semibold mb-3">Hit the AUC target—fast.</h1>
+              <h1 className="text-xl font-semibold mb-3">Hit that UAC--fast</h1>
               <Alert className="border-warning bg-warning/10 text-warning-foreground mb-4">
                 <AlertTriangle className="h-4 w-4 text-warning" />
                 <div className="text-xs">Clinical decision support only. Verify with institutional protocols.</div>
