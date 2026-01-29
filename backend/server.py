@@ -283,7 +283,10 @@ def meta_disclaimer():
 @app.get("/api/meta/version")
 @app.get("/meta/version")
 def meta_version():
-    """Expose deploy/version info to confirm latest static build is being served."""
+    """Backward-compatible deploy/version info.
+
+    Note: this endpoint is not shown in the clinician-facing footer.
+    """
     built_at = datetime.now(timezone.utc).isoformat()
 
     # Prefer Render env var, then try git.
@@ -295,6 +298,48 @@ def meta_version():
             git_sha = None
 
     return {"git": git_sha, "built_at": built_at}
+
+
+@app.get("/api/version")
+@app.get("/version")
+def api_version():
+    """Dedicated version endpoint for support/audit.
+
+    Uses env vars when available. Never includes PHI.
+    """
+    app_name = os.environ.get("APP_NAME", "Vancomyzer")
+    app_version = os.environ.get("APP_VERSION", "v1")
+
+    # Build time: prefer explicit BUILD_TIME, otherwise fall back to request-time UTC.
+    build_time = os.environ.get("BUILD_TIME")
+    if not build_time:
+        build_time = datetime.now(timezone.utc).isoformat()
+
+    git_sha = (
+        os.environ.get("GIT_SHA")
+        or os.environ.get("RENDER_GIT_COMMIT")
+        or None
+    )
+    if not git_sha:
+        try:
+            git_sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=str(BASE_DIR.parent)).decode().strip()
+        except Exception:
+            git_sha = None
+
+    environment = (
+        os.environ.get("RENDER_SERVICE_NAME")
+        or os.environ.get("ENVIRONMENT")
+        or os.environ.get("RENDER")
+        or "unknown"
+    )
+
+    return {
+        "app": app_name,
+        "version": app_version,
+        "git_sha": git_sha,
+        "build_time": build_time,
+        "environment": environment,
+    }
 
 
 # -------- SPA serving (MUST be mounted after API routes) --------

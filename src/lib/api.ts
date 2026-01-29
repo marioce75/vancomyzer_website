@@ -33,6 +33,13 @@ export type ReferenceEntry = { title: string; org: string; year: number; note?: 
 export type ReferencesResponse = { references: ReferenceEntry[] };
 export type DisclaimerResponse = { short: string; full: string[] };
 export type VersionResponse = { git: string | null; built_at: string };
+export type SupportVersionResponse = {
+  app: string;
+  version: string;
+  git_sha: string | null;
+  build_time: string;
+  environment: string;
+};
 
 const API_BASE = "";
 
@@ -124,6 +131,15 @@ export async function getDisclaimer(): Promise<DisclaimerResponse> {
 
 export async function getVersion(): Promise<VersionResponse> {
   const res = await fetch(`${API_BASE}/api/meta/version`);
+  if (!res.ok) {
+    const parsed = await readErrorBody(res);
+    throw new ApiError(parsed?.detail || `Service error: ${res.status}`, res.status, parsed ?? undefined);
+  }
+  return res.json();
+}
+
+export async function getSupportVersion(): Promise<SupportVersionResponse> {
+  const res = await fetch(`${API_BASE}/api/version`);
   if (!res.ok) {
     const parsed = await readErrorBody(res);
     throw new ApiError(parsed?.detail || `Service error: ${res.status}`, res.status, parsed ?? undefined);

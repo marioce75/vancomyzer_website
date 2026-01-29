@@ -7,8 +7,7 @@ import AucDoseSliderChart from "@/components/AucDoseSliderChart";
 import ConcentrationTimeChart from "@/components/ConcentrationTimeChart";
 import { Alert } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { PkCalculateResponse, getVersion, type VersionResponse } from "@/lib/api";
-import RoundsModeBar from "@/components/RoundsModeBar";
+import { PkCalculateResponse } from "@/lib/api";
 import PearlsPanel from "@/components/PearlsPanel";
 import TimingHelperMini from "@/components/TimingHelperMini";
 import { copyToClipboard, decodeShareState } from "@/lib/shareLink";
@@ -34,7 +33,6 @@ function navigate(to: string) {
 
 function HomePage() {
   const [result, setResult] = useState<PkCalculateResponse | undefined>(undefined);
-  const [trustDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [roundsMode, setRoundsMode] = useState<boolean>(() => {
     try {
       return window.localStorage.getItem("vancomyzer.roundsMode") === "1";
@@ -43,15 +41,6 @@ function HomePage() {
     }
   });
   const [sharedRegimenText, setSharedRegimenText] = useState<string | null>(null);
-  const [version, setVersion] = useState<VersionResponse | null>(null);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem("vancomyzer.roundsMode", roundsMode ? "1" : "0");
-    } catch {
-      // ignore
-    }
-  }, [roundsMode]);
 
   // If a share link was opened, show a tiny non-PHI summary banner.
   useEffect(() => {
@@ -62,20 +51,6 @@ function HomePage() {
     if (!state?.result) return;
     const text = `Opened shared regimen: ${Math.round(state.result.maintenanceDoseMg ?? 0)} mg q${state.result.intervalHr ?? 12}h (AUC24 ~ ${Math.round(state.result.auc24 ?? 0)}).`;
     setSharedRegimenText(text);
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    getVersion()
-      .then((v) => {
-        if (!cancelled) setVersion(v);
-      })
-      .catch(() => {
-        // ignore; footer will just omit version
-      });
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
   async function onAdjust(update: { dose?: number; interval?: number }) {
@@ -93,6 +68,7 @@ function HomePage() {
   }
 
   const targets = useMemo(() => ({ low: 400, high: 600 }), []);
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
 
   return (
     <DisclaimerGate>
@@ -147,21 +123,17 @@ function HomePage() {
         </main>
 
         <footer className="fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur">
-          <div className="max-w-6xl mx-auto p-3 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2">
+          <div className="max-w-6xl mx-auto p-3 grid grid-cols-3 items-center text-xs">
+            <div className="flex items-center gap-2 justify-start">
               <AlertTriangle className="h-3 w-3 text-warning" />
               <span>Safety + References</span>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center gap-4">
               <button className="underline" onClick={() => navigate("/references")}>References</button>
               <button className="underline" onClick={() => navigate("/disclaimer")}>Disclaimer</button>
               <button className="underline" onClick={() => navigate("/about")}>About</button>
-              <span className="text-muted-foreground">
-                v1 • Updated {trustDate}
-                {version?.git ? ` • ${version.git}` : ""}
-                {version?.built_at ? ` • ${new Date(version.built_at).toISOString().slice(0, 19)}Z` : ""}
-              </span>
             </div>
+            <div className="text-muted-foreground text-right">© {currentYear} Vancomyzer®</div>
           </div>
         </footer>
       </div>
