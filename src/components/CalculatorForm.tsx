@@ -5,11 +5,12 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { calculatePk, bayesianEstimate, PkCalculateResponse, ApiError, type PkCalculatePayload } from "@/lib/api";
+import { calculateEducational, type CalculateRequest, type CalculateResponse, ApiError } from "@/lib/api";
 
 export type CalculatorFormProps = {
-  onResult: (result: PkCalculateResponse | undefined) => void;
+  onResult: (result: CalculateResponse | undefined) => void;
   onLoadingChange?: (loading: boolean) => void;
+  onInputsChange?: (inputs: { patient: CalculateRequest["patient"]; regimen: CalculateRequest["regimen"]; dose_history?: CalculateRequest["dose_history"]; levels?: CalculateRequest["levels"]; mode: CalculateRequest["mode"]; }) => void;
 };
 
 type UiError = { message: string; issues?: Array<{ path: string; message: string }> };
@@ -19,7 +20,7 @@ function formatValidationLoc(loc: Array<string | number>): string {
   return loc.filter((p) => p !== "body").join(".");
 }
 
-export default function CalculatorForm({ onResult, onLoadingChange }: CalculatorFormProps) {
+export default function CalculatorForm({ onResult, onLoadingChange, onInputsChange }: CalculatorFormProps) {
   const [age, setAge] = useState(60);
   const [sex, setSex] = useState<"male" | "female">("male");
   const [height, setHeight] = useState(175);
@@ -47,37 +48,48 @@ export default function CalculatorForm({ onResult, onLoadingChange }: Calculator
   const weightKg = useMemo(() => (weightUnit === "kg" ? weight : Math.round(weight * 0.453592)), [weight, weightUnit]);
 
   async function onSubmit() {
-    // Backend expects these exact keys (camelCase):
-    // - serumCreatinine (NOT scrMgDl)
-    // - levels[] uses timeHoursFromDoseStart
-    // - doseHistory[] uses startTimeHours
-    const payload: PkCalculatePayload = {
-      age: Number(age),
+    const patient: CalculateRequest["patient"] = {
+      age_yr: Number(age),
       sex,
-      heightCm: Number(heightCm),
-      weightKg: Number(weightKg),
-      serumCreatinine: Number(scr),
-      icu: Boolean(icu),
-      infectionSeverity: severity,
-      mic: Number(mic),
-      aucTargetLow: Number(aucLow),
-      aucTargetHigh: Number(aucHigh),
-      levels: haveLevels
-        ? levels
-            .filter((lv) => Number.isFinite(lv.concentration) && Number.isFinite(lv.timeHr))
-            .map((lv) => ({ concentration: Number(lv.concentration), timeHoursFromDoseStart: Number(lv.timeHr) }))
-        : undefined,
-      doseHistory: haveLevels
-        ? doseHistory
-            .filter((d) => Number.isFinite(d.doseMg) && Number.isFinite(d.timeHr))
-            .map((d) => ({ doseMg: Number(d.doseMg), startTimeHours: Number(d.timeHr), infusionHours: 1 }))
-        : undefined,
+      weight_kg: Number(weightKg),
+      serum_creatinine_mg_dl: Number(scr),
     };
+
+    // Provide simple regimen defaults; App can later treat these as controlled overrides.
+    const regimen: CalculateRequest["regimen"] = {
+      dose_mg: 1500,
+      interval_hr: 12,
+      infusion_hr: 1.5,
+    };
+
+    const mode: CalculateRequest["mode"] = haveLevels && useBayesian ? "bayes_demo" : "empiric";
+
+    const levelsPayload = haveLevels
+      ? levels
+          .filter((lv) => Number.isFinite(lv.concentration) && Number.isFinite(lv.timeHr))
+          .map((lv) => ({ time_hr: Number(lv.timeHr), concentration_mg_l: Number(lv.concentration) }))
+      : undefined;
+
+    const historyPayload = haveLevels
+      ? doseHistory
+          .filter((d) => Number.isFinite(d.doseMg) && Number.isFinite(d.timeHr))
+          .map((d) => ({ dose_mg: Number(d.doseMg), start_time_hr: Number(d.timeHr), infusion_hr: 1.0 }))
+      : undefined;
+
+    const req: CalculateRequest = {
+      mode,
+      patient,
+      regimen,
+      levels: levelsPayload,
+      dose_history: historyPayload,
+    };
+
+    onInputsChange?.({ patient, regimen, levels: levelsPayload, dose_history: historyPayload, mode });
 
     onLoadingChange?.(true);
     setError(null);
     try {
-      const result = await (useBayesian ? bayesianEstimate(payload) : calculatePk(payload));
+      const result = await calculateEducational(req);
       onResult(result);
     } catch (e) {
       console.error(e);
@@ -229,7 +241,7 @@ export default function CalculatorForm({ onResult, onLoadingChange }: Calculator
         </div>
       )}
 
-      <Button className="w-full" onClick={onSubmit}>Calculate regimen</Button>
+      <Button className="w-full" onClick={onSubmit}>Compute PK estimates</Button>
     </div>
   );
 }

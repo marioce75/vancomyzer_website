@@ -47,11 +47,11 @@ export default function AucDoseSliderChart({
           <div className="grid grid-cols-2 gap-2">
             <div>
               <div className="text-xs text-muted-foreground mb-1">Dose (mg)</div>
-              <Slider defaultValue={[doseMg]} min={500} max={2500} step={50} onValueChange={([v]) => onChange({ doseMg: v })} />
+              <Slider value={[doseMg]} min={250} max={3000} step={50} onValueChange={([v]) => onChange({ doseMg: v })} />
             </div>
             <div>
               <div className="text-xs text-muted-foreground mb-1">Interval (h)</div>
-              <Slider defaultValue={[intervalHr]} min={6} max={24} step={2} onValueChange={([v]) => onChange({ intervalHr: v })} />
+              <Slider value={[intervalHr]} min={4} max={48} step={1} onValueChange={([v]) => onChange({ intervalHr: v })} />
             </div>
           </div>
         </div>
