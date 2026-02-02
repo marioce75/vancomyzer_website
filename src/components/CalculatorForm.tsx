@@ -10,6 +10,7 @@ import { calculatePk, bayesianEstimate, PkCalculateResponse, ApiError, type PkCa
 export type CalculatorFormProps = {
   onResult: (result: PkCalculateResponse | undefined) => void;
   onLoadingChange?: (loading: boolean) => void;
+  onInputsChange?: (payload: PkCalculatePayload) => void;
 };
 
 type UiError = { message: string; issues?: Array<{ path: string; message: string }> };
@@ -19,7 +20,7 @@ function formatValidationLoc(loc: Array<string | number>): string {
   return loc.filter((p) => p !== "body").join(".");
 }
 
-export default function CalculatorForm({ onResult, onLoadingChange }: CalculatorFormProps) {
+export default function CalculatorForm({ onResult, onLoadingChange, onInputsChange }: CalculatorFormProps) {
   const [age, setAge] = useState(60);
   const [sex, setSex] = useState<"male" | "female">("male");
   const [height, setHeight] = useState(175);
@@ -74,6 +75,7 @@ export default function CalculatorForm({ onResult, onLoadingChange }: Calculator
         : undefined,
     };
 
+    onInputsChange?.(payload);
     onLoadingChange?.(true);
     setError(null);
     try {
