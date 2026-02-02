@@ -6,7 +6,13 @@ import CopyNoteButton from "./CopyNoteButton";
 import type { PkCalculateResponse } from "@/lib/api";
 import ShareButtons from "./ShareButtons";
 
-function ResultsPanel({ result, onAdjustDose }: { result?: PkCalculateResponse; onAdjustDose: (delta: { dose?: number; interval?: number }) => void; }) {
+function ResultsPanel({
+  result,
+  onAdjustDose,
+}: {
+  result?: PkCalculateResponse;
+  onAdjustDose?: (delta: { dose?: number; interval?: number }) => void;
+}) {
   if (!result) {
     return (
       <div className="text-sm text-muted-foreground">No results yet.</div>
@@ -39,12 +45,14 @@ function ResultsPanel({ result, onAdjustDose }: { result?: PkCalculateResponse; 
               <div className="font-medium">{result?.troughPredicted ? `${Math.round(result.troughPredicted.low)}–${Math.round(result.troughPredicted.high)} mg/L` : "—"}</div>
             </div>
           </div>
-          <div className="flex gap-2 mt-3">
-            <Button variant="secondary" onClick={() => onAdjustDose({ dose: (result?.maintenanceDoseMg || 0) + 250 })}>+250 mg</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ dose: (result?.maintenanceDoseMg || 0) - 250 })}>-250 mg</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ interval: (result?.intervalHr || 12) + 2 })}>+2h interval</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ interval: (result?.intervalHr || 12) - 2 })}>-2h interval</Button>
-          </div>
+          {onAdjustDose && (
+            <div className="flex gap-2 mt-3">
+              <Button variant="secondary" onClick={() => onAdjustDose({ dose: (result?.maintenanceDoseMg || 0) + 250 })}>+250 mg</Button>
+              <Button variant="secondary" onClick={() => onAdjustDose({ dose: (result?.maintenanceDoseMg || 0) - 250 })}>-250 mg</Button>
+              <Button variant="secondary" onClick={() => onAdjustDose({ interval: (result?.intervalHr || 12) + 2 })}>+2h interval</Button>
+              <Button variant="secondary" onClick={() => onAdjustDose({ interval: (result?.intervalHr || 12) - 2 })}>-2h interval</Button>
+            </div>
+          )}
           <div className="mt-3">
             <ShareButtons result={result} />
           </div>

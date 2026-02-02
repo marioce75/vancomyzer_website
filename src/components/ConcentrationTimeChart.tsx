@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Line, LineChart, Scatter, ScatterChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { ComposedChart, Line, Scatter, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export default function ConcentrationTimeChart({ curve, levels, showBand }: {
   curve?: Array<{ t: number; c: number }>;
@@ -14,7 +14,7 @@ export default function ConcentrationTimeChart({ curve, levels, showBand }: {
       <CardHeader><CardTitle>Concentration–Time (24h)</CardTitle></CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={curve || []} margin={{ left: 10, right: 10, top: 10, bottom: 10 }}>
+          <ComposedChart data={curve || []} margin={{ left: 10, right: 10, top: 10, bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="t" domain={[0, 24]} tickFormatter={(v) => `${v}h`} />
             <YAxis />
@@ -27,11 +27,9 @@ export default function ConcentrationTimeChart({ curve, levels, showBand }: {
             )}
             <Line type="monotone" dataKey="c" stroke="#2563eb" dot={false} />
             {levels && levels.length > 0 && (
-              <ScatterChart>
-                <Scatter data={levels.map(l => ({ t: l.timeHr, c: l.concentration }))} fill="#ef4444" />
-              </ScatterChart>
+              <Scatter data={levels.map(l => ({ t: l.timeHr, c: l.concentration }))} fill="#ef4444" />
             )}
-          </LineChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>

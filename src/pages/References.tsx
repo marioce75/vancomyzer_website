@@ -8,6 +8,14 @@ export default function References() {
           <li>AUC/MIC (mg·h/L) target 400–600 for serious MRSA to balance efficacy and nephrotoxicity.</li>
           <li>Trough alone is imperfect; AUC-guided dosing is recommended.</li>
         </ul>
+        <h2 className="font-medium">Educational background</h2>
+        <ul className="list-disc ml-5">
+          <li>
+            <a className="underline" href="/bayesian-pk-education.pdf" target="_blank" rel="noreferrer">
+              Bayesian PK simulation primer (PDF)
+            </a>
+          </li>
+        </ul>
         <h2 className="font-medium">Monitoring strategy and timing</h2>
         <ul className="list-disc ml-5">
           <li>Obtain levels at steady state or after dose changes; use Bayesian when feasible.</li>
@@ -23,9 +31,10 @@ export default function References() {
         </ul>
         <h2 className="font-medium">Citations</h2>
         <ul className="list-disc ml-5">
-          <li>ASHP/IDSA Guidelines on Vancomycin Monitoring, 2020–2024.</li>
-          <li>Institutional protocols and consensus statements.</li>
+          <li>IDSA/ASHP vancomycin monitoring guideline (placeholder citation).</li>
+          <li>Institutional protocols and consensus statements (local).</li>
         </ul>
+        <div className="text-xs text-muted-foreground">Not affiliated with IDSA/ASHP.</div>
       </div>
     </div>
   );
