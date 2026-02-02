@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import List, Optional, Any
 
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
@@ -91,6 +91,12 @@ class DoseEvent(BaseModel):
     infusionHours: float = Field(gt=0)
 
 
+class RegimenOverride(BaseModel):
+    doseMg: float = Field(gt=0)
+    intervalHr: int = Field(gt=0)
+    infusionHours: float = Field(gt=0)
+
+
 class PkCalculateRequest(BaseModel):
     age: int
     sex: str
@@ -104,6 +110,7 @@ class PkCalculateRequest(BaseModel):
     aucTargetHigh: int = 600
     levels: Optional[List[Level]] = None
     doseHistory: Optional[List[DoseEvent]] = None
+    regimen: Optional[RegimenOverride] = None
 
 
 class Safety(BaseModel):
@@ -165,6 +172,43 @@ def predict_trough(dose_mg: float, tau_h: int, cl_l_h: float, v_l: float, infusi
     return float(max(0.0, c_trough))
 
 
+def build_concentration_curve(
+    dose_mg: float,
+    tau_h: int,
+    cl_l_h: float,
+    v_l: float,
+    infusion_h: float = 1.0,
+    duration_h: float = 24.0,
+    step_h: float = 0.5,
+) -> List[dict]:
+    cl = max(cl_l_h, 0.1)
+    v = max(v_l, 1.0)
+    tau = float(max(1.0, tau_h))
+    tin = float(max(0.1, min(float(infusion_h), tau)))
+    k = cl / v
+    r = dose_mg / tin
+
+    points: List[dict] = []
+    n_doses = max(6, int(math.ceil(duration_h / tau)) + 6)
+    steps = int(math.floor(duration_h / step_h))
+
+    for i in range(steps + 1):
+        t = i * step_h
+        c = 0.0
+        for n in range(n_doses):
+            start = -n * tau
+            dt = t - start
+            if dt < 0:
+                continue
+            if dt <= tin:
+                c += (r / cl) * (1.0 - math.exp(-k * dt))
+            else:
+                c += (r / cl) * (1.0 - math.exp(-k * tin)) * math.exp(-k * (dt - tin))
+        points.append({"t": float(round(t, 2)), "c": float(round(max(c, 0.0), 3))})
+
+    return points
+
+
 # -------- API endpoints (with /api aliases) --------
 @app.post("/pk/calculate", response_model=PkCalculateResponse)
 @app.post("/api/pk/calculate", response_model=PkCalculateResponse)
@@ -177,15 +221,22 @@ def pk_calculate(req: PkCalculateRequest) -> PkCalculateResponse:
     cl = estimate_cl_l_per_h(crcl)
     v = estimate_v_l(req.weightKg)
 
-    target_mid = (req.aucTargetLow + req.aucTargetHigh) / 2
-    daily_dose_needed_mg = target_mid * cl * req.mic * 1000.0
+    infusion_h = 1.0
+    if req.regimen:
+        tau = int(max(4, req.regimen.intervalHr))
+        per_dose_mg = float(max(250, min(3000, req.regimen.doseMg)))
+        infusion_h = float(max(0.5, min(req.regimen.infusionHours, tau)))
+    else:
+        target_mid = (req.aucTargetLow + req.aucTargetHigh) / 2
+        daily_dose_needed_mg = target_mid * cl * req.mic * 1000.0
 
-    tau = pick_interval(crcl)
-    per_dose_mg = daily_dose_needed_mg * (tau / 24.0)
-    per_dose_mg = max(500, min(3000, round(per_dose_mg / 250) * 250))
+        tau = pick_interval(crcl)
+        per_dose_mg = daily_dose_needed_mg * (tau / 24.0)
+        per_dose_mg = max(500, min(3000, round(per_dose_mg / 250) * 250))
 
     auc24_pred = auc24_from_daily((per_dose_mg * (24.0 / tau)), cl, req.mic)
-    trough = predict_trough(per_dose_mg, tau, cl, v, infusion_h=1.0)
+    trough = predict_trough(per_dose_mg, tau, cl, v, infusion_h=infusion_h)
+    curve = build_concentration_curve(per_dose_mg, tau, cl, v, infusion_h=infusion_h)
 
     loading = None
     if req.infectionSeverity.lower() == "serious" or req.icu:
@@ -215,7 +266,7 @@ def pk_calculate(req: PkCalculateRequest) -> PkCalculateResponse:
             crclLow=bool(crclLow),
             messages=messages,
         ),
-        concentrationCurve=None,
+        concentrationCurve=curve,
     )
 
 
@@ -342,6 +393,24 @@ def api_version():
     }
 
 
-# -------- SPA serving (MUST be mounted after API routes) --------
-# Root should always serve built frontend index.html when present.
-app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True, check_dir=False), name="spa")
+# -------- SPA serving (MUST be declared after API routes) --------
+@app.get("/", response_class=HTMLResponse)
+@app.get("/{full_path:path}")
+def serve_spa(full_path: str = ""):
+    root_segment = full_path.split("/", 1)[0] if full_path else ""
+    if root_segment in {"api", "pk", "meta", "health", "healthz"}:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    if not INDEX_FILE.exists():
+        return HTMLResponse("<h1>Frontend build not found</h1>", status_code=503)
+
+    candidate = (STATIC_DIR / full_path).resolve()
+    if full_path:
+        if not str(candidate).startswith(str(STATIC_DIR.resolve())):
+            raise HTTPException(status_code=404, detail="Not found")
+        if candidate.is_file():
+            return FileResponse(candidate)
+        if candidate.suffix or full_path.startswith(("assets/", "static/")):
+            raise HTTPException(status_code=404, detail="Not found")
+
+    return FileResponse(INDEX_FILE)
