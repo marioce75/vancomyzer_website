@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 // API configuration
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+const API_BASE_URL =
+  process.env.REACT_APP_BACKEND_URL ||
+  (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8001');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -57,15 +59,15 @@ export const vancomyzerAPI = {
 
   // Calculate vancomycin dosing
   calculateDosing: async (patientData) => {
-    const response = await api.post('/api/calculate_dose', patientData);
+    const response = await api.post('/api/calculate-dosing', patientData);
     return response.data;
   },
 
   // Bayesian optimization
   bayesianOptimization: async (patientData, levels) => {
     const response = await api.post('/api/bayesian-optimization', {
-      ...patientData,
-      levels
+      patient: patientData,
+      levels,
     });
     return response.data;
   },
