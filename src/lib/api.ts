@@ -1,3 +1,6 @@
+import { calculateLoadingDose, calculatePK, type Patient, type Regimen } from "@/pk/core";
+import { calculateFromLevels, type Level } from "@/pk/levels";
+
 // Lightweight API client for FastAPI backend
 export type PkCalculatePayload = {
   age: number;
@@ -27,6 +30,60 @@ export type PkCalculateResponse = {
     messages: string[];
   };
   concentrationCurve?: Array<{ t: number; c: number }>;
+};
+
+export type EducationalRegimen = {
+  dose_mg: number;
+  interval_hr: number;
+  infusion_hr: number;
+  doseMg?: number;
+  intervalHr?: number;
+  infusionHr?: number;
+};
+
+export type EducationalPatient = {
+  age: number;
+  sex: "male" | "female" | "M" | "F";
+  height_cm?: number;
+  heightCm?: number;
+  height?: number;
+  weight_kg?: number;
+  weightKg?: number;
+  weight?: number;
+  scr_mg_dl?: number;
+  serumCreatinine?: number;
+  scr?: number;
+  icu?: boolean;
+  infectionSeverity?: "standard" | "serious";
+  mic?: number;
+  aucTargetLow?: number;
+  aucTargetHigh?: number;
+};
+
+export type CalculateRequest = {
+  mode?: "deterministic" | "levels" | "bayesian";
+  patient: EducationalPatient;
+  regimen: EducationalRegimen;
+  dose_history?: Array<{
+    dose_mg?: number;
+    doseMg?: number;
+    start_time_hr?: number;
+    startTimeHours?: number;
+    infusion_hr?: number;
+    infusionHours?: number;
+  }>;
+  levels?: Array<{ timeHr?: number; time?: number; concentration: number }>;
+};
+
+export type CalculateResponse = PkCalculateResponse & {
+  auc24_mg_h_l: number;
+  trough_mg_l: number;
+  concentration_curve?: Array<{ t: number; c: number }>;
+  regimen?: {
+    dose_mg: number;
+    interval_hr: number;
+    infusion_hr: number;
+  };
 };
 
 export type ReferenceEntry = { title: string; org: string; year: number; note?: string };
@@ -63,6 +120,93 @@ export class ApiError extends Error {
     this.errors = opts?.errors;
     this.received_body = opts?.received_body;
   }
+}
+
+const DEFAULT_INFUSION_HR = 1;
+
+function pickNumber(...values: Array<number | undefined>): number | undefined {
+  for (const value of values) {
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+  }
+  return undefined;
+}
+
+function requireNumber(value: number | undefined, field: string): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    throw new ApiError(`Missing or invalid ${field}`, 422);
+  }
+  return value;
+}
+
+function normalizeSex(value: EducationalPatient["sex"]): "M" | "F" {
+  const normalized = String(value).toLowerCase();
+  return normalized.startsWith("f") ? "F" : "M";
+}
+
+function normalizePatient(input: EducationalPatient): Patient {
+  const heightCm = pickNumber(input.height_cm, input.heightCm, input.height);
+  const weightKg = pickNumber(input.weight_kg, input.weightKg, input.weight);
+  const scr = pickNumber(input.scr_mg_dl, input.serumCreatinine, input.scr);
+
+  return {
+    age: requireNumber(input.age, "patient.age"),
+    sex: normalizeSex(input.sex),
+    height: requireNumber(heightCm, "patient.height"),
+    weight: requireNumber(weightKg, "patient.weight"),
+    scr: requireNumber(scr, "patient.scr"),
+  };
+}
+
+function normalizeRegimen(input: EducationalRegimen): { doseMg: number; intervalHr: number; infusionHr: number } {
+  const doseMg = pickNumber(input.dose_mg, input.doseMg);
+  const intervalHr = pickNumber(input.interval_hr, input.intervalHr);
+  const infusionHr = pickNumber(input.infusion_hr, input.infusionHr) ?? DEFAULT_INFUSION_HR;
+
+  return {
+    doseMg: requireNumber(doseMg, "regimen.dose"),
+    intervalHr: requireNumber(intervalHr, "regimen.interval"),
+    infusionHr,
+  };
+}
+
+function normalizeLevels(levels?: CalculateRequest["levels"]): Level[] {
+  if (!levels || levels.length === 0) return [];
+  return levels
+    .map((level) => ({
+      time: pickNumber(level.timeHr, level.time) ?? 0,
+      concentration: level.concentration,
+    }))
+    .filter((level) => Number.isFinite(level.time) && Number.isFinite(level.concentration));
+}
+
+function buildSafety(auc24: number, crcl: number): PkCalculateResponse["safety"] {
+  const aucWarning800 = auc24 > 800;
+  const aucWarning600 = auc24 > 600;
+  const crclLow = crcl < 30;
+  const messages: string[] = [];
+
+  if (aucWarning800) {
+    messages.push("AUC > 800: high nephrotoxicity risk.");
+  } else if (aucWarning600) {
+    messages.push("AUC > 600: consider dose reduction.");
+  }
+
+  if (crclLow) {
+    messages.push("Low CrCl: dose cautiously and monitor Scr.");
+  }
+
+  return {
+    aucWarning600,
+    aucWarning800,
+    crclLow,
+    messages,
+  };
+}
+
+function buildCurve(points: Array<{ time: number; concentration: number }>): Array<{ t: number; c: number }> {
+  return points
+    .filter((point) => point.time <= 24)
+    .map((point) => ({ t: point.time, c: point.concentration }));
 }
 
 async function readErrorBody(
@@ -109,6 +253,50 @@ export async function calculatePk(payload: PkCalculatePayload): Promise<PkCalcul
 
 export async function bayesianEstimate(payload: PkCalculatePayload): Promise<PkCalculateResponse> {
   return postJSON<PkCalculateResponse>(`${API_BASE}/api/pk/bayesian`, payload);
+}
+
+export async function calculateEducational(payload: CalculateRequest): Promise<CalculateResponse> {
+  const patient = normalizePatient(payload.patient);
+  const regimenInput = normalizeRegimen(payload.regimen);
+  const regimen: Regimen = {
+    dose: regimenInput.doseMg,
+    interval: regimenInput.intervalHr,
+    infusionTime: regimenInput.infusionHr * 60,
+  };
+
+  const levels = normalizeLevels(payload.levels);
+  const levelsResult = levels.length > 0 ? calculateFromLevels(patient, regimen, levels) : null;
+  const pkResult = levelsResult ?? calculatePK(patient, regimen);
+  const metrics = pkResult.metrics;
+
+  const auc24 = Number(metrics.auc24);
+  const trough = Number(metrics.trough);
+  const safety = buildSafety(auc24, metrics.crcl);
+  const curve = buildCurve(pkResult.timeCourse);
+
+  const needsLoading = Boolean(payload.patient.icu || payload.patient.infectionSeverity === "serious");
+  const loadingDoseMg = needsLoading ? calculateLoadingDose(patient, 25) : undefined;
+
+  return {
+    loadingDoseMg,
+    maintenanceDoseMg: regimenInput.doseMg,
+    intervalHr: Math.round(regimenInput.intervalHr),
+    auc24,
+    troughPredicted: {
+      low: Number((trough * 0.9).toFixed(1)),
+      high: Number((trough * 1.1).toFixed(1)),
+    },
+    safety,
+    concentrationCurve: curve,
+    auc24_mg_h_l: auc24,
+    trough_mg_l: trough,
+    concentration_curve: curve,
+    regimen: {
+      dose_mg: regimenInput.doseMg,
+      interval_hr: regimenInput.intervalHr,
+      infusion_hr: regimenInput.infusionHr,
+    },
+  };
 }
 
 export async function getReferences(): Promise<ReferencesResponse> {
