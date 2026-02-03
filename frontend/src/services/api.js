@@ -57,6 +57,18 @@ export const vancomyzerAPI = {
     return response.data;
   },
 
+  // Streamlined dosing (2020 guideline workflow)
+  calculateDose: async (payload) => {
+    const response = await api.post('/api/calculate-dose', payload);
+    return response.data;
+  },
+
+  // Bayesian/Sawchuk-Zaske adjustment
+  bayesianDose: async (payload) => {
+    const response = await api.post('/api/bayesian-dose', payload);
+    return response.data;
+  },
+
   // Calculate vancomycin dosing
   calculateDosing: async (patientData) => {
     const response = await api.post('/api/calculate-dosing', patientData);

@@ -11,6 +11,7 @@ import math
 import uuid
 from datetime import datetime
 from enum import Enum
+from utils import pk
 
 app = FastAPI(
     title="Vancomyzer API",
@@ -139,6 +140,40 @@ class BayesianResult(BaseModel):
     iterations_used: int
     individual_pk_curve: List[Dict[str, float]]
     population_pk_curve: List[Dict[str, float]]
+
+# Streamlined dosing models (2020 ASHP/IDSA/PIDS/SIDP)
+class PatientInfo(BaseModel):
+    age_years: float = Field(..., gt=0, le=120)
+    weight_kg: float = Field(..., gt=0, le=300)
+    height_cm: Optional[float] = Field(None, gt=0, le=250)
+    sex: str = Field(..., pattern="^(male|female)$")
+    serum_creatinine: float = Field(..., gt=0, le=20)
+    serious_infection: bool = False
+
+class BayesianLevel(BaseModel):
+    level_mg_l: float = Field(..., gt=0, le=200)
+    time_hours: float = Field(..., gt=0, le=72)
+    level_type: Optional[str] = Field(None, pattern="^(peak|trough)$")
+    dose_mg: Optional[float] = Field(None, gt=0, le=4000)
+    infusion_hours: Optional[float] = Field(1.0, gt=0, le=24)
+
+class DoseRequest(BaseModel):
+    patient: PatientInfo
+    levels: Optional[List[BayesianLevel]] = None
+
+class DoseResponse(BaseModel):
+    loading_dose_mg: float
+    maintenance_dose_mg: float
+    interval_hours: float
+    predicted_peak_mg_l: float
+    predicted_trough_mg_l: float
+    predicted_auc_24: float
+    k_e: float
+    vd_l: float
+    half_life_hours: float
+    crcl_ml_min: float
+    method: str
+    notes: List[str]
 
 # Pharmacokinetic Calculation Engine
 class VancomycinPKCalculator:
@@ -725,6 +760,97 @@ async def root():
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
+
+@app.post("/api/calculate-dose", response_model=DoseResponse)
+async def calculate_dose_endpoint(request: DoseRequest):
+    """Guideline-based dosing using traditional PK equations."""
+    patient = request.patient
+    crcl = pk.cockcroft_gault(
+        patient.age_years,
+        patient.weight_kg,
+        patient.sex,
+        patient.serum_creatinine,
+        patient.height_cm,
+    )
+    regimen = pk.calculate_dose(patient.weight_kg, crcl, patient.serious_infection)
+
+    notes = []
+    if regimen["predicted_auc_24"] >= 800:
+        notes.append("Predicted AUC exceeds 800 mg·h/L; consider dose reduction.")
+
+    return DoseResponse(
+        loading_dose_mg=regimen["loading_dose_mg"],
+        maintenance_dose_mg=regimen["maintenance_dose_mg"],
+        interval_hours=regimen["interval_hours"],
+        predicted_peak_mg_l=regimen["predicted_peak_mg_l"],
+        predicted_trough_mg_l=regimen["predicted_trough_mg_l"],
+        predicted_auc_24=regimen["predicted_auc_24"],
+        k_e=regimen["k_e"],
+        vd_l=regimen["vd_l"],
+        half_life_hours=regimen["half_life_h"],
+        crcl_ml_min=crcl,
+        method="population_pk",
+        notes=notes,
+    )
+
+@app.post("/api/bayesian-dose", response_model=DoseResponse)
+async def bayesian_dose_endpoint(request: DoseRequest):
+    """Bayesian/Sawchuk–Zaske adjustment when levels are available."""
+    patient = request.patient
+    crcl = pk.cockcroft_gault(
+        patient.age_years,
+        patient.weight_kg,
+        patient.sex,
+        patient.serum_creatinine,
+        patient.height_cm,
+    )
+
+    base = pk.calculate_dose(patient.weight_kg, crcl, patient.serious_infection)
+    levels = request.levels or []
+    if not levels:
+        raise HTTPException(status_code=400, detail="At least one level is required for Bayesian dosing.")
+
+    infusion_h = float(levels[0].infusion_hours or 1.0)
+    dose_mg = float(levels[0].dose_mg or base["maintenance_dose_mg"])
+
+    level_payload = [
+        {"level_mg_l": l.level_mg_l, "time_hours": l.time_hours}
+        for l in levels
+    ]
+
+    k_e, vd, method = pk.estimate_patient_pk(
+        level_payload,
+        dose_mg,
+        infusion_h,
+        base["k_e"],
+        base["vd_l"],
+    )
+
+    regimen = pk.calculate_dose(
+        patient.weight_kg,
+        crcl,
+        patient.serious_infection,
+        bayesian={"k_e": k_e, "vd": vd},
+    )
+
+    notes = []
+    if regimen["predicted_auc_24"] >= 800:
+        notes.append("Predicted AUC exceeds 800 mg·h/L; consider dose reduction.")
+
+    return DoseResponse(
+        loading_dose_mg=regimen["loading_dose_mg"],
+        maintenance_dose_mg=regimen["maintenance_dose_mg"],
+        interval_hours=regimen["interval_hours"],
+        predicted_peak_mg_l=regimen["predicted_peak_mg_l"],
+        predicted_trough_mg_l=regimen["predicted_trough_mg_l"],
+        predicted_auc_24=regimen["predicted_auc_24"],
+        k_e=regimen["k_e"],
+        vd_l=regimen["vd_l"],
+        half_life_hours=regimen["half_life_h"],
+        crcl_ml_min=crcl,
+        method=method,
+        notes=notes,
+    )
 
 @app.post("/api/calculate-dosing", response_model=DosingResult)
 async def calculate_dosing(patient: PatientInput):
