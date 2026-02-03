@@ -1,0 +1,14 @@
+{
+  "sheet": "Lkup",
+  "max_row_dumped": 2,
+  "max_col_dumped": 1,
+  "nonempty_cells_dumped": 2,
+  "grid": [
+    [
+      "YES"
+    ],
+    [
+      "NO"
+    ]
+  ]
+}
