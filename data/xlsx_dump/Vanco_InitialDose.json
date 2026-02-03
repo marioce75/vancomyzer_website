@@ -1,0 +1,95 @@
+{
+  "sheet": "Vanco_InitialDose",
+  "max_row_dumped": 24,
+  "max_col_dumped": 3,
+  "nonempty_cells_dumped": 38,
+  "grid": [
+    [
+      "UCSF Adult Vancomycin Dosing Calculator",
+      "Enter information in fields outlined in red"
+    ],
+    [
+      "Select or Evaluate Vancomycin Dose",
+      "Calculated values in blue"
+    ],
+    [],
+    [
+      "Select Vancomycin Dosing Regimen"
+    ],
+    [
+      "Recommended Dosing Interval (hours)",
+      "=Calculation_Details!A23"
+    ],
+    [
+      "Chosen Dosing Interval (hours)",
+      12,
+      "Select 6,8,12,24 hours"
+    ],
+    [],
+    [
+      "Recommended Vancomycin Dose (mg)",
+      "=Calculation_Details!A26",
+      "Dose to achieve a steady-state trough of 15 mg/L"
+    ],
+    [
+      "Chosen Vancomycin Dose (mg)",
+      1000,
+      "Select 250,500,750,1000,1250,1500,2000mg "
+    ],
+    [],
+    [
+      "Predicted Vancomycin AUC24",
+      "=Calculation_Details!B29",
+      "Target AUC24 is >350"
+    ],
+    [
+      "Predicted Vancomycin Trough (mg/L)",
+      "=Calculation_Details!D26",
+      "Acceptable vancomycin troughs should be <21 to reduce nephrotoxicity"
+    ],
+    [
+      "Predicted Vancomycin Peak (mg/L)",
+      "=Calculation_Details!C26",
+      "Acceptable vancomycin peaks should be <75 to reduce ototoxicity"
+    ],
+    [],
+    [
+      "Recommended Loading Dose (mg)",
+      "=Calculation_Details!D29",
+      "Loading doses are recommended for patients with severe infections (round to nearest 250mg, cap at 2000mg)"
+    ],
+    [],
+    [
+      "Monitoring"
+    ],
+    [
+      "Vancomycin half-life",
+      "=Calculation_Details!D20",
+      "Steady-state is approximately reached after 4 half-lives of continuous dosing"
+    ],
+    [
+      null,
+      null,
+      "For routine monitoring, draw trough level before the 4th dose if dosing interval ≥ half-life"
+    ],
+    [
+      null,
+      null,
+      "If loading dose given, draw draw trough level before the 4th dose of the maintenance regimen"
+    ],
+    [
+      null,
+      null,
+      "If dosing interval substantially < half-life, draw level before next dose after 3 half-lives have passed"
+    ],
+    [
+      "To return to patient information tab, click here"
+    ],
+    [
+      "To view calculation details, click here"
+    ],
+    [
+      "To record patient information for follow-up/QI, click here"
+    ]
+  ]
+}
