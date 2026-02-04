@@ -54,6 +54,9 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
       weight_kg: Number(weightKg),
       serum_creatinine_mg_dl: Number(scr),
     };
+    if (Number.isFinite(heightCm) && heightCm > 0) {
+      patient.height_cm = Number(heightCm);
+    }
 
     // Provide simple regimen defaults; App can later treat these as controlled overrides.
     const regimen: CalculateRequest["regimen"] = {
