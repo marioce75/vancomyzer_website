@@ -6,11 +6,9 @@ import type { CalculateResponse } from "@/lib/api";
 function ResultsPanel({
   result,
   onAdjustDose,
-  updating,
 }: {
-  result?: CalculateResponse;
-  onAdjustDose: (delta: { dose_mg?: number; interval_hr?: number }) => void;
-  updating?: boolean;
+  result?: PkCalculateResponse;
+  onAdjustDose?: (delta: { dose?: number; interval?: number }) => void;
 }) {
   if (!result) {
     return <div className="text-sm text-muted-foreground">No results yet.</div>;
@@ -43,12 +41,16 @@ function ResultsPanel({
               </div>
             )}
           </div>
-
-          <div className="flex flex-wrap gap-2 mt-3">
-            <Button variant="secondary" onClick={() => onAdjustDose({ dose_mg: 250 })}>+250 mg</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ dose_mg: -250 })}>-250 mg</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ interval_hr: 2 })}>+2h interval</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ interval_hr: -2 })}>-2h interval</Button>
+          {onAdjustDose && (
+            <div className="flex gap-2 mt-3">
+              <Button variant="secondary" onClick={() => onAdjustDose({ dose: (result?.maintenanceDoseMg || 0) + 250 })}>+250 mg</Button>
+              <Button variant="secondary" onClick={() => onAdjustDose({ dose: (result?.maintenanceDoseMg || 0) - 250 })}>-250 mg</Button>
+              <Button variant="secondary" onClick={() => onAdjustDose({ interval: (result?.intervalHr || 12) + 2 })}>+2h interval</Button>
+              <Button variant="secondary" onClick={() => onAdjustDose({ interval: (result?.intervalHr || 12) - 2 })}>-2h interval</Button>
+            </div>
+          )}
+          <div className="mt-3">
+            <ShareButtons result={result} />
           </div>
 
           {result.safety?.length > 0 && (

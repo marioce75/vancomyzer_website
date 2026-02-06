@@ -4,7 +4,7 @@ import math
 import os
 import subprocess
 from datetime import datetime, timezone
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Literal, Tuple
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -170,6 +170,140 @@ def predict_trough(dose_mg: float, tau_h: int, cl_l_h: float, v_l: float, infusi
     return float(max(0.0, c_trough))
 
 
+def _lognormal_mu_sigma(mean: float, variance: float) -> Tuple[float, float]:
+    mean = max(float(mean), 1e-6)
+    variance = max(float(variance), 1e-6)
+    sigma2 = math.log(1.0 + (variance / (mean ** 2)))
+    sigma = math.sqrt(max(sigma2, 1e-9))
+    mu = math.log(mean) - 0.5 * sigma2
+    return mu, sigma
+
+
+def _prior_log_pdf(x: np.ndarray, mean: float, variance: float, distribution: str) -> np.ndarray:
+    dist = (distribution or "lognormal").lower()
+    variance = max(float(variance), 1e-6)
+    if dist == "lognormal":
+        mu, sigma = _lognormal_mu_sigma(mean, variance)
+        safe_x = np.maximum(x, 1e-9)
+        return -0.5 * ((np.log(safe_x) - mu) / sigma) ** 2 - np.log(safe_x * sigma)
+    sd = math.sqrt(variance)
+    return -0.5 * ((x - mean) / sd) ** 2 - math.log(sd)
+
+
+def _prior_range(mean: float, variance: float, distribution: str) -> Tuple[float, float]:
+    dist = (distribution or "lognormal").lower()
+    variance = max(float(variance), 1e-6)
+    if dist == "lognormal":
+        mu, sigma = _lognormal_mu_sigma(mean, variance)
+        lo = math.exp(mu - 3.0 * sigma)
+        hi = math.exp(mu + 3.0 * sigma)
+    else:
+        sd = math.sqrt(variance)
+        lo = mean - 3.0 * sd
+        hi = mean + 3.0 * sd
+    lo = max(lo, 0.05)
+    hi = max(hi, lo * 1.25)
+    return lo, hi
+
+
+def _steady_state_concentration(
+    time_h: np.ndarray | float,
+    dose_mg: float,
+    interval_h: float,
+    infusion_h: float,
+    cl_l_h: np.ndarray | float,
+    v_l: np.ndarray | float,
+) -> np.ndarray:
+    interval = max(float(interval_h), 1e-3)
+    tin = max(1e-3, min(float(infusion_h), interval))
+    t = np.mod(time_h, interval)
+    cl = np.maximum(cl_l_h, 1e-6)
+    v = np.maximum(v_l, 1e-6)
+    k = cl / v
+    r = float(dose_mg) / tin
+    denom = 1.0 - np.exp(-k * interval)
+    denom = np.where(denom < 1e-9, 1e-9, denom)
+    during = t <= tin
+    c_during = (r / cl) * (1.0 - np.exp(-k * t)) / denom
+    c_after = (r / cl) * (1.0 - np.exp(-k * tin)) * np.exp(-k * (t - tin)) / denom
+    return np.where(during, c_during, c_after)
+
+
+def _simulate_curve(
+    cl_l_h: float,
+    v_l: float,
+    dose_mg: float,
+    interval_h: float,
+    infusion_h: float,
+    duration_h: float = 24.0,
+    step_h: float = 0.25,
+) -> Tuple[np.ndarray, np.ndarray]:
+    times = np.arange(0.0, duration_h + step_h * 0.5, step_h)
+    conc = _steady_state_concentration(times, dose_mg, interval_h, infusion_h, cl_l_h, v_l)
+    return times, conc
+
+
+def _posterior_grid(
+    level_times: List[float],
+    level_concs: List[float],
+    dose_mg: float,
+    interval_h: float,
+    infusion_h: float,
+    prior_cl: dict,
+    prior_v: dict,
+    sigma: float,
+    grid_size: int = 40,
+) -> Tuple[float, float, float, float, float, float]:
+    cl_lo, cl_hi = _prior_range(prior_cl["mean"], prior_cl["variance"], prior_cl["distribution"])
+    v_lo, v_hi = _prior_range(prior_v["mean"], prior_v["variance"], prior_v["distribution"])
+
+    cl_values = np.linspace(cl_lo, cl_hi, grid_size)
+    v_values = np.linspace(v_lo, v_hi, grid_size)
+    cl_grid, v_grid = np.meshgrid(cl_values, v_values, indexing="ij")
+
+    log_prior = _prior_log_pdf(cl_grid, prior_cl["mean"], prior_cl["variance"], prior_cl["distribution"]) + _prior_log_pdf(
+        v_grid, prior_v["mean"], prior_v["variance"], prior_v["distribution"]
+    )
+
+    if not level_times:
+        cl_mean = float(prior_cl["mean"])
+        v_mean = float(prior_v["mean"])
+        cl_sd = float(math.sqrt(max(prior_cl["variance"], 1e-6)))
+        v_sd = float(math.sqrt(max(prior_v["variance"], 1e-6)))
+        return cl_mean, cl_sd, v_mean, v_sd, cl_mean, v_mean
+
+    preds = []
+    for t in level_times:
+        preds.append(_steady_state_concentration(float(t), dose_mg, interval_h, infusion_h, cl_grid, v_grid))
+    pred_arr = np.stack(preds, axis=0)
+
+    obs = np.maximum(np.array(level_concs, dtype=float), 1e-6)
+    log_obs = np.log(obs)[:, None, None]
+    log_pred = np.log(np.maximum(pred_arr, 1e-9))
+    resid = (log_obs - log_pred) / max(float(sigma), 1e-6)
+    log_like = -0.5 * np.sum(resid ** 2, axis=0)
+
+    log_post = log_prior + log_like
+    max_log = float(np.max(log_post))
+    weights = np.exp(log_post - max_log)
+    wsum = float(np.sum(weights))
+    if wsum <= 0.0:
+        idx = np.unravel_index(np.argmax(log_post), log_post.shape)
+        map_cl = float(cl_grid[idx])
+        map_v = float(v_grid[idx])
+        return map_cl, 0.0, map_v, 0.0, map_cl, map_v
+
+    cl_mean = float(np.sum(weights * cl_grid) / wsum)
+    v_mean = float(np.sum(weights * v_grid) / wsum)
+    cl_sd = float(np.sqrt(np.sum(weights * (cl_grid - cl_mean) ** 2) / wsum))
+    v_sd = float(np.sqrt(np.sum(weights * (v_grid - v_mean) ** 2) / wsum))
+
+    idx = np.unravel_index(np.argmax(log_post), log_post.shape)
+    map_cl = float(cl_grid[idx])
+    map_v = float(v_grid[idx])
+    return cl_mean, cl_sd, v_mean, v_sd, map_cl, map_v
+
+
 # -------- API endpoints (with /api aliases) --------
 @app.post("/pk/calculate", response_model=PkCalculateResponse)
 @app.post("/api/pk/calculate", response_model=PkCalculateResponse)
@@ -238,6 +372,66 @@ class BayesianResponse(BaseModel):
     safety: Safety
 
 
+class BayesLevel(BaseModel):
+    time_hr_from_start: float
+    concentration_mg_l: float
+
+
+class BayesRegimen(BaseModel):
+    dose_mg: float
+    interval_hr: float
+    infusion_hr: float
+
+
+class PriorParam(BaseModel):
+    mean: float
+    variance: float
+    distribution: Literal["normal", "lognormal"] = "lognormal"
+
+
+class PriorSet(BaseModel):
+    cl: PriorParam
+    v: PriorParam
+    sigma: Optional[PriorParam] = None
+
+
+class BayesSimulateRequest(BaseModel):
+    age: float
+    weight: float
+    sex: Optional[str] = None
+    scr: float
+    regimen: BayesRegimen
+    levels: Optional[List[BayesLevel]] = None
+    priors: PriorSet
+
+
+class PosteriorSummary(BaseModel):
+    cl_mean: float
+    cl_sd: float
+    v_mean: float
+    v_sd: float
+
+
+class CurvePoint(BaseModel):
+    time_hr: float
+    concentration_mg_l: float
+
+
+class SimulationMetrics(BaseModel):
+    auc24_mg_h_l: float
+    cmax_mg_l: float
+    cmin_mg_l: float
+
+
+class BayesSimulateResponse(BaseModel):
+    posterior: PosteriorSummary
+    curve: List[CurvePoint]
+    metrics: SimulationMetrics
+    warnings: List[str] = []
+    method: str = "grid-map"
+    educational_note: str = "Educational demonstration only."
+
+
 def _validate_bayesian_inputs(levels: List[Level], dose_history: List[DoseEvent]) -> None:
     if not levels or len(levels) < 1:
         raise HTTPException(status_code=422, detail="At least 1 level is required for Bayesian estimation")
@@ -258,6 +452,123 @@ def pk_bayesian(req: BayesianRequest) -> BayesianResponse:
         auc24=det.auc24,
         recommended={"maintenanceDoseMg": det.maintenanceDoseMg, "intervalHr": det.intervalHr},
         safety=det.safety,
+    )
+
+
+@app.post("/pk/bayes_simulate", response_model=BayesSimulateResponse)
+@app.post("/api/pk/bayes_simulate", response_model=BayesSimulateResponse)
+def pk_bayes_simulate(req: BayesSimulateRequest) -> BayesSimulateResponse:
+    warnings: List[str] = []
+    dose_mg = float(req.regimen.dose_mg)
+    interval_hr = float(req.regimen.interval_hr)
+    infusion_hr = float(req.regimen.infusion_hr)
+
+    if interval_hr <= 0:
+        warnings.append("Interval must be positive; using 12 hours for simulation.")
+        interval_hr = 12.0
+    if infusion_hr <= 0:
+        warnings.append("Infusion duration must be positive; using 1 hour for simulation.")
+        infusion_hr = 1.0
+    if dose_mg <= 0:
+        warnings.append("Dose must be positive; using 1000 mg for simulation.")
+        dose_mg = 1000.0
+
+    if infusion_hr < 0.5 or infusion_hr > 4.0:
+        warnings.append("Infusion duration outside 0.5–4 h; interpret simulations cautiously.")
+    if interval_hr not in {6.0, 8.0, 12.0, 24.0}:
+        warnings.append("Non-standard interval (typical: 6, 8, 12, 24 h).")
+    if dose_mg < 250 or dose_mg > 6000:
+        warnings.append("Dose outside typical 250–6000 mg range.")
+    if infusion_hr > interval_hr:
+        warnings.append("Infusion duration exceeds interval; using infusion = interval for simulation.")
+        infusion_hr = interval_hr
+
+    daily_dose = dose_mg * (24.0 / interval_hr)
+    max_daily_display = 6000.0
+    if daily_dose > max_daily_display:
+        capped = max_daily_display * (interval_hr / 24.0)
+        warnings.append(
+            f"Daily dose capped at {max_daily_display:.0f} mg/day for educational display "
+            f"(simulating {capped:.0f} mg q{interval_hr:g}h)."
+        )
+        dose_mg = capped
+
+    valid_times: List[float] = []
+    valid_concs: List[float] = []
+    for level in req.levels or []:
+        if level.time_hr_from_start < 0:
+            warnings.append("Ignoring level with negative time.")
+            continue
+        if level.concentration_mg_l <= 0:
+            warnings.append("Ignoring level with non-positive concentration.")
+            continue
+        valid_times.append(float(level.time_hr_from_start))
+        valid_concs.append(float(level.concentration_mg_l))
+
+    def _sanitize_prior(prior: PriorParam, name: str) -> dict:
+        mean = float(prior.mean)
+        variance = float(prior.variance)
+        dist = prior.distribution.lower()
+        if dist not in {"normal", "lognormal"}:
+            warnings.append(f"{name} prior distribution not recognized; using lognormal.")
+            dist = "lognormal"
+        if dist == "lognormal" and mean <= 0:
+            warnings.append(f"{name} prior mean must be positive for lognormal; using absolute value.")
+            mean = max(abs(mean), 0.1)
+        if variance <= 0:
+            warnings.append(f"{name} prior variance must be positive; using 10% CV default.")
+            variance = (0.1 * max(mean, 0.1)) ** 2
+        return {"mean": mean, "variance": variance, "distribution": dist}
+
+    prior_cl = _sanitize_prior(req.priors.cl, "CL")
+    prior_v = _sanitize_prior(req.priors.v, "V")
+    sigma_prior = req.priors.sigma or PriorParam(mean=0.25, variance=0.04, distribution="normal")
+    prior_sigma = _sanitize_prior(sigma_prior, "Sigma")
+    sigma = max(prior_sigma["mean"], 0.05)
+
+    if not valid_times:
+        warnings.append("No valid levels provided; posterior reflects prior information only.")
+
+    cl_mean, cl_sd, v_mean, v_sd, map_cl, map_v = _posterior_grid(
+        valid_times,
+        valid_concs,
+        dose_mg,
+        interval_hr,
+        infusion_hr,
+        prior_cl,
+        prior_v,
+        sigma,
+        grid_size=40,
+    )
+
+    sim_cl = cl_mean if cl_mean > 0 else map_cl
+    sim_v = v_mean if v_mean > 0 else map_v
+    times, concs = _simulate_curve(sim_cl, sim_v, dose_mg, interval_hr, infusion_hr, duration_h=24.0, step_h=0.25)
+    auc24 = float(np.trapz(concs, times))
+    cmax = float(_steady_state_concentration(infusion_hr, dose_mg, interval_hr, infusion_hr, sim_cl, sim_v))
+    cmin = float(_steady_state_concentration(interval_hr - 1e-6, dose_mg, interval_hr, infusion_hr, sim_cl, sim_v))
+
+    curve = [
+        CurvePoint(time_hr=float(t), concentration_mg_l=float(c))
+        for t, c in zip(times.tolist(), concs.tolist())
+    ]
+
+    return BayesSimulateResponse(
+        posterior=PosteriorSummary(
+            cl_mean=float(cl_mean),
+            cl_sd=float(cl_sd),
+            v_mean=float(v_mean),
+            v_sd=float(v_sd),
+        ),
+        curve=curve,
+        metrics=SimulationMetrics(
+            auc24_mg_h_l=auc24,
+            cmax_mg_l=cmax,
+            cmin_mg_l=cmin,
+        ),
+        warnings=warnings,
+        method="grid-map",
+        educational_note="Educational demonstration only — not for clinical use.",
     )
 
 

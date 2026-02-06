@@ -29,6 +29,48 @@ export type PkCalculateResponse = {
   concentrationCurve?: Array<{ t: number; c: number }>;
 };
 
+export type PriorParam = {
+  mean: number;
+  variance: number;
+  distribution: "normal" | "lognormal";
+};
+
+export type BayesSimulateRequest = {
+  age: number;
+  weight: number;
+  sex?: string;
+  scr: number;
+  regimen: {
+    dose_mg: number;
+    interval_hr: number;
+    infusion_hr: number;
+  };
+  levels?: Array<{ time_hr_from_start: number; concentration_mg_l: number }>;
+  priors: {
+    cl: PriorParam;
+    v: PriorParam;
+    sigma?: PriorParam;
+  };
+};
+
+export type BayesSimulateResponse = {
+  posterior: {
+    cl_mean: number;
+    cl_sd: number;
+    v_mean: number;
+    v_sd: number;
+  };
+  curve: Array<{ time_hr: number; concentration_mg_l: number }>;
+  metrics: {
+    auc24_mg_h_l: number;
+    cmax_mg_l: number;
+    cmin_mg_l: number;
+  };
+  warnings: string[];
+  method?: string;
+  educational_note?: string;
+};
+
 export type ReferenceEntry = { title: string; org: string; year: number; note?: string };
 export type ReferencesResponse = { references: ReferenceEntry[] };
 export type DisclaimerResponse = { short: string; full: string[] };
@@ -109,6 +151,10 @@ export async function calculatePk(payload: PkCalculatePayload): Promise<PkCalcul
 
 export async function bayesianEstimate(payload: PkCalculatePayload): Promise<PkCalculateResponse> {
   return postJSON<PkCalculateResponse>(`${API_BASE}/api/pk/bayesian`, payload);
+}
+
+export async function bayesSimulate(payload: BayesSimulateRequest): Promise<BayesSimulateResponse> {
+  return postJSON<BayesSimulateResponse>(`${API_BASE}/api/pk/bayes_simulate`, payload);
 }
 
 export async function getReferences(): Promise<ReferencesResponse> {
