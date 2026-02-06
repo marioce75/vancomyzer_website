@@ -4,14 +4,19 @@ import math
 import os
 import subprocess
 from datetime import datetime, timezone
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Literal, Tuple
 
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
 import numpy as np
+
+from backend.models import CalculateRequest, CalculateResponse, CurvePoint, SafetyMessage
+from backend.pk.sim import simulate_regimen_0_48h, auc_trapz, estimate_peak_trough_from_sim, Event, build_repeated_regimen_events, concentration_time_series
+from backend.pk.bayes_demo import map_fit_demo
+
 
 app = FastAPI(title="Vancomyzer Server")
 
@@ -91,6 +96,12 @@ class DoseEvent(BaseModel):
     infusionHours: float = Field(gt=0)
 
 
+class RegimenOverride(BaseModel):
+    doseMg: float = Field(gt=0)
+    intervalHr: int = Field(gt=0)
+    infusionHours: float = Field(gt=0)
+
+
 class PkCalculateRequest(BaseModel):
     age: int
     sex: str
@@ -104,6 +115,7 @@ class PkCalculateRequest(BaseModel):
     aucTargetHigh: int = 600
     levels: Optional[List[Level]] = None
     doseHistory: Optional[List[DoseEvent]] = None
+    regimen: Optional[RegimenOverride] = None
 
 
 class Safety(BaseModel):
@@ -165,6 +177,43 @@ def predict_trough(dose_mg: float, tau_h: int, cl_l_h: float, v_l: float, infusi
     return float(max(0.0, c_trough))
 
 
+def build_concentration_curve(
+    dose_mg: float,
+    tau_h: int,
+    cl_l_h: float,
+    v_l: float,
+    infusion_h: float = 1.0,
+    duration_h: float = 24.0,
+    step_h: float = 0.5,
+) -> List[dict]:
+    cl = max(cl_l_h, 0.1)
+    v = max(v_l, 1.0)
+    tau = float(max(1.0, tau_h))
+    tin = float(max(0.1, min(float(infusion_h), tau)))
+    k = cl / v
+    r = dose_mg / tin
+
+    points: List[dict] = []
+    n_doses = max(6, int(math.ceil(duration_h / tau)) + 6)
+    steps = int(math.floor(duration_h / step_h))
+
+    for i in range(steps + 1):
+        t = i * step_h
+        c = 0.0
+        for n in range(n_doses):
+            start = -n * tau
+            dt = t - start
+            if dt < 0:
+                continue
+            if dt <= tin:
+                c += (r / cl) * (1.0 - math.exp(-k * dt))
+            else:
+                c += (r / cl) * (1.0 - math.exp(-k * tin)) * math.exp(-k * (dt - tin))
+        points.append({"t": float(round(t, 2)), "c": float(round(max(c, 0.0), 3))})
+
+    return points
+
+
 # -------- API endpoints (with /api aliases) --------
 @app.post("/pk/calculate", response_model=PkCalculateResponse)
 @app.post("/api/pk/calculate", response_model=PkCalculateResponse)
@@ -177,15 +226,22 @@ def pk_calculate(req: PkCalculateRequest) -> PkCalculateResponse:
     cl = estimate_cl_l_per_h(crcl)
     v = estimate_v_l(req.weightKg)
 
-    target_mid = (req.aucTargetLow + req.aucTargetHigh) / 2
-    daily_dose_needed_mg = target_mid * cl * req.mic * 1000.0
+    infusion_h = 1.0
+    if req.regimen:
+        tau = int(max(4, req.regimen.intervalHr))
+        per_dose_mg = float(max(250, min(3000, req.regimen.doseMg)))
+        infusion_h = float(max(0.5, min(req.regimen.infusionHours, tau)))
+    else:
+        target_mid = (req.aucTargetLow + req.aucTargetHigh) / 2
+        daily_dose_needed_mg = target_mid * cl * req.mic * 1000.0
 
-    tau = pick_interval(crcl)
-    per_dose_mg = daily_dose_needed_mg * (tau / 24.0)
-    per_dose_mg = max(500, min(3000, round(per_dose_mg / 250) * 250))
+        tau = pick_interval(crcl)
+        per_dose_mg = daily_dose_needed_mg * (tau / 24.0)
+        per_dose_mg = max(500, min(3000, round(per_dose_mg / 250) * 250))
 
     auc24_pred = auc24_from_daily((per_dose_mg * (24.0 / tau)), cl, req.mic)
-    trough = predict_trough(per_dose_mg, tau, cl, v, infusion_h=1.0)
+    trough = predict_trough(per_dose_mg, tau, cl, v, infusion_h=infusion_h)
+    curve = build_concentration_curve(per_dose_mg, tau, cl, v, infusion_h=infusion_h)
 
     loading = None
     if req.infectionSeverity.lower() == "serious" or req.icu:
@@ -215,7 +271,7 @@ def pk_calculate(req: PkCalculateRequest) -> PkCalculateResponse:
             crclLow=bool(crclLow),
             messages=messages,
         ),
-        concentrationCurve=None,
+        concentrationCurve=curve,
     )
 
 
@@ -231,6 +287,66 @@ class BayesianResponse(BaseModel):
     auc24: float
     recommended: dict
     safety: Safety
+
+
+class BayesLevel(BaseModel):
+    time_hr_from_start: float
+    concentration_mg_l: float
+
+
+class BayesRegimen(BaseModel):
+    dose_mg: float
+    interval_hr: float
+    infusion_hr: float
+
+
+class PriorParam(BaseModel):
+    mean: float
+    variance: float
+    distribution: Literal["normal", "lognormal"] = "lognormal"
+
+
+class PriorSet(BaseModel):
+    cl: PriorParam
+    v: PriorParam
+    sigma: Optional[PriorParam] = None
+
+
+class BayesSimulateRequest(BaseModel):
+    age: float
+    weight: float
+    sex: Optional[str] = None
+    scr: float
+    regimen: BayesRegimen
+    levels: Optional[List[BayesLevel]] = None
+    priors: PriorSet
+
+
+class PosteriorSummary(BaseModel):
+    cl_mean: float
+    cl_sd: float
+    v_mean: float
+    v_sd: float
+
+
+class CurvePoint(BaseModel):
+    time_hr: float
+    concentration_mg_l: float
+
+
+class SimulationMetrics(BaseModel):
+    auc24_mg_h_l: float
+    cmax_mg_l: float
+    cmin_mg_l: float
+
+
+class BayesSimulateResponse(BaseModel):
+    posterior: PosteriorSummary
+    curve: List[CurvePoint]
+    metrics: SimulationMetrics
+    warnings: List[str] = []
+    method: str = "grid-map"
+    educational_note: str = "Educational demonstration only."
 
 
 def _validate_bayesian_inputs(levels: List[Level], dose_history: List[DoseEvent]) -> None:
@@ -253,6 +369,123 @@ def pk_bayesian(req: BayesianRequest) -> BayesianResponse:
         auc24=det.auc24,
         recommended={"maintenanceDoseMg": det.maintenanceDoseMg, "intervalHr": det.intervalHr},
         safety=det.safety,
+    )
+
+
+@app.post("/pk/bayes_simulate", response_model=BayesSimulateResponse)
+@app.post("/api/pk/bayes_simulate", response_model=BayesSimulateResponse)
+def pk_bayes_simulate(req: BayesSimulateRequest) -> BayesSimulateResponse:
+    warnings: List[str] = []
+    dose_mg = float(req.regimen.dose_mg)
+    interval_hr = float(req.regimen.interval_hr)
+    infusion_hr = float(req.regimen.infusion_hr)
+
+    if interval_hr <= 0:
+        warnings.append("Interval must be positive; using 12 hours for simulation.")
+        interval_hr = 12.0
+    if infusion_hr <= 0:
+        warnings.append("Infusion duration must be positive; using 1 hour for simulation.")
+        infusion_hr = 1.0
+    if dose_mg <= 0:
+        warnings.append("Dose must be positive; using 1000 mg for simulation.")
+        dose_mg = 1000.0
+
+    if infusion_hr < 0.5 or infusion_hr > 4.0:
+        warnings.append("Infusion duration outside 0.5–4 h; interpret simulations cautiously.")
+    if interval_hr not in {6.0, 8.0, 12.0, 24.0}:
+        warnings.append("Non-standard interval (typical: 6, 8, 12, 24 h).")
+    if dose_mg < 250 or dose_mg > 6000:
+        warnings.append("Dose outside typical 250–6000 mg range.")
+    if infusion_hr > interval_hr:
+        warnings.append("Infusion duration exceeds interval; using infusion = interval for simulation.")
+        infusion_hr = interval_hr
+
+    daily_dose = dose_mg * (24.0 / interval_hr)
+    max_daily_display = 6000.0
+    if daily_dose > max_daily_display:
+        capped = max_daily_display * (interval_hr / 24.0)
+        warnings.append(
+            f"Daily dose capped at {max_daily_display:.0f} mg/day for educational display "
+            f"(simulating {capped:.0f} mg q{interval_hr:g}h)."
+        )
+        dose_mg = capped
+
+    valid_times: List[float] = []
+    valid_concs: List[float] = []
+    for level in req.levels or []:
+        if level.time_hr_from_start < 0:
+            warnings.append("Ignoring level with negative time.")
+            continue
+        if level.concentration_mg_l <= 0:
+            warnings.append("Ignoring level with non-positive concentration.")
+            continue
+        valid_times.append(float(level.time_hr_from_start))
+        valid_concs.append(float(level.concentration_mg_l))
+
+    def _sanitize_prior(prior: PriorParam, name: str) -> dict:
+        mean = float(prior.mean)
+        variance = float(prior.variance)
+        dist = prior.distribution.lower()
+        if dist not in {"normal", "lognormal"}:
+            warnings.append(f"{name} prior distribution not recognized; using lognormal.")
+            dist = "lognormal"
+        if dist == "lognormal" and mean <= 0:
+            warnings.append(f"{name} prior mean must be positive for lognormal; using absolute value.")
+            mean = max(abs(mean), 0.1)
+        if variance <= 0:
+            warnings.append(f"{name} prior variance must be positive; using 10% CV default.")
+            variance = (0.1 * max(mean, 0.1)) ** 2
+        return {"mean": mean, "variance": variance, "distribution": dist}
+
+    prior_cl = _sanitize_prior(req.priors.cl, "CL")
+    prior_v = _sanitize_prior(req.priors.v, "V")
+    sigma_prior = req.priors.sigma or PriorParam(mean=0.25, variance=0.04, distribution="normal")
+    prior_sigma = _sanitize_prior(sigma_prior, "Sigma")
+    sigma = max(prior_sigma["mean"], 0.05)
+
+    if not valid_times:
+        warnings.append("No valid levels provided; posterior reflects prior information only.")
+
+    cl_mean, cl_sd, v_mean, v_sd, map_cl, map_v = _posterior_grid(
+        valid_times,
+        valid_concs,
+        dose_mg,
+        interval_hr,
+        infusion_hr,
+        prior_cl,
+        prior_v,
+        sigma,
+        grid_size=40,
+    )
+
+    sim_cl = cl_mean if cl_mean > 0 else map_cl
+    sim_v = v_mean if v_mean > 0 else map_v
+    times, concs = _simulate_curve(sim_cl, sim_v, dose_mg, interval_hr, infusion_hr, duration_h=24.0, step_h=0.25)
+    auc24 = float(np.trapz(concs, times))
+    cmax = float(_steady_state_concentration(infusion_hr, dose_mg, interval_hr, infusion_hr, sim_cl, sim_v))
+    cmin = float(_steady_state_concentration(interval_hr - 1e-6, dose_mg, interval_hr, infusion_hr, sim_cl, sim_v))
+
+    curve = [
+        CurvePoint(time_hr=float(t), concentration_mg_l=float(c))
+        for t, c in zip(times.tolist(), concs.tolist())
+    ]
+
+    return BayesSimulateResponse(
+        posterior=PosteriorSummary(
+            cl_mean=float(cl_mean),
+            cl_sd=float(cl_sd),
+            v_mean=float(v_mean),
+            v_sd=float(v_sd),
+        ),
+        curve=curve,
+        metrics=SimulationMetrics(
+            auc24_mg_h_l=auc24,
+            cmax_mg_l=cmax,
+            cmin_mg_l=cmin,
+        ),
+        warnings=warnings,
+        method="grid-map",
+        educational_note="Educational demonstration only — not for clinical use.",
     )
 
 
@@ -342,6 +575,24 @@ def api_version():
     }
 
 
-# -------- SPA serving (MUST be mounted after API routes) --------
-# Root should always serve built frontend index.html when present.
-app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True, check_dir=False), name="spa")
+# -------- SPA serving (MUST be declared after API routes) --------
+@app.get("/", response_class=HTMLResponse)
+@app.get("/{full_path:path}")
+def serve_spa(full_path: str = ""):
+    root_segment = full_path.split("/", 1)[0] if full_path else ""
+    if root_segment in {"api", "pk", "meta", "health", "healthz"}:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    if not INDEX_FILE.exists():
+        return HTMLResponse("<h1>Frontend build not found</h1>", status_code=503)
+
+    candidate = (STATIC_DIR / full_path).resolve()
+    if full_path:
+        if not str(candidate).startswith(str(STATIC_DIR.resolve())):
+            raise HTTPException(status_code=404, detail="Not found")
+        if candidate.is_file():
+            return FileResponse(candidate)
+        if candidate.suffix or full_path.startswith(("assets/", "static/")):
+            raise HTTPException(status_code=404, detail="Not found")
+
+    return FileResponse(INDEX_FILE)

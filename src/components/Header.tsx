@@ -1,18 +1,16 @@
-import { DisclaimerBanner } from "./DisclaimerBanner";
-
 export function Header() {
   return (
-    <header className="py-8 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground">
+    <header className="py-8 bg-sky-50 border-b">
       <div className="container mx-auto px-4">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-            Vancomyzer
+        <div className="text-center space-y-3">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-sky-900">
+            Vancomyzer®
           </h1>
-          <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
-            Professional vancomycin dosing calculator with advanced pharmacokinetic modeling
+          <p className="text-sm md:text-base text-muted-foreground">
+            Aligned with current IDSA/ASHP vancomycin monitoring guidelines
           </p>
-          <div className="text-sm opacity-75">
-            Evidence-based dosing • Population pharmacokinetics • Clinical decision support
+          <div className="text-sm font-medium text-sky-900">
+            Hit that AUC target—fast
           </div>
         </div>
       </div>

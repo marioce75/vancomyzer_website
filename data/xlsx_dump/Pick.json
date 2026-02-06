@@ -1,0 +1,52 @@
+{
+  "sheet": "Pick",
+  "max_row_dumped": 7,
+  "max_col_dumped": 5,
+  "nonempty_cells_dumped": 20,
+  "grid": [
+    [
+      "YES",
+      1,
+      6,
+      250,
+      "MALE"
+    ],
+    [
+      "NO",
+      2,
+      8,
+      500,
+      "FEMALE"
+    ],
+    [
+      null,
+      3,
+      12,
+      750
+    ],
+    [
+      null,
+      4,
+      24,
+      1000
+    ],
+    [
+      null,
+      5,
+      null,
+      1250
+    ],
+    [
+      null,
+      null,
+      null,
+      1500
+    ],
+    [
+      null,
+      null,
+      null,
+      2000
+    ]
+  ]
+}

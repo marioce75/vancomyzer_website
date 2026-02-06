@@ -15,6 +15,7 @@ export type PkCalculatePayload = {
   aucTargetHigh?: number;
   levels?: Array<{ concentration: number; timeHoursFromDoseStart: number }>;
   doseHistory?: Array<{ doseMg: number; startTimeHours: number; infusionHours: number }>;
+  regimen?: { doseMg: number; intervalHr: number; infusionHours: number };
 };
 
 export type PkCalculateResponse = {
@@ -212,6 +213,7 @@ function buildCurve(points: Array<{ time: number; concentration: number }>): Arr
 async function readErrorBody(
   res: Response,
 ): Promise<{ detail?: string; errors?: ApiValidationError[]; received_body?: unknown } | null> {
+  const clone = res.clone();
   try {
     const body: unknown = await res.json();
     if (body && typeof body === "object") {
@@ -222,9 +224,20 @@ async function readErrorBody(
         received_body: maybe.received_body,
       };
     }
+    if (typeof body === "string") {
+      return { detail: body };
+    }
+  } catch {
+    // fall through
+  }
+
+  try {
+    const text = await clone.text();
+    if (text) return { detail: text };
   } catch {
     // ignore
   }
+
   return null;
 }
 
@@ -249,6 +262,10 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
 
 export async function calculatePk(payload: PkCalculatePayload): Promise<PkCalculateResponse> {
   return postJSON<PkCalculateResponse>(`${API_BASE}/api/pk/calculate`, payload);
+}
+
+export async function calculateEducational(payload: CalculateRequest): Promise<CalculateResponse> {
+  return postJSON<CalculateResponse>(`${API_BASE}/api/pk/calculate`, payload);
 }
 
 export async function bayesianEstimate(payload: PkCalculatePayload): Promise<PkCalculateResponse> {
@@ -333,4 +350,42 @@ export async function getSupportVersion(): Promise<SupportVersionResponse> {
     throw new ApiError(parsed?.detail || `Service error: ${res.status}`, res.status, parsed ?? undefined);
   }
   return res.json();
+}
+
+export type CalculateMode = "empiric" | "bayes_demo";
+
+export type CalculateRequest = {
+  mode: CalculateMode;
+  patient: {
+    age_yr: number;
+    sex: "male" | "female";
+    weight_kg: number;
+    serum_creatinine_mg_dl: number;
+  };
+  regimen: {
+    dose_mg: number;
+    interval_hr: number;
+    infusion_hr: number;
+  };
+  dose_history?: Array<{ dose_mg: number; start_time_hr: number; infusion_hr: number }>;
+  levels?: Array<{ time_hr: number; concentration_mg_l: number }>;
+};
+
+export type CalculateResponse = {
+  auc24_mg_h_l: number;
+  trough_mg_l: number;
+  peak_mg_l: number;
+  concentration_curve: Array<{ t_hr: number; conc_mg_l: number }>;
+  safety: Array<{ kind: "info" | "warning"; message: string }>;
+  bayes_demo?: {
+    label: string;
+    cl_l_hr: number;
+    v_l: number;
+    ke_hr: number;
+    rmse_mg_l: number;
+  };
+};
+
+export async function calculateEducational(req: CalculateRequest): Promise<CalculateResponse> {
+  return postJSON<CalculateResponse>(`${API_BASE}/api/pk/calculate`, req);
 }
