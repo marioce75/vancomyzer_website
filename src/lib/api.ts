@@ -12,6 +12,7 @@ export type PkCalculatePayload = {
   aucTargetHigh?: number;
   levels?: Array<{ concentration: number; timeHoursFromDoseStart: number }>;
   doseHistory?: Array<{ doseMg: number; startTimeHours: number; infusionHours: number }>;
+  regimen?: { doseMg: number; intervalHr: number; infusionHours: number };
 };
 
 export type PkCalculateResponse = {
@@ -29,47 +30,8 @@ export type PkCalculateResponse = {
   concentrationCurve?: Array<{ t: number; c: number }>;
 };
 
-export type PriorParam = {
-  mean: number;
-  variance: number;
-  distribution: "normal" | "lognormal";
-};
-
-export type BayesSimulateRequest = {
-  age: number;
-  weight: number;
-  sex?: string;
-  scr: number;
-  regimen: {
-    dose_mg: number;
-    interval_hr: number;
-    infusion_hr: number;
-  };
-  levels?: Array<{ time_hr_from_start: number; concentration_mg_l: number }>;
-  priors: {
-    cl: PriorParam;
-    v: PriorParam;
-    sigma?: PriorParam;
-  };
-};
-
-export type BayesSimulateResponse = {
-  posterior: {
-    cl_mean: number;
-    cl_sd: number;
-    v_mean: number;
-    v_sd: number;
-  };
-  curve: Array<{ time_hr: number; concentration_mg_l: number }>;
-  metrics: {
-    auc24_mg_h_l: number;
-    cmax_mg_l: number;
-    cmin_mg_l: number;
-  };
-  warnings: string[];
-  method?: string;
-  educational_note?: string;
-};
+export type CalculateRequest = PkCalculatePayload;
+export type CalculateResponse = PkCalculateResponse;
 
 export type ReferenceEntry = { title: string; org: string; year: number; note?: string };
 export type ReferencesResponse = { references: ReferenceEntry[] };
@@ -110,6 +72,7 @@ export class ApiError extends Error {
 async function readErrorBody(
   res: Response,
 ): Promise<{ detail?: string; errors?: ApiValidationError[]; received_body?: unknown } | null> {
+  const clone = res.clone();
   try {
     const body: unknown = await res.json();
     if (body && typeof body === "object") {
@@ -120,9 +83,20 @@ async function readErrorBody(
         received_body: maybe.received_body,
       };
     }
+    if (typeof body === "string") {
+      return { detail: body };
+    }
+  } catch {
+    // fall through
+  }
+
+  try {
+    const text = await clone.text();
+    if (text) return { detail: text };
   } catch {
     // ignore
   }
+
   return null;
 }
 
@@ -147,6 +121,10 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
 
 export async function calculatePk(payload: PkCalculatePayload): Promise<PkCalculateResponse> {
   return postJSON<PkCalculateResponse>(`${API_BASE}/api/pk/calculate`, payload);
+}
+
+export async function calculateEducational(payload: CalculateRequest): Promise<CalculateResponse> {
+  return postJSON<CalculateResponse>(`${API_BASE}/api/pk/calculate`, payload);
 }
 
 export async function bayesianEstimate(payload: PkCalculatePayload): Promise<PkCalculateResponse> {

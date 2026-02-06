@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import List, Optional, Any, Literal, Tuple
 
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
@@ -96,6 +96,12 @@ class DoseEvent(BaseModel):
     infusionHours: float = Field(gt=0)
 
 
+class RegimenOverride(BaseModel):
+    doseMg: float = Field(gt=0)
+    intervalHr: int = Field(gt=0)
+    infusionHours: float = Field(gt=0)
+
+
 class PkCalculateRequest(BaseModel):
     age: int
     sex: str
@@ -109,6 +115,7 @@ class PkCalculateRequest(BaseModel):
     aucTargetHigh: int = 600
     levels: Optional[List[Level]] = None
     doseHistory: Optional[List[DoseEvent]] = None
+    regimen: Optional[RegimenOverride] = None
 
 
 class Safety(BaseModel):
@@ -170,138 +177,41 @@ def predict_trough(dose_mg: float, tau_h: int, cl_l_h: float, v_l: float, infusi
     return float(max(0.0, c_trough))
 
 
-def _lognormal_mu_sigma(mean: float, variance: float) -> Tuple[float, float]:
-    mean = max(float(mean), 1e-6)
-    variance = max(float(variance), 1e-6)
-    sigma2 = math.log(1.0 + (variance / (mean ** 2)))
-    sigma = math.sqrt(max(sigma2, 1e-9))
-    mu = math.log(mean) - 0.5 * sigma2
-    return mu, sigma
-
-
-def _prior_log_pdf(x: np.ndarray, mean: float, variance: float, distribution: str) -> np.ndarray:
-    dist = (distribution or "lognormal").lower()
-    variance = max(float(variance), 1e-6)
-    if dist == "lognormal":
-        mu, sigma = _lognormal_mu_sigma(mean, variance)
-        safe_x = np.maximum(x, 1e-9)
-        return -0.5 * ((np.log(safe_x) - mu) / sigma) ** 2 - np.log(safe_x * sigma)
-    sd = math.sqrt(variance)
-    return -0.5 * ((x - mean) / sd) ** 2 - math.log(sd)
-
-
-def _prior_range(mean: float, variance: float, distribution: str) -> Tuple[float, float]:
-    dist = (distribution or "lognormal").lower()
-    variance = max(float(variance), 1e-6)
-    if dist == "lognormal":
-        mu, sigma = _lognormal_mu_sigma(mean, variance)
-        lo = math.exp(mu - 3.0 * sigma)
-        hi = math.exp(mu + 3.0 * sigma)
-    else:
-        sd = math.sqrt(variance)
-        lo = mean - 3.0 * sd
-        hi = mean + 3.0 * sd
-    lo = max(lo, 0.05)
-    hi = max(hi, lo * 1.25)
-    return lo, hi
-
-
-def _steady_state_concentration(
-    time_h: np.ndarray | float,
+def build_concentration_curve(
     dose_mg: float,
-    interval_h: float,
-    infusion_h: float,
-    cl_l_h: np.ndarray | float,
-    v_l: np.ndarray | float,
-) -> np.ndarray:
-    interval = max(float(interval_h), 1e-3)
-    tin = max(1e-3, min(float(infusion_h), interval))
-    t = np.mod(time_h, interval)
-    cl = np.maximum(cl_l_h, 1e-6)
-    v = np.maximum(v_l, 1e-6)
-    k = cl / v
-    r = float(dose_mg) / tin
-    denom = 1.0 - np.exp(-k * interval)
-    denom = np.where(denom < 1e-9, 1e-9, denom)
-    during = t <= tin
-    c_during = (r / cl) * (1.0 - np.exp(-k * t)) / denom
-    c_after = (r / cl) * (1.0 - np.exp(-k * tin)) * np.exp(-k * (t - tin)) / denom
-    return np.where(during, c_during, c_after)
-
-
-def _simulate_curve(
+    tau_h: int,
     cl_l_h: float,
     v_l: float,
-    dose_mg: float,
-    interval_h: float,
-    infusion_h: float,
+    infusion_h: float = 1.0,
     duration_h: float = 24.0,
-    step_h: float = 0.25,
-) -> Tuple[np.ndarray, np.ndarray]:
-    times = np.arange(0.0, duration_h + step_h * 0.5, step_h)
-    conc = _steady_state_concentration(times, dose_mg, interval_h, infusion_h, cl_l_h, v_l)
-    return times, conc
+    step_h: float = 0.5,
+) -> List[dict]:
+    cl = max(cl_l_h, 0.1)
+    v = max(v_l, 1.0)
+    tau = float(max(1.0, tau_h))
+    tin = float(max(0.1, min(float(infusion_h), tau)))
+    k = cl / v
+    r = dose_mg / tin
 
+    points: List[dict] = []
+    n_doses = max(6, int(math.ceil(duration_h / tau)) + 6)
+    steps = int(math.floor(duration_h / step_h))
 
-def _posterior_grid(
-    level_times: List[float],
-    level_concs: List[float],
-    dose_mg: float,
-    interval_h: float,
-    infusion_h: float,
-    prior_cl: dict,
-    prior_v: dict,
-    sigma: float,
-    grid_size: int = 40,
-) -> Tuple[float, float, float, float, float, float]:
-    cl_lo, cl_hi = _prior_range(prior_cl["mean"], prior_cl["variance"], prior_cl["distribution"])
-    v_lo, v_hi = _prior_range(prior_v["mean"], prior_v["variance"], prior_v["distribution"])
+    for i in range(steps + 1):
+        t = i * step_h
+        c = 0.0
+        for n in range(n_doses):
+            start = -n * tau
+            dt = t - start
+            if dt < 0:
+                continue
+            if dt <= tin:
+                c += (r / cl) * (1.0 - math.exp(-k * dt))
+            else:
+                c += (r / cl) * (1.0 - math.exp(-k * tin)) * math.exp(-k * (dt - tin))
+        points.append({"t": float(round(t, 2)), "c": float(round(max(c, 0.0), 3))})
 
-    cl_values = np.linspace(cl_lo, cl_hi, grid_size)
-    v_values = np.linspace(v_lo, v_hi, grid_size)
-    cl_grid, v_grid = np.meshgrid(cl_values, v_values, indexing="ij")
-
-    log_prior = _prior_log_pdf(cl_grid, prior_cl["mean"], prior_cl["variance"], prior_cl["distribution"]) + _prior_log_pdf(
-        v_grid, prior_v["mean"], prior_v["variance"], prior_v["distribution"]
-    )
-
-    if not level_times:
-        cl_mean = float(prior_cl["mean"])
-        v_mean = float(prior_v["mean"])
-        cl_sd = float(math.sqrt(max(prior_cl["variance"], 1e-6)))
-        v_sd = float(math.sqrt(max(prior_v["variance"], 1e-6)))
-        return cl_mean, cl_sd, v_mean, v_sd, cl_mean, v_mean
-
-    preds = []
-    for t in level_times:
-        preds.append(_steady_state_concentration(float(t), dose_mg, interval_h, infusion_h, cl_grid, v_grid))
-    pred_arr = np.stack(preds, axis=0)
-
-    obs = np.maximum(np.array(level_concs, dtype=float), 1e-6)
-    log_obs = np.log(obs)[:, None, None]
-    log_pred = np.log(np.maximum(pred_arr, 1e-9))
-    resid = (log_obs - log_pred) / max(float(sigma), 1e-6)
-    log_like = -0.5 * np.sum(resid ** 2, axis=0)
-
-    log_post = log_prior + log_like
-    max_log = float(np.max(log_post))
-    weights = np.exp(log_post - max_log)
-    wsum = float(np.sum(weights))
-    if wsum <= 0.0:
-        idx = np.unravel_index(np.argmax(log_post), log_post.shape)
-        map_cl = float(cl_grid[idx])
-        map_v = float(v_grid[idx])
-        return map_cl, 0.0, map_v, 0.0, map_cl, map_v
-
-    cl_mean = float(np.sum(weights * cl_grid) / wsum)
-    v_mean = float(np.sum(weights * v_grid) / wsum)
-    cl_sd = float(np.sqrt(np.sum(weights * (cl_grid - cl_mean) ** 2) / wsum))
-    v_sd = float(np.sqrt(np.sum(weights * (v_grid - v_mean) ** 2) / wsum))
-
-    idx = np.unravel_index(np.argmax(log_post), log_post.shape)
-    map_cl = float(cl_grid[idx])
-    map_v = float(v_grid[idx])
-    return cl_mean, cl_sd, v_mean, v_sd, map_cl, map_v
+    return points
 
 
 # -------- API endpoints (with /api aliases) --------
@@ -316,15 +226,22 @@ def pk_calculate(req: PkCalculateRequest) -> PkCalculateResponse:
     cl = estimate_cl_l_per_h(crcl)
     v = estimate_v_l(req.weightKg)
 
-    target_mid = (req.aucTargetLow + req.aucTargetHigh) / 2
-    daily_dose_needed_mg = target_mid * cl * req.mic * 1000.0
+    infusion_h = 1.0
+    if req.regimen:
+        tau = int(max(4, req.regimen.intervalHr))
+        per_dose_mg = float(max(250, min(3000, req.regimen.doseMg)))
+        infusion_h = float(max(0.5, min(req.regimen.infusionHours, tau)))
+    else:
+        target_mid = (req.aucTargetLow + req.aucTargetHigh) / 2
+        daily_dose_needed_mg = target_mid * cl * req.mic * 1000.0
 
-    tau = pick_interval(crcl)
-    per_dose_mg = daily_dose_needed_mg * (tau / 24.0)
-    per_dose_mg = max(500, min(3000, round(per_dose_mg / 250) * 250))
+        tau = pick_interval(crcl)
+        per_dose_mg = daily_dose_needed_mg * (tau / 24.0)
+        per_dose_mg = max(500, min(3000, round(per_dose_mg / 250) * 250))
 
     auc24_pred = auc24_from_daily((per_dose_mg * (24.0 / tau)), cl, req.mic)
-    trough = predict_trough(per_dose_mg, tau, cl, v, infusion_h=1.0)
+    trough = predict_trough(per_dose_mg, tau, cl, v, infusion_h=infusion_h)
+    curve = build_concentration_curve(per_dose_mg, tau, cl, v, infusion_h=infusion_h)
 
     loading = None
     if req.infectionSeverity.lower() == "serious" or req.icu:
@@ -354,7 +271,7 @@ def pk_calculate(req: PkCalculateRequest) -> PkCalculateResponse:
             crclLow=bool(crclLow),
             messages=messages,
         ),
-        concentrationCurve=None,
+        concentrationCurve=curve,
     )
 
 
@@ -658,119 +575,24 @@ def api_version():
     }
 
 
-# -------- SPA serving (MUST be mounted after API routes) --------
-# Root should always serve built frontend index.html when present.
-app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True, check_dir=False), name="spa")
+# -------- SPA serving (MUST be declared after API routes) --------
+@app.get("/", response_class=HTMLResponse)
+@app.get("/{full_path:path}")
+def serve_spa(full_path: str = ""):
+    root_segment = full_path.split("/", 1)[0] if full_path else ""
+    if root_segment in {"api", "pk", "meta", "health", "healthz"}:
+        raise HTTPException(status_code=404, detail="Not found")
 
+    if not INDEX_FILE.exists():
+        return HTMLResponse("<h1>Frontend build not found</h1>", status_code=503)
 
-def _default_pk_params_from_patient(age: int, sex: str, scr: float, weight_kg: float):
-    """Very simple covariate-based defaults (educational).
+    candidate = (STATIC_DIR / full_path).resolve()
+    if full_path:
+        if not str(candidate).startswith(str(STATIC_DIR.resolve())):
+            raise HTTPException(status_code=404, detail="Not found")
+        if candidate.is_file():
+            return FileResponse(candidate)
+        if candidate.suffix or full_path.startswith(("assets/", "static/")):
+            raise HTTPException(status_code=404, detail="Not found")
 
-    We reuse the existing CG CrCl -> CL heuristic already in this file.
-    """
-    crcl = cockcroft_gault_crcl(age, sex, scr, weight_kg)
-    cl = estimate_cl_l_per_h(crcl)
-    v = estimate_v_l(weight_kg)
-    return crcl, cl, v
-
-
-def _build_safety_messages(dose_mg: float, interval_hr: float, infusion_hr: float) -> List[SafetyMessage]:
-    msgs: List[SafetyMessage] = [
-        SafetyMessage(kind="warning", message="Educational PK estimates only — not medical advice. Verify with institutional protocols."),
-        SafetyMessage(kind="info", message="Do not enter PHI. Times are relative hours for demonstration."),
-    ]
-    daily = float(dose_mg) * (24.0 / max(float(interval_hr), 1e-6))
-    if dose_mg > 2500:
-        msgs.append(SafetyMessage(kind="warning", message="High single dose entered (>2500 mg). Double-check inputs."))
-    if daily > 4500:
-        msgs.append(SafetyMessage(kind="warning", message="High total daily dose implied (>4500 mg/day). Double-check inputs."))
-    if interval_hr < 6 or interval_hr > 48:
-        msgs.append(SafetyMessage(kind="warning", message="Unusual dosing interval entered. Double-check interval and units."))
-    if infusion_hr <= 0 or infusion_hr > 6:
-        msgs.append(SafetyMessage(kind="warning", message="Unusual infusion duration entered. Double-check infusion hours."))
-    return msgs
-
-
-@app.post("/api/pk/calculate", response_model=CalculateResponse)
-@app.post("/pk/calculate2", response_model=CalculateResponse)
-def pk_calculate_educational(req: CalculateRequest) -> CalculateResponse:
-    """Educational PK estimate endpoint.
-
-    NOTE: This does not provide dosing recommendations.
-    """
-
-    # Build CL/V defaults
-    crcl, cl_l_hr, v_l = _default_pk_params_from_patient(
-        age=req.patient.age_yr,
-        sex=req.patient.sex,
-        scr=req.patient.serum_creatinine_mg_dl,
-        weight_kg=req.patient.weight_kg,
-    )
-
-    dose_mg = float(req.regimen.dose_mg)
-    interval_hr = float(req.regimen.interval_hr)
-    infusion_hr = float(req.regimen.infusion_hr)
-
-    # Empiric simulation for 0-48h
-    t, c = simulate_regimen_0_48h(
-        cl_l_hr=cl_l_hr,
-        v_l=v_l,
-        dose_mg=dose_mg,
-        interval_hr=interval_hr,
-        infusion_hr=infusion_hr,
-        dt_min=10.0,
-    )
-
-    auc24 = auc_trapz(t, c, 0.0, 24.0)
-    peak, trough = estimate_peak_trough_from_sim(t, c, interval_hr=interval_hr)
-
-    safety_msgs = _build_safety_messages(dose_mg, interval_hr, infusion_hr)
-
-    bayes_demo = None
-    if req.mode == "bayes_demo":
-        # Convert history + levels into events & observations
-        if not req.dose_history or not req.levels:
-            raise HTTPException(status_code=422, detail="bayes_demo requires dose_history[] and levels[]")
-
-        events = [Event(dose_mg=e.dose_mg, start_hr=e.start_time_hr, infusion_hr=e.infusion_hr) for e in req.dose_history]
-        levels = [(lv.time_hr, lv.concentration_mg_l) for lv in req.levels]
-        try:
-            cl_hat, v_hat, rmse = map_fit_demo(events=events, levels=levels)
-        except ValueError as e:
-            raise HTTPException(status_code=422, detail=str(e))
-
-        cl_l_hr = float(cl_hat)
-        v_l = float(v_hat)
-
-        # Re-simulate with fitted params for 0-48h
-        t, c = simulate_regimen_0_48h(
-            cl_l_hr=cl_l_hr,
-            v_l=v_l,
-            dose_mg=dose_mg,
-            interval_hr=interval_hr,
-            infusion_hr=infusion_hr,
-            dt_min=10.0,
-        )
-        auc24 = auc_trapz(t, c, 0.0, 24.0)
-        peak, trough = estimate_peak_trough_from_sim(t, c, interval_hr=interval_hr)
-
-        bayes_demo = {
-            "label": "Educational demo",
-            "cl_l_hr": float(cl_l_hr),
-            "v_l": float(v_l),
-            "ke_hr": float(cl_l_hr / max(v_l, 1e-6)),
-            "rmse_mg_l": float(rmse),
-        }
-
-        safety_msgs.append(SafetyMessage(kind="info", message="Bayesian mode is an educational MAP-fit demo (not validated for clinical use)."))
-
-    curve = [CurvePoint(t_hr=float(tt), conc_mg_l=float(cc)) for tt, cc in zip(t.tolist(), c.tolist())]
-
-    return CalculateResponse(
-        auc24_mg_h_l=float(auc24),
-        trough_mg_l=float(trough),
-        peak_mg_l=float(peak),
-        concentration_curve=curve,
-        safety=safety_msgs,
-        bayes_demo=bayes_demo,
-    )
+    return FileResponse(INDEX_FILE)

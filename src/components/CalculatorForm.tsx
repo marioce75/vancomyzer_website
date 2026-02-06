@@ -10,7 +10,7 @@ import { calculateEducational, type CalculateRequest, type CalculateResponse, Ap
 export type CalculatorFormProps = {
   onResult: (result: CalculateResponse | undefined) => void;
   onLoadingChange?: (loading: boolean) => void;
-  onInputsChange?: (inputs: { patient: CalculateRequest["patient"]; regimen: CalculateRequest["regimen"]; dose_history?: CalculateRequest["dose_history"]; levels?: CalculateRequest["levels"]; mode: CalculateRequest["mode"]; }) => void;
+  onInputsChange?: (payload: PkCalculatePayload) => void;
 };
 
 type UiError = { message: string; issues?: Array<{ path: string; message: string }> };
@@ -89,6 +89,7 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
 
     onInputsChange?.({ patient, regimen, levels: levelsPayload, dose_history: historyPayload, mode });
 
+    onInputsChange?.(payload);
     onLoadingChange?.(true);
     setError(null);
     try {
