@@ -1,10 +1,7 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import SafetyFlags from "./SafetyFlags";
-import CopyNoteButton from "./CopyNoteButton";
-import type { PkCalculateResponse } from "@/lib/api";
-import ShareButtons from "./ShareButtons";
+import type { CalculateResponse } from "@/lib/api";
 
 function ResultsPanel({
   result,
@@ -14,36 +11,35 @@ function ResultsPanel({
   onAdjustDose?: (delta: { dose?: number; interval?: number }) => void;
 }) {
   if (!result) {
-    return (
-      <div className="text-sm text-muted-foreground">No results yet.</div>
-    );
+    return <div className="text-sm text-muted-foreground">No results yet.</div>;
   }
-  const maintenance = `${Math.round(result.maintenanceDoseMg)} mg q${result.intervalHr}h`;
 
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Suggested Regimen</CardTitle>
+          <CardTitle>PK Estimates {updating ? "(Updating…)" : ""}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <div className="text-muted-foreground">Loading dose</div>
-              <div className="font-medium">{result?.loadingDoseMg ? `${Math.round(result.loadingDoseMg)} mg` : "Not indicated"}</div>
+              <div className="text-muted-foreground">AUC₍0–24₎ (mg·h/L)</div>
+              <div className="font-medium">{Math.round(result.auc24_mg_h_l)}</div>
             </div>
             <div>
-              <div className="text-muted-foreground">Maintenance</div>
-              <div className="font-medium">{maintenance}</div>
+              <div className="text-muted-foreground">Estimated trough (mg/L)</div>
+              <div className="font-medium">{result.trough_mg_l.toFixed(1)}</div>
             </div>
             <div>
-              <div className="text-muted-foreground">Predicted AUC24</div>
-              <div className="font-medium">{result ? Math.round(result.auc24) : "—"}</div>
+              <div className="text-muted-foreground">Estimated peak (mg/L)</div>
+              <div className="font-medium">{result.peak_mg_l.toFixed(1)}</div>
             </div>
-            <div>
-              <div className="text-muted-foreground">Predicted trough</div>
-              <div className="font-medium">{result?.troughPredicted ? `${Math.round(result.troughPredicted.low)}–${Math.round(result.troughPredicted.high)} mg/L` : "—"}</div>
-            </div>
+            {result.bayes_demo && (
+              <div>
+                <div className="text-muted-foreground">Model fit (RMSE)</div>
+                <div className="font-medium">{result.bayes_demo.rmse_mg_l.toFixed(2)} mg/L</div>
+              </div>
+            )}
           </div>
           {onAdjustDose && (
             <div className="flex gap-2 mt-3">
@@ -56,22 +52,45 @@ function ResultsPanel({
           <div className="mt-3">
             <ShareButtons result={result} />
           </div>
+
+          {result.safety?.length > 0 && (
+            <div className="mt-4 space-y-1">
+              {result.safety.map((m, i) => (
+                <div
+                  key={i}
+                  className={
+                    "text-xs rounded px-2 py-1 " +
+                    (m.kind === "warning" ? "bg-warning/10 text-warning-foreground border border-warning/30" : "bg-muted text-muted-foreground")
+                  }
+                >
+                  {m.message}
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {result && <SafetyFlags safety={result.safety} />}
-
-      {result && (
+      {result.bayes_demo && (
         <Card>
-          <CardHeader><CardTitle>Next steps</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Bayesian MAP-fit demo</CardTitle>
+          </CardHeader>
           <CardContent className="text-sm">
-            <ul className="list-disc ml-5 space-y-1">
-              <li>Recheck levels after 3–4 doses or sooner if renal function changes.</li>
-              <li>Aim for AUC/MIC 400–600; adjust dose or interval to stay in band.</li>
-              <li>Monitor Scr daily in ICU; watch for nephrotoxicity signals.</li>
-            </ul>
-            <div className="mt-3">
-              <CopyNoteButton result={result} />
+            <div className="text-muted-foreground mb-2">{result.bayes_demo.label}</div>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <div className="text-muted-foreground">CL</div>
+                <div className="font-medium">{result.bayes_demo.cl_l_hr.toFixed(2)} L/hr</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">V</div>
+                <div className="font-medium">{result.bayes_demo.v_l.toFixed(1)} L</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">k</div>
+                <div className="font-medium">{result.bayes_demo.ke_hr.toFixed(3)} hr⁻¹</div>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -192,3 +192,41 @@ export async function getSupportVersion(): Promise<SupportVersionResponse> {
   }
   return res.json();
 }
+
+export type CalculateMode = "empiric" | "bayes_demo";
+
+export type CalculateRequest = {
+  mode: CalculateMode;
+  patient: {
+    age_yr: number;
+    sex: "male" | "female";
+    weight_kg: number;
+    serum_creatinine_mg_dl: number;
+  };
+  regimen: {
+    dose_mg: number;
+    interval_hr: number;
+    infusion_hr: number;
+  };
+  dose_history?: Array<{ dose_mg: number; start_time_hr: number; infusion_hr: number }>;
+  levels?: Array<{ time_hr: number; concentration_mg_l: number }>;
+};
+
+export type CalculateResponse = {
+  auc24_mg_h_l: number;
+  trough_mg_l: number;
+  peak_mg_l: number;
+  concentration_curve: Array<{ t_hr: number; conc_mg_l: number }>;
+  safety: Array<{ kind: "info" | "warning"; message: string }>;
+  bayes_demo?: {
+    label: string;
+    cl_l_hr: number;
+    v_l: number;
+    ke_hr: number;
+    rmse_mg_l: number;
+  };
+};
+
+export async function calculateEducational(req: CalculateRequest): Promise<CalculateResponse> {
+  return postJSON<CalculateResponse>(`${API_BASE}/api/pk/calculate`, req);
+}

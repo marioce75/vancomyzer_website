@@ -13,6 +13,11 @@ from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
 import numpy as np
 
+from backend.models import CalculateRequest, CalculateResponse, CurvePoint, SafetyMessage
+from backend.pk.sim import simulate_regimen_0_48h, auc_trapz, estimate_peak_trough_from_sim, Event, build_repeated_regimen_events, concentration_time_series
+from backend.pk.bayes_demo import map_fit_demo
+
+
 app = FastAPI(title="Vancomyzer Server")
 
 # -------- Static frontend paths --------
@@ -656,3 +661,116 @@ def api_version():
 # -------- SPA serving (MUST be mounted after API routes) --------
 # Root should always serve built frontend index.html when present.
 app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True, check_dir=False), name="spa")
+
+
+def _default_pk_params_from_patient(age: int, sex: str, scr: float, weight_kg: float):
+    """Very simple covariate-based defaults (educational).
+
+    We reuse the existing CG CrCl -> CL heuristic already in this file.
+    """
+    crcl = cockcroft_gault_crcl(age, sex, scr, weight_kg)
+    cl = estimate_cl_l_per_h(crcl)
+    v = estimate_v_l(weight_kg)
+    return crcl, cl, v
+
+
+def _build_safety_messages(dose_mg: float, interval_hr: float, infusion_hr: float) -> List[SafetyMessage]:
+    msgs: List[SafetyMessage] = [
+        SafetyMessage(kind="warning", message="Educational PK estimates only — not medical advice. Verify with institutional protocols."),
+        SafetyMessage(kind="info", message="Do not enter PHI. Times are relative hours for demonstration."),
+    ]
+    daily = float(dose_mg) * (24.0 / max(float(interval_hr), 1e-6))
+    if dose_mg > 2500:
+        msgs.append(SafetyMessage(kind="warning", message="High single dose entered (>2500 mg). Double-check inputs."))
+    if daily > 4500:
+        msgs.append(SafetyMessage(kind="warning", message="High total daily dose implied (>4500 mg/day). Double-check inputs."))
+    if interval_hr < 6 or interval_hr > 48:
+        msgs.append(SafetyMessage(kind="warning", message="Unusual dosing interval entered. Double-check interval and units."))
+    if infusion_hr <= 0 or infusion_hr > 6:
+        msgs.append(SafetyMessage(kind="warning", message="Unusual infusion duration entered. Double-check infusion hours."))
+    return msgs
+
+
+@app.post("/api/pk/calculate", response_model=CalculateResponse)
+@app.post("/pk/calculate2", response_model=CalculateResponse)
+def pk_calculate_educational(req: CalculateRequest) -> CalculateResponse:
+    """Educational PK estimate endpoint.
+
+    NOTE: This does not provide dosing recommendations.
+    """
+
+    # Build CL/V defaults
+    crcl, cl_l_hr, v_l = _default_pk_params_from_patient(
+        age=req.patient.age_yr,
+        sex=req.patient.sex,
+        scr=req.patient.serum_creatinine_mg_dl,
+        weight_kg=req.patient.weight_kg,
+    )
+
+    dose_mg = float(req.regimen.dose_mg)
+    interval_hr = float(req.regimen.interval_hr)
+    infusion_hr = float(req.regimen.infusion_hr)
+
+    # Empiric simulation for 0-48h
+    t, c = simulate_regimen_0_48h(
+        cl_l_hr=cl_l_hr,
+        v_l=v_l,
+        dose_mg=dose_mg,
+        interval_hr=interval_hr,
+        infusion_hr=infusion_hr,
+        dt_min=10.0,
+    )
+
+    auc24 = auc_trapz(t, c, 0.0, 24.0)
+    peak, trough = estimate_peak_trough_from_sim(t, c, interval_hr=interval_hr)
+
+    safety_msgs = _build_safety_messages(dose_mg, interval_hr, infusion_hr)
+
+    bayes_demo = None
+    if req.mode == "bayes_demo":
+        # Convert history + levels into events & observations
+        if not req.dose_history or not req.levels:
+            raise HTTPException(status_code=422, detail="bayes_demo requires dose_history[] and levels[]")
+
+        events = [Event(dose_mg=e.dose_mg, start_hr=e.start_time_hr, infusion_hr=e.infusion_hr) for e in req.dose_history]
+        levels = [(lv.time_hr, lv.concentration_mg_l) for lv in req.levels]
+        try:
+            cl_hat, v_hat, rmse = map_fit_demo(events=events, levels=levels)
+        except ValueError as e:
+            raise HTTPException(status_code=422, detail=str(e))
+
+        cl_l_hr = float(cl_hat)
+        v_l = float(v_hat)
+
+        # Re-simulate with fitted params for 0-48h
+        t, c = simulate_regimen_0_48h(
+            cl_l_hr=cl_l_hr,
+            v_l=v_l,
+            dose_mg=dose_mg,
+            interval_hr=interval_hr,
+            infusion_hr=infusion_hr,
+            dt_min=10.0,
+        )
+        auc24 = auc_trapz(t, c, 0.0, 24.0)
+        peak, trough = estimate_peak_trough_from_sim(t, c, interval_hr=interval_hr)
+
+        bayes_demo = {
+            "label": "Educational demo",
+            "cl_l_hr": float(cl_l_hr),
+            "v_l": float(v_l),
+            "ke_hr": float(cl_l_hr / max(v_l, 1e-6)),
+            "rmse_mg_l": float(rmse),
+        }
+
+        safety_msgs.append(SafetyMessage(kind="info", message="Bayesian mode is an educational MAP-fit demo (not validated for clinical use)."))
+
+    curve = [CurvePoint(t_hr=float(tt), conc_mg_l=float(cc)) for tt, cc in zip(t.tolist(), c.tolist())]
+
+    return CalculateResponse(
+        auc24_mg_h_l=float(auc24),
+        trough_mg_l=float(trough),
+        peak_mg_l=float(peak),
+        concentration_curve=curve,
+        safety=safety_msgs,
+        bayes_demo=bayes_demo,
+    )
