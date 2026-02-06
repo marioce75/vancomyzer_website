@@ -1,0 +1,131 @@
+{
+  "sheet": "Patient_Info",
+  "max_row_dumped": 30,
+  "max_col_dumped": 6,
+  "nonempty_cells_dumped": 63,
+  "grid": [
+    [
+      "UCSF Adult Vancomycin Dosing Calculator",
+      "Enter information in fields outlined in red"
+    ],
+    [
+      "Patient Information",
+      "Calculated values in blue"
+    ],
+    [
+      "*Disclaimer* Use of this tool does not replace clinical judgment.  "
+    ],
+    [
+      "Input Patient Parameters"
+    ],
+    [
+      "Patient Age (years)",
+      67
+    ],
+    [
+      "Gender",
+      "MALE",
+      null,
+      null,
+      "Enter",
+      "Conversion"
+    ],
+    [
+      "Weight (kg)",
+      183.5,
+      "Enter lbs to convert to kg",
+      null,
+      250,
+      "=E7/2.2"
+    ],
+    [
+      "Height (cm)",
+      168,
+      "Enter inches to convert to cm",
+      null,
+      72,
+      "=E8*2.54"
+    ],
+    [
+      "Serum creatinine (mg/L)",
+      1.24
+    ],
+    [],
+    [
+      "Assess Patient Clearance"
+    ],
+    [
+      "Is patient on intermittent HD?",
+      "NO",
+      "If YES, see UCSF dosing card for correct dose"
+    ],
+    [
+      "Is patient on CRRT?",
+      "NO",
+      "If YES, see UCSF dosing card for correct dose"
+    ],
+    [
+      "Is patient's renal function stable?",
+      "YES",
+      "IF NO, calculations will be unreliable.  Suggest ad hoc dosing and following vancomycin levels."
+    ],
+    [
+      "Total Body Weight/Ideal Body Weight Ratio",
+      "=Calculation_Details!C6",
+      "If TBW/IBW>1.2, consider using  Adjusted (method 2) or Ideal (method 3) Body Weight in CrCl calculation"
+    ],
+    [
+      "Age>65 and SCr<1",
+      "NO",
+      "If YES or patient with low muscle mass, consider rounding serum creatinine up to 1 in CrCl calculation (method 4)"
+    ],
+    [],
+    [
+      "Estimators of Creatinine Clearance"
+    ],
+    [
+      "Cockroft-Gault using Total Body Weight (TBW)",
+      "=Calculation_Details!A12",
+      "Method 1 (CrCl maximum capped at 150 ml/min)"
+    ],
+    [
+      "Cockroft-Gault using Adjusted Body Weight (AdjBW)",
+      "=Calculation_Details!B12",
+      "Method 2 (CrCl maximum capped at 150 ml/min)"
+    ],
+    [
+      "Cockroft-Gault using Ideal Body Weight (IBW)",
+      "=Calculation_Details!C12",
+      "Method 3 (CrCl maximum capped at 150 ml/min)"
+    ],
+    [
+      "Cockroft-Gault using TBW and SCr rounded up to 1",
+      "=Calculation_Details!D12",
+      "Method 4 (CrCl maximum capped at 150 ml/min)"
+    ],
+    [
+      "Input Custom CrCl estimation",
+      42,
+      "Method 5"
+    ],
+    [],
+    [
+      "Select Best Estimator of Creatinine Clearance",
+      2,
+      "Select 1-5 from Methods Above"
+    ],
+    [],
+    [
+      "To select or evaluate an initial vancomycin dose, click here "
+    ],
+    [
+      "To evaluate a vancomycin dosing regimen with a single trough level, click here"
+    ],
+    [
+      "To evaluate a vancomycin dosing regimen with two postdistributional levels, click here"
+    ],
+    [
+      "To record patient information for follow-up/QI, click here"
+    ]
+  ]
+}

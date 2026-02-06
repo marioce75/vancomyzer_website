@@ -4,7 +4,7 @@ import math
 import os
 import subprocess
 from datetime import datetime, timezone
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Literal, Tuple
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
@@ -12,6 +12,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
 import numpy as np
+
+from backend.models import CalculateRequest, CalculateResponse, CurvePoint, SafetyMessage
+from backend.pk.sim import simulate_regimen_0_48h, auc_trapz, estimate_peak_trough_from_sim, Event, build_repeated_regimen_events, concentration_time_series
+from backend.pk.bayes_demo import map_fit_demo
+
 
 app = FastAPI(title="Vancomyzer Server")
 
@@ -284,6 +289,66 @@ class BayesianResponse(BaseModel):
     safety: Safety
 
 
+class BayesLevel(BaseModel):
+    time_hr_from_start: float
+    concentration_mg_l: float
+
+
+class BayesRegimen(BaseModel):
+    dose_mg: float
+    interval_hr: float
+    infusion_hr: float
+
+
+class PriorParam(BaseModel):
+    mean: float
+    variance: float
+    distribution: Literal["normal", "lognormal"] = "lognormal"
+
+
+class PriorSet(BaseModel):
+    cl: PriorParam
+    v: PriorParam
+    sigma: Optional[PriorParam] = None
+
+
+class BayesSimulateRequest(BaseModel):
+    age: float
+    weight: float
+    sex: Optional[str] = None
+    scr: float
+    regimen: BayesRegimen
+    levels: Optional[List[BayesLevel]] = None
+    priors: PriorSet
+
+
+class PosteriorSummary(BaseModel):
+    cl_mean: float
+    cl_sd: float
+    v_mean: float
+    v_sd: float
+
+
+class CurvePoint(BaseModel):
+    time_hr: float
+    concentration_mg_l: float
+
+
+class SimulationMetrics(BaseModel):
+    auc24_mg_h_l: float
+    cmax_mg_l: float
+    cmin_mg_l: float
+
+
+class BayesSimulateResponse(BaseModel):
+    posterior: PosteriorSummary
+    curve: List[CurvePoint]
+    metrics: SimulationMetrics
+    warnings: List[str] = []
+    method: str = "grid-map"
+    educational_note: str = "Educational demonstration only."
+
+
 def _validate_bayesian_inputs(levels: List[Level], dose_history: List[DoseEvent]) -> None:
     if not levels or len(levels) < 1:
         raise HTTPException(status_code=422, detail="At least 1 level is required for Bayesian estimation")
@@ -304,6 +369,123 @@ def pk_bayesian(req: BayesianRequest) -> BayesianResponse:
         auc24=det.auc24,
         recommended={"maintenanceDoseMg": det.maintenanceDoseMg, "intervalHr": det.intervalHr},
         safety=det.safety,
+    )
+
+
+@app.post("/pk/bayes_simulate", response_model=BayesSimulateResponse)
+@app.post("/api/pk/bayes_simulate", response_model=BayesSimulateResponse)
+def pk_bayes_simulate(req: BayesSimulateRequest) -> BayesSimulateResponse:
+    warnings: List[str] = []
+    dose_mg = float(req.regimen.dose_mg)
+    interval_hr = float(req.regimen.interval_hr)
+    infusion_hr = float(req.regimen.infusion_hr)
+
+    if interval_hr <= 0:
+        warnings.append("Interval must be positive; using 12 hours for simulation.")
+        interval_hr = 12.0
+    if infusion_hr <= 0:
+        warnings.append("Infusion duration must be positive; using 1 hour for simulation.")
+        infusion_hr = 1.0
+    if dose_mg <= 0:
+        warnings.append("Dose must be positive; using 1000 mg for simulation.")
+        dose_mg = 1000.0
+
+    if infusion_hr < 0.5 or infusion_hr > 4.0:
+        warnings.append("Infusion duration outside 0.5–4 h; interpret simulations cautiously.")
+    if interval_hr not in {6.0, 8.0, 12.0, 24.0}:
+        warnings.append("Non-standard interval (typical: 6, 8, 12, 24 h).")
+    if dose_mg < 250 or dose_mg > 6000:
+        warnings.append("Dose outside typical 250–6000 mg range.")
+    if infusion_hr > interval_hr:
+        warnings.append("Infusion duration exceeds interval; using infusion = interval for simulation.")
+        infusion_hr = interval_hr
+
+    daily_dose = dose_mg * (24.0 / interval_hr)
+    max_daily_display = 6000.0
+    if daily_dose > max_daily_display:
+        capped = max_daily_display * (interval_hr / 24.0)
+        warnings.append(
+            f"Daily dose capped at {max_daily_display:.0f} mg/day for educational display "
+            f"(simulating {capped:.0f} mg q{interval_hr:g}h)."
+        )
+        dose_mg = capped
+
+    valid_times: List[float] = []
+    valid_concs: List[float] = []
+    for level in req.levels or []:
+        if level.time_hr_from_start < 0:
+            warnings.append("Ignoring level with negative time.")
+            continue
+        if level.concentration_mg_l <= 0:
+            warnings.append("Ignoring level with non-positive concentration.")
+            continue
+        valid_times.append(float(level.time_hr_from_start))
+        valid_concs.append(float(level.concentration_mg_l))
+
+    def _sanitize_prior(prior: PriorParam, name: str) -> dict:
+        mean = float(prior.mean)
+        variance = float(prior.variance)
+        dist = prior.distribution.lower()
+        if dist not in {"normal", "lognormal"}:
+            warnings.append(f"{name} prior distribution not recognized; using lognormal.")
+            dist = "lognormal"
+        if dist == "lognormal" and mean <= 0:
+            warnings.append(f"{name} prior mean must be positive for lognormal; using absolute value.")
+            mean = max(abs(mean), 0.1)
+        if variance <= 0:
+            warnings.append(f"{name} prior variance must be positive; using 10% CV default.")
+            variance = (0.1 * max(mean, 0.1)) ** 2
+        return {"mean": mean, "variance": variance, "distribution": dist}
+
+    prior_cl = _sanitize_prior(req.priors.cl, "CL")
+    prior_v = _sanitize_prior(req.priors.v, "V")
+    sigma_prior = req.priors.sigma or PriorParam(mean=0.25, variance=0.04, distribution="normal")
+    prior_sigma = _sanitize_prior(sigma_prior, "Sigma")
+    sigma = max(prior_sigma["mean"], 0.05)
+
+    if not valid_times:
+        warnings.append("No valid levels provided; posterior reflects prior information only.")
+
+    cl_mean, cl_sd, v_mean, v_sd, map_cl, map_v = _posterior_grid(
+        valid_times,
+        valid_concs,
+        dose_mg,
+        interval_hr,
+        infusion_hr,
+        prior_cl,
+        prior_v,
+        sigma,
+        grid_size=40,
+    )
+
+    sim_cl = cl_mean if cl_mean > 0 else map_cl
+    sim_v = v_mean if v_mean > 0 else map_v
+    times, concs = _simulate_curve(sim_cl, sim_v, dose_mg, interval_hr, infusion_hr, duration_h=24.0, step_h=0.25)
+    auc24 = float(np.trapz(concs, times))
+    cmax = float(_steady_state_concentration(infusion_hr, dose_mg, interval_hr, infusion_hr, sim_cl, sim_v))
+    cmin = float(_steady_state_concentration(interval_hr - 1e-6, dose_mg, interval_hr, infusion_hr, sim_cl, sim_v))
+
+    curve = [
+        CurvePoint(time_hr=float(t), concentration_mg_l=float(c))
+        for t, c in zip(times.tolist(), concs.tolist())
+    ]
+
+    return BayesSimulateResponse(
+        posterior=PosteriorSummary(
+            cl_mean=float(cl_mean),
+            cl_sd=float(cl_sd),
+            v_mean=float(v_mean),
+            v_sd=float(v_sd),
+        ),
+        curve=curve,
+        metrics=SimulationMetrics(
+            auc24_mg_h_l=auc24,
+            cmax_mg_l=cmax,
+            cmin_mg_l=cmin,
+        ),
+        warnings=warnings,
+        method="grid-map",
+        educational_note="Educational demonstration only — not for clinical use.",
     )
 
 

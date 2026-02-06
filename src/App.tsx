@@ -1,10 +1,8 @@
-import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import "./App.css";
 import DisclaimerGate from "@/components/DisclaimerGate";
 import CalculatorForm from "@/components/CalculatorForm";
 import ResultsPanel from "@/components/ResultsPanel";
-import AucDoseSliderChart from "@/components/AucDoseSliderChart";
-import ConcentrationTimeChart from "@/components/ConcentrationTimeChart";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
@@ -34,7 +32,7 @@ function navigate(to: string) {
 }
 
 function HomePage() {
-  const [result, setResult] = useState<CalculateResponse | undefined>(undefined);
+  const [result, setResult] = useState<PkCalculateResponse | undefined>(undefined);
   const [updating, setUpdating] = useState(false);
   const [simError, setSimError] = useState<string | null>(null);
 
@@ -206,17 +204,31 @@ function HomePage() {
                     </Alert>
                   )}
 
-                  {roundsMode && (
+            <TabsContent value="auc">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <CalculatorForm onResult={setResult} onLoadingChange={setUpdating} />
+                </div>
+                <div className="space-y-4">
+                  {updating && (
+                    <div className="text-xs text-muted-foreground">Updating…</div>
+                  )}
+                  <ResultsPanel result={result} />
+                  {roundsMode && result && (
                     <div className="grid gap-4">
-                      <RoundsSummaryCard inputs={inputs} result={result} />
+                      <RoundsSummaryCard result={result} />
                       <PearlsPanel />
                       <TimingHelperMini />
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="bayesian">
+              <BayesianSimulator />
+            </TabsContent>
+          </Tabs>
         </main>
 
         <footer className="fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur">

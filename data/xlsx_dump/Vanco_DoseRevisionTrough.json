@@ -1,0 +1,120 @@
+{
+  "sheet": "Vanco_DoseRevisionTrough",
+  "max_row_dumped": 31,
+  "max_col_dumped": 3,
+  "nonempty_cells_dumped": 50,
+  "grid": [
+    [
+      "UCSF Adult Vancomycin Dosing Calculator",
+      "Enter information in fields outlined in red"
+    ],
+    [
+      "Evaluate vancomycin dosing regimen based on single trough",
+      "Calculated values in blue"
+    ],
+    [],
+    [
+      "Enter Vancomycin Dosing Regimen"
+    ],
+    [
+      "Vancomycin Dose (mg)",
+      500
+    ],
+    [
+      "Vancomycin Frequency (hours)",
+      12
+    ],
+    [],
+    [
+      "Dose Revisions based on Single Steady-state Trough",
+      "Note: assumes vancomycin volume of distribution is constant; obesity, fluid overload, or burns "
+    ],
+    [
+      "Level drawn at steady-state (after >3 half-lives?)",
+      "YES",
+      "If NO, trough will be UNDERestimated and calculations unreliable"
+    ],
+    [
+      "Level drawn <= 30 min before end of dosing interval?",
+      "YES",
+      "If NO, trough will be OVERestimated and calculations unreliable"
+    ],
+    [
+      "Vancomycin trough serum concentration (mg/L)",
+      8.8
+    ],
+    [],
+    [
+      "Select Revised Vancomycin Dosing Regimen"
+    ],
+    [
+      "Recommended Dosing Interval (hours)",
+      "=Calculation_Details!A39"
+    ],
+    [
+      "Select New Dosing Interval (Hours)",
+      12,
+      "Select 6,8,12,24 hours"
+    ],
+    [],
+    [
+      "Recommended Vancomycin Dose (mg)",
+      "=Calculation_Details!A42",
+      "Dose to achieve a steady-state trough of 15 mg/L"
+    ],
+    [
+      "Chosen Vancomycin Dose (mg)",
+      750,
+      "Select 250,500,750,1000,1250,1500,2000mg "
+    ],
+    [],
+    [
+      "Predicted Vancomycin AUC24",
+      "=Calculation_Details!B45",
+      "Target AUC24 is >350"
+    ],
+    [
+      "Predicted Vancomycin Trough (mg/L)",
+      "=Calculation_Details!D42",
+      "Acceptable vancomycin troughs should be <21 to reduce nephrotoxicity"
+    ],
+    [
+      "Predicted Vancomycin Peak (mg/L)",
+      "=Calculation_Details!C42",
+      "Acceptable vancomycin peaks should be <75 to reduce ototoxicity"
+    ],
+    [],
+    [
+      "Monitoring"
+    ],
+    [
+      "Vancomycin half-life",
+      "=Calculation_Details!B36",
+      "Steady-state is approximately reached after 4 half-lives of continuous dosing"
+    ],
+    [
+      null,
+      null,
+      "For routine monitoring, draw trough level before the 4th dose if dosing interval ≥ half-life"
+    ],
+    [
+      null,
+      null,
+      "If loading dose given, draw draw trough level before the 4th dose of the maintenance regimen"
+    ],
+    [
+      null,
+      null,
+      "If dosing interval substantially < half-life, draw level before next dose after 3 half-lives have passed"
+    ],
+    [
+      "To return to patient information tab, click here"
+    ],
+    [
+      "To view calculation details, click here"
+    ],
+    [
+      "To return to patient information tab, click here"
+    ]
+  ]
+}

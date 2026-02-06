@@ -16,6 +16,7 @@ export default function References() {
           <li>Institutional vancomycin dosing protocol (local).</li>
           <li>Consensus statements on AUC-guided dosing.</li>
         </ul>
+        <div className="text-xs text-muted-foreground">Not affiliated with IDSA/ASHP.</div>
       </div>
     </div>
   );

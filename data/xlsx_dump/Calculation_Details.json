@@ -1,0 +1,303 @@
+{
+  "sheet": "Calculation_Details",
+  "max_row_dumped": 61,
+  "max_col_dumped": 7,
+  "nonempty_cells_dumped": 189,
+  "grid": [
+    [
+      "Patient Parameters"
+    ],
+    [
+      "Age",
+      "Weight (kg)",
+      "Height (cm)",
+      "SCr",
+      "Female"
+    ],
+    [
+      "=Patient_Info!B5",
+      "=Patient_Info!B7",
+      "=Patient_Info!B8",
+      "=Patient_Info!B9",
+      "=IF(Patient_Info!B6=\"FEMALE\",1,0)"
+    ],
+    [],
+    [
+      "IBW",
+      "ABW",
+      "TBW/IBW",
+      "Elderly Flag",
+      "Height (in)"
+    ],
+    [
+      "=IF(E3=1,(45.5+(2.3*(E6-60))),(50+(2.3*(E6-60))))",
+      "=0.4*(B3-A6)+A6",
+      "=B3/A6",
+      "=IF(AND(A3>65,D3<1),\"YES\",\"NO\")",
+      "=C3*0.393701"
+    ],
+    [],
+    [
+      "TBW",
+      "AdjBW",
+      "IBW",
+      "TBW & Round SCr",
+      "Forced CrCl"
+    ],
+    [
+      "CrCl (ml/min)",
+      "CrCl (ml/min)",
+      "CrCl (ml/min)",
+      "CrCl (ml/min)",
+      "CrCl (ml/min)"
+    ],
+    [
+      "=IF(E3<=0,((140-A3)*B3)/((72)*(D3)),(0.85*((140-A3)*B3/(72*D3))))",
+      "=IF(E3<=0,((140-A3)*B6)/((72)*(D3)),(0.85*((140-A3)*B6/(72*D3))))",
+      "=IF(E3<=0,((140-A3)*A6)/((72)*(D3)),(0.85*((140-A3)*A6/(72*D3))))",
+      "=IF(E3<=0,((140-A3)*B3)/((72)),(0.85*((140-A3)*B3/(72*1))))",
+      "=Patient_Info!B23"
+    ],
+    [
+      "Maximum cutoff 150 ml/min"
+    ],
+    [
+      "=IF(A10>150,150,A10)",
+      "=IF(B10>150,150,B10)",
+      "=IF(C10>150,150,C10)",
+      "=IF(D10>150,150,D10)",
+      "=IF(E10>150,150,E10)"
+    ],
+    [
+      "CrCl (L/hr)",
+      "CrCl (L/hr)",
+      "CrCl (L/hr)",
+      "CrCl (L/hr)",
+      "CrCl (L/hr)"
+    ],
+    [
+      "=(A12*60)/1000",
+      "=(B12*60)/1000",
+      "=(C12*60)/1000",
+      "=(D12*60)/1000",
+      "=(E12*60)/1000"
+    ],
+    [],
+    [
+      "Select Dosing CrCl: 1 for TBW, 2 for ABW, 3 for IBW, 4 for TBW & Rounded SCr, 5 to force CrCl"
+    ],
+    [
+      "=Patient_Info!B25"
+    ],
+    [
+      "Vanco Initial Dosing"
+    ],
+    [
+      "Vd_vanc",
+      "Clvanc",
+      "k",
+      "t1/2"
+    ],
+    [
+      "=0.7*B3",
+      "=IF(A17=1,A14*0.75,IF(A17=2,B14*0.75,IF(A17=3,C14*0.75,IF(A17=4,D14*0.75,IF(A17=5,E14*0.75)))))",
+      "=B20/A20",
+      "=0.693/C20"
+    ],
+    [],
+    [
+      "Suggested T",
+      "Chosen Tau",
+      "Target trough",
+      "(-kT)",
+      "tpeak",
+      "(-ktpeak)"
+    ],
+    [
+      "=IF(D20<6,6,IF(AND(D20>6,D20<=10),8,IF(AND(D20>10,D20<=18),12,IF(D20>18,24))))",
+      "=Vanco_InitialDose!B6",
+      15,
+      "=-1*(C20*B23)",
+      "=E26+1",
+      "=(C20*-E23)"
+    ],
+    [],
+    [
+      "Vanco dose",
+      "Dose chosen",
+      "Predicted peak",
+      "Predicted trough",
+      "Infusion Time"
+    ],
+    [
+      "=((C23*A20)*(1-EXP(D23))) / EXP(D23)",
+      "=Vanco_InitialDose!B9",
+      "=((B26/A20)*EXP(F23))/(1-EXP(D23))",
+      "=((B26/A20)*EXP(D23))/(1-EXP(D23))",
+      "=IF(B26<=1000,1,IF(B26=1500,1.5,IF(B26=2000,2)))"
+    ],
+    [],
+    [
+      "Daily Dose",
+      "AUC",
+      "Target Peak",
+      " Loading Dose",
+      "Loading Dose",
+      "Peak1"
+    ],
+    [
+      "=(B26*(24/B23))",
+      "=A29/B20",
+      35,
+      "=C29*A20",
+      2000,
+      "=E29/A20"
+    ],
+    [],
+    [
+      "Vanco Dose Revision: Single Trough Level"
+    ],
+    [
+      "Interval",
+      "Trough level",
+      "calc field"
+    ],
+    [
+      "=Vanco_DoseRevisionTrough!B6",
+      "=Vanco_DoseRevisionTrough!B11",
+      "=(B33+(Vanco_DoseRevisionTrough!B5/A20))/B33"
+    ],
+    [],
+    [
+      "k",
+      "t1/2",
+      "Clvanc"
+    ],
+    [
+      "=LN(C33)/A33",
+      "=0.693/A36",
+      "=A36*A20"
+    ],
+    [],
+    [
+      "Suggested T",
+      "Chosen T",
+      "Target Trough",
+      "(-kT)",
+      "tpeak",
+      "(-ktpeak)"
+    ],
+    [
+      "=IF(B36<6,6,IF(AND(B36>6,B36<=10),8,IF(AND(B36>10,B36<=18),12,IF(B36>18,24))))",
+      "=Vanco_DoseRevisionTrough!B15",
+      15,
+      "=-1*(A36*B39)",
+      "=E26+1",
+      "=(A36*-E39)"
+    ],
+    [],
+    [
+      "Vanco dose",
+      "Dose chosen",
+      "Predicted peak",
+      "Predicted trough"
+    ],
+    [
+      "=((C39*A20)*(1-EXP(D39))) / EXP(D39)",
+      "=Vanco_DoseRevisionTrough!B18",
+      "=((B42/A20)*EXP(F39))/(1-EXP(D39))",
+      "=((B42/A20)*EXP(D39))/(1-EXP(D39))"
+    ],
+    [],
+    [
+      "Daily Dose",
+      "AUC",
+      "Target Peak",
+      "Loading Dose"
+    ],
+    [
+      "=(B42*(24/B39))",
+      "=A45/C36",
+      35,
+      "=(C45-B33)*A20"
+    ],
+    [],
+    [
+      "Vanco Dose Revision: Paired Levels"
+    ],
+    [
+      "Level 1",
+      "Level 1 time post infusion",
+      "Interval",
+      "Level 2 time before trough",
+      "Level 2",
+      "Cpeak",
+      "Ctrough"
+    ],
+    [
+      "=Vanco_DoseRevisionTwoLevels!B9",
+      "=Vanco_DoseRevisionTwoLevels!B10",
+      "=Vanco_DoseRevisionTwoLevels!B11",
+      "=Vanco_DoseRevisionTwoLevels!B13",
+      "=Vanco_DoseRevisionTwoLevels!B12",
+      "=(A49)/(EXP((A52)*-B49))",
+      "=(E49)/(EXP((A52)*-D49))"
+    ],
+    [],
+    [
+      "k",
+      "t1/2",
+      "Clvanc",
+      "Vvanc"
+    ],
+    [
+      "=(LN(A49/E49))/C49",
+      "=0.693/A52",
+      "=D52*A52",
+      "=((B26/E26)*(1-(EXP(A52*-E26)))/(A52*(F49-(G49*(EXP(A52*-E26))))))"
+    ],
+    [],
+    [
+      "Suggested T",
+      "Chosen T",
+      "Target Trough",
+      "(-kT)",
+      "tpeak",
+      "(-ktpeak)"
+    ],
+    [
+      "=IF(B52<6,6,IF(AND(B52>6,B52<=10),8,IF(AND(B52>10,B52<=18),12,IF(B52>18,24))))",
+      "=Vanco_DoseRevisionTwoLevels!B17",
+      15,
+      "=-1*(A52*B55)",
+      "=E26+1",
+      "=(A52*-E55)"
+    ],
+    [],
+    [
+      "Vanco dose",
+      "Dose chosen",
+      "Predicted peak",
+      "Predicted trough"
+    ],
+    [
+      "=((C55*D52)*(1-EXP(D55))) / EXP(D55)",
+      "=Vanco_DoseRevisionTwoLevels!B20",
+      "=((B58/D52)*EXP(F55))/(1-EXP(D55))",
+      "=((B58/D52)*EXP(D55))/(1-EXP(D55))"
+    ],
+    [],
+    [
+      "Daily Dose",
+      "AUC",
+      "Target Peak",
+      "Loading Dose"
+    ],
+    [
+      "=(B58*(24/B55))",
+      "=A61/C52",
+      35,
+      "=(C61-E49)*D52"
+    ]
+  ]
+}

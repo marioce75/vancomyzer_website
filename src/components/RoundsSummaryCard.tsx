@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/shareLink";
-import type { CalculateRequest, CalculateResponse } from "@/lib/api";
+import type { PkCalculateResponse } from "@/lib/api";
 
 function formatTimestamp(ts: Date): string {
   return ts.toLocaleString(undefined, {
@@ -15,11 +15,11 @@ function formatTimestamp(ts: Date): string {
 }
 
 export default function RoundsSummaryCard({
-  inputs,
   result,
+  infusionHr = 1,
 }: {
-  inputs: CalculateRequest | null;
-  result?: CalculateResponse;
+  result?: PkCalculateResponse;
+  infusionHr?: number;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -41,7 +41,7 @@ export default function RoundsSummaryCard({
       `Note: Educational PK estimates only — not medical advice. Verify with institutional protocols.`,
       `No PHI stored.`,
     ].join("\n");
-  }, [inputs, result, timestamp]);
+  }, [result, infusionHr, timestamp]);
 
   async function onCopy() {
     if (!summary) return;
