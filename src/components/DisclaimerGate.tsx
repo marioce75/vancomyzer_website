@@ -28,8 +28,13 @@ export default function DisclaimerGate({ children }: { children: React.ReactNode
         <h2 className="text-lg font-semibold mb-2">Education-only tool</h2>
         <p className="text-sm text-muted-foreground mb-4">Educational demonstration only. Verify with institutional protocols. No patient identifiers collected.</p>
         <div className="flex items-center gap-2 mb-4">
+<<<<<<< HEAD
           <Checkbox id="ack" onCheckedChange={(v) => setAck(!!v)} />
           <label htmlFor="ack" className="text-sm">I understand this is for education only.</label>
+=======
+          <Checkbox id="ack" checked={checked} onCheckedChange={(v) => setChecked(!!v)} />
+          <label htmlFor="ack" className="text-sm">I understand this does not replace clinical judgment.</label>
+>>>>>>> cursor/git-commit-push-3c1e
         </div>
         <Button className="w-full" disabled={!checked} onClick={confirm}>Continue</Button>
       </div>
