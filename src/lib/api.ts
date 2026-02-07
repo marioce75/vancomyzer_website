@@ -230,6 +230,7 @@ export type BasicCalculateResponse = {
     half_life_hr?: number;
   };
   breakdown: Record<string, unknown>;
+  curve?: Array<{ t_hr: number; conc_mg_l: number }>;
 };
 
 export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicCalculateResponse> {

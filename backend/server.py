@@ -309,11 +309,28 @@ def basic_calculate(req: BasicCalculateRequest) -> BasicCalculateResponse:
         "trough": outputs.get("predicted_trough"),
         "half_life_hr": outputs.get("half_life_hr"),
     }
+    curve = None
+    try:
+        cl_l_hr = float(outputs.get("vanco_cl") or 0.0)
+        v_l = float(outputs.get("vanco_vd") or 0.0)
+        if cl_l_hr > 0 and v_l > 0:
+            t, c = simulate_regimen_0_48h(
+                cl_l_hr=cl_l_hr,
+                v_l=v_l,
+                dose_mg=req.regimen.dose_mg,
+                interval_hr=req.regimen.interval_hr,
+                infusion_hr=req.regimen.infusion_hr or 1.0,
+                dt_min=10.0,
+            )
+            curve = [CurvePoint(t_hr=float(tt), conc_mg_l=float(cc)) for tt, cc in zip(t.tolist(), c.tolist())]
+    except Exception:
+        curve = None
     return BasicCalculateResponse(
         crcl=crcl,
         regimen=regimen,
         predicted=predicted,
         breakdown=outputs,
+        curve=curve,
     )
 
 

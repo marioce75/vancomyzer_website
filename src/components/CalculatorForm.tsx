@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -40,8 +39,6 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
   const [weight, setWeight] = useState(80);
   const [weightUnit, setWeightUnit] = useState<"kg" | "lb">("kg");
   const [scr, setScr] = useState(1.0);
-  const [icu, setIcu] = useState(false);
-  const [severity, setSeverity] = useState<"standard" | "serious">("standard");
   const [mic, setMic] = useState(1.0);
   const [aucLow, setAucLow] = useState(400);
   const [aucHigh, setAucHigh] = useState(600);
@@ -136,8 +133,6 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
             infusion_hr: Number(infusionHr),
           },
           mic: Number(mic),
-          icu,
-          mrsa: severity === "serious",
         });
         onResult(result, "basic");
       } else {
@@ -199,7 +194,7 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
           <Select value={mode} onValueChange={(v: "basic" | "bayesian") => setMode(v)}>
             <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="basic">Basic Calculator (Excel parity)</SelectItem>
+              <SelectItem value="basic">Basic Calculator</SelectItem>
               <SelectItem value="bayesian">Bayesian AUC Engine</SelectItem>
             </SelectContent>
           </Select>
@@ -281,16 +276,6 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
             value={scr}
             onChange={e => setScr(Number(e.target.value))}
           />
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="space-y-1">
-            <Label>ICU/Critical</Label>
-            <Switch checked={icu} onCheckedChange={setIcu} />
-          </div>
-          <div className="space-y-1">
-            <Label>Serious MRSA</Label>
-            <Switch checked={severity === "serious"} onCheckedChange={(v) => setSeverity(v ? "serious" : "standard")} />
-          </div>
         </div>
         <div>
           <LabelHelp label="MIC assumption" help="Assume MIC=1 mg/L unless known. Targets are based on MIC=1." />

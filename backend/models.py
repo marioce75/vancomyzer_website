@@ -109,6 +109,7 @@ class BasicCalculateResponse(BaseModel):
     regimen: dict
     predicted: dict
     breakdown: dict
+    curve: Optional[List[CurvePoint]] = None
 
 
 class PkDoseEvent(BaseModel):

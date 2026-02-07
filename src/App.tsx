@@ -100,6 +100,12 @@ function HomePage() {
             <div>
               <ResultsPanel mode={mode} result={result} />
 
+              {mode === "basic" && result && "curve" in result && result.curve && (
+                <div className="mt-4 grid gap-4">
+                  <ConcentrationTimeChart curve={result.curve} levels={[]} />
+                </div>
+              )}
+
               {mode === "bayesian" && result && "curve" in result && (
                 <div className="mt-4 grid gap-4">
                   <ConcentrationTimeChart
