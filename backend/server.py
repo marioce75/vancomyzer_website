@@ -295,10 +295,25 @@ def basic_calculate(req: BasicCalculateRequest) -> BasicCalculateResponse:
         "tbw_scr1": outputs.get("crcl_tbw_scr1"),
         "forced": outputs.get("crcl_forced"),
     }
+    def _round_to_250(mg: Optional[float]) -> Optional[float]:
+        if mg is None:
+            return None
+        return float(round(mg / 250.0) * 250.0)
+
+    def _round_interval(interval: Optional[float]) -> Optional[float]:
+        if interval is None:
+            return None
+        allowed = [6.0, 8.0, 12.0, 24.0]
+        return float(min(allowed, key=lambda x: abs(x - interval)))
+
+    recommended_interval = _round_interval(outputs.get("recommended_interval_hr"))
+    recommended_dose = _round_to_250(outputs.get("recommended_dose_mg"))
+    recommended_loading = _round_to_250(outputs.get("recommended_loading_dose_mg"))
+
     regimen = {
-        "recommended_interval_hr": outputs.get("recommended_interval_hr"),
-        "recommended_dose_mg": outputs.get("recommended_dose_mg"),
-        "recommended_loading_dose_mg": outputs.get("recommended_loading_dose_mg"),
+        "recommended_interval_hr": recommended_interval,
+        "recommended_dose_mg": recommended_dose,
+        "recommended_loading_dose_mg": recommended_loading,
         "chosen_interval_hr": req.regimen.interval_hr,
         "chosen_dose_mg": req.regimen.dose_mg,
         "infusion_hr": req.regimen.infusion_hr,

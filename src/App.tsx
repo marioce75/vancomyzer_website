@@ -1,7 +1,7 @@
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import DisclaimerGate from "@/components/DisclaimerGate";
-import CalculatorForm from "@/components/CalculatorForm";
+import CalculatorForm, { type CalculatorFormHandle } from "@/components/CalculatorForm";
 import ResultsPanel from "@/components/ResultsPanel";
 import ConcentrationTimeChart from "@/components/ConcentrationTimeChart";
 import { Alert } from "@/components/ui/alert";
@@ -32,6 +32,7 @@ function HomePage() {
   const [result, setResult] = useState<BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse | undefined>(undefined);
   const [mode, setMode] = useState<"basic" | "bayesian" | "educational">("basic");
   const [bayesLevels, setBayesLevels] = useState<Array<{ time_hr: number; concentration_mg_l: number }>>([]);
+  const formRef = useRef<CalculatorFormHandle | null>(null);
 
   const [sharedRegimenText, setSharedRegimenText] = useState<string | null>(null);
   const [roundsMode] = useState<boolean>(() => {
@@ -83,6 +84,7 @@ function HomePage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <CalculatorForm
+                ref={formRef}
                 onResult={(res, nextMode) => {
                   setResult(res);
                   setMode(nextMode);
@@ -98,7 +100,11 @@ function HomePage() {
               />
             </div>
             <div>
-              <ResultsPanel mode={mode} result={result} />
+              <ResultsPanel
+                mode={mode}
+                result={result}
+                onAdjustDose={(delta) => formRef.current?.adjustDose(delta)}
+              />
 
               {mode === "basic" && result && "curve" in result && result.curve && (
                 <div className="mt-4 grid gap-4">

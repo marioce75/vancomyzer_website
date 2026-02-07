@@ -5,7 +5,15 @@ import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateRespon
 
 type Mode = "basic" | "bayesian" | "educational";
 
-function ResultsPanel({ mode, result }: { mode: Mode; result?: BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse }) {
+function ResultsPanel({
+  mode,
+  result,
+  onAdjustDose,
+}: {
+  mode: Mode;
+  result?: BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse;
+  onAdjustDose?: (delta: { doseMg?: number; intervalHr?: number }) => void;
+}) {
   const [copied, setCopied] = useState(false);
 
   if (!result) {
@@ -98,6 +106,14 @@ function ResultsPanel({ mode, result }: { mode: Mode; result?: BasicCalculateRes
                 </div>
               )}
             </div>
+            {onAdjustDose && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: 250 })}>+250 mg</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: -250 })}>-250 mg</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: 2 })}>+2h interval</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: -2 })}>-2h interval</Button>
+              </div>
+            )}
           <div className="print-summary">
             <pre className="whitespace-pre-wrap text-sm">{buildSummary()}</pre>
           </div>
@@ -152,6 +168,14 @@ function ResultsPanel({ mode, result }: { mode: Mode; result?: BasicCalculateRes
                 </div>
               )}
             </div>
+            {onAdjustDose && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: 250 })}>+250 mg</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: -250 })}>-250 mg</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: 2 })}>+2h interval</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: -2 })}>-2h interval</Button>
+              </div>
+            )}
             {result.warnings.length > 0 && (
               <div className="mt-4 space-y-1">
                 {result.warnings.map((m, i) => (

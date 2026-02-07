@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,6 +13,10 @@ import {
   type BayesianCalculateResponse,
   ApiError,
 } from "@/lib/api";
+
+export type CalculatorFormHandle = {
+  adjustDose: (delta: { doseMg?: number; intervalHr?: number }) => void;
+};
 
 export type CalculatorFormProps = {
   onResult: (result: BasicCalculateResponse | BayesianCalculateResponse | undefined, mode: "basic" | "bayesian") => void;
@@ -31,7 +35,7 @@ function formatValidationLoc(loc: Array<string | number>): string {
   return loc.filter((p) => p !== "body").join(".");
 }
 
-export default function CalculatorForm({ onResult, onLoadingChange, onInputsChange }: CalculatorFormProps) {
+const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ onResult, onLoadingChange, onInputsChange }, ref) => {
   const [age, setAge] = useState(60);
   const [sex, setSex] = useState<"male" | "female">("male");
   const [height, setHeight] = useState(175);
@@ -114,10 +118,12 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
     );
   }
 
-  async function onSubmit() {
+  async function onSubmit(overrides?: { doseMg?: number; intervalHr?: number }) {
     onLoadingChange?.(true);
     setError(null);
     try {
+      const effectiveDose = overrides?.doseMg ?? doseMg;
+      const effectiveInterval = overrides?.intervalHr ?? intervalHr;
       if (mode === "basic") {
         const result = await calculateBasic({
           patient: {
@@ -128,8 +134,8 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
             serum_creatinine: Number(scr),
           },
           regimen: {
-            dose_mg: Number(doseMg),
-            interval_hr: Number(intervalHr),
+            dose_mg: Number(effectiveDose),
+            interval_hr: Number(effectiveInterval),
             infusion_hr: Number(infusionHr),
           },
           mic: Number(mic),
@@ -146,7 +152,7 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
           ? doseHistory
               .filter((d) => Number.isFinite(d.doseMg) && d.doseMg > 0)
               .map((d) => ({ dose_mg: Number(d.doseMg), start_time_hr: Number(d.timeHr), infusion_hr: Number(d.infusionHr) }))
-          : [{ dose_mg: Number(doseMg), start_time_hr: 0, infusion_hr: Number(infusionHr) }];
+          : [{ dose_mg: Number(effectiveDose), start_time_hr: 0, infusion_hr: Number(infusionHr) }];
         onInputsChange?.({ mode: "bayesian", levels: levelsPayload, dose_history: historyPayload });
         const result = await calculateBayesian({
           patient: {
@@ -179,6 +185,22 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
       onLoadingChange?.(false);
     }
   }
+
+  function adjustDose(delta: { doseMg?: number; intervalHr?: number }) {
+    const nextDose = Math.max(250, (delta.doseMg ?? 0) + doseMg);
+    const nextInterval = Math.max(4, (delta.intervalHr ?? 0) + intervalHr);
+    setDoseMg(nextDose);
+    setIntervalHr(nextInterval);
+    setDoseHistory((prev) =>
+      prev.map((row) => ({
+        ...row,
+        doseMg: Math.max(0, row.doseMg + (delta.doseMg ?? 0)),
+      })),
+    );
+    onSubmit({ doseMg: nextDose, intervalHr: nextInterval });
+  }
+
+  useImperativeHandle(ref, () => ({ adjustDose }));
 
   return (
     <TooltipProvider>
@@ -435,8 +457,12 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
         </div>
       )}
 
-      <Button className="w-full" onClick={onSubmit} disabled={!formValid}>Compute PK estimates</Button>
+      <Button className="w-full" onClick={() => onSubmit()} disabled={!formValid}>Compute PK estimates</Button>
       </div>
     </TooltipProvider>
   );
-}
+});
+
+CalculatorForm.displayName = "CalculatorForm";
+
+export default CalculatorForm;
