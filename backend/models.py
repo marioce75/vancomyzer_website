@@ -78,3 +78,67 @@ class CalculateResponse(BaseModel):
     concentration_curve: List[CurvePoint]
     safety: List[SafetyMessage] = []
     bayes_demo: Optional[BayesDemoResult] = None
+
+
+class BasicPatient(BaseModel):
+    age: int = Field(ge=0, le=120)
+    sex: Literal["male", "female"]
+    height_cm: float = Field(gt=0)
+    weight_kg: float = Field(gt=0)
+    serum_creatinine: float = Field(gt=0)
+
+
+class BasicRegimen(BaseModel):
+    dose_mg: float = Field(gt=0)
+    interval_hr: float = Field(gt=0)
+    infusion_hr: Optional[float] = Field(default=None, gt=0)
+
+
+class BasicCalculateRequest(BaseModel):
+    patient: BasicPatient
+    regimen: BasicRegimen
+    mic: float = Field(default=1.0, gt=0)
+    icu: bool = False
+    mrsa: bool = False
+    crcl_method: Optional[int] = Field(default=None, ge=1, le=5)
+    forced_crcl: Optional[float] = Field(default=None, gt=0)
+
+
+class BasicCalculateResponse(BaseModel):
+    crcl: dict
+    regimen: dict
+    predicted: dict
+    breakdown: dict
+
+
+class PkDoseEvent(BaseModel):
+    dose_mg: float = Field(gt=0)
+    start_time_hr: float = Field(ge=0)
+    infusion_hr: float = Field(gt=0)
+
+
+class PkLevelObservation(BaseModel):
+    time_hr: float = Field(ge=0)
+    concentration_mg_l: float = Field(gt=0)
+
+
+class PkBayesianRequest(BaseModel):
+    patient: PatientInputs
+    mic: float = Field(default=1.0, gt=0)
+    dose_history: List[PkDoseEvent]
+    levels: List[PkLevelObservation]
+    target_low: float = Field(default=400.0, gt=0)
+    target_high: float = Field(default=600.0, gt=0)
+
+
+class PkBayesianResponse(BaseModel):
+    auc24: float
+    auc24_ci_low: float
+    auc24_ci_high: float
+    cl_l_hr: float
+    v_l: float
+    curve: List[CurvePoint]
+    curve_ci_low: List[CurvePoint]
+    curve_ci_high: List[CurvePoint]
+    recommendation: dict
+    warnings: List[str] = []

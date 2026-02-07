@@ -1,99 +1,95 @@
-# Vancomyzer Website
+# Vancomyzer
 
-This project deploys as a single Render Web Service (FastAPI backend + Vite-built static frontend).
+Production-ready vancomycin dosing calculator with two modes:
+- Basic Calculator (Excel parity)
+- Bayesian AUC Engine (MAP, optional posterior band)
 
-## Render commands
+Educational use only. Do not enter PHI.
 
-**Build Command**
+## Architecture
 
-Use the script:
+Monorepo:
+- `backend/` FastAPI API + SPA static hosting
+- `src/` Vite + React + TypeScript + shadcn/ui
+- `data/` Excel inputs, parsed JSON, priors
 
-- `bash scripts/render_build.sh`
+The backend serves the built SPA from `backend/static/` and exposes `/api` endpoints.
 
-Equivalent one-liner:
+## Local development
 
-- `python -m pip install -r backend/requirements.txt && npm ci && npm run build && mkdir -p backend/static && rm -rf backend/static/* && cp -R dist/* backend/static/`
-
-**Start Command**
-
-- `python -m uvicorn backend.server:app --host 0.0.0.0 --port $PORT`
-
-**Health check**
-
-- `GET /health` returns `{ "status": "ok" }`
-
----
-
-# Welcome to your Lovable project
-
-## Project info
-
-**URL**: https://lovable.dev/projects/ea33932d-e7d6-4de6-99b5-de5427ed716b
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/ea33932d-e7d6-4de6-99b5-de5427ed716b) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
+Backend:
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r backend/requirements.txt
+python -m uvicorn backend.server:app --host 0.0.0.0 --port 8000
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Frontend:
+```sh
+npm ci
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Excel parsing (Basic Calculator)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Parse the provided XLSX into deterministic JSON:
+```sh
+python3 scripts/parse_basic_excel.py path/to/Vanco_Dosing.xlsx
+```
 
-**Use GitHub Codespaces**
+Output:
+- `data/parsed/basic_workbook.json`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The Basic Calculator uses the parsed workbook at runtime. If `data/parsed/basic_workbook.json` is missing, it falls back to `data/xlsx_dump/`.
 
-## What technologies are used for this project?
+## Priors (Bayesian AUC Engine)
 
-This project is built with:
+Priors live in:
+- `data/priors.json`
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+These include log-normal priors for CL and V and residual error defaults. Adjust as needed for population updates.
 
-## How can I deploy this project?
+## API endpoints
 
-Use Render as described above (single Web Service).
+Health:
+- `GET /api/health` -> `{ "status": "ok" }`
 
-## Can I connect a custom domain to my Lovable project?
+Basic Calculator (Excel parity):
+- `POST /api/basic/calculate`
 
-Yes, you can!
+Bayesian AUC Engine (MAP):
+- `POST /api/pk/calculate`
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Educational endpoint (legacy):
+- `POST /api/pk/educational`
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Guideline alignment
+
+The Bayesian mode targets AUC/MIC 400–600 (assuming MIC 1 mg/L) and applies dosing guardrails (loading and daily caps) aligned with the 2020 ASHP/IDSA/PIDS consensus guideline. See the guideline for full clinical context:  
+https://www.ashp.org/-/media/assets/policy-guidelines/docs/therapeutic-guidelines/therapeutic-guidelines-monitoring-vancomycin-ASHP-IDSA-PIDS.pdf
+
+## Tests
+
+```sh
+python -m pytest backend/tests
+```
+
+## Render deployment
+
+Build command:
+```sh
+bash scripts/render_build.sh
+```
+
+Start command:
+```sh
+python -m uvicorn backend.server:app --host 0.0.0.0 --port $PORT
+```
+
+Health check:
+- `GET /api/health`
+
+## Disclaimer
+
+Vancomyzer is for educational and clinical decision support only. It does not replace clinical judgment or institutional protocols.
