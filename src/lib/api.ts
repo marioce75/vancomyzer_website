@@ -104,7 +104,7 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
 }
 
 export async function calculatePk(payload: PkCalculatePayload): Promise<PkCalculateResponse> {
-  return postJSON<PkCalculateResponse>(`${API_BASE}/api/pk/calculate`, payload);
+  return postJSON<PkCalculateResponse>(`${API_BASE}/api/pk/calculate-legacy`, payload);
 }
 
 export async function bayesianEstimate(payload: PkCalculatePayload): Promise<PkCalculateResponse> {

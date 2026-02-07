@@ -192,7 +192,7 @@ def predict_trough(dose_mg: float, tau_h: int, cl_l_h: float, v_l: float, infusi
 
 # -------- API endpoints (with /api aliases) --------
 @app.post("/pk/calculate", response_model=PkCalculateResponse)
-@app.post("/api/pk/calculate", response_model=PkCalculateResponse)
+@app.post("/api/pk/calculate-legacy", response_model=PkCalculateResponse)
 def pk_calculate(req: PkCalculateRequest) -> PkCalculateResponse:
     try:
         crcl = cockcroft_gault_crcl(req.age, req.sex, req.serumCreatinine, req.weightKg)
