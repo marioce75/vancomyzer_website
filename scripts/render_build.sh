@@ -16,4 +16,14 @@ mkdir -p backend/static
 rm -rf backend/static/*
 cp -R dist/* backend/static/
 
-echo "Render build complete: backend/static populated from dist/"
+BUILD_TIME="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+GIT_SHA="${RENDER_GIT_COMMIT:-}"
+if [ -z "$GIT_SHA" ]; then
+  GIT_SHA="$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")"
+fi
+
+cat > backend/static/build-info.json <<EOF
+{"git_sha":"$GIT_SHA","build_time":"$BUILD_TIME"}
+EOF
+
+echo "Render build complete: backend/static populated from dist/ (git=$GIT_SHA)"

@@ -3,6 +3,7 @@ import traceback
 import math
 import os
 import subprocess
+import json
 from datetime import datetime, timezone
 from typing import List, Optional, Any
 
@@ -31,6 +32,25 @@ app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR), check_dir=False), na
 
 # Optional: expose /static for debugging/legacy paths (not used by Vite)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR), check_dir=False), name="static")
+
+
+def _read_build_info() -> dict:
+    build_info_path = STATIC_DIR / "build-info.json"
+    if not build_info_path.exists():
+        return {}
+    try:
+        return json.loads(build_info_path.read_text())
+    except Exception:
+        return {}
+
+
+@app.middleware("http")
+async def add_cache_headers(request: Request, call_next):
+    response = await call_next(request)
+    content_type = response.headers.get("content-type", "")
+    if content_type.startswith("text/html"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
 
 
 # -------- Health --------
@@ -292,10 +312,11 @@ def meta_version():
 
     Note: this endpoint is not shown in the clinician-facing footer.
     """
-    built_at = datetime.now(timezone.utc).isoformat()
+    build_info = _read_build_info()
+    built_at = build_info.get("build_time") or datetime.now(timezone.utc).isoformat()
 
-    # Prefer Render env var, then try git.
-    git_sha = os.environ.get("RENDER_GIT_COMMIT")
+    # Prefer build info/env var, then try git.
+    git_sha = build_info.get("git_sha") or os.environ.get("RENDER_GIT_COMMIT")
     if not git_sha:
         try:
             git_sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=str(BASE_DIR.parent)).decode().strip()
@@ -315,16 +336,14 @@ def api_version():
     app_name = os.environ.get("APP_NAME", "Vancomyzer")
     app_version = os.environ.get("APP_VERSION", "v1")
 
-    # Build time: prefer explicit BUILD_TIME, otherwise fall back to request-time UTC.
-    build_time = os.environ.get("BUILD_TIME")
+    build_info = _read_build_info()
+
+    # Build time: prefer build info/env var, otherwise fall back to request-time UTC.
+    build_time = build_info.get("build_time") or os.environ.get("BUILD_TIME")
     if not build_time:
         build_time = datetime.now(timezone.utc).isoformat()
 
-    git_sha = (
-        os.environ.get("GIT_SHA")
-        or os.environ.get("RENDER_GIT_COMMIT")
-        or None
-    )
+    git_sha = build_info.get("git_sha") or os.environ.get("GIT_SHA") or os.environ.get("RENDER_GIT_COMMIT") or None
     if not git_sha:
         try:
             git_sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=str(BASE_DIR.parent)).decode().strip()
