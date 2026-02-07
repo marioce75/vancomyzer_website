@@ -30,3 +30,10 @@ __pycache__/
 
 # Local env
 frontend/.env.local
+
+# local env
+backend/.venv/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+

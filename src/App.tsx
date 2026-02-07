@@ -10,9 +10,8 @@ import { AlertTriangle } from "lucide-react";
 import PearlsPanel from "@/components/PearlsPanel";
 import TimingHelperMini from "@/components/TimingHelperMini";
 import RoundsSummaryCard from "@/components/RoundsSummaryCard";
-import { decodeShareState } from "@/lib/shareLink";
+import { copyToClipboard, decodeShareState } from "@/lib/shareLink";
 import { calculateEducational, type CalculateRequest, type CalculateResponse } from "@/lib/api";
-
 const ReferencesPageLazy = React.lazy(() => import("@/pages/References"));
 const DisclaimerPageLazy = React.lazy(() => import("@/pages/Disclaimer"));
 const AboutPageLazy = React.lazy(() => import("@/pages/About"));
@@ -75,7 +74,7 @@ function HomePage() {
     }, 300);
   }
 
-  function onAdjust(delta: { dose_mg?: number; interval_hr?: number }) {
+  async function onAdjust(delta: { dose_mg?: number; interval_hr?: number }) {
     if (!inputs) return;
     const next: CalculateRequest = {
       ...inputs,
@@ -154,18 +153,11 @@ function HomePage() {
                       })
                     }
                   />
-                  <ConcentrationTimeChart
-                    curve={result.concentration_curve?.map((p) => ({ t_hr: p.t, conc_mg_l: p.c }))}
-                    levels={inputs.levels?.map((l) => ({
-                      time_hr: l.timeHr ?? l.time ?? 0,
-                      concentration_mg_l: l.concentration,
-                    }))}
-                    showBand={false}
-                  />
+                  <ConcentrationTimeChart curve={result.concentration_curve} levels={inputs.levels} showBand={false} />
 
                   {roundsMode && (
                     <div className="grid gap-4">
-                      <RoundsSummaryCard result={result} />
+                      <RoundsSummaryCard inputs={inputs} result={result} />
                       <PearlsPanel />
                       <TimingHelperMini />
                     </div>

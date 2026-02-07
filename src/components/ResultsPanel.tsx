@@ -1,6 +1,6 @@
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import ShareButtons from "@/components/ShareButtons";
 import type { CalculateResponse } from "@/lib/api";
 
 function ResultsPanel({
@@ -43,15 +43,12 @@ function ResultsPanel({
               </div>
             )}
           </div>
+
           <div className="flex flex-wrap gap-2 mt-3">
-            <Button variant="secondary" onClick={() => onAdjustDose({ dose_mg: 250 })} disabled={updating}>+250 mg</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ dose_mg: -250 })} disabled={updating}>-250 mg</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ interval_hr: 2 })} disabled={updating}>+2h interval</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ interval_hr: -2 })} disabled={updating}>-2h interval</Button>
-            {updating && <div className="text-xs text-muted-foreground self-center">Updating…</div>}
-          </div>
-          <div className="mt-3">
-            <ShareButtons result={result} />
+            <Button variant="secondary" onClick={() => onAdjustDose({ dose_mg: 250 })}>+250 mg</Button>
+            <Button variant="secondary" onClick={() => onAdjustDose({ dose_mg: -250 })}>-250 mg</Button>
+            <Button variant="secondary" onClick={() => onAdjustDose({ interval_hr: 2 })}>+2h interval</Button>
+            <Button variant="secondary" onClick={() => onAdjustDose({ interval_hr: -2 })}>-2h interval</Button>
           </div>
 
           {result.safety?.length > 0 && (

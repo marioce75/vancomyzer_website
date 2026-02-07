@@ -60,7 +60,7 @@ class InteractiveApiService {
     // Read from <meta name="vancomyzer-api-base" content="..." />
     const meta = document.querySelector('meta[name="vancomyzer-api-base"]') as HTMLMetaElement | null;
     const apiUrl = meta?.content?.trim();
-    const baseUrl = apiUrl || '/api';
+    const baseUrl = apiUrl || 'https://vancomyzer.onrender.com/api';
     return baseUrl.replace(/\/$/, '');
   }
 
@@ -84,8 +84,7 @@ class InteractiveApiService {
 
   async checkHealth(): Promise<boolean> {
     try {
-      const response = await fetch('/healthz');
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      await this.makeRequest('/health');
       this.isOnline = true;
       return true;
     } catch (error) {
