@@ -10,7 +10,7 @@ import { calculateEducational, type CalculateRequest, type CalculateResponse, Ap
 export type CalculatorFormProps = {
   onResult: (result: CalculateResponse | undefined) => void;
   onLoadingChange?: (loading: boolean) => void;
-  onInputsChange?: (payload: PkCalculatePayload) => void;
+  onInputsChange?: (inputs: { patient: CalculateRequest["patient"]; regimen: CalculateRequest["regimen"]; dose_history?: CalculateRequest["dose_history"]; levels?: CalculateRequest["levels"]; mode: CalculateRequest["mode"]; }) => void;
 };
 
 type UiError = { message: string; issues?: Array<{ path: string; message: string }> };
@@ -54,9 +54,6 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
       weight_kg: Number(weightKg),
       serum_creatinine_mg_dl: Number(scr),
     };
-    if (Number.isFinite(heightCm) && heightCm > 0) {
-      patient.height_cm = Number(heightCm);
-    }
 
     // Provide simple regimen defaults; App can later treat these as controlled overrides.
     const regimen: CalculateRequest["regimen"] = {
@@ -89,7 +86,6 @@ export default function CalculatorForm({ onResult, onLoadingChange, onInputsChan
 
     onInputsChange?.({ patient, regimen, levels: levelsPayload, dose_history: historyPayload, mode });
 
-    onInputsChange?.(payload);
     onLoadingChange?.(true);
     setError(null);
     try {

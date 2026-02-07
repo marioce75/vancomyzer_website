@@ -9,7 +9,6 @@ export default function AucDoseSliderChart({
   auc24,
   targetLow = 400,
   targetHigh = 600,
-  pending = false,
   onChange,
 }: {
   doseMg: number;
@@ -17,13 +16,12 @@ export default function AucDoseSliderChart({
   auc24: number;
   targetLow?: number;
   targetHigh?: number;
-  pending?: boolean;
   onChange: (update: { doseMg?: number; intervalHr?: number }) => void;
 }) {
   const data = useMemo(() => {
     // Synthetic response curve for UX; backend calculates exact values on submit
     const points = [] as Array<{ x: number; y: number }>;
-    for (let x = 250; x <= 3000; x += 100) {
+    for (let x = 500; x <= 2500; x += 100) {
       const y = Math.max(200, Math.min(1200, auc24 * (x / (doseMg || 1)) * (intervalHr / (intervalHr || 12))));
       points.push({ x, y });
     }
@@ -53,10 +51,9 @@ export default function AucDoseSliderChart({
             </div>
             <div>
               <div className="text-xs text-muted-foreground mb-1">Interval (h)</div>
-              <Slider value={[intervalHr]} min={4} max={24} step={2} onValueChange={([v]) => onChange({ intervalHr: v })} />
+              <Slider value={[intervalHr]} min={4} max={48} step={1} onValueChange={([v]) => onChange({ intervalHr: v })} />
             </div>
           </div>
-          {pending && <div className="text-xs text-muted-foreground">Updating simulation…</div>}
         </div>
       </CardContent>
     </Card>

@@ -17,11 +17,9 @@ function formatTimestamp(ts: Date): string {
 export default function RoundsSummaryCard({
   inputs,
   result,
-  infusionHr = 1,
 }: {
-  inputs?: CalculateRequest;
+  inputs: CalculateRequest | null;
   result?: CalculateResponse;
-  infusionHr?: number;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -31,17 +29,16 @@ export default function RoundsSummaryCard({
     if (!inputs || !result) return null;
     // No PHI: only regimen + AUC estimate + timestamp + mode label.
     const r = inputs.regimen;
-    const trough = result.trough_mg_l;
     return [
       `Vancomyzer® Rounds Summary (educational estimate)`,
       `Time: ${formatTimestamp(timestamp)}`,
-      `Regimen: ${Math.round(r.dose_mg)} mg q${Math.round(r.interval_hr)}h (infusion ${infusionHr.toFixed(1)}h)`,
+      `Regimen: ${Math.round(r.dose_mg)} mg q${Math.round(r.interval_hr)}h (infusion ${r.infusion_hr.toFixed(1)}h)`,
       `AUC0–24: ~${Math.round(result.auc24_mg_h_l)} mg·h/L`,
-      `Trough: ~${trough.toFixed(1)} mg/L`,
+      `Trough: ~${result.trough_mg_l.toFixed(1)} mg/L`,
       `Note: Educational PK estimates only — not medical advice. Verify with institutional protocols.`,
       `No PHI stored.`,
     ].join("\n");
-  }, [inputs, result, infusionHr, timestamp]);
+  }, [inputs, result, timestamp]);
 
   async function onCopy() {
     if (!summary) return;
@@ -50,7 +47,7 @@ export default function RoundsSummaryCard({
     window.setTimeout(() => setCopied(false), 1200);
   }
 
-  if (!inputs || !inputs.regimen || !result) return null;
+  if (!inputs || !result) return null;
 
   return (
     <Card className="border-sky-200 bg-sky-50/40">
