@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/shareLink";
-import type { PkCalculateResponse } from "@/lib/api";
+import type { CalculateRequest, CalculateResponse } from "@/lib/api";
 
 function formatTimestamp(ts: Date): string {
   return ts.toLocaleString(undefined, {
@@ -15,10 +15,12 @@ function formatTimestamp(ts: Date): string {
 }
 
 export default function RoundsSummaryCard({
+  inputs,
   result,
   infusionHr = 1,
 }: {
-  result?: PkCalculateResponse;
+  inputs?: CalculateRequest;
+  result?: CalculateResponse;
   infusionHr?: number;
 }) {
   const [copied, setCopied] = useState(false);
@@ -29,19 +31,17 @@ export default function RoundsSummaryCard({
     if (!inputs || !result) return null;
     // No PHI: only regimen + AUC estimate + timestamp + mode label.
     const r = inputs.regimen;
-    const trough = result.troughPredicted
-      ? (result.troughPredicted.low + result.troughPredicted.high) / 2
-      : undefined;
+    const trough = result.trough_mg_l;
     return [
       `Vancomyzer® Rounds Summary (educational estimate)`,
       `Time: ${formatTimestamp(timestamp)}`,
-      `Regimen: ${Math.round(r.doseMg)} mg q${Math.round(r.intervalHr)}h (infusion ${r.infusionHours.toFixed(1)}h)`,
-      `AUC0–24: ~${Math.round(result.auc24)} mg·h/L`,
-      `Trough: ~${trough ? trough.toFixed(1) : "—"} mg/L`,
+      `Regimen: ${Math.round(r.dose_mg)} mg q${Math.round(r.interval_hr)}h (infusion ${infusionHr.toFixed(1)}h)`,
+      `AUC0–24: ~${Math.round(result.auc24_mg_h_l)} mg·h/L`,
+      `Trough: ~${trough.toFixed(1)} mg/L`,
       `Note: Educational PK estimates only — not medical advice. Verify with institutional protocols.`,
       `No PHI stored.`,
     ].join("\n");
-  }, [result, infusionHr, timestamp]);
+  }, [inputs, result, infusionHr, timestamp]);
 
   async function onCopy() {
     if (!summary) return;

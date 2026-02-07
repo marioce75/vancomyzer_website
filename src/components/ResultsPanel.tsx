@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import ShareButtons from "@/components/ShareButtons";
 import type { CalculateResponse } from "@/lib/api";
 
 function ResultsPanel({
@@ -7,8 +8,8 @@ function ResultsPanel({
   onAdjustDose,
   updating,
 }: {
-  result?: PkCalculateResponse;
-  onAdjustDose: (delta: { dose?: number; interval?: number }) => void;
+  result?: CalculateResponse;
+  onAdjustDose: (delta: { dose_mg?: number; interval_hr?: number }) => void;
   updating?: boolean;
 }) {
   if (!result) {
@@ -43,10 +44,10 @@ function ResultsPanel({
             )}
           </div>
           <div className="flex flex-wrap gap-2 mt-3">
-            <Button variant="secondary" onClick={() => onAdjustDose({ dose: 250 })} disabled={updating}>+250 mg</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ dose: -250 })} disabled={updating}>-250 mg</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ interval: 2 })} disabled={updating}>+2h interval</Button>
-            <Button variant="secondary" onClick={() => onAdjustDose({ interval: -2 })} disabled={updating}>-2h interval</Button>
+            <Button variant="secondary" onClick={() => onAdjustDose({ dose_mg: 250 })} disabled={updating}>+250 mg</Button>
+            <Button variant="secondary" onClick={() => onAdjustDose({ dose_mg: -250 })} disabled={updating}>-250 mg</Button>
+            <Button variant="secondary" onClick={() => onAdjustDose({ interval_hr: 2 })} disabled={updating}>+2h interval</Button>
+            <Button variant="secondary" onClick={() => onAdjustDose({ interval_hr: -2 })} disabled={updating}>-2h interval</Button>
             {updating && <div className="text-xs text-muted-foreground self-center">Updating…</div>}
           </div>
           <div className="mt-3">
