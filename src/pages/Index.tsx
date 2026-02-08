@@ -13,6 +13,7 @@ import { MethodSelector, CalculationMethod } from "@/components/MethodSelector";
 import { LevelsInput } from "@/components/LevelsInput";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatNumber } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Calculator, Info, Brain, Activity } from "lucide-react";
 
@@ -177,7 +178,7 @@ const Index = () => {
                     {loadingDose} mg
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Based on {(loadingDose / patient.weight).toFixed(1)} mg/kg
+                    Based on {formatNumber(loadingDose / patient.weight, 1)} mg/kg
                   </div>
                 </div>
                 

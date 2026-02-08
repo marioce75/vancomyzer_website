@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateResponse } from "@/lib/api";
+import { AUC_TARGET, REGIMEN_LIMITS } from "@/lib/constraints";
+import { formatNumber } from "@/lib/format";
 
 type Mode = "basic" | "bayesian" | "educational";
 
@@ -9,10 +12,14 @@ function ResultsPanel({
   mode,
   result,
   onAdjustDose,
+  regimen,
+  onRegimenChange,
 }: {
   mode: Mode;
   result?: BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse;
   onAdjustDose?: (delta: { doseMg?: number; intervalHr?: number }) => void;
+  regimen?: { doseMg: number; intervalHr: number; infusionHr: number };
+  onRegimenChange?: (next: { doseMg: number; intervalHr: number; infusionHr: number }) => void;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -34,31 +41,45 @@ function ResultsPanel({
     if (mode === "basic" && "predicted" in result) {
       return [
         "Vancomyzer Basic Calculator",
-        `AUC24: ${Math.round(result.predicted.auc24 ?? 0)} mg·h/L`,
-        `Peak: ${(result.predicted.peak ?? 0).toFixed(1)} mg/L`,
-        `Trough: ${(result.predicted.trough ?? 0).toFixed(1)} mg/L`,
-        `Recommended regimen: ${Math.round(result.regimen.recommended_dose_mg ?? 0)} mg q${Math.round(result.regimen.recommended_interval_hr ?? 0)}h`,
+        `AUC24: ${formatNumber(result.predicted.auc24 ?? 0, 0)} mg·h/L`,
+        `Peak: ${formatNumber(result.predicted.peak ?? 0, 1)} mg/L`,
+        `Trough: ${formatNumber(result.predicted.trough ?? 0, 1)} mg/L`,
+        `Recommended regimen: ${formatNumber(result.regimen.recommended_dose_mg ?? 0, 0)} mg q${formatNumber(result.regimen.recommended_interval_hr ?? 0, 0)}h`,
       ].join("\n");
     }
     if (mode === "bayesian" && "auc24" in result) {
       return [
         "Vancomyzer Bayesian AUC Engine",
-        `AUC24: ${Math.round(result.auc24)} (95% CI ${Math.round(result.auc24_ci_low)}–${Math.round(result.auc24_ci_high)}) mg·h/L`,
-        `CL: ${result.cl_l_hr.toFixed(2)} L/hr`,
-        `V: ${result.v_l.toFixed(1)} L`,
-        `Suggested regimen: ${Math.round(result.recommendation.per_dose_mg)} mg q${Math.round(result.recommendation.interval_hr)}h`,
+        `AUC24: ${formatNumber(result.auc24, 0)} (95% CI ${formatNumber(result.auc24_ci_low, 0)}–${formatNumber(result.auc24_ci_high, 0)}) mg·h/L`,
+        `CL: ${formatNumber(result.cl_l_hr, 2)} L/hr`,
+        `V: ${formatNumber(result.v_l, 1)} L`,
+        `Suggested regimen: ${formatNumber(result.recommendation.per_dose_mg, 0)} mg q${formatNumber(result.recommendation.interval_hr, 0)}h`,
       ].join("\n");
     }
     const edu = result as CalculateResponse;
     return [
       "Vancomyzer Educational PK Estimates",
-      `AUC24: ${Math.round(edu.auc24_mg_h_l)} mg·h/L`,
-      `Peak: ${edu.peak_mg_l.toFixed(1)} mg/L`,
-      `Trough: ${edu.trough_mg_l.toFixed(1)} mg/L`,
+      `AUC24: ${formatNumber(edu.auc24_mg_h_l, 0)} mg·h/L`,
+      `Peak: ${formatNumber(edu.peak_mg_l, 1)} mg/L`,
+      `Trough: ${formatNumber(edu.trough_mg_l, 1)} mg/L`,
     ].join("\n");
   }
 
   if (mode === "basic" && "predicted" in result) {
+    const auc24 = result.predicted.auc24 ?? 0;
+    const outsideTarget = auc24 < AUC_TARGET.low || auc24 > AUC_TARGET.high;
+    const chosenDose = result.regimen.chosen_dose_mg ?? regimen?.doseMg;
+    const chosenInterval = result.regimen.chosen_interval_hr ?? regimen?.intervalHr;
+    const chosenDoseNum = Number(chosenDose ?? 0);
+    const chosenIntervalNum = Number(chosenInterval ?? 0);
+    const dailyDose = chosenIntervalNum > 0 ? chosenDoseNum * (24 / chosenIntervalNum) : 0;
+    const guardrailWarnings: string[] = [];
+    if (chosenDoseNum > REGIMEN_LIMITS.maxSingleDoseMg) {
+      guardrailWarnings.push(`Chosen dose exceeds max single dose (${REGIMEN_LIMITS.maxSingleDoseMg} mg).`);
+    }
+    if (dailyDose > REGIMEN_LIMITS.maxDailyDoseMg) {
+      guardrailWarnings.push(`Chosen daily dose exceeds cap (${REGIMEN_LIMITS.maxDailyDoseMg} mg/day).`);
+    }
     return (
       <div className="space-y-4">
         <Card>
@@ -67,7 +88,7 @@ function ResultsPanel({
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between gap-3 mb-3 print-hidden">
-              <div className="text-xs text-muted-foreground">Excel parity outputs</div>
+              <div className="text-xs text-muted-foreground">Deterministic results</div>
               <div className="flex gap-2">
                 <Button variant="secondary" size="sm" onClick={() => onCopySummary(buildSummary())}>
                   {copied ? "Copied" : "Copy summary"}
@@ -80,32 +101,92 @@ function ResultsPanel({
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <div className="text-muted-foreground">AUC₍0–24₎ (mg·h/L)</div>
-                <div className="font-medium">{Math.round(result.predicted.auc24 ?? 0)}</div>
+                <div className="font-medium">{formatNumber(auc24, 0)}</div>
+                {outsideTarget && (
+                  <div className="text-xs text-warning-foreground mt-1">
+                    Outside target {AUC_TARGET.low}-{AUC_TARGET.high} mg·h/L
+                  </div>
+                )}
               </div>
               <div>
                 <div className="text-muted-foreground">Predicted trough (mg/L)</div>
-                <div className="font-medium">{(result.predicted.trough ?? 0).toFixed(1)}</div>
+                <div className="font-medium">{formatNumber(result.predicted.trough ?? 0, 1)}</div>
               </div>
               <div>
                 <div className="text-muted-foreground">Predicted peak (mg/L)</div>
-                <div className="font-medium">{(result.predicted.peak ?? 0).toFixed(1)}</div>
+                <div className="font-medium">{formatNumber(result.predicted.peak ?? 0, 1)}</div>
               </div>
               <div>
                 <div className="text-muted-foreground">Half-life (hr)</div>
-                <div className="font-medium">{(result.predicted.half_life_hr ?? 0).toFixed(1)}</div>
+                <div className="font-medium">{formatNumber(result.predicted.half_life_hr ?? 0, 1)}</div>
               </div>
             </div>
             <div className="mt-4 text-sm">
               <div className="text-muted-foreground">Recommended regimen</div>
               <div className="font-medium">
-                {Math.round(result.regimen.recommended_dose_mg ?? 0)} mg q{Math.round(result.regimen.recommended_interval_hr ?? 0)}h
+                {formatNumber(result.regimen.recommended_dose_mg ?? 0, 0)} mg q{formatNumber(result.regimen.recommended_interval_hr ?? 0, 0)}h
               </div>
               {result.regimen.recommended_loading_dose_mg && (
                 <div className="text-muted-foreground">
-                  Loading dose: {Math.round(result.regimen.recommended_loading_dose_mg)} mg
+                  Loading dose: {formatNumber(result.regimen.recommended_loading_dose_mg, 0)} mg
                 </div>
               )}
             </div>
+            {(chosenDose || chosenInterval) && (
+              <div className="mt-4 text-sm">
+                <div className="text-muted-foreground">Chosen regimen</div>
+                <div className="font-medium">
+                  {formatNumber(chosenDose ?? 0, 0)} mg q{formatNumber(chosenInterval ?? 0, 0)}h
+                </div>
+              </div>
+            )}
+            {guardrailWarnings.length > 0 && (
+              <div className="mt-3 space-y-1">
+                {guardrailWarnings.map((warning, idx) => (
+                  <div key={idx} className="text-xs rounded px-2 py-1 bg-warning/10 text-warning-foreground border border-warning/30">
+                    {warning}
+                  </div>
+                ))}
+              </div>
+            )}
+            {regimen && onRegimenChange && (
+              <div className="mt-4 rounded-md border bg-muted/30 p-3">
+                <div className="text-sm font-medium mb-2">Adjust dose and interval</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Dose (mg)</div>
+                    <Input
+                      type="number"
+                      step="50"
+                      value={regimen.doseMg}
+                      onChange={(e) =>
+                        onRegimenChange({
+                          ...regimen,
+                          doseMg: Math.max(REGIMEN_LIMITS.minDoseMg, Number(e.target.value)),
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Interval (hr)</div>
+                    <Input
+                      type="number"
+                      step="1"
+                      value={regimen.intervalHr}
+                      onChange={(e) =>
+                        onRegimenChange({
+                          ...regimen,
+                          intervalHr: Math.max(REGIMEN_LIMITS.minIntervalHr, Number(e.target.value)),
+                        })
+                      }
+                    />
+                    <div className="text-[10px] text-muted-foreground mt-1">
+                      Allowed: {REGIMEN_LIMITS.allowedIntervalsHr.join(", ")}h
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             {onAdjustDose && (
               <div className="flex flex-wrap gap-2 mt-4">
                 <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: 250 })}>+250 mg</Button>
@@ -145,37 +226,29 @@ function ResultsPanel({
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <div className="text-muted-foreground">AUC₍0–24₎ (mg·h/L)</div>
-                <div className="font-medium">{Math.round(result.auc24)}</div>
+                <div className="font-medium">{formatNumber(result.auc24, 0)}</div>
                 <div className="text-xs text-muted-foreground">
-                  95% CI {Math.round(result.auc24_ci_low)}–{Math.round(result.auc24_ci_high)}
+                  95% CI {formatNumber(result.auc24_ci_low, 0)}–{formatNumber(result.auc24_ci_high, 0)}
                 </div>
               </div>
               <div>
                 <div className="text-muted-foreground">CL / V</div>
                 <div className="font-medium">
-                  {result.cl_l_hr.toFixed(2)} L/hr · {result.v_l.toFixed(1)} L
+                  {formatNumber(result.cl_l_hr, 2)} L/hr · {formatNumber(result.v_l, 1)} L
                 </div>
               </div>
             </div>
             <div className="mt-4 text-sm">
               <div className="text-muted-foreground">Suggested dosing to target AUC</div>
               <div className="font-medium">
-                {Math.round(result.recommendation.per_dose_mg)} mg q{Math.round(result.recommendation.interval_hr)}h
+                {formatNumber(result.recommendation.per_dose_mg, 0)} mg q{formatNumber(result.recommendation.interval_hr, 0)}h
               </div>
               {(result.recommendation.max_loading_mg || result.recommendation.max_daily_mg) && (
                 <div className="text-xs text-muted-foreground mt-1">
-                  Guardrails: max loading {Math.round(result.recommendation.max_loading_mg ?? 0)} mg · max daily {Math.round(result.recommendation.max_daily_mg ?? 0)} mg
+                  Guardrails: max loading {formatNumber(result.recommendation.max_loading_mg ?? 0, 0)} mg · max daily {formatNumber(result.recommendation.max_daily_mg ?? 0, 0)} mg
                 </div>
               )}
             </div>
-            {onAdjustDose && (
-              <div className="flex flex-wrap gap-2 mt-4">
-                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: 250 })}>+250 mg</Button>
-                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: -250 })}>-250 mg</Button>
-                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: 2 })}>+2h interval</Button>
-                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: -2 })}>-2h interval</Button>
-              </div>
-            )}
             {result.warnings.length > 0 && (
               <div className="mt-4 space-y-1">
                 {result.warnings.map((m, i) => (
@@ -215,20 +288,20 @@ function ResultsPanel({
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <div className="text-muted-foreground">AUC₍0–24₎ (mg·h/L)</div>
-              <div className="font-medium">{Math.round((result as CalculateResponse).auc24_mg_h_l)}</div>
+              <div className="font-medium">{formatNumber((result as CalculateResponse).auc24_mg_h_l, 0)}</div>
             </div>
             <div>
               <div className="text-muted-foreground">Estimated trough (mg/L)</div>
-              <div className="font-medium">{(result as CalculateResponse).trough_mg_l.toFixed(1)}</div>
+              <div className="font-medium">{formatNumber((result as CalculateResponse).trough_mg_l, 1)}</div>
             </div>
             <div>
               <div className="text-muted-foreground">Estimated peak (mg/L)</div>
-              <div className="font-medium">{(result as CalculateResponse).peak_mg_l.toFixed(1)}</div>
+              <div className="font-medium">{formatNumber((result as CalculateResponse).peak_mg_l, 1)}</div>
             </div>
             {(result as CalculateResponse).bayes_demo && (
               <div>
                 <div className="text-muted-foreground">Model fit (RMSE)</div>
-                <div className="font-medium">{(result as CalculateResponse).bayes_demo?.rmse_mg_l.toFixed(2)} mg/L</div>
+                <div className="font-medium">{formatNumber((result as CalculateResponse).bayes_demo?.rmse_mg_l ?? 0, 2)} mg/L</div>
               </div>
             )}
           </div>
@@ -263,15 +336,15 @@ function ResultsPanel({
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <div className="text-muted-foreground">CL</div>
-                <div className="font-medium">{(result as CalculateResponse).bayes_demo?.cl_l_hr.toFixed(2)} L/hr</div>
+                <div className="font-medium">{formatNumber((result as CalculateResponse).bayes_demo?.cl_l_hr ?? 0, 2)} L/hr</div>
               </div>
               <div>
                 <div className="text-muted-foreground">V</div>
-                <div className="font-medium">{(result as CalculateResponse).bayes_demo?.v_l.toFixed(1)} L</div>
+                <div className="font-medium">{formatNumber((result as CalculateResponse).bayes_demo?.v_l ?? 0, 1)} L</div>
               </div>
               <div>
                 <div className="text-muted-foreground">k</div>
-                <div className="font-medium">{(result as CalculateResponse).bayes_demo?.ke_hr.toFixed(3)} hr⁻¹</div>
+                <div className="font-medium">{formatNumber((result as CalculateResponse).bayes_demo?.ke_hr ?? 0, 3)} hr⁻¹</div>
               </div>
             </div>
           </CardContent>

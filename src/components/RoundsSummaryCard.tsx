@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/shareLink";
 import type { CalculateRequest, CalculateResponse } from "@/lib/api";
+import { formatNumber } from "@/lib/format";
 
 function formatTimestamp(ts: Date): string {
   return ts.toLocaleString(undefined, {
@@ -32,9 +33,9 @@ export default function RoundsSummaryCard({
     return [
       `Vancomyzer® Rounds Summary (educational estimate)`,
       `Time: ${formatTimestamp(timestamp)}`,
-      `Regimen: ${Math.round(r.dose_mg)} mg q${Math.round(r.interval_hr)}h (infusion ${r.infusion_hr.toFixed(1)}h)`,
-      `AUC0–24: ~${Math.round(result.auc24_mg_h_l)} mg·h/L`,
-      `Trough: ~${result.trough_mg_l.toFixed(1)} mg/L`,
+      `Regimen: ${formatNumber(r.dose_mg, 0)} mg q${formatNumber(r.interval_hr, 0)}h (infusion ${formatNumber(r.infusion_hr, 1)}h)`,
+      `AUC0–24: ~${formatNumber(result.auc24_mg_h_l, 0)} mg·h/L`,
+      `Trough: ~${formatNumber(result.trough_mg_l, 1)} mg/L`,
       `Note: Educational PK estimates only — not medical advice. Verify with institutional protocols.`,
       `No PHI stored.`,
     ].join("\n");

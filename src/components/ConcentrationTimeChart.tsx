@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatNumber } from "@/lib/format";
 import {
   Area,
   Line,
@@ -63,10 +64,12 @@ export default function ConcentrationTimeChart({
   curve,
   levels,
   band,
+  emptyMessage,
 }: {
   curve?: Array<{ t_hr: number; conc_mg_l: number }>;
   levels?: Array<{ time_hr: number; concentration_mg_l: number }>;
   band?: { lower: Array<{ t_hr: number; conc_mg_l: number }>; upper: Array<{ t_hr: number; conc_mg_l: number }> } | null;
+  emptyMessage?: string;
 }) {
   const base = useMemo(() => densifyCurve(curve || []), [curve]);
   const bandUpper = useMemo(() => densifyCurve(band?.upper ?? []), [band]);
@@ -93,6 +96,21 @@ export default function ConcentrationTimeChart({
     );
   }, [base]);
 
+  if (base.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Concentration-Time (0-48h)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm text-muted-foreground">
+            {emptyMessage ?? "Provide regimen inputs to generate a concentration-time curve."}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -113,7 +131,7 @@ export default function ConcentrationTimeChart({
             <YAxis
               domain={[0, yMax]}
               tickCount={6}
-              tickFormatter={(v) => `${v}`}
+              tickFormatter={(v) => `${formatNumber(Number(v), 1)}`}
               label={{ value: "Concentration (mg/L)", angle: -90, position: "insideLeft" }}
             />
             <Tooltip
@@ -122,8 +140,8 @@ export default function ConcentrationTimeChart({
                 const conc = payload.find((p) => p.dataKey === "conc_mg_l")?.value;
                 return (
                   <div className="rounded border bg-background px-2 py-1 text-xs shadow">
-                    <div>Time: {Number(label).toFixed(2)} hr</div>
-                    <div>Concentration: {Number(conc ?? 0).toFixed(2)} mg/L</div>
+                    <div>Time: {formatNumber(Number(label), 2)} hr</div>
+                    <div>Concentration: {formatNumber(Number(conc ?? 0), 2)} mg/L</div>
                   </div>
                 );
               }}

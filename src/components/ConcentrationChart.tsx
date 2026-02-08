@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TimeConcentrationPoint } from "@/pk/core";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { formatNumber } from "@/lib/format";
 
 interface ConcentrationChartProps {
   data: TimeConcentrationPoint[];
@@ -16,10 +17,10 @@ export function ConcentrationChart({ data, regimen, showUncertainty }: Concentra
       return (
         <div className="bg-card border border-border rounded-lg p-3 shadow-elevated">
           <div className="text-sm font-medium text-foreground">
-            Time: {Number(label).toFixed(1)} hours
+            Time: {formatNumber(Number(label), 1)} hours
           </div>
           <div className="text-sm text-primary">
-            Concentration: {Number(concentration).toFixed(2)} mg/L
+            Concentration: {formatNumber(Number(concentration), 2)} mg/L
           </div>
         </div>
       );
@@ -69,7 +70,7 @@ export function ConcentrationChart({ data, regimen, showUncertainty }: Concentra
               <YAxis 
                 stroke="hsl(var(--muted-foreground))"
                 tick={{ fontSize: 12 }}
-                tickFormatter={(value) => `${value}`}
+                tickFormatter={(value) => `${formatNumber(Number(value), 1)}`}
                 label={{ 
                   value: 'Concentration (mg/L)', 
                   angle: -90, 

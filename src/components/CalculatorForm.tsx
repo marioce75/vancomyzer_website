@@ -13,6 +13,7 @@ import {
   type BayesianCalculateResponse,
   ApiError,
 } from "@/lib/api";
+import { REGIMEN_LIMITS } from "@/lib/constraints";
 
 export type CalculatorFormHandle = {
   adjustDose: (delta: { doseMg?: number; intervalHr?: number }) => void;
@@ -40,7 +41,7 @@ function formatValidationLoc(loc: Array<string | number>): string {
 
 type PatientStorage = {
   age: string;
-  sex: "male" | "female";
+  sex: "male" | "female" | "";
   height: string;
   heightUnit: "cm" | "in";
   weight: string;
@@ -53,16 +54,16 @@ type PatientStorage = {
 
 const PATIENT_STORAGE_KEY = "vancomyzer.patient.v1";
 const DEFAULT_PATIENT: PatientStorage = {
-  age: "60",
-  sex: "male",
-  height: "175",
+  age: "",
+  sex: "",
+  height: "",
   heightUnit: "cm",
-  weight: "80",
+  weight: "",
   weightUnit: "kg",
-  scr: "1.0",
-  mic: "1.0",
-  aucLow: "400",
-  aucHigh: "600",
+  scr: "",
+  mic: "",
+  aucLow: "",
+  aucHigh: "",
 };
 
 function readPatientStorage(): PatientStorage | null {
@@ -73,7 +74,7 @@ function readPatientStorage(): PatientStorage | null {
     return {
       ...DEFAULT_PATIENT,
       ...parsed,
-      sex: parsed.sex === "female" ? "female" : "male",
+      sex: parsed.sex === "female" || parsed.sex === "male" ? parsed.sex : "",
       heightUnit: parsed.heightUnit === "in" ? "in" : "cm",
       weightUnit: parsed.weightUnit === "lb" ? "lb" : "kg",
     };
@@ -111,7 +112,7 @@ function normalizeNumericInput(value: string): string {
 const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ onResult, onLoadingChange, onReset, onInputsChange }, ref) => {
   const initialPatient = useMemo(() => readPatientStorage() ?? DEFAULT_PATIENT, []);
   const [age, setAge] = useState(initialPatient.age);
-  const [sex, setSex] = useState<"male" | "female">(initialPatient.sex);
+  const [sex, setSex] = useState<"male" | "female" | "">(initialPatient.sex);
   const [height, setHeight] = useState(initialPatient.height);
   const [heightUnit, setHeightUnit] = useState<"cm" | "in">(initialPatient.heightUnit);
   const [weight, setWeight] = useState(initialPatient.weight);
@@ -124,10 +125,8 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
   const [doseMg, setDoseMg] = useState(1000);
   const [intervalHr, setIntervalHr] = useState(12);
   const [infusionHr, setInfusionHr] = useState(1.0);
-  const [levels, setLevels] = useState<Array<{ timeHr: number; concentration: number }>>([{ timeHr: 2, concentration: 0 }]);
-  const [doseHistory, setDoseHistory] = useState<Array<{ timeHr: number; doseMg: number; infusionHr: number }>>([
-    { timeHr: 0, doseMg: 1000, infusionHr: 1.0 },
-  ]);
+  const [levels, setLevels] = useState<Array<{ timeHr: number; concentration: number }>>([]);
+  const [doseHistory, setDoseHistory] = useState<Array<{ timeHr: number; doseMg: number; infusionHr: number }>>([]);
   const [error, setError] = useState<UiError | null>(null);
   const [dosingHost, setDosingHost] = useState<HTMLElement | null>(null);
   const submitTimer = useRef<number | null>(null);
@@ -167,9 +166,16 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
   const levelHasValue = levels.some((lv) => Number.isFinite(lv.concentration) && lv.concentration > 0);
   const doseHasValue = doseHistory.some((d) => Number.isFinite(d.doseMg) && d.doseMg > 0);
   const micValid = Number.isFinite(micNum) && micNum >= 0.5 && micNum <= 2;
-  const intervalValid = Number.isFinite(intervalHr) && intervalHr >= 6 && intervalHr <= 48;
-  const infusionValid = Number.isFinite(infusionHr) && infusionHr > 0 && infusionHr <= 6;
+  const intervalValid =
+    Number.isFinite(intervalHr) &&
+    intervalHr >= REGIMEN_LIMITS.minIntervalHr &&
+    intervalHr <= REGIMEN_LIMITS.maxIntervalHr;
+  const infusionValid =
+    Number.isFinite(infusionHr) &&
+    infusionHr >= REGIMEN_LIMITS.minInfusionHr &&
+    infusionHr <= REGIMEN_LIMITS.maxInfusionHr;
   const patientValid =
+    sex !== "" &&
     Number.isFinite(ageNum) &&
     ageNum > 0 &&
     Number.isFinite(weightKg) &&
@@ -257,11 +263,12 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
         if (levelsPayload.length < 1) {
           throw new Error("Enter at least one vancomycin level for Bayesian mode.");
         }
-        const historyPayload = doseHistory.length
-          ? doseHistory
-              .filter((d) => Number.isFinite(d.doseMg) && d.doseMg > 0)
-              .map((d) => ({ dose_mg: Number(d.doseMg), start_time_hr: Number(d.timeHr), infusion_hr: Number(d.infusionHr) }))
-          : [{ dose_mg: Number(effectiveDose), start_time_hr: 0, infusion_hr: Number(effectiveInfusion) }];
+        const historyPayload = doseHistory
+          .filter((d) => Number.isFinite(d.doseMg) && d.doseMg > 0)
+          .map((d) => ({ dose_mg: Number(d.doseMg), start_time_hr: Number(d.timeHr), infusion_hr: Number(d.infusionHr) }));
+        if (historyPayload.length < 1) {
+          throw new Error("Enter at least one dose event for Bayesian mode.");
+        }
         onInputsChange?.({ mode: "bayesian", levels: levelsPayload, dose_history: historyPayload });
         const result = await calculateBayesian({
           patient: {
@@ -332,8 +339,14 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
   }
 
   function adjustDose(delta: { doseMg?: number; intervalHr?: number }) {
-    const nextDose = Math.max(250, (delta.doseMg ?? 0) + doseMg);
-    const nextInterval = Math.max(4, (delta.intervalHr ?? 0) + intervalHr);
+    const nextDose = Math.min(
+      REGIMEN_LIMITS.maxSingleDoseMg,
+      Math.max(REGIMEN_LIMITS.minDoseMg, (delta.doseMg ?? 0) + doseMg),
+    );
+    const nextInterval = Math.min(
+      REGIMEN_LIMITS.maxIntervalHr,
+      Math.max(REGIMEN_LIMITS.minIntervalHr, (delta.intervalHr ?? 0) + intervalHr),
+    );
     recompute({ doseMg: nextDose, intervalHr: nextInterval, infusionHr });
   }
 
@@ -343,6 +356,11 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
     }
     try {
       window.localStorage.removeItem(PATIENT_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    try {
+      window.sessionStorage.removeItem(PATIENT_STORAGE_KEY);
     } catch {
       // ignore
     }
@@ -360,8 +378,8 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
     setDoseMg(1000);
     setIntervalHr(12);
     setInfusionHr(1.0);
-    setLevels([{ timeHr: 2, concentration: 0 }]);
-    setDoseHistory([{ timeHr: 0, doseMg: 1000, infusionHr: 1.0 }]);
+    setLevels([]);
+    setDoseHistory([]);
     setError(null);
     onReset?.();
   }
@@ -371,42 +389,6 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
   const dosingPanel = dosingHost
     ? createPortal(
         <div className="space-y-4">
-          <div className="rounded-md border bg-card p-4">
-            <div className="flex items-center justify-between gap-2">
-              <div className="text-sm font-medium">Regimen inputs</div>
-              <div className="text-xs text-muted-foreground">Dose, interval, infusion</div>
-            </div>
-            <div className="grid grid-cols-3 gap-2 mt-3">
-              <div>
-                <div className="text-xs text-muted-foreground">Dose (mg)</div>
-                <Input type="number" step="250" value={doseMg} onChange={(e) => updateRegimen({ doseMg: Number(e.target.value) })} />
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground">Interval (hr)</div>
-                <Input
-                  type="number"
-                  step="1"
-                  className={!intervalValid ? "border-destructive" : ""}
-                  value={intervalHr}
-                  onChange={(e) => updateRegimen({ intervalHr: Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground">Infusion (hr)</div>
-                <Input
-                  type="number"
-                  step="0.1"
-                  className={!infusionValid ? "border-destructive" : ""}
-                  value={infusionHr}
-                  onChange={(e) => updateRegimen({ infusionHr: Number(e.target.value) })}
-                />
-              </div>
-            </div>
-            {(!intervalValid || !infusionValid) && (
-              <div className="text-xs text-destructive mt-2">Check interval (6-48h) and infusion (0-6h).</div>
-            )}
-          </div>
-
           <div className={"rounded-md border p-4 " + (bayesMissing ? "border-destructive/40 bg-destructive/5" : "bg-card")}>
             <div className="flex items-center justify-between gap-2">
               <div className="text-sm font-medium">Bayesian inputs</div>
@@ -415,7 +397,21 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
               </div>
             </div>
             <div className="text-xs text-muted-foreground mt-1">
-              Include measured levels and dosing history for precise estimation.
+              Bayesian AUC uses population PK + 1-2 measured levels. Exact timing matters.
+            </div>
+            <div className="mt-3 rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
+              <div className="font-medium text-foreground mb-1">What you need</div>
+              <ul className="list-disc ml-4 space-y-1">
+                <li>Dosing history with dose amount, start time, and infusion duration.</li>
+                <li>At least one level with exact draw time relative to dose start.</li>
+                <li>Two levels (peak + trough) improves accuracy when available.</li>
+              </ul>
+            </div>
+            <div className="mt-3 rounded-md border bg-card p-3 text-xs text-muted-foreground">
+              <div className="font-medium text-foreground mb-1">Accuracy guidance</div>
+              <div>Best accuracy: full dosing history + exact infusion duration + 2 levels.</div>
+              <div>Minimum viable: one timed level + most recent dose details.</div>
+              <div>Trough-only estimates are limited; add a second level when possible.</div>
             </div>
             <div className="space-y-4 mt-4">
               <div>
@@ -424,9 +420,12 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
                   <Button variant="secondary" size="sm" onClick={addLevelRow}>Add level</Button>
                 </div>
                 <div className="text-xs text-muted-foreground mb-2">
-                  At least 1 level required. Include sample time relative to dose start; avoid unknown timing.
+                  Provide concentration and exact draw time (hours from dose start or timestamp).
                 </div>
                 <div className="space-y-2">
+                  {levels.length === 0 && (
+                    <div className="text-xs text-muted-foreground">No levels yet. Add a level to begin.</div>
+                  )}
                   {levels.map((row, idx) => (
                     <div key={idx} className="grid grid-cols-5 gap-2 items-center">
                       <Input
@@ -438,7 +437,7 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
                       />
                       <Input
                         className={isBayesian && !levelHasValue ? "border-destructive" : ""}
-                        placeholder="Time (hr)"
+                        placeholder="Draw time (hr)"
                         type="number"
                         value={row.timeHr}
                         onChange={(e) => updateLevelRow(idx, "timeHr", Number(e.target.value))}
@@ -462,9 +461,12 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
                   <Button variant="secondary" size="sm" onClick={addDoseRow}>Add dose</Button>
                 </div>
                 <div className="text-xs text-muted-foreground mb-2">
-                  Include at least one dose event with start time and infusion duration; multiple recent doses improve steady-state context.
+                  Include dose amount, start time, and infusion duration for each dose.
                 </div>
                 <div className="space-y-2">
+                  {doseHistory.length === 0 && (
+                    <div className="text-xs text-muted-foreground">No doses yet. Add the most recent dose first.</div>
+                  )}
                   {doseHistory.map((row, idx) => (
                     <div key={idx} className="grid grid-cols-5 gap-2 items-center">
                       <Input
@@ -524,14 +526,14 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
           <Select value={mode} onValueChange={(v: "basic" | "bayesian") => setMode(v)}>
             <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="basic">Deterministic (educational)</SelectItem>
+              <SelectItem value="basic">Basic Calculator</SelectItem>
               <SelectItem value="bayesian">Bayesian (MAP-fit using levels)</SelectItem>
             </SelectContent>
           </Select>
           <div className="text-xs text-muted-foreground mt-1">
             {isBayesian
               ? "Bayesian MAP-fit uses measured levels to estimate AUC more precisely."
-              : "Deterministic mode uses covariates only; no measured levels required."}
+              : "Basic Calculator uses covariates only; no measured levels required."}
           </div>
         </div>
         <div>
@@ -548,8 +550,10 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
         </div>
         <div>
           <Label>Sex</Label>
-          <Select value={sex} onValueChange={(v: "male" | "female") => setSex(v)}>
-            <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+          <Select value={sex} onValueChange={(v: "male" | "female" | "") => setSex(v)}>
+            <SelectTrigger className={!patientValid && sex === "" ? "w-full border-destructive" : "w-full"}>
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="male">Male</SelectItem>
               <SelectItem value="female">Female</SelectItem>

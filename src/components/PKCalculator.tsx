@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { formatNumber } from "@/lib/format";
 
 interface LevelRow {
   time: number;
@@ -151,11 +152,11 @@ const PKCalculator: React.FC = () => {
       {result && isPK(result) && (
         <div className="mt-4 border rounded p-4">
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div><span className="font-medium">CrCl:</span> {result.crcl.toFixed(1)} mL/min</div>
-            <div><span className="font-medium">ke:</span> {result.ke.toFixed(3)} h⁻¹</div>
-            <div><span className="font-medium">Vd:</span> {result.vd.toFixed(1)} L</div>
-            <div className="col-span-2"><span className="font-medium">Regimen:</span> {result.regimen.doseMg} mg q{result.regimen.intervalH}h (infusion {result.regimen.infusionH} h)</div>
-            <div className="col-span-2"><span className="font-medium">AUC24:</span> {result.auc24.toFixed(0)} mg·h/L</div>
+            <div><span className="font-medium">CrCl:</span> {formatNumber(result.crcl, 1)} mL/min</div>
+            <div><span className="font-medium">ke:</span> {formatNumber(result.ke, 3)} h⁻¹</div>
+            <div><span className="font-medium">Vd:</span> {formatNumber(result.vd, 1)} L</div>
+            <div className="col-span-2"><span className="font-medium">Regimen:</span> {formatNumber(result.regimen.doseMg, 0)} mg q{formatNumber(result.regimen.intervalH, 0)}h (infusion {formatNumber(result.regimen.infusionH, 1)} h)</div>
+            <div className="col-span-2"><span className="font-medium">AUC24:</span> {formatNumber(result.auc24, 0)} mg·h/L</div>
           </div>
           {result.warnings.length > 0 && (
             <ul className="mt-2 text-sm text-orange-700 list-disc list-inside">
@@ -168,8 +169,8 @@ const PKCalculator: React.FC = () => {
       {result && !isPK(result) && (
         <div className="mt-4 border rounded p-4 text-sm">
           <div className="mb-2 font-medium">Bayesian result</div>
-          <div>AUC24: {result.metrics.auc24.toFixed(0)} mg·h/L</div>
-          <div>Peak: {result.metrics.peak.toFixed(1)} mg/L, Trough: {result.metrics.trough.toFixed(1)} mg/L</div>
+          <div>AUC24: {formatNumber(result.metrics.auc24, 0)} mg·h/L</div>
+          <div>Peak: {formatNumber(result.metrics.peak, 1)} mg/L, Trough: {formatNumber(result.metrics.trough, 1)} mg/L</div>
         </div>
       )}
     </form>

@@ -9,11 +9,17 @@ import { AlertTriangle } from "lucide-react";
 import { decodeShareState } from "@/lib/shareLink";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateResponse } from "@/lib/api";
+import { REGIMEN_LIMITS } from "@/lib/constraints";
 
 function HomePage() {
   const [result, setResult] = useState<BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse | undefined>(undefined);
   const [mode, setMode] = useState<"basic" | "bayesian" | "educational">("basic");
   const [bayesLevels, setBayesLevels] = useState<Array<{ time_hr: number; concentration_mg_l: number }>>([]);
+  const [activeRegimen, setActiveRegimen] = useState<{ doseMg: number; intervalHr: number; infusionHr: number }>({
+    doseMg: 1000,
+    intervalHr: 12,
+    infusionHr: 1.0,
+  });
   const formRef = useRef<CalculatorFormHandle | null>(null);
   const [referencesOpen, setReferencesOpen] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
@@ -32,6 +38,27 @@ function HomePage() {
   }, []);
 
   const currentYear = useMemo(() => new Date().getFullYear(), []);
+
+  function clampDose(doseMg: number) {
+    return Math.max(REGIMEN_LIMITS.minDoseMg, Math.min(REGIMEN_LIMITS.maxSingleDoseMg, doseMg));
+  }
+
+  function snapInterval(intervalHr: number) {
+    const allowed = REGIMEN_LIMITS.allowedIntervalsHr;
+    return allowed.reduce((closest, val) => (Math.abs(val - intervalHr) < Math.abs(closest - intervalHr) ? val : closest), allowed[0]);
+  }
+
+  function applyRegimen(next: { doseMg: number; intervalHr: number; infusionHr: number }) {
+    const safe = {
+      doseMg: clampDose(next.doseMg),
+      intervalHr: snapInterval(
+        Math.min(REGIMEN_LIMITS.maxIntervalHr, Math.max(REGIMEN_LIMITS.minIntervalHr, next.intervalHr)),
+      ),
+      infusionHr: Math.min(REGIMEN_LIMITS.maxInfusionHr, Math.max(REGIMEN_LIMITS.minInfusionHr, next.infusionHr)),
+    };
+    setActiveRegimen(safe);
+    formRef.current?.recompute(safe);
+  }
 
   return (
     <DisclaimerGate>
@@ -74,10 +101,14 @@ function HomePage() {
                   setMode("basic");
                   setBayesLevels([]);
                   setSharedRegimenText(null);
+                  setActiveRegimen({ doseMg: 1000, intervalHr: 12, infusionHr: 1.0 });
                 }}
                 onInputsChange={(payload) => {
                   if (payload.mode === "bayesian" && payload.levels) {
                     setBayesLevels(payload.levels);
+                  }
+                  if (payload.regimen) {
+                    setActiveRegimen(payload.regimen);
                   }
                 }}
               />
@@ -87,12 +118,24 @@ function HomePage() {
               <ResultsPanel
                 mode={mode}
                 result={result}
-                onAdjustDose={(delta) => formRef.current?.adjustDose(delta)}
+                regimen={activeRegimen}
+                onRegimenChange={applyRegimen}
+                onAdjustDose={(delta) => {
+                  applyRegimen({
+                    doseMg: activeRegimen.doseMg + (delta.doseMg ?? 0),
+                    intervalHr: activeRegimen.intervalHr + (delta.intervalHr ?? 0),
+                    infusionHr: activeRegimen.infusionHr,
+                  });
+                }}
               />
 
-              {mode === "basic" && result && "curve" in result && result.curve && (
+              {mode === "basic" && result && "curve" in result && (
                 <div className="mt-4 grid gap-4">
-                  <ConcentrationTimeChart curve={result.curve} levels={[]} />
+                  <ConcentrationTimeChart
+                    curve={result.curve}
+                    levels={[]}
+                    emptyMessage="Add regimen inputs and compute to generate a concentration-time curve."
+                  />
                 </div>
               )}
 
@@ -102,6 +145,7 @@ function HomePage() {
                     curve={result.curve}
                     levels={bayesLevels}
                     band={{ lower: result.curve_ci_low, upper: result.curve_ci_high }}
+                    emptyMessage="Provide dosing history and levels to generate a Bayesian curve."
                   />
                 </div>
               )}
