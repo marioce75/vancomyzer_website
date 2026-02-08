@@ -5,7 +5,19 @@ import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateRespon
 
 type Mode = "basic" | "bayesian" | "educational";
 
-function ResultsPanel({ mode, result }: { mode: Mode; result?: BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse }) {
+function ResultsPanel({
+  mode,
+  result,
+  onAdjustDose,
+  regimen,
+  onRegimenChange,
+}: {
+  mode: Mode;
+  result?: BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse;
+  onAdjustDose?: (delta: { doseMg?: number; intervalHr?: number }) => void;
+  regimen?: { doseMg: number; intervalHr: number; infusionHr: number };
+  onRegimenChange?: (next: { doseMg: number; intervalHr: number; infusionHr: number }) => void;
+}) {
   const [copied, setCopied] = useState(false);
 
   if (!result) {
@@ -98,6 +110,51 @@ function ResultsPanel({ mode, result }: { mode: Mode; result?: BasicCalculateRes
                 </div>
               )}
             </div>
+            {regimen && onRegimenChange && (
+              <div className="mt-4 rounded-md border bg-muted/30 p-3">
+                <div className="text-sm font-medium mb-2">Interactive regimen</div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Dose (mg)</div>
+                    <input
+                      className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                      type="number"
+                      step="250"
+                      value={regimen.doseMg}
+                      onChange={(e) => onRegimenChange({ ...regimen, doseMg: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Interval (hr)</div>
+                    <input
+                      className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                      type="number"
+                      step="1"
+                      value={regimen.intervalHr}
+                      onChange={(e) => onRegimenChange({ ...regimen, intervalHr: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Infusion (hr)</div>
+                    <input
+                      className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                      type="number"
+                      step="0.1"
+                      value={regimen.infusionHr}
+                      onChange={(e) => onRegimenChange({ ...regimen, infusionHr: Number(e.target.value) })}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            {onAdjustDose && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: 250 })}>+250 mg</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: -250 })}>-250 mg</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: 2 })}>+2h interval</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: -2 })}>-2h interval</Button>
+              </div>
+            )}
           <div className="print-summary">
             <pre className="whitespace-pre-wrap text-sm">{buildSummary()}</pre>
           </div>
@@ -152,6 +209,51 @@ function ResultsPanel({ mode, result }: { mode: Mode; result?: BasicCalculateRes
                 </div>
               )}
             </div>
+            {regimen && onRegimenChange && (
+              <div className="mt-4 rounded-md border bg-muted/30 p-3">
+                <div className="text-sm font-medium mb-2">Interactive regimen</div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Dose (mg)</div>
+                    <input
+                      className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                      type="number"
+                      step="250"
+                      value={regimen.doseMg}
+                      onChange={(e) => onRegimenChange({ ...regimen, doseMg: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Interval (hr)</div>
+                    <input
+                      className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                      type="number"
+                      step="1"
+                      value={regimen.intervalHr}
+                      onChange={(e) => onRegimenChange({ ...regimen, intervalHr: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Infusion (hr)</div>
+                    <input
+                      className="h-9 w-full rounded-md border bg-background px-2 text-sm"
+                      type="number"
+                      step="0.1"
+                      value={regimen.infusionHr}
+                      onChange={(e) => onRegimenChange({ ...regimen, infusionHr: Number(e.target.value) })}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            {onAdjustDose && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: 250 })}>+250 mg</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: -250 })}>-250 mg</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: 2 })}>+2h interval</Button>
+                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: -2 })}>-2h interval</Button>
+              </div>
+            )}
             {result.warnings.length > 0 && (
               <div className="mt-4 space-y-1">
                 {result.warnings.map((m, i) => (
