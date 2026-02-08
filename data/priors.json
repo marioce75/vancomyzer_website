@@ -1,0 +1,6 @@
+{
+  "sigma_log_cl": 0.25,
+  "sigma_log_v": 0.25,
+  "sigma_add": 1.5,
+  "sigma_prop": 0.15
+}

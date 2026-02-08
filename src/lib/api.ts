@@ -104,7 +104,7 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
 }
 
 export async function calculatePk(payload: PkCalculatePayload): Promise<PkCalculateResponse> {
-  return postJSON<PkCalculateResponse>(`${API_BASE}/api/pk/calculate`, payload);
+  return postJSON<PkCalculateResponse>(`${API_BASE}/api/pk/calculate-legacy`, payload);
 }
 
 export async function bayesianEstimate(payload: PkCalculatePayload): Promise<PkCalculateResponse> {
@@ -182,5 +182,95 @@ export type CalculateResponse = {
 };
 
 export async function calculateEducational(req: CalculateRequest): Promise<CalculateResponse> {
-  return postJSON<CalculateResponse>(`${API_BASE}/api/pk/calculate`, req);
+  return postJSON<CalculateResponse>(`${API_BASE}/api/pk/educational`, req);
+}
+
+export type BasicCalculateRequest = {
+  patient: {
+    age: number;
+    sex: "male" | "female";
+    height_cm: number;
+    weight_kg: number;
+    serum_creatinine: number;
+  };
+  regimen: {
+    dose_mg: number;
+    interval_hr: number;
+    infusion_hr?: number;
+  };
+  mic?: number;
+  icu?: boolean;
+  mrsa?: boolean;
+  crcl_method?: number;
+  forced_crcl?: number;
+};
+
+export type BasicCalculateResponse = {
+  crcl: {
+    selected_ml_min?: number;
+    selected_l_hr?: number;
+    tbw?: number;
+    abw?: number;
+    ibw?: number;
+    tbw_scr1?: number;
+    forced?: number;
+  };
+  regimen: {
+    recommended_interval_hr?: number;
+    recommended_dose_mg?: number;
+    recommended_loading_dose_mg?: number;
+    chosen_interval_hr: number;
+    chosen_dose_mg: number;
+    infusion_hr?: number;
+  };
+  predicted: {
+    auc24?: number;
+    peak?: number;
+    trough?: number;
+    half_life_hr?: number;
+  };
+  breakdown: Record<string, unknown>;
+  curve?: Array<{ t_hr: number; conc_mg_l: number }>;
+};
+
+export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicCalculateResponse> {
+  return postJSON<BasicCalculateResponse>(`${API_BASE}/api/basic/calculate`, req);
+}
+
+export type BayesianCalculateRequest = {
+  patient: {
+    age_yr: number;
+    sex: "male" | "female";
+    weight_kg: number;
+    serum_creatinine_mg_dl: number;
+  };
+  mic?: number;
+  dose_history: Array<{ dose_mg: number; start_time_hr: number; infusion_hr: number }>;
+  levels: Array<{ time_hr: number; concentration_mg_l: number }>;
+  target_low?: number;
+  target_high?: number;
+};
+
+export type BayesianCalculateResponse = {
+  auc24: number;
+  auc24_ci_low: number;
+  auc24_ci_high: number;
+  cl_l_hr: number;
+  v_l: number;
+  curve: Array<{ t_hr: number; conc_mg_l: number }>;
+  curve_ci_low: Array<{ t_hr: number; conc_mg_l: number }>;
+  curve_ci_high: Array<{ t_hr: number; conc_mg_l: number }>;
+  recommendation: {
+    target_auc: number;
+    daily_dose_mg: number;
+    per_dose_mg: number;
+    interval_hr: number;
+    max_loading_mg?: number;
+    max_daily_mg?: number;
+  };
+  warnings: string[];
+};
+
+export async function calculateBayesian(req: BayesianCalculateRequest): Promise<BayesianCalculateResponse> {
+  return postJSON<BayesianCalculateResponse>(`${API_BASE}/api/pk/calculate`, req);
 }
