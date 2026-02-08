@@ -5,8 +5,15 @@ from fastapi.responses import HTMLResponse
 from pathlib import Path
 from pydantic import BaseModel
 from typing import List, Optional
+import os
+import json
+from datetime import datetime, timezone
 
-app = FastAPI(title="Vancomyzer API", openapi_url="/api/openapi.json")
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+BUILD_INFO_PATH = STATIC_DIR / "build-info.json"
+
+app = FastAPI(title="Vancomyzer API", openapi_url="/openapi.json")
 
 # CORS for static site
 app.add_middleware(
@@ -18,12 +25,12 @@ app.add_middleware(
 )
 
 # Serve static assets
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR), check_dir=False), name="static")
 
 # Serve compiled index.html at root
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
-    return Path("static/index.html").read_text()
+    return (STATIC_DIR / "index.html").read_text()
 
 # PK Models
 class PKRequest(BaseModel):
@@ -68,6 +75,43 @@ def pk_calculate(req: PKRequest):
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
+
+
+def _read_build_info() -> dict:
+    """Best-effort build metadata (git SHA + build time)."""
+    git_sha = os.getenv("RENDER_GIT_COMMIT") or os.getenv("GIT_SHA")
+    build_time = None
+
+    if BUILD_INFO_PATH.exists():
+        try:
+            data = json.loads(BUILD_INFO_PATH.read_text())
+            git_sha = git_sha or data.get("git_sha")
+            build_time = data.get("build_time")
+        except Exception:
+            pass
+
+    return {
+        "git_sha": git_sha or "unknown",
+        "build_time": build_time or datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@app.get("/version")
+@app.get("/api/version")
+def version():
+    info = _read_build_info()
+    return {
+        "app": "vancomyzer",
+        "git_sha": info["git_sha"],
+        "build_time": info["build_time"],
+    }
+
+
+@app.get("/meta/version")
+@app.get("/api/meta/version")
+def meta_version():
+    # Keep this endpoint stable for automated checks.
+    return _read_build_info()
 
 # Schemas derived from original design
 class Patient(BaseModel):
