@@ -1,0 +1,39 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Render build artifacts (DO NOT COMMIT)
+backend/static/
+!backend/static/.gitkeep
+dist/
+node_modules/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Local env
+frontend/.env.local
+
+# local env
+backend/.venv/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+

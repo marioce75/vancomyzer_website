@@ -1,0 +1,22 @@
+# Reduce Docker build context
+.git
+.gitignore
+frontend/
+node_modules/
+**/node_modules/
+.vscode/
+.venv/
+__pycache__/
+*.py[cod]
+*.log
+npm-debug.log*
+yarn-error.log*
+coverage/
+.dist/
+build/
+Dockerfile~
+*.tsbuildinfo
+# Exclude local test artifacts
+**/*.test.*
+**/*.spec.*
+**/__tests__/**
