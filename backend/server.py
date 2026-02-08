@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any
 import numpy as np
@@ -8,6 +9,7 @@ from scipy import optimize
 from scipy.stats import multivariate_normal
 import json
 import math
+import os
 import uuid
 from datetime import datetime
 from enum import Enum
@@ -29,13 +31,63 @@ app.add_middleware(
 )
 
 # Serve static files
-import os
 from pathlib import Path
 
 # Path to backend/static relative to project root
 static_path = Path(__file__).parent / "static"
+build_info_path = static_path / "build-info.json"
 
-app.mount("/static", StaticFiles(directory=static_path), name="static")
+app.mount("/static", StaticFiles(directory=static_path, check_dir=False), name="static")
+app.mount("/assets", StaticFiles(directory=static_path / "assets", check_dir=False), name="assets")
+
+
+def _read_build_info() -> dict:
+    git_sha = os.getenv("RENDER_GIT_COMMIT") or os.getenv("GIT_SHA")
+    build_time = None
+    if build_info_path.exists():
+        try:
+            data = json.loads(build_info_path.read_text())
+            git_sha = git_sha or data.get("git_sha")
+            build_time = data.get("build_time")
+        except Exception:
+            pass
+    return {
+        "git_sha": git_sha or "unknown",
+        "build_time": build_time or datetime.utcnow().isoformat() + "Z",
+    }
+
+
+@app.get("/", response_class=HTMLResponse)
+def serve_index():
+    html = (static_path / "index.html").read_text()
+    html = html.replace('src="/assets/', 'src="/static/assets/')
+    html = html.replace('href="/assets/', 'href="/static/assets/')
+    return HTMLResponse(html, headers={"Cache-Control": "no-store, no-cache, must-revalidate"})
+
+
+@app.get("/build-info.json")
+def build_info():
+    if build_info_path.exists():
+        return json.loads(build_info_path.read_text())
+    return {"detail": "Not Found"}
+
+
+@app.get("/api/version")
+@app.get("/version")
+def api_version():
+    info = _read_build_info()
+    return {
+        "app": "Vancomyzer",
+        "version": "v1",
+        "git_sha": info["git_sha"],
+        "build_time": info["build_time"],
+    }
+
+
+@app.get("/api/meta/version")
+@app.get("/meta/version")
+def meta_version():
+    return _read_build_info()
 
 # Data Models
 class PopulationType(str, Enum):
