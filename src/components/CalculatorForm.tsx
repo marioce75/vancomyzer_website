@@ -27,6 +27,7 @@ export type CalculatorFormProps = {
   onInputsChange?: (payload: {
     mode: "basic" | "bayesian";
     regimen?: { doseMg: number; intervalHr: number; infusionHr: number };
+    patient?: { age_yr: number; sex: "male" | "female"; height_cm: number; weight_kg: number; serum_creatinine: number };
     levels?: Array<{ time_hr: number; concentration_mg_l: number }>;
     dose_history?: Array<{ dose_mg: number; start_time_hr: number; infusion_hr: number }>;
   }) => void;
@@ -125,7 +126,7 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
   const [doseMg, setDoseMg] = useState(1000);
   const [intervalHr, setIntervalHr] = useState(12);
   const [infusionHr, setInfusionHr] = useState(1.0);
-  const [levels, setLevels] = useState<Array<{ timeHr: number; concentration: number }>>([]);
+  const [levels, setLevels] = useState<Array<{ timeHr: string; concentration: string }>>([]);
   const [doseHistory, setDoseHistory] = useState<Array<{ timeHr: number; doseMg: number; infusionHr: number }>>([]);
   const [error, setError] = useState<UiError | null>(null);
   const [dosingHost, setDosingHost] = useState<HTMLElement | null>(null);
@@ -163,7 +164,23 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
     setDosingHost(document.getElementById("dosing-panel-host"));
   }, []);
 
-  const levelHasValue = levels.some((lv) => Number.isFinite(lv.concentration) && lv.concentration > 0);
+  function parseNumericInput(value: string): number | null {
+    const trimmed = value.trim();
+    if (trimmed === "") return null;
+    const num = Number(trimmed);
+    return Number.isFinite(num) ? num : null;
+  }
+
+  function normalizeNumericInputStrict(value: string): string {
+    const num = parseNumericInput(value);
+    if (num === null) return "";
+    return String(num);
+  }
+
+  const levelHasValue = levels.some((lv) => {
+    const conc = parseNumericInput(lv.concentration);
+    return conc !== null && conc > 0;
+  });
   const doseHasValue = doseHistory.some((d) => Number.isFinite(d.doseMg) && d.doseMg > 0);
   const micValid = Number.isFinite(micNum) && micNum >= 0.5 && micNum <= 2;
   const intervalValid =
@@ -188,12 +205,12 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
   const formValid = patientValid && micValid && intervalValid && infusionValid && bayesValid;
   const bayesMissing = isBayesian && (!levelHasValue || !doseHasValue);
 
-  function updateLevelRow(idx: number, field: "timeHr" | "concentration", value: number) {
+  function updateLevelRow(idx: number, field: "timeHr" | "concentration", value: string) {
     setLevels((prev) => prev.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
   }
 
   function addLevelRow() {
-    setLevels((prev) => [...prev, { timeHr: 6, concentration: 0 }]);
+    setLevels((prev) => [...prev, { timeHr: "", concentration: "" }]);
   }
 
   function removeLevelRow(idx: number) {
@@ -235,10 +252,24 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
       const effectiveDose = overrides?.doseMg ?? doseMg;
       const effectiveInterval = overrides?.intervalHr ?? intervalHr;
       const effectiveInfusion = overrides?.infusionHr ?? infusionHr;
+    if (sex !== "" && patientValid) {
+      onInputsChange?.({
+        mode,
+        regimen: { doseMg: effectiveDose, intervalHr: effectiveInterval, infusionHr: effectiveInfusion },
+        patient: {
+          age_yr: Number(ageNum),
+          sex,
+          height_cm: Number(heightCm),
+          weight_kg: Number(weightKg),
+          serum_creatinine: Number(scrNum),
+        },
+      });
+    } else {
       onInputsChange?.({
         mode,
         regimen: { doseMg: effectiveDose, intervalHr: effectiveInterval, infusionHr: effectiveInfusion },
       });
+    }
       if (mode === "basic") {
         const result = await calculateBasic({
           patient: {
@@ -258,8 +289,12 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
         onResult(result, "basic");
       } else {
         const levelsPayload = levels
-          .filter((lv) => Number.isFinite(lv.concentration) && Number.isFinite(lv.timeHr) && lv.concentration > 0)
-          .map((lv) => ({ time_hr: Number(lv.timeHr), concentration_mg_l: Number(lv.concentration) }));
+          .map((lv) => ({
+            time: parseNumericInput(lv.timeHr),
+            concentration: parseNumericInput(lv.concentration),
+          }))
+          .filter((lv) => lv.concentration !== null && lv.time !== null && lv.concentration > 0)
+          .map((lv) => ({ time_hr: Number(lv.time), concentration_mg_l: Number(lv.concentration) }));
         if (levelsPayload.length < 1) {
           throw new Error("Enter at least one vancomycin level for Bayesian mode.");
         }
@@ -432,15 +467,19 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
                         className={isBayesian && !levelHasValue ? "border-destructive" : ""}
                         placeholder="Concentration (mg/L)"
                         type="number"
+                        step="0.1"
                         value={row.concentration}
-                        onChange={(e) => updateLevelRow(idx, "concentration", Number(e.target.value))}
+                        onChange={(e) => updateLevelRow(idx, "concentration", e.target.value)}
+                        onBlur={(e) => updateLevelRow(idx, "concentration", normalizeNumericInputStrict(e.target.value))}
                       />
                       <Input
                         className={isBayesian && !levelHasValue ? "border-destructive" : ""}
                         placeholder="Draw time (hr)"
                         type="number"
+                        step="0.1"
                         value={row.timeHr}
-                        onChange={(e) => updateLevelRow(idx, "timeHr", Number(e.target.value))}
+                        onChange={(e) => updateLevelRow(idx, "timeHr", e.target.value)}
+                        onBlur={(e) => updateLevelRow(idx, "timeHr", normalizeNumericInputStrict(e.target.value))}
                       />
                       <div className="col-span-3 flex justify-end">
                         <Button variant="ghost" size="sm" onClick={() => removeLevelRow(idx)} disabled={levels.length <= 1}>

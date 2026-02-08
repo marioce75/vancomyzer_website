@@ -1,17 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TimeConcentrationPoint } from "@/pk/core";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, type TooltipProps } from "recharts";
 import { formatNumber } from "@/lib/format";
 
 interface ConcentrationChartProps {
   data: TimeConcentrationPoint[];
   regimen: { interval: number; infusionTime: number };
-  showUncertainty?: any; // Bayesian result with CI data
+  showUncertainty?: unknown; // Bayesian result with CI data
 }
 
 export function ConcentrationChart({ data, regimen, showUncertainty }: ConcentrationChartProps) {
   // Custom tooltip component
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
     if (active && payload && payload.length) {
       const concentration = payload[0].value;
       return (

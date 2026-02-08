@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { formatNumber } from "@/lib/format";
 
 interface LevelRow {
-  time: number;
-  concentration: number;
+  time: string;
+  concentration: string;
 }
 
 interface RegimenOut { doseMg: number; intervalH: number; infusionH: number }
@@ -41,13 +41,26 @@ const PKCalculator: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const addLevel = () => setLevels([...levels, { time: 0, concentration: 0 }]);
+  const addLevel = () => setLevels([...levels, { time: "", concentration: "" }]);
   const removeLevel = (idx: number) => setLevels(levels.filter((_, i) => i !== idx));
-  const updateLevel = (idx: number, field: keyof LevelRow, value: number) => {
+  const updateLevel = (idx: number, field: keyof LevelRow, value: string) => {
     const next = [...levels];
     next[idx] = { ...next[idx], [field]: value } as LevelRow;
     setLevels(next);
   };
+
+  function parseNumericInput(value: string): number | null {
+    const trimmed = value.trim();
+    if (trimmed === "") return null;
+    const num = Number(trimmed);
+    return Number.isFinite(num) ? num : null;
+  }
+
+  function normalizeNumericInputStrict(value: string): string {
+    const num = parseNumericInput(value);
+    if (num === null) return "";
+    return String(num);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +74,12 @@ const PKCalculator: React.FC = () => {
         patient: { age, sex, weight, height, scr },
         regimen: { doseMg: 0, intervalH: 0, infusionH },
         levels: levels
+          .map((l) => ({
+            time: parseNumericInput(l.time),
+            concentration: parseNumericInput(l.concentration),
+          }))
+          .filter((l) => l.time !== null && l.concentration !== null && l.concentration > 0)
+          .map((l) => ({ time: Number(l.time), concentration: Number(l.concentration) })),
       };
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -136,8 +155,24 @@ const PKCalculator: React.FC = () => {
           {levels.length === 0 && <p className="text-sm text-gray-500">No levels added.</p>}
           {levels.map((lvl, idx) => (
             <div key={idx} className="flex gap-2 items-center">
-              <input type="number" step="0.1" className="flex-1 p-2 border rounded" placeholder="Time (h)" value={lvl.time} onChange={e => updateLevel(idx, 'time', Number(e.target.value))} />
-              <input type="number" step="0.1" className="flex-1 p-2 border rounded" placeholder="Concentration (mg/L)" value={lvl.concentration} onChange={e => updateLevel(idx, 'concentration', Number(e.target.value))} />
+              <input
+                type="number"
+                step="0.1"
+                className="flex-1 p-2 border rounded"
+                placeholder="Time (h)"
+                value={lvl.time}
+                onChange={e => updateLevel(idx, 'time', e.target.value)}
+                onBlur={(e) => updateLevel(idx, "time", normalizeNumericInputStrict(e.target.value))}
+              />
+              <input
+                type="number"
+                step="0.1"
+                className="flex-1 p-2 border rounded"
+                placeholder="Concentration (mg/L)"
+                value={lvl.concentration}
+                onChange={e => updateLevel(idx, 'concentration', e.target.value)}
+                onBlur={(e) => updateLevel(idx, "concentration", normalizeNumericInputStrict(e.target.value))}
+              />
               <button type="button" onClick={() => removeLevel(idx)} className="px-2 py-1 border rounded">Remove</button>
             </div>
           ))}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateResponse } from "@/lib/api";
 import { AUC_TARGET, REGIMEN_LIMITS } from "@/lib/constraints";
 import { formatNumber } from "@/lib/format";
@@ -72,6 +73,8 @@ function ResultsPanel({
     const chosenInterval = result.regimen.chosen_interval_hr ?? regimen?.intervalHr;
     const chosenDoseNum = Number(chosenDose ?? 0);
     const chosenIntervalNum = Number(chosenInterval ?? 0);
+    const intervalOptions = REGIMEN_LIMITS.allowedIntervalsHr;
+    const safeInterval = regimen ? (intervalOptions.includes(regimen.intervalHr) ? regimen.intervalHr : 12) : 12;
     const dailyDose = chosenIntervalNum > 0 ? chosenDoseNum * (24 / chosenIntervalNum) : 0;
     const guardrailWarnings: string[] = [];
     if (chosenDoseNum > REGIMEN_LIMITS.maxSingleDoseMg) {
@@ -169,17 +172,26 @@ function ResultsPanel({
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground">Interval (hr)</div>
-                    <Input
-                      type="number"
-                      step="1"
-                      value={regimen.intervalHr}
-                      onChange={(e) =>
+                    <Select
+                      value={String(safeInterval)}
+                      onValueChange={(value) =>
                         onRegimenChange({
                           ...regimen,
-                          intervalHr: Math.max(REGIMEN_LIMITS.minIntervalHr, Number(e.target.value)),
+                          intervalHr: Number(value),
                         })
                       }
-                    />
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {intervalOptions.map((hr) => (
+                          <SelectItem key={hr} value={String(hr)}>
+                            {hr}h
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <div className="text-[10px] text-muted-foreground mt-1">
                       Allowed: {REGIMEN_LIMITS.allowedIntervalsHr.join(", ")}h
                     </div>

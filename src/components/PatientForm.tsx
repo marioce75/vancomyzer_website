@@ -10,7 +10,7 @@ interface PatientFormProps {
 }
 
 export function PatientForm({ patient, onChange }: PatientFormProps) {
-  const updateField = (field: keyof Patient, value: any) => {
+  const updateField = (field: keyof Patient, value: Patient[keyof Patient]) => {
     onChange({ ...patient, [field]: value });
   };
 

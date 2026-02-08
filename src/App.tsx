@@ -10,6 +10,7 @@ import { decodeShareState } from "@/lib/shareLink";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateResponse } from "@/lib/api";
 import { REGIMEN_LIMITS } from "@/lib/constraints";
+import { calculatePK } from "@/pk/core";
 
 function HomePage() {
   const [result, setResult] = useState<BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse | undefined>(undefined);
@@ -20,6 +21,13 @@ function HomePage() {
     intervalHr: 12,
     infusionHr: 1.0,
   });
+  const [patientForCurve, setPatientForCurve] = useState<{
+    age: number;
+    sex: "male" | "female";
+    heightCm: number;
+    weightKg: number;
+    scr: number;
+  } | null>(null);
   const formRef = useRef<CalculatorFormHandle | null>(null);
   const [referencesOpen, setReferencesOpen] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
@@ -59,6 +67,48 @@ function HomePage() {
     setActiveRegimen(safe);
     formRef.current?.recompute(safe);
   }
+
+  const effectiveRegimen = useMemo(() => {
+    if (mode === "bayesian" && result && "recommendation" in result) {
+      return {
+        doseMg: result.recommendation.per_dose_mg,
+        intervalHr: result.recommendation.interval_hr,
+        infusionHr: activeRegimen.infusionHr,
+      };
+    }
+    return activeRegimen;
+  }, [mode, result, activeRegimen]);
+
+  const derivedCurve = useMemo(() => {
+    if (!patientForCurve || !effectiveRegimen) return [];
+    const pkPatient = {
+      age: patientForCurve.age,
+      sex: patientForCurve.sex === "female" ? "F" : "M",
+      weight: patientForCurve.weightKg,
+      height: patientForCurve.heightCm,
+      scr: patientForCurve.scr,
+    };
+    const pkRegimen = {
+      dose: effectiveRegimen.doseMg,
+      interval: effectiveRegimen.intervalHr,
+      infusionTime: effectiveRegimen.infusionHr * 60,
+    };
+    try {
+      const pkResult = calculatePK(pkPatient, pkRegimen);
+      return pkResult.timeCourse.map((point) => ({
+        t_hr: point.time,
+        conc_mg_l: point.concentration,
+      }));
+    } catch {
+      return [];
+    }
+  }, [patientForCurve, effectiveRegimen]);
+
+  const chartCurve = useMemo(() => {
+    if (derivedCurve.length > 0) return derivedCurve;
+    if (result && "curve" in result && result.curve) return result.curve;
+    return [];
+  }, [derivedCurve, result]);
 
   return (
     <DisclaimerGate>
@@ -110,11 +160,31 @@ function HomePage() {
                   if (payload.regimen) {
                     setActiveRegimen(payload.regimen);
                   }
+                  if (payload.patient) {
+                    setPatientForCurve({
+                      age: payload.patient.age_yr,
+                      sex: payload.patient.sex,
+                      heightCm: payload.patient.height_cm,
+                      weightKg: payload.patient.weight_kg,
+                      scr: payload.patient.serum_creatinine,
+                    });
+                  }
                 }}
               />
+              <div className="mt-6 grid gap-4">
+                <ConcentrationTimeChart
+                  curve={chartCurve}
+                  levels={mode === "bayesian" ? bayesLevels : []}
+                  band={mode === "bayesian" && result && "curve_ci_low" in result ? { lower: result.curve_ci_low, upper: result.curve_ci_high } : null}
+                  emptyMessage={
+                    mode === "bayesian"
+                      ? "Provide dosing history and levels to generate a Bayesian curve."
+                      : "Compute a basic regimen to generate a concentration-time curve."
+                  }
+                />
+              </div>
             </div>
             <div>
-              <div id="dosing-panel-host" className="space-y-4" />
               <ResultsPanel
                 mode={mode}
                 result={result}
@@ -128,27 +198,8 @@ function HomePage() {
                   });
                 }}
               />
+              <div id="dosing-panel-host" className="space-y-4 mt-4" />
 
-              {mode === "basic" && result && "curve" in result && (
-                <div className="mt-4 grid gap-4">
-                  <ConcentrationTimeChart
-                    curve={result.curve}
-                    levels={[]}
-                    emptyMessage="Add regimen inputs and compute to generate a concentration-time curve."
-                  />
-                </div>
-              )}
-
-              {mode === "bayesian" && result && "curve" in result && (
-                <div className="mt-4 grid gap-4">
-                  <ConcentrationTimeChart
-                    curve={result.curve}
-                    levels={bayesLevels}
-                    band={{ lower: result.curve_ci_low, upper: result.curve_ci_high }}
-                    emptyMessage="Provide dosing history and levels to generate a Bayesian curve."
-                  />
-                </div>
-              )}
             </div>
           </div>
         </main>

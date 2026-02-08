@@ -12,7 +12,7 @@ interface OptionsPanelProps {
 }
 
 export function OptionsPanel({ options, onChange }: OptionsPanelProps) {
-  const updateField = (field: keyof PKOptions, value: any) => {
+  const updateField = (field: keyof PKOptions, value: PKOptions[keyof PKOptions]) => {
     onChange({ ...options, [field]: value });
   };
 
