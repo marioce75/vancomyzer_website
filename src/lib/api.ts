@@ -233,8 +233,73 @@ export type BasicCalculateResponse = {
   curve?: Array<{ t_hr: number; conc_mg_l: number }>;
 };
 
+type DoseRequest = {
+  patient: {
+    age_years: number;
+    weight_kg: number;
+    height_cm?: number | null;
+    sex: "male" | "female";
+    serum_creatinine: number;
+    serious_infection?: boolean;
+  };
+  levels?: Array<{
+    level_mg_l: number;
+    time_hours: number;
+    level_type?: "peak" | "trough" | null;
+    dose_mg?: number | null;
+    infusion_hours?: number | null;
+  }> | null;
+};
+
+type DoseResponse = {
+  loading_dose_mg: number;
+  maintenance_dose_mg: number;
+  interval_hours: number;
+  predicted_peak_mg_l: number;
+  predicted_trough_mg_l: number;
+  predicted_auc_24: number;
+  k_e: number;
+  vd_l: number;
+  half_life_hours: number;
+  crcl_ml_min: number;
+  method: string;
+  notes: string[];
+};
+
 export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicCalculateResponse> {
-  return postJSON<BasicCalculateResponse>(`${API_BASE}/api/basic/calculate`, req);
+  const payload: DoseRequest = {
+    patient: {
+      age_years: req.patient.age,
+      weight_kg: req.patient.weight_kg,
+      height_cm: req.patient.height_cm,
+      sex: req.patient.sex,
+      serum_creatinine: req.patient.serum_creatinine,
+      serious_infection: false,
+    },
+    levels: null,
+  };
+  const res = await postJSON<DoseResponse>(`${API_BASE}/api/calculate-dose`, payload);
+  return {
+    crcl: {
+      selected_ml_min: res.crcl_ml_min,
+    },
+    regimen: {
+      recommended_interval_hr: res.interval_hours,
+      recommended_dose_mg: res.maintenance_dose_mg,
+      recommended_loading_dose_mg: res.loading_dose_mg,
+      chosen_interval_hr: req.regimen.interval_hr,
+      chosen_dose_mg: req.regimen.dose_mg,
+      infusion_hr: req.regimen.infusion_hr,
+    },
+    predicted: {
+      auc24: res.predicted_auc_24,
+      peak: res.predicted_peak_mg_l,
+      trough: res.predicted_trough_mg_l,
+      half_life_hr: res.half_life_hours,
+    },
+    breakdown: {},
+    curve: undefined,
+  };
 }
 
 export type BayesianCalculateRequest = {
@@ -272,5 +337,41 @@ export type BayesianCalculateResponse = {
 };
 
 export async function calculateBayesian(req: BayesianCalculateRequest): Promise<BayesianCalculateResponse> {
-  return postJSON<BayesianCalculateResponse>(`${API_BASE}/api/pk/calculate`, req);
+  const firstDose = req.dose_history[0];
+  const payload: DoseRequest = {
+    patient: {
+      age_years: req.patient.age_yr,
+      weight_kg: req.patient.weight_kg,
+      height_cm: null,
+      sex: req.patient.sex,
+      serum_creatinine: req.patient.serum_creatinine_mg_dl,
+      serious_infection: false,
+    },
+    levels: req.levels.map((lv) => ({
+      level_mg_l: lv.concentration_mg_l,
+      time_hours: lv.time_hr,
+      level_type: null,
+      dose_mg: firstDose?.dose_mg ?? null,
+      infusion_hours: firstDose?.infusion_hr ?? null,
+    })),
+  };
+  const res = await postJSON<DoseResponse>(`${API_BASE}/api/bayesian-dose`, payload);
+  const cl = res.k_e * res.vd_l;
+  return {
+    auc24: res.predicted_auc_24,
+    auc24_ci_low: res.predicted_auc_24,
+    auc24_ci_high: res.predicted_auc_24,
+    cl_l_hr: cl,
+    v_l: res.vd_l,
+    curve: [],
+    curve_ci_low: [],
+    curve_ci_high: [],
+    recommendation: {
+      target_auc: res.predicted_auc_24,
+      daily_dose_mg: res.maintenance_dose_mg * (24.0 / res.interval_hours),
+      per_dose_mg: res.maintenance_dose_mg,
+      interval_hr: res.interval_hours,
+    },
+    warnings: res.notes || [],
+  };
 }
