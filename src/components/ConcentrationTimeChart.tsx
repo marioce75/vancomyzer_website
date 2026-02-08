@@ -4,15 +4,15 @@ import { Line, LineChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 export default function ConcentrationTimeChart({
   curve,
   levels,
-  showBand,
+  band,
 }: {
   curve?: Array<{ t_hr: number; conc_mg_l: number }>;
   levels?: Array<{ time_hr: number; concentration_mg_l: number }>;
-  showBand?: boolean;
+  band?: { lower: Array<{ t_hr: number; conc_mg_l: number }>; upper: Array<{ t_hr: number; conc_mg_l: number }> } | null;
 }) {
   const base = curve || [];
-  const bandUpper = showBand ? base.map((p) => ({ ...p, conc_mg_l: p.conc_mg_l * 1.2 })) : [];
-  const bandLower = showBand ? base.map((p) => ({ ...p, conc_mg_l: p.conc_mg_l * 0.8 })) : [];
+  const bandUpper = band?.upper ?? [];
+  const bandLower = band?.lower ?? [];
 
   const levelPoints = (levels || []).map((l) => ({ t_hr: l.time_hr, conc_mg_l: l.concentration_mg_l }));
 
@@ -29,7 +29,7 @@ export default function ConcentrationTimeChart({
             <YAxis />
             <Tooltip formatter={(v: number) => Number(v).toFixed(2)} labelFormatter={(l) => `${l}h`} />
 
-            {showBand && (
+            {bandUpper.length > 0 && bandLower.length > 0 && (
               <>
                 <Line type="monotone" data={bandUpper} dataKey="conc_mg_l" stroke="#93c5fd" dot={false} />
                 <Line type="monotone" data={bandLower} dataKey="conc_mg_l" stroke="#93c5fd" dot={false} />
