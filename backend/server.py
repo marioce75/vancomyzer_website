@@ -805,9 +805,6 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 # API Endpoints
-@app.get("/")
-async def root():
-    return {"message": "Vancomyzer API - Evidence-based vancomycin dosing calculator"}
 
 @app.get("/api/health")
 async def health_check():

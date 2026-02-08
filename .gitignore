@@ -9,7 +9,6 @@ lerna-debug.log*
 
 # Render build artifacts (DO NOT COMMIT)
 backend/static/
-!backend/static/.gitkeep
 dist/
 node_modules/
 
