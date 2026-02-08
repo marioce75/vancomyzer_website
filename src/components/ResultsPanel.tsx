@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,10 +23,6 @@ function ResultsPanel({
   onRegimenChange?: (next: { doseMg: number; intervalHr: number; infusionHr: number }) => void;
 }) {
   const [copied, setCopied] = useState(false);
-
-  if (!result) {
-    return <div className="text-sm text-muted-foreground">No results yet.</div>;
-  }
 
   async function onCopySummary(text: string) {
     try {
@@ -66,6 +62,25 @@ function ResultsPanel({
     ].join("\n");
   }
 
+  const intervalOptions = REGIMEN_LIMITS.allowedIntervalsHr;
+  const safeInterval = regimen
+    ? intervalOptions.reduce(
+        (closest, val) => (Math.abs(val - regimen.intervalHr) < Math.abs(closest - regimen.intervalHr) ? val : closest),
+        intervalOptions[0],
+      )
+    : null;
+
+  useEffect(() => {
+    if (mode !== "basic" || !regimen || !onRegimenChange || safeInterval === null) return;
+    if (regimen.intervalHr !== safeInterval) {
+      onRegimenChange({ ...regimen, intervalHr: safeInterval });
+    }
+  }, [mode, regimen, onRegimenChange, safeInterval]);
+
+  if (!result) {
+    return <div className="text-sm text-muted-foreground">No results yet.</div>;
+  }
+
   if (mode === "basic" && "predicted" in result) {
     const auc24 = result.predicted.auc24 ?? 0;
     const outsideTarget = auc24 < AUC_TARGET.low || auc24 > AUC_TARGET.high;
@@ -73,8 +88,6 @@ function ResultsPanel({
     const chosenInterval = result.regimen.chosen_interval_hr ?? regimen?.intervalHr;
     const chosenDoseNum = Number(chosenDose ?? 0);
     const chosenIntervalNum = Number(chosenInterval ?? 0);
-    const intervalOptions = REGIMEN_LIMITS.allowedIntervalsHr;
-    const safeInterval = regimen ? (intervalOptions.includes(regimen.intervalHr) ? regimen.intervalHr : 12) : 12;
     const dailyDose = chosenIntervalNum > 0 ? chosenDoseNum * (24 / chosenIntervalNum) : 0;
     const guardrailWarnings: string[] = [];
     if (chosenDoseNum > REGIMEN_LIMITS.maxSingleDoseMg) {
@@ -173,7 +186,7 @@ function ResultsPanel({
                   <div>
                     <div className="text-xs text-muted-foreground">Interval (hr)</div>
                     <Select
-                      value={String(safeInterval)}
+                      value={String(safeInterval ?? 12)}
                       onValueChange={(value) =>
                         onRegimenChange({
                           ...regimen,

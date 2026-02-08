@@ -11,11 +11,15 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogT
 import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateResponse } from "@/lib/api";
 import { REGIMEN_LIMITS } from "@/lib/constraints";
 import { calculatePK } from "@/pk/core";
+import { calculateFromLevels } from "@/pk/levels";
 
 function HomePage() {
   const [result, setResult] = useState<BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse | undefined>(undefined);
   const [mode, setMode] = useState<"basic" | "bayesian" | "educational">("basic");
   const [bayesLevels, setBayesLevels] = useState<Array<{ time_hr: number; concentration_mg_l: number }>>([]);
+  const [bayesDoseHistory, setBayesDoseHistory] = useState<
+    Array<{ dose_mg: number; start_time_hr: number; infusion_hr: number }>
+  >([]);
   const [activeRegimen, setActiveRegimen] = useState<{ doseMg: number; intervalHr: number; infusionHr: number }>({
     doseMg: 1000,
     intervalHr: 12,
@@ -88,12 +92,34 @@ function HomePage() {
       height: patientForCurve.heightCm,
       scr: patientForCurve.scr,
     };
+
+    const effectiveDoseHistory = bayesDoseHistory.length > 0 ? bayesDoseHistory : null;
+    const firstDose = effectiveDoseHistory?.[0];
+    const inferredInterval =
+      effectiveDoseHistory && effectiveDoseHistory.length > 1
+        ? Math.max(1, effectiveDoseHistory[1].start_time_hr - effectiveDoseHistory[0].start_time_hr)
+        : null;
+
     const pkRegimen = {
-      dose: effectiveRegimen.doseMg,
-      interval: effectiveRegimen.intervalHr,
-      infusionTime: effectiveRegimen.infusionHr * 60,
+      dose: firstDose?.dose_mg ?? effectiveRegimen.doseMg,
+      interval: inferredInterval ?? effectiveRegimen.intervalHr,
+      infusionTime: (firstDose?.infusion_hr ?? effectiveRegimen.infusionHr) * 60,
     };
+
     try {
+      if (mode === "bayesian" && bayesLevels.length > 0) {
+        const levels = bayesLevels.map((lv) => ({
+          time: lv.time_hr,
+          concentration: lv.concentration_mg_l,
+        }));
+        const levelsResult = calculateFromLevels(pkPatient, pkRegimen, levels);
+        if (levelsResult?.timeCourse?.length) {
+          return levelsResult.timeCourse.map((point) => ({
+            t_hr: point.time,
+            conc_mg_l: point.concentration,
+          }));
+        }
+      }
       const pkResult = calculatePK(pkPatient, pkRegimen);
       return pkResult.timeCourse.map((point) => ({
         t_hr: point.time,
@@ -102,7 +128,7 @@ function HomePage() {
     } catch {
       return [];
     }
-  }, [patientForCurve, effectiveRegimen]);
+  }, [patientForCurve, effectiveRegimen, bayesLevels, bayesDoseHistory, mode]);
 
   const chartCurve = useMemo(() => {
     if (derivedCurve.length > 0) return derivedCurve;
@@ -150,12 +176,16 @@ function HomePage() {
                   setResult(undefined);
                   setMode("basic");
                   setBayesLevels([]);
+                  setBayesDoseHistory([]);
                   setSharedRegimenText(null);
                   setActiveRegimen({ doseMg: 1000, intervalHr: 12, infusionHr: 1.0 });
                 }}
                 onInputsChange={(payload) => {
                   if (payload.mode === "bayesian" && payload.levels) {
                     setBayesLevels(payload.levels);
+                  }
+                  if (payload.mode === "bayesian" && payload.dose_history) {
+                    setBayesDoseHistory(payload.dose_history);
                   }
                   if (payload.regimen) {
                     setActiveRegimen(payload.regimen);
