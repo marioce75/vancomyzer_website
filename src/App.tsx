@@ -32,6 +32,11 @@ function HomePage() {
   const [result, setResult] = useState<BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse | undefined>(undefined);
   const [mode, setMode] = useState<"basic" | "bayesian" | "educational">("basic");
   const [bayesLevels, setBayesLevels] = useState<Array<{ time_hr: number; concentration_mg_l: number }>>([]);
+  const [activeRegimen, setActiveRegimen] = useState<{ doseMg: number; intervalHr: number; infusionHr: number }>({
+    doseMg: 1000,
+    intervalHr: 12,
+    infusionHr: 1.0,
+  });
   const formRef = useRef<CalculatorFormHandle | null>(null);
 
   const [sharedRegimenText, setSharedRegimenText] = useState<string | null>(null);
@@ -96,6 +101,9 @@ function HomePage() {
                   if (payload.mode === "bayesian" && payload.levels) {
                     setBayesLevels(payload.levels);
                   }
+                  if (payload.regimen) {
+                    setActiveRegimen(payload.regimen);
+                  }
                 }}
               />
             </div>
@@ -104,6 +112,11 @@ function HomePage() {
                 mode={mode}
                 result={result}
                 onAdjustDose={(delta) => formRef.current?.adjustDose(delta)}
+                regimen={activeRegimen}
+                onRegimenChange={(next) => {
+                  setActiveRegimen(next);
+                  formRef.current?.recompute(next);
+                }}
               />
 
               {mode === "basic" && result && "curve" in result && result.curve && (

@@ -309,6 +309,11 @@ def basic_calculate(req: BasicCalculateRequest) -> BasicCalculateResponse:
     recommended_interval = _round_interval(outputs.get("recommended_interval_hr"))
     recommended_dose = _round_to_250(outputs.get("recommended_dose_mg"))
     recommended_loading = _round_to_250(outputs.get("recommended_loading_dose_mg"))
+    if recommended_interval and recommended_dose:
+        max_daily = min(4500.0, 100.0 * float(req.patient.weight_kg))
+        daily = recommended_dose * (24.0 / recommended_interval)
+        if daily > max_daily:
+            recommended_dose = _round_to_250(max_daily * (recommended_interval / 24.0))
 
     regimen = {
         "recommended_interval_hr": recommended_interval,
