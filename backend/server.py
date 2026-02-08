@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import List, Optional, Any
 
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -216,8 +216,9 @@ def predict_trough(dose_mg: float, tau_h: int, cl_l_h: float, v_l: float, infusi
 
 
 # -------- API endpoints (with /api aliases) --------
-@app.post("/pk/calculate", response_model=PkCalculateResponse)
-@app.post("/api/pk/calculate-legacy", response_model=PkCalculateResponse)
+@app.post("/pk/recommend", response_model=PkCalculateResponse)
+@app.post("/api/pk/recommend", response_model=PkCalculateResponse)
+@app.post("/api/pk/initial", response_model=PkCalculateResponse)
 def pk_calculate(req: PkCalculateRequest) -> PkCalculateResponse:
     try:
         crcl = cockcroft_gault_crcl(req.age, req.sex, req.serumCreatinine, req.weightKg)
@@ -535,7 +536,27 @@ def api_version():
 
 # -------- SPA serving (MUST be mounted after API routes) --------
 # Root should always serve built frontend index.html when present.
-app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True, check_dir=False), name="spa")
+
+
+# Serve index.html for root if present, else 404. Fallback for all non-API/static paths.
+@app.get("/", include_in_schema=False)
+def spa_index():
+    if INDEX_FILE.exists():
+        return FileResponse(str(INDEX_FILE))
+    raise HTTPException(status_code=404, detail="Frontend not built")
+
+
+@app.get("/{full_path:path}", include_in_schema=False)
+def spa_fallback(full_path: str):
+    # Never hijack API/static routes
+    if full_path.startswith((
+        "api/", "pk/", "meta/", "health", "healthz", "assets/", "static/"
+    )):
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    if INDEX_FILE.exists():
+        return FileResponse(str(INDEX_FILE))
+    raise HTTPException(status_code=404, detail="Frontend not built")
 
 
 def _default_pk_params_from_patient(age: int, sex: str, scr: float, weight_kg: float):
@@ -566,8 +587,8 @@ def _build_safety_messages(dose_mg: float, interval_hr: float, infusion_hr: floa
     return msgs
 
 
-@app.post("/api/pk/educational", response_model=CalculateResponse)
-@app.post("/pk/calculate2", response_model=CalculateResponse)
+@app.post("/pk/calculate", response_model=CalculateResponse)
+@app.post("/api/pk/calculate", response_model=CalculateResponse)
 def pk_calculate_educational(req: CalculateRequest) -> CalculateResponse:
     """Educational PK estimate endpoint.
 

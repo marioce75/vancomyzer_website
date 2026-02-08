@@ -6,9 +6,11 @@ import ResultsPanel from "@/components/ResultsPanel";
 import ConcentrationTimeChart from "@/components/ConcentrationTimeChart";
 import { Alert } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { decodeShareState } from "@/lib/shareLink";
-import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateResponse } from "@/lib/api";
-
+import PearlsPanel from "@/components/PearlsPanel";
+import TimingHelperMini from "@/components/TimingHelperMini";
+import RoundsSummaryCard from "@/components/RoundsSummaryCard";
+import { copyToClipboard, decodeShareState } from "@/lib/shareLink";
+import { calculateEducational, type CalculateRequest, type CalculateResponse } from "@/lib/api";
 const ReferencesPageLazy = React.lazy(() => import("@/pages/References"));
 const DisclaimerPageLazy = React.lazy(() => import("@/pages/Disclaimer"));
 const AboutPageLazy = React.lazy(() => import("@/pages/About"));
