@@ -27,10 +27,27 @@ app.add_middleware(
 # Serve static assets
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR), check_dir=False), name="static")
 
+# Vite outputs asset URLs under /assets by default; expose them from the same build directory
+app.mount(
+    "/assets",
+    StaticFiles(directory=str(STATIC_DIR / "assets"), check_dir=False),
+    name="assets",
+)
+
 # Serve compiled index.html at root
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
-    return (STATIC_DIR / "index.html").read_text()
+    html = (STATIC_DIR / "index.html").read_text()
+    # Fallback: if the frontend was built with absolute /assets paths, make it work under /static as well
+    html = html.replace('src="/assets/', 'src="/static/assets/')
+    html = html.replace('href="/assets/', 'href="/static/assets/')
+    return HTMLResponse(html, headers={"Cache-Control": "no-store, no-cache, must-revalidate"})
+
+@app.get("/build-info.json")
+def build_info():
+    if BUILD_INFO_PATH.exists():
+        return json.loads(BUILD_INFO_PATH.read_text())
+    return {"detail": "Not Found"}
 
 # PK Models
 class PKRequest(BaseModel):
