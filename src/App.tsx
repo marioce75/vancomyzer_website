@@ -12,7 +12,6 @@ import TimingHelperMini from "@/components/TimingHelperMini";
 import RoundsSummaryCard from "@/components/RoundsSummaryCard";
 import { copyToClipboard, decodeShareState } from "@/lib/shareLink";
 import { calculateEducational, type CalculateRequest, type CalculateResponse } from "@/lib/api";
-
 const ReferencesPageLazy = React.lazy(() => import("@/pages/References"));
 const DisclaimerPageLazy = React.lazy(() => import("@/pages/Disclaimer"));
 const AboutPageLazy = React.lazy(() => import("@/pages/About"));
