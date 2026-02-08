@@ -3,44 +3,22 @@ import traceback
 import math
 import os
 import subprocess
-import json
 from datetime import datetime, timezone
 from typing import List, Optional, Any
 
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import numpy as np
 
-from backend.models import (
-    CalculateRequest,
-    CalculateResponse,
-    CurvePoint,
-    SafetyMessage,
-    BasicCalculateRequest,
-    BasicCalculateResponse,
-    PkBayesianRequest,
-    PkBayesianResponse,
-)
+from backend.models import CalculateRequest, CalculateResponse, CurvePoint, SafetyMessage
 from backend.pk.sim import simulate_regimen_0_48h, auc_trapz, estimate_peak_trough_from_sim, Event, build_repeated_regimen_events, concentration_time_series
 from backend.pk.bayes_demo import map_fit_demo
-from backend.pk.bayesian import map_fit, load_priors, curve_with_band, estimate_auc24, recommended_dose_adjustment
-from backend.basic.calculator import compute_basic, BasicInputs
 
 
 app = FastAPI(title="Vancomyzer Server")
-
-# CORS for frontend + API
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # -------- Static frontend paths --------
 BASE_DIR = Path(__file__).resolve().parent
@@ -55,32 +33,9 @@ app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR), check_dir=False), na
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR), check_dir=False), name="static")
 
 
-def _read_build_info() -> dict:
-    build_info_path = STATIC_DIR / "build-info.json"
-    if not build_info_path.exists():
-        return {}
-    try:
-        return json.loads(build_info_path.read_text())
-    except Exception:
-        return {}
-
-
-@app.middleware("http")
-async def add_cache_headers(request: Request, call_next):
-    response = await call_next(request)
-    content_type = response.headers.get("content-type", "")
-    path = request.url.path
-    if content_type.startswith("text/html"):
-        response.headers["Cache-Control"] = "no-cache"
-    elif path.startswith("/assets/") or path.startswith("/static/"):
-        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
-    return response
-
-
 # -------- Health --------
 @app.get("/health")
 @app.get("/healthz")
-@app.get("/api/health")
 def health():
     return {"status": "ok"}
 
@@ -216,8 +171,9 @@ def predict_trough(dose_mg: float, tau_h: int, cl_l_h: float, v_l: float, infusi
 
 
 # -------- API endpoints (with /api aliases) --------
-@app.post("/pk/calculate", response_model=PkCalculateResponse)
-@app.post("/api/pk/calculate-legacy", response_model=PkCalculateResponse)
+@app.post("/pk/recommend", response_model=PkCalculateResponse)
+@app.post("/api/pk/recommend", response_model=PkCalculateResponse)
+@app.post("/api/pk/initial", response_model=PkCalculateResponse)
 def pk_calculate(req: PkCalculateRequest) -> PkCalculateResponse:
     try:
         crcl = cockcroft_gault_crcl(req.age, req.sex, req.serumCreatinine, req.weightKg)
@@ -269,127 +225,6 @@ def pk_calculate(req: PkCalculateRequest) -> PkCalculateResponse:
     )
 
 
-# -------- Basic (Excel parity) --------
-@app.post("/api/basic/calculate", response_model=BasicCalculateResponse)
-def basic_calculate(req: BasicCalculateRequest) -> BasicCalculateResponse:
-    outputs = compute_basic(
-        BasicInputs(
-            age=req.patient.age,
-            sex=req.patient.sex,
-            weight_kg=req.patient.weight_kg,
-            height_cm=req.patient.height_cm,
-            serum_creatinine=req.patient.serum_creatinine,
-            dose_mg=req.regimen.dose_mg,
-            interval_hr=req.regimen.interval_hr,
-            infusion_hr=req.regimen.infusion_hr,
-            crcl_method=req.crcl_method,
-            forced_crcl=req.forced_crcl,
-        )
-    )
-    crcl = {
-        "selected_ml_min": outputs.get("crcl_selected_ml_min"),
-        "selected_l_hr": outputs.get("crcl_selected_l_hr"),
-        "tbw": outputs.get("crcl_tbw"),
-        "abw": outputs.get("crcl_abw"),
-        "ibw": outputs.get("crcl_ibw"),
-        "tbw_scr1": outputs.get("crcl_tbw_scr1"),
-        "forced": outputs.get("crcl_forced"),
-    }
-    regimen = {
-        "recommended_interval_hr": outputs.get("recommended_interval_hr"),
-        "recommended_dose_mg": outputs.get("recommended_dose_mg"),
-        "recommended_loading_dose_mg": outputs.get("recommended_loading_dose_mg"),
-        "chosen_interval_hr": req.regimen.interval_hr,
-        "chosen_dose_mg": req.regimen.dose_mg,
-        "infusion_hr": req.regimen.infusion_hr,
-    }
-    predicted = {
-        "auc24": outputs.get("predicted_auc24"),
-        "peak": outputs.get("predicted_peak"),
-        "trough": outputs.get("predicted_trough"),
-        "half_life_hr": outputs.get("half_life_hr"),
-    }
-    curve = None
-    try:
-        cl_l_hr = float(outputs.get("vanco_cl") or 0.0)
-        v_l = float(outputs.get("vanco_vd") or 0.0)
-        if cl_l_hr > 0 and v_l > 0:
-            t, c = simulate_regimen_0_48h(
-                cl_l_hr=cl_l_hr,
-                v_l=v_l,
-                dose_mg=req.regimen.dose_mg,
-                interval_hr=req.regimen.interval_hr,
-                infusion_hr=req.regimen.infusion_hr or 1.0,
-                dt_min=10.0,
-            )
-            curve = [CurvePoint(t_hr=float(tt), conc_mg_l=float(cc)) for tt, cc in zip(t.tolist(), c.tolist())]
-    except Exception:
-        curve = None
-    return BasicCalculateResponse(
-        crcl=crcl,
-        regimen=regimen,
-        predicted=predicted,
-        breakdown=outputs,
-        curve=curve,
-    )
-
-
-# -------- Bayesian PK (MAP) --------
-@app.post("/api/pk/calculate", response_model=PkBayesianResponse)
-@app.post("/api/pk/bayesian", response_model=PkBayesianResponse)
-def pk_bayesian_map(req: PkBayesianRequest) -> PkBayesianResponse:
-    # Default covariate priors (same heuristics used elsewhere)
-    crcl_ml_min = cockcroft_gault_crcl(req.patient.age_yr, req.patient.sex, req.patient.serum_creatinine_mg_dl, req.patient.weight_kg)
-    cl_mean = estimate_cl_l_per_h(crcl_ml_min)
-    v_mean = estimate_v_l(req.patient.weight_kg)
-
-    events = [Event(dose_mg=e.dose_mg, start_hr=e.start_time_hr, infusion_hr=e.infusion_hr) for e in req.dose_history]
-    levels = [(lv.time_hr, lv.concentration_mg_l) for lv in req.levels]
-    priors = load_priors()
-    cl_map, v_map = map_fit(events, levels, cl_mean=cl_mean, v_mean=v_mean, priors=priors)
-
-    auc24 = estimate_auc24(events, cl_l_hr=cl_map, v_l=v_map)
-    t, c, lo, hi = curve_with_band(events, cl_l_hr=cl_map, v_l=v_map, priors=priors)
-    curve = [CurvePoint(t_hr=float(tt), conc_mg_l=float(cc)) for tt, cc in zip(t.tolist(), c.tolist())]
-    curve_lo = [CurvePoint(t_hr=float(tt), conc_mg_l=float(cc)) for tt, cc in zip(t.tolist(), lo.tolist())]
-    curve_hi = [CurvePoint(t_hr=float(tt), conc_mg_l=float(cc)) for tt, cc in zip(t.tolist(), hi.tolist())]
-
-    # AUC24 CI from log-normal CL uncertainty
-    auc_low = auc24 * math.exp(-1.96 * priors.sigma_log_cl)
-    auc_high = auc24 * math.exp(1.96 * priors.sigma_log_cl)
-
-    interval = req.dose_history[1].start_time_hr - req.dose_history[0].start_time_hr if len(req.dose_history) > 1 else 12.0
-    recommendation = recommended_dose_adjustment(
-        cl_map,
-        interval_hr=float(interval),
-        weight_kg=req.patient.weight_kg,
-        target_low=req.target_low,
-        target_high=req.target_high,
-        mic=req.mic,
-    )
-
-    warnings = []
-    if req.mic > 1.0:
-        warnings.append("MIC > 1 mg/L: achieving AUC/MIC target may require higher exposures and increased toxicity risk.")
-    if auc24 > 800:
-        warnings.append("AUC > 800: high nephrotoxicity risk.")
-    elif auc24 > 600:
-        warnings.append("AUC > 600: consider dose reduction.")
-
-    return PkBayesianResponse(
-        auc24=float(auc24),
-        auc24_ci_low=float(auc_low),
-        auc24_ci_high=float(auc_high),
-        cl_l_hr=float(cl_map),
-        v_l=float(v_map),
-        curve=curve,
-        curve_ci_low=curve_lo,
-        curve_ci_high=curve_hi,
-        recommendation=recommendation,
-        warnings=warnings,
-    )
-
-
 # Bayesian models
 class BayesianRequest(PkCalculateRequest):
     levels: List[Level]
@@ -411,8 +246,8 @@ def _validate_bayesian_inputs(levels: List[Level], dose_history: List[DoseEvent]
         raise HTTPException(status_code=422, detail="At least 1 dose event is required for Bayesian estimation")
 
 
-@app.post("/pk/bayesian-demo", response_model=BayesianResponse)
-@app.post("/api/pk/bayesian-demo", response_model=BayesianResponse)
+@app.post("/pk/bayesian", response_model=BayesianResponse)
+@app.post("/api/pk/bayesian", response_model=BayesianResponse)
 def pk_bayesian(req: BayesianRequest) -> BayesianResponse:
     _validate_bayesian_inputs(req.levels, req.doseHistory)
 
@@ -434,7 +269,6 @@ def meta_references():
     return {
         "references": [
             {"title": "Therapeutic Monitoring of Vancomycin for Serious MRSA Infections", "org": "ASHP/IDSA/PIDS/SIDP", "year": 2020, "note": "AUC/MIC 400–600"},
-            {"title": "Therapeutic monitoring of vancomycin for serious MRSA infections (consensus guideline)", "org": "ASHP/IDSA/PIDS/SIDP", "year": 2020, "note": "Target AUC/MIC 400–600; AUC-guided dosing preferred"},
         ]
     }
 
@@ -459,11 +293,10 @@ def meta_version():
 
     Note: this endpoint is not shown in the clinician-facing footer.
     """
-    build_info = _read_build_info()
-    built_at = build_info.get("build_time") or datetime.now(timezone.utc).isoformat()
+    built_at = datetime.now(timezone.utc).isoformat()
 
-    # Prefer build info/env var, then try git.
-    git_sha = build_info.get("git_sha") or os.environ.get("RENDER_GIT_COMMIT")
+    # Prefer Render env var, then try git.
+    git_sha = os.environ.get("RENDER_GIT_COMMIT")
     if not git_sha:
         try:
             git_sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=str(BASE_DIR.parent)).decode().strip()
@@ -483,14 +316,16 @@ def api_version():
     app_name = os.environ.get("APP_NAME", "Vancomyzer")
     app_version = os.environ.get("APP_VERSION", "v1")
 
-    build_info = _read_build_info()
-
-    # Build time: prefer build info/env var, otherwise fall back to request-time UTC.
-    build_time = build_info.get("build_time") or os.environ.get("BUILD_TIME")
+    # Build time: prefer explicit BUILD_TIME, otherwise fall back to request-time UTC.
+    build_time = os.environ.get("BUILD_TIME")
     if not build_time:
         build_time = datetime.now(timezone.utc).isoformat()
 
-    git_sha = build_info.get("git_sha") or os.environ.get("GIT_SHA") or os.environ.get("RENDER_GIT_COMMIT") or None
+    git_sha = (
+        os.environ.get("GIT_SHA")
+        or os.environ.get("RENDER_GIT_COMMIT")
+        or None
+    )
     if not git_sha:
         try:
             git_sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=str(BASE_DIR.parent)).decode().strip()
@@ -515,7 +350,27 @@ def api_version():
 
 # -------- SPA serving (MUST be mounted after API routes) --------
 # Root should always serve built frontend index.html when present.
-app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True, check_dir=False), name="spa")
+
+
+# Serve index.html for root if present, else 404. Fallback for all non-API/static paths.
+@app.get("/", include_in_schema=False)
+def spa_index():
+    if INDEX_FILE.exists():
+        return FileResponse(str(INDEX_FILE))
+    raise HTTPException(status_code=404, detail="Frontend not built")
+
+
+@app.get("/{full_path:path}", include_in_schema=False)
+def spa_fallback(full_path: str):
+    # Never hijack API/static routes
+    if full_path.startswith((
+        "api/", "pk/", "meta/", "health", "healthz", "assets/", "static/"
+    )):
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    if INDEX_FILE.exists():
+        return FileResponse(str(INDEX_FILE))
+    raise HTTPException(status_code=404, detail="Frontend not built")
 
 
 def _default_pk_params_from_patient(age: int, sex: str, scr: float, weight_kg: float):
@@ -546,8 +401,8 @@ def _build_safety_messages(dose_mg: float, interval_hr: float, infusion_hr: floa
     return msgs
 
 
-@app.post("/api/pk/educational", response_model=CalculateResponse)
-@app.post("/pk/calculate2", response_model=CalculateResponse)
+@app.post("/pk/calculate", response_model=CalculateResponse)
+@app.post("/api/pk/calculate", response_model=CalculateResponse)
 def pk_calculate_educational(req: CalculateRequest) -> CalculateResponse:
     """Educational PK estimate endpoint.
 

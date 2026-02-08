@@ -1,14 +1,17 @@
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import DisclaimerGate from "@/components/DisclaimerGate";
 import CalculatorForm from "@/components/CalculatorForm";
 import ResultsPanel from "@/components/ResultsPanel";
+import AucDoseSliderChart from "@/components/AucDoseSliderChart";
 import ConcentrationTimeChart from "@/components/ConcentrationTimeChart";
 import { Alert } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { decodeShareState } from "@/lib/shareLink";
-import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateResponse } from "@/lib/api";
-
+import PearlsPanel from "@/components/PearlsPanel";
+import TimingHelperMini from "@/components/TimingHelperMini";
+import RoundsSummaryCard from "@/components/RoundsSummaryCard";
+import { copyToClipboard, decodeShareState } from "@/lib/shareLink";
+import { calculateEducational, type CalculateRequest, type CalculateResponse } from "@/lib/api";
 const ReferencesPageLazy = React.lazy(() => import("@/pages/References"));
 const DisclaimerPageLazy = React.lazy(() => import("@/pages/Disclaimer"));
 const AboutPageLazy = React.lazy(() => import("@/pages/About"));
@@ -29,9 +32,10 @@ function navigate(to: string) {
 }
 
 function HomePage() {
-  const [result, setResult] = useState<BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse | undefined>(undefined);
-  const [mode, setMode] = useState<"basic" | "bayesian" | "educational">("basic");
-  const [bayesLevels, setBayesLevels] = useState<Array<{ time_hr: number; concentration_mg_l: number }>>([]);
+  const [result, setResult] = useState<CalculateResponse | undefined>(undefined);
+  const [updating, setUpdating] = useState(false);
+
+  const [inputs, setInputs] = useState<CalculateRequest | null>(null);
 
   const [sharedRegimenText, setSharedRegimenText] = useState<string | null>(null);
   const [roundsMode] = useState<boolean>(() => {
@@ -53,6 +57,37 @@ function HomePage() {
     setSharedRegimenText(text);
   }, []);
 
+  // Debounced recompute when regimen changes
+  const recomputeTimer = useRef<number | null>(null);
+
+  function scheduleRecompute(next: CalculateRequest) {
+    setInputs(next);
+    if (recomputeTimer.current) window.clearTimeout(recomputeTimer.current);
+    recomputeTimer.current = window.setTimeout(async () => {
+      setUpdating(true);
+      try {
+        const r = await calculateEducational(next);
+        setResult(r);
+      } finally {
+        setUpdating(false);
+      }
+    }, 300);
+  }
+
+  async function onAdjust(delta: { dose_mg?: number; interval_hr?: number }) {
+    if (!inputs) return;
+    const next: CalculateRequest = {
+      ...inputs,
+      regimen: {
+        ...inputs.regimen,
+        dose_mg: Math.max(250, inputs.regimen.dose_mg + (delta.dose_mg ?? 0)),
+        interval_hr: Math.max(4, inputs.regimen.interval_hr + (delta.interval_hr ?? 0)),
+      },
+    };
+    scheduleRecompute(next);
+  }
+
+  const targets = useMemo(() => ({ low: 400, high: 600 }), []);
   const currentYear = useMemo(() => new Date().getFullYear(), []);
 
   return (
@@ -83,36 +118,50 @@ function HomePage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <CalculatorForm
-                onResult={(res, nextMode) => {
-                  setResult(res);
-                  setMode(nextMode);
-                  if (nextMode !== "bayesian") {
-                    setBayesLevels([]);
-                  }
-                }}
-                onInputsChange={(payload) => {
-                  if (payload.mode === "bayesian" && payload.levels) {
-                    setBayesLevels(payload.levels);
-                  }
+                onResult={setResult}
+                onInputsChange={(x) => {
+                  const req: CalculateRequest = {
+                    mode: x.mode,
+                    patient: x.patient,
+                    regimen: x.regimen,
+                    dose_history: x.dose_history,
+                    levels: x.levels,
+                  };
+                  setInputs(req);
                 }}
               />
             </div>
             <div>
-              <ResultsPanel mode={mode} result={result} />
+              <ResultsPanel result={result} onAdjustDose={onAdjust} updating={updating} />
 
-              {mode === "basic" && result && "curve" in result && result.curve && (
+              {result && inputs && (
                 <div className="mt-4 grid gap-4">
-                  <ConcentrationTimeChart curve={result.curve} levels={[]} />
-                </div>
-              )}
-
-              {mode === "bayesian" && result && "curve" in result && (
-                <div className="mt-4 grid gap-4">
-                  <ConcentrationTimeChart
-                    curve={result.curve}
-                    levels={bayesLevels}
-                    band={{ lower: result.curve_ci_low, upper: result.curve_ci_high }}
+                  <AucDoseSliderChart
+                    doseMg={Math.round(inputs.regimen.dose_mg)}
+                    intervalHr={Math.round(inputs.regimen.interval_hr)}
+                    auc24={result.auc24_mg_h_l}
+                    targetLow={targets.low}
+                    targetHigh={targets.high}
+                    onChange={({ doseMg, intervalHr }) =>
+                      scheduleRecompute({
+                        ...inputs,
+                        regimen: {
+                          ...inputs.regimen,
+                          dose_mg: doseMg ?? inputs.regimen.dose_mg,
+                          interval_hr: intervalHr ?? inputs.regimen.interval_hr,
+                        },
+                      })
+                    }
                   />
+                  <ConcentrationTimeChart curve={result.concentration_curve} levels={inputs.levels} showBand={false} />
+
+                  {roundsMode && (
+                    <div className="grid gap-4">
+                      <RoundsSummaryCard inputs={inputs} result={result} />
+                      <PearlsPanel />
+                      <TimingHelperMini />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
