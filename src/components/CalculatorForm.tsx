@@ -12,6 +12,7 @@ import {
   type BasicCalculateResponse,
   type BayesianCalculateResponse,
   ApiError,
+  type DoseRequest,
 } from "@/lib/api";
 import { REGIMEN_LIMITS } from "@/lib/constraints";
 
@@ -308,23 +309,29 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
         const historyPayload = doseHistory
           .filter((d) => Number.isFinite(d.doseMg) && d.doseMg > 0 && Number.isFinite(d.infusionHr) && d.infusionHr > 0)
           .map((d) => ({ dose_mg: Number(d.doseMg), start_time_hr: Number(d.timeHr), infusion_hr: Number(d.infusionHr) }));
-        if (historyPayload.length < 1) {
-          throw new Error("Enter at least one dose event for Bayesian mode.");
+        if (levelsPayload.length < 1) {
+          setError({ message: "Bayesian mode requires at least one level with a valid draw time." });
+          return;
         }
         onInputsChange?.({ mode: "bayesian", levels: levelsPayload, dose_history: historyPayload });
-        const result = await calculateBayesian({
+        const payload: DoseRequest = {
           patient: {
-            age_yr: Number(ageNum),
-            sex,
+            age_years: Number(ageNum),
             weight_kg: Number(weightKg),
-            serum_creatinine_mg_dl: Number(scrNum),
+            height_cm: Number(heightCm),
+            sex,
+            serum_creatinine: Number(scrNum),
+            serious_infection: false,
           },
-          mic: Number(micNum),
-          dose_history: historyPayload,
-          levels: levelsPayload,
-          target_low: Number.isFinite(aucLowNum) ? Number(aucLowNum) : undefined,
-          target_high: Number.isFinite(aucHighNum) ? Number(aucHighNum) : undefined,
-        });
+          levels: levelsPayload.map((lv) => ({
+            level_mg_l: lv.concentration_mg_l,
+            time_hours: lv.time_hr,
+            level_type: null,
+            dose_mg: historyPayload[0]?.dose_mg ?? null,
+            infusion_hours: historyPayload[0]?.infusion_hr ?? null,
+          })),
+        };
+        const result = await calculateBayesian(payload);
         onResult(result, "bayesian");
       }
     } catch (e) {
@@ -332,7 +339,8 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
       const err = e as unknown;
       if (err instanceof ApiError) {
         const issues = err.errors?.map((x) => ({ path: formatValidationLoc(x.loc), message: x.msg }));
-        setError({ message: err.detail || err.message, issues });
+        const message = err.status === 422 ? "Validation error (422)" : err.detail || err.message;
+        setError({ message, issues });
       } else if (err instanceof Error) {
         setError({ message: err.message });
       } else {
@@ -448,6 +456,12 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
                 <li>At least one level with exact draw time relative to dose start.</li>
                 <li>Two levels (peak + trough) improves accuracy when available.</li>
               </ul>
+            </div>
+            <div className="mt-3 rounded-md border bg-card p-3 text-xs text-muted-foreground">
+              <div className="font-medium text-foreground mb-1">Required fields for a valid request</div>
+              <div>Patient: age (years), weight (kg), sex, serum creatinine (mg/dL).</div>
+              <div>Level: concentration (mg/L) + draw time (hours after dose start).</div>
+              <div>Dose: dose amount (mg) + infusion duration (hours).</div>
             </div>
             <div className="mt-3 rounded-md border bg-card p-3 text-xs text-muted-foreground">
               <div className="font-medium text-foreground mb-1">Accuracy guidance</div>
