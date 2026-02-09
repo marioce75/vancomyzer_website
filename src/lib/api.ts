@@ -338,6 +338,9 @@ export type BayesianCalculateResponse = {
 
 export async function calculateBayesian(req: BayesianCalculateRequest): Promise<BayesianCalculateResponse> {
   const firstDose = req.dose_history[0];
+  if (!firstDose || !Number.isFinite(firstDose.dose_mg) || !Number.isFinite(firstDose.infusion_hr)) {
+    throw new Error("Bayesian requires dosing history with dose and infusion duration.");
+  }
   const payload: DoseRequest = {
     patient: {
       age_years: req.patient.age_yr,
@@ -348,11 +351,11 @@ export async function calculateBayesian(req: BayesianCalculateRequest): Promise<
       serious_infection: false,
     },
     levels: req.levels.map((lv) => ({
-      level_mg_l: lv.concentration_mg_l,
-      time_hours: lv.time_hr,
+      level_mg_l: Number(lv.concentration_mg_l),
+      time_hours: Number(lv.time_hr),
       level_type: null,
-      dose_mg: firstDose?.dose_mg ?? null,
-      infusion_hours: firstDose?.infusion_hr ?? null,
+      dose_mg: firstDose.dose_mg,
+      infusion_hours: firstDose.infusion_hr,
     })),
   };
   const res = await postJSON<DoseResponse>(`${API_BASE}/api/bayesian-dose`, payload);
