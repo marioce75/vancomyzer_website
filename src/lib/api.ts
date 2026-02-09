@@ -341,6 +341,19 @@ export async function calculateBayesian(req: BayesianCalculateRequest): Promise<
   if (!firstDose || !Number.isFinite(firstDose.dose_mg) || !Number.isFinite(firstDose.infusion_hr)) {
     throw new Error("Bayesian requires dosing history with dose and infusion duration.");
   }
+  const levelsPayload = req.levels
+    .filter((lv) => Number.isFinite(lv.concentration_mg_l) && Number.isFinite(lv.time_hr))
+    .filter((lv) => lv.concentration_mg_l > 0 && lv.time_hr > 0)
+    .map((lv) => ({
+      level_mg_l: Number(lv.concentration_mg_l),
+      time_hours: Number(lv.time_hr),
+      level_type: null as "peak" | "trough" | null,
+      dose_mg: firstDose.dose_mg,
+      infusion_hours: firstDose.infusion_hr,
+    }));
+  if (levelsPayload.length < 1) {
+    throw new Error("Bayesian requires at least one level with a valid draw time.");
+  }
   const payload: DoseRequest = {
     patient: {
       age_years: req.patient.age_yr,
@@ -350,13 +363,7 @@ export async function calculateBayesian(req: BayesianCalculateRequest): Promise<
       serum_creatinine: req.patient.serum_creatinine_mg_dl,
       serious_infection: false,
     },
-    levels: req.levels.map((lv) => ({
-      level_mg_l: Number(lv.concentration_mg_l),
-      time_hours: Number(lv.time_hr),
-      level_type: null,
-      dose_mg: firstDose.dose_mg,
-      infusion_hours: firstDose.infusion_hr,
-    })),
+    levels: levelsPayload,
   };
   const res = await postJSON<DoseResponse>(`${API_BASE}/api/bayesian-dose`, payload);
   const cl = res.k_e * res.vd_l;

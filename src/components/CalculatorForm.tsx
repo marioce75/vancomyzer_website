@@ -179,9 +179,16 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
 
   const levelHasValue = levels.some((lv) => {
     const conc = parseNumericInput(lv.concentration);
-    return conc !== null && conc > 0;
+    const time = parseNumericInput(lv.timeHr);
+    return conc !== null && conc > 0 && time !== null && time > 0;
   });
-  const doseHasValue = doseHistory.some((d) => Number.isFinite(d.doseMg) && d.doseMg > 0);
+  const doseHasValue = doseHistory.some(
+    (d) =>
+      Number.isFinite(d.doseMg) &&
+      d.doseMg > 0 &&
+      Number.isFinite(d.infusionHr) &&
+      d.infusionHr > 0,
+  );
   const micValid = Number.isFinite(micNum) && micNum >= 0.5 && micNum <= 2;
   const intervalValid =
     Number.isFinite(intervalHr) &&
@@ -293,13 +300,13 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
             time: parseNumericInput(lv.timeHr),
             concentration: parseNumericInput(lv.concentration),
           }))
-          .filter((lv) => lv.concentration !== null && lv.time !== null && lv.concentration > 0)
+          .filter((lv) => lv.concentration !== null && lv.time !== null && lv.concentration > 0 && lv.time > 0)
           .map((lv) => ({ time_hr: Number(lv.time), concentration_mg_l: Number(lv.concentration) }));
         if (levelsPayload.length < 1) {
           throw new Error("Enter at least one vancomycin level for Bayesian mode.");
         }
         const historyPayload = doseHistory
-          .filter((d) => Number.isFinite(d.doseMg) && d.doseMg > 0)
+          .filter((d) => Number.isFinite(d.doseMg) && d.doseMg > 0 && Number.isFinite(d.infusionHr) && d.infusionHr > 0)
           .map((d) => ({ dose_mg: Number(d.doseMg), start_time_hr: Number(d.timeHr), infusion_hr: Number(d.infusionHr) }));
         if (historyPayload.length < 1) {
           throw new Error("Enter at least one dose event for Bayesian mode.");
@@ -490,7 +497,9 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
                   ))}
                 </div>
                 {isBayesian && !levelHasValue && (
-                  <div className="text-xs text-destructive mt-1">At least one level is required for Bayesian mode.</div>
+                  <div className="text-xs text-destructive mt-1">
+                    At least one level with a valid draw time is required for Bayesian mode.
+                  </div>
                 )}
               </div>
 
@@ -539,7 +548,9 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
                   ))}
                 </div>
                 {isBayesian && !doseHasValue && (
-                  <div className="text-xs text-destructive mt-1">At least one dose is required for Bayesian mode.</div>
+                  <div className="text-xs text-destructive mt-1">
+                    At least one dose with infusion duration is required for Bayesian mode.
+                  </div>
                 )}
               </div>
             </div>
