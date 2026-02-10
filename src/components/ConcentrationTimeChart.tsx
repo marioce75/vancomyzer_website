@@ -2,6 +2,15 @@ import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatNumber } from "@/lib/format";
 import {
+  buildMarkerPoints,
+  derivePeakTroughFromCurve,
+  findNearestMarker,
+  formatConcentration,
+  mergeCurveWithMarkers,
+  type CurvePoint,
+  type RegimenForCurve,
+} from "@/lib/pkCurve";
+import {
   Area,
   Line,
   LineChart,
@@ -14,8 +23,6 @@ import {
   ReferenceLine,
   ReferenceDot,
 } from "recharts";
-
-type CurvePoint = { t_hr: number; conc_mg_l: number };
 
 function densifyCurve(curve: CurvePoint[], stepHr = 0.1): CurvePoint[] {
   if (curve.length < 2) return curve;
@@ -65,13 +72,23 @@ export default function ConcentrationTimeChart({
   levels,
   band,
   emptyMessage,
+  regimen,
 }: {
   curve?: Array<{ t_hr: number; conc_mg_l: number }>;
   levels?: Array<{ time_hr: number; concentration_mg_l: number }>;
   band?: { lower: Array<{ t_hr: number; conc_mg_l: number }>; upper: Array<{ t_hr: number; conc_mg_l: number }> } | null;
   emptyMessage?: string;
+  regimen?: RegimenForCurve | null;
 }) {
-  const base = useMemo(() => densifyCurve(curve || []), [curve]);
+  const markerPoints = useMemo(
+    () => (regimen && curve ? buildMarkerPoints(curve, regimen) : []),
+    [curve, regimen],
+  );
+  const mergedCurve = useMemo(
+    () => (markerPoints.length > 0 && curve ? mergeCurveWithMarkers(curve, markerPoints) : curve || []),
+    [curve, markerPoints],
+  );
+  const base = useMemo(() => densifyCurve(mergedCurve || []), [mergedCurve]);
   const bandUpper = useMemo(() => densifyCurve(band?.upper ?? []), [band]);
   const bandLower = useMemo(() => densifyCurve(band?.lower ?? []), [band]);
   const aucArea = useMemo(() => buildAucArea(base, 24), [base]);
@@ -84,17 +101,10 @@ export default function ConcentrationTimeChart({
   const maxConc = useMemo(() => Math.max(10, ...base.map((p) => p.conc_mg_l)), [base]);
   const yMax = useMemo(() => Math.ceil(maxConc * 1.15), [maxConc]);
 
-  const peakPoint = useMemo(() => {
-    const within = base.filter((p) => p.t_hr <= 24);
-    if (within.length === 0) return null;
-    return within.reduce((max, p) => (p.conc_mg_l > max.conc_mg_l ? p : max), within[0]);
-  }, [base]);
-  const troughPoint = useMemo(() => {
-    if (base.length === 0) return null;
-    return base.reduce((closest, p) =>
-      Math.abs(p.t_hr - 24) < Math.abs(closest.t_hr - 24) ? p : closest,
-    );
-  }, [base]);
+  const derived = useMemo(() => {
+    if (!regimen || base.length === 0) return null;
+    return derivePeakTroughFromCurve(base, regimen);
+  }, [base, regimen]);
 
   if (base.length === 0) {
     return (
@@ -138,10 +148,14 @@ export default function ConcentrationTimeChart({
               content={({ active, payload, label }) => {
                 if (!active || !payload || payload.length === 0) return null;
                 const conc = payload.find((p) => p.dataKey === "conc_mg_l")?.value;
+                const marker = findNearestMarker(markerPoints, Number(label));
+                const displayConc = marker ? marker.conc_mg_l : Number(conc ?? 0);
+                const markerLabel = marker ? (marker.kind === "peak" ? "Peak" : "Trough") : null;
                 return (
                   <div className="rounded border bg-background px-2 py-1 text-xs shadow">
                     <div>Time: {formatNumber(Number(label), 2)} hr</div>
-                    <div>Concentration: {formatNumber(Number(conc ?? 0), 2)} mg/L</div>
+                    <div>Concentration: {formatConcentration(displayConc, 2)} mg/L</div>
+                    {markerLabel && <div className="text-muted-foreground">{markerLabel}</div>}
                   </div>
                 );
               }}
@@ -168,11 +182,11 @@ export default function ConcentrationTimeChart({
 
             <Line type="linear" dataKey="conc_mg_l" stroke="#2563eb" dot={false} />
 
-            {peakPoint && (
-              <ReferenceDot x={peakPoint.t_hr} y={peakPoint.conc_mg_l} r={4} fill="#2563eb" stroke="none" />
+            {derived && (
+              <ReferenceDot x={derived.peakTime} y={derived.peak} r={4} fill="#2563eb" stroke="none" />
             )}
-            {troughPoint && (
-              <ReferenceDot x={troughPoint.t_hr} y={troughPoint.conc_mg_l} r={4} fill="#0f172a" stroke="none" />
+            {derived && (
+              <ReferenceDot x={derived.troughTime} y={derived.trough} r={4} fill="#0f172a" stroke="none" />
             )}
 
             {levelPoints.length > 0 && (

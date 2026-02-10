@@ -14,6 +14,7 @@ import uuid
 from datetime import datetime
 from enum import Enum
 from utils import pk
+from backend.pk.sim import simulate_regimen_0_48h
 
 app = FastAPI(
     title="Vancomyzer API",
@@ -226,6 +227,7 @@ class DoseResponse(BaseModel):
     crcl_ml_min: float
     method: str
     notes: List[str]
+    concentration_curve: List[Dict[str, float]]
 
 # Pharmacokinetic Calculation Engine
 class VancomycinPKCalculator:
@@ -827,6 +829,16 @@ async def calculate_dose_endpoint(request: DoseRequest):
     if regimen["predicted_auc_24"] >= 800:
         notes.append("Predicted AUC exceeds 800 mg·h/L; consider dose reduction.")
 
+    t, c = simulate_regimen_0_48h(
+        cl_l_hr=regimen["k_e"] * regimen["vd_l"],
+        v_l=regimen["vd_l"],
+        dose_mg=regimen["maintenance_dose_mg"],
+        interval_hr=regimen["interval_hours"],
+        infusion_hr=1.0,
+        dt_min=10.0,
+    )
+    curve = [{"t_hr": float(tt), "conc_mg_l": float(cc)} for tt, cc in zip(t, c)]
+
     return DoseResponse(
         loading_dose_mg=regimen["loading_dose_mg"],
         maintenance_dose_mg=regimen["maintenance_dose_mg"],
@@ -840,6 +852,7 @@ async def calculate_dose_endpoint(request: DoseRequest):
         crcl_ml_min=crcl,
         method="population_pk",
         notes=notes,
+        concentration_curve=curve,
     )
 
 @app.post("/api/bayesian-dose", response_model=DoseResponse)
@@ -886,6 +899,16 @@ async def bayesian_dose_endpoint(request: DoseRequest):
     if regimen["predicted_auc_24"] >= 800:
         notes.append("Predicted AUC exceeds 800 mg·h/L; consider dose reduction.")
 
+    t, c = simulate_regimen_0_48h(
+        cl_l_hr=regimen["k_e"] * regimen["vd_l"],
+        v_l=regimen["vd_l"],
+        dose_mg=regimen["maintenance_dose_mg"],
+        interval_hr=regimen["interval_hours"],
+        infusion_hr=infusion_h,
+        dt_min=10.0,
+    )
+    curve = [{"t_hr": float(tt), "conc_mg_l": float(cc)} for tt, cc in zip(t, c)]
+
     return DoseResponse(
         loading_dose_mg=regimen["loading_dose_mg"],
         maintenance_dose_mg=regimen["maintenance_dose_mg"],
@@ -899,6 +922,7 @@ async def bayesian_dose_endpoint(request: DoseRequest):
         crcl_ml_min=crcl,
         method=method,
         notes=notes,
+        concentration_curve=curve,
     )
 
 @app.post("/api/calculate-dosing", response_model=DosingResult)

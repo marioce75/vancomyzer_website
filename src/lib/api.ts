@@ -233,7 +233,7 @@ export type BasicCalculateResponse = {
   curve?: Array<{ t_hr: number; conc_mg_l: number }>;
 };
 
-type DoseRequest = {
+export type DoseRequest = {
   patient: {
     age_years: number;
     weight_kg: number;
@@ -264,6 +264,7 @@ type DoseResponse = {
   crcl_ml_min: number;
   method: string;
   notes: string[];
+  concentration_curve: Array<{ t_hr: number; conc_mg_l: number }>;
 };
 
 export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicCalculateResponse> {
@@ -298,23 +299,9 @@ export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicC
       half_life_hr: res.half_life_hours,
     },
     breakdown: {},
-    curve: undefined,
+    curve: res.concentration_curve,
   };
 }
-
-export type BayesianCalculateRequest = {
-  patient: {
-    age_yr: number;
-    sex: "male" | "female";
-    weight_kg: number;
-    serum_creatinine_mg_dl: number;
-  };
-  mic?: number;
-  dose_history: Array<{ dose_mg: number; start_time_hr: number; infusion_hr: number }>;
-  levels: Array<{ time_hr: number; concentration_mg_l: number }>;
-  target_low?: number;
-  target_high?: number;
-};
 
 export type BayesianCalculateResponse = {
   auc24: number;
@@ -336,36 +323,8 @@ export type BayesianCalculateResponse = {
   warnings: string[];
 };
 
-export async function calculateBayesian(req: BayesianCalculateRequest): Promise<BayesianCalculateResponse> {
-  const firstDose = req.dose_history[0];
-  if (!firstDose || !Number.isFinite(firstDose.dose_mg) || !Number.isFinite(firstDose.infusion_hr)) {
-    throw new Error("Bayesian requires dosing history with dose and infusion duration.");
-  }
-  const levelsPayload = req.levels
-    .filter((lv) => Number.isFinite(lv.concentration_mg_l) && Number.isFinite(lv.time_hr))
-    .filter((lv) => lv.concentration_mg_l > 0 && lv.time_hr > 0)
-    .map((lv) => ({
-      level_mg_l: Number(lv.concentration_mg_l),
-      time_hours: Number(lv.time_hr),
-      level_type: null as "peak" | "trough" | null,
-      dose_mg: firstDose.dose_mg,
-      infusion_hours: firstDose.infusion_hr,
-    }));
-  if (levelsPayload.length < 1) {
-    throw new Error("Bayesian requires at least one level with a valid draw time.");
-  }
-  const payload: DoseRequest = {
-    patient: {
-      age_years: req.patient.age_yr,
-      weight_kg: req.patient.weight_kg,
-      height_cm: null,
-      sex: req.patient.sex,
-      serum_creatinine: req.patient.serum_creatinine_mg_dl,
-      serious_infection: false,
-    },
-    levels: levelsPayload,
-  };
-  const res = await postJSON<DoseResponse>(`${API_BASE}/api/bayesian-dose`, payload);
+export async function calculateBayesian(req: DoseRequest): Promise<BayesianCalculateResponse> {
+  const res = await postJSON<DoseResponse>(`${API_BASE}/api/bayesian-dose`, req);
   const cl = res.k_e * res.vd_l;
   return {
     auc24: res.predicted_auc_24,
@@ -373,7 +332,7 @@ export async function calculateBayesian(req: BayesianCalculateRequest): Promise<
     auc24_ci_high: res.predicted_auc_24,
     cl_l_hr: cl,
     v_l: res.vd_l,
-    curve: [],
+    curve: res.concentration_curve,
     curve_ci_low: [],
     curve_ci_high: [],
     recommendation: {

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateResponse } from "@/lib/api";
 import { AUC_TARGET, REGIMEN_LIMITS } from "@/lib/constraints";
 import { formatNumber } from "@/lib/format";
+import { derivePeakTroughFromCurve, formatConcentration } from "@/lib/pkCurve";
 
 type Mode = "basic" | "bayesian" | "educational";
 
@@ -36,11 +37,16 @@ function ResultsPanel({
 
   function buildSummary() {
     if (mode === "basic" && "predicted" in result) {
+      const derived = result.curve && regimen
+        ? derivePeakTroughFromCurve(result.curve, { intervalHr: regimen.intervalHr, infusionHr: regimen.infusionHr })
+        : null;
+      const peakValue = derived ? derived.peak : result.predicted.peak ?? 0;
+      const troughValue = derived ? derived.trough : result.predicted.trough ?? 0;
       return [
         "Vancomyzer Basic Calculator",
         `AUC24: ${formatNumber(result.predicted.auc24 ?? 0, 0)} mg·h/L`,
-        `Peak: ${formatNumber(result.predicted.peak ?? 0, 1)} mg/L`,
-        `Trough: ${formatNumber(result.predicted.trough ?? 0, 1)} mg/L`,
+        `Peak: ${formatConcentration(peakValue, 1)} mg/L`,
+        `Trough: ${formatConcentration(troughValue, 1)} mg/L`,
         `Recommended regimen: ${formatNumber(result.regimen.recommended_dose_mg ?? 0, 0)} mg q${formatNumber(result.regimen.recommended_interval_hr ?? 0, 0)}h`,
       ].join("\n");
     }
@@ -86,6 +92,11 @@ function ResultsPanel({
     const outsideTarget = auc24 < AUC_TARGET.low || auc24 > AUC_TARGET.high;
     const chosenDose = result.regimen.chosen_dose_mg ?? regimen?.doseMg;
     const chosenInterval = result.regimen.chosen_interval_hr ?? regimen?.intervalHr;
+    const derived = result.curve && regimen
+      ? derivePeakTroughFromCurve(result.curve, { intervalHr: regimen.intervalHr, infusionHr: regimen.infusionHr })
+      : null;
+    const peakValue = derived ? derived.peak : result.predicted.peak ?? 0;
+    const troughValue = derived ? derived.trough : result.predicted.trough ?? 0;
     const chosenDoseNum = Number(chosenDose ?? 0);
     const chosenIntervalNum = Number(chosenInterval ?? 0);
     const dailyDose = chosenIntervalNum > 0 ? chosenDoseNum * (24 / chosenIntervalNum) : 0;
@@ -126,11 +137,11 @@ function ResultsPanel({
               </div>
               <div>
                 <div className="text-muted-foreground">Predicted trough (mg/L)</div>
-                <div className="font-medium">{formatNumber(result.predicted.trough ?? 0, 1)}</div>
+                <div className="font-medium">{formatConcentration(troughValue, 1)}</div>
               </div>
               <div>
                 <div className="text-muted-foreground">Predicted peak (mg/L)</div>
-                <div className="font-medium">{formatNumber(result.predicted.peak ?? 0, 1)}</div>
+                <div className="font-medium">{formatConcentration(peakValue, 1)}</div>
               </div>
               <div>
                 <div className="text-muted-foreground">Half-life (hr)</div>
