@@ -8,8 +8,8 @@ export const AUC_TARGET = {
 
 export const REGIMEN_LIMITS = {
   minDoseMg: 0,
-  maxSingleDoseMg: 2500,
-  maxDailyDoseMg: 6000,
+  maxSingleDoseMg: 2000,
+  maxDailyDoseMg: 4500,
   minIntervalHr: 6,
   maxIntervalHr: 48,
   allowedIntervalsHr: [6, 8, 12, 24, 48],

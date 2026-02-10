@@ -134,6 +134,9 @@ function ResultsPanel({
                     Outside target {AUC_TARGET.low}-{AUC_TARGET.high} mg·h/L
                   </div>
                 )}
+                {!outsideTarget && (
+                  <div className="text-xs text-emerald-700 mt-1">In target (400-600)</div>
+                )}
               </div>
               <div>
                 <div className="text-muted-foreground">Predicted trough (mg/L)</div>

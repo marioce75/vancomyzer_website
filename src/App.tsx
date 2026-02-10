@@ -65,7 +65,7 @@ function HomePage() {
 
   const chartRegimen = useMemo(() => {
     if (mode === "bayesian" && result && "recommendation" in result) {
-      const infusion = bayesDoseHistory[0]?.infusion_hr ?? activeRegimen.infusionHr;
+      const infusion = result.infusion_hr ?? activeRegimen.infusionHr;
       return { intervalHr: result.recommendation.interval_hr, infusionHr: infusion };
     }
     if (mode === "basic" && result && "regimen" in result) {
@@ -74,7 +74,7 @@ function HomePage() {
       return { intervalHr: interval, infusionHr: infusion };
     }
     return { intervalHr: activeRegimen.intervalHr, infusionHr: activeRegimen.infusionHr };
-  }, [mode, result, bayesDoseHistory, activeRegimen]);
+  }, [mode, result, activeRegimen]);
 
   const chartCurve = useMemo(() => {
     if (result && "curve" in result && result.curve) return result.curve;

@@ -15,6 +15,10 @@ from datetime import datetime
 from enum import Enum
 from utils import pk
 from backend.pk.sim import simulate_regimen_0_48h
+from backend.regimen_recommender import (
+    recommend_regimen,
+    loading_dose as recommend_loading_dose,
+)
 
 app = FastAPI(
     title="Vancomyzer API",
@@ -218,6 +222,7 @@ class DoseResponse(BaseModel):
     loading_dose_mg: float
     maintenance_dose_mg: float
     interval_hours: float
+    infusion_hours: float
     predicted_peak_mg_l: float
     predicted_trough_mg_l: float
     predicted_auc_24: float
@@ -823,34 +828,42 @@ async def calculate_dose_endpoint(request: DoseRequest):
         patient.serum_creatinine,
         patient.height_cm,
     )
-    regimen = pk.calculate_dose(patient.weight_kg, crcl, patient.serious_infection)
-
-    notes = []
-    if regimen["predicted_auc_24"] >= 800:
+    k_e = pk.elimination_constant(crcl)
+    vd = pk.volume_distribution(patient.weight_kg)
+    recommended, warnings = recommend_regimen(
+        weight_kg=patient.weight_kg,
+        crcl=crcl,
+        serious=patient.serious_infection,
+        k_e=k_e,
+        vd_l=vd,
+    )
+    notes = warnings[:]
+    if recommended.auc24 >= 800:
         notes.append("Predicted AUC exceeds 800 mg·h/L; consider dose reduction.")
 
     t, c = simulate_regimen_0_48h(
-        cl_l_hr=regimen["k_e"] * regimen["vd_l"],
-        v_l=regimen["vd_l"],
-        dose_mg=regimen["maintenance_dose_mg"],
-        interval_hr=regimen["interval_hours"],
-        infusion_hr=1.0,
+        cl_l_hr=k_e * vd,
+        v_l=vd,
+        dose_mg=recommended.dose_mg,
+        interval_hr=recommended.interval_hr,
+        infusion_hr=recommended.infusion_hr,
         dt_min=10.0,
     )
     curve = [{"t_hr": float(tt), "conc_mg_l": float(cc)} for tt, cc in zip(t, c)]
 
     return DoseResponse(
-        loading_dose_mg=regimen["loading_dose_mg"],
-        maintenance_dose_mg=regimen["maintenance_dose_mg"],
-        interval_hours=regimen["interval_hours"],
-        predicted_peak_mg_l=regimen["predicted_peak_mg_l"],
-        predicted_trough_mg_l=regimen["predicted_trough_mg_l"],
-        predicted_auc_24=regimen["predicted_auc_24"],
-        k_e=regimen["k_e"],
-        vd_l=regimen["vd_l"],
-        half_life_hours=regimen["half_life_h"],
+        loading_dose_mg=recommend_loading_dose(patient.weight_kg, patient.serious_infection),
+        maintenance_dose_mg=recommended.dose_mg,
+        interval_hours=recommended.interval_hr,
+        infusion_hours=recommended.infusion_hr,
+        predicted_peak_mg_l=recommended.peak,
+        predicted_trough_mg_l=recommended.trough,
+        predicted_auc_24=recommended.auc24,
+        k_e=k_e,
+        vd_l=vd,
+        half_life_hours=pk.half_life_hours(k_e),
         crcl_ml_min=crcl,
-        method="population_pk",
+        method="population_recommender",
         notes=notes,
         concentration_curve=curve,
     )
@@ -867,7 +880,6 @@ async def bayesian_dose_endpoint(request: DoseRequest):
         patient.height_cm,
     )
 
-    base = pk.calculate_dose(patient.weight_kg, crcl, patient.serious_infection)
     levels = request.levels or []
     if not levels:
         raise HTTPException(status_code=400, detail="At least one level is required for Bayesian dosing.")
@@ -884,43 +896,45 @@ async def bayesian_dose_endpoint(request: DoseRequest):
         level_payload,
         dose_mg,
         infusion_h,
-        base["k_e"],
-        base["vd_l"],
-    )
-
-    regimen = pk.calculate_dose(
-        patient.weight_kg,
-        crcl,
-        patient.serious_infection,
-        bayesian={"k_e": k_e, "vd": vd},
+        pk.elimination_constant(crcl),
+        pk.volume_distribution(patient.weight_kg),
     )
 
     notes = []
-    if regimen["predicted_auc_24"] >= 800:
+    recommended, warnings = recommend_regimen(
+        weight_kg=patient.weight_kg,
+        crcl=crcl,
+        serious=patient.serious_infection,
+        k_e=k_e,
+        vd_l=vd,
+    )
+    notes.extend(warnings)
+    if recommended.auc24 >= 800:
         notes.append("Predicted AUC exceeds 800 mg·h/L; consider dose reduction.")
 
     t, c = simulate_regimen_0_48h(
-        cl_l_hr=regimen["k_e"] * regimen["vd_l"],
-        v_l=regimen["vd_l"],
-        dose_mg=regimen["maintenance_dose_mg"],
-        interval_hr=regimen["interval_hours"],
-        infusion_hr=infusion_h,
+        cl_l_hr=k_e * vd,
+        v_l=vd,
+        dose_mg=recommended.dose_mg,
+        interval_hr=recommended.interval_hr,
+        infusion_hr=recommended.infusion_hr,
         dt_min=10.0,
     )
     curve = [{"t_hr": float(tt), "conc_mg_l": float(cc)} for tt, cc in zip(t, c)]
 
     return DoseResponse(
-        loading_dose_mg=regimen["loading_dose_mg"],
-        maintenance_dose_mg=regimen["maintenance_dose_mg"],
-        interval_hours=regimen["interval_hours"],
-        predicted_peak_mg_l=regimen["predicted_peak_mg_l"],
-        predicted_trough_mg_l=regimen["predicted_trough_mg_l"],
-        predicted_auc_24=regimen["predicted_auc_24"],
-        k_e=regimen["k_e"],
-        vd_l=regimen["vd_l"],
-        half_life_hours=regimen["half_life_h"],
+        loading_dose_mg=recommend_loading_dose(patient.weight_kg, patient.serious_infection),
+        maintenance_dose_mg=recommended.dose_mg,
+        interval_hours=recommended.interval_hr,
+        infusion_hours=recommended.infusion_hr,
+        predicted_peak_mg_l=recommended.peak,
+        predicted_trough_mg_l=recommended.trough,
+        predicted_auc_24=recommended.auc24,
+        k_e=k_e,
+        vd_l=vd,
+        half_life_hours=pk.half_life_hours(k_e),
         crcl_ml_min=crcl,
-        method=method,
+        method=f"{method}_recommender",
         notes=notes,
         concentration_curve=curve,
     )

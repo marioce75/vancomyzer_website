@@ -255,6 +255,7 @@ type DoseResponse = {
   loading_dose_mg: number;
   maintenance_dose_mg: number;
   interval_hours: number;
+  infusion_hours: number;
   predicted_peak_mg_l: number;
   predicted_trough_mg_l: number;
   predicted_auc_24: number;
@@ -290,7 +291,7 @@ export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicC
       recommended_loading_dose_mg: res.loading_dose_mg,
       chosen_interval_hr: req.regimen.interval_hr,
       chosen_dose_mg: req.regimen.dose_mg,
-      infusion_hr: req.regimen.infusion_hr,
+      infusion_hr: res.infusion_hours ?? req.regimen.infusion_hr,
     },
     predicted: {
       auc24: res.predicted_auc_24,
@@ -312,6 +313,7 @@ export type BayesianCalculateResponse = {
   curve: Array<{ t_hr: number; conc_mg_l: number }>;
   curve_ci_low: Array<{ t_hr: number; conc_mg_l: number }>;
   curve_ci_high: Array<{ t_hr: number; conc_mg_l: number }>;
+  infusion_hr?: number;
   recommendation: {
     target_auc: number;
     daily_dose_mg: number;
@@ -335,6 +337,7 @@ export async function calculateBayesian(req: DoseRequest): Promise<BayesianCalcu
     curve: res.concentration_curve,
     curve_ci_low: [],
     curve_ci_high: [],
+    infusion_hr: res.infusion_hours,
     recommendation: {
       target_auc: res.predicted_auc_24,
       daily_dose_mg: res.maintenance_dose_mg * (24.0 / res.interval_hours),
