@@ -219,6 +219,7 @@ export type BasicCalculateResponse = {
     recommended_interval_hr?: number;
     recommended_dose_mg?: number;
     recommended_loading_dose_mg?: number;
+    recommended_infusion_hr?: number;
     chosen_interval_hr: number;
     chosen_dose_mg: number;
     infusion_hr?: number;
@@ -242,12 +243,22 @@ export type DoseRequest = {
     serum_creatinine: number;
     serious_infection?: boolean;
   };
+  regimen?: {
+    dose_mg: number;
+    interval_hr: number;
+    infusion_hr?: number;
+  };
   levels?: Array<{
     level_mg_l: number;
     time_hours: number;
     level_type?: "peak" | "trough" | null;
     dose_mg?: number | null;
     infusion_hours?: number | null;
+  }> | null;
+  dose_history?: Array<{
+    dose_mg: number;
+    start_time_hr: number;
+    infusion_hr: number;
   }> | null;
 };
 
@@ -278,6 +289,11 @@ export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicC
       serum_creatinine: req.patient.serum_creatinine,
       serious_infection: false,
     },
+    regimen: {
+      dose_mg: req.regimen.dose_mg,
+      interval_hr: req.regimen.interval_hr,
+      infusion_hr: req.regimen.infusion_hr,
+    },
     levels: null,
   };
   const res = await postJSON<DoseResponse>(`${API_BASE}/api/calculate-dose`, payload);
@@ -289,9 +305,10 @@ export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicC
       recommended_interval_hr: res.interval_hours,
       recommended_dose_mg: res.maintenance_dose_mg,
       recommended_loading_dose_mg: res.loading_dose_mg,
+      recommended_infusion_hr: res.infusion_hours,
       chosen_interval_hr: req.regimen.interval_hr,
       chosen_dose_mg: req.regimen.dose_mg,
-      infusion_hr: res.infusion_hours ?? req.regimen.infusion_hr,
+      infusion_hr: req.regimen.infusion_hr,
     },
     predicted: {
       auc24: res.predicted_auc_24,

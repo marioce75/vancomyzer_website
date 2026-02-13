@@ -14,7 +14,8 @@ import uuid
 from datetime import datetime
 from enum import Enum
 from utils import pk
-from backend.pk.sim import simulate_regimen_0_48h
+from backend.pk import bayesian as bayesian_pk
+from backend.pk.sim import Event, simulate_regimen_0_48h
 from backend.regimen_recommender import (
     recommend_regimen,
     loading_dose as recommend_loading_dose,
@@ -214,9 +215,21 @@ class BayesianLevel(BaseModel):
     dose_mg: Optional[float] = Field(None, gt=0, le=4000)
     infusion_hours: Optional[float] = Field(1.0, gt=0, le=24)
 
+class DoseHistoryEvent(BaseModel):
+    dose_mg: float = Field(..., gt=0, le=4000)
+    start_time_hr: float = Field(..., ge=0, le=240)
+    infusion_hr: float = Field(..., gt=0, le=24)
+
+class RegimenOverride(BaseModel):
+    dose_mg: float = Field(..., gt=0, le=4000)
+    interval_hr: float = Field(..., gt=0, le=72)
+    infusion_hr: float = Field(..., gt=0, le=24)
+
 class DoseRequest(BaseModel):
     patient: PatientInfo
     levels: Optional[List[BayesianLevel]] = None
+    dose_history: Optional[List[DoseHistoryEvent]] = None
+    regimen: Optional[RegimenOverride] = None
 
 class DoseResponse(BaseModel):
     loading_dose_mg: float
@@ -841,12 +854,20 @@ async def calculate_dose_endpoint(request: DoseRequest):
     if recommended.auc24 >= 800:
         notes.append("Predicted AUC exceeds 800 mg·h/L; consider dose reduction.")
 
+    regimen_override = request.regimen
+    chosen_dose = regimen_override.dose_mg if regimen_override else recommended.dose_mg
+    chosen_interval = regimen_override.interval_hr if regimen_override else recommended.interval_hr
+    chosen_infusion = regimen_override.infusion_hr if regimen_override else recommended.infusion_hr
+    chosen_auc = pk.calculate_auc_24(chosen_dose, chosen_interval, k_e, vd)
+    chosen_peak = pk.predict_peak(chosen_dose, chosen_interval, k_e, vd, chosen_infusion)
+    chosen_trough = pk.predict_trough(chosen_dose, chosen_interval, k_e, vd, chosen_infusion)
+
     t, c = simulate_regimen_0_48h(
         cl_l_hr=k_e * vd,
         v_l=vd,
-        dose_mg=recommended.dose_mg,
-        interval_hr=recommended.interval_hr,
-        infusion_hr=recommended.infusion_hr,
+        dose_mg=chosen_dose,
+        interval_hr=chosen_interval,
+        infusion_hr=chosen_infusion,
         dt_min=10.0,
     )
     curve = [{"t_hr": float(tt), "conc_mg_l": float(cc)} for tt, cc in zip(t, c)]
@@ -856,9 +877,9 @@ async def calculate_dose_endpoint(request: DoseRequest):
         maintenance_dose_mg=recommended.dose_mg,
         interval_hours=recommended.interval_hr,
         infusion_hours=recommended.infusion_hr,
-        predicted_peak_mg_l=recommended.peak,
-        predicted_trough_mg_l=recommended.trough,
-        predicted_auc_24=recommended.auc24,
+        predicted_peak_mg_l=chosen_peak,
+        predicted_trough_mg_l=chosen_trough,
+        predicted_auc_24=chosen_auc,
         k_e=k_e,
         vd_l=vd,
         half_life_hours=pk.half_life_hours(k_e),
@@ -884,23 +905,38 @@ async def bayesian_dose_endpoint(request: DoseRequest):
     if not levels:
         raise HTTPException(status_code=400, detail="At least one level is required for Bayesian dosing.")
 
-    infusion_h = float(levels[0].infusion_hours or 1.0)
-    dose_mg = float(levels[0].dose_mg or base["maintenance_dose_mg"])
+    dose_history = request.dose_history or []
+    level_payload = [{"level_mg_l": l.level_mg_l, "time_hours": l.time_hours} for l in levels]
+    fallback_ke = pk.elimination_constant(crcl)
+    fallback_vd = pk.volume_distribution(patient.weight_kg)
 
-    level_payload = [
-        {"level_mg_l": l.level_mg_l, "time_hours": l.time_hours}
-        for l in levels
-    ]
-
-    k_e, vd, method = pk.estimate_patient_pk(
-        level_payload,
-        dose_mg,
-        infusion_h,
-        pk.elimination_constant(crcl),
-        pk.volume_distribution(patient.weight_kg),
-    )
+    if dose_history:
+        events = [
+            Event(dose_mg=d.dose_mg, start_hr=d.start_time_hr, infusion_hr=d.infusion_hr)
+            for d in dose_history
+        ]
+        levels_for_fit = [(l["time_hours"], l["level_mg_l"]) for l in level_payload]
+        cl_mean = fallback_ke * fallback_vd
+        cl_map, v_map = bayesian_pk.map_fit(events, levels_for_fit, cl_mean, fallback_vd)
+        k_e = cl_map / max(v_map, 1e-6)
+        vd = v_map
+        method = "bayesian_map"
+    else:
+        infusion_h = float(levels[0].infusion_hours or 1.0)
+        dose_mg = float(levels[0].dose_mg or 0.0)
+        if dose_mg <= 0:
+            raise HTTPException(status_code=400, detail="Dose history is required for Bayesian MAP fitting.")
+        k_e, vd, method = pk.estimate_patient_pk(
+            level_payload,
+            dose_mg,
+            infusion_h,
+            fallback_ke,
+            fallback_vd,
+        )
 
     notes = []
+    if method == "bayesian_map":
+        notes.append("Bayesian MAP fit using dose history and measured levels.")
     recommended, warnings = recommend_regimen(
         weight_kg=patient.weight_kg,
         crcl=crcl,

@@ -69,7 +69,7 @@ function HomePage() {
       return { intervalHr: result.recommendation.interval_hr, infusionHr: infusion };
     }
     if (mode === "basic" && result && "regimen" in result) {
-      const interval = result.regimen.recommended_interval_hr ?? activeRegimen.intervalHr;
+      const interval = result.regimen.chosen_interval_hr ?? result.regimen.recommended_interval_hr ?? activeRegimen.intervalHr;
       const infusion = result.regimen.infusion_hr ?? activeRegimen.infusionHr;
       return { intervalHr: interval, infusionHr: infusion };
     }
@@ -157,13 +157,6 @@ function HomePage() {
                 result={result}
                 regimen={activeRegimen}
                 onRegimenChange={applyRegimen}
-                onAdjustDose={(delta) => {
-                  applyRegimen({
-                    doseMg: activeRegimen.doseMg + (delta.doseMg ?? 0),
-                    intervalHr: activeRegimen.intervalHr + (delta.intervalHr ?? 0),
-                    infusionHr: activeRegimen.infusionHr,
-                  });
-                }}
               />
               <div id="dosing-panel-host" className="space-y-4 mt-4" />
 

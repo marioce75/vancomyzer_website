@@ -13,13 +13,11 @@ type Mode = "basic" | "bayesian" | "educational";
 function ResultsPanel({
   mode,
   result,
-  onAdjustDose,
   regimen,
   onRegimenChange,
 }: {
   mode: Mode;
   result?: BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse;
-  onAdjustDose?: (delta: { doseMg?: number; intervalHr?: number }) => void;
   regimen?: { doseMg: number; intervalHr: number; infusionHr: number };
   onRegimenChange?: (next: { doseMg: number; intervalHr: number; infusionHr: number }) => void;
 }) {
@@ -42,12 +40,13 @@ function ResultsPanel({
         : null;
       const peakValue = derived ? derived.peak : result.predicted.peak ?? 0;
       const troughValue = derived ? derived.trough : result.predicted.trough ?? 0;
+      const infusion = result.regimen.recommended_infusion_hr ?? result.regimen.infusion_hr ?? regimen?.infusionHr;
       return [
         "Vancomyzer Basic Calculator",
         `AUC24: ${formatNumber(result.predicted.auc24 ?? 0, 0)} mg·h/L`,
         `Peak: ${formatConcentration(peakValue, 1)} mg/L`,
         `Trough: ${formatConcentration(troughValue, 1)} mg/L`,
-        `Recommended regimen: ${formatNumber(result.regimen.recommended_dose_mg ?? 0, 0)} mg q${formatNumber(result.regimen.recommended_interval_hr ?? 0, 0)}h`,
+        `Recommended regimen: ${formatNumber(result.regimen.recommended_dose_mg ?? 0, 0)} mg q${formatNumber(result.regimen.recommended_interval_hr ?? 0, 0)}h${infusion ? ` (infuse over ${formatNumber(infusion, 1)}h)` : ""}`,
       ].join("\n");
     }
     if (mode === "bayesian" && "auc24" in result) {
@@ -56,7 +55,7 @@ function ResultsPanel({
         `AUC24: ${formatNumber(result.auc24, 0)} (95% CI ${formatNumber(result.auc24_ci_low, 0)}–${formatNumber(result.auc24_ci_high, 0)}) mg·h/L`,
         `CL: ${formatNumber(result.cl_l_hr, 2)} L/hr`,
         `V: ${formatNumber(result.v_l, 1)} L`,
-        `Suggested regimen: ${formatNumber(result.recommendation.per_dose_mg, 0)} mg q${formatNumber(result.recommendation.interval_hr, 0)}h`,
+        `Suggested regimen: ${formatNumber(result.recommendation.per_dose_mg, 0)} mg q${formatNumber(result.recommendation.interval_hr, 0)}h${result.infusion_hr ? ` (infuse over ${formatNumber(result.infusion_hr, 1)}h)` : ""}`,
       ].join("\n");
     }
     const edu = result as CalculateResponse;
@@ -100,6 +99,8 @@ function ResultsPanel({
     const chosenDoseNum = Number(chosenDose ?? 0);
     const chosenIntervalNum = Number(chosenInterval ?? 0);
     const dailyDose = chosenIntervalNum > 0 ? chosenDoseNum * (24 / chosenIntervalNum) : 0;
+    const recommendedInfusion = result.regimen.recommended_infusion_hr ?? result.regimen.infusion_hr ?? regimen?.infusionHr;
+    const chosenInfusion = result.regimen.infusion_hr ?? regimen?.infusionHr;
     const guardrailWarnings: string[] = [];
     if (chosenDoseNum > REGIMEN_LIMITS.maxSingleDoseMg) {
       guardrailWarnings.push(`Chosen dose exceeds max single dose (${REGIMEN_LIMITS.maxSingleDoseMg} mg).`);
@@ -155,6 +156,7 @@ function ResultsPanel({
               <div className="text-muted-foreground">Recommended regimen</div>
               <div className="font-medium">
                 {formatNumber(result.regimen.recommended_dose_mg ?? 0, 0)} mg q{formatNumber(result.regimen.recommended_interval_hr ?? 0, 0)}h
+                {recommendedInfusion ? ` (infuse over ${formatNumber(recommendedInfusion, 1)}h)` : ""}
               </div>
               {result.regimen.recommended_loading_dose_mg && (
                 <div className="text-muted-foreground">
@@ -167,6 +169,7 @@ function ResultsPanel({
                 <div className="text-muted-foreground">Chosen regimen</div>
                 <div className="font-medium">
                   {formatNumber(chosenDose ?? 0, 0)} mg q{formatNumber(chosenInterval ?? 0, 0)}h
+                  {chosenInfusion ? ` (infuse over ${formatNumber(chosenInfusion, 1)}h)` : ""}
                 </div>
               </div>
             )}
@@ -188,14 +191,22 @@ function ResultsPanel({
                     <Input
                       type="number"
                       step="50"
+                      min={REGIMEN_LIMITS.minDoseMg}
+                      max={REGIMEN_LIMITS.maxSingleDoseMg}
                       value={regimen.doseMg}
                       onChange={(e) =>
                         onRegimenChange({
                           ...regimen,
-                          doseMg: Math.max(REGIMEN_LIMITS.minDoseMg, Number(e.target.value)),
+                          doseMg: Math.min(
+                            REGIMEN_LIMITS.maxSingleDoseMg,
+                            Math.max(REGIMEN_LIMITS.minDoseMg, Number(e.target.value)),
+                          ),
                         })
                       }
                     />
+                    <div className="text-[10px] text-muted-foreground mt-1">
+                      Max single dose {REGIMEN_LIMITS.maxSingleDoseMg} mg
+                    </div>
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground">Interval (hr)</div>
@@ -224,14 +235,6 @@ function ResultsPanel({
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-            {onAdjustDose && (
-              <div className="flex flex-wrap gap-2 mt-4">
-                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: 250 })}>+250 mg</Button>
-                <Button variant="secondary" onClick={() => onAdjustDose({ doseMg: -250 })}>-250 mg</Button>
-                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: 2 })}>+2h interval</Button>
-                <Button variant="secondary" onClick={() => onAdjustDose({ intervalHr: -2 })}>-2h interval</Button>
               </div>
             )}
           <div className="print-summary">
@@ -281,6 +284,7 @@ function ResultsPanel({
               <div className="text-muted-foreground">Suggested dosing to target AUC</div>
               <div className="font-medium">
                 {formatNumber(result.recommendation.per_dose_mg, 0)} mg q{formatNumber(result.recommendation.interval_hr, 0)}h
+                {result.infusion_hr ? ` (infuse over ${formatNumber(result.infusion_hr, 1)}h)` : ""}
               </div>
               {(result.recommendation.max_loading_mg || result.recommendation.max_daily_mg) && (
                 <div className="text-xs text-muted-foreground mt-1">

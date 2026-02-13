@@ -323,6 +323,7 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
             serum_creatinine: Number(scrNum),
             serious_infection: false,
           },
+          dose_history: historyPayload,
           levels: levelsPayload.map((lv) => ({
             level_mg_l: lv.concentration_mg_l,
             time_hours: lv.time_hr,
@@ -450,24 +451,19 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
               Bayesian AUC uses population PK + 1-2 measured levels. Exact timing matters.
             </div>
             <div className="mt-3 rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
-              <div className="font-medium text-foreground mb-1">What you need</div>
-              <ul className="list-disc ml-4 space-y-1">
-                <li>Dosing history with dose amount, start time, and infusion duration.</li>
-                <li>At least one level with exact draw time relative to dose start.</li>
-                <li>Two levels (peak + trough) improves accuracy when available.</li>
-              </ul>
+              <div className="font-medium text-foreground mb-1">Quick steps</div>
+              <ol className="list-decimal ml-4 space-y-1">
+                <li>Add dosing history (dose, start time, infusion duration).</li>
+                <li>Add at least one level with exact draw time after dose start.</li>
+                <li>Click Compute to run Bayesian MAP fitting.</li>
+              </ol>
             </div>
             <div className="mt-3 rounded-md border bg-card p-3 text-xs text-muted-foreground">
-              <div className="font-medium text-foreground mb-1">Required fields for a valid request</div>
-              <div>Patient: age (years), weight (kg), sex, serum creatinine (mg/dL).</div>
-              <div>Level: concentration (mg/L) + draw time (hours after dose start).</div>
-              <div>Dose: dose amount (mg) + infusion duration (hours).</div>
-            </div>
-            <div className="mt-3 rounded-md border bg-card p-3 text-xs text-muted-foreground">
-              <div className="font-medium text-foreground mb-1">Accuracy guidance</div>
-              <div>Best accuracy: full dosing history + exact infusion duration + 2 levels.</div>
-              <div>Minimum viable: one timed level + most recent dose details.</div>
-              <div>Trough-only estimates are limited; add a second level when possible.</div>
+              <div className="font-medium text-foreground mb-1">Required fields</div>
+              <div>Patient: age, weight, sex, serum creatinine.</div>
+              <div>Level: concentration + draw time (hours).</div>
+              <div>Dose: amount + infusion duration.</div>
+              <div className="mt-1">Tip: Two levels (peak + trough) improves accuracy.</div>
             </div>
             <div className="space-y-4 mt-4">
               <div>
