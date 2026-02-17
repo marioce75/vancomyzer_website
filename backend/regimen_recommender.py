@@ -42,14 +42,14 @@ def _interval_preference(interval_hr: float) -> int:
     return order.get(int(interval_hr), 99)
 
 
-def recommend_regimen(
+def recommend_regimens(
     weight_kg: float,
     crcl: float,
     serious: bool,
     k_e: float | None = None,
     vd_l: float | None = None,
-) -> Tuple[CandidateRegimen, List[str]]:
-    """Search candidate regimens and select best match to AUC target."""
+) -> Tuple[List[CandidateRegimen], List[str]]:
+    """Search candidate regimens and return ordered options."""
     k_e = k_e or pk.elimination_constant(crcl)
     vd_l = vd_l or pk.volume_distribution(weight_kg)
 
@@ -101,7 +101,19 @@ def recommend_regimen(
             f"Unable to reach {AUC_TARGET_LOW:.0f}-{AUC_TARGET_HIGH:.0f} mg·h/L with allowed constraints; closest is {best.auc24:.0f}."
         )
 
-    return best, warnings
+    return candidates_sorted, warnings
+
+
+def recommend_regimen(
+    weight_kg: float,
+    crcl: float,
+    serious: bool,
+    k_e: float | None = None,
+    vd_l: float | None = None,
+) -> Tuple[CandidateRegimen, List[str]]:
+    """Return the single best regimen."""
+    options, warnings = recommend_regimens(weight_kg, crcl, serious, k_e=k_e, vd_l=vd_l)
+    return options[0], warnings
 
 
 def loading_dose(weight_kg: float, serious: bool) -> float:

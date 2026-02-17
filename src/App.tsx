@@ -137,6 +137,14 @@ function HomePage() {
                   }
                 }}
               />
+            </div>
+            <div>
+              <ResultsPanel
+                mode={mode}
+                result={result}
+                regimen={activeRegimen}
+                onRegimenChange={applyRegimen}
+              />
               <div className="mt-6 grid gap-4">
                 <ConcentrationTimeChart
                   curve={chartCurve}
@@ -149,15 +157,54 @@ function HomePage() {
                   }
                   regimen={chartRegimen}
                 />
+                <div className="rounded-md border bg-card p-4 text-sm">
+                  <div className="font-medium mb-2">Calculation Details</div>
+                  {!result || !("calculation_details" in result) || !result.calculation_details ? (
+                    <div className="text-muted-foreground">Run a calculation to view model details.</div>
+                  ) : (
+                    <div className="space-y-2 text-xs text-muted-foreground">
+                      <div><span className="font-medium text-foreground">Model:</span> {String(result.calculation_details.model)}</div>
+                      <div><span className="font-medium text-foreground">Method:</span> {String(result.calculation_details.method)}</div>
+                      <div><span className="font-medium text-foreground">AUC method:</span> {String(result.calculation_details.auc_method)}</div>
+                      <div><span className="font-medium text-foreground">Assumptions:</span> {String(result.calculation_details.assumptions)}</div>
+                      {result.calculation_details.formulas && (
+                        <div>
+                          <div className="font-medium text-foreground">Formulas</div>
+                          <div>CL: {String(result.calculation_details.formulas.cl)}</div>
+                          <div>AUC24: {String(result.calculation_details.formulas.auc)}</div>
+                        </div>
+                      )}
+                      {result.calculation_details.parameters && (
+                        <div className="grid grid-cols-2 gap-2 text-[11px]">
+                          <div>CL: {Number(result.calculation_details.parameters.cl_l_hr ?? 0).toFixed(2)} L/hr</div>
+                          <div>Vd: {Number(result.calculation_details.parameters.vd_l ?? 0).toFixed(1)} L</div>
+                          <div>k<sub>e</sub>: {Number(result.calculation_details.parameters.k_e ?? 0).toFixed(3)} hr⁻¹</div>
+                          <div>t½: {Number(result.calculation_details.parameters.half_life_hr ?? 0).toFixed(1)} hr</div>
+                          <div>CrCl: {Number(result.calculation_details.parameters.crcl_ml_min ?? 0).toFixed(0)} mL/min</div>
+                        </div>
+                      )}
+                      {result.calculation_details.levels && (
+                        <div>
+                          <div className="font-medium text-foreground">Level timing used</div>
+                          <div>Times are hours after dose start.</div>
+                        </div>
+                      )}
+                      {"fit_diagnostics" in result && result.fit_diagnostics && (result.fit_diagnostics as { level_predictions?: Array<{ time_hours: number; observed: number; predicted: number; residual: number }> }).level_predictions && (
+                        <div>
+                          <div className="font-medium text-foreground">Observed vs predicted</div>
+                          <div className="space-y-1">
+                            {(result.fit_diagnostics as { level_predictions: Array<{ time_hours: number; observed: number; predicted: number; residual: number }> }).level_predictions.slice(0, 5).map((row, idx) => (
+                              <div key={idx}>
+                                t={row.time_hours}h · obs {row.observed.toFixed(1)} · pred {row.predicted.toFixed(1)} · resid {row.residual.toFixed(1)}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            <div>
-              <ResultsPanel
-                mode={mode}
-                result={result}
-                regimen={activeRegimen}
-                onRegimenChange={applyRegimen}
-              />
               <div id="dosing-panel-host" className="space-y-4 mt-4" />
 
             </div>

@@ -15,11 +15,24 @@ from datetime import datetime
 from enum import Enum
 from utils import pk
 from backend.pk import bayesian as bayesian_pk
+from backend.pk.deterministic import compute_curve_and_metrics
 from backend.pk.sim import Event, simulate_regimen_0_48h
 from backend.regimen_recommender import (
     recommend_regimen,
+    recommend_regimens,
     loading_dose as recommend_loading_dose,
 )
+
+# --- CamelModel and alias generator ---
+def _to_camel(s: str) -> str:
+    parts = s.split('_')
+    return parts[0] + ''.join(p.capitalize() for p in parts[1:])
+
+
+class CamelModel(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+        alias_generator = _to_camel
 
 app = FastAPI(
     title="Vancomyzer API",
@@ -45,6 +58,11 @@ build_info_path = static_path / "build-info.json"
 
 app.mount("/static", StaticFiles(directory=static_path, check_dir=False), name="static")
 app.mount("/assets", StaticFiles(directory=static_path / "assets", check_dir=False), name="assets")
+
+if os.getenv("VANCO_DEBUG_ROUTES") == "1":
+    @app.get("/api/routes")
+    async def list_routes():
+        return {"routes": sorted({route.path for route in app.routes if hasattr(route, "path")})}
 
 
 def _read_build_info() -> dict:
@@ -200,32 +218,33 @@ class BayesianResult(BaseModel):
     population_pk_curve: List[Dict[str, float]]
 
 # Streamlined dosing models (2020 ASHP/IDSA/PIDS/SIDP)
-class PatientInfo(BaseModel):
+class PatientInfo(CamelModel):
     age_years: float = Field(..., gt=0, le=120)
     weight_kg: float = Field(..., gt=0, le=300)
     height_cm: Optional[float] = Field(None, gt=0, le=250)
     sex: str = Field(..., pattern="^(male|female)$")
-    serum_creatinine: float = Field(..., gt=0, le=20)
+    # Accept legacy frontend payload key `serum_creatinine_mg_dl` as well as camelCase/snake_case
+    serum_creatinine: float = Field(..., gt=0, le=20, alias="serum_creatinine_mg_dl")
     serious_infection: bool = False
 
-class BayesianLevel(BaseModel):
+class BayesianLevel(CamelModel):
     level_mg_l: float = Field(..., gt=0, le=200)
     time_hours: float = Field(..., gt=0, le=72)
     level_type: Optional[str] = Field(None, pattern="^(peak|trough)$")
     dose_mg: Optional[float] = Field(None, gt=0, le=4000)
     infusion_hours: Optional[float] = Field(1.0, gt=0, le=24)
 
-class DoseHistoryEvent(BaseModel):
+class DoseHistoryEvent(CamelModel):
     dose_mg: float = Field(..., gt=0, le=4000)
     start_time_hr: float = Field(..., ge=0, le=240)
     infusion_hr: float = Field(..., gt=0, le=24)
 
-class RegimenOverride(BaseModel):
+class RegimenOverride(CamelModel):
     dose_mg: float = Field(..., gt=0, le=4000)
     interval_hr: float = Field(..., gt=0, le=72)
     infusion_hr: float = Field(..., gt=0, le=24)
 
-class DoseRequest(BaseModel):
+class DoseRequest(CamelModel):
     patient: PatientInfo
     levels: Optional[List[BayesianLevel]] = None
     dose_history: Optional[List[DoseHistoryEvent]] = None
@@ -246,6 +265,32 @@ class DoseResponse(BaseModel):
     method: str
     notes: List[str]
     concentration_curve: List[Dict[str, float]]
+    auc24_ci_low: Optional[float] = None
+    auc24_ci_high: Optional[float] = None
+    curve_ci_low: Optional[List[Dict[str, float]]] = None
+    curve_ci_high: Optional[List[Dict[str, float]]] = None
+    regimen_options: Optional[List[Dict[str, float]]] = None
+    calculation_details: Optional[Dict[str, Any]] = None
+    fit_diagnostics: Optional[Dict[str, Any]] = None
+
+
+class BasicPatientPayload(BaseModel):
+    age: int = Field(ge=0, le=120)
+    sex: str = Field(..., pattern="^(male|female)$")
+    height_cm: float = Field(gt=0, le=250)
+    weight_kg: float = Field(gt=0, le=300)
+    serum_creatinine: float = Field(gt=0, le=20)
+
+
+class BasicRegimenPayload(BaseModel):
+    dose_mg: float = Field(gt=0, le=4000)
+    interval_hr: float = Field(gt=0, le=72)
+    infusion_hr: Optional[float] = Field(default=None, gt=0, le=24)
+
+
+class BasicCalculateAlias(BaseModel):
+    patient: BasicPatientPayload
+    regimen: BasicRegimenPayload
 
 # Pharmacokinetic Calculation Engine
 class VancomycinPKCalculator:
@@ -843,13 +888,14 @@ async def calculate_dose_endpoint(request: DoseRequest):
     )
     k_e = pk.elimination_constant(crcl)
     vd = pk.volume_distribution(patient.weight_kg)
-    recommended, warnings = recommend_regimen(
+    options, warnings = recommend_regimens(
         weight_kg=patient.weight_kg,
         crcl=crcl,
         serious=patient.serious_infection,
         k_e=k_e,
         vd_l=vd,
     )
+    recommended = options[0]
     notes = warnings[:]
     if recommended.auc24 >= 800:
         notes.append("Predicted AUC exceeds 800 mg·h/L; consider dose reduction.")
@@ -858,11 +904,7 @@ async def calculate_dose_endpoint(request: DoseRequest):
     chosen_dose = regimen_override.dose_mg if regimen_override else recommended.dose_mg
     chosen_interval = regimen_override.interval_hr if regimen_override else recommended.interval_hr
     chosen_infusion = regimen_override.infusion_hr if regimen_override else recommended.infusion_hr
-    chosen_auc = pk.calculate_auc_24(chosen_dose, chosen_interval, k_e, vd)
-    chosen_peak = pk.predict_peak(chosen_dose, chosen_interval, k_e, vd, chosen_infusion)
-    chosen_trough = pk.predict_trough(chosen_dose, chosen_interval, k_e, vd, chosen_infusion)
-
-    t, c = simulate_regimen_0_48h(
+    metrics = compute_curve_and_metrics(
         cl_l_hr=k_e * vd,
         v_l=vd,
         dose_mg=chosen_dose,
@@ -870,16 +912,42 @@ async def calculate_dose_endpoint(request: DoseRequest):
         infusion_hr=chosen_infusion,
         dt_min=10.0,
     )
-    curve = [{"t_hr": float(tt), "conc_mg_l": float(cc)} for tt, cc in zip(t, c)]
+    curve = metrics["curve"]
 
+    option_payload: List[Dict[str, float]] = []
+    for candidate in options[:5]:
+        option_metrics = compute_curve_and_metrics(
+            cl_l_hr=k_e * vd,
+            v_l=vd,
+            dose_mg=candidate.dose_mg,
+            interval_hr=candidate.interval_hr,
+            infusion_hr=candidate.infusion_hr,
+            dt_min=10.0,
+        )
+        option_payload.append(
+            {
+                "dose_mg": float(candidate.dose_mg),
+                "interval_hr": float(candidate.interval_hr),
+                "infusion_hr": float(candidate.infusion_hr),
+                "auc24": float(option_metrics["auc24"]),
+                "peak": float(option_metrics["peak"]),
+                "trough": float(option_metrics["trough"]),
+                "daily_dose_mg": float(candidate.daily_dose_mg),
+            }
+        )
+
+    if regimen_override:
+        notes.append(
+            f"Regimen override applied: {chosen_dose:.0f} mg q{chosen_interval:g}h (infusion {chosen_infusion:g}h)."
+        )
     return DoseResponse(
         loading_dose_mg=recommend_loading_dose(patient.weight_kg, patient.serious_infection),
         maintenance_dose_mg=recommended.dose_mg,
         interval_hours=recommended.interval_hr,
         infusion_hours=recommended.infusion_hr,
-        predicted_peak_mg_l=chosen_peak,
-        predicted_trough_mg_l=chosen_trough,
-        predicted_auc_24=chosen_auc,
+        predicted_peak_mg_l=float(metrics["peak"]),
+        predicted_trough_mg_l=float(metrics["trough"]),
+        predicted_auc_24=float(metrics["auc24"]),
         k_e=k_e,
         vd_l=vd,
         half_life_hours=pk.half_life_hours(k_e),
@@ -887,7 +955,71 @@ async def calculate_dose_endpoint(request: DoseRequest):
         method="population_recommender",
         notes=notes,
         concentration_curve=curve,
+        regimen_options=option_payload,
+        calculation_details={
+            "model": "1-compartment IV infusion (first-order elimination)",
+            "method": "Deterministic population PK",
+            "auc_method": "Trapezoidal (0–24h) from simulated curve",
+            "assumptions": "Simulate repeated doses 0–48h at 10-min resolution; peak at end of infusion in last interval; trough just before next dose.",
+            "formulas": {
+                "cl": "CL = k_e × V",
+                "auc": "AUC24 = trapezoid(curve, 0–24h)",
+            },
+            "peak_time_hr": metrics["peak_time_hr"],
+            "trough_time_hr": metrics["trough_time_hr"],
+            "dt_min": metrics["dt_min"],
+            "parameters": {
+                "k_e": k_e,
+                "vd_l": vd,
+                "cl_l_hr": k_e * vd,
+                "half_life_hr": pk.half_life_hours(k_e),
+                "crcl_ml_min": crcl,
+            },
+            "chosen_regimen": {
+                "dose_mg": float(chosen_dose),
+                "interval_hr": float(chosen_interval),
+                "infusion_hr": float(chosen_infusion),
+            },
+        },
     )
+
+
+@app.post("/api/basic/calculate", response_model=DoseResponse)
+async def basic_calculate_alias(payload: BasicCalculateAlias):
+    """Alias for deterministic calculator used by legacy clients."""
+    dose_request = DoseRequest(
+        patient=PatientInfo(
+            age_years=payload.patient.age,
+            weight_kg=payload.patient.weight_kg,
+            height_cm=payload.patient.height_cm,
+            sex=payload.patient.sex,
+            serum_creatinine=payload.patient.serum_creatinine,
+            serious_infection=False,
+        ),
+        levels=None,
+        regimen=RegimenOverride(
+            dose_mg=payload.regimen.dose_mg,
+            interval_hr=payload.regimen.interval_hr,
+            infusion_hr=payload.regimen.infusion_hr or 1.0,
+        ),
+    )
+    return await calculate_dose_endpoint(dose_request)
+
+# Route alias for trailing slash and legacy callers.
+app.add_api_route(
+    "/api/basic/calculate/",
+    basic_calculate_alias,
+    methods=["POST"],
+    response_model=DoseResponse,
+    include_in_schema=True,
+)
+app.add_api_route(
+    "/api/calculate-dose/",
+    calculate_dose_endpoint,
+    methods=["POST"],
+    response_model=DoseResponse,
+    include_in_schema=False,
+)
 
 @app.post("/api/bayesian-dose", response_model=DoseResponse)
 async def bayesian_dose_endpoint(request: DoseRequest):
@@ -915,57 +1047,130 @@ async def bayesian_dose_endpoint(request: DoseRequest):
             Event(dose_mg=d.dose_mg, start_hr=d.start_time_hr, infusion_hr=d.infusion_hr)
             for d in dose_history
         ]
-        levels_for_fit = [(l["time_hours"], l["level_mg_l"]) for l in level_payload]
-        cl_mean = fallback_ke * fallback_vd
-        cl_map, v_map = bayesian_pk.map_fit(events, levels_for_fit, cl_mean, fallback_vd)
-        k_e = cl_map / max(v_map, 1e-6)
-        vd = v_map
-        method = "bayesian_map"
+    elif request.regimen:
+        max_level = max(l["time_hours"] for l in level_payload)
+        interval_hr = float(request.regimen.interval_hr)
+        n_doses = int(max(1, (max_level // interval_hr) + 2))
+        events = [
+            Event(
+                dose_mg=float(request.regimen.dose_mg),
+                start_hr=float(i * interval_hr),
+                infusion_hr=float(request.regimen.infusion_hr or 1.0),
+            )
+            for i in range(n_doses)
+        ]
     else:
-        infusion_h = float(levels[0].infusion_hours or 1.0)
-        dose_mg = float(levels[0].dose_mg or 0.0)
-        if dose_mg <= 0:
-            raise HTTPException(status_code=400, detail="Dose history is required for Bayesian MAP fitting.")
-        k_e, vd, method = pk.estimate_patient_pk(
-            level_payload,
-            dose_mg,
-            infusion_h,
-            fallback_ke,
-            fallback_vd,
-        )
+        raise HTTPException(status_code=400, detail="Dose history or regimen override is required for Bayesian MAP fitting.")
+
+    levels_for_fit = [(l["time_hours"], l["level_mg_l"]) for l in level_payload]
+    cl_mean = fallback_ke * fallback_vd
+    cl_map, v_map, samples = bayesian_pk.posterior_samples(events, levels_for_fit, cl_mean, fallback_vd)
+    k_e = cl_map / max(v_map, 1e-6)
+    vd = v_map
+    method = "bayesian_map"
 
     notes = []
     if method == "bayesian_map":
         notes.append("Bayesian MAP fit using dose history and measured levels.")
-    recommended, warnings = recommend_regimen(
+    options, warnings = recommend_regimens(
         weight_kg=patient.weight_kg,
         crcl=crcl,
         serious=patient.serious_infection,
         k_e=k_e,
         vd_l=vd,
     )
+    recommended = options[0]
     notes.extend(warnings)
     if recommended.auc24 >= 800:
         notes.append("Predicted AUC exceeds 800 mg·h/L; consider dose reduction.")
 
-    t, c = simulate_regimen_0_48h(
+    regimen_override = request.regimen
+    chosen_dose = regimen_override.dose_mg if regimen_override else recommended.dose_mg
+    chosen_interval = regimen_override.interval_hr if regimen_override else recommended.interval_hr
+    chosen_infusion = regimen_override.infusion_hr if regimen_override else recommended.infusion_hr
+
+    if regimen_override:
+        notes.append(
+            f"Regimen override applied: {chosen_dose:.0f} mg q{chosen_interval:g}h (infusion {chosen_infusion:g}h)."
+        )
+
+    metrics = compute_curve_and_metrics(
         cl_l_hr=k_e * vd,
         v_l=vd,
-        dose_mg=recommended.dose_mg,
-        interval_hr=recommended.interval_hr,
-        infusion_hr=recommended.infusion_hr,
+        dose_mg=chosen_dose,
+        interval_hr=chosen_interval,
+        infusion_hr=chosen_infusion,
         dt_min=10.0,
     )
-    curve = [{"t_hr": float(tt), "conc_mg_l": float(cc)} for tt, cc in zip(t, c)]
+    curve = metrics["curve"]
+
+    t, _ = simulate_regimen_0_48h(
+        cl_l_hr=k_e * vd,
+        v_l=vd,
+        dose_mg=chosen_dose,
+        interval_hr=chosen_interval,
+        infusion_hr=chosen_infusion,
+        dt_min=10.0,
+    )
+    sample_curves = []
+    for cl_s, v_s in samples[:120]:
+        _, c_s = simulate_regimen_0_48h(
+            cl_l_hr=float(cl_s),
+            v_l=float(v_s),
+            dose_mg=chosen_dose,
+            interval_hr=chosen_interval,
+            infusion_hr=chosen_infusion,
+            dt_min=10.0,
+        )
+        sample_curves.append(c_s)
+    if sample_curves:
+        stack = np.vstack(sample_curves)
+        lower = np.percentile(stack, 2.5, axis=0)
+        upper = np.percentile(stack, 97.5, axis=0)
+        curve_ci_low = [{"t_hr": float(tt), "conc_mg_l": float(cc)} for tt, cc in zip(t, lower)]
+        curve_ci_high = [{"t_hr": float(tt), "conc_mg_l": float(cc)} for tt, cc in zip(t, upper)]
+    else:
+        curve_ci_low = None
+        curve_ci_high = None
+
+    auc_samples = []
+    for cl_s, v_s in samples[:120]:
+        k_s = float(cl_s) / max(float(v_s), 1e-6)
+        auc_samples.append(pk.calculate_auc_24(chosen_dose, chosen_interval, k_s, float(v_s)))
+    auc_ci_low = float(np.percentile(auc_samples, 2.5)) if auc_samples else None
+    auc_ci_high = float(np.percentile(auc_samples, 97.5)) if auc_samples else None
+
+    option_payload: List[Dict[str, float]] = []
+    for candidate in options[:5]:
+        option_metrics = compute_curve_and_metrics(
+            cl_l_hr=k_e * vd,
+            v_l=vd,
+            dose_mg=candidate.dose_mg,
+            interval_hr=candidate.interval_hr,
+            infusion_hr=candidate.infusion_hr,
+            dt_min=10.0,
+        )
+        option_payload.append(
+            {
+                "dose_mg": float(candidate.dose_mg),
+                "interval_hr": float(candidate.interval_hr),
+                "infusion_hr": float(candidate.infusion_hr),
+                "auc24": float(option_metrics["auc24"]),
+                "peak": float(option_metrics["peak"]),
+                "trough": float(option_metrics["trough"]),
+                "daily_dose_mg": float(candidate.daily_dose_mg),
+            }
+        )
+
 
     return DoseResponse(
         loading_dose_mg=recommend_loading_dose(patient.weight_kg, patient.serious_infection),
         maintenance_dose_mg=recommended.dose_mg,
         interval_hours=recommended.interval_hr,
         infusion_hours=recommended.infusion_hr,
-        predicted_peak_mg_l=recommended.peak,
-        predicted_trough_mg_l=recommended.trough,
-        predicted_auc_24=recommended.auc24,
+        predicted_peak_mg_l=float(metrics["peak"]),
+        predicted_trough_mg_l=float(metrics["trough"]),
+        predicted_auc_24=float(metrics["auc24"]),
         k_e=k_e,
         vd_l=vd,
         half_life_hours=pk.half_life_hours(k_e),
@@ -973,7 +1178,59 @@ async def bayesian_dose_endpoint(request: DoseRequest):
         method=f"{method}_recommender",
         notes=notes,
         concentration_curve=curve,
+        auc24_ci_low=auc_ci_low,
+        auc24_ci_high=auc_ci_high,
+        curve_ci_low=curve_ci_low,
+        curve_ci_high=curve_ci_high,
+        regimen_options=option_payload,
+        calculation_details={
+            "model": "1-compartment IV infusion (first-order elimination)",
+            "method": "Bayesian MAP fit",
+            "auc_method": "Trapezoidal (0–24h) from simulated curve",
+            "assumptions": "Simulate repeated doses 0–48h at 10-min resolution; peak at end of infusion in last interval; trough just before next dose.",
+            "formulas": {
+                "cl": "CL = k_e × V",
+                "auc": "AUC24 = trapezoid(curve, 0–24h)",
+            },
+            "peak_time_hr": metrics["peak_time_hr"],
+            "trough_time_hr": metrics["trough_time_hr"],
+            "dt_min": metrics["dt_min"],
+            "parameters": {
+                "k_e": k_e,
+                "vd_l": vd,
+                "cl_l_hr": k_e * vd,
+                "half_life_hr": pk.half_life_hours(k_e),
+                "crcl_ml_min": crcl,
+            },
+            "levels": level_payload,
+            "chosen_regimen": {
+                "dose_mg": float(chosen_dose),
+                "interval_hr": float(chosen_interval),
+                "infusion_hr": float(chosen_infusion),
+            },
+        },
+        fit_diagnostics={
+            "method": method,
+            "level_predictions": [
+                {
+                    "time_hours": float(t),
+                    "observed": float(c),
+                    "predicted": float(p),
+                    "residual": float(c - p),
+                }
+                for t, c, p in zip(
+                    [lv["time_hours"] for lv in level_payload],
+                    [lv["level_mg_l"] for lv in level_payload],
+                    bayesian_pk.predict_levels(events, [lv["time_hours"] for lv in level_payload], cl_map, v_map),
+                )
+            ],
+        },
     )
+
+# Route alias for bayesian endpoint with trailing slash
+@app.post("/api/bayesian-dose/")
+async def bayesian_dose_endpoint_slash(request: DoseRequest):
+    return await bayesian_dose_endpoint(request)
 
 @app.post("/api/calculate-dosing", response_model=DosingResult)
 async def calculate_dosing(patient: PatientInput):

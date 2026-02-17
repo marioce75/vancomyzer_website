@@ -123,6 +123,98 @@ def map_fit(
     return cl, v
 
 
+def _neg_log_posterior_log(
+    theta: np.ndarray,
+    obs_t: np.ndarray,
+    obs_c: np.ndarray,
+    events: List[Event],
+    cl_mean: float,
+    v_mean: float,
+    priors: Priors,
+) -> float:
+    cl = float(np.exp(theta[0]))
+    v = float(np.exp(theta[1]))
+    return _neg_log_posterior(cl, v, obs_t, obs_c, events, cl_mean, v_mean, priors)
+
+
+def _hessian_2d(func, x: np.ndarray, eps: float = 1e-3) -> np.ndarray:
+    h = np.zeros((2, 2), dtype=float)
+    f0 = func(x)
+    for i in range(2):
+        x_ip = x.copy()
+        x_im = x.copy()
+        x_ip[i] += eps
+        x_im[i] -= eps
+        f_ip = func(x_ip)
+        f_im = func(x_im)
+        h[i, i] = (f_ip - 2 * f0 + f_im) / (eps * eps)
+        for j in range(i + 1, 2):
+            x_pp = x.copy()
+            x_pm = x.copy()
+            x_mp = x.copy()
+            x_mm = x.copy()
+            x_pp[i] += eps
+            x_pp[j] += eps
+            x_pm[i] += eps
+            x_pm[j] -= eps
+            x_mp[i] -= eps
+            x_mp[j] += eps
+            x_mm[i] -= eps
+            x_mm[j] -= eps
+            f_pp = func(x_pp)
+            f_pm = func(x_pm)
+            f_mp = func(x_mp)
+            f_mm = func(x_mm)
+            h_ij = (f_pp - f_pm - f_mp + f_mm) / (4 * eps * eps)
+            h[i, j] = h_ij
+            h[j, i] = h_ij
+    return h
+
+
+def posterior_samples(
+    events: List[Event],
+    levels: List[Tuple[float, float]],
+    cl_mean: float,
+    v_mean: float,
+    priors: Optional[Priors] = None,
+    n: int = 200,
+) -> Tuple[float, float, np.ndarray]:
+    """
+    MAP fit + Laplace approximation in log-space.
+    Returns MAP cl, MAP v, and samples of (cl, v).
+    """
+    priors = priors or load_priors()
+    cl_map, v_map = map_fit(events, levels, cl_mean, v_mean, priors)
+
+    obs_t = np.array([t for t, _ in levels], dtype=float)
+    obs_c = np.array([c for _, c in levels], dtype=float)
+    theta0 = np.log(np.array([cl_map, v_map]))
+
+    def nlp(theta: np.ndarray) -> float:
+        return _neg_log_posterior_log(theta, obs_t, obs_c, events, cl_mean, v_mean, priors)
+
+    hess = _hessian_2d(nlp, theta0)
+    try:
+        cov = np.linalg.inv(hess)
+    except np.linalg.LinAlgError:
+        cov = np.diag([priors.sigma_log_cl ** 2, priors.sigma_log_v ** 2])
+
+    rng = np.random.default_rng(42)
+    draws = rng.multivariate_normal(mean=theta0, cov=cov, size=n)
+    samples = np.exp(draws)
+    return cl_map, v_map, samples
+
+
+def predict_levels(
+    events: List[Event],
+    times_hr: List[float],
+    cl_l_hr: float,
+    v_l: float,
+) -> np.ndarray:
+    t = np.array(times_hr, dtype=float)
+    return concentration_time_series(t, events, cl_l_hr=cl_l_hr, v_l=v_l)
+
+
 def estimate_auc24(events: List[Event], cl_l_hr: float, v_l: float) -> float:
     t, c = simulate_regimen_0_48h(
         cl_l_hr=cl_l_hr,

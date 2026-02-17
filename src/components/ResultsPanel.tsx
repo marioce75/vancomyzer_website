@@ -101,6 +101,14 @@ function ResultsPanel({
     const dailyDose = chosenIntervalNum > 0 ? chosenDoseNum * (24 / chosenIntervalNum) : 0;
     const recommendedInfusion = result.regimen.recommended_infusion_hr ?? result.regimen.infusion_hr ?? regimen?.infusionHr;
     const chosenInfusion = result.regimen.infusion_hr ?? regimen?.infusionHr;
+    const regimenOptions = result.regimen_options || [];
+    const alternativeOptions = regimenOptions.filter(
+      (opt) =>
+        opt.auc24 >= AUC_TARGET.low &&
+        opt.auc24 <= AUC_TARGET.high &&
+        (opt.dose_mg !== result.regimen.recommended_dose_mg ||
+          opt.interval_hr !== result.regimen.recommended_interval_hr),
+    );
     const guardrailWarnings: string[] = [];
     if (chosenDoseNum > REGIMEN_LIMITS.maxSingleDoseMg) {
       guardrailWarnings.push(`Chosen dose exceeds max single dose (${REGIMEN_LIMITS.maxSingleDoseMg} mg).`);
@@ -112,7 +120,7 @@ function ResultsPanel({
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Basic Calculator Results</CardTitle>
+            <CardTitle>Suggested Dose</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between gap-3 mb-3 print-hidden">
@@ -170,6 +178,34 @@ function ResultsPanel({
                 <div className="font-medium">
                   {formatNumber(chosenDose ?? 0, 0)} mg q{formatNumber(chosenInterval ?? 0, 0)}h
                   {chosenInfusion ? ` (infuse over ${formatNumber(chosenInfusion, 1)}h)` : ""}
+                </div>
+              </div>
+            )}
+            {alternativeOptions.length > 0 && onRegimenChange && regimen && (
+              <div className="mt-4 text-sm">
+                <div className="text-muted-foreground">Alternative regimens within target</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {alternativeOptions.slice(0, 5).map((opt) => (
+                    <button
+                      key={`${opt.dose_mg}-${opt.interval_hr}-${opt.infusion_hr}`}
+                      type="button"
+                      className="rounded-md border px-3 py-2 text-xs hover:border-primary/50 hover:bg-primary/5"
+                      onClick={() =>
+                        onRegimenChange({
+                          doseMg: opt.dose_mg,
+                          intervalHr: opt.interval_hr,
+                          infusionHr: opt.infusion_hr,
+                        })
+                      }
+                    >
+                      <div className="font-medium">
+                        {formatNumber(opt.dose_mg, 0)} mg q{formatNumber(opt.interval_hr, 0)}h
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        AUC {formatNumber(opt.auc24, 0)} · Peak {formatConcentration(opt.peak, 1)} · Trough {formatConcentration(opt.trough, 1)}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
@@ -251,7 +287,7 @@ function ResultsPanel({
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Bayesian AUC Engine</CardTitle>
+            <CardTitle>Suggested Dose (Bayesian MAP)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between gap-3 mb-3 print-hidden">
@@ -292,6 +328,37 @@ function ResultsPanel({
                 </div>
               )}
             </div>
+            {result.regimen_options && result.regimen_options.length > 0 && onRegimenChange && regimen && (
+              <div className="mt-4 text-sm">
+                <div className="text-muted-foreground">Alternative regimens within target</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {result.regimen_options
+                    .filter((opt) => opt.auc24 >= AUC_TARGET.low && opt.auc24 <= AUC_TARGET.high)
+                    .slice(0, 5)
+                    .map((opt) => (
+                    <button
+                      key={`${opt.dose_mg}-${opt.interval_hr}-${opt.infusion_hr}`}
+                      type="button"
+                      className="rounded-md border px-3 py-2 text-xs hover:border-primary/50 hover:bg-primary/5"
+                      onClick={() =>
+                        onRegimenChange({
+                          doseMg: opt.dose_mg,
+                          intervalHr: opt.interval_hr,
+                          infusionHr: opt.infusion_hr,
+                        })
+                      }
+                    >
+                      <div className="font-medium">
+                        {formatNumber(opt.dose_mg, 0)} mg q{formatNumber(opt.interval_hr, 0)}h
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        AUC {formatNumber(opt.auc24, 0)} · Peak {formatConcentration(opt.peak, 1)} · Trough {formatConcentration(opt.trough, 1)}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             {result.warnings.length > 0 && (
               <div className="mt-4 space-y-1">
                 {result.warnings.map((m, i) => (

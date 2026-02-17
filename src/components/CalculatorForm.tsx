@@ -323,6 +323,11 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
             serum_creatinine: Number(scrNum),
             serious_infection: false,
           },
+          regimen: {
+            dose_mg: Number(effectiveDose),
+            interval_hr: Number(effectiveInterval),
+            infusion_hr: Number(effectiveInfusion),
+          },
           dose_history: historyPayload,
           levels: levelsPayload.map((lv) => ({
             level_mg_l: lv.concentration_mg_l,

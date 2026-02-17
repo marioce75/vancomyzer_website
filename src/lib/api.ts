@@ -93,6 +93,12 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
 
   if (!res.ok) {
     const parsed = await readErrorBody(res);
+    if (res.status === 422 && parsed?.errors?.length) {
+      const first = parsed.errors[0];
+      const where = first?.loc?.join(".") ?? "payload";
+      const msg = first?.msg ?? "Validation error";
+      throw new ApiError(`${msg} at ${where}`, res.status, { detail: parsed?.detail, errors: parsed?.errors, received_body: parsed?.received_body });
+    }
     const detail = parsed?.detail;
     const errors = parsed?.errors;
     const received_body = parsed?.received_body;
@@ -232,6 +238,16 @@ export type BasicCalculateResponse = {
   };
   breakdown: Record<string, unknown>;
   curve?: Array<{ t_hr: number; conc_mg_l: number }>;
+  regimen_options?: Array<{
+    dose_mg: number;
+    interval_hr: number;
+    infusion_hr: number;
+    auc24: number;
+    peak: number;
+    trough: number;
+    daily_dose_mg: number;
+  }>;
+  calculation_details?: Record<string, unknown>;
 };
 
 export type DoseRequest = {
@@ -277,6 +293,21 @@ type DoseResponse = {
   method: string;
   notes: string[];
   concentration_curve: Array<{ t_hr: number; conc_mg_l: number }>;
+  auc24_ci_low?: number | null;
+  auc24_ci_high?: number | null;
+  curve_ci_low?: Array<{ t_hr: number; conc_mg_l: number }> | null;
+  curve_ci_high?: Array<{ t_hr: number; conc_mg_l: number }> | null;
+  regimen_options?: Array<{
+    dose_mg: number;
+    interval_hr: number;
+    infusion_hr: number;
+    auc24: number;
+    peak: number;
+    trough: number;
+    daily_dose_mg: number;
+  }>;
+  calculation_details?: Record<string, unknown>;
+  fit_diagnostics?: Record<string, unknown>;
 };
 
 export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicCalculateResponse> {
@@ -318,6 +349,8 @@ export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicC
     },
     breakdown: {},
     curve: res.concentration_curve,
+    regimen_options: res.regimen_options,
+    calculation_details: res.calculation_details,
   };
 }
 
@@ -331,6 +364,17 @@ export type BayesianCalculateResponse = {
   curve_ci_low: Array<{ t_hr: number; conc_mg_l: number }>;
   curve_ci_high: Array<{ t_hr: number; conc_mg_l: number }>;
   infusion_hr?: number;
+  regimen_options?: Array<{
+    dose_mg: number;
+    interval_hr: number;
+    infusion_hr: number;
+    auc24: number;
+    peak: number;
+    trough: number;
+    daily_dose_mg: number;
+  }>;
+  calculation_details?: Record<string, unknown>;
+  fit_diagnostics?: Record<string, unknown>;
   recommendation: {
     target_auc: number;
     daily_dose_mg: number;
@@ -345,21 +389,29 @@ export type BayesianCalculateResponse = {
 export async function calculateBayesian(req: DoseRequest): Promise<BayesianCalculateResponse> {
   const res = await postJSON<DoseResponse>(`${API_BASE}/api/bayesian-dose`, req);
   const cl = res.k_e * res.vd_l;
+  const curve = Array.isArray(res.concentration_curve) ? res.concentration_curve : [];
+
   return {
     auc24: res.predicted_auc_24,
-    auc24_ci_low: res.predicted_auc_24,
-    auc24_ci_high: res.predicted_auc_24,
+    auc24_ci_low: res.auc24_ci_low ?? res.predicted_auc_24,
+    auc24_ci_high: res.auc24_ci_high ?? res.predicted_auc_24,
     cl_l_hr: cl,
     v_l: res.vd_l,
-    curve: res.concentration_curve,
-    curve_ci_low: [],
-    curve_ci_high: [],
+    curve,
+    curve_ci_low: res.curve_ci_low ?? [],
+    curve_ci_high: res.curve_ci_high ?? [],
     infusion_hr: res.infusion_hours,
+    regimen_options: res.regimen_options,
+    calculation_details: res.calculation_details,
+    fit_diagnostics: res.fit_diagnostics,
     recommendation: {
+      // This is a target *request* concept; backend should eventually return target separately.
       target_auc: res.predicted_auc_24,
-      daily_dose_mg: res.maintenance_dose_mg * (24.0 / res.interval_hours),
+      daily_dose_mg: res.interval_hours > 0 ? res.maintenance_dose_mg * (24.0 / res.interval_hours) : res.maintenance_dose_mg,
       per_dose_mg: res.maintenance_dose_mg,
       interval_hr: res.interval_hours,
+      max_loading_mg: undefined,
+      max_daily_mg: undefined,
     },
     warnings: res.notes || [],
   };
