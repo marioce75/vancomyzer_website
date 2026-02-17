@@ -260,6 +260,14 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
       const effectiveDose = overrides?.doseMg ?? doseMg;
       const effectiveInterval = overrides?.intervalHr ?? intervalHr;
       const effectiveInfusion = overrides?.infusionHr ?? infusionHr;
+      if (!formValid) {
+        setError({
+          message: bayesMissing
+            ? "Bayesian mode requires at least one level and one dose event."
+            : "Please correct the highlighted fields before calculating.",
+        });
+        return;
+      }
     if (sex !== "" && patientValid) {
       onInputsChange?.({
         mode,
@@ -267,7 +275,7 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
         patient: {
           age_yr: Number(ageNum),
           sex,
-          height_cm: Number(heightCm),
+          height_cm: Number.isFinite(heightCm) ? Number(heightCm) : undefined,
           weight_kg: Number(weightKg),
           serum_creatinine: Number(scrNum),
         },
@@ -383,7 +391,9 @@ const CalculatorForm = forwardRef<CalculatorFormHandle, CalculatorFormProps>(({ 
         infusionHr: next.infusionHr,
       }));
     });
-    queueSubmit(next);
+    if (formValid) {
+      queueSubmit(next);
+    }
   }
 
   function updateRegimen(next: Partial<{ doseMg: number; intervalHr: number; infusionHr: number }>) {
