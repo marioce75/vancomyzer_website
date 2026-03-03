@@ -17,7 +17,7 @@ Vancomyzer is a clinical vancomycin dosing calculator with a Python FastAPI back
 
 - **Python 3.11 is required.** The backend pins `numpy==1.24.3` and `scipy==1.11.3` which are incompatible with Python 3.12+. The venv at `backend/.venv` uses Python 3.11 (installed from the deadsnakes PPA).
 - **Backend must run from the repo root** using `python -m uvicorn backend.main:app`, not from `backend/`. The server imports modules as `backend.pk.*`, `backend.regimen_recommender`, etc. which require the repo root on `sys.path`.
-- **Frontend `.env`** should contain `VITE_API_BASE=http://localhost:8001` for local development. The `.env.example` ships with the Render production URL.
+- **Frontend API base:** `src/lib/api.ts` hardcodes `API_BASE = ""` (empty string), meaning API calls are relative to the frontend origin. In production this works because the backend serves the frontend statically. In dev with separate Vite (8080) + backend (8001) servers, the frontend API calls hit port 8080 and 404. A Vite proxy or code change to use `import.meta.env.VITE_API_BASE` is needed for full frontend-backend communication in dev mode. The backend API itself works correctly and can be tested independently via curl.
 - **CORS** is set to `allow_origins=["*"]` so no CORS configuration is needed for local dev.
 - The `PatientInfo` model requires `serum_creatinine_mg_dl` as the field name (an alias for `serum_creatinine`). The frontend handles this mapping in `src/lib/api.ts`.
 
