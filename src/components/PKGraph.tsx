@@ -127,33 +127,21 @@ export default function PKGraph() {
 
   const maxConc = useMemo(() => Math.max(10, ...base.map((p) => p.conc_mg_l)), [base]);
   const yMax = useMemo(() => Math.ceil(maxConc * 1.15), [maxConc]);
+  const hasCurve = base.length > 0;
 
   const derived = useMemo(() => {
     if (!regimen || base.length === 0) return null;
     return derivePeakTroughFromCurve(base, regimen);
   }, [base, regimen]);
 
-  if (base.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-semibold text-gray-900">Concentration–Time (0–24 h)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-500">Enter patient data and run a calculation to see the PK curve.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base font-semibold text-gray-900">Concentration–Time (0–24 h)</CardTitle>
+        <CardTitle className="text-base font-semibold text-foreground">Concentration–Time (0–24 h)</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-2">
         <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={base} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+          <LineChart data={hasCurve ? base : [{ t_hr: 0, conc_mg_l: 0 }, { t_hr: X_MAX, conc_mg_l: 0 }]} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis
               dataKey="t_hr"
@@ -165,7 +153,7 @@ export default function PKGraph() {
               stroke="#6b7280"
             />
             <YAxis
-              domain={[0, yMax]}
+              domain={[0, hasCurve ? yMax : 50]}
               tickCount={6}
               tickFormatter={(v) => formatNumber(Number(v), 1)}
               label={{ value: "Concentration (mg/L)", angle: -90, position: "insideLeft" }}
@@ -187,7 +175,7 @@ export default function PKGraph() {
                 );
               }}
             />
-            {aucArea.length > 0 && (
+            {hasCurve && aucArea.length > 0 && (
               <Area
                 type="linear"
                 data={aucArea}
@@ -197,13 +185,13 @@ export default function PKGraph() {
                 fillOpacity={0.35}
               />
             )}
-            {bandUpper.length > 0 && bandLower.length > 0 && (
+            {hasCurve && bandUpper.length > 0 && bandLower.length > 0 && (
               <>
                 <Line type="linear" data={bandUpper} dataKey="conc_mg_l" stroke="#93c5fd" dot={false} />
                 <Line type="linear" data={bandLower} dataKey="conc_mg_l" stroke="#93c5fd" dot={false} />
               </>
             )}
-            <Line type="linear" dataKey="conc_mg_l" stroke="#2563eb" strokeWidth={2} dot={false} />
+            {hasCurve && <Line type="linear" dataKey="conc_mg_l" stroke="#2563eb" strokeWidth={2} dot={false} />}
             {derived && (
               <ReferenceDot x={derived.peakTime} y={derived.peak} r={4} fill="#2563eb" stroke="white" strokeWidth={1} />
             )}
@@ -213,6 +201,9 @@ export default function PKGraph() {
             {levelPoints.length > 0 && <Scatter data={levelPoints} fill="#dc2626" name="Observed" />}
           </LineChart>
         </ResponsiveContainer>
+        {!hasCurve && (
+          <p className="text-sm text-muted-foreground text-center">Enter patient data and run a calculation to see the PK curve.</p>
+        )}
       </CardContent>
     </Card>
   );

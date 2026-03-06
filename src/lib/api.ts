@@ -311,13 +311,14 @@ type DoseResponse = {
 };
 
 export async function calculateBasic(req: BasicCalculateRequest): Promise<BasicCalculateResponse> {
-  const payload: DoseRequest = {
+  // Backend PatientInfo expects serum_creatinine_mg_dl (alias); optional height_cm as null when 0
+  const payload = {
     patient: {
       age_years: req.patient.age,
       weight_kg: req.patient.weight_kg,
-      height_cm: req.patient.height_cm,
+      height_cm: req.patient.height_cm > 0 ? req.patient.height_cm : null,
       sex: req.patient.sex,
-      serum_creatinine: req.patient.serum_creatinine,
+      serum_creatinine_mg_dl: req.patient.serum_creatinine,
       serious_infection: false,
     },
     regimen: {

@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Vancocalc-style: light gray page, white cards, green primary */
+    /* Light gray page, white cards, blue primary */
     --background: 0 0% 94%;
     --foreground: 220 15% 18%;
 
@@ -18,11 +18,11 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 18%;
 
-    /* Primary green (Vancocalc-style) */
-    --primary: 142 56% 36%;
+    /* Primary blue */
+    --primary: 211 100% 42%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 142 56% 30%;
-    --primary-glow: 142 56% 55%;
+    --primary-hover: 211 100% 36%;
+    --primary-glow: 211 100% 58%;
 
     /* Secondary clinical grays */
     --secondary: 0 0% 96%;
@@ -33,32 +33,32 @@ All colors MUST be HSL.
     --muted: 0 0% 96%;
     --muted-foreground: 220 10% 45%;
 
-    /* Accent for highlights */
-    --accent: 142 40% 94%;
-    --accent-foreground: 142 56% 25%;
+    /* Accent for highlights (blue tint) */
+    --accent: 211 80% 95%;
+    --accent-foreground: 211 100% 28%;
 
     /* Clinical alert colors */
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
     --warning: 45 100% 50%;
     --warning-foreground: 45 100% 10%;
-    --success: 142 56% 36%;
+    --success: 211 100% 42%;
     --success-foreground: 0 0% 100%;
 
     --border: 220 13% 88%;
     --input: 220 13% 92%;
-    --input-focus: 142 56% 36%;
-    --ring: 142 56% 36%;
+    --input-focus: 211 100% 42%;
+    --ring: 211 100% 42%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(142 56% 36%), hsl(142 56% 42%));
+    --gradient-primary: linear-gradient(135deg, hsl(211 100% 42%), hsl(211 100% 48%));
     --gradient-secondary: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 99%));
 
-    /* Shadows for depth (Vancocalc-style cards) */
+    /* Shadows for depth */
     --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
     --shadow-elevated: 0 4px 12px -2px rgb(0 0 0 / 0.08);
-    --shadow-focus: 0 0 0 3px hsl(142 56% 36% / 0.2);
+    --shadow-focus: 0 0 0 3px hsl(211 100% 42% / 0.2);
 
     --radius: 0.625rem;
 

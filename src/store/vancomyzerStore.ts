@@ -252,7 +252,7 @@ export const useVancomyzerStore = create<VancomyzerState>((set, get) => ({
           patient: {
             age_years: patient.age,
             weight_kg: patient.weightKg,
-            height_cm: patient.heightCm,
+            height_cm: patient.heightCm > 0 ? patient.heightCm : null,
             sex: patient.sex,
             serum_creatinine: patient.serumCreatinine,
             serious_infection: false,

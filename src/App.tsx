@@ -32,9 +32,9 @@ function HomePage() {
   return (
     <DisclaimerGate>
       <div className="min-h-screen pb-24 font-sans bg-[hsl(var(--background))]">
-        {/* Vancocalc-style header: green brand block */}
+        {/* Header: brand block */}
         <header className="sticky top-0 z-30 bg-[hsl(var(--background))] border-b border-border/60 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 py-3 md:px-6">
+          <div className="w-full max-w-[1600px] mx-auto px-4 py-3 md:px-6">
             <div className="flex flex-col sm:flex-row sm:items-end gap-2">
               <div className="bg-primary rounded-lg px-5 py-3 inline-flex flex-col text-primary-foreground">
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight">Vancomyzer®</h1>
@@ -46,7 +46,7 @@ function HomePage() {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto p-4 md:p-6">
+        <main className="w-full max-w-[1600px] mx-auto p-4 md:p-6">
           {sharedRegimenText && (
             <Alert className="mb-4 rounded-xl border border-border bg-card shadow-sm">
               <div className="text-xs">{sharedRegimenText}</div>
@@ -74,7 +74,7 @@ function HomePage() {
         <VancoCoachWidget />
 
         <footer className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-card/95 backdrop-blur shadow-[0_-1px_3px_0_rgba(0,0,0,0.06)]">
-          <div className="max-w-6xl mx-auto p-3 text-xs">
+          <div className="w-full max-w-[1600px] mx-auto p-3 text-xs">
             <div className="grid grid-cols-3 items-center">
               <div className="flex items-center gap-2 justify-start">
                 <AlertTriangle className="h-3 w-3 text-warning" />
