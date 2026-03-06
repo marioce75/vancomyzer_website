@@ -22,6 +22,8 @@ from backend.regimen_recommender import (
     recommend_regimens,
     loading_dose as recommend_loading_dose,
 )
+from backend.pk_bayes import fit_map, simulate_posterior, rank_regimens
+from backend.pk_bayes.model_registry import get_model
 
 # --- CamelModel and alias generator ---
 def _to_camel(s: str) -> str:
@@ -291,6 +293,45 @@ class BasicRegimenPayload(BaseModel):
 class BasicCalculateAlias(BaseModel):
     patient: BasicPatientPayload
     regimen: BasicRegimenPayload
+
+
+# --- Bayesian MAP engine (pk_bayes) — research/educational only ---
+class BayesFitSample(BaseModel):
+    time_h: float = Field(..., ge=0, le=168, description="Sample time (hours)")
+    concentration_mg_L: float = Field(..., gt=0, le=200, description="Concentration (mg/L)")
+    sample_type: Optional[str] = Field(None, pattern="^(peak|trough|random)$")
+    dose_event_link: Optional[int] = None
+
+
+class BayesFitRegimenItem(BaseModel):
+    dose_mg: float = Field(..., gt=0, le=4000)
+    start_time_hr: float = Field(..., ge=0, le=240)
+    infusion_hr: float = Field(..., gt=0, le=24)
+
+
+class BayesFitRequest(BaseModel):
+    """Request for Bayesian MAP fit (2-compartment, NONMEM-style). NOT FOR CLINICAL USE."""
+    patient: PatientInfo
+    regimen: List[BayesFitRegimenItem]
+    samples: List[BayesFitSample]
+    model_name: Optional[str] = Field("vancomycin_2comp_placeholder", description="Prior model name")
+    engine: Optional[str] = Field("bayes_map_laplace", description="Engine identifier")
+
+
+class BayesFitResponse(BaseModel):
+    """Response from Bayesian MAP fit. Research/educational only."""
+    engine: str = "bayes_map_laplace"
+    model_name: str = ""
+    assumptions: str = ""
+    clinical_warning: str = "NOT FOR CLINICAL USE. Research and educational use only."
+    diagnostics: Dict[str, Any] = Field(default_factory=dict)
+    pk_params: Dict[str, Any] = Field(default_factory=dict)
+    predictions: Dict[str, Any] = Field(default_factory=dict)
+    curves: Dict[str, Any] = Field(default_factory=dict)
+    regimen_options: List[Dict[str, Any]] = Field(default_factory=list)
+    extrapolation_warnings: List[str] = Field(default_factory=list)
+    guardrail_rejections: List[str] = Field(default_factory=list)
+
 
 # Pharmacokinetic Calculation Engine
 class VancomycinPKCalculator:
@@ -1231,6 +1272,187 @@ async def bayesian_dose_endpoint(request: DoseRequest):
 @app.post("/api/bayesian-dose/")
 async def bayesian_dose_endpoint_slash(request: DoseRequest):
     return await bayesian_dose_endpoint(request)
+
+
+def _bayes_fit_guardrails(patient: PatientInfo, samples: list) -> List[str]:
+    """Validate inputs and return list of rejection reasons (empty if ok)."""
+    rejections = []
+    if patient.weight_kg <= 0 or patient.weight_kg > 300:
+        rejections.append("weight_kg must be in (0, 300]")
+    if patient.serum_creatinine <= 0 or patient.serum_creatinine > 20:
+        rejections.append("serum_creatinine must be in (0, 20]")
+    crcl = pk.cockcroft_gault(
+        patient.age_years, patient.weight_kg, patient.sex,
+        patient.serum_creatinine, patient.height_cm,
+    )
+    if crcl < 5:
+        rejections.append("CrCl < 5 mL/min: model may extrapolate poorly")
+    for s in samples:
+        t = getattr(s, "time_h", getattr(s, "time_hours", None))
+        if t is not None and t < 0:
+            rejections.append("Sample time cannot be negative")
+    return rejections
+
+
+@app.post("/api/bayes/fit", response_model=BayesFitResponse)
+async def bayes_fit_endpoint(request: BayesFitRequest):
+    """
+    Bayesian MAP fit using 2-compartment population PK + IIV + Laplace posterior.
+    Returns fit diagnostics, PK params with uncertainty, posterior predictive curves, PTA, and regimen ranking.
+    NOT FOR CLINICAL USE. Research/educational only.
+    """
+    guardrails = _bayes_fit_guardrails(request.patient, request.samples)
+    if guardrails:
+        return BayesFitResponse(
+            engine="bayes_map_laplace",
+            model_name=request.model_name or "vancomycin_2comp_placeholder",
+            guardrail_rejections=guardrails,
+            clinical_warning="NOT FOR CLINICAL USE. Research and educational use only. Input validation failed.",
+        )
+
+    try:
+        pop_model = get_model(request.model_name or "vancomycin_2comp_placeholder")
+    except KeyError:
+        raise HTTPException(status_code=400, detail=f"Unknown model: {request.model_name}")
+
+    crcl = pk.cockcroft_gault(
+        request.patient.age_years,
+        request.patient.weight_kg,
+        request.patient.sex,
+        request.patient.serum_creatinine,
+        request.patient.height_cm,
+    )
+    covariates = {
+        "weight_kg": request.patient.weight_kg,
+        "crcl_ml_min": crcl,
+    }
+    regimen_dicts = [
+        {"dose_mg": r.dose_mg, "start_time_hr": r.start_time_hr, "infusion_hr": r.infusion_hr}
+        for r in request.regimen
+    ]
+    if not regimen_dicts:
+        raise HTTPException(status_code=400, detail="At least one regimen event is required")
+    samples_dicts = [
+        {"time_h": s.time_h, "concentration_mg_L": s.concentration_mg_L}
+        for s in request.samples
+    ]
+    if not samples_dicts:
+        raise HTTPException(status_code=400, detail="At least one sample is required")
+
+    # Covariate range warning
+    ext_warnings = []
+    cov_ranges = pop_model.get("covariate_ranges", {})
+    if cov_ranges:
+        w_min, w_max = cov_ranges.get("weight_kg", [40, 150])
+        if request.patient.weight_kg < w_min or request.patient.weight_kg > w_max:
+            ext_warnings.append(f"Weight {request.patient.weight_kg} kg outside prior range [{w_min}, {w_max}]; extrapolation.")
+        c_min, c_max = cov_ranges.get("crcl_ml_min", [10, 150])
+        if crcl < c_min or crcl > c_max:
+            ext_warnings.append(f"CrCl {crcl:.0f} mL/min outside prior range [{c_min}, {c_max}]; extrapolation.")
+
+    try:
+        fit_result = fit_map(covariates, regimen_dicts, samples_dicts, pop_model)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    # Posterior predictive
+    times_hr = np.linspace(0, 24, 241)
+    try:
+        post_sim = simulate_posterior(fit_result, regimen_dicts, times_h=times_hr, n=1000)
+    except Exception as e:
+        post_sim = None
+
+    # Regimen options (candidates)
+    dose_mg = regimen_dicts[0]["dose_mg"] if regimen_dicts else 1000
+    interval_hr = 12.0
+    if len(regimen_dicts) > 1:
+        interval_hr = regimen_dicts[1]["start_time_hr"] - regimen_dicts[0]["start_time_hr"]
+    candidates = [
+        {"dose_mg": 1000, "interval_hr": 12, "infusion_hr": 1.0},
+        {"dose_mg": 1250, "interval_hr": 12, "infusion_hr": 1.0},
+        {"dose_mg": 1500, "interval_hr": 12, "infusion_hr": 1.0},
+        {"dose_mg": dose_mg, "interval_hr": 8, "infusion_hr": 1.0},
+        {"dose_mg": dose_mg, "interval_hr": 24, "infusion_hr": 1.0},
+    ]
+    try:
+        ranked = rank_regimens(fit_result, candidates, n_sim=300)
+        regimen_options = [
+            {
+                "dose_mg": r.dose_mg,
+                "interval_hr": r.interval_hr,
+                "infusion_hr": r.infusion_hr,
+                "pta_auc400_600": r.score,
+                "p_auc_gt650": r.p_auc_gt650,
+                "p_trough_gt20": r.p_trough_gt20,
+                "auc24_median": r.posterior_sim.auc24_median,
+                "peak_median": r.posterior_sim.peak_median,
+                "trough_median": r.posterior_sim.trough_median,
+            }
+            for r in ranked[:5]
+        ]
+    except Exception:
+        regimen_options = []
+
+    # Build curves for frontend
+    curves_payload = {"time_hr": [], "median": [], "lower": [], "upper": []}
+    if post_sim is not None:
+        curves_payload["time_hr"] = [float(t) for t in post_sim.times_hr]
+        curves_payload["median"] = [float(c) for c in post_sim.median_curve]
+        curves_payload["lower"] = [float(c) for c in post_sim.lower_curve]
+        curves_payload["upper"] = [float(c) for c in post_sim.upper_curve]
+
+    predictions = {}
+    if post_sim is not None:
+        predictions = {
+            "auc24_median": post_sim.auc24_median,
+            "auc24_lower": post_sim.auc24_lower,
+            "auc24_upper": post_sim.auc24_upper,
+            "peak_median": post_sim.peak_median,
+            "peak_lower": post_sim.peak_lower,
+            "peak_upper": post_sim.peak_upper,
+            "trough_median": post_sim.trough_median,
+            "trough_lower": post_sim.trough_lower,
+            "trough_upper": post_sim.trough_upper,
+            "pta_auc400_600": post_sim.pta_auc400_600,
+            "pta_trough_lt20": post_sim.pta_trough_lt20,
+            "pta_auc_lt650": post_sim.pta_auc_lt650,
+        }
+
+    pk_params = {
+        "CL": fit_result.individual_params.get("CL"),
+        "V1": fit_result.individual_params.get("V1"),
+        "Q": fit_result.individual_params.get("Q"),
+        "V2": fit_result.individual_params.get("V2"),
+        "eta_hat": [float(x) for x in fit_result.eta_hat],
+    }
+    cl = fit_result.individual_params.get("CL", 4.0)
+    v1 = fit_result.individual_params.get("V1", 35.0)
+    pk_params["half_life_hr"] = 0.693 * v1 / cl if cl > 0 else None
+
+    diagnostics = {
+        "convergence": fit_result.convergence,
+        "objective": fit_result.objective,
+        "message": fit_result.message,
+        "model_fit_r_squared": fit_result.model_fit_r_squared,
+        "warnings": fit_result.warnings,
+    }
+    if fit_result.residuals is not None:
+        diagnostics["residuals"] = [float(r) for r in fit_result.residuals]
+
+    return BayesFitResponse(
+        engine="bayes_map_laplace",
+        model_name=fit_result.model_name,
+        assumptions=fit_result.assumptions,
+        clinical_warning="NOT FOR CLINICAL USE. Research and educational use only.",
+        diagnostics=diagnostics,
+        pk_params=pk_params,
+        predictions=predictions,
+        curves=curves_payload,
+        regimen_options=regimen_options,
+        extrapolation_warnings=ext_warnings,
+        guardrail_rejections=[],
+    )
+
 
 @app.post("/api/calculate-dosing", response_model=DosingResult)
 async def calculate_dosing(patient: PatientInput):

@@ -1,35 +1,22 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import DisclaimerGate from "@/components/DisclaimerGate";
-import CalculatorForm, { type CalculatorFormHandle } from "@/components/CalculatorForm";
-import ResultsPanel from "@/components/ResultsPanel";
-import ConcentrationTimeChart from "@/components/ConcentrationTimeChart";
+import PatientInputPanel from "@/components/PatientInputPanel";
+import DoseRecommendationCard from "@/components/DoseRecommendationCard";
+import PKGraph from "@/components/PKGraph";
+import PKDetailsPanel from "@/components/PKDetailsPanel";
+import VancoCoachWidget from "@/components/VancoCoachWidget";
 import { Alert } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { decodeShareState } from "@/lib/shareLink";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { BasicCalculateResponse, BayesianCalculateResponse, CalculateResponse } from "@/lib/api";
-import { REGIMEN_LIMITS } from "@/lib/constraints";
 
 function HomePage() {
-  const [result, setResult] = useState<BasicCalculateResponse | BayesianCalculateResponse | CalculateResponse | undefined>(undefined);
-  const [mode, setMode] = useState<"basic" | "bayesian" | "educational">("basic");
-  const [bayesLevels, setBayesLevels] = useState<Array<{ time_hr: number; concentration_mg_l: number }>>([]);
-  const [bayesDoseHistory, setBayesDoseHistory] = useState<
-    Array<{ dose_mg: number; start_time_hr: number; infusion_hr: number }>
-  >([]);
-  const [activeRegimen, setActiveRegimen] = useState<{ doseMg: number; intervalHr: number; infusionHr: number }>({
-    doseMg: 1000,
-    intervalHr: 12,
-    infusionHr: 1.0,
-  });
-  const formRef = useRef<CalculatorFormHandle | null>(null);
   const [referencesOpen, setReferencesOpen] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
-
   const [sharedRegimenText, setSharedRegimenText] = useState<string | null>(null);
-  // If a share link was opened, show a tiny non-PHI summary banner.
+
   useEffect(() => {
     const hash = window.location.hash || "";
     const m = hash.match(/(?:^#|&)s=([^&]+)/);
@@ -42,174 +29,44 @@ function HomePage() {
 
   const currentYear = useMemo(() => new Date().getFullYear(), []);
 
-  function clampDose(doseMg: number) {
-    return Math.max(REGIMEN_LIMITS.minDoseMg, Math.min(REGIMEN_LIMITS.maxSingleDoseMg, doseMg));
-  }
-
-  function snapInterval(intervalHr: number) {
-    const allowed = REGIMEN_LIMITS.allowedIntervalsHr;
-    return allowed.reduce((closest, val) => (Math.abs(val - intervalHr) < Math.abs(closest - intervalHr) ? val : closest), allowed[0]);
-  }
-
-  function applyRegimen(next: { doseMg: number; intervalHr: number; infusionHr: number }) {
-    const safe = {
-      doseMg: clampDose(next.doseMg),
-      intervalHr: snapInterval(
-        Math.min(REGIMEN_LIMITS.maxIntervalHr, Math.max(REGIMEN_LIMITS.minIntervalHr, next.intervalHr)),
-      ),
-      infusionHr: Math.min(REGIMEN_LIMITS.maxInfusionHr, Math.max(REGIMEN_LIMITS.minInfusionHr, next.infusionHr)),
-    };
-    setActiveRegimen(safe);
-    formRef.current?.recompute(safe);
-  }
-
-  const chartRegimen = useMemo(() => {
-    if (mode === "bayesian" && result && "recommendation" in result) {
-      const infusion = result.infusion_hr ?? activeRegimen.infusionHr;
-      return { intervalHr: result.recommendation.interval_hr, infusionHr: infusion };
-    }
-    if (mode === "basic" && result && "regimen" in result) {
-      const interval = result.regimen.chosen_interval_hr ?? result.regimen.recommended_interval_hr ?? activeRegimen.intervalHr;
-      const infusion = result.regimen.infusion_hr ?? activeRegimen.infusionHr;
-      return { intervalHr: interval, infusionHr: infusion };
-    }
-    return { intervalHr: activeRegimen.intervalHr, infusionHr: activeRegimen.infusionHr };
-  }, [mode, result, activeRegimen]);
-
-  const chartCurve = useMemo(() => {
-    if (result && "curve" in result && result.curve) return result.curve;
-    return [];
-  }, [result]);
-
   return (
     <DisclaimerGate>
-      <div className="min-h-screen pb-24">
-        <header className="px-4 py-4 border-b bg-sky-50 sticky top-0 z-30">
-          <div className="flex flex-col gap-3">
+      <div className="min-h-screen pb-24 font-sans">
+        <header className="px-4 py-4 border-b bg-white border-gray-200 sticky top-0 z-30 shadow-sm">
+          <div className="flex flex-col gap-1">
             <div className="text-center">
-              <span className="font-semibold text-2xl sm:text-3xl tracking-tight">Vancomyzer®</span>
-              <div className="text-xs text-muted-foreground mt-1">Educational PK estimates only - not medical advice.</div>
-              <div className="text-sm font-medium mt-2 text-sky-900">Hit that AUC target fast</div>
+              <span className="font-semibold text-2xl sm:text-3xl tracking-tight text-gray-900">Vancomyzer®</span>
+              <div className="text-xs text-gray-500 mt-1">Clinical dosing support · Bayesian AUC · Not medical advice</div>
             </div>
           </div>
         </header>
 
-        <main className="max-w-6xl mx-auto p-4">
+        <main className="max-w-7xl mx-auto p-4 md:p-6">
           {sharedRegimenText && (
-            <Alert className="mb-4">
+            <Alert className="mb-4 border-gray-200 bg-gray-50">
               <div className="text-xs">{sharedRegimenText}</div>
             </Alert>
           )}
 
-          <Alert className="border-warning bg-warning/10 text-warning-foreground mb-4">
-            <AlertTriangle className="h-4 w-4 text-warning" />
-            <div className="text-xs">Educational PK estimates only - not medical advice. Verify with institutional protocols. No PHI stored.</div>
+          <Alert className="border-amber-200 bg-amber-50/80 text-amber-900 mb-4">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <div className="text-xs">Educational PK estimates only. Verify with institutional protocols. No PHI stored.</div>
           </Alert>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <CalculatorForm
-                ref={formRef}
-                onResult={(res, nextMode) => {
-                  setResult(res);
-                  setMode(nextMode);
-                  if (nextMode !== "bayesian") {
-                    setBayesLevels([]);
-                  }
-                }}
-                onReset={() => {
-                  setResult(undefined);
-                  setMode("basic");
-                  setBayesLevels([]);
-                  setBayesDoseHistory([]);
-                  setSharedRegimenText(null);
-                  setActiveRegimen({ doseMg: 1000, intervalHr: 12, infusionHr: 1.0 });
-                }}
-                onInputsChange={(payload) => {
-                  if (payload.mode === "bayesian" && payload.levels) {
-                    setBayesLevels(payload.levels);
-                  }
-                  if (payload.mode === "bayesian" && payload.dose_history) {
-                    setBayesDoseHistory(payload.dose_history);
-                  }
-                  if (payload.regimen) {
-                    setActiveRegimen(payload.regimen);
-                  }
-                }}
-              />
-            </div>
-            <div>
-              <ResultsPanel
-                mode={mode}
-                result={result}
-                regimen={activeRegimen}
-                onRegimenChange={applyRegimen}
-              />
-              <div className="mt-6 grid gap-4">
-                <ConcentrationTimeChart
-                  curve={chartCurve}
-                  levels={mode === "bayesian" ? bayesLevels : []}
-                  band={mode === "bayesian" && result && "curve_ci_low" in result ? { lower: result.curve_ci_low, upper: result.curve_ci_high } : null}
-                  emptyMessage={
-                    mode === "bayesian"
-                      ? "Provide dosing history and levels to generate a Bayesian curve."
-                      : "Compute a basic regimen to generate a concentration-time curve."
-                  }
-                  regimen={chartRegimen}
-                />
-                <div className="rounded-md border bg-card p-4 text-sm">
-                  <div className="font-medium mb-2">Calculation Details</div>
-                  {!result || !("calculation_details" in result) || !result.calculation_details ? (
-                    <div className="text-muted-foreground">Run a calculation to view model details.</div>
-                  ) : (
-                    <div className="space-y-2 text-xs text-muted-foreground">
-                      <div><span className="font-medium text-foreground">Model:</span> {String(result.calculation_details.model)}</div>
-                      <div><span className="font-medium text-foreground">Method:</span> {String(result.calculation_details.method)}</div>
-                      <div><span className="font-medium text-foreground">AUC method:</span> {String(result.calculation_details.auc_method)}</div>
-                      <div><span className="font-medium text-foreground">Assumptions:</span> {String(result.calculation_details.assumptions)}</div>
-                      {result.calculation_details.formulas && (
-                        <div>
-                          <div className="font-medium text-foreground">Formulas</div>
-                          <div>CL: {String(result.calculation_details.formulas.cl)}</div>
-                          <div>AUC24: {String(result.calculation_details.formulas.auc)}</div>
-                        </div>
-                      )}
-                      {result.calculation_details.parameters && (
-                        <div className="grid grid-cols-2 gap-2 text-[11px]">
-                          <div>CL: {Number(result.calculation_details.parameters.cl_l_hr ?? 0).toFixed(2)} L/hr</div>
-                          <div>Vd: {Number(result.calculation_details.parameters.vd_l ?? 0).toFixed(1)} L</div>
-                          <div>k<sub>e</sub>: {Number(result.calculation_details.parameters.k_e ?? 0).toFixed(3)} hr⁻¹</div>
-                          <div>t½: {Number(result.calculation_details.parameters.half_life_hr ?? 0).toFixed(1)} hr</div>
-                          <div>CrCl: {Number(result.calculation_details.parameters.crcl_ml_min ?? 0).toFixed(0)} mL/min</div>
-                        </div>
-                      )}
-                      {result.calculation_details.levels && (
-                        <div>
-                          <div className="font-medium text-foreground">Level timing used</div>
-                          <div>Times are hours after dose start.</div>
-                        </div>
-                      )}
-                      {"fit_diagnostics" in result && result.fit_diagnostics && (result.fit_diagnostics as { level_predictions?: Array<{ time_hours: number; observed: number; predicted: number; residual: number }> }).level_predictions && (
-                        <div>
-                          <div className="font-medium text-foreground">Observed vs predicted</div>
-                          <div className="space-y-1">
-                            {(result.fit_diagnostics as { level_predictions: Array<{ time_hours: number; observed: number; predicted: number; residual: number }> }).level_predictions.slice(0, 5).map((row, idx) => (
-                              <div key={idx}>
-                                t={row.time_hours}h · obs {row.observed.toFixed(1)} · pred {row.predicted.toFixed(1)} · resid {row.residual.toFixed(1)}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div id="dosing-panel-host" className="space-y-4 mt-4" />
-
-            </div>
+          {/* Clinical dashboard: left panel ~32% / right panel ~68% */}
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.32fr)_minmax(0,0.68fr)] gap-6">
+            <aside className="lg:max-h-[calc(100vh-12rem)] lg:sticky lg:top-24 w-full lg:w-auto lg:min-w-[320px]">
+              <PatientInputPanel />
+            </aside>
+            <section className="space-y-6 min-w-0">
+              <DoseRecommendationCard />
+              <PKGraph />
+              <PKDetailsPanel />
+            </section>
           </div>
         </main>
+
+        <VancoCoachWidget />
 
         <footer className="fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur">
           <div className="max-w-6xl mx-auto p-3 text-xs">

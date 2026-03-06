@@ -1,0 +1,30 @@
+{
+  "model_name": "vancomycin_2comp_placeholder",
+  "description": "Placeholder 2-compartment prior for research/educational use. NOT VALIDATED. Replace with published prior for any real use.",
+  "covariate_ranges": {
+    "weight_kg": [40, 150],
+    "crcl_ml_min": [10, 150]
+  },
+  "theta": {
+    "TVCL": 4.0,
+    "TVV1": 35.0,
+    "TVQ": 3.0,
+    "TVV2": 25.0,
+    "theta_crcl_cl": 0.8,
+    "theta_wt_cl": 0.75,
+    "theta_wt_v1": 1.0,
+    "theta_wt_q": 0.75,
+    "theta_wt_v2": 0.75
+  },
+  "omega": [
+    [0.2, 0, 0, 0],
+    [0, 0.2, 0, 0],
+    [0, 0, 0.15, 0],
+    [0, 0, 0, 0.15]
+  ],
+  "sigma": {
+    "proportional": 0.15,
+    "additive": 1.5
+  },
+  "residual_model": "combined"
+}
