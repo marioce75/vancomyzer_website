@@ -8,59 +8,59 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Medical blue theme with clinical professionalism */
-    --background: 210 20% 98%;
-    --foreground: 215 25% 15%;
+    /* Vancocalc-style: light gray page, white cards, green primary */
+    --background: 0 0% 94%;
+    --foreground: 220 15% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 220 15% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 220 15% 18%;
 
-    /* Primary medical blue */
-    --primary: 210 100% 42%;
+    /* Primary green (Vancocalc-style) */
+    --primary: 142 56% 36%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 210 100% 38%;
-    --primary-glow: 210 100% 70%;
+    --primary-hover: 142 56% 30%;
+    --primary-glow: 142 56% 55%;
 
     /* Secondary clinical grays */
-    --secondary: 210 15% 95%;
-    --secondary-foreground: 215 25% 25%;
-    --secondary-hover: 210 15% 90%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 220 15% 25%;
+    --secondary-hover: 0 0% 92%;
 
     /* Muted backgrounds */
-    --muted: 210 15% 96%;
-    --muted-foreground: 215 15% 50%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 220 10% 45%;
 
     /* Accent for highlights */
-    --accent: 195 100% 95%;
-    --accent-foreground: 195 100% 25%;
+    --accent: 142 40% 94%;
+    --accent-foreground: 142 56% 25%;
 
     /* Clinical alert colors */
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
     --warning: 45 100% 50%;
     --warning-foreground: 45 100% 10%;
-    --success: 140 60% 45%;
+    --success: 142 56% 36%;
     --success-foreground: 0 0% 100%;
 
-    --border: 210 20% 88%;
-    --input: 210 20% 92%;
-    --input-focus: 210 100% 50%;
-    --ring: 210 100% 42%;
+    --border: 220 13% 88%;
+    --input: 220 13% 92%;
+    --input-focus: 142 56% 36%;
+    --ring: 142 56% 36%;
 
-    /* Medical gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(210 100% 42%), hsl(195 100% 48%));
-    --gradient-secondary: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 15% 98%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 15% 99%));
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(142 56% 36%), hsl(142 56% 42%));
+    --gradient-secondary: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 99%));
 
-    /* Shadows for depth */
-    --shadow-card: 0 2px 8px -2px hsl(210 15% 15% / 0.08);
-    --shadow-elevated: 0 8px 24px -4px hsl(210 15% 15% / 0.12);
-    --shadow-focus: 0 0 0 3px hsl(210 100% 42% / 0.2);
+    /* Shadows for depth (Vancocalc-style cards) */
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+    --shadow-elevated: 0 4px 12px -2px rgb(0 0 0 / 0.08);
+    --shadow-focus: 0 0 0 3px hsl(142 56% 36% / 0.2);
 
-    --radius: 0.5rem;
+    --radius: 0.625rem;
 
     --sidebar-background: 0 0% 98%;
 

@@ -33,7 +33,7 @@ export default function PKDetailsPanel() {
 
   if (!result) {
     return (
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardContent className="py-4">
           <p className="text-sm text-gray-500">Run a calculation to view PK model details.</p>
         </CardContent>
@@ -42,12 +42,12 @@ export default function PKDetailsPanel() {
   }
 
   return (
-    <Card className="bg-white border border-gray-200 shadow-sm">
+    <Card>
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50/50 rounded-t-lg transition-colors">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base font-semibold text-gray-900">PK Model Details</CardTitle>
+              <CardTitle className="text-base font-semibold text-foreground">PK Model Details</CardTitle>
               {open ? <ChevronDown className="h-4 w-4 text-gray-500" /> : <ChevronRight className="h-4 w-4 text-gray-500" />}
             </div>
           </CardHeader>

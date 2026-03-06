@@ -97,7 +97,7 @@ export default function VancoCoachWidget() {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
       {open && (
-        <Card className="w-[360px] max-w-[calc(100vw-2rem)] border border-gray-200 shadow-lg bg-white">
+        <Card className="w-[360px] max-w-[calc(100vw-2rem)] shadow-lg">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-primary" />

@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useVancomyzerStore } from "@/store/vancomyzerStore";
 import { REGIMEN_LIMITS } from "@/lib/constraints";
 import { Plus, Trash2 } from "lucide-react";
@@ -87,9 +88,9 @@ export default function PatientInputPanel() {
   return (
     <div className="space-y-4 h-full overflow-y-auto">
       {/* Patient Profile */}
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold text-gray-900">Patient Profile</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Patient Profile</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
@@ -105,19 +106,16 @@ export default function PatientInputPanel() {
               />
             </div>
             <div>
-              <Label className="text-xs text-gray-600">Sex</Label>
-              <Select
+              <Label className="text-xs text-muted-foreground">Sex</Label>
+              <ToggleGroup
+                type="single"
                 value={patient.sex}
-                onValueChange={(v: "male" | "female") => setPatient({ sex: v })}
+                onValueChange={(v) => v && setPatient({ sex: v as "male" | "female" })}
+                className="mt-1.5 flex rounded-lg border border-input bg-muted/30 p-0.5"
               >
-                <SelectTrigger className="mt-1 h-9">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                </SelectContent>
-              </Select>
+                <ToggleGroupItem value="male" className="flex-1 rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground" aria-label="Male">Male</ToggleGroupItem>
+                <ToggleGroupItem value="female" className="flex-1 rounded-md data-[state=on]:bg-primary data-[state=on]:text-primary-foreground" aria-label="Female">Female</ToggleGroupItem>
+              </ToggleGroup>
             </div>
             <div>
               <Label className="text-xs text-gray-600">Height (cm)</Label>
@@ -156,9 +154,9 @@ export default function PatientInputPanel() {
       </Card>
 
       {/* Renal Function */}
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold text-gray-900">Renal Function</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Renal Function</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
@@ -200,9 +198,9 @@ export default function PatientInputPanel() {
       </Card>
 
       {/* Infection Data */}
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold text-gray-900">Infection Data</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Infection Data</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
@@ -246,9 +244,9 @@ export default function PatientInputPanel() {
       </Card>
 
       {/* Dosing Inputs */}
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold text-gray-900">Dosing Inputs</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Dosing Inputs</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-3 gap-3">
@@ -298,9 +296,9 @@ export default function PatientInputPanel() {
       </Card>
 
       {/* Serum Levels */}
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-base font-semibold text-gray-900">Serum Levels</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Serum Levels</CardTitle>
           <Button type="button" variant="outline" size="sm" onClick={addLevel} className="h-8">
             <Plus className="h-4 w-4 mr-1" /> Add
           </Button>
@@ -357,9 +355,9 @@ export default function PatientInputPanel() {
 
       {/* Dose History (Bayesian) */}
       {mode === "bayesian" && (
-        <Card className="bg-white border border-gray-200 shadow-sm">
+        <Card>
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
-            <CardTitle className="text-base font-semibold text-gray-900">Dose History</CardTitle>
+            <CardTitle className="text-base font-semibold text-foreground">Dose History</CardTitle>
             <Button type="button" variant="outline" size="sm" onClick={addDose} className="h-8">
               <Plus className="h-4 w-4 mr-1" /> Add
             </Button>
@@ -409,7 +407,7 @@ export default function PatientInputPanel() {
       )}
 
       {/* Mode toggle + Reset */}
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardContent className="pt-4 space-y-3">
           <div>
             <Label className="text-xs text-gray-600">Calculation mode</Label>

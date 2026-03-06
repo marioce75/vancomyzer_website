@@ -93,7 +93,7 @@ export default function DoseRecommendationCard() {
 
   if (error) {
     return (
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardContent className="py-6">
           <p className="text-sm text-red-600">{error}</p>
         </CardContent>
@@ -103,7 +103,7 @@ export default function DoseRecommendationCard() {
 
   if (loading) {
     return (
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardContent className="py-8">
           <p className="text-sm text-gray-500 text-center">Calculating…</p>
         </CardContent>
@@ -113,9 +113,9 @@ export default function DoseRecommendationCard() {
 
   if (!data) {
     return (
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-gray-900">Recommended Dose</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Recommended Dose</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-gray-500">Enter patient data to see recommendations.</p>
@@ -129,9 +129,9 @@ export default function DoseRecommendationCard() {
   const troughStat = troughStatus(data.predictedTrough);
 
   return (
-    <Card className="bg-white border border-gray-200 shadow-sm">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-base font-semibold text-gray-900">
+        <CardTitle className="text-base font-semibold text-foreground">
           Recommended Dose {data.isBayesian ? "(Bayesian)" : ""}
         </CardTitle>
       </CardHeader>

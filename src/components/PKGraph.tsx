@@ -135,7 +135,7 @@ export default function PKGraph() {
 
   if (base.length === 0) {
     return (
-      <Card className="bg-white border border-gray-200 shadow-sm">
+      <Card>
         <CardHeader>
           <CardTitle className="text-base font-semibold text-gray-900">Concentration–Time (0–24 h)</CardTitle>
         </CardHeader>
@@ -147,7 +147,7 @@ export default function PKGraph() {
   }
 
   return (
-    <Card className="bg-white border border-gray-200 shadow-sm">
+    <Card>
       <CardHeader>
         <CardTitle className="text-base font-semibold text-gray-900">Concentration–Time (0–24 h)</CardTitle>
       </CardHeader>

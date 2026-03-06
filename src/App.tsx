@@ -31,25 +31,30 @@ function HomePage() {
 
   return (
     <DisclaimerGate>
-      <div className="min-h-screen pb-24 font-sans">
-        <header className="px-4 py-4 border-b bg-white border-gray-200 sticky top-0 z-30 shadow-sm">
-          <div className="flex flex-col gap-1">
-            <div className="text-center">
-              <span className="font-semibold text-2xl sm:text-3xl tracking-tight text-gray-900">Vancomyzer®</span>
-              <div className="text-xs text-gray-500 mt-1">Clinical dosing support · Bayesian AUC · Not medical advice</div>
+      <div className="min-h-screen pb-24 font-sans bg-[hsl(var(--background))]">
+        {/* Vancocalc-style header: green brand block */}
+        <header className="sticky top-0 z-30 bg-[hsl(var(--background))] border-b border-border/60 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 py-3 md:px-6">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-2">
+              <div className="bg-primary rounded-lg px-5 py-3 inline-flex flex-col text-primary-foreground">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight">Vancomyzer®</h1>
+                <p className="text-sm opacity-95 mt-0.5">Vancomycin Dosage Calculator</p>
+                <p className="text-xs opacity-90">Using Bayesian modeling &amp; Pharmacokinetics</p>
+              </div>
+              <p className="text-xs text-muted-foreground sm:mb-1 sm:ml-2">Clinical dosing support · Not medical advice</p>
             </div>
           </div>
         </header>
 
         <main className="max-w-7xl mx-auto p-4 md:p-6">
           {sharedRegimenText && (
-            <Alert className="mb-4 border-gray-200 bg-gray-50">
+            <Alert className="mb-4 rounded-xl border border-border bg-card shadow-sm">
               <div className="text-xs">{sharedRegimenText}</div>
             </Alert>
           )}
 
-          <Alert className="border-amber-200 bg-amber-50/80 text-amber-900 mb-4">
-            <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <Alert className="mb-4 rounded-xl border border-amber-200 bg-amber-50/90 text-amber-900 shadow-sm">
+            <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
             <div className="text-xs">Educational PK estimates only. Verify with institutional protocols. No PHI stored.</div>
           </Alert>
 
@@ -68,7 +73,7 @@ function HomePage() {
 
         <VancoCoachWidget />
 
-        <footer className="fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur">
+        <footer className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-card/95 backdrop-blur shadow-[0_-1px_3px_0_rgba(0,0,0,0.06)]">
           <div className="max-w-6xl mx-auto p-3 text-xs">
             <div className="grid grid-cols-3 items-center">
               <div className="flex items-center gap-2 justify-start">
