@@ -1,0 +1,6 @@
+.env
+telegram_agent.log
+.venv
+website/.next/
+website/node_modules/
+website/tsconfig.tsbuildinfo

@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-03-12T22:42:31.114536+00:00",
+  "source": "reddit",
+  "status": "blocked_without_api_access",
+  "recommended_next_step": "Use official Reddit API credentials or replace Reddit with alternative public discussion sources.",
+  "alternatives": [
+    "StudentDoctorNetwork public threads",
+    "pharmacy and infectious disease blogs",
+    "Google Alerts / RSS around vancomycin dosing topics",
+    "continued PubMed monitoring",
+    "public guideline/news pages"
+  ]
+}

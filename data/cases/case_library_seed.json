@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-03-12T22:59:15.303704Z",
+  "cases": [
+    {
+      "case_id": "CASE-001",
+      "title": "Stable adult with preserved renal function",
+      "scenario": "Adult inpatient receiving vancomycin with stable serum creatinine and routine monitoring needs.",
+      "teaching_points": [
+        "basic AUC workflow",
+        "interpreting routine dosing outputs",
+        "transparent explanation of assumptions"
+      ]
+    },
+    {
+      "case_id": "CASE-002",
+      "title": "Renal function instability",
+      "scenario": "Adult inpatient with changing serum creatinine and uncertainty in dose interpretation.",
+      "teaching_points": [
+        "impact of unstable renal function",
+        "higher uncertainty",
+        "need for caution in recommendation review"
+      ]
+    },
+    {
+      "case_id": "CASE-003",
+      "title": "Sparse level data",
+      "scenario": "Limited level information available, requiring careful explanation of assumptions and uncertainty.",
+      "teaching_points": [
+        "sparse data handling",
+        "confidence limitations",
+        "importance of visible assumptions"
+      ]
+    },
+    {
+      "case_id": "CASE-004",
+      "title": "AUC versus trough interpretation",
+      "scenario": "Case designed to explain why AUC-guided interpretation may differ from trough-based reasoning.",
+      "teaching_points": [
+        "AUC vs trough",
+        "Bayesian explanation",
+        "education-focused interpretation"
+      ]
+    },
+    {
+      "case_id": "CASE-005",
+      "title": "Complex workflow communication case",
+      "scenario": "Case focused on explaining dose changes to a broader clinical team in a readable way.",
+      "teaching_points": [
+        "communication clarity",
+        "documentation-ready summary",
+        "trust-building output design"
+      ]
+    }
+  ]
+}

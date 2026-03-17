@@ -1,0 +1,85 @@
+from pathlib import Path
+from datetime import datetime
+
+out = Path("reports/lead-magnets/VANCOMYZER_EMAIL_CAPTURE_AND_LEAD_MAGNETS.md")
+
+lines = []
+lines.append("# Vancomyzer Email Capture and Lead Magnets")
+lines.append("")
+lines.append(f"Generated: {datetime.utcnow().isoformat()}Z")
+lines.append("")
+
+lines.append("## Purpose")
+lines.append("Define how Vancomyzer should convert educational interest into audience growth using credible, clinician-relevant lead magnets.")
+lines.append("")
+
+lines.append("## Core goals")
+lines.append("- Capture interest without aggressive selling")
+lines.append("- Offer genuinely useful educational value")
+lines.append("- Connect content exploration to repeat engagement")
+lines.append("- Build trust before product-driven conversion asks")
+lines.append("")
+
+lines.append("## Recommended lead magnets")
+lines.append("")
+lines.append("### 1. Vancomycin AUC quick-reference guide")
+lines.append("- concise educational guide")
+lines.append("- clinician-oriented")
+lines.append("- trust-building and SEO-aligned")
+lines.append("")
+
+lines.append("### 2. Bayesian dosing explanation sheet")
+lines.append("- plain-language explanation")
+lines.append("- supports education and onboarding")
+lines.append("- helps first-time visitors understand the workflow")
+lines.append("")
+
+lines.append("### 3. Case pack: vancomycin dosing examples")
+lines.append("- stable monitoring case")
+lines.append("- renal instability case")
+lines.append("- sparse data case")
+lines.append("- AUC vs trough case")
+lines.append("")
+
+lines.append("### 4. Documentation-ready summary examples")
+lines.append("- quick summary examples")
+lines.append("- clinical note examples")
+lines.append("- shows workflow and communication value")
+lines.append("")
+
+lines.append("## Where email capture should appear")
+lines.append("")
+lines.append("- resource hub")
+lines.append("- SEO pages")
+lines.append("- case pages")
+lines.append("- FAQ page")
+lines.append("- documentation/demo pages")
+lines.append("")
+
+lines.append("## Suggested CTA language")
+lines.append("")
+lines.append("- Get the quick-reference guide")
+lines.append("- Get sample vancomycin dosing cases")
+lines.append("- Get documentation-ready examples")
+lines.append("- Get the Bayesian dosing explainer")
+lines.append("")
+
+lines.append("## Messaging guardrails")
+lines.append("")
+lines.append("- Keep offers educational, not hype-driven")
+lines.append("- Avoid overpromising outcomes")
+lines.append("- Make clear what the user will receive")
+lines.append("- Keep the value concrete and clinician-relevant")
+lines.append("")
+
+lines.append("## Conversion philosophy")
+lines.append("")
+lines.append("- Education first")
+lines.append("- Trust before stronger CTAs")
+lines.append("- Lead magnet relevance should match page intent")
+lines.append("- The best lead magnets should help the user do something useful immediately")
+lines.append("")
+
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text("\n".join(lines), encoding="utf-8")
+print(f"Wrote {out}")

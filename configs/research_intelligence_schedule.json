@@ -1,0 +1,141 @@
+{
+  "enabled": true,
+  "loop_sleep_seconds": 900,
+  "report_output_dir": "reports/market-intel",
+  "task_recommendation_dir": "reports/market-intel/task-recommendations",
+  "sources": {
+    "pubmed": {
+      "enabled": true,
+      "min_interval_hours": 24,
+      "max_items_per_run": 3,
+      "prefer_firecrawl": true,
+      "targets": [
+        {
+          "name": "Ducharme 1994 adult PK paper",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/7846752/",
+          "notes": "Primary adult PK reference for clearance-volume language used in Vancomyzer."
+        },
+        {
+          "name": "Vancomycin AUC monitoring literature search",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=vancomycin+AUC+monitoring",
+          "notes": "Watch for new literature or practice-shaping evidence summaries."
+        },
+        {
+          "name": "Vancomycin Bayesian dosing literature search",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=vancomycin+Bayesian+dosing",
+          "notes": "Track changes in patient-specific dosing and model-positioning literature."
+        }
+      ]
+    },
+    "guidelines": {
+      "enabled": true,
+      "min_interval_hours": 24,
+      "max_items_per_run": 3,
+      "prefer_firecrawl": true,
+      "targets": [
+        {
+          "name": "ASHP therapeutic monitoring guideline page",
+          "url": "https://www.ashp.org/clinical-pharmacy/practice-and-policy/therapeutic-guidelines/monitoring-vancomycin",
+          "notes": "Check for practice guidance changes or updated framing."
+        },
+        {
+          "name": "IDSA practice guidance",
+          "url": "https://www.idsociety.org/practice-guideline/",
+          "notes": "Watch for guideline updates affecting vancomycin monitoring interpretation."
+        },
+        {
+          "name": "Sanford Guide vancomycin content landing",
+          "url": "https://www.sanfordguide.com/",
+          "notes": "Monitor public-facing changes in guideline-adjacent vancomycin education or positioning."
+        }
+      ]
+    },
+    "reddit": {
+      "enabled": true,
+      "min_interval_hours": 12,
+      "max_items_per_run": 3,
+      "prefer_firecrawl": true,
+      "targets": [
+        {
+          "name": "Reddit search: vancomycin AUC dosing",
+          "url": "https://www.reddit.com/search/?q=vancomycin%20AUC%20dosing",
+          "notes": "Look for recurring workflow pain, calculator confusion, and monitoring questions."
+        },
+        {
+          "name": "Reddit search: vancomycin trough",
+          "url": "https://www.reddit.com/search/?q=vancomycin%20trough",
+          "notes": "Check for persistent trough-vs-AUC transition pain."
+        },
+        {
+          "name": "Reddit search: Bayesian vancomycin",
+          "url": "https://www.reddit.com/search/?q=Bayesian%20vancomycin",
+          "notes": "Track public discussion about Bayesian tools and trust concerns."
+        }
+      ]
+    },
+    "studentdoctor": {
+      "enabled": true,
+      "min_interval_hours": 24,
+      "max_items_per_run": 2,
+      "prefer_firecrawl": true,
+      "targets": [
+        {
+          "name": "Student Doctor Network search vancomycin",
+          "url": "https://forums.studentdoctor.net/search/61123320/?q=vancomycin&o=relevance",
+          "notes": "Educational discussion surface for dosing and pharmacokinetics questions."
+        },
+        {
+          "name": "Student Doctor Network forums",
+          "url": "https://forums.studentdoctor.net/",
+          "notes": "Fallback public forum landing page if search results are sparse or blocked."
+        }
+      ]
+    },
+    "pharmacy_forums": {
+      "enabled": true,
+      "min_interval_hours": 24,
+      "max_items_per_run": 2,
+      "prefer_firecrawl": true,
+      "targets": [
+        {
+          "name": "Pharmacy Times vancomycin search",
+          "url": "https://www.pharmacytimes.com/search?search=vancomycin",
+          "notes": "Monitor pharmacy-facing discussion and education pages."
+        },
+        {
+          "name": "tl;dr pharmacy vancomycin search",
+          "url": "https://www.tldrpharmacy.com/search?q=vancomycin",
+          "notes": "Track public pharmacy education content and recurring framing."
+        }
+      ]
+    },
+    "competitor_tools": {
+      "enabled": true,
+      "min_interval_hours": 48,
+      "max_items_per_run": 4,
+      "prefer_firecrawl": true,
+      "targets": [
+        {
+          "name": "DoseMeRx vancomycin page",
+          "url": "https://doseme-rx.com/vancomycin/",
+          "notes": "Watch positioning, workflow, and trust-language changes."
+        },
+        {
+          "name": "InsightRX vancomycin page",
+          "url": "https://www.insightrx.com/vancomycin-dosing-software",
+          "notes": "Track public claims and messaging shifts."
+        },
+        {
+          "name": "PrecisePK vancomycin page",
+          "url": "https://www.precisepk.com/vancomycin/",
+          "notes": "Monitor public-facing feature and evidence framing."
+        },
+        {
+          "name": "VancoCalc calculator page",
+          "url": "https://vancocalc.com/",
+          "notes": "Check simple calculator positioning and public UX messaging."
+        }
+      ]
+    }
+  }
+}

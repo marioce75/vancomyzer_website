@@ -1,0 +1,96 @@
+from pathlib import Path
+from datetime import datetime
+
+out = Path("reports/demo-deck/VANCOMYZER_DEMO_DECK_CONTENT.md")
+
+lines = []
+lines.append("# Vancomyzer Demo Deck Content")
+lines.append("")
+lines.append(f"Generated: {datetime.utcnow().isoformat()}Z")
+lines.append("")
+
+lines.append("## Purpose")
+lines.append("Define the content structure for a serious evaluator deck that presents Vancomyzer clearly, credibly, and without overstated claims.")
+lines.append("")
+
+lines.append("## Recommended deck flow")
+lines.append("")
+lines.append("### 1. Title slide")
+lines.append("- Vancomyzer")
+lines.append("- Transparent vancomycin dosing workflow support")
+lines.append("")
+
+lines.append("### 2. Problem slide")
+lines.append("- vancomycin dosing can be difficult to interpret")
+lines.append("- assumptions and outputs are often not easy to review")
+lines.append("- clinicians need workflow-friendly, interpretable support")
+lines.append("")
+
+lines.append("### 3. Product thesis")
+lines.append("- transparency")
+lines.append("- interpretability")
+lines.append("- documentation-ready summaries")
+lines.append("- clinician-friendly workflow")
+lines.append("")
+
+lines.append("### 4. What Vancomyzer is designed to support")
+lines.append("- review of dosing recommendations")
+lines.append("- explanation of assumptions and outputs")
+lines.append("- educational case exploration")
+lines.append("- documentation and communication workflow")
+lines.append("")
+
+lines.append("### 5. Product walkthrough")
+lines.append("- input flow")
+lines.append("- recommendation summary")
+lines.append("- why this recommendation was made")
+lines.append("- visible assumptions and limitations")
+lines.append("- export/documentation example")
+lines.append("")
+
+lines.append("### 6. Sample cases")
+lines.append("- stable monitoring case")
+lines.append("- renal instability case")
+lines.append("- sparse data case")
+lines.append("- AUC vs trough interpretation case")
+lines.append("")
+
+lines.append("### 7. Trust and transparency")
+lines.append("- visible assumptions")
+lines.append("- visible method/model")
+lines.append("- caution and limitation notes")
+lines.append("- evidence-aware communication")
+lines.append("")
+
+lines.append("### 8. Why this may matter for teams")
+lines.append("- easier review")
+lines.append("- clearer communication")
+lines.append("- more interpretable workflow")
+lines.append("- documentation-ready outputs")
+lines.append("")
+
+lines.append("### 9. Evaluation CTA")
+lines.append("- review sample cases")
+lines.append("- review documentation-ready examples")
+lines.append("- request workflow evaluation")
+lines.append("")
+
+lines.append("## Messaging guardrails")
+lines.append("")
+lines.append("- avoid unsupported superiority claims")
+lines.append("- avoid unsupported outcome or ROI claims")
+lines.append("- keep all deck content concrete and product-linked")
+lines.append("- use educational and workflow language, not hype")
+lines.append("")
+
+lines.append("## Suggested appendix materials")
+lines.append("")
+lines.append("- FAQ highlights")
+lines.append("- case examples")
+lines.append("- documentation export examples")
+lines.append("- trust/evidence notes")
+lines.append("")
+
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text("\n".join(lines), encoding="utf-8")
+print(f"Wrote {out}")

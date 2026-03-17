@@ -1,0 +1,550 @@
+{
+  "generated_at": "2026-03-12T22:20:26.169753+00:00",
+  "source": "PubMed E-utilities",
+  "results": [
+    {
+      "query": "vancomycin auc bayesian",
+      "count": 10,
+      "articles": [
+        {
+          "pmid": "41794682",
+          "title": "The optimal target of vancomycin area under the curve in early or later phase on clinical outcomes and nephrotoxicity in patients with enterococcal infective endocarditis: how much is enough?",
+          "abstract": "",
+          "journal": "BMC infectious diseases",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": "07"
+          },
+          "doi": "10.1186/s12879-026-12993-5",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41794682/"
+        },
+        {
+          "pmid": "41760398",
+          "title": "AI-enhanced therapeutic drug monitoring for vancomycin and β-lactam antibiotics in critical care: from population PK to bedside algorithms.",
+          "abstract": "INTRODUCTION: Although sepsis and other severe infections in intensive care are common and deadly, obtaining safe and effective exposure for vancomycin and broad-spectrum β-lactams is difficult because of substantial kinetic variability, operational difficulties with AUC-guided therapeutic drug monitoring (TDM) and model‑informed precision dosing (MIPD), and the limited effectiveness of current tools on patient-centered outcomes.\nAREAS COVERED: This is a narrative review of exposure-response correlations, vancomycin and β-lactam kinetic targets, and the use of artificial intelligence (AI)-driven dosing tools and TDM/MIPD in patients in intensive care units (ICUs) and other high-acuity settings. From 2005 to 2025, we searched PubMed/MEDLINE, Embase, Web of Science, IEEE Xplore, and Google Scholar for English-language research, recommendations, and methodological publications on TDM, MIPD, AI, and machine learning (ML). This review summarized information on early AI-enabled clinical decision support systems, AUC-guided vancomycin TDM, β-lactam TDM in high-risk patients, and AI models that predict drug concentrations, AUC, acute kidney injury (AKI), and composite outcomes.\nEXPERT OPINION: Most AI models are single-center, retrospective, and surrogate-focused. By incorporating validated AI components into multicentre procedures that prioritize explainability, data quality, usability, and prospective assessment, it has the greatest immediate advantage of enhancing guideline-aligned AUC-guided TDM and population pharmacokinetic (PopPK)//Bayesian frameworks.",
+          "journal": "Expert review of clinical pharmacology",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": "02"
+          },
+          "doi": "10.1080/17512433.2026.2638352",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41760398/"
+        },
+        {
+          "pmid": "40966765",
+          "title": "Analysis of Pharmacokinetics and Comparison Between One-point Versus Two-point Sampling for Therapeutic Drug Monitoring of Vancomycin in Children.",
+          "abstract": "BACKGROUND: Vancomycin therapeutic drug monitoring (TDM) is essential for optimizing efficacy and minimizing toxicity, particularly in acute kidney injury (AKI). However, recent guidelines favor area under the curve (AUC)-guided dosing over traditional trough monitoring to improve dosing. This study aimed to compare vancomycin TDM strategies in pediatric patients, examine the agreement between 1-point and 2-point sampling methods for AUC estimation, and explore the association between vancomycin exposure and clinical outcomes.\nMETHODS: This retrospective cohort study included pediatric patients (2 months to 18 years of age) who underwent vancomycin TDM between 2017 and 2019 (trough-based dosing) and 2020 and 2022 (AUC-based dosing). The pharmacokinetic parameters were estimated using Bayesian software. AKI was defined according to the Kidney Disease: Improving Global Outcomes criteria. Receiver operating characteristic curve analysis was performed to identify the threshold values of AUC and trough concentrations for predicting AKI.\nRESULTS: A total of 288 patients were included in the study: 164 were from 2017 to 2019 and 124 were from 2020 to 2022, respectively. A comparison of the 1-point and 2-point sampling methods for estimating the AUC showed no significant differences. The incidence of AKI was slightly lower in the 2020-2022 cohort (2.4%) than in the 2017-2019 cohort (6.7%), though the difference was not statistically significant. The AUC threshold for predicting AKI was similar between 1-point and 2-point sampling methods (588-621 mg h/L).\nCONCLUSIONS: AUC-based vancomycin dosing was associated with a reduced incidence of AKI in pediatric patients, without compromising efficacy. Further studies are warranted to refine the exposure targets for bacteremia resolution.",
+          "journal": "The Pediatric infectious disease journal",
+          "pubdate": {
+            "year": "2026",
+            "month": "Feb",
+            "day": "01"
+          },
+          "doi": "10.1097/INF.0000000000005006",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40966765/"
+        },
+        {
+          "pmid": "40326023",
+          "title": "Implementation of AUC-Guided Vancomycin Dosing: What Role Remains for Trough-Only Monitoring? A Retrospective, Cohort Study.",
+          "abstract": "BackgroundThe 2020 consensus guidelines for drug monitoring of vancomycin recommended AUC-guided dosing to reduce acute kidney injury (AKI) and improve clinical outcomes in patients with serious methicillin-resistant Staphylococcus aureus (MRSA) infections previously managed with trough concentrations of 15-20 mg/L.ObjectivesTo determine if AUC-guided dosing of vancomycin reduces AKI and improves clinical outcomes including non-invasive infections with S. aureus compared with trough-only dosing broadened to concentrations of 10-20 mg/L.MethodsA retrospective, single-center, cohort study was conducted over 12 months comparing Bayesian software-guided AUC-dosing with trough-only dosing. Information collected included patient demographics, co-morbidities, concurrent nephrotoxins, assessment measures of drug exposure, and patient outcomes. Nominal data were analyzed using the chi-square test, and continuous data using the independent t test.ResultsBased on the Kidney Disease Improving Global Outcomes (KDIGO) criteria, the incidence of AKI was 7.65% and 6.06% (P = 0.56), among 183 patients in the AUC-guided and 165 subjects in the trough-only groups, respectively. Individuals in the trough-only group were younger, had fewer co-morbidities and admissions to the ICU. A lower incidence of AKI findings among trough-only subjects was likely a result of the duration of therapy (mean of 4.2 days), mean trough concentrations <15 mg/L, and fewer concurrent nephrotoxins. AUC-guided dosing significantly reduced the total daily dose, 2.29 vs 2.54 g/day (P = 0.01), but provided no significant reductions in cumulative dose, duration of therapy, length of hospital stays, or overall patient outcomes.ConclusionAUC-guided vancomycin dosing did not reduce the incidence of AKI nor impact patient outcomes vs trough-only dosing. Successful clinical outcomes with lower average trough concentrations may have resulted from the treatment of nonbacteremic skin soft tissue infections (SSTI), suggesting an indication for further exploration of vancomycin dosing strategies.",
+          "journal": "Journal of pharmacy practice",
+          "pubdate": {
+            "year": "2026",
+            "month": "Feb",
+            "day": ""
+          },
+          "doi": "10.1177/08971900251338904",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40326023/"
+        },
+        {
+          "pmid": "41321659",
+          "title": "Adverse events leading to discontinuation of daptomycin versus vancomycin in outpatient parenteral antimicrobial therapy: a retrospective cohort study.",
+          "abstract": "OBJECTIVES: To compare the adverse event rates between daptomycin and vancomycin in the outpatient parenteral antimicrobial therapy (OPAT) setting.\nMETHODS: This was a retrospective cohort study of patients treated with vancomycin or daptomycin in OPAT. Demographic and clinical data were abstracted from the electronic medical record. Vancomycin was dosed using Bayesian kinetics software to achieve a goal AUC of 400-600 mg h/L and daptomycin was a weight-based dose. The primary outcome was the occurrence of an adverse event resulting in a change in antimicrobial therapy or early discontinuation due to harm or injury. Secondary outcomes included measurement of time to adverse event occurrence and time in therapeutic range for the vancomycin group. The primary outcome was analyzed using a chi-square test.\nRESULTS: A total of 175 patients were included, with 112 in the daptomycin group and 63 in the vancomycin group. The primary outcome of early discontinuation of OPAT therapy was not statistically different between the daptomycin and vancomycin groups [15/112 (13%) versus 9/63 (14%); P = 0.87]. The daptomycin group demonstrated a shorter median time to adverse event occurrence compared with the vancomycin group (12 versus 30 days).\nCONCLUSIONS: When comparing the rate of early discontinuation between daptomycin and vancomycin in OPAT, there was no significant difference between groups. These findings suggest that either agent may be considered in the OPAT setting depending on patient-specific factors. Dosing of vancomycin using Bayesian model dosing software may have led to a reduction of adverse events in the vancomycin group.",
+          "journal": "JAC-antimicrobial resistance",
+          "pubdate": {
+            "year": "2025",
+            "month": "Dec",
+            "day": ""
+          },
+          "doi": "10.1093/jacamr/dlaf227",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41321659/"
+        },
+        {
+          "pmid": "40681311",
+          "title": "Impact of using different renal function estimation equations on vancomycin dosing.",
+          "abstract": "OBJECTIVES: To assess which of the formulae for estimating renal function (Cockcroft-Gault (CG), Chronic Kidney Disease Epidemiology Collaboration CKD-EPI) and Modification of Diet in Renal Disease (MDRD)) provides the most accurate prediction of minimum vancomycin concentration (Cmin) and to evaluate whether they can be interchanged to optimise vancomycin dosage.\nMETHODS: An observational and retrospective study was undertaken in hospitalised adult patients treated with intravenous vancomycin. Patients with serum creatinine (Scr) >2 mg/dL and <0.5 mg/dL, body mass index >40 kg/m2, need for extracorporeal clearance techniques and unstable renal function were excluded. Bayesian analysis was used to obtain individual pharmacokinetic parameters. Vancomycin clearance (CLvan) was calculated by means of CG (eCLvanCG), CKD-EPI (eCLvanCKD-EPI) and MDRD (eCLvanMDRD) and used to obtain Cmin estimates (eCmin). eCmin and observed Cmin were compared using an intraclass correlation coefficient (ICC). A post-hoc analysis by subgroups (age, sex, weight, Scr and estimated glomerular filtration rate (eGFR)) was performed. From each eCLvan, the area under the curve (AUC) was calculated and categorised as AUC <400 mg*hour/L, AUC 400-600 mg*hour/L and AUC >600 mg*hour/L. The kappa coefficient was applied to study AUC concordance.\nRESULTS: A total of 228 patients (69.3% men) were included. eCminCG had a statistically significant better agreement with Cmin (ICC >0.7) and showed good agreement in almost all subgroups. Patients with Scr >1.1 mg/dL were the only subgroup in which eCminMDRD and eCminCKD-EPI had an adequate ICC with no statistically significant differences compared with eCminCG. eCminMDRD had a similar ICC to eCminCG in the eGFR <60 mL/min and age 46-75 years subgroups. Kappa values showed regular agreement in all subgroups: 0.32 (AUC <400 mg*hour/L), 0.24 (AUC 400-600 mg*hour/L) and 0.41 (AUC >600 mg*hour/L).\nCONCLUSIONS: The CG formula provides the most accurate prediction of vancomycin Cmin. In patients with eGFR <60 mL/min and aged 46-75 years, MDRD also shows a good predictive capacity. However, in low weight and elderly patients, Cmin predictions are superior with CG. Therefore, renal function estimation equations should not be considered interchangeable for vancomycin dose adjustments.",
+          "journal": "European journal of hospital pharmacy : science and practice",
+          "pubdate": {
+            "year": "2025",
+            "month": "Nov",
+            "day": "09"
+          },
+          "doi": "10.1136/ejhpharm-2025-004590",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40681311/"
+        },
+        {
+          "pmid": "40758132",
+          "title": "Use of nomograms based on the one-compartment model in the estimation of area under the blood concentration-time curve of vancomycin: a retrospective cohort study.",
+          "abstract": "BACKGROUND: Current guidelines for vancomycin dosing and monitoring recommend calculating area under the concentration-time curve (AUC) using a Bayesian approach. However, Bayesian approaches are challenging, requiring specialised software and expertise. Thus, simpler AUC calculation methods are required.\nAIM: To develop and validate a nomogram to estimate the AUC of vancomycin based on the mathematical equation of the one-compartment model, and to investigate the clinical applicability of the apparent volume of distribution (Vd,app) estimated from the first peak concentration after the first dose as an alternative to the volume of distribution.\nMETHODS: AUC values based on the nomogram and the Bayesian approach were compared in 51 patients who received vancomycin between May 2022 and December 2023. The first peak concentration and steady-state trough concentrations were measured in all patients, and Vd,app was calculated using the following formula: Vd,app = First dose / the first peak concentration. The regression line was estimated using the Passing-Bablok method, and the correlation was evaluated using Kendall's tau.\nRESULTS: The regression line relating the AUC based on the nomogram to the Bayesian approach had a slope of 0.988 (95% CI, 0.855, 1.131) and an intercept of 5.35 (95% CI, - 48.59, 64.26). Kendall's tau was 0.643 (P < 0.01), indicating a positive correlation.\nCONCLUSION: The estimation method utilising AUC nomograms and Vd,app represents a straightforward approach with accuracy comparable to that of the Bayesian method, suggesting its potential for clinical application. However, its implementation in cases of high clearance or in patients with severe infections warrants careful consideration.",
+          "journal": "European journal of clinical pharmacology",
+          "pubdate": {
+            "year": "2025",
+            "month": "Nov",
+            "day": ""
+          },
+          "doi": "10.1007/s00228-025-03885-9",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40758132/"
+        },
+        {
+          "pmid": "41179952",
+          "title": "Pharmacokinetic variability of vancomycin in patients undergoing hematopoietic stem cell transplantation: a retrospective cohort study in Peru.",
+          "abstract": "BACKGROUND: Vancomycin exhibits high pharmacokinetic variability, particularly in hematopoietic stem cell transplantation (HSCT) patients, where augmented renal clearance (ARC) may compromise therapeutic exposure. This variability necessitates individualized dosing strategies to ensure optimal treatment efficacy.\nOBJECTIVE: To evaluate the pharmacokinetic variability of vancomycin in pediatric and adult patients undergoing HSCT and to assess the association of ARC with serum drug concentrations.\nDESIGN: A retrospective cohort study.\nMETHODS: We analyzed medical records of post-HSCT patients with febrile neutropenia who received intravenous vancomycin at a tertiary hospital in Lima, Peru. Vancomycin plasma concentrations were assessed at baseline and after dose adjustments. Pharmacokinetic parameters were estimated using Bayesian modeling via PrecisePK software. Regression models were used to evaluate associations between creatinine clearance and vancomycin area under the curve (AUC).\nRESULTS: A total of 40 post-HSCT patients were included, 50% of whom were female. The median age was 17.0 years (interquartile range (IQR): 12.0-39.5), with 25% belonging to the pediatric group. The most frequent disease was B-cell acute lymphoblastic leukemia (47.5%). A significant change was observed in the vancomycin area under the curve (AUC0-24/MIC) before and after dose adjustment (343 mg h/L vs 523 mg h/L; p < 0.001). The median relative dose adjustment percentage of vancomycin was 45% (IQR: 20-73.3). In the multivariate linear regression model, an increase in creatinine clearance was associated with a lower vancomycin AUC (β = -0.67; 95% CI: -1.14 to -0.19). This relationship was maintained after bootstrap resampling with 3000 repetitions (β = -0.67; 95% CI: -1.11 to -0.23). Sepsis was associated with the development of ARC (aRR: 1.378; 95% CI: 1.164-1.631), and as age increased, the risk of ARC decreased (aRR: 0.991; 95% CI: 0.99-0.996).\nCONCLUSION: Most post-HSCT patients had subtherapeutic vancomycin levels at the beginning of treatment, which were optimized through individualized adjustments. The pharmacokinetic variability associated with ARC in young patients and those with sepsis supports the use of AUC-based therapeutic drug monitoring over trough concentration monitoring. These findings also highlight the importance of early renal function monitoring in patients treated with HSCT.",
+          "journal": "Therapeutic advances in drug safety",
+          "pubdate": {
+            "year": "2025",
+            "month": "",
+            "day": ""
+          },
+          "doi": "10.1177/20420986251384239",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41179952/"
+        },
+        {
+          "pmid": "40995929",
+          "title": "Development of Vancomycin Population Pharmacokinetic Models for Pediatric Patients Using a Real-World Web Application Database.",
+          "abstract": "BACKGROUND: The Japanese Society of Chemotherapy developed practical area under the concentration-time curve (AUC)-guided therapeutic drug monitoring (PAT), a freely available web-based application widely used in Japan to support AUC-guided dosing of vancomycin. Its broad adoption has generated a substantial real-world pharmacokinetic database. Although PAT includes a preliminary pediatric model based on data from American children aged 3 months or older, that model requires further optimization. This study aimed to develop a population pharmacokinetic (popPK) model specifically for Japanese pediatric patients and to compare its performance with existing models.\nMETHODS: We utilized a real-world database collected through PAT between December 2022 and October 2024, comprising 1673 pediatric patients aged 3 months or older. Population pharmacokinetic analysis was performed using nonlinear mixed-effects modeling, with comparisons made against 5 existing models.\nRESULTS: The developed model demonstrated strong a priori predictive performance for empirical vancomycin dosing, with a mean prediction error of 0.2 μg/mL and a mean absolute prediction error of 5.6 μg/mL. These results showed no apparent bias. Graphical diagnostics confirmed optimal a priori prediction in the developed model. A posteriori predictive performance-used for Bayesian posterior dosing-was similarly favorable across all models. Notably, 2-point sampling produced significantly different clearance estimates compared with 1-point sampling in 21 of 116 patients (18.1%).\nCONCLUSIONS: For Japanese pediatric patients aged 3 months or older, the developed popPK model is suitable for both empirical and Bayesian-guided vancomycin dosing. Two-point sampling improves the accuracy of clearance estimation and is recommended when feasible.",
+          "journal": "Journal of the Pediatric Infectious Diseases Society",
+          "pubdate": {
+            "year": "2025",
+            "month": "Oct",
+            "day": "02"
+          },
+          "doi": "10.1093/jpids/piaf087",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40995929/"
+        },
+        {
+          "pmid": "40570348",
+          "title": "Optimal Vancomycin AUC Target in Pediatric MRSA Bacteremia: A Bayesian-guided Approach.",
+          "abstract": "BACKGROUND: The optimal vancomycin area under the concentration-time curve (AUC) target for pediatric methicillin-resistant Staphylococcus aures (MRSA) bacteremia remains unclear. This study aimed to determine the optimal AUC target using Bayesian software.\nMETHODS: A retrospective analysis was conducted on patients 3 months to 18 years of age diagnosed with MRSA bacteremia at Asan Medical Center Children`s Hospital between September 2013 and December 2021. The vancomycin AUC was estimated using Bayesian software, and the relationship between AUC 24-48 and outcomes, including persistent bacteremia ≥48 hours, acute kidney injury (AKI), 30-day all-cause mortality and recurrence, was analyzed.\nRESULTS: Fifty-six cases were included, with a median age of 2.4 years. Most cases were healthcare-associated infections (96.4%) and occurred in patients with underlying conditions (92.9%). Persistent bacteremia, recurrent bacteremia, 30-day all-cause mortality and AKI were observed in 17.9%, 14.8%, 3.7% and 7.1%, respectively. Although an AUC 24-48 ≥400 mg·h/L did not demonstrate clinical benefit, the receiver operating characteristic curve analysis identified 530 mg·h/L as the appropriate AUC 24-48 threshold for predicting persistent bacteremia and AKI. Persistent bacteremia and AKI were more frequent in patients with AUC 24-48 >530 mg·h/L (62.5% vs. 10.4%, P < 0.01; 37.5% vs. 2.1%, P < 0.01). No significant differences in 30-day mortality or recurrence were observed between the groups with AUC 24-48 above and below this threshold.\nCONCLUSIONS: AUC 24-48 ≤530 mg·h/L was associated with reduced persistent bacteremia and AKI in pediatric MRSA bacteremia, without significant disadvantages in mortality and recurrence. Future research should explore the lower limit of AUC targets to optimize vancomycin therapy in pediatric patients.",
+          "journal": "The Pediatric infectious disease journal",
+          "pubdate": {
+            "year": "2025",
+            "month": "Oct",
+            "day": "01"
+          },
+          "doi": "10.1097/INF.0000000000004841",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40570348/"
+        }
+      ]
+    },
+    {
+      "query": "vancomycin therapeutic drug monitoring",
+      "count": 10,
+      "articles": [
+        {
+          "pmid": "41803667",
+          "title": "A Machine Learning-Based Model for Individualized Prediction of Vancomycin Concentration-Time Curves in ICU Patients.",
+          "abstract": "Therapeutic drug monitoring is essential for ensuring the efficacy and safety of vancomycin therapy in critically ill patients. This study aimed to develop a machine learning model for individualized prediction of vancomycin concentration-time curves in ICU patients. Adult ICU patients who received intravenous vancomycin and underwent therapeutic drug monitoring at Peking Union Medical College Hospital between January 2014 and December 2023 were retrospectively included. A total of 401 patients were randomly divided into training (n = 280) and testing (n = 121) cohorts. Individual pharmacokinetic parameters were estimated using Bayesian posterior inference and served as reference targets. Five machine learning algorithms were evaluated, and the two with the best predictive performance, Lasso Regression and LightGBM, were integrated with a one-compartment pharmacokinetic model to construct the final predictive model. In the internal testing cohort, the model achieved a mean absolute percentage error (MAPE) of 39.5% for vancomycin concentration prediction. External validation in an independent cohort of 2283 patients showed consistent performance (MAPE = 35.6%). The machine learning-based model significantly outperformed the classic pharmacokinetic model (p < 0.001) in both internal and external validations. A user-friendly software tool based on the model was also developed to facilitate clinical implementation. These findings suggest that the proposed model offers a robust and practical decision-support tool for optimizing individualized vancomycin dosing in ICU settings. Trial Registration: ClinicalTrials.gov identifier: NCT06431412.",
+          "journal": "Pharmacology research & perspectives",
+          "pubdate": {
+            "year": "2026",
+            "month": "Apr",
+            "day": ""
+          },
+          "doi": "10.1002/prp2.70235",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41803667/"
+        },
+        {
+          "pmid": "40817016",
+          "title": "High-dose daptomycin versus linezolid for the treatment of vancomycin-resistant Enterococcus faecium bloodstream infections: Role of pharmacodynamic target attainment.",
+          "abstract": "BACKGROUND: Although high-dose daptomycin (≥8 mg/kg) and linezolid are recommended treatments for vancomycin-resistant Enterococci (VRE) bloodstream infection (BSI), direct comparisons and the impact of achieving prespecified pharmacokinetic/pharmacodynamic (PK/PD) target on outcomes remain unclear.\nMETHODS: We conducted a retrospective observational study in a single health system (January 2010-December 2021). Patients receiving daptomycin ≥8 mg/kg or linezolid for VRE BSI were included. The primary outcome was in-hospital mortality. The free area under the concentration-time curve to minimum inhibitory concentration ratio (fAUC/MIC) was estimated to assess its association with outcomes.\nRESULTS: Overall, 795 patients met the inclusion criteria. The overall mortality was 59.2 %. The linezolid group (n = 170) had a mortality of 44 %, and the daptomycin group (n = 625) mortality was 63 % (P < 0.001). Among daptomycin-treated patients, 528 had fAUC/MIC data and 114 achieved the PK/PD target. Mortality was 66 % for fAUC/MIC ≤75.07 (P < 0.001) and 49 % for fAUC/MIC >75.07 (P = 0.41), compared with linezolid group. In multivariable analysis, daptomycin was associated with higher mortality than linezolid (adjusted odds ratio [aOR], 2.00; P < 0.001). However, failing to achieve PK/PD target conferred significantly higher mortality than linezolid (aOR, 2.51; P < 0.001), whereas achieving the PK/PD target showed no difference (aOR, 0.97; P = 0.91).\nCONCLUSIONS: Even at doses ≥8 mg/kg, the efficacy for daptomycin is comparable to linezolid only when the PK/PD target is reached. Failing to achieve PK/PD target leads to worse outcomes, underscoring the importance of dose optimization and therapeutic drug monitoring.",
+          "journal": "Journal of microbiology, immunology, and infection = Wei mian yu gan ran za zhi",
+          "pubdate": {
+            "year": "2026",
+            "month": "Apr",
+            "day": ""
+          },
+          "doi": "10.1016/j.jmii.2025.08.005",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40817016/"
+        },
+        {
+          "pmid": "41813773",
+          "title": "Vancomycin therapeutic drug monitoring is associated with reduced toxicity in ICU patients: a MIMIC-IV retrospective study.",
+          "abstract": "",
+          "journal": "Scientific reports",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": "11"
+          },
+          "doi": "10.1038/s41598-026-42395-1",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41813773/"
+        },
+        {
+          "pmid": "41718556",
+          "title": "Oral vancomycin for primary sclerosing cholangitis and associated inflammatory bowel disease - paving a path forward.",
+          "abstract": "INTRODUCTION: Primary sclerosing cholangitis (PSC) is a fibro-inflammatory cholangiopathy strongly associated with inflammatory bowel disease (PSC-IBD). With no approved PSC therapy, clinicians face uncertainty about oral vancomycin (OV) as a therapeutic option. This review synthesizes clinical effectiveness evidence alongside mechanistic data.\nAREAS COVERED: We searched PubMed/Google Scholar for studies of vancomycin in PSC from 1998 through November, 2025. OV shows consistent IBD benefits and variable liver responses. In PSC-IBD, clinical and endoscopic remission occurred in 60% at 6 months and in 71% at 12 months in a pediatric cohort; in an adult single-arm study (n = 15), 80% achieved endoscopic remission at 4 weeks with universal mucosal healing, reductions in fecal calprotectin and Mayo scores, and relapse after withdrawal. For liver disease, a pediatric open-label cohort (n = 45) reported ≥50% declines in gamma-glutamyl transferase in 82%; in an adult pilot randomized controlled trial, alkaline phosphatase fell 46% at 12 weeks. Imaging/histology improved as evidenced by MRCP in 26/34 large-duct PSC and reduced portal/periportal inflammation in 11/12 small-duct PSC. No vancomycin-resistant enterococci development has been reported.\nEXPERT OPINION: OV appears effective for colitis control in PSC-IBD. Differences in observed liver outcomes across studies likely reflect variation in treatment duration, dose, and endpoint selection. Liver responses may depend on higher doses. Cross-specialty guidance and pragmatic, integrated trials are needed.",
+          "journal": "Expert review of gastroenterology & hepatology",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": "10"
+          },
+          "doi": "10.1080/17474124.2026.2635420",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41718556/"
+        },
+        {
+          "pmid": "41586498",
+          "title": "Protein binding of vancomycin in a large mixed patient population at a university hospital.",
+          "abstract": "Vancomycin remains a key treatment for infections caused by β-lactam-resistant gram-positive cocci. While there is unanimity that only drug not bound to plasma proteins is pharmacologically active, a wide range of values and interdependencies for the unbound fraction (fu) of vancomycin have been reported in the past. In the present study, we evaluated 706 plasma samples from 228 adult in-patients who were sent for therapeutic drug monitoring. Total and free concentrations of vancomycin were analyzed by a validated method using ultrafiltration and HPLC-UV. Covariate effects on fu were assessed by a linear mixed-effects model. The mean unbound fraction was 72.2 ± 5.5% (coefficient of variation 7.7%, range 53-93%), the intra-individual and inter-individual variability were low (median coefficient of variation 5.7% and 6.4%, respectively). The unbound fraction was independent of total vancomycin, plasma albumin or total protein concentrations, or other biochemical or demographic variables, and did not differ between patients treated inside or outside of intensive care (P=0.465). Linear mixed-effects modeling confirmed low overall variability (coefficient of variation 7.0%), decomposed into 2.2% inter-individual, 3.8% inter-occasion, and 5.5% residual variability. Method comparison showed an excellent agreement between high-performance liquid chromatography with ultraviolet detection (HPLC-UV) and the immunoassay used for routine drug monitoring (bias +0.2%). Free concentrations of vancomycin can be reliably predicted from total concentrations. An unbound fraction of approximately 70% provides a robust and clinically useful estimate. Remaining variability appears to be primarily methodological, and not of clinical relevance.",
+          "journal": "Antimicrobial agents and chemotherapy",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": "04"
+          },
+          "doi": "10.1128/aac.01593-25",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41586498/"
+        },
+        {
+          "pmid": "41809938",
+          "title": "Negative Pressure Wound Therapy and Ultrasound Monitoring for Fracture-Related Infection of the Proximal Femur: A Case Report.",
+          "abstract": "BACKGROUND: Fracture-related infection (FRI) is one of the main complications of hip fracture. Negative pressure wound therapy (NPWT) seems to be a potential solution for FRI, because of offering exudate management, drainage enhancement, and tissue repair. Additionally, ultrasound cannot be ignored because of its role in evaluating musculoskeletal tissue infections.\nCASE PRESENTATION: A 55-year-old man mainly suffered from a fracture of the right proximal femur. The fracture was classified as AO/OTA 31-A3. The patient had a history of smoking. After internal fixation of the fracture and other symptomatic treatment, the patient was discharged. However, the surgical incision dehisced one month later. After examination, the patient was diagnosed with FRI with wound disruption and sinus tract formation. The blurred parafemoral shadow in X-ray, positive bacterial culture result, abnormal secretions, and elevated C-reactive protein and erythrocyte sedimentation rate were the bases for diagnosing FRI. In the course of treatment, we made full use of NPWT following limited debridement surgery to effectively treat FRI, and then continuously monitored the changes of lesions in deep infected areas through ultrasound detection. Intravenous infusion of ceftazidime and local rinsing with vancomycin solution were applied during the treatment process. Follow-up results showed that the patient had no recurrence of infection or other adverse events three months after treatment.\nCONCLUSION: This case shows that NPWT combined with ultrasound monitoring can control early fracture-related infection and allow implant retention. This treatment method may be applicable to areas with scarce medical resources. But larger-scale validation is still needed before clinical adoption.",
+          "journal": "Infection and drug resistance",
+          "pubdate": {
+            "year": "2026",
+            "month": "",
+            "day": ""
+          },
+          "doi": "10.2147/IDR.S575912",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41809938/"
+        },
+        {
+          "pmid": "41800298",
+          "title": "Population Pharmacokinetics and Cerebrospinal Fluid Penetration of Intravenous Vancomycin in Intracranial Hemorrhage Patients with External Ventricular Drains: Implications for Dosing and Therapeutic Drug Monitoring.",
+          "abstract": "PURPOSE: Vancomycin is frequently used to treat central nervous system (CNS) infections, yet its cerebrospinal fluid (CSF) penetration remains poorly characterized in patients with intracranial hemorrhage (ICH) requiring external ventricular drains (EVDs).\nMETHODS: A prospective observational study was conducted on nine neurosurgical patients with ICH and EVDs receiving intravenous vancomycin. Plasma and CSF samples were collected at predefined time points and analyzed by validated assays. Noncompartmental analysis, regression modeling, and nonlinear mixed-effects pharmacokinetic (PK) modeling were performed.\nRESULTS: The AUCCSF/plasma ratios ranged from 0.84% to 14.22%. CSF penetration correlated strongly with plasma-CSF concentration ratios at the end of infusion (Spearman r = 0.791; p = 0.004). Linear regression identified urine output (R2 = 0.51, p = 0.014), WBC/total cell ratio (R2 = 0.62, p = 0.007), and end-of-infusion concentration (R2 = 0.45, p = 0.049) as significant predictors of AUCCSF. A two-compartment model provided the best fit for vancomycin population PK, yielding clearance and volume of distribution estimates similar to previous reports, although no significant covariates for CSF penetration were identified.\nCONCLUSION: To our knowledge, this is the first study reporting real-world data of vancomycin CSF penetration in Taiwanese neurosurgical patients. These findings provide a critical PK foundation for developing future model-informed precision dosing strategies and validating surrogate TDM markers in this neurocritical care population.",
+          "journal": "Drug design, development and therapy",
+          "pubdate": {
+            "year": "2026",
+            "month": "",
+            "day": ""
+          },
+          "doi": "10.2147/DDDT.S574548",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41800298/"
+        },
+        {
+          "pmid": "41760398",
+          "title": "AI-enhanced therapeutic drug monitoring for vancomycin and β-lactam antibiotics in critical care: from population PK to bedside algorithms.",
+          "abstract": "INTRODUCTION: Although sepsis and other severe infections in intensive care are common and deadly, obtaining safe and effective exposure for vancomycin and broad-spectrum β-lactams is difficult because of substantial kinetic variability, operational difficulties with AUC-guided therapeutic drug monitoring (TDM) and model‑informed precision dosing (MIPD), and the limited effectiveness of current tools on patient-centered outcomes.\nAREAS COVERED: This is a narrative review of exposure-response correlations, vancomycin and β-lactam kinetic targets, and the use of artificial intelligence (AI)-driven dosing tools and TDM/MIPD in patients in intensive care units (ICUs) and other high-acuity settings. From 2005 to 2025, we searched PubMed/MEDLINE, Embase, Web of Science, IEEE Xplore, and Google Scholar for English-language research, recommendations, and methodological publications on TDM, MIPD, AI, and machine learning (ML). This review summarized information on early AI-enabled clinical decision support systems, AUC-guided vancomycin TDM, β-lactam TDM in high-risk patients, and AI models that predict drug concentrations, AUC, acute kidney injury (AKI), and composite outcomes.\nEXPERT OPINION: Most AI models are single-center, retrospective, and surrogate-focused. By incorporating validated AI components into multicentre procedures that prioritize explainability, data quality, usability, and prospective assessment, it has the greatest immediate advantage of enhancing guideline-aligned AUC-guided TDM and population pharmacokinetic (PopPK)//Bayesian frameworks.",
+          "journal": "Expert review of clinical pharmacology",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": "02"
+          },
+          "doi": "10.1080/17512433.2026.2638352",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41760398/"
+        },
+        {
+          "pmid": "41686358",
+          "title": "ContraIndicator: A Natural Language Processing-Based Approach to Potential Drug-Drug Interaction Detection in Pediatric Intensive Care.",
+          "abstract": "BACKGROUND AND OBJECTIVES: The intricate nature of pediatric patients' physiology and the frequent administration of multiple medications in pediatric intensive care units expose hospitalized patients to potential drug-drug interactions. Therefore, this study aimed to examine and characterize clinically relevant drug-drug interactions in pediatric patients admitted to intensive care units, leveraging artificial intelligence to enhance their identification and management.\nMETHODS: Prescription data from pediatric intensive care unit admissions were analyzed using ContraIndicator, a natural language processing-based framework developed for the identification of potential drug-drug interactions. Medication information extracted from prescription records was evaluated against the DDInter database, and its clinical relevance was determined using the severity ratings of the database (major, moderate, and minor). Using univariate and multivariate logistic regression, the associations between severity and age, as well as between severity and the number of prescribed medications, were investigated.\nRESULTS: The examination of 8010 prescriptions for 899 hospitalized patients identified 3884 potential drug-drug interactions. The most frequent interacting drug pairs were midazolam + fluconazole, fluconazole + fentanyl, fentanyl + dexamethasone, and vancomycin + piperacillin. Among the 49.6% (446) of pediatric patients who had at least one interaction (major, moderate, or minor), 38.8% (173) had a major potential drug-drug interaction. In this investigation, a higher number of prescribed drugs was significantly linked with a higher incidence of potential drug-drug interactions (odds ratio: 12.79; 95% confidence interval: 8.26-20.6; p < 0.001).\nCONCLUSIONS: The study suggests that potential drug-drug interactions are frequent in pediatric intensive care units. The majority of these interactions were moderate, followed by major severity. There is a statistically significant association between the quantity of drugs provided and the prevalence of potential drug-drug interactions. The findings of this study could aid in planning and executing future studies, as well as in monitoring and preventing potential drug-drug interactions in patients receiving intensive care. This study introduces ContraIndicator, a graphical user interface that presents empirical findings and promotes awareness regarding potential drug-drug interactions.",
+          "journal": "Clinical drug investigation",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": ""
+          },
+          "doi": "10.1007/s40261-026-01529-z",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41686358/"
+        },
+        {
+          "pmid": "41604430",
+          "title": "Management of Inflammatory Bowel Disease Associated With Primary Sclerosing Cholangitis Pre- and Post-liver Transplantation.",
+          "abstract": "Primary sclerosing cholangitis (PSC)-associated inflammatory bowel disease (IBD) is considered a distinct IBD phenotype, with probably a distinct pathogenesis according to genome-wide association studies and mucosal immunology and microbiome studies. Management of IBD in patients with PSC presents with specific monitoring and therapeutic challenges. Both IBD-related and treatment-related complications have to be carefully considered in the context of hepatobiliary disease, end-stage liver disease, and liver transplant recipients. Standard IBD drug therapies are generally effective and well-tolerated in PSC-IBD, both pre- and post-liver transplantation. However, evidence of direct benefit on PSC progression is limited and largely based on surrogate endpoints such as alkaline phosphatase reduction. Vedolizumab and adalimumab have shown modest biochemical improvements in selected cohorts, although no therapy has demonstrated consistent disease-modifying effects on PSC. Based on current available data, vancomycin seems promising to improve IBD and PSC outcomes. In patients with an indication for colectomy, counseling on functional outcome in general and on disease-specific risks of recurrent intestinal inflammation, neoplasia, and PSC progression is warranted. Immunosuppressive regimens posttransplant and persistent intestinal inflammation influence graft survival and PSC recurrence. Thus, management in patients with PSC and IBD requires a tailored, risk-adapted approach, integrating control of intestinal inflammation, hepatobiliary monitoring, and cancer surveillance. This contemporary review aimede to elucidate the current understanding regarding the efficacy and safety of medical and surgical therapies used for IBD in light of the pre- and posttransplant course of patients with PSC-IBD.",
+          "journal": "Transplantation",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": "01"
+          },
+          "doi": "10.1097/TP.0000000000005607",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41604430/"
+        }
+      ]
+    },
+    {
+      "query": "vancomycin dosing guideline",
+      "count": 10,
+      "articles": [
+        {
+          "pmid": "41760398",
+          "title": "AI-enhanced therapeutic drug monitoring for vancomycin and β-lactam antibiotics in critical care: from population PK to bedside algorithms.",
+          "abstract": "INTRODUCTION: Although sepsis and other severe infections in intensive care are common and deadly, obtaining safe and effective exposure for vancomycin and broad-spectrum β-lactams is difficult because of substantial kinetic variability, operational difficulties with AUC-guided therapeutic drug monitoring (TDM) and model‑informed precision dosing (MIPD), and the limited effectiveness of current tools on patient-centered outcomes.\nAREAS COVERED: This is a narrative review of exposure-response correlations, vancomycin and β-lactam kinetic targets, and the use of artificial intelligence (AI)-driven dosing tools and TDM/MIPD in patients in intensive care units (ICUs) and other high-acuity settings. From 2005 to 2025, we searched PubMed/MEDLINE, Embase, Web of Science, IEEE Xplore, and Google Scholar for English-language research, recommendations, and methodological publications on TDM, MIPD, AI, and machine learning (ML). This review summarized information on early AI-enabled clinical decision support systems, AUC-guided vancomycin TDM, β-lactam TDM in high-risk patients, and AI models that predict drug concentrations, AUC, acute kidney injury (AKI), and composite outcomes.\nEXPERT OPINION: Most AI models are single-center, retrospective, and surrogate-focused. By incorporating validated AI components into multicentre procedures that prioritize explainability, data quality, usability, and prospective assessment, it has the greatest immediate advantage of enhancing guideline-aligned AUC-guided TDM and population pharmacokinetic (PopPK)//Bayesian frameworks.",
+          "journal": "Expert review of clinical pharmacology",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": "02"
+          },
+          "doi": "10.1080/17512433.2026.2638352",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41760398/"
+        },
+        {
+          "pmid": "41618547",
+          "title": "Pharmacokinetics and Customized Dosing of Vancomycin in Adult Patients With Hematological Malignancies: Status, Challenges, and Opportunities.",
+          "abstract": "Vancomycin (VAN) remains the first-line treatment for methicillin-resistant, multidrug-resistant gram-positive bacterial infections, even among cancer patients. Patients with hematological malignancies (HMs) represent a unique population, whose physiological and pathological changes often differ from those of the general population. These variations may cause significant alterations in the in vivo pharmacokinetics (PK) of VAN, causing unpredictable changes in the safety, efficacy, and bacterial resistance. Customized dosing of VAN (CDvan) offers potential solutions to these challenges. However, there is currently a lack of guideline-based, consensus-driven references, and limited research on the implementation of CDvan in HM patients, particularly in adults. This review concentrates on adult HM patients and reviews studies on VAN PK in them (including population PK and its models), focusing on current mainstream and novel CDvan technologies, including therapeutic drug monitoring-guided, model-guided, closed-loop control systems, and artificial intelligence-guided CDvan technologies. The challenges faced in the broader implementation of these technologies and the promising solutions exploited, such as blockchain technology-driven clinical decision support systems, are also discussed. Understanding the multifaceted aspects of PK research and personalized dosing of VAN in HM patients will help facilitate the rational treatment of VAN, in-depth PK research, and the development of CDvan techniques in HM patients.",
+          "journal": "Pharmacology research & perspectives",
+          "pubdate": {
+            "year": "2026",
+            "month": "Feb",
+            "day": ""
+          },
+          "doi": "10.1002/prp2.70218",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41618547/"
+        },
+        {
+          "pmid": "40465837",
+          "title": "Implementation of the VancomycIn per Pharmacy Education tRaining (VIPER) program for pharmacists at a children's hospital.",
+          "abstract": "PURPOSE: Pharmacists play a vital role in supporting the safe and efficacious use of vancomycin in children. However, vancomycin dosing in children is challenging, and recent recommendations for implementation of 24-hour area under the curve (AUC24)-based dosing and model informed precision dosing (MIPD) approaches introduce additional complexity. Herein, we describe the development and implementation of a \"VancomycIn per Pharmacy Education tRaining\" (VIPER) program that supports a pharmacy-led vancomycin therapeutic drug monitoring (TDM) service at a children's hospital.\nSUMMARY: Our children's hospital implemented a formal VIPER program to educate and evaluate the competency of pharmacists on vancomycin therapeutic principles in children, including AUC24-based dosing and use of a commercially available MIPD tool. Pharmacists were required to complete the VIPER core program prior to managing TDM independently in children. VIPER maintenance programs were delivered annually to sustain and expand knowledge. Pharmacists' perceptions of VIPER were captured annually via survey. Since implementation of VIPER in 2020, over 100 pharmacists have received training. Overall, pharmacists rated the VIPER program highly, with 89% (96/108) agreeing or strongly agreeing that VIPER was an effective strategy for delivering institutional guideline updates and 84% (91/108) agreeing or strongly agreeing they felt more confident in vancomycin dose adjustments in children after VIPER. Competency assessment also demonstrated that pharmacist postcourse knowledge was high (a median score of ≥85% for each year).\nCONCLUSION: VIPER, a formal, yearly educational program, was successfully implemented at our hospital to help support a pharmacist-led vancomycin TDM service in children. The pharmacists reported high satisfaction with VIPER and agreed the program was a successful format for delivering education and improving skills.",
+          "journal": "American journal of health-system pharmacy : AJHP : official journal of the American Society of Health-System Pharmacists",
+          "pubdate": {
+            "year": "2026",
+            "month": "Jan",
+            "day": "06"
+          },
+          "doi": "10.1093/ajhp/zxaf142",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40465837/"
+        },
+        {
+          "pmid": "41202902",
+          "title": "Consumption and expenditure on fidaxomicin and oral vancomycin for Clostridioides difficile infection: A 12-year longitudinal study of 43 countries and regions.",
+          "abstract": "BACKGROUND: Current treatment guidelines recommend fidaxomicin and oral vancomycin as first-line treatments for Clostridioides difficile infection (CDI). Disparities in the prevalence of CDI and the availability of novel treatments necessitate understanding the contemporary trends in their consumption at the global level.\nMETHODS: This longitudinal study used global pharmaceutical sales from IQVIA-MIDAS for fidaxomicin and oral vancomycin in 43 countries from 2012 to 2023. We measured defined daily doses per 100,000 inhabitants per year (DDD/100K) and manufacture-level prices, calculating changes using compound annual growth rates (CAGR). We conducted interrupted time-series analyses to assess the impact of guideline updates by Infectious Diseases Society of America and the Society for Healthcare Epidemiology of America (IDSA/SHEA) on quarterly consumption.\nRESULTS: Overall fidaxomicin consumption increased from 21.68 DDD/100K in 2012 to 126.86 DDD/100K in 2023 (CAGR = 17.42%) and similar increases in expenditure (0.07-0.34 USD/capita; CAGR = 14.96%). Oral vancomycin consumption increased from 71.61 to 120.82 DDD/100K (CAGR = 4.87%), although with a decreasing trend in expenditure (0.20-0.03 USD/capita; CAGR = -15.16%). The earliest adoption of fidaxomicin in middle-income economies occurred five years later than in high-income economies. Despite higher CAGRs, consumption of fidaxomicin and oral vancomycin in middle-income economies was only 1.9% and 2.3%, respectively, of that in high-income economies in 2023. Following the IDSA/SHEA guideline updates, fidaxomicin consumption in Northern America increased immediately.\nCONCLUSION: Consumption of fidaxomicin and oral vancomycin continues to increase globally; however, significant economic and geographical disparities in utilization highlight inequitable access to first-line CDI treatments.",
+          "journal": "International journal of antimicrobial agents",
+          "pubdate": {
+            "year": "2026",
+            "month": "Jan",
+            "day": ""
+          },
+          "doi": "10.1016/j.ijantimicag.2025.107664",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41202902/"
+        },
+        {
+          "pmid": "41475800",
+          "title": "Treatment outcomes in methicillin-resistant",
+          "abstract": "BACKGROUND: Methicillin-resistant Staphylococcus aureus (MRSA) bacteraemia remains a major clinical challenge with high mortality, despite guideline-recommended vancomycin therapy. Although a ratio of the area under the curve to the minimum inhibitory concentration (AUC/MIC) ≥400 mg·hour/L is advocated for efficacy, the association between pharmacokinetic/pharmacodynamic (PK/PD) target attainment and clinical outcomes remains uncertain.\nOBJECTIVE: To determine the in-hospital mortality rate among patients with MRSA bacteraemia receiving vancomycin. The secondary objectives were to (1) evaluate the association between patient characteristics and in-hospital mortality, (2) examine the relationship between in-hospital mortality and secondary treatment outcomes, and (3) assess the impact of vancomycin AUC/MIC target attainment on in-hospital mortality.\nMETHODS: A retrospective cohort study was conducted at a tertiary hospital in Malaysia involving adults with MRSA bacteraemia treated from 2014 to 2024. AUC/MIC data were analysed for patients receiving intermittent vancomycin dosing. Multivariable logistic regression identified independent predictors of mortality.\nRESULTS: Among 148 patients included, the in-hospital mortality rate was 32.4% (n=48/148). Four factors were independently associated with in-hospital mortality: organ failure (adjusted OR (aOR) 19.28, 95% CI 5.14 to 72.26), recent antibiotic exposure (aOR 5.24, 95% CI 1.90 to 14.51), hypoalbuminaemia <30 g/L (aOR 4.56, 95% CI 1.69 to 13.06) and cerebrovascular disease (aOR 4.24, 95% CI 1.15 to 15.60). Subgroup analysis of patients on intermittent dosing revealed six independent predictors of in-hospital mortality: cerebrovascular disease (aOR 26.9, 95% CI 2.76 to 261.98), hypoalbuminaemia <30 g/L (aOR 10.68, 95% CI 1.54 to 74.29), organ failure (aOR 48.15, 95% CI 4.27 to 542.81), polymicrobial bacteraemia (aOR 24.28, 95% CI 3.09 to 190.64), persistent bacteraemia (aOR 90.08, 95% CI 2.85 to 2845.83) and intensive care unit admission (aOR 0.09, 95% CI 0.01 to 0.91), the latter showing a protective effect. Only 22.2% (n=26/117) achieved the target AUC/MIC, which was not significantly linked to mortality reduction.\nCONCLUSIONS: Vancomycin AUC/MIC attainment was suboptimal, and mortality was primarily influenced by host factors and disease severity. Early risk stratification and timely intervention are critical to improve outcomes and guide resource prioritisation, particularly in settings with limited access to AUC-guided dosing.",
+          "journal": "European journal of hospital pharmacy : science and practice",
+          "pubdate": {
+            "year": "2025",
+            "month": "Dec",
+            "day": "31"
+          },
+          "doi": "10.1136/ejhpharm-2025-004716",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41475800/"
+        },
+        {
+          "pmid": "40993490",
+          "title": "Establishment of a Vancomycin Population Pharmacokinetic Model for Pediatric Patients Based on the Non-Linear Mixed-Effects Model.",
+          "abstract": "BACKGROUND AND OBJECTIVES: Vancomycin (VCM) pharmacokinetic parameters vary widely between individuals. Existing models developed domestically and internationally may not apply universally because of differences in patient populations and testing methodologies. Therefore, the present study aimed to address the clinical challenge of optimizing individualized VCM dosing in pediatric patients at the study institution by developing a VCM population pharmacokinetic model and identifying key factors influencing VCM clearance, thereby providing a reference for safe and effective clinical dosing strategies.\nMETHODS: Data regarding 124 effective VCM concentrations and 100 pediatric patients who received intravenous VCM were retrospectively collected. We used a non-linear mixed-effects model with forward inclusion and backward elimination to create the final VCM population pharmacokinetic model. The model was internally validated using bootstrapping, goodness of fit, and visual predictive check. The Monte Carlo method was used to simulate the range of trough concentrations in pediatric patients with renal insufficiency and normal function under different dosing regimens.\nRESULTS: A one-compartment model adequately described the pharmacokinetic behavior of VCM in vivo. The typical values of clearance and volume of distribution were 8.22 L/h and 113 L, respectively. Renal function and body weight were the most important factors affecting the clearance of VCM. The model was validated as stable and reliable.\nCONCLUSIONS: The VCM population pharmacokinetic model established during this study can assist physicians with the development and optimization of dosing regimens for pediatric patients.",
+          "journal": "Drugs in R&D",
+          "pubdate": {
+            "year": "2025",
+            "month": "Dec",
+            "day": ""
+          },
+          "doi": "10.1007/s40268-025-00523-8",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40993490/"
+        },
+        {
+          "pmid": "41306142",
+          "title": "Perioperative Antibiotic Administration Review: An Analysis of Outpatient Surgeries at OhioHealth Doctors Hospital.",
+          "abstract": "INTRODUCTION: A vital part of preventing surgical site infections (SSIs) is perioperative antibiotic prophylaxis. Antibiotics must be administered within a certain window of time, usually 15 to 60 minutes prior to the surgical incision, for them to be effective. The most frequently utilized medication, cefazolin, can be administered quickly by intravenous push (IVP), but other medications, such as vancomycin and clindamycin, need longer infusion times. Antibiotic efficacy declines, and the risk of SSIs is increased when scheduling requirements are not followed. With special focus on time, dosage, and variation by surgery type, this study evaluates adherence to perioperative antibiotic administration guidelines in outpatient surgeries at OhioHealth Doctors Hospital.\nMETHODS: This retrospective study was conducted at OhioHealth Doctors Hospital in Columbus, Ohio. Patients aged 18 and older who underwent outpatient surgery between January 1, 2018, and December 31, 2021, were included. A total of 448 cases were analyzed. Data were extracted from electronic medical records and reviewed to assess antibiotic type, administration timing, dosing accuracy (based on patient weight), and surgery type. Descriptive statistics and appropriate statistical tests, including chi-square and confidence intervals, were used for analysis.\nRESULTS: Antibiotics were given to just 3.3% of patients over the advised pre-incision period. Antibiotics offered via IVP had a greater probability of being delivered on schedule (4.6%) compared to those that needed infusion pumps (0.7%, p = 0.0446). The most frequently administered antibiotic was cefazolin (65.6%), with 88.8% of doses being appropriately weight-adjusted. Nonetheless, there were notable differences in timing protocol adherence by surgical specialty, with numerous specialties displaying 0% compliance and orthopedic procedures exhibiting the highest adherence at 7.9%.\nCONCLUSION: Adherence to perioperative timing standards was concerningly inadequate, even though antibiotic selection and dosage were generally suitable. The findings point to a substantial workflow and protocol enforcement gap at the system level. Operational adjustments like real-time warnings, checklists integrated with electronic health records (EHRs), and simpler delivery techniques may increase adherence and reduce preventable SSIs. Future research is required to assess how these strategies influence patient outcomes.",
+          "journal": "Cureus",
+          "pubdate": {
+            "year": "2025",
+            "month": "Oct",
+            "day": ""
+          },
+          "doi": "10.7759/cureus.95443",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41306142/"
+        },
+        {
+          "pmid": "40152654",
+          "title": "Model-Informed Precision Dosing of Vancomycin in Vietnamese Children: Innovative Midpoint Concentration Monitoring Using 2 Bayesian Programs.",
+          "abstract": "BACKGROUND: Bayesian area under the curve (AUC)-guided vancomycin dosing, preferably with 2 samples (2S), is recommended for pediatric patients. However, the timing of sampling may not always be convenient in the clinical setting. In low- to middle-income countries, the implementation of model-informed precision dosing (MIPD) using the Bayesian approach remains limited because of high software costs. Using MIPD with Bayesian analysis, the authors compared the accuracy and precision of midpoint and guideline-recommended 2S strategies and evaluated the clinical utility of an open-source software package and compared it with PrecisePK.\nMETHODS: This retrospective cohort study was conducted at 2 pediatric hospitals with a combined 2000 beds from April 2022 to April 2023. The authors enrolled patients aged from 3 months to 16 years who received at least 2 doses of vancomycin and had at least 2 measured drug concentrations: Cmax (1-2 hours after the end of infusion), Cmid (midpoint of the dosing interval), and Ctrough (30 minutes-1 hour before the next dose). The accuracy and precision of pharmacokinetic parameters were calculated using and , respectively.\nRESULTS: Eighty children with 226 vancomycin concentrations were included. The median age was 1.6 (interquartile range 0.88-3.01) years, the average weight was 10.0 (8.0-12.0) kg, the baseline serum creatinine concentration was 0.43 (0.38-0.53) mg/dL, and the empirical vancomycin dose was 60 (57-61) mg/kg/d. Most subjects received empirical vancomycin for pneumonia (75%) and bacteremia (26%), and 75% were admitted to the intensive care unit. Compared with the 2S monitoring state, the accuracy and precision of the midpoint for the Bayesian-derived AUC 24 values were 5.02% and 6.45%, respectively. Compared with PrecisePK, the AUC 24 estimation by Shiny exhibited an accuracy and precision of -5.58% and 6.09%, respectively.\nCONCLUSIONS: Midpoint concentration offers a convenient sampling approach to accurately monitor vancomycin therapy in hospitalized pediatric patients. Shiny serves as an alternative Bayesian MIPD tool for dosing and monitoring vancomycin therapy in children in Vietnam.",
+          "journal": "Therapeutic drug monitoring",
+          "pubdate": {
+            "year": "2025",
+            "month": "Oct",
+            "day": "01"
+          },
+          "doi": "10.1097/FTD.0000000000001323",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40152654/"
+        },
+        {
+          "pmid": "41009874",
+          "title": "Impact of Obesity on Serum Concentrations of Vancomycin Administered as Continuous Infusion and on Clinical Outcomes in Critically Ill Patients-A Retrospective Observational Study.",
+          "abstract": "Background/Objectives: Vancomycin is a commonly used antibiotic in critically ill patients with severe methicillin-resistant Staphylococcus aureus infections. Due to its narrow therapeutic window, under- or overdosing is likely to result in adverse effects, especially in patients with conditions associated with altered pharmacokinetics such as obesity. The objective of this study was to investigate the impact of obesity on serum concentrations of vancomycin in critically ill patients receiving intravenous vancomycin by continuous infusion based on ideal body weight (IBW). Methods: This retrospective observational study performed at the University Hospital of Leipzig, Germany, included all patients admitted to the intensive care unit (ICU) between January 2009 and December 2015 who received guideline-based vancomycin therapy based on IBW. Serum concentrations were obtained through routinely performed therapeutic drug monitoring (TDM). Results: A total of 1066 patients with a median age of 62 years were included in this study. The median (25%; 75% quantile) vancomycin treatment duration was 4 (2; 7) days and the median time to reach target concentrations of 20-25 mg L-1 was 3 (2; 4) days without a significant difference between BMI groups. Overall, only 25.9% of patients were in the therapeutic range of 20-25 mg L-1 in the entire treatment interval. 47.8% of vancomycin concentrations obtained from TDM were below the desired target range with no differences between the BMI groups (p = 0.077). 26.3% of measurements exceeded the target range, with a significant increase in the morbidly obese group (p < 0.001). A higher BMI was associated with an increased ICU, in-hospital, 28- and 90-day mortality in morbidly obese patients (p < 0.05). Age, BMI and high SAPS-II and SOFA scores were significant predictors of an increased risk of death. Conclusions: Our preliminary findings suggest that IBW-based dosing may help reduce the risk of supratherapeutic concentrations in morbidly obese patients. The high rates of sub- and supratherapeutic vancomycin serum concentrations across all patients highlight the need for close TDM and dose adjustments, particularly in morbidly obese patients with the highest rates of supratherapeutic vancomycin serum concentrations and of RRT.",
+          "journal": "Antibiotics (Basel, Switzerland)",
+          "pubdate": {
+            "year": "2025",
+            "month": "Sep",
+            "day": "04"
+          },
+          "doi": "10.3390/antibiotics14090895",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41009874/"
+        },
+        {
+          "pmid": "41099739",
+          "title": "Vancomycin Therapy Monitoring-The Gaps Between Guidelines and Clinical Practice.",
+          "abstract": "BACKGROUND: Therapeutic drug monitoring represents an improvement in treatment efficacy and helps reduce side effects. For vancomycin therapy, plasma analysis helps prevent subtherapeutic dosages, which can lead to treatment failure and the potential emergence of antibiotic resistance, while also limiting side effects caused by toxicity.\nAREAS OF UNCERTAINTY: Although vancomycin dosing based on area under the curve (AUC) has been supported by scientific grade IIIA evidence as improving patient outcomes, it is still not widely adopted, and many questions remain unanswered. There is significant heterogeneity in therapeutic range values presented in guidelines for both point-to-point and AUC measurements, and uncertainty about when to apply these protocols in vancomycin administration. This narrative review aims to evaluate the indications and target values presented in current vancomycin monitoring guidelines, comparing them with studies where vancomycin dosing is not recommended.\nDATA SOURCES: Articles related to vancomycin dosing were searched on medical databases such as Scopus, PubMed, and Google Scholar.\nTHERAPEUTIC ADVANCES: All review articles and guidelines issued by scientific societies support vancomycin dosing, particularly for dialysis patients, pediatric patients, and those in intensive care units. Although target values may vary across guidelines, trough values between 10 and 20 mg/L are widely accepted. Although AUC-based dosing is more complex, it is recommended, with a therapeutic range between 400 and 700 mg/L/24 h. Although some authors challenge this approach, they reflect the opinions of a relatively small group of experts.\nCONCLUSIONS: Further pharmacokinetic studies are required to furnish robust evidence and facilitate the establishment of a uniform recommendation for vancomycin drug monitoring by guidelines. In addition, it is essential to assess vancomycin dosing across all patient categories to examine the viability of theories that do not support the need for vancomycin dosing.",
+          "journal": "American journal of therapeutics",
+          "pubdate": {
+            "year": "",
+            "month": "",
+            "day": ""
+          },
+          "doi": "10.1097/MJT.0000000000002009",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41099739/"
+        }
+      ]
+    },
+    {
+      "query": "vancomycin auc mic",
+      "count": 10,
+      "articles": [
+        {
+          "pmid": "41763021",
+          "title": "Design, synthesis, and optimization of Honokiol-Piperazine derivatives as lung-enriched agents against MRSA pneumonia infection.",
+          "abstract": "Methicillin-resistant Staphylococcus aureus (MRSA) causes severe bacterial pneumonia; current therapies (e.g., vancomycin) suffer from poor pulmonary bioavailability and dose-limiting safety concerns, demanding precision lung-enriched agents. However, small-molecule lung-enriched antibacterials are relatively rare. Honokiol (HNK), a natural phenolic compound with broad pharmacological activities but moderate antibacterial potency and limited tissue selectivity, was selected as the scaffold. We integrated a piperazine moiety into HNK and synthesized a series of HNK-piperazine derivatives. Among them, 13f showed potent activity primarily against Gram-positive bacteria, including MRSA (MIC: 2-4 μM; 16-32-fold more potent than HNK) together with preferential lung exposure. 13f exhibited rapid bactericidal activity and showed minimal MIC shift under sub-MIC selection over 31 serial passages (MICₙ/MIC₀ = 1-2), whereas ciprofloxacin displayed a 256-fold increase over the same period; it also attenuated staphyloxanthin production and reduced biofilm biomass. Mechanistic assays suggested time- and concentration-dependent membrane-associated effects, as reflected by permeability/depolarization readouts, nucleic acid/protein leakage, SEM imaging, and complementary MD analyses, with more pronounced effects at higher exposures. Pharmacokinetic and biodistribution analyses revealed a 13-fold longer half-life and a 147.92-fold higher lung AUC for 13f than for HNK. In a murine MRSA pneumonia model, 13f substantially reduced pulmonary bacterial burden and showed in vivo activity in the same overall range as vancomycin under the tested dosing regimen. No obvious histopathological alterations were observed under the tested short-term conditions. Overall, this work demonstrated a small-molecule approach to combine lung enrichment with potent anti-MRSA activity, supporting the further preclinical evaluation of 13f for MRSA pneumonia.",
+          "journal": "Bioorganic chemistry",
+          "pubdate": {
+            "year": "2026",
+            "month": "Jun",
+            "day": "05"
+          },
+          "doi": "10.1016/j.bioorg.2026.109694",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41763021/"
+        },
+        {
+          "pmid": "41794682",
+          "title": "The optimal target of vancomycin area under the curve in early or later phase on clinical outcomes and nephrotoxicity in patients with enterococcal infective endocarditis: how much is enough?",
+          "abstract": "",
+          "journal": "BMC infectious diseases",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": "07"
+          },
+          "doi": "10.1186/s12879-026-12993-5",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41794682/"
+        },
+        {
+          "pmid": "41720749",
+          "title": "Population Pharmacokinetics of Vancomycin in Critically Ill Patients Undergoing Continuous Renal Replacement Therapy: Influence of Adsorptive Membranes.",
+          "abstract": "Vancomycin is commonly used to treat Staphylococcus aureus infections. In critically ill patients receiving continuous renal replacement therapy (CRRT), adsorptive membranes like oXiris may alter drug pharmacokinetics. This retrospective study developed a population pharmacokinetics (PopPK) model using MonolixSuite software, incorporating adsorptive membrane use as a covariate. The final one-compartment model estimated that the population volume of distribution of vancomycin was 94.97 L (RSE 10.5%) and population clearance was 2.82 L/h (RSE 19.0%). Adsorptive membrane use was a significant covariate, slightly increasing vancomycin clearance, while aging was associated with reduced clearance. Monte Carlo simulations indicated that a regimen of 2 g loading dose followed by 1 g every 24 h achieved an AUC0-24/MIC ≥ 400 mg h/L in more than 90% of patients. Individualized vancomycin dosing in this population should consider membrane type, along with patient-specific factors such as age, to optimize therapeutic outcomes.",
+          "journal": "Clinical and translational science",
+          "pubdate": {
+            "year": "2026",
+            "month": "Mar",
+            "day": ""
+          },
+          "doi": "10.1111/cts.70511",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41720749/"
+        },
+        {
+          "pmid": "41715039",
+          "title": "Continuous versus intermittent vancomycin infusions in critically ill children with gram-positive bacterial infections: a randomized controlled trial.",
+          "abstract": "OBJECTIVE: This randomized controlled trial (RCT) compares continuous intravenous infusion (CIV) and intermittent infusion of vancomycin (IIV) regimens (40 mg/kg/day) in PICU patients with Gram-positive infections. The study aims to evaluate pharmacokinetics/pharmacodynamics (PK/PD) target attainment (Area under curve/Minimum inhibitory concentration, AUC/MIC ≥ 400) and renal safety profiles, with the ultimate goal of establishing optimized dosing protocols to enhance first-dose attainment of steady-state concentrations and enhance AUC/MIC ratio compliance, thereby supporting individualized treatment strategies for critically ill children.\nMETHODS: This single-center RCT was conducted at the PICU of Capital Center for Children’s Health, Capital Medical University (a tertiary pediatric critical care center specializing in severe infections in critically ill children) from June 2017 to June 2020. Eighty children (1 month to 14 years) with suspected or confirmed Gram-positive infections requiring vancomycin were randomized 1:1 to CIV (n = 40; 24-hour continuous infusion) or IIV (n = 40; intermittent infusion every 6 h, 1-hour infusion each time). PK/PD parameters (AUC0–24 h/MIC), clinical outcomes, and renal adverse events were compared.\nRESULTS: CIV achieved higher steady-state vancomycin concentrations than IIV (15.22 mg/L vs. 6.25 mg/L, p < 0.05). AUC0–24 h/MIC values were numerically higher in CIV (median 456.5 [Interquartile Range, IQR 291.9-590.9]) versus IIV (median 358.0 [IQR 276.1-714.4]), though differences were non-significant (p > 0.05).Between-group differences in clinical efficacy, including fever resolution and inflammatory markers, were not observed (p > 0.05).\nCONCLUSION: CIV rapidly achieves target vancomycin exposure in critically ill children without dose escalation, demonstrating comparable efficacy and renal safety to IIV. This strategy may optimize antimicrobial therapy in pediatric sepsis.\nTRIAL REGISTRATION: This trial was registered at the Chinese Clinical Trial Registry (ChiCTR) on 24 February 2021 with the registration number ChiCTR2100043659\nSUPPLEMENTARY INFORMATION: The online version contains supplementary material available at 10.1186/s12879-026-12560-y.",
+          "journal": "BMC infectious diseases",
+          "pubdate": {
+            "year": "2026",
+            "month": "Feb",
+            "day": "19"
+          },
+          "doi": "10.1186/s12879-026-12560-y",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41715039/"
+        },
+        {
+          "pmid": "41753715",
+          "title": "Methicillin-Resistant",
+          "abstract": "Staphylococcus aureus (MRSA) and vancomycin-resistant enterococci (VRE) are high-burden healthcare-associated pathogens that increase mortality, prolong hospitalisation, and drive substantial healthcare costs worldwide. These infections are associated with high morbidity, increased mortality, prolonged hospital stays, and significant costs, particularly among immunocompromised patients or those with extended hospitalizations. This systematic review was conducted and reported in accordance with PRISMA 2020, aiming to synthesise existing data on the epidemiology, resistance mechanisms, clinical manifestations, and strategies for the diagnosis, treatment, and prevention of MRSA and VRE infections. Data were qualitatively synthesised. A total of 113 records published between 2020 and 2025 met the inclusion criteria and were identified through searches in multiple bibliographic databases and publisher platforms (e.g., PubMed, Scopus, Web of Science). MRSA and VRE are implicated in numerous severe infections, including ventilator-associated pneumonia, catheter-associated urinary tract infections, endocarditis, and bacteraemia. Antimicrobial resistance is driven by the mecA, vanA, and vanB genes, while biofilm formation further complicates therapeutic efforts. Biofilm formation can promote antibiotic tolerance (slower killing without an increase in MIC) and persistence (survival of 'persister' cells), distinct from genetic resistance, and may complicate therapy in selected infections. Effective strategies include appropriate anti-MRSA/anti-VRE agents (e.g., ceftaroline for MRSA; linezolid or daptomycin for VRE), active screening, stringent infection prevention and control measures, and antimicrobial stewardship programmes. Implementation is often hindered by institutional barriers, limited resources, and insufficient staff training. A multidisciplinary, evidence-based approach is essential for the effective management of these infections. Reducing this burden requires coordinated implementation of rapid diagnostics, stringent infection prevention and control, and antimicrobial stewardship, supported by sustained institutional and public health investment.",
+          "journal": "Microorganisms",
+          "pubdate": {
+            "year": "2026",
+            "month": "Feb",
+            "day": "11"
+          },
+          "doi": "10.3390/microorganisms14020428",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41753715/"
+        },
+        {
+          "pmid": "41655740",
+          "title": "Linezolid use in postoperative central nervous system infections: a pharmacokinetic simulation-based approach for critically ill patients.",
+          "abstract": "BACKGROUND: Postoperative central nervous system (CNS) infections pose a significant challenge in neurosurgery. While linezolid may offer advantages over vancomycin, its optimal dosing for critically ill patients remains unclear. This study aims to optimize linezolid treatment in ICU patients with postoperative CNS infections using pharmacokinetic/pharmacodynamic modeling and simulation.\nMETHODS: ICU population PK models were analyzed using Monte Carlo simulations (n = 1,000) to evaluate six LZD regimens: 600 mg q12 h, 600 mg q8h, 600 mg q6h, and equivalent total daily doses by continuous infusion. Probability of target attainment (PTA) was calculated for time above MIC (%T>MIC) ≥85% and AUC/MIC > 100 in plasma and cerebrospinal fluid. MIC distributions of common pathogens were incorporated to estimate the cumulative fraction of response (CFR) for each regimen.\nRESULTS: Standard 600 mg q12 h dosing failed to achieve >90% PTA at MIC = 1 mg/L in all models. Intensified regimens (600 mg q8h, q6h, or continuous infusion) improved target attainment. A 2400 mg/day continuous infusion was required to consistently cover pathogens with MIC = 2 mg/L, albeit with a non-negligible toxicity risk. As approximately 90% of clinical isolates show linezolid MICs of 1-2 mg/L, CFR analysis suggested that ∼50% of ICU patients may be underdosed with the standard regimen.\nCONCLUSIONS: Standard linezolid dosing appears inadequate for postoperative CNS infections in ICU patients. Optimized regimens are necessary to reliably target pathogens with MIC ≥ 1 mg/L. Due to linezolid's narrow therapeutic window and toxicity risk at higher doses, individualized dosing and therapeutic drug monitoring may be recommended in neurocritical care settings.",
+          "journal": "Anaesthesia, critical care & pain medicine",
+          "pubdate": {
+            "year": "2026",
+            "month": "Feb",
+            "day": "06"
+          },
+          "doi": "10.1016/j.accpm.2026.101768",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41655740/"
+        },
+        {
+          "pmid": "40811453",
+          "title": "A Scoping Review on Vancomycin Monitoring in Intermittent Hemodialysis: Current Evidence and Future Perspectives.",
+          "abstract": "BACKGROUND: Despite the general recommendation of AUC 0-24h /MIC ratio of 400-600 mg·h/L for vancomycin (VAN) effectiveness, there is no strong evidence of this index for patients undergoing renal replacement therapy (RRT). The aim of this scoping review was to summarize the scientific literature to assess the current evidence on VAN monitoring in hospitalized patients receiving intermittent hemodialysis (HD), identify gaps in knowledge, and guide future research.\nMETHODS: A systematic search was performed using PubMed, Web of Science, Embase, LILACS, and the Cochrane Library databases based on keywords related to VAN, dialysis, and Therapeutic Drug Monitoring (TDM). References in the articles were also screened. The inclusion criteria were studies involving hospitalized adults undergoing intermittent HD, receiving intravenous VAN therapy, and with available TDM data.\nRESULTS: Systematic searches retrieved 297 articles, of which 21 were selected along with 1 from the reference screening, for 22 included studies. Clinical outcome data are still insufficient to determine the best VAN TDM parameters for patients undergoing intermittent HD. Target attainment was suboptimal in most settings regardless of the TDM method. The intradialytic removal of VAN is highly variable because of the combination of the RRT modality, RRT parameters, and dialyzer characteristics, which are often poorly described. The exact influence of the RRT parameters on intermittent RRT settings remains unclear.\nCONCLUSIONS: The poor description of RRT, suboptimal VAN target attainment, and limited clinical outcome data in patients undergoing intermittent HD highlight the urgent need for further research. As VAN removal during RRT is influenced by a complex interplay of factors, improved dosing and monitoring strategies are required. In the future, model-informed precision dosing may play a significant role in optimizing VAN therapy in patients undergoing intermittent HD.",
+          "journal": "Therapeutic drug monitoring",
+          "pubdate": {
+            "year": "2026",
+            "month": "Feb",
+            "day": "01"
+          },
+          "doi": "10.1097/FTD.0000000000001368",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40811453/"
+        },
+        {
+          "pmid": "41563485",
+          "title": "Vancomycin resistance in gram-positive infections: evolutionary strategies of survival.",
+          "abstract": "Vancomycin is a critical glycopeptide antibiotic for treating severe infections caused by Gram-positive bacteria, particularly MRSA and Clostridioides difficile, by inhibiting cell wall synthesis through binding to D-Ala-D-Ala termini of peptidoglycan precursors. Resistance has emerged in Enterococcus spp (VRE) and Staphylococcus spp, (VISA/VRSA) through acquisition of van operons, precursor modification (D-Ala-D-Lac/D-Ser), cell wall thickening, biofilm formation, and regulatory mutations, leading to treatment failures and increased morbidity. Global genomic surveillance reveals ongoing clonal expansion and horizontal spread of resistance determinants. This review comprehensively examines vancomycin's mechanism of action, the evolutionary emergence and genetic basis of resistance, adaptive survival strategies of pathogens, clinical/epidemiological consequences, current alternative therapies, and precision stewardship approaches including area under the concentration-time curve/minimum inhibitory concentration (AUC/MIC)-guided therapeutic drug monitoring (TDM). Most importantly, it highlights the transformative and still under-appreciated role of artificial intelligence in overcoming vancomycin resistance: machine learning accelerates discovery of novel antimicrobial peptides and repurposed drugs, AI-driven surveillance enables real-time resistance detection and outbreak forecasting, and hybrid AI-molecular modeling rationally designs superior vancomycin derivatives with enhanced activity against VRE and VRSA. These rapidly evolving AI-integrated strategies, when combined with strengthened infection control and stewardship, offer the most promising path forward to preserve and extend the clinical utility of vancomycin and related antibiotics.",
+          "journal": "Archives of microbiology",
+          "pubdate": {
+            "year": "2026",
+            "month": "Jan",
+            "day": "21"
+          },
+          "doi": "10.1007/s00203-025-04698-1",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41563485/"
+        },
+        {
+          "pmid": "41594084",
+          "title": "Vancomycin Dosing Regimen to Obtain the Target Area Under the Concentration-Time Curve, Which Provides an Early Treatment Response for Patients on Haemodialysis.",
+          "abstract": "Objectives: This study aimed to clarify the area under the curve (AUC) for obtaining better clinical outcomes and to demonstrate vancomycin dosing for achieving the AUC in haemodialysis (HD). Methods: The vancomycin concentration was measured before the second HD. The AUC24-48h after the initial HD was assessed to evaluate its correlation with an early clinical response and to determine the dosing regimen, assuming an inter-dialysis interval of 48 h, even if the interval was 72 h. Results: An AUC/MIC ≥ 400 was an independent factor for an early response in treating MRSA infections and infections caused by methicillin-resistant Gram-positive organisms. An AUC of 600-700 μg·h/mL did not increase the incidence of adverse effects compared with that of <600 μg·h/mL. An AUC of 400-700 μg·h/mL was obtained in 90.5% of patients with a loading dose of 30 mg/kg followed by a maintenance dose of 10 mg/kg. Pre-dialysis concentrations were significantly higher than the trough concentration required in non-HD patients to achieve the same AUC category, and AUC24-48h was strongly correlated with pre-dialysis concentrations (R2 = 0.921). In a receiver operating characteristic curve, the cut-off value for an early response was 16.8 μg/mL for the pre-dialysis concentration/MIC. Conclusions: AUC24-48h after the initial HD/MIC of ≥400 μg/mL improves the clinical outcomes in patients on HD, and the target PK/PD can be achieved with an upper range of the recommended dose. The pre-dialysis concentration may be a reliable surrogate for the AUC, and the vancomycin dose could be adjusted according to this PK target.",
+          "journal": "Antibiotics (Basel, Switzerland)",
+          "pubdate": {
+            "year": "2026",
+            "month": "Jan",
+            "day": "03"
+          },
+          "doi": "10.3390/antibiotics15010047",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41594084/"
+        },
+        {
+          "pmid": "41475800",
+          "title": "Treatment outcomes in methicillin-resistant",
+          "abstract": "BACKGROUND: Methicillin-resistant Staphylococcus aureus (MRSA) bacteraemia remains a major clinical challenge with high mortality, despite guideline-recommended vancomycin therapy. Although a ratio of the area under the curve to the minimum inhibitory concentration (AUC/MIC) ≥400 mg·hour/L is advocated for efficacy, the association between pharmacokinetic/pharmacodynamic (PK/PD) target attainment and clinical outcomes remains uncertain.\nOBJECTIVE: To determine the in-hospital mortality rate among patients with MRSA bacteraemia receiving vancomycin. The secondary objectives were to (1) evaluate the association between patient characteristics and in-hospital mortality, (2) examine the relationship between in-hospital mortality and secondary treatment outcomes, and (3) assess the impact of vancomycin AUC/MIC target attainment on in-hospital mortality.\nMETHODS: A retrospective cohort study was conducted at a tertiary hospital in Malaysia involving adults with MRSA bacteraemia treated from 2014 to 2024. AUC/MIC data were analysed for patients receiving intermittent vancomycin dosing. Multivariable logistic regression identified independent predictors of mortality.\nRESULTS: Among 148 patients included, the in-hospital mortality rate was 32.4% (n=48/148). Four factors were independently associated with in-hospital mortality: organ failure (adjusted OR (aOR) 19.28, 95% CI 5.14 to 72.26), recent antibiotic exposure (aOR 5.24, 95% CI 1.90 to 14.51), hypoalbuminaemia <30 g/L (aOR 4.56, 95% CI 1.69 to 13.06) and cerebrovascular disease (aOR 4.24, 95% CI 1.15 to 15.60). Subgroup analysis of patients on intermittent dosing revealed six independent predictors of in-hospital mortality: cerebrovascular disease (aOR 26.9, 95% CI 2.76 to 261.98), hypoalbuminaemia <30 g/L (aOR 10.68, 95% CI 1.54 to 74.29), organ failure (aOR 48.15, 95% CI 4.27 to 542.81), polymicrobial bacteraemia (aOR 24.28, 95% CI 3.09 to 190.64), persistent bacteraemia (aOR 90.08, 95% CI 2.85 to 2845.83) and intensive care unit admission (aOR 0.09, 95% CI 0.01 to 0.91), the latter showing a protective effect. Only 22.2% (n=26/117) achieved the target AUC/MIC, which was not significantly linked to mortality reduction.\nCONCLUSIONS: Vancomycin AUC/MIC attainment was suboptimal, and mortality was primarily influenced by host factors and disease severity. Early risk stratification and timely intervention are critical to improve outcomes and guide resource prioritisation, particularly in settings with limited access to AUC-guided dosing.",
+          "journal": "European journal of hospital pharmacy : science and practice",
+          "pubdate": {
+            "year": "2025",
+            "month": "Dec",
+            "day": "31"
+          },
+          "doi": "10.1136/ejhpharm-2025-004716",
+          "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41475800/"
+        }
+      ]
+    }
+  ]
+}

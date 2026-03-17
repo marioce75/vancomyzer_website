@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-03-12T22:45:39.121926+00:00",
+  "source": "guideline_pages",
+  "results": [
+    {
+      "url": "https://www.idsociety.org/",
+      "status": "ok",
+      "content_sha256": "ea74411d04a641cb2c0130a9567320148df6840be178ca3a44e1799ca364d73a",
+      "text_excerpt": "IDSA Home You are using an outdated browser. Please upgrade your browser to improve your experience and security. Advertisement Skip to nav Skip to content IDSA Foundation IDWeek HIVMA About Journals Events Multimedia Blog News Login ID Topics ID Topics Infectious Diseases Infectious Diseases Avian Influenza A(H5N1) COVID-19 Ebola Influenza Lyme Disease Measles Mpox Viral Hepatitis Special Topics Special Topics Antimicrobial Resistance Climate Change Emerging Infections Hurricanes and Flooding Immunization & Vaccination Guidelines Looking for Practice Guidelines? Practice Resources Practice Resources Guidelines Guidelines A-Z Guideline Listing Search All Guidelines Training & Resources Practice Tools Practice Tools Antimicrobial Stewardship Coding and Payment ID Physician Compensation Quality Measurement and Improvement Guidelines View all Practice Guidelines Education & Training Education & Training Professional Development Professional Development Alzheimer’s Disease Research Grant Program IDSA Academy iDMentorship365 ID STEP Program Leadership Institute Training and Curriculum Training and Curriculum Fellows-in-Training Career Resources ID Fellowship Match ID Fellowship Training Program Directory Jobs in ID Training Program Director Resources training Browse IDSA Academy Courses Policy & Advocacy Policy & Advocacy Advocacy and Action Advocacy and Action Advocacy Federal Policy Watch Take Action Member Advocacy Program IDSA Policy and Priorities IDSA Policy and Priorities A"
+    },
+    {
+      "url": "https://www.ashp.org/",
+      "status": "error",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "url": "https://www.fda.gov/drugs/drug-safety-and-availability",
+      "status": "ok",
+      "content_sha256": "7f57ca96772bc2aa6d760ee589aba30fa5d43e36a9f409fa19b07b13ce99f794",
+      "text_excerpt": "Drug Safety and Availability | FDA Skip to main content Skip to FDA Search Skip to in this section menu Skip to footer links An official website of the United States government Here’s how you know The .gov means it’s official. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you're on a federal government site. The site is secure. The https:// ensures that you are connecting to the official website and that any information you provide is encrypted and transmitted securely. &nbsp; Search &nbsp; Menu Search FDA Submit search Featured Report a Product Problem Contact FDA FDA Guidance Documents Recalls, Market Withdrawals and Safety Alerts Press Announcements Warning Letters Advisory Committees En Espa&#241ol Products Food Drugs Medical Devices Radiation-Emitting Products Vaccines, Blood, and Biologics Animal and Veterinary Cosmetics Tobacco Products Topics About FDA Combination Products Regulatory Information Safety Emergency Preparedness International Programs News and Events Training and Continuing Education Inspections and Compliance Science and Research Information For Consumers Patients Industry Health Professionals Federal, State and Local Officials In this section : Drugs Drug Safety and Availability Drug Alerts and Statements Information about Nitrosamine Impurities in Medications Drug Safety Communications Food and Drug Administration Overdose Prevention Framework Drug Shortages FDA Drug Safety Podcasts Information b"
+    }
+  ]
+}

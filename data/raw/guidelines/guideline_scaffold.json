@@ -1,0 +1,5 @@
+{
+  "generated_at": "2026-03-12T22:19:03.498508Z",
+  "status": "scaffold_only",
+  "next_step": "Implement public-page fetch + change detection for guideline/news sources."
+}

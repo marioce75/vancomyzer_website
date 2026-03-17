@@ -1,0 +1,25 @@
+pubmed:
+  enabled: true
+  queries:
+    - "vancomycin auc bayesian"
+    - "vancomycin therapeutic drug monitoring"
+    - "vancomycin dosing guideline"
+    - "vancomycin auc mic"
+  output_dir: "data/raw/pubmed"
+
+guidelines:
+  enabled: true
+  pages:
+    - "https://www.idsociety.org/"
+    - "https://www.ashp.org/"
+    - "https://www.fda.gov/drugs/drug-safety-and-availability"
+  output_dir: "data/raw/guidelines"
+
+public_discussions:
+  enabled: true
+  sources:
+    - "reddit"
+    - "studentdoctor"
+    - "blogs"
+  notes: "Use compliant public collection only; no auth bypass or aggressive scraping."
+  output_dir: "data/raw/discussions"

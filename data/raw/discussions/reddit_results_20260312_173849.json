@@ -1,0 +1,22 @@
+{
+  "generated_at": "2026-03-12T22:38:49.760252",
+  "query": "vancomycin",
+  "results": [
+    {
+      "subreddit": "pharmacy",
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "subreddit": "medicine",
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "subreddit": "criticalcare",
+      "error": "HTTP Error 403: Blocked"
+    },
+    {
+      "subreddit": "Residency",
+      "error": "HTTP Error 403: Blocked"
+    }
+  ]
+}

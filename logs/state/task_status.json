@@ -1,0 +1,1702 @@
+{
+  "001_pk_engine_audit.md": {
+    "title": "Audit the Vancomyzer pharmacokinetic engine",
+    "assigned_roles": [
+      "agents/pk-engine"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.718357+00:00",
+    "updated_at": "2026-03-13T00:05:36.718474+00:00",
+    "notes": ""
+  },
+  "002_research_monitoring_setup.md": {
+    "title": "Set up continuous research monitoring for vancomycin dosing trends and clinician pain points",
+    "assigned_roles": [
+      "agents/research-intelligence"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.719800+00:00",
+    "updated_at": "2026-03-13T00:05:36.719803+00:00",
+    "notes": ""
+  },
+  "003_marketing_engine_setup.md": {
+    "title": "Establish best-in-class marketing framework for Vancomyzer",
+    "assigned_roles": [
+      "agents/marketing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.720067+00:00",
+    "updated_at": "2026-03-13T00:05:36.720069+00:00",
+    "notes": ""
+  },
+  "004_product_growth_alignment.md": {
+    "title": "Align product roadmap with research and growth goals",
+    "assigned_roles": [
+      "agents/product-strategy"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.720299+00:00",
+    "updated_at": "2026-03-13T00:05:36.720301+00:00",
+    "notes": ""
+  },
+  "005_source_registry_review.md": {
+    "title": "Review and refine Vancomyzer intelligence source registry",
+    "assigned_roles": [
+      "agents/research-intelligence",
+      "agents/competitive-intel"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.720532+00:00",
+    "updated_at": "2026-03-13T00:05:36.720534+00:00",
+    "notes": ""
+  },
+  "006_first_weekly_intel_report.md": {
+    "title": "Produce first weekly Vancomyzer intelligence report",
+    "assigned_roles": [
+      "agents/research-intelligence",
+      "agents/product-strategy",
+      "agents/marketing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.720766+00:00",
+    "updated_at": "2026-03-13T00:05:36.720767+00:00",
+    "notes": ""
+  },
+  "007_competitor_baseline.md": {
+    "title": "Create baseline competitor landscape for Vancomyzer",
+    "assigned_roles": [
+      "agents/competitive-intel"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.720961+00:00",
+    "updated_at": "2026-03-13T00:05:36.720962+00:00",
+    "notes": ""
+  },
+  "008_monitoring_script_implementation.md": {
+    "title": "Implement first-pass monitoring scripts for Vancomyzer intelligence pipeline",
+    "assigned_roles": [
+      "agents/research-intelligence",
+      "agents/architect",
+      "agents/testing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.721168+00:00",
+    "updated_at": "2026-03-13T00:05:36.721169+00:00",
+    "notes": ""
+  },
+  "009_marketing_signal_translation.md": {
+    "title": "Translate research findings into marketing signals and content opportunities",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.721369+00:00",
+    "updated_at": "2026-03-13T00:05:36.721370+00:00",
+    "notes": ""
+  },
+  "010_research_summary_from_first_pass.md": {
+    "title": "Summarize first-pass market intelligence into actionable clinical and product signals",
+    "assigned_roles": [
+      "agents/research-intelligence"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.721574+00:00",
+    "updated_at": "2026-03-13T00:05:36.721575+00:00",
+    "notes": ""
+  },
+  "011_marketing_topics_from_first_pass.md": {
+    "title": "Convert first-pass intelligence into content and acquisition ideas",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.721803+00:00",
+    "updated_at": "2026-03-13T00:05:36.721805+00:00",
+    "notes": ""
+  },
+  "012_product_features_from_first_pass.md": {
+    "title": "Convert first-pass intelligence into product roadmap ideas",
+    "assigned_roles": [
+      "agents/product-strategy",
+      "agents/pk-engine",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.722036+00:00",
+    "updated_at": "2026-03-13T00:05:36.722038+00:00",
+    "notes": ""
+  },
+  "013_guideline_monitor_review.md": {
+    "title": "Review first-pass guideline monitor output for authoritative signals",
+    "assigned_roles": [
+      "agents/research-intelligence",
+      "agents/verifier",
+      "agents/product-strategy"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.722266+00:00",
+    "updated_at": "2026-03-13T00:05:36.722268+00:00",
+    "notes": ""
+  },
+  "014_combined_dashboard_review.md": {
+    "title": "Review combined intelligence dashboard and identify highest-priority actions",
+    "assigned_roles": [
+      "agents/research-intelligence",
+      "agents/product-strategy",
+      "agents/marketing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.722480+00:00",
+    "updated_at": "2026-03-13T00:05:36.722481+00:00",
+    "notes": ""
+  },
+  "015_competitor_baseline_execution.md": {
+    "title": "Build first competitor baseline reports for major vancomycin dosing tools",
+    "assigned_roles": [
+      "agents/competitive-intel",
+      "agents/product-strategy"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.722690+00:00",
+    "updated_at": "2026-03-13T00:05:36.722691+00:00",
+    "notes": ""
+  },
+  "016_vancocalc_baseline.md": {
+    "title": "Build baseline competitor report for VancoCalc",
+    "assigned_roles": [
+      "agents/competitive-intel",
+      "agents/product-strategy"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.722904+00:00",
+    "updated_at": "2026-03-13T00:05:36.722905+00:00",
+    "notes": ""
+  },
+  "017_dosemerx_baseline.md": {
+    "title": "Build baseline competitor report for DoseMeRx",
+    "assigned_roles": [
+      "agents/competitive-intel",
+      "agents/product-strategy"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.723113+00:00",
+    "updated_at": "2026-03-13T00:05:36.723114+00:00",
+    "notes": ""
+  },
+  "018_insightrx_baseline.md": {
+    "title": "Build baseline competitor report for InsightRx",
+    "assigned_roles": [
+      "agents/competitive-intel",
+      "agents/product-strategy"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.723325+00:00",
+    "updated_at": "2026-03-13T00:05:36.723326+00:00",
+    "notes": ""
+  },
+  "019_precisepk_baseline.md": {
+    "title": "Build baseline competitor report for PrecisePK",
+    "assigned_roles": [
+      "agents/competitive-intel",
+      "agents/product-strategy"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.723534+00:00",
+    "updated_at": "2026-03-13T00:05:36.723535+00:00",
+    "notes": ""
+  },
+  "020_competitor_synthesis.md": {
+    "title": "Synthesize competitor baseline findings into Vancomyzer strategy",
+    "assigned_roles": [
+      "agents/competitive-intel",
+      "agents/product-strategy",
+      "agents/marketing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.723745+00:00",
+    "updated_at": "2026-03-13T00:05:36.723746+00:00",
+    "notes": ""
+  },
+  "021_fill_vancocalc_baseline.md": {
+    "title": "Fill in the VancoCalc baseline report with observable product details",
+    "assigned_roles": [
+      "agents/competitive-intel"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.723956+00:00",
+    "updated_at": "2026-03-13T00:05:36.723957+00:00",
+    "notes": ""
+  },
+  "022_fill_dosemerx_baseline.md": {
+    "title": "Fill in the DoseMeRx baseline report with observable product details",
+    "assigned_roles": [
+      "agents/competitive-intel"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.724163+00:00",
+    "updated_at": "2026-03-13T00:05:36.724164+00:00",
+    "notes": ""
+  },
+  "023_fill_insightrx_baseline.md": {
+    "title": "Fill in the InsightRx baseline report with observable product details",
+    "assigned_roles": [
+      "agents/competitive-intel"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.724374+00:00",
+    "updated_at": "2026-03-13T00:05:36.724375+00:00",
+    "notes": ""
+  },
+  "024_fill_precisepk_baseline.md": {
+    "title": "Fill in the PrecisePK baseline report with observable product details",
+    "assigned_roles": [
+      "agents/competitive-intel"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.724586+00:00",
+    "updated_at": "2026-03-13T00:05:36.724587+00:00",
+    "notes": ""
+  },
+  "025_competitor_snapshot_review.md": {
+    "title": "Review competitor snapshots and update baseline reports",
+    "assigned_roles": [
+      "agents/competitive-intel",
+      "agents/product-strategy",
+      "agents/marketing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.724800+00:00",
+    "updated_at": "2026-03-13T00:05:36.724801+00:00",
+    "notes": ""
+  },
+  "026_product_positioning_matrix.md": {
+    "title": "Create Vancomyzer product positioning matrix against competitors",
+    "assigned_roles": [
+      "agents/product-strategy",
+      "agents/competitive-intel",
+      "agents/marketing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.725013+00:00",
+    "updated_at": "2026-03-13T00:05:36.725014+00:00",
+    "notes": ""
+  },
+  "027_content_roadmap.md": {
+    "title": "Build first content roadmap for Vancomyzer",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/research-intelligence"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.725192+00:00",
+    "updated_at": "2026-03-13T00:05:36.725193+00:00",
+    "notes": ""
+  },
+  "028_ui_transparency_improvements.md": {
+    "title": "Define UI transparency improvements for Vancomyzer dosing outputs",
+    "assigned_roles": [
+      "agents/pk-engine",
+      "agents/backend",
+      "agents/verifier",
+      "agents/architect"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.725375+00:00",
+    "updated_at": "2026-03-13T00:05:36.725376+00:00",
+    "notes": ""
+  },
+  "029_fill_positioning_matrix.md": {
+    "title": "Fill the Vancomyzer positioning matrix using current competitor and intelligence findings",
+    "assigned_roles": [
+      "agents/product-strategy",
+      "agents/competitive-intel",
+      "agents/marketing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.725558+00:00",
+    "updated_at": "2026-03-13T00:05:36.725560+00:00",
+    "notes": ""
+  },
+  "030_website_messaging_refinement.md": {
+    "title": "Refine website messaging from the positioning matrix",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.725744+00:00",
+    "updated_at": "2026-03-13T00:05:36.725745+00:00",
+    "notes": ""
+  },
+  "031_fill_ui_transparency_spec.md": {
+    "title": "Fill the UI transparency spec with concrete recommendations for Vancomyzer",
+    "assigned_roles": [
+      "agents/pk-engine",
+      "agents/backend",
+      "agents/verifier",
+      "agents/architect"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.726007+00:00",
+    "updated_at": "2026-03-13T00:05:36.726009+00:00",
+    "notes": ""
+  },
+  "032_refine_output_panel_wireframe.md": {
+    "title": "Refine the Vancomyzer output panel wireframe",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/backend",
+      "agents/verifier",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.726220+00:00",
+    "updated_at": "2026-03-13T00:05:36.726221+00:00",
+    "notes": ""
+  },
+  "033_execute_content_roadmap.md": {
+    "title": "Execute the Vancomyzer content roadmap",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/research-intelligence",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.726432+00:00",
+    "updated_at": "2026-03-13T00:05:36.726434+00:00",
+    "notes": ""
+  },
+  "034_case_library_expansion.md": {
+    "title": "Expand the Vancomyzer case library into realistic clinician-facing examples",
+    "assigned_roles": [
+      "agents/pk-engine",
+      "agents/verifier",
+      "agents/marketing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.726645+00:00",
+    "updated_at": "2026-03-13T00:05:36.726646+00:00",
+    "notes": ""
+  },
+  "035_case_based_content_plan.md": {
+    "title": "Build a case-based content plan for Vancomyzer",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/research-intelligence",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.726860+00:00",
+    "updated_at": "2026-03-13T00:05:36.726861+00:00",
+    "notes": ""
+  },
+  "036_fill_documentation_export_spec.md": {
+    "title": "Fill the documentation export spec for Vancomyzer",
+    "assigned_roles": [
+      "agents/verifier",
+      "agents/pk-engine",
+      "agents/backend",
+      "agents/docs"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.727075+00:00",
+    "updated_at": "2026-03-13T00:05:36.727076+00:00",
+    "notes": ""
+  },
+  "037_case_export_examples.md": {
+    "title": "Create case-based export examples for Vancomyzer",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/marketing",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.727288+00:00",
+    "updated_at": "2026-03-13T00:05:36.727290+00:00",
+    "notes": ""
+  },
+  "038_review_sample_exports.md": {
+    "title": "Review Vancomyzer sample exports for clarity, safety, and demo usefulness",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/verifier",
+      "agents/marketing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.727504+00:00",
+    "updated_at": "2026-03-13T00:05:36.727505+00:00",
+    "notes": ""
+  },
+  "039_export_ui_integration_plan.md": {
+    "title": "Plan how documentation exports should connect to Vancomyzer UI and workflow",
+    "assigned_roles": [
+      "agents/backend",
+      "agents/architect",
+      "agents/verifier",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.727717+00:00",
+    "updated_at": "2026-03-13T00:05:36.727718+00:00",
+    "notes": ""
+  },
+  "040_website_demo_pack_refinement.md": {
+    "title": "Refine the Vancomyzer website demo pack",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/docs",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.727933+00:00",
+    "updated_at": "2026-03-13T00:05:36.727934+00:00",
+    "notes": ""
+  },
+  "041_demo_case_selection.md": {
+    "title": "Select the best cases for website demos and onboarding",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/verifier",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.728143+00:00",
+    "updated_at": "2026-03-13T00:05:36.728144+00:00",
+    "notes": ""
+  },
+  "042_homepage_copy_refinement.md": {
+    "title": "Refine Vancomyzer homepage copy for clarity, trust, and conversion",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.728355+00:00",
+    "updated_at": "2026-03-13T00:05:36.728356+00:00",
+    "notes": ""
+  },
+  "043_homepage_section_priority.md": {
+    "title": "Prioritize homepage sections for first-version Vancomyzer site",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/architect"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.728568+00:00",
+    "updated_at": "2026-03-13T00:05:36.728569+00:00",
+    "notes": ""
+  },
+  "044_feature_page_refinement.md": {
+    "title": "Refine Vancomyzer feature page copy",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.728782+00:00",
+    "updated_at": "2026-03-13T00:05:36.728783+00:00",
+    "notes": ""
+  },
+  "045_feature_page_priority.md": {
+    "title": "Prioritize which feature pages should launch first",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/product-strategy",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.728991+00:00",
+    "updated_at": "2026-03-13T00:05:36.728993+00:00",
+    "notes": ""
+  },
+  "046_seo_page_refinement.md": {
+    "title": "Refine Vancomyzer SEO landing pages",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/research-intelligence",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729197+00:00",
+    "updated_at": "2026-03-13T00:05:36.729199+00:00",
+    "notes": ""
+  },
+  "047_seo_page_priority.md": {
+    "title": "Prioritize which SEO pages should launch first",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/product-strategy",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729374+00:00",
+    "updated_at": "2026-03-13T00:05:36.729375+00:00",
+    "notes": ""
+  },
+  "048_seo_landing_section_refinement.md": {
+    "title": "Refine the section structure for Vancomyzer SEO landing pages",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729555+00:00",
+    "updated_at": "2026-03-13T00:05:36.729556+00:00",
+    "notes": ""
+  },
+  "049_seo_page_template_strategy.md": {
+    "title": "Define reusable page templates for Vancomyzer SEO landing pages",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/marketing",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729736+00:00",
+    "updated_at": "2026-03-13T00:05:36.729737+00:00",
+    "notes": ""
+  },
+  "050_case_page_refinement.md": {
+    "title": "Refine Vancomyzer case pages for website and educational use",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/docs",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729777+00:00",
+    "updated_at": "2026-03-13T00:05:36.729778+00:00",
+    "notes": ""
+  },
+  "051_case_page_template_strategy.md": {
+    "title": "Define reusable case page templates for Vancomyzer",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/marketing",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729808+00:00",
+    "updated_at": "2026-03-13T00:05:36.729809+00:00",
+    "notes": ""
+  },
+  "052_comparison_page_refinement.md": {
+    "title": "Refine Vancomyzer comparison pages for education, trust, and positioning",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/competitive-intel",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729839+00:00",
+    "updated_at": "2026-03-13T00:05:36.729840+00:00",
+    "notes": ""
+  },
+  "053_comparison_page_priority.md": {
+    "title": "Prioritize which comparison pages should launch first",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/product-strategy",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729869+00:00",
+    "updated_at": "2026-03-13T00:05:36.729871+00:00",
+    "notes": ""
+  },
+  "054_faq_refinement.md": {
+    "title": "Refine the Vancomyzer FAQ for trust, clarity, and onboarding value",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/docs",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729900+00:00",
+    "updated_at": "2026-03-13T00:05:36.729901+00:00",
+    "notes": ""
+  },
+  "055_faq_priority_and_structure.md": {
+    "title": "Prioritize and structure Vancomyzer FAQ content",
+    "assigned_roles": [
+      "agents/customer-conversion",
+      "agents/marketing",
+      "agents/architect"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729931+00:00",
+    "updated_at": "2026-03-13T00:05:36.729932+00:00",
+    "notes": ""
+  },
+  "056_onboarding_flow_refinement.md": {
+    "title": "Refine the Vancomyzer onboarding flow for trust, clarity, and conversion",
+    "assigned_roles": [
+      "agents/customer-conversion",
+      "agents/marketing",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729962+00:00",
+    "updated_at": "2026-03-13T00:05:36.729963+00:00",
+    "notes": ""
+  },
+  "057_onboarding_page_priority.md": {
+    "title": "Prioritize which onboarding elements should appear first",
+    "assigned_roles": [
+      "agents/customer-conversion",
+      "agents/marketing",
+      "agents/architect"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.729992+00:00",
+    "updated_at": "2026-03-13T00:05:36.729994+00:00",
+    "notes": ""
+  },
+  "058_pricing_page_refinement.md": {
+    "title": "Refine Vancomyzer pricing and conversion page strategy",
+    "assigned_roles": [
+      "agents/customer-conversion",
+      "agents/marketing",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730024+00:00",
+    "updated_at": "2026-03-13T00:05:36.730025+00:00",
+    "notes": ""
+  },
+  "059_demo_first_conversion_strategy.md": {
+    "title": "Define a demo-first conversion strategy for Vancomyzer",
+    "assigned_roles": [
+      "agents/customer-conversion",
+      "agents/marketing",
+      "agents/docs"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730054+00:00",
+    "updated_at": "2026-03-13T00:05:36.730056+00:00",
+    "notes": ""
+  },
+  "060_institutional_page_refinement.md": {
+    "title": "Refine Vancomyzer institutional page strategy",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730085+00:00",
+    "updated_at": "2026-03-13T00:05:36.730087+00:00",
+    "notes": ""
+  },
+  "061_contact_page_structure.md": {
+    "title": "Define Vancomyzer contact page structure and evaluation flow",
+    "assigned_roles": [
+      "agents/customer-conversion",
+      "agents/marketing",
+      "agents/docs"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730116+00:00",
+    "updated_at": "2026-03-13T00:05:36.730117+00:00",
+    "notes": ""
+  },
+  "062_trust_evidence_page_refinement.md": {
+    "title": "Refine the Vancomyzer trust and evidence page strategy",
+    "assigned_roles": [
+      "agents/verifier",
+      "agents/marketing",
+      "agents/docs"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730148+00:00",
+    "updated_at": "2026-03-13T00:05:36.730149+00:00",
+    "notes": ""
+  },
+  "063_validation_claims_guardrails.md": {
+    "title": "Define validation and evidence guardrails for Vancomyzer website claims",
+    "assigned_roles": [
+      "agents/verifier",
+      "agents/docs",
+      "agents/marketing"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.730179+00:00",
+    "updated_at": "2026-03-13T00:11:02.496591+00:00",
+    "notes": "Guardrail document drafted and execution note completed"
+  },
+  "064_about_page_refinement.md": {
+    "title": "Refine the Vancomyzer about page for clarity, credibility, and mission fit",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/docs",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730209+00:00",
+    "updated_at": "2026-03-13T00:05:36.730210+00:00",
+    "notes": ""
+  },
+  "065_about_page_priority_and_structure.md": {
+    "title": "Define the best structure and placement for the Vancomyzer about page",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/architect"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730240+00:00",
+    "updated_at": "2026-03-13T00:05:36.730241+00:00",
+    "notes": ""
+  },
+  "066_resource_hub_refinement.md": {
+    "title": "Refine the Vancomyzer resource hub structure",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/docs",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730271+00:00",
+    "updated_at": "2026-03-13T00:05:36.730272+00:00",
+    "notes": ""
+  },
+  "067_resource_hub_priority_and_navigation.md": {
+    "title": "Define Vancomyzer resource hub navigation and priority structure",
+    "assigned_roles": [
+      "agents/customer-conversion",
+      "agents/architect",
+      "agents/marketing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730301+00:00",
+    "updated_at": "2026-03-13T00:05:36.730303+00:00",
+    "notes": ""
+  },
+  "068_lead_magnet_refinement.md": {
+    "title": "Refine Vancomyzer lead magnet strategy for trust, relevance, and audience growth",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/docs"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730332+00:00",
+    "updated_at": "2026-03-13T00:05:36.730333+00:00",
+    "notes": ""
+  },
+  "069_email_capture_placement_strategy.md": {
+    "title": "Define Vancomyzer email capture placement and friction strategy",
+    "assigned_roles": [
+      "agents/customer-conversion",
+      "agents/marketing",
+      "agents/architect"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730362+00:00",
+    "updated_at": "2026-03-13T00:05:36.730363+00:00",
+    "notes": ""
+  },
+  "070_newsletter_refinement.md": {
+    "title": "Refine the Vancomyzer newsletter and update digest strategy",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/research-intelligence",
+      "agents/docs"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730393+00:00",
+    "updated_at": "2026-03-13T00:05:36.730394+00:00",
+    "notes": ""
+  },
+  "071_digest_content_pipeline.md": {
+    "title": "Define the Vancomyzer digest content pipeline",
+    "assigned_roles": [
+      "agents/research-intelligence",
+      "agents/marketing",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730423+00:00",
+    "updated_at": "2026-03-13T00:05:36.730424+00:00",
+    "notes": ""
+  },
+  "072_social_content_refinement.md": {
+    "title": "Refine Vancomyzer social and micro-content strategy",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/research-intelligence",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730454+00:00",
+    "updated_at": "2026-03-13T00:05:36.730455+00:00",
+    "notes": ""
+  },
+  "073_social_repurposing_pipeline.md": {
+    "title": "Define the Vancomyzer social repurposing pipeline",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/docs"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730486+00:00",
+    "updated_at": "2026-03-13T00:05:36.730487+00:00",
+    "notes": ""
+  },
+  "074_webinar_event_refinement.md": {
+    "title": "Refine the Vancomyzer webinar and educational event strategy",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/research-intelligence",
+      "agents/docs",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730517+00:00",
+    "updated_at": "2026-03-13T00:05:36.730518+00:00",
+    "notes": ""
+  },
+  "075_event_repurposing_pipeline.md": {
+    "title": "Define the Vancomyzer event repurposing pipeline",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/docs",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730548+00:00",
+    "updated_at": "2026-03-13T00:05:36.730549+00:00",
+    "notes": ""
+  },
+  "076_partnership_outreach_refinement.md": {
+    "title": "Refine the Vancomyzer partnership and outreach strategy",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/docs",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730579+00:00",
+    "updated_at": "2026-03-13T00:05:36.730580+00:00",
+    "notes": ""
+  },
+  "077_outreach_asset_mapping.md": {
+    "title": "Map Vancomyzer outreach assets to target audiences",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/docs",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730610+00:00",
+    "updated_at": "2026-03-13T00:05:36.730611+00:00",
+    "notes": ""
+  },
+  "078_demo_deck_refinement.md": {
+    "title": "Refine the Vancomyzer demo deck content for serious evaluators",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/docs",
+      "agents/verifier",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730641+00:00",
+    "updated_at": "2026-03-13T00:05:36.730642+00:00",
+    "notes": ""
+  },
+  "079_demo_deck_appendix_strategy.md": {
+    "title": "Define the appendix strategy for the Vancomyzer demo deck",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/verifier",
+      "agents/architect"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730671+00:00",
+    "updated_at": "2026-03-13T00:05:36.730672+00:00",
+    "notes": ""
+  },
+  "080_implementation_blueprint_refinement.md": {
+    "title": "Refine the Vancomyzer implementation blueprint into a practical build sequence",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730703+00:00",
+    "updated_at": "2026-03-13T00:05:36.730704+00:00",
+    "notes": ""
+  },
+  "081_phase_one_delivery_plan.md": {
+    "title": "Define the Phase 1 delivery plan for Vancomyzer core site foundation",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/docs"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T00:05:36.730733+00:00",
+    "updated_at": "2026-03-13T00:05:36.730735+00:00",
+    "notes": ""
+  },
+  "082_mvp_website_spec_refinement.md": {
+    "title": "Refine the Vancomyzer minimum viable website spec",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.730765+00:00",
+    "updated_at": "2026-03-13T00:12:31.532069+00:00",
+    "notes": "Refined MVP website spec drafted"
+  },
+  "083_mvp_page_asset_map.md": {
+    "title": "Map required assets to each Vancomyzer MVP page",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/marketing"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.730795+00:00",
+    "updated_at": "2026-03-13T00:22:24.829984+00:00",
+    "notes": "MVP page asset map drafted"
+  },
+  "084_homepage_implementation_refinement.md": {
+    "title": "Refine the Vancomyzer homepage implementation spec into a practical build document",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.730830+00:00",
+    "updated_at": "2026-03-13T00:23:53.956611+00:00",
+    "notes": "Refined homepage implementation spec drafted"
+  },
+  "085_homepage_asset_selection.md": {
+    "title": "Select the exact assets to use on the Vancomyzer homepage",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/docs",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.730861+00:00",
+    "updated_at": "2026-03-13T00:25:19.921017+00:00",
+    "notes": "Homepage asset selection drafted"
+  },
+  "086_trust_evidence_implementation_refinement.md": {
+    "title": "Refine the Vancomyzer trust/evidence implementation spec into a practical build document",
+    "assigned_roles": [
+      "agents/verifier",
+      "agents/marketing",
+      "agents/docs",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.730893+00:00",
+    "updated_at": "2026-03-13T00:26:56.400289+00:00",
+    "notes": "Refined Trust & Evidence implementation spec drafted"
+  },
+  "087_trust_evidence_asset_selection.md": {
+    "title": "Select the exact assets to use on the Vancomyzer trust/evidence page",
+    "assigned_roles": [
+      "agents/verifier",
+      "agents/docs",
+      "agents/marketing"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.730926+00:00",
+    "updated_at": "2026-03-13T00:29:42.140000+00:00",
+    "notes": "Trust/evidence asset selection drafted"
+  },
+  "088_faq_implementation_refinement.md": {
+    "title": "Refine the Vancomyzer FAQ implementation spec into a practical build document",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/marketing",
+      "agents/verifier",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.730960+00:00",
+    "updated_at": "2026-03-13T02:55:08.568604+00:00",
+    "notes": "Refined FAQ implementation spec drafted"
+  },
+  "089_faq_asset_selection.md": {
+    "title": "Select the exact assets to use on the Vancomyzer FAQ page",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/marketing",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.730991+00:00",
+    "updated_at": "2026-03-13T02:57:15.951505+00:00",
+    "notes": "FAQ asset selection drafted"
+  },
+  "090_about_implementation_refinement.md": {
+    "title": "Refine the Vancomyzer about-page implementation spec into a practical build document",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/marketing",
+      "agents/verifier",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731022+00:00",
+    "updated_at": "2026-03-13T02:59:01.270287+00:00",
+    "notes": "Refined About page implementation spec drafted"
+  },
+  "091_about_asset_selection.md": {
+    "title": "Select the exact assets to use on the Vancomyzer about page",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/marketing",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731054+00:00",
+    "updated_at": "2026-03-13T03:00:45.953112+00:00",
+    "notes": "About-page asset bundle selected"
+  },
+  "092_contact_institutional_implementation_refinement.md": {
+    "title": "Refine the Vancomyzer contact/institutional implementation spec into a practical build document",
+    "assigned_roles": [
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier",
+      "agents/docs"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731089+00:00",
+    "updated_at": "2026-03-13T03:02:42.165327+00:00",
+    "notes": "Refined contact/institutional implementation spec drafted"
+  },
+  "093_contact_institutional_asset_selection.md": {
+    "title": "Select the exact assets to use on the Vancomyzer contact/institutional page",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/marketing",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731120+00:00",
+    "updated_at": "2026-03-13T03:04:42.845541+00:00",
+    "notes": "Contact/institutional asset selection drafted"
+  },
+  "094_phase1_sitemap_refinement.md": {
+    "title": "Refine the Vancomyzer Phase 1 site map and navigation structure",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/customer-conversion",
+      "agents/marketing"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731152+00:00",
+    "updated_at": "2026-03-13T03:07:02.877634+00:00",
+    "notes": "Refined Phase 1 sitemap drafted"
+  },
+  "095_phase1_crosslinking_plan.md": {
+    "title": "Define the Phase 1 cross-linking plan for Vancomyzer pages",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731186+00:00",
+    "updated_at": "2026-03-13T03:08:48.210903+00:00",
+    "notes": "Phase 1 cross-linking plan drafted"
+  },
+  "096_phase1_asset_manifest_refinement.md": {
+    "title": "Refine the Vancomyzer Phase 1 asset manifest into a practical implementation checklist",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/marketing",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731218+00:00",
+    "updated_at": "2026-03-13T03:10:48.584538+00:00",
+    "notes": "Refined Phase 1 asset manifest drafted"
+  },
+  "097_phase1_asset_selection_bundle.md": {
+    "title": "Define the final Phase 1 asset selection bundle for Vancomyzer",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731249+00:00",
+    "updated_at": "2026-03-13T09:24:42.587670+00:00",
+    "notes": "Final Phase 1 asset selection bundle drafted"
+  },
+  "098_phase1_build_sequence_refinement.md": {
+    "title": "Refine the Vancomyzer Phase 1 build sequence into a practical implementation order",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731282+00:00",
+    "updated_at": "2026-03-13T09:26:29.848811+00:00",
+    "notes": "Refined Phase 1 build sequence drafted"
+  },
+  "099_phase1_ready_to_build_check.md": {
+    "title": "Define the final readiness checklist before building Vancomyzer Phase 1 pages",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731315+00:00",
+    "updated_at": "2026-03-13T09:28:36.890447+00:00",
+    "notes": "Phase 1 readiness checklist drafted"
+  },
+  "100_phase1_handoff_packet_refinement.md": {
+    "title": "Refine the Vancomyzer Phase 1 handoff packet into a clean implementation package",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/marketing",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731346+00:00",
+    "updated_at": "2026-03-13T09:30:28.843323+00:00",
+    "notes": "Refined Phase 1 handoff packet drafted"
+  },
+  "101_phase1_builder_brief.md": {
+    "title": "Create the builder brief for Vancomyzer Phase 1 implementation",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731377+00:00",
+    "updated_at": "2026-03-13T09:32:12.027626+00:00",
+    "notes": "Phase 1 builder brief created"
+  },
+  "102_builder_prompt_refinement.md": {
+    "title": "Refine the Vancomyzer Phase 1 builder prompt into a clean implementation handoff prompt",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731407+00:00",
+    "updated_at": "2026-03-13T09:34:17.983184+00:00",
+    "notes": "Refined Phase 1 builder prompt drafted"
+  },
+  "103_cursor_prompt_variant.md": {
+    "title": "Create a Cursor-ready variant of the Vancomyzer Phase 1 builder prompt",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T00:05:36.731438+00:00",
+    "updated_at": "2026-03-13T09:36:09.463807+00:00",
+    "notes": "Cursor-ready Phase 1 prompt drafted"
+  },
+  "104_task_runner_refinement.md": {
+    "title": "Refine the Vancomyzer task runner into a reliable execution layer",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T09:38:29.244616+00:00",
+    "updated_at": "2026-03-13T09:38:48.734510+00:00",
+    "notes": "Refined task-runner guidance drafted"
+  },
+  "105_phase1_execution_queue.md": {
+    "title": "Define the prioritized Phase 1 execution queue for Vancomyzer",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-13T09:38:29.245503+00:00",
+    "updated_at": "2026-03-13T09:40:58.823734+00:00",
+    "notes": "Phase 1 execution queue drafted"
+  },
+  "106_phase1_tranche_one_execution.md": {
+    "title": "Execute the first Phase 1 task tranche for Vancomyzer",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/marketing",
+      "agents/customer-conversion",
+      "agents/verifier",
+      "agents/docs"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T09:38:29.245741+00:00",
+    "updated_at": "2026-03-13T09:38:29.245744+00:00",
+    "notes": ""
+  },
+  "107_phase1_defer_list_review.md": {
+    "title": "Review and validate the deferred-task list for Vancomyzer",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/marketing",
+      "agents/customer-conversion"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T09:38:29.245948+00:00",
+    "updated_at": "2026-03-13T09:38:29.245950+00:00",
+    "notes": ""
+  },
+  "108_execution_note_template_refinement.md": {
+    "title": "Refine the Vancomyzer execution note template and note system",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/architect",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T09:38:29.246192+00:00",
+    "updated_at": "2026-03-13T09:38:29.246194+00:00",
+    "notes": ""
+  },
+  "109_tranche_one_note_review.md": {
+    "title": "Review the tranche-one execution note setup for Vancomyzer",
+    "assigned_roles": [
+      "agents/docs",
+      "agents/verifier",
+      "agents/architect"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-13T09:38:29.246427+00:00",
+    "updated_at": "2026-03-13T09:38:29.246429+00:00",
+    "notes": ""
+  },
+  "110_homepage_build_blueprint.md": {
+    "title": "Create the Homepage build blueprint for Vancomyzer Phase 1",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/customer-conversion",
+      "agents/marketing"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-14T01:01:45.033804+00:00",
+    "updated_at": "2026-03-14T01:02:10.603990+00:00",
+    "notes": "Homepage build blueprint drafted"
+  },
+  "111_trust_evidence_build_blueprint.md": {
+    "title": "Create the Trust & Evidence build blueprint for Vancomyzer Phase 1",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-14T01:12:13.795074+00:00",
+    "updated_at": "2026-03-14T01:12:46.065954+00:00",
+    "notes": "Trust & Evidence build blueprint drafted"
+  },
+  "112_faq_build_blueprint.md": {
+    "title": "Create the FAQ build blueprint for Vancomyzer Phase 1",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-14T01:13:58.991576+00:00",
+    "updated_at": "2026-03-14T01:14:37.964684+00:00",
+    "notes": "FAQ build blueprint drafted"
+  },
+  "113_about_build_blueprint.md": {
+    "title": "Create the About build blueprint for Vancomyzer Phase 1",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/customer-conversion",
+      "agents/marketing"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-14T23:22:20.260290+00:00",
+    "updated_at": "2026-03-14T23:22:57.393593+00:00",
+    "notes": "About build blueprint drafted"
+  },
+  "114_contact_institutional_build_blueprint.md": {
+    "title": "Create the Contact / Institutional build blueprint for Vancomyzer Phase 1",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/customer-conversion",
+      "agents/marketing",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-14T23:24:39.100808+00:00",
+    "updated_at": "2026-03-14T23:25:15.824134+00:00",
+    "notes": "Contact / Institutional build blueprint drafted"
+  },
+  "115_phase1_site_cursor_build_prompt.md": {
+    "title": "Create the single Cursor build prompt for the full Vancomyzer Phase 1 site",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-14T23:26:44.494129+00:00",
+    "updated_at": "2026-03-14T23:27:43.059010+00:00",
+    "notes": "Unified Cursor build prompt for full Phase 1 site drafted"
+  },
+  "116_phase1_cursor_execution_handoff.md": {
+    "title": "Create the Cursor execution handoff package for the Vancomyzer Phase 1 site build",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/customer-conversion",
+      "agents/verifier"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-14T23:30:15.794320+00:00",
+    "updated_at": "2026-03-14T23:30:49.139493+00:00",
+    "notes": "Cursor execution handoff package drafted"
+  },
+  "117_calculator_architecture_blueprint.md": {
+    "title": "Create the Vancomyzer calculator architecture blueprint",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T00:30:13.801314+00:00",
+    "updated_at": "2026-03-15T00:35:43.823317+00:00",
+    "notes": "Calculator architecture blueprint created"
+  },
+  "118_calculator_ui_blueprint.md": {
+    "title": "Create the Vancomyzer calculator UI blueprint",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T00:37:44.444413+00:00",
+    "updated_at": "2026-03-15T00:38:35.102987+00:00",
+    "notes": "Calculator UI blueprint created"
+  },
+  "119_calculator_api_contract_blueprint.md": {
+    "title": "Create the Vancomyzer calculator API contract and sample payload blueprint",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T00:40:23.802037+00:00",
+    "updated_at": "2026-03-15T00:43:10.085743+00:00",
+    "notes": "Calculator API contract blueprint created"
+  },
+  "120_calculator_route_shell_blueprint.md": {
+    "title": "Create the Vancomyzer calculator route shell build blueprint",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T00:44:53.352085+00:00",
+    "updated_at": "2026-03-15T00:46:00.351992+00:00",
+    "notes": "Calculator route shell blueprint created"
+  },
+  "121_calculator_component_map_and_prompt.md": {
+    "title": "Create the Vancomyzer calculator component map and implementation prompt",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T00:47:38.709125+00:00",
+    "updated_at": "2026-03-15T00:49:05.855660+00:00",
+    "notes": "Calculator component map and implementation prompt created"
+  },
+  "122_calculator_api_route_skeleton.md": {
+    "title": "Create the Vancomyzer calculator API route skeleton",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T01:17:04.472046+00:00",
+    "updated_at": "2026-03-15T01:17:56.381221+00:00",
+    "notes": "Calculator API route skeleton created"
+  },
+  "123_calculator_submit_flow_wiring.md": {
+    "title": "Wire the Vancomyzer calculator submit flow to /api/calculate",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "in_progress",
+    "created_at": "2026-03-15T01:31:14.722363+00:00",
+    "updated_at": "2026-03-15T01:31:14.742647+00:00",
+    "notes": "Starting calculator submit flow wiring"
+  },
+  "124_dual_workflow_calculator_correction.md": {
+    "title": "Redesign the Vancomyzer calculator around dual clinical workflows",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T01:50:18.681349+00:00",
+    "updated_at": "2026-03-15T01:51:12.723669+00:00",
+    "notes": "Dual-workflow calculator correction package created"
+  },
+  "125_pk_engine_module_architecture.md": {
+    "title": "Create the Vancomyzer PK engine module architecture",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T02:22:19.038721+00:00",
+    "updated_at": "2026-03-15T02:23:14.414007+00:00",
+    "notes": "PK engine module architecture created"
+  },
+  "126_initial_regimen_engine_blueprint.md": {
+    "title": "Create the Vancomyzer initial regimen engine blueprint",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T02:26:12.534119+00:00",
+    "updated_at": "2026-03-15T02:26:39.773508+00:00",
+    "notes": "Initial regimen engine blueprint created"
+  },
+  "127_existing_regimen_adjustment_engine_blueprint.md": {
+    "title": "Create the Vancomyzer existing regimen adjustment engine blueprint",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T02:28:00.905443+00:00",
+    "updated_at": "2026-03-15T02:28:54.544111+00:00",
+    "notes": "Existing regimen adjustment engine blueprint created"
+  },
+  "128_recommendation_and_explanation_engine_blueprint.md": {
+    "title": "Create the Vancomyzer recommendation and explanation engine blueprint",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder",
+      "agents/customer-conversion"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T02:30:11.335188+00:00",
+    "updated_at": "2026-03-15T02:31:19.727168+00:00",
+    "notes": "Recommendation and explanation engine blueprint created"
+  },
+  "129_initial_regimen_calculation_implementation_prompt.md": {
+    "title": "Create the first-pass Vancomyzer initial regimen calculation implementation prompt",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T02:32:37.429503+00:00",
+    "updated_at": "2026-03-15T02:33:29.042271+00:00",
+    "notes": "Initial regimen calculation implementation prompt created"
+  },
+  "130_existing_regimen_adjustment_calculation_implementation_prompt.md": {
+    "title": "Create the first-pass Vancomyzer existing regimen adjustment calculation implementation prompt",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T09:17:48.657807+00:00",
+    "updated_at": "2026-03-15T09:18:34.918113+00:00",
+    "notes": "Existing regimen adjustment calculation implementation prompt created"
+  },
+  "131_existing_regimen_pk_math_correction.md": {
+    "title": "Correct the existing-regimen PK math so AUC24, peak, trough, and curve come from one internally consistent model",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T20:00:34.841630+00:00",
+    "updated_at": "2026-03-15T20:01:21.892388+00:00",
+    "notes": "Existing-regimen PK math correction package created"
+  },
+  "132_pk_graph_rendering.md": {
+    "title": "Render the Vancomyzer concentration-time curve in the calculator UI",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T20:27:41.636156+00:00",
+    "updated_at": "2026-03-15T20:28:11.256268+00:00",
+    "notes": "PK graph rendering prompt created"
+  },
+  "133_posterior_estimation_engine_architecture.md": {
+    "title": "Create the Vancomyzer posterior estimation engine architecture",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T22:33:07.996557+00:00",
+    "updated_at": "2026-03-15T22:33:33.623062+00:00",
+    "notes": "Posterior estimation engine architecture created"
+  },
+  "134_posterior_fitting_implementation_prompt.md": {
+    "title": "Create the first-pass Vancomyzer posterior fitting implementation prompt",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T22:35:12.583074+00:00",
+    "updated_at": "2026-03-15T22:36:10.273053+00:00",
+    "notes": "Posterior fitting implementation prompt created"
+  },
+  "135_regimen_recommendation_correction.md": {
+    "title": "Correct the regimen recommendation engine so it proposes clinically sensible regimens",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/docs",
+      "agents/verifier",
+      "agents/coder"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-15T23:26:31.241095+00:00",
+    "updated_at": "2026-03-15T23:26:31.267042+00:00",
+    "notes": "Regimen recommendation correction package created"
+  },
+  "136_existing_regimen_full_coherence_rebuild.md": {
+    "title": "Rebuild the existing-regimen engine for full internal coherence in one pass",
+    "assigned_roles": [
+      "agents/architect",
+      "agents/pk-engine",
+      "agents/backend",
+      "agents/testing",
+      "agents/verifier",
+      "agents/docs"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-16T01:50:43.172853+00:00",
+    "updated_at": "2026-03-16T10:18:20.111726+00:00",
+    "notes": "Existing-regimen full coherence rebuild implemented; note and verifier review completed"
+  },
+  "137_existing_regimen_timing_semantics_validation.md": {
+    "title": "Implement explicit timing-semantics validation for existing-regimen steady-state calculations",
+    "assigned_roles": [
+      "agents/pk-engine",
+      "agents/backend",
+      "agents/testing",
+      "agents/verifier",
+      "agents/docs"
+    ],
+    "status": "review_ready",
+    "created_at": "2026-03-16T02:02:30.544384+00:00",
+    "updated_at": "2026-03-16T10:18:20.139492+00:00",
+    "notes": "Timing semantics validation implemented; note and verifier review completed"
+  },
+  "138_regulatory_compliance_review_framework.md": {
+    "title": "Establish the regulatory and legal-compliance review framework for Vancomyzer artifacts",
+    "assigned_roles": [
+      "agents/regulatory-compliance",
+      "agents/docs",
+      "agents/verifier"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-16T02:10:39.013151+00:00",
+    "updated_at": "2026-03-16T02:10:39.013151+00:00",
+    "notes": ""
+  },
+  "139_continuous_external_monitoring_daemon.md": {
+    "title": "Stand up a lightweight continuous external monitoring daemon for research-intelligence",
+    "assigned_roles": [
+      "agents/research-intelligence",
+      "agents/architect",
+      "agents/docs",
+      "agents/testing"
+    ],
+    "status": "queued",
+    "created_at": "2026-03-16T02:20:56.327182+00:00",
+    "updated_at": "2026-03-16T02:20:56.327182+00:00",
+    "notes": ""
+  }
+}

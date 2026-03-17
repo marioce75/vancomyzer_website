@@ -1,0 +1,86 @@
+from pathlib import Path
+from datetime import datetime
+
+out = Path("reports/partnerships/VANCOMYZER_PARTNERSHIP_AND_OUTREACH.md")
+
+lines = []
+lines.append("# Vancomyzer Partnership and Outreach")
+lines.append("")
+lines.append(f"Generated: {datetime.utcnow().isoformat()}Z")
+lines.append("")
+
+lines.append("## Purpose")
+lines.append("Define how Vancomyzer should approach professional communities, educators, stewardship teams, and institutional contacts in a credible, education-first way.")
+lines.append("")
+
+lines.append("## Primary goals")
+lines.append("- build trust through useful educational collaboration")
+lines.append("- identify high-fit outreach targets")
+lines.append("- avoid generic sales-style outreach")
+lines.append("- connect outreach to real educational and workflow value")
+lines.append("")
+
+lines.append("## Potential outreach audiences")
+lines.append("")
+lines.append("### 1. Antimicrobial stewardship teams")
+lines.append("- interested in workflow consistency")
+lines.append("- interested in reviewable and interpretable dosing support")
+lines.append("- likely to value documentation-ready outputs")
+lines.append("")
+
+lines.append("### 2. ICU and ID pharmacists")
+lines.append("- interested in practical dosing workflow")
+lines.append("- interested in Bayesian/AUC interpretation")
+lines.append("- likely to value transparent assumptions and outputs")
+lines.append("")
+
+lines.append("### 3. Pharmacy educators and residency programs")
+lines.append("- interested in educational cases and explainers")
+lines.append("- may value case-based teaching assets")
+lines.append("- can amplify trust and awareness through education")
+lines.append("")
+
+lines.append("### 4. Professional communities and media")
+lines.append("- pharmacy newsletters")
+lines.append("- clinical blogs")
+lines.append("- relevant LinkedIn communities")
+lines.append("- educational webinars and conference-adjacent channels")
+lines.append("")
+
+lines.append("## Outreach angles")
+lines.append("")
+lines.append("- educational case pack")
+lines.append("- workflow demo")
+lines.append("- transparent dosing logic and assumptions")
+lines.append("- documentation-ready examples")
+lines.append("- webinar or case-based teaching session")
+lines.append("")
+
+lines.append("## Suggested outreach CTAs")
+lines.append("")
+lines.append("- Review the educational case pack")
+lines.append("- Explore a workflow demo")
+lines.append("- Review documentation-ready examples")
+lines.append("- Schedule an educational walkthrough")
+lines.append("")
+
+lines.append("## Messaging guardrails")
+lines.append("")
+lines.append("- keep outreach educational and specific")
+lines.append("- avoid unsupported claims")
+lines.append("- avoid generic enterprise language")
+lines.append("- tie outreach to concrete use cases and assets")
+lines.append("")
+
+lines.append("## Recommended first outreach assets")
+lines.append("")
+lines.append("- AUC quick-reference guide")
+lines.append("- Bayesian dosing explainer")
+lines.append("- sample case pack")
+lines.append("- documentation-ready examples")
+lines.append("- transparency/trust explainer page")
+lines.append("")
+
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text('\n'.join(lines), encoding='utf-8')
+print(f"Wrote {out}")

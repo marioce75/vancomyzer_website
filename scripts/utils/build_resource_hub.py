@@ -1,0 +1,88 @@
+from pathlib import Path
+from datetime import datetime
+
+out = Path("reports/resource-hub/VANCOMYZER_RESOURCE_HUB.md")
+
+lines = []
+lines.append("# Vancomyzer Resource Hub")
+lines.append("")
+lines.append(f"Generated: {datetime.utcnow().isoformat()}Z")
+lines.append("")
+
+lines.append("## Purpose")
+lines.append("Define a structured knowledge center that helps clinicians explore Vancomyzer through educational, comparison, case-based, and trust-building content.")
+lines.append("")
+
+lines.append("## Core resource categories")
+lines.append("")
+lines.append("### 1. Getting started")
+lines.append("- What Vancomyzer is")
+lines.append("- How to explore the workflow")
+lines.append("- Sample case entry points")
+lines.append("- FAQ highlights")
+lines.append("")
+
+lines.append("### 2. Educational content")
+lines.append("- Bayesian dosing explanation")
+lines.append("- AUC workflow explanation")
+lines.append("- Trough vs AUC comparison")
+lines.append("- Transparent dosing logic")
+lines.append("")
+
+lines.append("### 3. Case library")
+lines.append("- Stable monitoring cases")
+lines.append("- Renal instability cases")
+lines.append("- Sparse data cases")
+lines.append("- AUC vs trough interpretation cases")
+lines.append("")
+
+lines.append("### 4. Comparison pages")
+lines.append("- Vancomyzer vs VancoCalc")
+lines.append("- Bayesian vs traditional PK")
+lines.append("- AUC vs trough monitoring")
+lines.append("")
+
+lines.append("### 5. Trust and documentation")
+lines.append("- Transparency features")
+lines.append("- Documentation-ready summaries")
+lines.append("- Trust and evidence guidance")
+lines.append("- Validation/evidence wording guardrails")
+lines.append("")
+
+lines.append("## Recommended resource hub sections")
+lines.append("")
+lines.append("1. Intro to the knowledge center")
+lines.append("2. Browse by clinician need")
+lines.append("3. Browse by workflow topic")
+lines.append("4. Browse by example cases")
+lines.append("5. Browse trust/documentation resources")
+lines.append("")
+
+lines.append("## Suggested browse-by-need groups")
+lines.append("")
+lines.append("- I want to understand AUC-guided dosing")
+lines.append("- I want to compare Bayesian and traditional approaches")
+lines.append("- I want sample dosing cases")
+lines.append("- I want documentation-ready examples")
+lines.append("- I want to understand how the tool explains its outputs")
+lines.append("")
+
+lines.append("## CTA ideas")
+lines.append("")
+lines.append("- Explore a sample case")
+lines.append("- Review the workflow")
+lines.append("- Read the FAQ")
+lines.append("- See how calculations are explained")
+lines.append("")
+
+lines.append("## Messaging guardrails")
+lines.append("")
+lines.append("- Keep the hub educational and navigable")
+lines.append("- Avoid hype-heavy promotional language")
+lines.append("- Keep trust and caution visible")
+lines.append("- Make it easy to move from education to exploration")
+lines.append("")
+
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text("\n".join(lines), encoding="utf-8")
+print(f"Wrote {out}")

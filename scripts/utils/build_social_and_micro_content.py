@@ -1,0 +1,95 @@
+from pathlib import Path
+from datetime import datetime
+
+out = Path("reports/social/VANCOMYZER_SOCIAL_AND_MICRO_CONTENT.md")
+
+lines = []
+lines.append("# Vancomyzer Social and Micro-Content")
+lines.append("")
+lines.append(f"Generated: {datetime.utcnow().isoformat()}Z")
+lines.append("")
+
+lines.append("## Purpose")
+lines.append("Define how Vancomyzer should turn educational and intelligence assets into short-form content for audience growth, trust-building, and repeat visibility.")
+lines.append("")
+
+lines.append("## Primary goals")
+lines.append("- repurpose educational assets efficiently")
+lines.append("- reinforce clinician trust and interpretability")
+lines.append("- maintain useful, non-hype communication")
+lines.append("- connect short-form content to deeper resources")
+lines.append("")
+
+lines.append("## Recommended content categories")
+lines.append("")
+lines.append("### 1. Clinical insight posts")
+lines.append("- short practical notes on AUC, Bayesian dosing, workflow, or caution points")
+lines.append("- useful even without clicking through")
+lines.append("")
+
+lines.append("### 2. Mini explainers")
+lines.append("- short explanations of common concepts")
+lines.append("- Bayesian vs traditional PK")
+lines.append("- trough vs AUC")
+lines.append("- why transparency matters")
+lines.append("")
+
+lines.append("### 3. Case spotlights")
+lines.append("- one teaching point from a realistic case")
+lines.append("- connect to sample case pages or documentation examples")
+lines.append("")
+
+lines.append("### 4. Product/workflow snippets")
+lines.append("- short explanations of transparency features")
+lines.append("- explain workflow value without sounding overpromotional")
+lines.append("")
+
+lines.append("### 5. FAQ snippets")
+lines.append("- short answers to common clinician questions")
+lines.append("- link back to FAQ or resource hub")
+lines.append("")
+
+lines.append("## Platform guidance")
+lines.append("")
+lines.append("### LinkedIn")
+lines.append("- longer educational posts")
+lines.append("- practical, thoughtful, clinician-oriented tone")
+lines.append("- good for explainers and case spotlights")
+lines.append("")
+
+lines.append("### X / short-form posts")
+lines.append("- concise and high-signal")
+lines.append("- focus on one insight per post")
+lines.append("- useful for quick explainers and FAQ snippets")
+lines.append("")
+
+lines.append("## Suggested CTA patterns")
+lines.append("")
+lines.append("- Review the sample case")
+lines.append("- Read the explainer")
+lines.append("- Explore the workflow")
+lines.append("- See how the calculation is explained")
+lines.append("- Review the FAQ")
+lines.append("")
+
+lines.append("## Messaging guardrails")
+lines.append("")
+lines.append("- avoid unsupported claims")
+lines.append("- avoid hype-heavy promotion")
+lines.append("- keep each post educational first")
+lines.append("- align product mentions with actual functionality")
+lines.append("- prefer clarity over cleverness")
+lines.append("")
+
+lines.append("## Example micro-content prompts")
+lines.append("")
+lines.append("- Why AUC-guided interpretation may differ from trough-only reasoning")
+lines.append("- What clinicians should review before accepting a dosing recommendation")
+lines.append("- Why visible assumptions matter in vancomycin dosing tools")
+lines.append("- What sparse level data means for confidence and interpretation")
+lines.append("- How documentation-ready summaries support clinical workflow")
+lines.append("")
+
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text("\n".join(lines), encoding="utf-8")
+print(f"Wrote {out}")
