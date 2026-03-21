@@ -1,5 +1,38 @@
-Vancomyzer update ready for review.
-Summary:
-- Telegram notification pipeline works
-- File-based notification helper works
-- Localhost ready.
+[2026-03-19 06:31 CDT] Mandatory-gate correction cycle checkpoint.
+
+What changed
+- moved explicit safety and scope guardrails ahead of the recommendation in the main result flow
+- moved review-status / verify-before-acting content ahead of the dose surface
+- updated the recommendation surface to show explicit guardrail thresholds, not just raw values:
+  - recommended TDD with ≤ 4500 mg/day limit
+  - recommended infusion rate with ≤ 10 mg/min limit
+  - draft TDD with the same threshold
+  - draft infusion rate with the same threshold
+- reduced visual fragmentation further by simplifying multiple panels from rounded-card/shadow treatment toward flatter clinical blocks
+- simplified method and optional scaffold modules to reduce explanatory overhead and marketing-style chrome
+- tightened workspace spacing again so the cockpit reads more like a compressed operational shell than a stack of premium cards
+
+Files changed this cycle
+- website/src/components/calculator/CalculatorWorkspace.tsx
+- website/src/components/calculator/DoseRecommendationCard.tsx
+- website/src/components/calculator/ResultScopeBanner.tsx
+- website/src/components/calculator/DataFitReviewabilityPanel.tsx
+- website/src/components/calculator/CalculationMethodPanel.tsx
+- website/src/components/calculator/PrimaryMetricsCard.tsx
+- website/src/components/calculator/RegimenSuggestionCard.tsx
+- website/src/components/calculator/CalculatorActionBar.tsx
+
+Validation
+- npm run lint ✅
+- npm run build ✅
+
+What to review on localhost
+- result order: confirm safety guardrails and verify-before-acting content now appear before the dose recommendation
+- recommendation guardrails: confirm TDD and infusion-rate rows show explicit safety thresholds, not just values
+- draft editing: confirm draft TDD/rate thresholds are visible while editing
+- right rail hierarchy: confirm the graph still anchors the rail and the post-graph stack now reads safety/reviewability first, dose second
+- shell density: confirm the cockpit feels flatter, more restrained, and less card-fragmented than the prior pass
+
+Checkpoint status
+- reached clean compile/lint checkpoint
+- ready for another mandatory gate revalidation cycle

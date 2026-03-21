@@ -32,6 +32,36 @@ export interface CalculateRequest {
   levels?: CalculateRequestLevel[];
 }
 
+export type ReviewStatusLevel = "prior_only" | "caution" | "supported";
+export type WorkflowFitCategory = "prior_only" | "single_level" | "multi_level_coherent";
+
+export interface ReviewStatus {
+  level: ReviewStatusLevel;
+  workflow_fit: WorkflowFitCategory;
+  banner_title: string;
+  banner_body: string;
+  next_actions: string[];
+}
+
+export interface CalculationDetails {
+  method: string;
+  evidence_strength: string;
+  data_quality_summary: string;
+  key_inputs: string[];
+  caution_flags: string[];
+  review_status: ReviewStatus;
+}
+
+export interface FrequencyOption {
+  dose_mg: number;
+  interval_hours: number;
+  auc24: number;
+  peak: number;
+  trough: number;
+  infusion_duration_hours: number;
+  is_recommended: boolean;
+}
+
 export interface CalculateResponse {
   recommendation_type: "initial_regimen" | "existing_regimen";
   auc24: number;
@@ -39,11 +69,16 @@ export interface CalculateResponse {
   trough: number;
   recommended_dose: string;
   recommended_interval_hours: number;
+  recommended_infusion_duration_hours?: number;
+  infusion_duration_adjusted_for_safety?: boolean;
+  infusion_safety_note?: string;
   interpretation_summary: string;
   assumptions: string[];
   limitations: string[];
   curve: { time_hours: number; concentration: number }[];
   measured_levels: { time_hours: number; concentration: number }[];
+  calculation_details?: CalculationDetails;
+  frequency_options?: FrequencyOption[];
   documentation_preview?: {
     quick_summary: string;
     clinical_note: string;
@@ -56,4 +91,6 @@ export interface CalculateErrorResponse {
   field_errors?: Record<string, string>;
   details?: string[];
   limitations?: string[];
+  recovery_guidance?: string[];
+  fallback_workflow?: "initial_regimen" | "repeat_existing_regimen_sampling";
 }

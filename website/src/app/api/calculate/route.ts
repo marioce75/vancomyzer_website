@@ -2,12 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { computeInitialRegimen } from "@/lib/initialRegimen";
 import { runExistingRegimenPipeline } from "@/lib/pk/runExistingRegimenPipeline";
 
-/**
- * POST /api/calculate
- * initial_regimen: first-pass calculation from patient only (CrCl + dose/interval).
- * existing_regimen: first-pass one-compartment evaluation (patient + regimen + levels).
- */
-
 type Mode = "initial_regimen" | "existing_regimen";
 
 interface RequestBody {
@@ -35,11 +29,11 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
     field_errors["patient"] = "Required.";
   } else {
     const p = o.patient as Record<string, unknown>;
-    if (typeof p.age !== "number" || Number.isNaN(p.age) || p.age < 0) field_errors["patient.age"] = "Must be a non-negative number.";
+    if (typeof p.age !== "number" || Number.isNaN(p.age) || p.age < 18 || p.age > 120) field_errors["patient.age"] = "Adult calculator requires age 18-120.";
     if (typeof p.sex !== "string" || !p.sex.trim()) field_errors["patient.sex"] = "Required.";
     if (typeof p.height_cm !== "number" || Number.isNaN(p.height_cm) || p.height_cm <= 0) field_errors["patient.height_cm"] = "Must be a positive number.";
-    if (typeof p.weight_kg !== "number" || Number.isNaN(p.weight_kg) || p.weight_kg <= 0) field_errors["patient.weight_kg"] = "Must be a positive number.";
-    if (typeof p.serum_creatinine_mg_dl !== "number" || Number.isNaN(p.serum_creatinine_mg_dl) || p.serum_creatinine_mg_dl < 0) field_errors["patient.serum_creatinine_mg_dl"] = "Must be a non-negative number.";
+    if (typeof p.weight_kg !== "number" || Number.isNaN(p.weight_kg) || p.weight_kg < 30 || p.weight_kg > 400) field_errors["patient.weight_kg"] = "Weight must be 30-400 kg.";
+    if (typeof p.serum_creatinine_mg_dl !== "number" || Number.isNaN(p.serum_creatinine_mg_dl) || p.serum_creatinine_mg_dl < 0.1 || p.serum_creatinine_mg_dl > 15) field_errors["patient.serum_creatinine_mg_dl"] = "Scr must be 0.1-15 mg/dL.";
   }
 
   if (resolvedMode === "existing_regimen") {
@@ -49,7 +43,7 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
       const r = o.regimen as Record<string, unknown>;
       if (typeof r.dose_mg !== "number" || Number.isNaN(r.dose_mg) || r.dose_mg <= 0) field_errors["regimen.dose_mg"] = "Must be a positive number.";
       if (typeof r.interval_hours !== "number" || Number.isNaN(r.interval_hours) || r.interval_hours <= 0) field_errors["regimen.interval_hours"] = "Must be a positive number.";
-      if (typeof r.infusion_duration_hours !== "number" || Number.isNaN(r.infusion_duration_hours) || r.infusion_duration_hours < 0) field_errors["regimen.infusion_duration_hours"] = "Must be a non-negative number.";
+      if (typeof r.infusion_duration_hours !== "number" || Number.isNaN(r.infusion_duration_hours) || r.infusion_duration_hours <= 0) field_errors["regimen.infusion_duration_hours"] = "Must be a positive number greater than 0.";
     }
 
     if (!Array.isArray(o.levels) || o.levels.length === 0) {
@@ -60,7 +54,8 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
           field_errors[`levels[${i}]`] = "Invalid level object.";
         } else {
           const l = lev as Record<string, unknown>;
-          if (typeof l.value_mcg_ml !== "number" || Number.isNaN(l.value_mcg_ml) || l.value_mcg_ml < 0) field_errors[`levels[${i}].value_mcg_ml`] = "Must be a non-negative number.";
+          if (typeof l.value_mcg_ml !== "number" || Number.isNaN(l.value_mcg_ml) || l.value_mcg_ml <= 0) field_errors[`levels[${i}].value_mcg_ml`] = "Must be a positive measured concentration.";
+          if (Array.isArray(o.levels) && o.levels.length > 1 && (typeof l.collection_time !== "string" || !l.collection_time.trim())) field_errors[`levels[${i}].collection_time`] = "Collection time is required when more than one level is entered so timing semantics can be checked across the same dosing interval.";
           if (typeof l.time_since_last_dose_hours !== "number" || Number.isNaN(l.time_since_last_dose_hours) || l.time_since_last_dose_hours < 0) field_errors[`levels[${i}].time_since_last_dose_hours`] = "Must be a non-negative number.";
         }
       });
@@ -101,7 +96,7 @@ export async function POST(request: NextRequest) {
     const p = validated.data.patient as Record<string, unknown>;
     const patient = {
       age: p.age as number,
-      sex: String(p.sex ?? "").trim() || "male",
+      sex: String(p.sex ?? "").trim(),
       height_cm: p.height_cm as number,
       weight_kg: p.weight_kg as number,
       serum_creatinine_mg_dl: p.serum_creatinine_mg_dl as number,
@@ -116,7 +111,13 @@ export async function POST(request: NextRequest) {
   });
   if ("ok" in result && result.ok === false) {
     return NextResponse.json(
-      { error_type: result.error_type, message: result.message, field_errors: result.field_errors },
+      {
+        error_type: result.error_type,
+        message: result.message,
+        field_errors: result.field_errors,
+        recovery_guidance: result.recovery_guidance,
+        fallback_workflow: result.fallback_workflow,
+      },
       { status: 400 }
     );
   }

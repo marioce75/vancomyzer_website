@@ -1,4 +1,4 @@
-"use client";
+import React from "react";
 
 interface CalculatorActionBarProps {
   onCalculate: () => void;
@@ -6,28 +6,27 @@ interface CalculatorActionBarProps {
   disabled?: boolean;
 }
 
-export default function CalculatorActionBar({
-  onCalculate,
-  onReset,
-  disabled,
-}: CalculatorActionBarProps) {
+export default function CalculatorActionBar({ onCalculate, onReset, disabled }: CalculatorActionBarProps) {
   return (
-    <section className="mt-6 flex flex-wrap gap-4">
+    <div className="mt-1 flex items-center justify-between gap-3">
+      <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Recalculate after any draft change</p>
+      <div className="flex justify-end gap-3">
+      <button
+        type="button"
+        onClick={onReset}
+        className="rounded-[14px] border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200"
+      >
+        Reset
+      </button>
       <button
         type="button"
         onClick={onCalculate}
         disabled={disabled}
-        className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+        className="rounded-[14px] border border-cyan-800 bg-cyan-700 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Calculate
+        {disabled ? "Calculating..." : "Calculate"}
       </button>
-      <button
-        type="button"
-        onClick={onReset}
-        className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-      >
-        Reset
-      </button>
-    </section>
+      </div>
+    </div>
   );
 }

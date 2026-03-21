@@ -1,12 +1,9 @@
 /**
- * Existing-regimen engine: one internally consistent one-compartment intermittent-infusion model.
- * All of posterior update, AUC24, peak, trough, and curve come from the same parameter set
- * via steadyStateOneCompartment. Timing validity is enforced in validation (reject if
- * time_since_last_dose_hours > interval_hours).
+ * Existing-regimen engine: internally consistent two-compartment intermittent-infusion model.
  */
 
 import { runPosteriorEngine } from "../posterior/posteriorEngine";
-import { computeExposure, curvePoints } from "../steadyStateOneCompartment";
+import { computeExposure, curvePoints } from "../steadyStateTwoCompartment";
 import type { ExistingRegimenEngineInput, ExistingRegimenEngineOutput } from "../types";
 
 export function runExistingRegimenEngine(
@@ -15,8 +12,10 @@ export function runExistingRegimenEngine(
   const { patient, regimen, levels } = input;
   const posteriorResult = runPosteriorEngine({ patient, regimen, levels });
   const {
-    Ke,
-    V,
+    CL,
+    V1,
+    Q,
+    V2,
     crcl,
     success: used_posterior_refinement,
     diagnostics: posterior_fit,
@@ -25,19 +24,21 @@ export function runExistingRegimenEngine(
   const tau = interval_hours;
   const T_inf = Math.min(Math.max(0, infusion_duration_hours), tau);
 
-  const exposure = computeExposure({ Ke, V, dose_mg, tau, T_inf });
-  const curve = curvePoints({ Ke, V, dose_mg, tau, T_inf }, tau * 2, 0.5);
+  const exposure = computeExposure({ CL, V1, Q, V2, dose_mg, tau, T_inf });
+  const curve = curvePoints({ CL, V1, Q, V2, dose_mg, tau, T_inf }, tau * 2, 0.5);
 
   const measured_levels = levels.map((l) => ({
     time_hours: l.time_since_last_dose_hours,
     concentration: l.value_mcg_ml,
   }));
 
+  const priorMsg = "Colin 2019 two-compartment adult population prior";
+
   const data_quality_note = used_posterior_refinement
-    ? `Bounded MAP-style posterior update from measured level(s) using the explicit adult population prior (Ducharme 1994 CL-CrCl relationship; V from 0.69 L/kg IBW) and the shared one-compartment infusion model; fit quality ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}). Sparse-level fits should be interpreted cautiously and are not equivalent to a full commercial Bayesian engine.`
+    ? `Bounded MAP-style posterior update from measured level(s) using the ${priorMsg}; fit quality ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}). Sparse-level fits should be interpreted cautiously and are not equivalent to a full commercial Bayesian engine.`
     : levels.length === 1
-      ? `Single level present but posterior fit not applied. Outputs remain from the explicit adult population prior model (Ducharme 1994 CL-CrCl relationship; V from 0.69 L/kg IBW). Fit quality ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}).`
-      : `No posterior update applied; outputs remain from the explicit adult population prior model (Ducharme 1994 CL-CrCl relationship; V from 0.69 L/kg IBW). Fit quality ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}).`;
+      ? `Single level present but posterior fit not applied. Outputs remain from the ${priorMsg}. Fit quality ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}).`
+      : `No posterior update applied; outputs remain from the ${priorMsg}. Fit quality ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}).`;
 
   return {
     auc24: Math.round(exposure.auc24 * 10) / 10,
@@ -52,8 +53,10 @@ export function runExistingRegimenEngine(
     data_quality_note,
     used_posterior_refinement,
     posterior_fit,
-    Ke,
-    V,
+    CL,
+    V1,
+    Q,
+    V2,
     current_regimen_infusion_hours: T_inf,
   };
 }

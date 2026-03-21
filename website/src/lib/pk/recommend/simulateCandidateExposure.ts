@@ -1,9 +1,9 @@
 /**
- * Simulate expected exposure for a candidate regimen using the shared one-compartment model.
+ * Simulate expected exposure for a candidate regimen using the shared two-compartment model.
  * Used by the recommendation layer only. Ensures coherence with engine and posterior.
  */
 
-import { computeExposure } from "../steadyStateOneCompartment";
+import { computeExposure } from "../steadyStateTwoCompartment";
 
 export interface CandidateRegimen {
   dose_mg: number;
@@ -18,8 +18,10 @@ export interface SimulatedExposure {
 }
 
 export function simulateCandidateExposure(
-  Ke: number,
-  V: number,
+  CL: number,
+  V1: number,
+  Q: number,
+  V2: number,
   candidate: CandidateRegimen
 ): SimulatedExposure {
   const tau = candidate.interval_hours;
@@ -28,8 +30,10 @@ export function simulateCandidateExposure(
     tau || 1
   );
   return computeExposure({
-    Ke,
-    V,
+    CL,
+    V1,
+    Q,
+    V2,
     dose_mg: candidate.dose_mg,
     tau,
     T_inf,

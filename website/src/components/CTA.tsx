@@ -1,10 +1,9 @@
 import Link from "next/link";
 
-// Locked CTA family per Phase 1 — do not change mapping
 export const CTA_LINKS = {
-  exploreWorkflow: { href: "/", label: "Explore the workflow" },
-  sampleCase: { href: "/#sample-case", label: "Review a sample case" },
-  documentationSummary: { href: "/#documentation", label: "Review a documentation-ready summary" },
+  exploreWorkflow: { href: "/", label: "Open the calculator" },
+  sampleCase: { href: "/trust-evidence", label: "Review a sample case" },
+  documentationSummary: { href: "/trust-evidence", label: "Review a documentation-ready summary" },
   trustEvidence: { href: "/trust-evidence", label: "Explore the Trust & Evidence page" },
   contact: { href: "/contact", label: "Contact us" },
   requestEvaluation: { href: "/contact", label: "Request a workflow evaluation" },

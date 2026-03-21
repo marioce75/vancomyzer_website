@@ -1,11 +1,3 @@
-/**
- * First-pass posterior engine: prior → normalize observations → fit → posterior params.
- * Bounded and transparent; does not claim high-certainty precision from sparse data.
- *
- * Prior model is explicit in code via ADULT_VANCOMYCIN_PRIOR_MODEL
- * (currently the Ducharme 1994 adult population prior).
- */
-
 import { buildPriorParameters } from "./buildPriorParameters";
 import { normalizeObservations } from "./normalizeObservations";
 import { fitPosteriorParameters } from "./fitPosteriorParameters";
@@ -23,8 +15,10 @@ export interface PosteriorEngineInput {
 }
 
 export interface PosteriorEngineResult {
-  Ke: number;
-  V: number;
+  CL: number;
+  V1: number;
+  Q: number;
+  V2: number;
   crcl: number;
   success: boolean;
   diagnostics: PosteriorFitDiagnostics;
@@ -37,8 +31,10 @@ export function runPosteriorEngine(
   const prior = buildPriorParameters(patient, regimen);
   if (levels.length === 0) {
     return {
-      Ke: prior.Ke,
-      V: prior.V,
+      CL: prior.CL,
+      V1: prior.V1,
+      Q: prior.Q,
+      V2: prior.V2,
       crcl: prior.crcl,
       success: false,
       diagnostics: {
@@ -52,8 +48,10 @@ export function runPosteriorEngine(
 
   const { observations, context } = normalizeObservations(levels, regimen);
   const fit = fitPosteriorParameters({
-    priorKe: prior.Ke,
-    priorV: prior.V,
+    priorCL: prior.CL,
+    priorV1: prior.V1,
+    priorQ: prior.Q,
+    priorV2: prior.V2,
     dose_mg: regimen.dose_mg,
     tau: context.tau,
     T_inf: context.T_inf,
@@ -62,8 +60,10 @@ export function runPosteriorEngine(
 
   if (!fit.success) {
     return {
-      Ke: prior.Ke,
-      V: prior.V,
+      CL: prior.CL,
+      V1: prior.V1,
+      Q: prior.Q,
+      V2: prior.V2,
       crcl: prior.crcl,
       success: false,
       diagnostics: fit.diagnostics,
@@ -71,8 +71,10 @@ export function runPosteriorEngine(
   }
 
   return {
-    Ke: fit.Ke_posterior,
-    V: fit.V_posterior,
+    CL: fit.CL_posterior,
+    V1: fit.V1_posterior,
+    Q: fit.Q_posterior,
+    V2: fit.V2_posterior,
     crcl: prior.crcl,
     success: true,
     diagnostics: fit.diagnostics,

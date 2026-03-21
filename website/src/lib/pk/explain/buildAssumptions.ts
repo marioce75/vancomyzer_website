@@ -9,7 +9,7 @@ export function buildAssumptions(input: ExplanationInput): string[] {
 
   return [
     "Creatinine clearance estimated using Cockcroft-Gault with explicit adult weight selection (underweight: actual body weight; non-obese: ideal body weight; obese: adjusted body weight), using age, sex, height, weight, and serum creatinine.",
-    "One-compartment adult prior model explicit in code: Ducharme 1994 population clearance prior (CL = 0.771 × CrCl + 18.9 mL/min) with V prior = 0.69 L/kg ideal body weight.",
+    "Two-compartment adult prior model explicit in code: Colin 2019 population prior.",
     "Steady-state assumed for AUC/peak/trough estimates.",
     "Level collection time assumed within the current dosing interval (time_since_last_dose ≤ interval).",
     usedRefinement

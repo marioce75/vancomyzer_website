@@ -36,8 +36,8 @@ export interface PosteriorFitDiagnostics {
   mean_abs_error_mcg_ml?: number;
   max_abs_error_mcg_ml?: number;
   mean_relative_error?: number;
-  posterior_shift_ke_pct?: number;
-  posterior_shift_v_pct?: number;
+  posterior_shift_cl_pct?: number;
+  posterior_shift_v1_pct?: number;
   uncertainty_label: "population_only" | "high" | "moderate";
 }
 
@@ -57,14 +57,30 @@ export interface ExistingRegimenEngineOutput {
   /** Internal posterior fit diagnostics for explanation text. Not in API response. */
   posterior_fit?: PosteriorFitDiagnostics;
   /** Internal: used by recommendation layer to simulate candidate regimens. Not in API response. */
-  Ke?: number;
-  V?: number;
+  CL?: number;
+  V1?: number;
+  Q?: number;
+  V2?: number;
   current_regimen_infusion_hours?: number;
+}
+
+export interface FrequencyOption {
+  dose_mg: number;
+  interval_hours: number;
+  auc24: number;
+  peak: number;
+  trough: number;
+  infusion_duration_hours: number;
+  is_recommended: boolean;
 }
 
 export interface AdjustmentRecommendation {
   recommended_dose: string;
   recommended_interval_hours: number;
+  recommended_infusion_duration_hours?: number;
+  infusion_duration_adjusted_for_safety?: boolean;
+  infusion_safety_note?: string;
+  frequency_options?: FrequencyOption[];
 }
 
 export interface ExplanationInput {

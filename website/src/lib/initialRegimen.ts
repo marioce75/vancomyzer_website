@@ -1,18 +1,15 @@
 /**
  * First-pass initial regimen calculation for Vancomyzer.
  * For new patients only; no existing regimen or measured levels.
- *
- * Uses the same centralized PK modules as the existing-regimen path:
- * - adult prior parameters from buildPriorParameters
- * - one-compartment steady-state exposure from steadyStateOneCompartment
- * - candidate simulation from simulateCandidateExposure
- *
- * This remains a prior-based first-pass estimate only; no posterior/Bayesian update.
  */
 
 import { buildPriorParameters } from "./pk/posterior/buildPriorParameters";
+import { buildEmpiricLoadingDose } from "./pk/recommend/buildEmpiricLoadingDose";
 import { simulateCandidateExposure } from "./pk/recommend/simulateCandidateExposure";
-import { curvePoints } from "./pk/steadyStateOneCompartment";
+import { computeSafeInfusionDurationHours } from "./pk/recommend/infusionSafety";
+import { curvePoints } from "./pk/steadyStateTwoCompartment";
+import { buildInitialRegimenReviewStatus } from "./pk/response/buildReviewStatus";
+import type { CalculationDetails, FrequencyOption } from "@/types/calculator";
 
 interface Patient {
   age: number;
@@ -29,11 +26,16 @@ export interface InitialRegimenResult {
   trough: number;
   recommended_dose: string;
   recommended_interval_hours: number;
+  recommended_infusion_duration_hours: number;
+  infusion_duration_adjusted_for_safety?: boolean;
+  infusion_safety_note?: string;
   interpretation_summary: string;
   assumptions: string[];
   limitations: string[];
   curve: { time_hours: number; concentration: number }[];
   measured_levels: { time_hours: number; concentration: number }[];
+  calculation_details: CalculationDetails;
+  frequency_options: FrequencyOption[];
   documentation_preview: {
     quick_summary: string;
     clinical_note: string;
@@ -46,17 +48,18 @@ const TARGET_AUC24_MID = 500;
 const DOSE_OPTIONS_MG = [250, 500, 750, 1000, 1250, 1500, 1750, 2000];
 const INTERVAL_OPTIONS_H = [8, 12, 24];
 const DEFAULT_INFUSION_HOURS = 1;
-const MAX_TDD_MG_PER_DAY = 4500;
+
+function getMaxTdd(crcl: number): number {
+  if (crcl < 20) return 1000;
+  if (crcl < 50) return 2000;
+  if (crcl < 90) return 3000;
+  return 4500;
+}
+
 const MAX_PEAK_MCG_ML = 80;
 const MAX_TROUGH_MCG_ML = 25;
 
-function chooseInitialCandidate(Ke: number, V: number): {
-  dose_mg: number;
-  interval_hours: number;
-  auc24: number;
-  peak: number;
-  trough: number;
-} {
+function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, crcl: number) {
   const candidates: {
     dose_mg: number;
     interval_hours: number;
@@ -69,8 +72,8 @@ function chooseInitialCandidate(Ke: number, V: number): {
   for (const interval_hours of INTERVAL_OPTIONS_H) {
     for (const dose_mg of DOSE_OPTIONS_MG) {
       const tdd = (dose_mg * 24) / interval_hours;
-      if (tdd > MAX_TDD_MG_PER_DAY) continue;
-      const exposure = simulateCandidateExposure(Ke, V, {
+      if (tdd > getMaxTdd(crcl)) continue;
+      const exposure = simulateCandidateExposure(CL, V1, Q, V2, {
         dose_mg,
         interval_hours,
         infusion_duration_hours: Math.min(DEFAULT_INFUSION_HOURS, interval_hours),
@@ -87,24 +90,69 @@ function chooseInitialCandidate(Ke: number, V: number): {
     }
   }
 
-  const ranked = (candidates.some((c) => c.inRange) ? candidates.filter((c) => c.inRange) : candidates)
-    .sort((a, b) => {
-      const aucDelta = Math.abs(a.auc24 - TARGET_AUC24_MID) - Math.abs(b.auc24 - TARGET_AUC24_MID);
-      if (aucDelta !== 0) return aucDelta;
-      const dailyDoseA = (a.dose_mg * 24) / a.interval_hours;
-      const dailyDoseB = (b.dose_mg * 24) / b.interval_hours;
-      return dailyDoseA - dailyDoseB;
-    });
+  const inRangeCandidates = candidates.filter((c) => c.inRange);
+  const ranked = (inRangeCandidates.length > 0 ? inRangeCandidates : candidates).sort((a, b) => {
+    const aucDelta = Math.abs(a.auc24 - TARGET_AUC24_MID) - Math.abs(b.auc24 - TARGET_AUC24_MID);
+    if (aucDelta !== 0) return aucDelta;
+    const dailyDoseA = (a.dose_mg * 24) / a.interval_hours;
+    const dailyDoseB = (b.dose_mg * 24) / b.interval_hours;
+    return dailyDoseA - dailyDoseB;
+  });
 
-  return ranked[0] ?? {
+  const best = ranked.length > 0 ? ranked[0] : {
     dose_mg: 1000,
     interval_hours: 12,
-    ...simulateCandidateExposure(Ke, V, {
-      dose_mg: 1000,
-      interval_hours: 12,
-      infusion_duration_hours: 1,
-    }),
+    auc24: simulateCandidateExposure(CL, V1, Q, V2, {
+      dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1,
+    }).auc24,
+    peak: simulateCandidateExposure(CL, V1, Q, V2, {
+      dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1,
+    }).peak,
+    trough: simulateCandidateExposure(CL, V1, Q, V2, {
+      dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1,
+    }).trough,
+    inRange: false,
   };
+
+  // Build frequency options: best candidate per interval
+  const frequencyOptions = buildFrequencyOptions(candidates, best);
+
+  return { best, frequencyOptions };
+}
+
+function buildFrequencyOptions(
+  candidates: { dose_mg: number; interval_hours: number; auc24: number; peak: number; trough: number; inRange: boolean }[],
+  recommended: { dose_mg: number; interval_hours: number }
+): FrequencyOption[] {
+  const byInterval = new Map<number, typeof candidates>();
+  for (const c of candidates) {
+    if (!byInterval.has(c.interval_hours)) byInterval.set(c.interval_hours, []);
+    byInterval.get(c.interval_hours)!.push(c);
+  }
+
+  const options: FrequencyOption[] = [];
+  byInterval.forEach((group, interval) => {
+    // Prefer in-range, then closest to AUC mid-target
+    const sorted = [...group].sort((a, b) => {
+      if (a.inRange !== b.inRange) return a.inRange ? -1 : 1;
+      return Math.abs(a.auc24 - TARGET_AUC24_MID) - Math.abs(b.auc24 - TARGET_AUC24_MID);
+    });
+    const pick = sorted[0];
+    const infusion = computeSafeInfusionDurationHours(pick.dose_mg);
+    options.push({
+      dose_mg: pick.dose_mg,
+      interval_hours: interval,
+      auc24: Math.round(pick.auc24 * 10) / 10,
+      peak: Math.round(pick.peak * 10) / 10,
+      trough: Math.round(pick.trough * 10) / 10,
+      infusion_duration_hours: infusion.infusion_duration_hours,
+      is_recommended: pick.dose_mg === recommended.dose_mg && interval === recommended.interval_hours,
+    });
+  });
+
+  // Sort by interval ascending
+  options.sort((a, b) => a.interval_hours - b.interval_hours);
+  return options;
 }
 
 export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
@@ -123,14 +171,18 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
     }
   );
 
-  const choice = chooseInitialCandidate(prior.Ke, prior.V);
+  const { best: choice, frequencyOptions } = chooseInitialCandidate(prior.CL, prior.V1, prior.Q, prior.V2, prior.crcl);
+  const safeInfusion = computeSafeInfusionDurationHours(choice.dose_mg);
+  const loadingDose = buildEmpiricLoadingDose({ actual_body_weight_kg: patient.weight_kg });
   const curve = curvePoints(
     {
-      Ke: prior.Ke,
-      V: prior.V,
+      CL: prior.CL,
+      V1: prior.V1,
+      Q: prior.Q,
+      V2: prior.V2,
       dose_mg: choice.dose_mg,
       tau: choice.interval_hours,
-      T_inf: Math.min(DEFAULT_INFUSION_HOURS, choice.interval_hours),
+      T_inf: Math.min(safeInfusion.infusion_duration_hours, choice.interval_hours),
     },
     choice.interval_hours * 2,
     0.5
@@ -142,36 +194,47 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
   const trough = Math.round(choice.trough * 10) / 10;
 
   const interpretation_summary =
-    `Initial regimen suggestion: ${recommended_dose} every ${choice.interval_hours} hours. ` +
+    `Initial regimen suggestion: ${recommended_dose} every ${choice.interval_hours} hours infused over ${safeInfusion.infusion_duration_hours} hours. ` +
     `Prior-based first-pass estimate: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
-    `Estimated CrCl ${prior.crcl} mL/min. No measured levels; re-evaluate after levels are available. Intended to support review, not replace clinician judgment.`;
+    `Estimated CrCl ${prior.crcl} mL/min. If immediate severe-infection coverage is clinically necessary under local practice, a clinician may optionally consider an empiric loading-dose estimate around ${loadingDose.suggested_dose_mg} mg (${loadingDose.basis}) before maintenance dosing. ` +
+    `${safeInfusion.safety_note ? `${safeInfusion.safety_note} ` : ""}` +
+    `No measured levels; re-evaluate after levels are available. Intended to support review, not replace clinician judgment.`;
 
   const assumptions = [
     "Creatinine clearance estimated using Cockcroft-Gault with explicit adult weight selection (underweight: actual body weight; non-obese: ideal body weight; obese: adjusted body weight), using age, sex, height, weight, and serum creatinine.",
-    "Adult prior model explicit in code: Ducharme 1994 clearance prior (CL = 0.771 × CrCl + 18.9 mL/min) with V prior = 0.69 L/kg ideal body weight.",
-    "Initial regimen chosen from practical dose/interval candidates using the shared one-compartment steady-state PK model.",
+    "Adult prior model explicit in code: Colin 2019 two-compartment population prior.",
+    "Initial regimen chosen from practical dose/interval candidates using the shared two-compartment steady-state PK model.",
+    "Infusion duration constrained to a minimum of 60 minutes and a maximum rate of 10 mg/min in line with FDA labeling and guideline-based safety framing.",
+    "Empiric loading-dose note, when shown, is a capped actual-body-weight estimate for clinician consideration and does not encode severity, indication, or critical-illness context.",
     "No measured vancomycin levels; no posterior or Bayesian update.",
   ];
 
   const limitations = [
     "First-pass adult prior estimate only; no measured levels are available to individualize PK.",
     "Outputs are model-based prior predictions and should not be interpreted as patient-specific certainty.",
+    "Any loading-dose note is optional generic empiric support only and should not replace clinician judgment about infection severity, critical illness, low body weight, or institutional protocol.",
+    "Adult concentration limits (for example, dilution ≤5 mg/mL) were not enforced because infusion volume is not entered in this workflow.",
     "Clinical judgment, local protocols, and reassessment after levels remain essential.",
   ];
 
   const quick_summary = [
-    `Initial regimen: ${recommended_dose} every ${choice.interval_hours} hours`,
+    `Initial regimen: ${recommended_dose} every ${choice.interval_hours} hours infused over ${safeInfusion.infusion_duration_hours} hours`,
     `Prior-based estimate: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL`,
-    `Estimated CrCl: ${prior.crcl} mL/min. Assumptions and limitations apply.`,
+    ...(safeInfusion.safety_note ? [safeInfusion.safety_note] : []),
+    `Estimated CrCl: ${prior.crcl} mL/min. Loading-dose considerations are optional, generic empiric support only, and should be reviewed separately from the maintenance suggestion. Assumptions and limitations apply.`,
   ].join("\n");
 
   const clinical_note = [
     "Vancomycin initial regimen suggestion (no levels).",
-    `Dose: ${recommended_dose}; Interval: every ${choice.interval_hours} hours.`,
+    `Dose: ${recommended_dose}; Interval: every ${choice.interval_hours} hours; Infusion: ${safeInfusion.infusion_duration_hours} hours.`,
     `Prior-based estimate: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL.`,
-    `Estimated CrCl: ${prior.crcl} mL/min (Cockcroft-Gault). Adult prior model: Ducharme 1994 CL-CrCl relationship with V = 0.69 L/kg ideal body weight.`,
+    ...(safeInfusion.safety_note ? [safeInfusion.safety_note] : []),
+    `Estimated CrCl: ${prior.crcl} mL/min (Cockcroft-Gault with explicit adult weight selection). Adult prior model: Colin 2019 two-compartment population prior.`,
+    `If rapid empiric attainment is clinically necessary under local practice, an optional actual-body-weight loading-dose estimate around ${loadingDose.suggested_dose_mg} mg may be considered (${loadingDose.basis}).`,
     "Limitations: no measured levels; reassess when levels are available. Do not overinterpret prior-only outputs as patient-specific precision.",
   ].join("\n");
+
+  const review_status = buildInitialRegimenReviewStatus();
 
   return {
     recommendation_type: "initial_regimen",
@@ -180,11 +243,31 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
     trough,
     recommended_dose,
     recommended_interval_hours: choice.interval_hours,
+    recommended_infusion_duration_hours: safeInfusion.infusion_duration_hours,
+    infusion_duration_adjusted_for_safety: safeInfusion.adjusted_for_safety,
+    infusion_safety_note: safeInfusion.safety_note,
     interpretation_summary,
     assumptions,
     limitations,
     curve,
     measured_levels: [],
+    frequency_options: frequencyOptions,
+    calculation_details: {
+      method: "Adult prior model only in a two-compartment intermittent steady-state maintenance-selection workflow",
+      evidence_strength: "population prior only",
+      data_quality_summary: "No measured levels entered; workflow fit depends on population-prior assumptions and patient-characteristic inputs only.",
+      review_status,
+      key_inputs: [
+        `Cockcroft-Gault CrCl ${prior.crcl} mL/min`,
+        `Adult weight/height inputs ${patient.weight_kg} kg and ${patient.height_cm} cm`,
+        `Safety infusion duration ${safeInfusion.infusion_duration_hours} h`,
+      ],
+      caution_flags: [
+        "No posterior refinement from measured levels was applied.",
+        "Loading-dose language is optional generic empiric support, not patient-specific severity logic.",
+        "Review assumptions, scope exclusions, and local protocol before acting.",
+      ],
+    },
     documentation_preview: {
       quick_summary,
       clinical_note,

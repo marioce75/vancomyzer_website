@@ -1,0 +1,16 @@
+**UI Blueprint Applied: Calculator Redesigned**
+
+- **Summary**: Implemented the medical UI blueprint. The calculator now has a clean, enterprise-grade clinical interface (light background, white cards, data-first typography).
+- **Files Modified**:
+  - `src/app/globals.css`
+  - `src/components/calculator/CalculatorLayout.tsx`
+  - `src/components/calculator/CalculatorWorkspace.tsx`
+  - `src/components/calculator/PatientCharacteristicsForm.tsx`
+  - `src/components/calculator/RegimenForm.tsx`
+  - `src/components/calculator/PrimaryMetricsCard.tsx`
+  - `src/components/calculator/DoseRecommendationCard.tsx`
+- **To Verify on localhost**:
+  - Load the calculator and confirm the new light/white clinical aesthetic.
+  - Check that all input fields in the left-hand forms are aligned, uniform in height, and have no attached units.
+  - Verify that the result cards on the right (PK Metrics, Dose Recommendation) display large, bold numbers with smaller, muted labels.
+  - Check the accordion in the left panel for the new, cleaner style.

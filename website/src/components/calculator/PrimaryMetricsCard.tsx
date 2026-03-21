@@ -1,4 +1,4 @@
-"use client";
+import React from "react";
 
 interface PrimaryMetricsCardProps {
   auc24?: number | null;
@@ -8,37 +8,25 @@ interface PrimaryMetricsCardProps {
 
 function formatMetric(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) return "—";
-  return String(value);
+  return Number(value).toFixed(1).replace(/\.0$/, "");
 }
 
-export default function PrimaryMetricsCard({
-  auc24,
-  peak,
-  trough,
-}: PrimaryMetricsCardProps) {
+const Metric = ({ label, value, unit }: { label: string; value: string; unit: string }) => (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+      <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</span>
+      <div className="mt-2 flex items-baseline gap-1.5">
+        <span className="text-3xl font-semibold tracking-tight text-slate-950 tabular-nums">{value}</span>
+        <span className="text-sm font-medium text-slate-500">{unit}</span>
+      </div>
+    </div>
+  );
+
+export default function PrimaryMetricsCard({ auc24, peak, trough }: PrimaryMetricsCardProps) {
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4">
-      <h2 className="text-lg font-semibold text-gray-900">Primary metrics</h2>
-      <dl className="mt-4 grid grid-cols-3 gap-4">
-        <div>
-          <dt className="text-sm text-gray-500">AUC24</dt>
-          <dd className="mt-0.5 text-lg font-medium text-gray-900">
-            {formatMetric(auc24)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-sm text-gray-500">Peak (mcg/mL)</dt>
-          <dd className="mt-0.5 text-lg font-medium text-gray-900">
-            {formatMetric(peak)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-sm text-gray-500">Trough (mcg/mL)</dt>
-          <dd className="mt-0.5 text-lg font-medium text-gray-900">
-            {formatMetric(trough)}
-          </dd>
-        </div>
-      </dl>
-    </section>
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <Metric label="AUC24" value={formatMetric(auc24)} unit="mg·h/L" />
+      <Metric label="Peak" value={formatMetric(peak)} unit="mcg/mL" />
+      <Metric label="Trough" value={formatMetric(trough)} unit="mcg/mL" />
+    </div>
   );
 }

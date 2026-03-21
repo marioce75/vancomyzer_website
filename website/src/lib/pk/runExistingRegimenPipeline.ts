@@ -12,9 +12,23 @@ import { buildCalculateResponse } from "./response/buildCalculateResponse";
 import type { NormalizedPatient, ExplanationInput } from "./types";
 
 export interface ExistingRegimenPipelineInput {
-  patient: { age?: unknown; sex?: unknown; weight_kg?: unknown; serum_creatinine_mg_dl?: unknown; height_cm?: unknown };
-  regimen: { dose_mg?: unknown; interval_hours?: unknown; infusion_duration_hours?: unknown };
-  levels: Array<{ value_mcg_ml?: unknown; collection_time?: unknown; time_since_last_dose_hours?: unknown }>;
+  patient: {
+    age?: unknown;
+    sex?: unknown;
+    weight_kg?: unknown;
+    serum_creatinine_mg_dl?: unknown;
+    height_cm?: unknown;
+  };
+  regimen: {
+    dose_mg?: unknown;
+    interval_hours?: unknown;
+    infusion_duration_hours?: unknown;
+  };
+  levels: Array<{
+    value_mcg_ml?: unknown;
+    collection_time?: unknown;
+    time_since_last_dose_hours?: unknown;
+  }>;
 }
 
 export interface PipelineValidationError {
@@ -22,6 +36,8 @@ export interface PipelineValidationError {
   error_type: "validation_error";
   message: string;
   field_errors?: Record<string, string>;
+  recovery_guidance?: string[];
+  fallback_workflow?: "initial_regimen" | "repeat_existing_regimen_sampling";
 }
 
 export function runExistingRegimenPipeline(
@@ -38,6 +54,8 @@ export function runExistingRegimenPipeline(
       error_type: "validation_error",
       message: validation.message,
       field_errors: validation.field_errors,
+      recovery_guidance: validation.recovery_guidance,
+      fallback_workflow: validation.fallback_workflow,
     };
   }
 
@@ -52,5 +70,10 @@ export function runExistingRegimenPipeline(
     documentation_preview: buildDocumentationPreview(explanationInput),
   };
 
-  return buildCalculateResponse("existing_regimen", engineOutput, recommendation, explain) as ReturnType<typeof buildCalculateResponse>;
+  return buildCalculateResponse(
+    "existing_regimen",
+    engineOutput,
+    recommendation,
+    explain
+  ) as ReturnType<typeof buildCalculateResponse>;
 }
