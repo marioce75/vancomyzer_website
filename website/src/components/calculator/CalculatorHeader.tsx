@@ -24,12 +24,11 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
         <Link href="/" className="flex items-center gap-3 min-w-0 flex-1 group">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/vancomyzer-logo.svg"
+            src="/favicon.svg"
             alt="Vancomyzer™"
             width={36}
             height={36}
             className="shrink-0 transition-opacity group-hover:opacity-85"
-            style={{ filter: "invert(1) sepia(1) saturate(3) hue-rotate(80deg)" }}
           />
           <div className="min-w-0">
             <h1
