@@ -34,6 +34,9 @@ import ResultScopeBanner from "@/components/calculator/ResultScopeBanner";
 import CalculationDetailsCard from "@/components/calculator/CalculationDetailsCard";
 import DataFitReviewabilityPanel from "@/components/calculator/DataFitReviewabilityPanel";
 import RegimenSuggestionCard from "@/components/calculator/RegimenSuggestionCard";
+import SettingsPanel from "@/components/calculator/SettingsPanel";
+import VancomycinRain from "@/components/calculator/VancomycinRain";
+import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 
 const defaultPatient = { age: 0, weight_kg: 0, serum_creatinine_mg_dl: 0 };
 const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0 };
@@ -237,6 +240,8 @@ export default function CalculatorWorkspace() {
 
   // Layout State
   const [activeSection, setActiveSection] = useState<string>("patient");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const { settings } = useMatrixSettings();
 
   // Pre-fill patient state from URL query params only (e.g. sample case link)
   // localStorage is intentionally NOT used — state should start fresh on every page load
@@ -809,10 +814,14 @@ export default function CalculatorWorkspace() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden" style={{ background: "#000000", color: "#00ff41" }}>
-      <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} />
+      <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} />
       <div className="flex-1 overflow-hidden h-full">
         <CalculatorLayout left={leftColumn} right={rightColumn} />
       </div>
+      {settings.vancomycinRain && (
+        <VancomycinRain opacity={settings.rainOpacity} colorMode={settings.colorMode} />
+      )}
+      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );
 }

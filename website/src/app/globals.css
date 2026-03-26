@@ -89,12 +89,28 @@ body::after {
     to bottom,
     transparent 0px,
     transparent 2px,
-    rgba(0,0,0,0.10) 2px,
-    rgba(0,0,0,0.10) 4px
+    rgba(0,0,0, var(--mx-scanline-opacity, 0.10)) 2px,
+    rgba(0,0,0, var(--mx-scanline-opacity, 0.10)) 4px
   );
   pointer-events: none;
   z-index: 9997;
 }
+
+/* When scanlines are off, hide the pseudo-element entirely */
+body.no-scanlines::after {
+  display: none;
+}
+
+/* Typewriter animation — disabled when toggle is off */
+body.no-typewriter .mx-fadeIn { animation: none !important; }
+
+/* Blinking cursor — disabled when toggle is off */
+body.no-blink .mx-blink { animation: none !important; opacity: 1 !important; }
+
+/* Graph animations — disabled when toggle is off */
+body.no-graph-anim .recharts-active-dot,
+body.no-graph-anim .recharts-line,
+body.no-graph-anim .recharts-area { transition: none !important; animation: none !important; }
 
 /* ── Sharp edges — zero border radius ───────────────────────────
    Matrix terminals have no rounded corners anywhere.
@@ -319,3 +335,53 @@ input[type='number'] { -moz-appearance: textfield; }
 .hover\:text-gray-900:hover { color: #00ff41 !important; }
 .focus-visible\:ring-gray-900 { --tw-ring-color: #00ff41 !important; }
 .focus-visible\:ring-gray-400 { --tw-ring-color: rgba(0,255,65,0.5) !important; }
+
+/* ── Range slider — Matrix styled ────────────────────────── */
+
+input[type='range'].mx-range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #1a1a1a !important;
+  border: 1px solid #003b00 !important;
+  outline: none;
+  cursor: pointer;
+}
+input[type='range'].mx-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--mx-green, #00ff41);
+  border: 1px solid var(--mx-green, #00ff41);
+  cursor: pointer;
+  box-shadow: 0 0 6px var(--mx-green-glow, rgba(0,255,65,0.3));
+}
+input[type='range'].mx-range-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--mx-green, #00ff41);
+  border: 1px solid var(--mx-green, #00ff41);
+  cursor: pointer;
+  box-shadow: 0 0 6px var(--mx-green-glow, rgba(0,255,65,0.3));
+}
+input[type='range'].mx-range-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: linear-gradient(to right, var(--mx-green-dark, #003b00), var(--mx-green-dim, #00a827));
+}
+input[type='range'].mx-range-slider::-moz-range-track {
+  height: 4px;
+  background: linear-gradient(to right, var(--mx-green-dark, #003b00), var(--mx-green-dim, #00a827));
+  border: none;
+}
+input[type='range'].mx-range-slider:focus {
+  box-shadow: none !important;
+  border-color: var(--mx-green, #00ff41) !important;
+}
+
+/* ── Settings-controlled font size base ──────────────────── */
+
+body {
+  font-size: calc(var(--mx-font-size-base, 14px) * var(--mx-text-scale, 1));
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Providers from "./Providers";
 
 export const metadata: Metadata = {
   title: "Vancomyzer™ — Transparent vancomycin dosing support",
@@ -26,8 +27,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen flex flex-col antialiased">
-        {children}
+      <body className="min-h-screen flex flex-col antialiased" suppressHydrationWarning>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
