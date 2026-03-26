@@ -1,134 +1,334 @@
-import Link from "next/link";
-import CTA from "@/components/CTA";
+"use client";
 
-const FAQ_ITEMS = [
+import { useState } from "react";
+
+/* ── FAQ Data ──────────────────────────────────────────────────── */
+
+interface FaqRef {
+  label: string;
+  url: string;
+}
+
+interface FaqItem {
+  question: string;
+  answer: string[];        // paragraphs
+  refs: FaqRef[];
+}
+
+const FAQ_ITEMS: FaqItem[] = [
   {
-    q: "What is AUC-guided vancomycin dosing?",
-    short: "Exposure-based interpretation instead of relying only on troughs.",
-    a: "AUC-guided vancomycin dosing focuses on estimated drug exposure over time rather than relying only on trough levels. The goal is to support exposure-based interpretation in a more clinically meaningful way.",
+    question: "Why doesn\u2019t Vancomyzer use Cockcroft-Gault?",
+    answer: [
+      "Cockcroft-Gault estimates kidney function from age, weight, and creatinine \u2014 then feeds that estimate into a separate vancomycin equation. It introduces two layers of estimation before you even get a PK prediction. Vancomyzer skips that entirely by using serum creatinine directly as a covariate in the Colin 2019 model.",
+    ],
+    refs: [
+      {
+        label: "Cockcroft DW, Gault MH. Prediction of creatinine clearance from serum creatinine. Nephron. 1976;16(1):31-41.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/1244564/",
+      },
+    ],
   },
   {
-    q: "Why might two vancomycin calculators disagree?",
-    short: "Different models, assumptions, level timing rules, and scope limits.",
-    a: "Calculators may differ because they use different PK models, assumptions, level-timing handling, and scope rules. Differences become more noticeable when data are sparse, timing is imperfect, or the workflow falls outside routine steady-state assumptions.",
+    question: "Why is Cockcroft-Gault considered outdated for vancomycin dosing?",
+    answer: [
+      "It was developed in 1976 on 249 mostly male patients to estimate creatinine clearance \u2014 not to predict vancomycin pharmacokinetics. It systematically underperforms in elderly patients, low muscle mass, obesity, and critical illness. For a precision dosing tool, building on a 50-year-old renal estimate adds unnecessary error at the foundation.",
+    ],
+    refs: [
+      {
+        label: "Rybak MJ et al. Therapeutic monitoring of vancomycin for serious MRSA infections. ASHP/IDSA/SIDP 2020 Revised Consensus Guidelines.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/32191793/",
+      },
+    ],
   },
   {
-    q: "When is a one-level estimate less reliable?",
-    short: "When timing is weak, dose history is unclear, or the fit is sparse.",
-    a: "Single-level estimates can be more uncertain than coherent multi-level fits, especially when sample timing is close to infusion completion, dose history is unclear, or renal function is changing. Sparse data should be reviewed more cautiously, not overinterpreted.",
+    question: "How serum creatinine is measured matters \u2014 and it has changed",
+    answer: [
+      "Creatinine has been measured two ways in clinical labs:",
+      "The old way \u2014 Jaffe method (picric acid reaction, since 1886): A colorimetric reaction that measures creatinine but is non-specific. Glucose, bilirubin, acetoacetate, and certain drugs like cephalosporins all interfere and falsely elevate the result. At low creatinine concentrations \u2014 below 1.0 mg/dL \u2014 the Jaffe method reads approximately 7% higher than the enzymatic method, exceeding the acceptable bias threshold. This matters most in elderly, cachectic, and low-muscle-mass patients \u2014 exactly the populations most likely to receive vancomycin.",
+      "The current standard \u2014 Enzymatic method (IDMS-traceable): Modern labs use an enzymatic assay traceable to isotope dilution mass spectrometry (IDMS), the international gold standard. The enzymatic method is more specific \u2014 glucose, acetoacetate, and cephalosporins do not interfere \u2014 giving it better accuracy especially at lower creatinine concentrations.",
+      "Why this gap matters for dosing: Cockcroft-Gault was derived using Jaffe-measured creatinine. When you plug an enzymatic creatinine value into it \u2014 which is what modern labs report \u2014 you are using a number the equation was never calibrated for. Converting enzymatic SCr values back into Jaffe-equivalent values has been shown to significantly improve the performance of the Cockcroft-Gault equation for predicting vancomycin concentrations. That conversion step is rarely done at the bedside, creating a systematic mismatch baked silently into every Cockcroft-Gault-based vancomycin calculation in a modern hospital.",
+    ],
+    refs: [
+      { label: "Jaffe assay vs enzymatic bias", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6816857/" },
+      { label: "Clinical risk of Jaffe vs enzymatic misclassification", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4657986/" },
+      { label: "Impact on vancomycin dosing", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4432143/" },
+    ],
   },
   {
-    q: "What level timing problems make a result unsafe to overinterpret?",
-    short: "During infusion, too soon after infusion, or across unclear chronology.",
-    a: "Levels drawn during infusion, immediately after infusion, across unclear dose history, or with missing chronology can make a steady-state result unsafe to overread. In those cases, confirm actual dose times and consider repeat sampling or a different workflow.",
+    question: "What about muscle mass?",
+    answer: [
+      "Serum creatinine is a byproduct of muscle metabolism \u2014 so it reflects muscle mass as much as kidney function. A frail 80-year-old with a creatinine of 0.8 mg/dL may have severely reduced kidney function masked by low muscle mass. Cockcroft-Gault partially adjusts for this using age and a sex factor, but it was not built for patients with sarcopenia, critical illness, or extreme body compositions.",
+      "Colin 2019 uses serum creatinine directly as a continuous covariate within a Bayesian framework \u2014 not to estimate CrCl, but to inform the model\u2019s prediction of individual PK parameters. Combined with age and weight, the model accounts for muscle mass effects implicitly through the posterior update when a measured vancomycin level is entered. A bedbound geriatric patient\u2019s low creatinine and low weight together shift the posterior estimate in a way Cockcroft-Gault cannot replicate.",
+    ],
+    refs: [
+      {
+        label: "Colin PJ et al. Vancomycin Pharmacokinetics Throughout Life. Clin Pharmacokinet. 2019;58(6):767-780.",
+        url: "https://doi.org/10.1007/s40262-018-0727-5",
+      },
+    ],
   },
   {
-    q: "What patient types are outside scope?",
-    short: "Pediatric, dialysis-specific, and continuous-infusion workflows are outside the current scope.",
-    a: "The current calculator is scoped to adult intermittent-infusion vancomycin workflows. It is not intended for pediatric, dialysis-specific, or continuous-infusion use unless explicitly stated.",
+    question: "What does Colin 2019 use instead of Cockcroft-Gault?",
+    answer: [
+      "Colin 2019 uses age, weight, and serum creatinine directly as covariates in a two-compartment Bayesian model \u2014 no intermediate CrCl calculation. It was built from pooled data across 14 studies and multiple patient populations from neonates to elderly, making it one of the most broadly validated vancomycin PK models published. The model includes a specific age-decline function (FDecline) that captures the natural reduction in vancomycin clearance after peak adulthood \u2014 something Cockcroft-Gault approximates crudely through age alone.",
+    ],
+    refs: [
+      {
+        label: "Colin PJ et al. Clin Pharmacokinet. 2019.",
+        url: "https://doi.org/10.1007/s40262-018-0727-5",
+      },
+    ],
   },
   {
-    q: "What should clinicians verify before changing a regimen?",
-    short: "Inputs, method, level timing, assumptions, limitations, and local protocol.",
-    a: "Verify the inputs used, the method applied, the timing and sufficiency of measured levels, assumptions affecting the estimate, uncertainty or limitation notes, and local protocol or institutional practice.",
+    question: "How accurate is Colin 2019 compared to older methods?",
+    answer: [
+      "Independent evaluations consistently rank it among the top performers:",
+      "\u2022 Outperformed 6 of 7 literature models in a McGill University Health Centre validation\n\u2022 Second best in a Belgian multicenter study of 169 patients and 923 TDM samples\n\u2022 Identified as one of two best-transferable models in a head-to-head comparison of 7 vancomycin PopPK models\n\u2022 Validated across ICU, general ward, and outpatient settings in multiple countries\n\u2022 Performs comparably or better than obesity-specific models even in obese patients, without requiring a separate model",
+    ],
+    refs: [
+      { label: "Belgian multicenter validation", url: "https://pubmed.ncbi.nlm.nih.gov/35341931/" },
+      { label: "McGill head-to-head comparison", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9010252/" },
+      { label: "Obesity validation", url: "https://pubmed.ncbi.nlm.nih.gov/33278242/" },
+      { label: "Discrepancies between Bayesian models in ICU", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9767744/" },
+    ],
   },
   {
-    q: "Does Vancomyzer™ replace local protocol, pharmacist review, or clinician judgment?",
-    short: "No. It supports structured review but does not replace professional oversight.",
-    a: "No. Vancomyzer™ is designed to support structured review of model outputs and assumptions. Final interpretation and treatment decisions still require clinician judgment, pharmacist oversight, and local policy alignment.",
-  },
-  {
-    q: "Can documentation drafts improve workflow?",
-    short: "Yes—if they are reviewed and edited before communication or record use.",
-    a: "Documentation-support drafts can help communication and review by making the model output, assumptions, and cautions easier to inspect and edit. They should still be reviewed before use in clinical communication or the medical record.",
+    question: "Does Vancomyzer calculate CrCl anywhere?",
+    answer: [
+      "No. CrCl is not calculated, displayed, or used internally anywhere in Vancomyzer. The Colin 2019 model takes age, weight, and SCr directly. This removes one source of estimation error and keeps the input set minimal and fast at bedside.",
+    ],
+    refs: [
+      {
+        label: "Colin PJ et al. Clin Pharmacokinet. 2019.",
+        url: "https://doi.org/10.1007/s40262-018-0727-5",
+      },
+    ],
   },
 ];
 
+/* ── Accordion Item ────────────────────────────────────────────── */
+
+function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      style={{
+        borderLeft: open ? "2px solid var(--color-primary)" : "2px solid transparent",
+        background: open ? "var(--color-card)" : "transparent",
+        transition: "background 0.2s, border-color 0.2s",
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full text-left"
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: 12,
+          padding: "16px 20px",
+          cursor: "pointer",
+          background: "transparent",
+          border: "none",
+          fontFamily: "'Share Tech Mono', monospace",
+        }}
+      >
+        <span
+          style={{
+            color: "var(--color-primary)",
+            fontSize: 14,
+            fontWeight: 700,
+            fontFamily: "'Share Tech Mono', monospace",
+            lineHeight: 1.5,
+          }}
+        >
+          {">"} Q{index + 1}: {item.question}
+        </span>
+        <span
+          style={{
+            color: "var(--color-dim)",
+            fontSize: 16,
+            flexShrink: 0,
+            transition: "transform 0.2s",
+            transform: open ? "rotate(90deg)" : "rotate(0deg)",
+            fontFamily: "'Share Tech Mono', monospace",
+          }}
+        >
+          {"\u25B6"}
+        </span>
+      </button>
+
+      <div
+        style={{
+          maxHeight: open ? 2000 : 0,
+          overflow: "hidden",
+          transition: "max-height 0.35s ease",
+        }}
+      >
+        <div style={{ padding: "0 20px 20px 20px" }}>
+          {item.answer.map((paragraph, i) => (
+            <p
+              key={i}
+              style={{
+                color: "var(--color-secondary)",
+                fontSize: 13,
+                lineHeight: 1.7,
+                fontFamily: "'Share Tech Mono', monospace",
+                marginTop: i === 0 ? 0 : 12,
+                whiteSpace: "pre-line",
+              }}
+            >
+              {paragraph}
+            </p>
+          ))}
+
+          <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: "6px 14px" }}>
+            {item.refs.map((ref, i) => (
+              <a
+                key={i}
+                href={ref.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontSize: 11,
+                  color: "#007722",
+                  fontFamily: "'Share Tech Mono', monospace",
+                  textDecoration: "none",
+                  letterSpacing: "0.02em",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+                  (e.currentTarget as HTMLElement).style.textDecoration = "underline";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = "#007722";
+                  (e.currentTarget as HTMLElement).style.textDecoration = "none";
+                }}
+              >
+                [REF{item.refs.length > 1 ? ` ${i + 1}` : ""}] {ref.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Page ──────────────────────────────────────────────────────── */
+
 export default function FAQPage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
-      <section className="mb-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
-          Frequently asked questions
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
-          Condensed answers for quick clinical scanning. Expand each item for fuller nuance on timing quality, scope, calculator disagreement, and safe interpretation.
-        </p>
-      </section>
-
-      <section className="mb-16 space-y-3">
-        {FAQ_ITEMS.map(({ q, short, a }) => {
-          const id =
-            q === "When is a one-level estimate less reliable?"
-              ? "one-level-reliability"
-              : q === "What should clinicians verify before changing a regimen?"
-                ? "verify-before-change"
-                : q === "Does Vancomyzer™ replace local protocol, pharmacist review, or clinician judgment?"
-                  ? "replace-judgment"
-                  : undefined;
-
-          return (
-            <details
-              key={q}
-              id={id}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <summary className="cursor-pointer list-none">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <h2 className="text-lg font-semibold text-slate-950">{q}</h2>
-                    <p className="mt-1 text-sm text-slate-600">{short}</p>
-                  </div>
-                  <span className="text-sm font-medium text-slate-500">Expand</span>
-                </div>
-              </summary>
-              <p className="mt-4 text-sm leading-6 text-slate-600">{a}</p>
-            </details>
-          );
-        })}
-      </section>
-
-      <section className="mb-16 rounded-2xl border border-slate-200 bg-slate-50 p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-950">See the workflow in context</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              The calculator surfaces prior-only, caution-limited, or more reviewable states before clinicians lean on the dose suggestion.
-            </p>
-          </div>
-          <Link href="/calculator" className="text-sm font-medium text-slate-900 underline hover:no-underline">
-            Go to the calculator
-          </Link>
-        </div>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <CTA variant="sampleCase" primary />
-          <CTA variant="documentationSummary" />
-        </div>
-      </section>
-
-      <section className="mb-16 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-2xl font-semibold text-slate-950">Need the trust and evidence view?</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          If you want the inspectability and uncertainty framing behind these answers, continue to the Trust &amp; Evidence page.
-        </p>
-        <div className="mt-4">
-          <CTA variant="trustEvidence" />
-        </div>
-      </section>
-
-      <section className="border-t border-slate-200 pt-10">
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/calculator"
-            className="inline-flex items-center justify-center rounded-md bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--color-bg)",
+        padding: "48px 16px 80px",
+      }}
+    >
+      <div style={{ maxWidth: 840, margin: "0 auto" }}>
+        {/* Header */}
+        <div style={{ marginBottom: 40 }}>
+          <h1
+            style={{
+              fontSize: 18,
+              fontWeight: 700,
+              letterSpacing: "0.1em",
+              color: "var(--color-primary)",
+              fontFamily: "'Share Tech Mono', monospace",
+              textShadow: "0 0 10px var(--color-glow)",
+            }}
           >
-            Open the calculator
-          </Link>
-          <CTA variant="sampleCase" />
-          <CTA variant="trustEvidence" />
-          <CTA variant="requestEvaluation" />
+            {">"} FAQ — METHODOLOGY & DESIGN DECISIONS
+          </h1>
+          <p
+            style={{
+              marginTop: 8,
+              fontSize: 13,
+              color: "var(--color-dim)",
+              fontFamily: "'Share Tech Mono', monospace",
+            }}
+          >
+            {">"} Why Vancomyzer is built the way it is
+          </p>
         </div>
-      </section>
+
+        {/* Accordion list */}
+        <div
+          style={{
+            border: "1px solid var(--color-border)",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {FAQ_ITEMS.map((item, index) => (
+            <div
+              key={index}
+              style={{
+                borderTop: index === 0 ? "none" : "1px solid var(--color-border)",
+              }}
+            >
+              <AccordionItem item={item} index={index} />
+            </div>
+          ))}
+        </div>
+
+        {/* Footer nav */}
+        <div
+          style={{
+            marginTop: 40,
+            paddingTop: 24,
+            borderTop: "1px solid var(--color-border)",
+            display: "flex",
+            gap: 20,
+          }}
+        >
+          <a
+            href="/calculator"
+            style={{
+              fontSize: 12,
+              color: "var(--color-secondary)",
+              fontFamily: "'Share Tech Mono', monospace",
+              textDecoration: "none",
+              border: "1px solid var(--color-border)",
+              padding: "8px 16px",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
+            }}
+          >
+            [ OPEN CALCULATOR ]
+          </a>
+          <a
+            href="/trust-evidence"
+            style={{
+              fontSize: 12,
+              color: "var(--color-secondary)",
+              fontFamily: "'Share Tech Mono', monospace",
+              textDecoration: "none",
+              border: "1px solid var(--color-border)",
+              padding: "8px 16px",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
+            }}
+          >
+            [ TRUST & EVIDENCE ]
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
