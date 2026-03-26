@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0 -p ${PORT:-3000}",
     "lint": "next lint",
     "test": "npm run test:pk",
     "test:pk": "tsx src/lib/pk/__tests__/existingRegimen.integration.test.ts && tsx src/lib/pk/__tests__/initialRegimen.integration.test.ts"
