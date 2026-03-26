@@ -7,8 +7,6 @@ import { runExistingRegimenPipeline } from "../runExistingRegimenPipeline";
 
 const defaultPatient = {
   age: 55,
-  sex: "male",
-  height_cm: 170,
   weight_kg: 70,
   serum_creatinine_mg_dl: 1.0,
 };
@@ -96,17 +94,17 @@ function testCase8(): void {
 }
 
 function testCase9(): void {
-  const lean = runExistingRegimenPipeline({ patient: { age: 60, sex: "male", height_cm: 175, weight_kg: 78, serum_creatinine_mg_dl: 1.2 }, regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1 }, levels: [{ value_mcg_ml: 15, collection_time: "", time_since_last_dose_hours: 4 }] });
-  const obese = runExistingRegimenPipeline({ patient: { age: 60, sex: "male", height_cm: 175, weight_kg: 130, serum_creatinine_mg_dl: 1.2 }, regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1 }, levels: [{ value_mcg_ml: 15, collection_time: "", time_since_last_dose_hours: 4 }] });
+  const lean = runExistingRegimenPipeline({ patient: { age: 60, weight_kg: 78, serum_creatinine_mg_dl: 1.2 }, regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1 }, levels: [{ value_mcg_ml: 15, collection_time: "", time_since_last_dose_hours: 4 }] });
+  const obese = runExistingRegimenPipeline({ patient: { age: 60, weight_kg: 130, serum_creatinine_mg_dl: 1.2 }, regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1 }, levels: [{ value_mcg_ml: 15, collection_time: "", time_since_last_dose_hours: 4 }] });
   assert(!("ok" in lean && lean.ok === false), "Case 9a: expected success");
   assert(!("ok" in obese && obese.ok === false), "Case 9b: expected success");
   const a = lean as { auc24: number };
   const b = obese as { auc24: number };
-  assert(Math.abs(a.auc24 - b.auc24) > 1, "Case 9: obesity-aware Cockcroft-Gault should change output when body habitus differs materially.");
+  assert(Math.abs(a.auc24 - b.auc24) > 1, "Case 9: SCr-based Colin 2019 model should produce different output when weight differs materially.");
 }
 
 function testCase10(): void {
-  const result = runExistingRegimenPipeline({ patient: { age: 40, sex: "male", height_cm: 180, weight_kg: 80, serum_creatinine_mg_dl: 0.8 }, regimen: { dose_mg: 2000, interval_hours: 12, infusion_duration_hours: 2 }, levels: [{ value_mcg_ml: 35, collection_time: "", time_since_last_dose_hours: 11 }] });
+  const result = runExistingRegimenPipeline({ patient: { age: 40, weight_kg: 80, serum_creatinine_mg_dl: 0.8 }, regimen: { dose_mg: 2000, interval_hours: 12, infusion_duration_hours: 2 }, levels: [{ value_mcg_ml: 35, collection_time: "", time_since_last_dose_hours: 11 }] });
   assert(!("ok" in result && result.ok === false), "Case 10: expected success");
   const r = result as { recommended_dose: string; recommended_interval_hours: number };
   assert([6, 8, 12, 18, 24, 36, 48].includes(r.recommended_interval_hours), "Case 10: recommendation should stay within bounded expanded interval set");
@@ -180,6 +178,137 @@ function testCase20(): void {
   assert(r.documentation_preview.quick_summary.includes("interval extension") || r.documentation_preview.clinical_note.includes("interval extension"), "Case 20: documentation preview should preserve interval-extension rationale");
 }
 
+/**
+ * Case 21 — Cross-midnight regression test (patient safety)
+ *
+ * Scenario: dose given at 10:49 on day N (infusion ends 11:49), level drawn at
+ * 04:11 on day N+1. The UI computes time_since_last_dose_hours relative to the
+ * most-recent dose on the q12h schedule (22:49 on day N), yielding ~5.37 h post-dose.
+ * This must NOT be flagged as "drawn during infusion" or "too timing-sensitive".
+ *
+ * The backend pipeline receives the already-computed time value from the UI, so
+ * this test validates that the validation layer passes for a well-formed post-infusion
+ * cross-midnight level and that the Bayesian posterior engine proceeds normally.
+ */
+function testCase21(): void {
+  // 5.37 h = time from the most-recent q12 dose (22:49 day N) to level at 04:11 day N+1.
+  // Infusion duration 1 h → infusion ends at 23:49 day N → level is 5.37 h post-infusion. ✓
+  const crossMidnightQ12 = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1 },
+    levels: [{ value_mcg_ml: 14, collection_time: "", time_since_last_dose_hours: 5.37 }],
+  });
+  assert(
+    !("ok" in crossMidnightQ12 && crossMidnightQ12.ok === false),
+    "Case 21a: cross-midnight level (5.37 h post-dose on q12h) must not be rejected as during-infusion"
+  );
+  const r21a = crossMidnightQ12 as { auc24: number; peak: number; trough: number };
+  assert(r21a.auc24 > 0, "Case 21a: AUC24 must be positive for cross-midnight level");
+
+  // q8h variant: most-recent dose 02:49 day N+1, level 04:11 day N+1 → 1.37 h post-dose.
+  // Infusion ends at 03:49 → level is 0.37 h after infusion completion.
+  // 0.37 h < MIN_POST_INFUSION_LEVEL_HOURS (0.5 h) → correctly rejected as too timing-sensitive.
+  const crossMidnightQ8TooClose = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1000, interval_hours: 8, infusion_duration_hours: 1 },
+    levels: [{ value_mcg_ml: 14, collection_time: "", time_since_last_dose_hours: 1.37 }],
+  });
+  assert(
+    "ok" in crossMidnightQ8TooClose && crossMidnightQ8TooClose.ok === false,
+    "Case 21b: level 1.37 h post-dose with 1 h infusion must be rejected as too close to infusion completion (0.37 h after end, within 0.5 h grace)"
+  );
+
+  // q8h variant with level drawn 2.1 h post-dose (1.1 h after infusion end) — must succeed.
+  const crossMidnightQ8PostInfusion = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1000, interval_hours: 8, infusion_duration_hours: 1 },
+    levels: [{ value_mcg_ml: 14, collection_time: "", time_since_last_dose_hours: 2.1 }],
+  });
+  assert(
+    !("ok" in crossMidnightQ8PostInfusion && crossMidnightQ8PostInfusion.ok === false),
+    "Case 21c: level 2.1 h post-dose on q8h (1.1 h after infusion end) must not be rejected"
+  );
+  const r21c = crossMidnightQ8PostInfusion as { auc24: number };
+  assert(r21c.auc24 > 0, "Case 21c: AUC24 must be positive");
+}
+
+function testCase22(): void {
+  // Pulse dose / single-dose Bayesian workflow (doses_given = 1).
+  // Infusion = 1 h, so post-distributive threshold = 1 + 2 = 3 h post-dose.
+  // Planned interval q12h.
+
+  // 22a: Valid pulse dose level at 4 h post-dose (3 h post-infusion end) — must succeed.
+  const pulseDoseValid = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1500, interval_hours: 12, infusion_duration_hours: 1, doses_given: 1 },
+    levels: [{ value_mcg_ml: 16, collection_time: "", time_since_last_dose_hours: 4 }],
+  });
+  assert(
+    !("ok" in pulseDoseValid && pulseDoseValid.ok === false),
+    "Case 22a: pulse dose level at 4 h post-dose (3 h post-infusion) must not be rejected"
+  );
+  const r22a = pulseDoseValid as { auc24: number; peak: number; assumptions: string[]; limitations: string[] };
+  assert(r22a.auc24 > 0, "Case 22a: AUC24 must be positive for pulse dose");
+  assert(r22a.peak > 0, "Case 22a: peak must be positive for pulse dose");
+  assert(
+    r22a.assumptions.some((a) => a.toLowerCase().includes("pre-steady-state") || a.toLowerCase().includes("pulse")),
+    "Case 22a: assumptions must include pulse-dose / pre-steady-state language"
+  );
+  assert(
+    r22a.limitations.some((l) => l.toLowerCase().includes("pre-steady-state") || l.toLowerCase().includes("pulse")),
+    "Case 22a: limitations must include pulse-dose / pre-steady-state label"
+  );
+
+  // 22b: Pulse dose level during infusion (0.5 h post-dose, infusion = 1 h) — must be rejected.
+  const pulseDoseDuringInfusion = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1500, interval_hours: 12, infusion_duration_hours: 1, doses_given: 1 },
+    levels: [{ value_mcg_ml: 35, collection_time: "", time_since_last_dose_hours: 0.5 }],
+  });
+  assert(
+    "ok" in pulseDoseDuringInfusion && pulseDoseDuringInfusion.ok === false,
+    "Case 22b: pulse dose level during infusion must be rejected"
+  );
+
+  // 22c: Pulse dose level at 2.5 h post-dose (1.5 h post-infusion end — < 2 h threshold) — must be rejected.
+  const pulseDoseTooClose = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1500, interval_hours: 12, infusion_duration_hours: 1, doses_given: 1 },
+    levels: [{ value_mcg_ml: 28, collection_time: "", time_since_last_dose_hours: 2.5 }],
+  });
+  assert(
+    "ok" in pulseDoseTooClose && pulseDoseTooClose.ok === false,
+    "Case 22c: pulse dose level at 2.5 h (1.5 h post-infusion end, < 2 h ASHP threshold) must be rejected"
+  );
+
+  // 22d: Pulse dose level at 3.5 h post-dose (2.5 h post-infusion end — ≥ 2 h threshold) — must succeed.
+  const pulseDosePostDistributive = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1500, interval_hours: 12, infusion_duration_hours: 1, doses_given: 1 },
+    levels: [{ value_mcg_ml: 20, collection_time: "", time_since_last_dose_hours: 3.5 }],
+  });
+  assert(
+    !("ok" in pulseDosePostDistributive && pulseDosePostDistributive.ok === false),
+    "Case 22d: pulse dose level at 3.5 h (2.5 h post-infusion end) must not be rejected"
+  );
+  const r22d = pulseDosePostDistributive as { auc24: number };
+  assert(r22d.auc24 > 0, "Case 22d: AUC24 must be positive");
+
+  // 22e: Pulse dose level at 20 h post-dose (beyond q12h interval) — must succeed because
+  // interval_hours constraint is skipped for single-dose workflow.
+  const pulseDoseLateLevel = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1500, interval_hours: 12, infusion_duration_hours: 1, doses_given: 1 },
+    levels: [{ value_mcg_ml: 4, collection_time: "", time_since_last_dose_hours: 20 }],
+  });
+  assert(
+    !("ok" in pulseDoseLateLevel && pulseDoseLateLevel.ok === false),
+    "Case 22e: pulse dose level at 20 h (beyond q12h interval) must not be rejected — interval check skipped for single-dose"
+  );
+  const r22e = pulseDoseLateLevel as { auc24: number };
+  assert(r22e.auc24 > 0, "Case 22e: AUC24 must be positive for late pulse dose level");
+}
+
 export function runExistingRegimenTests(): void {
   testCase1();
   testCase2();
@@ -201,9 +330,11 @@ export function runExistingRegimenTests(): void {
   testCase18();
   testCase19();
   testCase20();
+  testCase21();
+  testCase22();
 }
 
 if (typeof process !== "undefined" && process.argv[1]?.includes("existingRegimen.integration.test")) {
   runExistingRegimenTests();
-  console.log("All 20 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, obesity-aware Cockcroft-Gault, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, and bounded interval extension for clearly supra-therapeutic sparse single-level cases.");
+  console.log("All 22 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, and pulse-dose single-dose Bayesian workflow.");
 }

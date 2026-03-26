@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { CalculationDetails, FrequencyOption } from "@/types/calculator";
 
 interface DoseRecommendationCardProps {
@@ -12,6 +14,7 @@ interface DoseRecommendationCardProps {
   frequency_options?: FrequencyOption[] | null;
   draftDiffersFromCalculated?: boolean;
   onApplyRecommendation?: (() => void) | null;
+  onApplyFrequency?: ((option: FrequencyOption) => void) | null;
   onSelectFrequency?: ((option: FrequencyOption) => void) | null;
 }
 
@@ -30,107 +33,145 @@ export default function DoseRecommendationCard({
   frequency_options,
   draftDiffersFromCalculated,
   onApplyRecommendation,
+  onApplyFrequency,
   onSelectFrequency,
 }: DoseRecommendationCardProps) {
-  if (!recommended_dose || !recommended_interval_hours) {
-    return null;
-  }
+  // Only display options with AUC24 strictly within 400–600 mg·h/L (ASHP/IDSA/SIDP 2020).
+  // The backend already enforces this; this is a defensive client-side guard.
+  const options = frequency_options?.filter(
+    (o) => o.dose_mg >= 500 && o.auc24 >= 400 && o.auc24 <= 600
+  ) ?? [];
 
-  const doseMatch = recommended_dose.match(/^([\d.]+)\s*(.*)$/);
-  const doseValue = doseMatch?.[1] ?? recommended_dose;
-  const doseUnit = doseMatch?.[2] || "mg";
+  const [activeIdx, setActiveIdx] = useState<number>(() => {
+    if (!recommended_dose || !recommended_interval_hours) return 0;
+    const recDose = Number.parseFloat(recommended_dose);
+    const idx = options.findIndex(
+      (o) => o.dose_mg === recDose && o.interval_hours === recommended_interval_hours
+    );
+    return idx >= 0 ? idx : 0;
+  });
 
-  const subline = `Infuse over ${recommended_infusion_duration_hours || "1"} hour${
-    (recommended_infusion_duration_hours ?? 1) === 1 ? "" : "s"
-  }.`;
+  if (!recommended_dose || !recommended_interval_hours) return null;
 
-  const interpretation = calculationDetails?.review_status?.banner_body || "Calculated optimal regimen based on patient parameters.";
+  const active = options[activeIdx] ?? null;
+  const displayDose = active ? String(active.dose_mg) : recommended_dose;
+  const displayInterval = active ? active.interval_hours : recommended_interval_hours;
+  const displayInfusionHours = active?.infusion_duration_hours ?? recommended_infusion_duration_hours ?? 1;
+  const displayAUC = active?.auc24 ?? null;
+  const range = displayAUC != null ? aucRangeLabel(displayAUC) : null;
 
-  const options = frequency_options?.filter((o) => o.dose_mg > 0) ?? [];
+  const subline = `Infuse over ${displayInfusionHours} hour${displayInfusionHours === 1 ? "" : "s"}.`;
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1">
-        {/* Primary recommendation */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="tracking-tight">
-            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              <span className="text-4xl font-bold text-slate-950 tabular-nums">{doseValue}</span>
-              <span className="text-xl font-semibold text-slate-600">{doseUnit}</span>
-              <span className="text-lg font-medium text-slate-500">every</span>
-              <span className="text-4xl font-bold text-slate-950 tabular-nums">{recommended_interval_hours}</span>
-              <span className="text-xl font-semibold text-slate-600">hours</span>
+    <div className="flex flex-col gap-3">
+      {/* Frequency tabs — horizontal scrollable */}
+      {options.length > 1 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+          {options.map((opt, idx) => {
+            const r = aucRangeLabel(opt.auc24);
+            const isActive = idx === activeIdx;
+            return (
+              <button
+                key={`${opt.dose_mg}-q${opt.interval_hours}`}
+                type="button"
+                onClick={() => {
+                  setActiveIdx(idx);
+                  onSelectFrequency?.(opt);
+                }}
+                className="shrink-0 flex flex-col items-center border px-3 py-2 text-center text-xs transition"
+                style={
+                  isActive
+                    ? { background: "#00ff41", borderColor: "#00ff41", color: "#000000", fontFamily: "'Share Tech Mono', monospace" }
+                    : { background: "#000000", borderColor: "#003b00", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }
+                }
+              >
+                <span className="font-bold tabular-nums text-sm" style={isActive ? { color: "#000000" } : { color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }}>
+                  {opt.dose_mg} mg
+                </span>
+                <span className="font-medium" style={isActive ? { color: "#000000" } : { color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>
+                  q{opt.interval_hours}h
+                </span>
+                <span
+                  className="mt-1 inline-flex border px-1.5 py-0.5 text-[10px] font-semibold leading-none"
+                  style={isActive
+                    ? { borderColor: "rgba(0,0,0,0.3)", background: "rgba(0,0,0,0.15)", color: "#000000", fontFamily: "'Share Tech Mono', monospace" }
+                    : { borderColor: "rgba(0,255,65,0.3)", background: "rgba(0,255,65,0.05)", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }
+                  }
+                >
+                  {r.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Active dose display */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1">
+          <div
+            className="px-4 py-3"
+            style={{
+              background: "#000000",
+              border: "1px solid rgba(0,255,65,0.4)",
+              boxShadow: "0 0 16px rgba(0,255,65,0.06)",
+            }}
+          >
+            <div className="flex flex-wrap items-baseline gap-x-1.5">
+              <span
+                className="text-4xl font-extrabold tabular-nums mx-glow"
+                style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 12px rgba(0,255,65,0.8)" }}
+              >
+                {displayDose}
+              </span>
+              <span className="text-xl font-semibold" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>mg</span>
+              <span className="text-base font-medium mx-1" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>every</span>
+              <span
+                className="text-4xl font-extrabold tabular-nums mx-glow"
+                style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 12px rgba(0,255,65,0.8)" }}
+              >
+                {displayInterval}
+              </span>
+              <span className="text-xl font-semibold" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>h</span>
             </div>
-            <p className="mt-3 text-sm leading-6 text-slate-600">{subline}</p>
+            <p className="mt-1 text-xs" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>{subline}</p>
+            {displayAUC != null && range && (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-xs" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>AUC24</span>
+                <span className="tabular-nums text-sm font-bold" style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }}>{displayAUC}</span>
+                <span className="text-xs" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>mg·h/L</span>
+                <span className="inline-flex border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider" style={{ borderColor: "rgba(0,255,65,0.4)", background: "rgba(0,255,65,0.06)", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>
+                  {range.label}
+                </span>
+              </div>
+            )}
           </div>
+        </div>
+        <div className="flex flex-col gap-2 shrink-0">
           {draftDiffersFromCalculated && onApplyRecommendation && (
             <button
               type="button"
               onClick={onApplyRecommendation}
-              className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-sm font-semibold text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100"
+              className="px-3 py-1.5 text-xs font-semibold transition"
+              style={{ border: "1px solid rgba(0,255,65,0.4)", background: "rgba(0,255,65,0.05)", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}
             >
-              Apply to Inputs
+              [APPLY RECOMMENDED]
             </button>
           )}
         </div>
-
-        {/* Frequency options */}
-        {options.length > 1 && (
-          <div className="mt-4">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Frequency options</p>
-            <div className="grid gap-2">
-              {options.map((opt) => {
-                const isActive = opt.dose_mg === Number(doseValue) && opt.interval_hours === recommended_interval_hours;
-                const range = aucRangeLabel(opt.auc24);
-                return (
-                  <button
-                    key={`${opt.dose_mg}-q${opt.interval_hours}`}
-                    type="button"
-                    onClick={() => !isActive && onSelectFrequency?.(opt)}
-                    className={`flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left text-sm transition ${
-                      isActive
-                        ? "border-cyan-300 bg-cyan-50 ring-1 ring-cyan-200"
-                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-                    }`}
-                  >
-                    <div className="flex items-baseline gap-2 min-w-0">
-                      <span className={`font-bold tabular-nums ${isActive ? "text-cyan-800" : "text-slate-900"}`}>
-                        {opt.dose_mg} mg
-                      </span>
-                      <span className="text-slate-500 font-medium">q{opt.interval_hours}h</span>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="tabular-nums text-xs text-slate-500">
-                        AUC {opt.auc24}
-                      </span>
-                      <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${range.color}`}>
-                        {range.label}
-                      </span>
-                      {isActive && (
-                        <span className="inline-flex rounded-full bg-cyan-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
-                          Selected
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {infusion_safety_note && (
-           <div className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm text-amber-800">
-             <strong>Note:</strong> {infusion_safety_note}
-           </div>
-        )}
       </div>
-      <div className="mt-4 border-t border-slate-200 pt-3 text-sm text-slate-700">
-        <p>
-          <span className="mr-1.5 font-semibold text-slate-800">Interpretation:</span>
-          {interpretation}
+
+      {infusion_safety_note && (
+        <div className="rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+          <strong>Note:</strong> {infusion_safety_note}
+        </div>
+      )}
+
+      {calculationDetails?.review_status?.banner_body && (
+        <p className="text-xs leading-5 pt-2" style={{ color: "#1a5c1a", borderTop: "1px solid #003b00", fontFamily: "'Share Tech Mono', monospace" }}>
+          {calculationDetails.review_status.banner_body}
         </p>
-      </div>
+      )}
     </div>
   );
 }

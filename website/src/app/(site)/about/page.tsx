@@ -8,18 +8,18 @@ export default function AboutPage() {
       {/* 1. Page introduction */}
       <section className="mb-16">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          About Vancomyzer
+          About Vancomyzer™
         </h1>
         <p className="mt-4 text-gray-600">
-          Vancomyzer is designed to help clinicians review vancomycin dosing
+          Vancomyzer™ is designed to help clinicians review vancomycin dosing
           workflow with greater clarity, interpretability, and transparency.
         </p>
       </section>
 
-      {/* 2. Why Vancomyzer exists */}
+      {/* 2. Why Vancomyzer™ exists */}
       <section className="mb-16">
         <h2 className="text-xl font-semibold text-gray-900">
-          Why Vancomyzer exists
+          Why Vancomyzer™ exists
         </h2>
         <p className="mt-3 text-gray-600">
           Vancomycin dosing can be hard to interpret. Clinicians benefit from

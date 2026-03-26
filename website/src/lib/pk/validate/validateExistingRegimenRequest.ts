@@ -2,6 +2,7 @@ import type { NormalizedPatient, NormalizedRegimen, NormalizedLevel } from "../t
 
 const TIMING_TOLERANCE_HOURS = 0.25;
 const MIN_POST_INFUSION_LEVEL_HOURS = 0.5;
+const MIN_POST_INFUSION_PULSE_DOSE_HOURS = 2.0; // ASHP 2020: post-distributive phase for single-dose Bayesian
 const MAX_INFUSION_FRACTION_OF_INTERVAL = 0.8;
 
 export type ValidationResult =
@@ -84,8 +85,6 @@ export function validateExistingRegimenRequest(
   const field_errors: Record<string, string> = {};
 
   if (patient.age < 0 || Number.isNaN(patient.age)) field_errors["patient.age"] = "Must be a non-negative number.";
-  if (!patient.sex?.trim()) field_errors["patient.sex"] = "Required.";
-  if (patient.height_cm <= 0 || Number.isNaN(patient.height_cm)) field_errors["patient.height_cm"] = "Must be a positive number.";
   if (patient.weight_kg <= 0 || Number.isNaN(patient.weight_kg)) field_errors["patient.weight_kg"] = "Must be a positive number.";
   if (patient.serum_creatinine_mg_dl <= 0 || Number.isNaN(patient.serum_creatinine_mg_dl)) field_errors["patient.serum_creatinine_mg_dl"] = "Must be a positive number greater than 0.";
 
@@ -101,6 +100,7 @@ export function validateExistingRegimenRequest(
   }
 
   const interval_hours = regimen.interval_hours;
+  const isPulseDose = regimen.doses_given === 1;
   const infusion_hours = Math.min(
     Math.max(0, regimen.infusion_duration_hours),
     interval_hours || 1
@@ -117,16 +117,20 @@ export function validateExistingRegimenRequest(
       if (l.time_since_last_dose_hours < 0) {
         field_errors[`levels[${i}].time_since_last_dose_hours`] = "Must be non-negative.";
       }
-      if (interval_hours > 0 && l.time_since_last_dose_hours > interval_hours) {
+      // For steady-state (not pulse dose), the level must be within the dosing interval.
+      if (!isPulseDose && interval_hours > 0 && l.time_since_last_dose_hours > interval_hours) {
         field_errors[`levels[${i}].time_since_last_dose_hours`] =
           "Must be within the dosing interval for a repeating steady-state regimen (time_since_last_dose_hours ≤ interval_hours).";
       }
       if (l.time_since_last_dose_hours < infusion_hours) {
         field_errors[`levels[${i}].time_since_last_dose_hours`] =
           "Levels drawn during infusion are not interpreted safely by this steady-state model; collect after infusion completion.";
+      } else if (isPulseDose && l.time_since_last_dose_hours < infusion_hours + MIN_POST_INFUSION_PULSE_DOSE_HOURS) {
+        field_errors[`levels[${i}].time_since_last_dose_hours`] =
+          `For single-dose Bayesian estimation, collect the level at least ${MIN_POST_INFUSION_PULSE_DOSE_HOURS} h after infusion completion to ensure the sample is in the post-distributive elimination phase (ASHP/IDSA/SIDP 2020).`;
       } else if (
-        l.time_since_last_dose_hours <
-        infusion_hours + MIN_POST_INFUSION_LEVEL_HOURS
+        !isPulseDose &&
+        l.time_since_last_dose_hours < infusion_hours + MIN_POST_INFUSION_LEVEL_HOURS
       ) {
         field_errors[`levels[${i}].time_since_last_dose_hours`] =
           `Levels drawn within ${MIN_POST_INFUSION_LEVEL_HOURS} h of infusion completion are too timing-sensitive for this simple steady-state model; collect later in the interval.`;
@@ -148,19 +152,28 @@ export function validateExistingRegimenRequest(
         const t2 = parsedCollectionTimes[j];
         if (t1 == null || t2 == null || Number.isNaN(t1) || Number.isNaN(t2)) continue;
 
-        const observedDelta = t2 - t1;
+        const observedDelta = t2 - t1; // hours between collection times
+
+        // Levels may be from different dose cycles (e.g. peak from dose N, trough from dose N+1).
+        // Normalize the observed delta to be within ±interval to find the within-cycle offset.
+        const normalizedDelta = observedDelta % interval_hours;
         const reportedDelta =
           levels[j].time_since_last_dose_hours - levels[i].time_since_last_dose_hours;
 
-        if (Math.abs(observedDelta) > interval_hours + TIMING_TOLERANCE_HOURS) {
+        // Allow levels spanning up to 3 dosing intervals (common in clinical practice)
+        if (observedDelta > 3 * interval_hours + TIMING_TOLERANCE_HOURS) {
           field_errors[`levels[${j}].collection_time`] =
-            "Collection times span more than one dosing interval; this simple repeating steady-state model cannot interpret missed/held-dose or cross-interval timing safely.";
+            "Collection times span more than 3 dosing intervals — please verify dates are correct.";
           continue;
         }
 
-        if (Math.abs(observedDelta - reportedDelta) > TIMING_TOLERANCE_HOURS) {
+        // Check that reported time_since_last_dose_hours is consistent with collection timestamps
+        // accounting for the fact that levels may come from different dose cycles
+        const cycleOffset = Math.round(observedDelta / interval_hours) * interval_hours;
+        const expectedReportedDelta = observedDelta - cycleOffset;
+        if (Math.abs(expectedReportedDelta - reportedDelta) > TIMING_TOLERANCE_HOURS + 0.5) {
           field_errors[`levels[${j}].collection_time`] =
-            "Collection time is inconsistent with reported time_since_last_dose_hours for the same steady-state dosing interval.";
+            "Collection time is inconsistent with reported time post-dose. Check that each level's dose time is the most recent dose before that level was drawn.";
         }
       }
     }

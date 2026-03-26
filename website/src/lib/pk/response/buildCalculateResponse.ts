@@ -1,5 +1,7 @@
-import type { ExistingRegimenEngineOutput, AdjustmentRecommendation } from "../types";
+import type { ExistingRegimenEngineOutput, AdjustmentRecommendation, ExplanationInput } from "../types";
 import { buildExistingRegimenReviewStatus } from "./buildReviewStatus";
+import { buildDocumentationPreview } from "../explain/buildDocumentationPreview";
+import { buildInterpretationSummary } from "../explain/buildInterpretationSummary";
 
 export interface ExistingRegimenExplainOutput {
   interpretation_summary: string;
@@ -16,6 +18,39 @@ export function buildCalculateResponse(
 ): Record<string, unknown> {
   const review_status = buildExistingRegimenReviewStatus(engineOutput);
 
+  // Enrich each frequency option with per-option documentation so the frontend
+  // can sync ALL output sections (interpretation text, quick summary, clinical note)
+  // to whichever dose option the pharmacist has selected.
+  const enrichedFrequencyOptions = (recommendation.frequency_options ?? []).map((opt) => {
+    const optInput: ExplanationInput = {
+      engineOutput: {
+        ...engineOutput,
+        // Override the AUC/peak/trough with this option's forward-predicted values
+        auc24: opt.auc24,
+        peak: opt.peak,
+        trough: opt.trough,
+      },
+      recommendation: {
+        ...recommendation,
+        recommended_dose: String(opt.dose_mg),
+        recommended_interval_hours: opt.interval_hours,
+        recommended_infusion_duration_hours: opt.infusion_duration_hours,
+        // Safety-adjusted infusion note is specific to the primary recommendation;
+        // option infusion durations are already computed correctly by the backend.
+        infusion_duration_adjusted_for_safety: false,
+        infusion_safety_note: undefined,
+      },
+    };
+    const optDocs = buildDocumentationPreview(optInput);
+    const optInterpretation = buildInterpretationSummary(optInput);
+    return {
+      ...opt,
+      interpretation_summary: optInterpretation,
+      quick_summary: optDocs.quick_summary,
+      clinical_note: optDocs.clinical_note,
+    };
+  });
+
   return {
     recommendation_type,
     auc24: engineOutput.auc24,
@@ -31,7 +66,7 @@ export function buildCalculateResponse(
     limitations: explain.limitations,
     curve: engineOutput.curve,
     measured_levels: engineOutput.measured_levels,
-    frequency_options: recommendation.frequency_options ?? [],
+    frequency_options: enrichedFrequencyOptions,
     calculation_details: {
       method: engineOutput.used_posterior_refinement
         ? "Adult prior model with bounded first-pass posterior refinement in a two-compartment intermittent steady-state workflow"
@@ -54,7 +89,7 @@ export function buildCalculateResponse(
             : "Multi-level workflow fit with explicit chronology; review still depends on coherent same-interval timing.",
       review_status,
       key_inputs: [
-        `Cockcroft-Gault CrCl ${engineOutput.crcl} mL/min`,
+        `SCr ${engineOutput.scr} mg/dL (Colin 2019 direct renal covariate)`,
         `${engineOutput.level_count} measured level${engineOutput.level_count === 1 ? "" : "s"}`,
         `Current regimen ${engineOutput.current_regimen_dose_mg} mg q${engineOutput.current_regimen_interval_hours}h`,
       ],
@@ -71,4 +106,3 @@ export function buildCalculateResponse(
     documentation_preview: explain.documentation_preview,
   };
 }
-

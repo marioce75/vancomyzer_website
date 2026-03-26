@@ -1,6 +1,7 @@
 import type { ExistingRegimenEngineOutput, AdjustmentRecommendation, FrequencyOption } from "../types";
 import { simulateCandidateExposure } from "./simulateCandidateExposure";
 import { computeSafeInfusionDurationHours } from "./infusionSafety";
+import { curvePoints } from "../steadyStateTwoCompartment";
 
 const TARGET_AUC24_LOW = 400;
 const TARGET_AUC24_HIGH = 600;
@@ -130,7 +131,8 @@ function boundedSparseHighExposureRecommendation(output: ExistingRegimenEngineOu
 function collectFrequencyOptions(
   CL: number, V1: number, Q: number, V2: number,
   infusion_hours: number,
-  recommended: { dose_mg: number; interval_hours: number }
+  recommended: { dose_mg: number; interval_hours: number },
+  targetAucMid: number = TARGET_AUC24_MID
 ): FrequencyOption[] {
   const allCandidates: { dose_mg: number; interval_hours: number; auc24: number; peak: number; trough: number; inRange: boolean }[] = [];
 
@@ -165,18 +167,27 @@ function collectFrequencyOptions(
   byInterval.forEach((group, interval) => {
     const sorted = [...group].sort((a, b) => {
       if (a.inRange !== b.inRange) return a.inRange ? -1 : 1;
-      return Math.abs(a.auc24 - TARGET_AUC24_MID) - Math.abs(b.auc24 - TARGET_AUC24_MID);
+      return Math.abs(a.auc24 - targetAucMid) - Math.abs(b.auc24 - targetAucMid);
     });
     const pick = sorted[0];
+    // Only emit options where the best available dose lands in the therapeutic window.
+    // ASHP/IDSA/SIDP 2020: AUC24 target 400–600 mg·h/L. Never display out-of-range options.
+    if (!pick.inRange) return;
     const infusion = computeSafeInfusionDurationHours(pick.dose_mg);
+    const T_inf = infusion.infusion_duration_hours;
+    const optCurve = curvePoints(
+      { CL, V1, Q, V2, dose_mg: pick.dose_mg, tau: interval, T_inf },
+      0.25
+    );
     options.push({
       dose_mg: pick.dose_mg,
       interval_hours: interval,
       auc24: Math.round(pick.auc24 * 10) / 10,
       peak: Math.round(pick.peak * 10) / 10,
       trough: Math.round(pick.trough * 10) / 10,
-      infusion_duration_hours: infusion.infusion_duration_hours,
+      infusion_duration_hours: T_inf,
       is_recommended: pick.dose_mg === recommended.dose_mg && interval === recommended.interval_hours,
+      curve: optCurve,
     });
   });
 
@@ -185,8 +196,11 @@ function collectFrequencyOptions(
 }
 
 export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutput): AdjustmentRecommendation {
-  const { auc24, current_regimen_dose_mg, current_regimen_interval_hours, CL, V1, Q, V2, current_regimen_infusion_hours, posterior_fit, level_count } = output;
+  const { auc24, current_regimen_dose_mg, current_regimen_interval_hours, CL, V1, Q, V2, current_regimen_infusion_hours, posterior_fit, level_count, doses_given, target_auc24 } = output;
   const infusion_hours = current_regimen_infusion_hours ?? 1;
+  const isPulseDose = doses_given === 1;
+  // For pulse dose, target the user-specified AUC₂₄ (default 450 per ASHP guidelines for initial dosing)
+  const targetAucMid = isPulseDose ? (target_auc24 ?? 450) : TARGET_AUC24_MID;
   const weakEvidenceRecommendation =
     posterior_fit?.fit_quality === "weak" ||
     posterior_fit?.uncertainty_label === "high" ||
@@ -201,7 +215,7 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
 
   let base: AdjustmentRecommendation;
 
-  if (weakEvidenceRecommendation) {
+  if (!isPulseDose && weakEvidenceRecommendation) {
     if (isClearlySupraTherapeuticSparseCase(output)) {
       base = boundedSparseHighExposureRecommendation(output) ?? conservativeSameIntervalDose(current_regimen_dose_mg, current_regimen_interval_hours, auc24, current_regimen_infusion_hours);
     } else {
@@ -235,23 +249,32 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
     const inRangeCandidates = candidates.filter((candidate) => candidate.auc24 >= TARGET_AUC24_LOW && candidate.auc24 <= TARGET_AUC24_HIGH);
     if (inRangeCandidates.length > 0) {
       inRangeCandidates.sort((a, b) => {
-        const aucDelta = Math.abs(a.auc24 - TARGET_AUC24_MID) - Math.abs(b.auc24 - TARGET_AUC24_MID);
+        const aucDelta = Math.abs(a.auc24 - targetAucMid) - Math.abs(b.auc24 - targetAucMid);
         if (aucDelta !== 0) return aucDelta;
-        if (a.sameInterval !== b.sameInterval) return a.sameInterval ? -1 : 1;
-        if (a.intervalDistance !== b.intervalDistance) return a.intervalDistance - b.intervalDistance;
+        // For pulse dose, no current interval to prefer — rank by shorter interval for convenience
+        if (!isPulseDose) {
+          if (a.sameInterval !== b.sameInterval) return a.sameInterval ? -1 : 1;
+          if (a.intervalDistance !== b.intervalDistance) return a.intervalDistance - b.intervalDistance;
+        } else {
+          if (a.interval_hours !== b.interval_hours) return a.interval_hours - b.interval_hours;
+        }
         return a.dailyDose - b.dailyDose;
       });
       base = finalizeRecommendation(inRangeCandidates[0].dose_mg, inRangeCandidates[0].interval_hours, infusion_hours);
     } else if (candidates.length > 0) {
       candidates.sort((a, b) => {
-        const aPenalty = Math.abs(a.auc24 - TARGET_AUC24_MID);
-        const bPenalty = Math.abs(b.auc24 - TARGET_AUC24_MID);
+        const aPenalty = Math.abs(a.auc24 - targetAucMid);
+        const bPenalty = Math.abs(b.auc24 - targetAucMid);
         if (aPenalty !== bPenalty) return aPenalty - bPenalty;
         const aSafetyPenalty = Math.max(0, a.trough - 20) + Math.max(0, a.peak - 40) * 0.25;
         const bSafetyPenalty = Math.max(0, b.trough - 20) + Math.max(0, b.peak - 40) * 0.25;
         if (aSafetyPenalty !== bSafetyPenalty) return aSafetyPenalty - bSafetyPenalty;
-        if (a.sameInterval !== b.sameInterval) return a.sameInterval ? -1 : 1;
-        if (a.intervalDistance !== b.intervalDistance) return a.intervalDistance - b.intervalDistance;
+        if (!isPulseDose) {
+          if (a.sameInterval !== b.sameInterval) return a.sameInterval ? -1 : 1;
+          if (a.intervalDistance !== b.intervalDistance) return a.intervalDistance - b.intervalDistance;
+        } else {
+          if (a.interval_hours !== b.interval_hours) return a.interval_hours - b.interval_hours;
+        }
         return a.dailyDose - b.dailyDose;
       });
       base = finalizeRecommendation(candidates[0].dose_mg, candidates[0].interval_hours, infusion_hours);
@@ -266,7 +289,8 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
   const recDose = Number.parseFloat(base.recommended_dose);
   base.frequency_options = collectFrequencyOptions(
     CL, V1, Q, V2, infusion_hours,
-    { dose_mg: Number.isFinite(recDose) ? recDose : current_regimen_dose_mg, interval_hours: base.recommended_interval_hours }
+    { dose_mg: Number.isFinite(recDose) ? recDose : current_regimen_dose_mg, interval_hours: base.recommended_interval_hours },
+    targetAucMid
   );
 
   return base;

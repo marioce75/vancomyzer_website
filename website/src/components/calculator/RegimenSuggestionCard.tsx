@@ -13,11 +13,14 @@ interface RegimenSuggestionCardProps {
   statMode?: boolean;
 }
 
-function estimateCrCl(patient: CalculateRequestPatient): number | null {
-  const { age, weight_kg, serum_creatinine_mg_dl, sex } = patient;
-  if (!age || !weight_kg || !serum_creatinine_mg_dl || !sex) return null;
-  const base = ((140 - age) * weight_kg) / (72 * serum_creatinine_mg_dl);
-  return sex === "female" ? base * 0.85 : base;
+function estimateScrBasedInterval(patient: CalculateRequestPatient): number | null {
+  const { age, weight_kg, serum_creatinine_mg_dl } = patient;
+  if (!age || !weight_kg || !serum_creatinine_mg_dl) return null;
+  // Simple SCr-based heuristic: higher SCr → longer interval
+  if (serum_creatinine_mg_dl >= 3.0) return 48;
+  if (serum_creatinine_mg_dl >= 2.0) return 36;
+  if (serum_creatinine_mg_dl >= 1.5) return 24;
+  return 12;
 }
 
 function roundedDose(weight: number): number {
@@ -28,11 +31,11 @@ function roundedDose(weight: number): number {
 }
 
 export default function RegimenSuggestionCard({ mode, patient, onApply, statMode = false }: RegimenSuggestionCardProps) {
-  const crcl = estimateCrCl(patient);
+  const interval = estimateScrBasedInterval(patient);
   const baseDose = roundedDose(patient.weight_kg);
   const suggestion: CalculateRequestRegimen = {
     dose_mg: baseDose,
-    interval_hours: crcl == null ? 12 : crcl >= 60 ? 12 : crcl >= 30 ? 24 : 36,
+    interval_hours: interval ?? 12,
     infusion_duration_hours: baseDose >= 1250 ? 1.5 : 1,
   };
 

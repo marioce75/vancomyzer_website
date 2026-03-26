@@ -7,8 +7,6 @@ function assert(condition: boolean, message: string): void {
 function testProducesNonZeroExposure(): void {
   const result = computeInitialRegimen({
     age: 55,
-    sex: "male",
-    height_cm: 170,
     weight_kg: 70,
     serum_creatinine_mg_dl: 1.0,
   });
@@ -53,40 +51,32 @@ function testProducesNonZeroExposure(): void {
   );
 }
 
-function testHeightAffectsPriorVolumeAndExposure(): void {
-  const shorter = computeInitialRegimen({
+function testScrAffectsClearanceAndExposure(): void {
+  const normalScr = computeInitialRegimen({
     age: 55,
-    sex: "male",
-    height_cm: 160,
     weight_kg: 70,
-    serum_creatinine_mg_dl: 1.0,
+    serum_creatinine_mg_dl: 0.8,
   });
-  const taller = computeInitialRegimen({
+  const elevatedScr = computeInitialRegimen({
     age: 55,
-    sex: "male",
-    height_cm: 190,
     weight_kg: 70,
-    serum_creatinine_mg_dl: 1.0,
+    serum_creatinine_mg_dl: 2.5,
   });
 
   assert(
-    Math.abs(shorter.peak - taller.peak) > 0.1 || Math.abs(shorter.auc24 - taller.auc24) > 1,
-    "Initial regimen should use height-sensitive prior volume rather than ignoring height."
+    Math.abs(normalScr.auc24 - elevatedScr.auc24) > 10,
+    "Initial regimen should respond to SCr as a direct Colin 2019 renal covariate."
   );
 }
 
 function testObesityAwareCrClSelectionChangesInitialRecommendation(): void {
   const nonObese = computeInitialRegimen({
     age: 60,
-    sex: "male",
-    height_cm: 175,
     weight_kg: 78,
     serum_creatinine_mg_dl: 1.2,
   });
   const obese = computeInitialRegimen({
     age: 60,
-    sex: "male",
-    height_cm: 175,
     weight_kg: 130,
     serum_creatinine_mg_dl: 1.2,
   });
@@ -95,15 +85,13 @@ function testObesityAwareCrClSelectionChangesInitialRecommendation(): void {
     nonObese.recommended_interval_hours !== obese.recommended_interval_hours ||
       nonObese.recommended_dose !== obese.recommended_dose ||
       Math.abs(nonObese.auc24 - obese.auc24) > 5,
-    "Initial regimen should respond to obesity-aware Cockcroft-Gault weight selection rather than using raw actual body weight for all patients."
+    "Initial regimen should respond to weight differences via the Colin 2019 allometric weight scaling."
   );
 }
 
 function testLoadingDoseGuidanceIsPresentAndBounded(): void {
   const result = computeInitialRegimen({
     age: 50,
-    sex: "female",
-    height_cm: 165,
     weight_kg: 140,
     serum_creatinine_mg_dl: 0.9,
   });
@@ -129,8 +117,6 @@ function testLoadingDoseGuidanceIsPresentAndBounded(): void {
 function testLowBodyWeightLoadingDoseIsNotArtificiallyFloored(): void {
   const result = computeInitialRegimen({
     age: 45,
-    sex: "female",
-    height_cm: 150,
     weight_kg: 30,
     serum_creatinine_mg_dl: 0.8,
   });
@@ -148,7 +134,7 @@ function testLowBodyWeightLoadingDoseIsNotArtificiallyFloored(): void {
 
 export function runInitialRegimenIntegrationTests(): void {
   testProducesNonZeroExposure();
-  testHeightAffectsPriorVolumeAndExposure();
+  testScrAffectsClearanceAndExposure();
   testObesityAwareCrClSelectionChangesInitialRecommendation();
   testLoadingDoseGuidanceIsPresentAndBounded();
   testLowBodyWeightLoadingDoseIsNotArtificiallyFloored();

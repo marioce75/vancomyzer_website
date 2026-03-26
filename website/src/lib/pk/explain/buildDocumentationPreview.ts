@@ -50,7 +50,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
     auc24,
     peak,
     trough,
-    crcl,
+    scr,
     used_posterior_refinement,
     posterior_fit,
   } = engineOutput;
@@ -66,7 +66,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
     changeSummary,
     ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
     ...(recommendation.infusion_duration_adjusted_for_safety && recommendation.infusion_safety_note ? [recommendation.infusion_safety_note] : []),
-    `CrCl: ${crcl} mL/min. Fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Assumptions and limitations apply.`,
+    `SCr: ${scr} mg/dL (Colin 2019 renal covariate). Fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Assumptions and limitations apply.`,
   ].join("\n");
 
   const clinical_note = [
@@ -75,7 +75,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
     `Recommendation: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1} h.`,
     changeSummary,
     ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
-    `CrCl: ${crcl} mL/min (Cockcroft-Gault). Explicit adult prior model: Colin 2019 two-compartment; ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`,
+    `SCr: ${scr} mg/dL (direct Colin 2019 covariate — no Cockcroft-Gault). Explicit adult prior model: Colin 2019 two-compartment; ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`,
     `Posterior fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"} (${posterior_fit?.fit_quality_reason ?? "no measured levels available"}). Uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Sparse levels do not justify overconfident patient-specific precision.`,
   ].join("\n");
 

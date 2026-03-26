@@ -39,7 +39,7 @@ function buildSparseHighExposureNote(input: ExplanationInput): string {
 
 export function buildInterpretationSummary(input: ExplanationInput): string {
   const { engineOutput, recommendation } = input;
-  const { auc24, peak, trough, crcl, current_regimen_dose_mg, current_regimen_interval_hours, data_quality_note, used_posterior_refinement, posterior_fit } = engineOutput;
+  const { auc24, peak, trough, scr, current_regimen_dose_mg, current_regimen_interval_hours, data_quality_note, used_posterior_refinement, posterior_fit } = engineOutput;
 
   const estimateType = used_posterior_refinement
     ? posterior_fit?.uncertainty_label === "high"
@@ -61,7 +61,7 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
   return (
     `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. ` +
     `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
-    `One-compartment model (CrCl ${crcl} mL/min). ` +
+    `One-compartment model (SCr ${scr} mg/dL). ` +
     `Recommended adjustment: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${infusionDuration} h. ` +
     `${changeExplanation} ` +
     `Fit quality ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty ${posterior_fit?.uncertainty_label ?? "population_only"}.` +

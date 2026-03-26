@@ -86,16 +86,24 @@ export default function TrustEvidencePage() {
 
         <details className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
           <summary className="cursor-pointer text-sm font-medium text-slate-900">
-            CASE-003 — sparse data example
+            CASE-003 — sparse data example (58 y/o, 82 kg, SCr 1.4 mg/dL)
           </summary>
           <div className="mt-3 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
             <div className="grid gap-3 sm:grid-cols-2">
               <p><span className="font-medium text-slate-900">Inputs used:</span> adult characteristics, intermittent regimen, limited measured levels</p>
-              <p><span className="font-medium text-slate-900">Method:</span> bounded adult prior with first-pass level refinement in scoped workflow</p>
+              <p><span className="font-medium text-slate-900">Method:</span> Colin 2019 population PK model with first-pass level refinement in scoped workflow</p>
               <p><span className="font-medium text-slate-900">Suggested regimen for review:</span> keep interpretation cautious until data quality is confirmed</p>
               <p><span className="font-medium text-slate-900">Why this appeared:</span> sparse data may shift the estimate, but uncertainty remains clinically important</p>
               <p><span className="font-medium text-slate-900">Assumptions:</span> dose timing and level chronology are coherent enough for scoped interpretation</p>
               <p><span className="font-medium text-slate-900">Limitations / safety notes:</span> sparse or mistimed levels may justify repeat sampling rather than regimen change</p>
+            </div>
+            <div className="mt-4">
+              <Link
+                href="/calculator?age=58&weight_kg=82&serum_creatinine_mg_dl=1.4"
+                className="inline-flex items-center gap-1 rounded-md bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+              >
+                Try the sample case in the calculator →
+              </Link>
             </div>
           </div>
         </details>
@@ -104,7 +112,7 @@ export default function TrustEvidencePage() {
       <section className="mb-12 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-2xl font-semibold text-slate-950">Evidence-aware communication</h2>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Vancomyzer is designed to support review of vancomycin dosing workflow with clearer interpretability. It is not presented here as clinically validated, FDA-cleared, outcome-improving, or superior to other dosing tools.
+          Vancomyzer™ is designed to support review of vancomycin dosing workflow with clearer interpretability. It is not presented here as clinically validated, FDA-cleared, outcome-improving, or superior to other dosing tools.
         </p>
         <details className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
           <summary className="cursor-pointer text-sm font-medium text-slate-900">
@@ -148,9 +156,8 @@ export default function TrustEvidencePage() {
           >
             Open the calculator
           </Link>
-          <CTA variant="documentationSummary" />
+          <CTA variant="sampleCase" />
           <CTA variant="contact" />
-          <CTA variant="requestEvaluation" />
         </div>
       </section>
     </div>

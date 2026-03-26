@@ -18,10 +18,17 @@ export function buildLimitations(input: ExplanationInput): string[] {
         "Clinical judgment and levels-based reassessment remain essential.",
       ];
 
+  const isPulseDose = engineOutput.doses_given === 1;
+
   if (engineOutput.level_count === 1 && !usedRefinement) {
     items.unshift("Single level limits precision; adjustment is a first-pass estimate.");
   }
-  items.unshift("Levels drawn during infusion or too close to infusion completion are not interpreted by this simple steady-state model and should be recollected later in the interval.");
+  if (isPulseDose) {
+    items.unshift("Bayesian estimate based on single pre-steady-state level — monitor and confirm with a follow-up level after additional doses.");
+    items.unshift("Pulse-dose / single-dose workflow: projected AUC24 and recommended maintenance dose assume steady-state PK will match the individual parameters estimated from this one level.");
+  } else {
+    items.unshift("Levels drawn during infusion or too close to infusion completion are not interpreted by this simple steady-state model and should be recollected later in the interval.");
+  }
   items.unshift("Near-continuous infusion regimens are outside this intermittent steady-state model; infusion duration should remain materially shorter than the dosing interval.");
   if (engineOutput.level_count === 1 && usedRefinement) {
     items.unshift("Single level used for first-pass parameter refinement; posterior fit quality may be weak even when the model returns a bounded estimate.");

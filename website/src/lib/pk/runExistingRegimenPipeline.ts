@@ -14,15 +14,15 @@ import type { NormalizedPatient, ExplanationInput } from "./types";
 export interface ExistingRegimenPipelineInput {
   patient: {
     age?: unknown;
-    sex?: unknown;
     weight_kg?: unknown;
     serum_creatinine_mg_dl?: unknown;
-    height_cm?: unknown;
   };
   regimen: {
     dose_mg?: unknown;
     interval_hours?: unknown;
     infusion_duration_hours?: unknown;
+    doses_given?: unknown;
+    target_auc24?: unknown;
   };
   levels: Array<{
     value_mcg_ml?: unknown;

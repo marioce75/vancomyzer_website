@@ -7,8 +7,6 @@ export type CalculatorMode = "initial_regimen" | "existing_regimen";
 
 export interface CalculateRequestPatient {
   age: number;
-  sex: string;
-  height_cm: number;
   weight_kg: number;
   serum_creatinine_mg_dl: number;
 }
@@ -17,6 +15,8 @@ export interface CalculateRequestRegimen {
   dose_mg: number;
   interval_hours: number;
   infusion_duration_hours: number;
+  doses_given?: number; // number of doses administered before levels drawn; affects steady-state assumption
+  target_auc24?: number; // desired AUC₂₄ target for maintenance recommendation (pulse dose workflow)
 }
 
 export interface CalculateRequestLevel {
@@ -59,7 +59,12 @@ export interface FrequencyOption {
   peak: number;
   trough: number;
   infusion_duration_hours: number;
+  doses_given?: number;
   is_recommended: boolean;
+  curve?: { time_hours: number; concentration: number }[];
+  interpretation_summary?: string;
+  quick_summary?: string;
+  clinical_note?: string;
 }
 
 export interface CalculateResponse {

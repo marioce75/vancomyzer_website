@@ -19,7 +19,7 @@ export interface PosteriorEngineResult {
   V1: number;
   Q: number;
   V2: number;
-  crcl: number;
+  scr: number;
   success: boolean;
   diagnostics: PosteriorFitDiagnostics;
 }
@@ -35,7 +35,7 @@ export function runPosteriorEngine(
       V1: prior.V1,
       Q: prior.Q,
       V2: prior.V2,
-      crcl: prior.crcl,
+      scr: prior.scr,
       success: false,
       diagnostics: {
         observation_count: 0,
@@ -64,7 +64,7 @@ export function runPosteriorEngine(
       V1: prior.V1,
       Q: prior.Q,
       V2: prior.V2,
-      crcl: prior.crcl,
+      scr: prior.scr,
       success: false,
       diagnostics: fit.diagnostics,
     };
@@ -75,7 +75,7 @@ export function runPosteriorEngine(
     V1: fit.V1_posterior,
     Q: fit.Q_posterior,
     V2: fit.V2_posterior,
-    crcl: prior.crcl,
+    scr: prior.scr,
     success: true,
     diagnostics: fit.diagnostics,
   };

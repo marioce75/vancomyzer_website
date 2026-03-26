@@ -32,17 +32,30 @@ export function normalizeObservations(
     Math.max(0, regimen.infusion_duration_hours ?? 0),
     tau || 1
   );
+
+  // For pulse-dose (single dose given), the level may be drawn beyond one tau.
+  // Using time_hours % tau would wrap the time incorrectly and compute the
+  // wrong steady-state concentration. Instead, use an effectiveTau large enough
+  // that no modulo wrap occurs — this makes concentrationAtTime approximate a
+  // true single-dose profile (accumulation factor → 1 as tau → ∞).
+  const isPulseDose = regimen.doses_given === 1;
+  const maxLevelTime = levels.reduce(
+    (max, l) => Math.max(max, Math.max(0, l.time_since_last_dose_hours)),
+    0
+  );
+  const effectiveTau = isPulseDose ? Math.max(tau, maxLevelTime + 1) : tau;
+
   const observations: NormalizedObservation[] = levels.map((l) => {
     const time_hours = Math.max(0, l.time_since_last_dose_hours);
     const concentration = Math.max(0, l.value_mcg_ml);
     return {
       time_hours,
       concentration,
-      time_in_interval: timeInInterval(time_hours, tau),
+      time_in_interval: timeInInterval(time_hours, effectiveTau),
     };
   });
   return {
     observations,
-    context: { tau, T_inf },
+    context: { tau: effectiveTau, T_inf },
   };
 }

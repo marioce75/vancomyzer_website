@@ -37,51 +37,31 @@ function roundedDose(weightKg: number): number {
   return weightKg >= 100 ? 1750 : weightKg >= 80 ? 1500 : weightKg >= 60 ? 1000 : 750;
 }
 
-function idealBodyWeightKg(patient: Pick<CalculateRequestPatient, "sex" | "height_cm">): number {
-  const heightInches = (patient.height_cm || 170) / 2.54;
-  const inchesOverFiveFeet = Math.max(0, heightInches - 60);
-  const sex = (patient.sex || "male").toLowerCase();
-  const base = sex === "female" ? 45.5 : 50;
-  return Math.max(30, base + 2.3 * inchesOverFiveFeet);
-}
-
-function adjustedBodyWeightKg(actualWeightKg: number, idealWeightKg: number): number {
-  return idealWeightKg + 0.4 * Math.max(0, actualWeightKg - idealWeightKg);
-}
-
-function cockcroftGaultWeightKg(patient: CalculateRequestPatient): number {
-  const actualWeightKg = Math.max(patient.weight_kg || 80, 30);
-  const idealWeightKg = idealBodyWeightKg(patient);
-
-  if (actualWeightKg < idealWeightKg) {
-    return actualWeightKg;
-  }
-  if (actualWeightKg > idealWeightKg * 1.2) {
-    return adjustedBodyWeightKg(actualWeightKg, idealWeightKg);
-  }
-  return idealWeightKg;
-}
-
-function creatinineClearance(patient: CalculateRequestPatient): number {
+// Simple Colin 2019-inspired preview: uses SCr directly (not Cockcroft-Gault)
+function colinPreviewCL(patient: CalculateRequestPatient): number {
+  const REF_CL = 4.10; // L/h at reference conditions
+  const REF_WT = 70;
+  const REF_SCR = 0.83;
+  const REF_AGE = 35;
+  const AGE_DECLINE = 0.026;
+  const wt = Math.max(patient.weight_kg || 70, 30);
   const scr = Math.max(patient.serum_creatinine_mg_dl || 1.0, 0.4);
-  const weightKg = cockcroftGaultWeightKg(patient);
   const age = patient.age || 50;
-  let crcl = ((140 - age) * weightKg) / (72 * scr);
-  if ((patient.sex || "male").toLowerCase() === "female") crcl *= 0.85;
-  return Math.max(0, Math.round(crcl * 10) / 10);
+  const wt_ratio = wt / REF_WT;
+  const scr_ratio = REF_SCR / scr;
+  const age_factor = Math.exp(-AGE_DECLINE * Math.max(0, age - REF_AGE));
+  return REF_CL * Math.pow(wt_ratio, 0.75) * Math.pow(scr_ratio, 0.80) * age_factor;
 }
 
 function previewCurve(mode: CalculatorMode, patient: CalculateRequestPatient, regimen: CalculateRequestRegimen): PreviewPoint[] {
   const dose = regimen.dose_mg > 0 ? regimen.dose_mg : roundedDose(patient.weight_kg);
   const t_inf = regimen.infusion_duration_hours > 0 ? regimen.infusion_duration_hours : 1;
   const interval = regimen.interval_hours > 0 ? regimen.interval_hours : (patient.serum_creatinine_mg_dl > 1.2 ? 24 : 12);
-  
-  const crcl = creatinineClearance(patient);
-  const ibwKg = idealBodyWeightKg(patient);
-  const vd = 0.69 * ibwKg; 
-  
-  const clMlMin = 0.771 * Math.max(0, crcl) + 18.9;
-  const clearanceLPerHour = (clMlMin * 60) / 1000;
+
+  const wt = Math.max(patient.weight_kg || 70, 30);
+  const clearanceLPerHour = colinPreviewCL(patient);
+  const vd = 0.69 * wt; // simplified Vd for preview
+
   let ke = 0.002;
   if (clearanceLPerHour > 0 && vd > 0) {
     ke = Math.min(Math.max(clearanceLPerHour / vd, 0.002), 0.2);
@@ -100,7 +80,6 @@ function previewCurve(mode: CalculatorMode, patient: CalculateRequestPatient, re
     const timeInInterval = t - (doseNumber * interval);
 
     let concentration;
-    const c_inf_end = (dose / (vd * ke * t_inf)) * (1 - Math.exp(-ke * t_inf));
 
     if (timeInInterval <= t_inf) {
       // During infusion

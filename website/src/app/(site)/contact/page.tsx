@@ -12,7 +12,7 @@ export default function ContactPage() {
         </h1>
         <p className="mt-4 text-gray-600">
           This page is for teams and evaluators who want to understand whether
-          Vancomyzer is relevant for their workflow. We recommend reviewing
+          Vancomyzer™ is relevant for their workflow. We recommend reviewing
           sample materials before reaching out.
         </p>
         <div className="mt-6 flex flex-wrap gap-4">
@@ -88,7 +88,7 @@ export default function ContactPage() {
         <p className="mt-2 text-sm text-gray-600">
           Email:{" "}
           <a
-            href="mailto:contact@vancomyzer.com?subject=Vancomyzer%20inquiry"
+            href="mailto:contact@vancomyzer.com?subject=Vancomyzer™%20inquiry"
             className="font-medium text-gray-900 underline hover:no-underline"
           >
             contact@vancomyzer.com
@@ -102,7 +102,7 @@ export default function ContactPage() {
             Request a workflow evaluation
           </a>
           <a
-            href="mailto:contact@vancomyzer.com?subject=Vancomyzer%20inquiry"
+            href="mailto:contact@vancomyzer.com?subject=Vancomyzer™%20inquiry"
             className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
           >
             Contact us

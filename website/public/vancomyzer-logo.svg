@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Rounded square — deep clinical navy, reads clearly at 16px–48px -->
+  <rect width="40" height="40" rx="9" fill="#0C2340"/>
+
+  <!-- Therapeutic window band (AUC 400–600 mg·h/L zone indicator) -->
+  <rect x="4" y="15" width="32" height="10" rx="1.5" fill="white" opacity="0.07"/>
+
+  <!-- PK curve: linear infusion rise → biexponential decline
+       Infusion phase:     (5,33) → peak (15,8)       [steep linear ascent]
+       Distribution phase: cubic bezier from peak      [fast initial drop]
+       Elimination phase:  slower exponential tail     [gradual baseline approach] -->
+  <path
+    d="M 5 33 L 15 8 C 18 9 22 13 25 18 C 28 23 31 28 35 33"
+    stroke="white"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+    opacity="0.93"
+  />
+
+  <!-- Cmax marker — Bayesian posterior estimate point -->
+  <circle cx="15" cy="8" r="3" fill="#2563EB"/>
+  <circle cx="15" cy="8" r="1.4" fill="white"/>
+
+  <!-- AUC target window tick marks (left edge of therapeutic band) -->
+  <line x1="4" y1="15" x2="7.5" y2="15" stroke="#60A5FA" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="4" y1="25" x2="7.5" y2="25" stroke="#60A5FA" stroke-width="1.6" stroke-linecap="round"/>
+</svg>

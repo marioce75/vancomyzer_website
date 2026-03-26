@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { CalculationDetails, CalculatorMode } from "@/types/calculator";
 
 interface CalculationMethodPanelProps {
@@ -63,7 +64,19 @@ export default function CalculationMethodPanel({
           </div>
           <div>
             <strong className="mb-1 block text-slate-800">References</strong>
-            <p>2020 ASHP/IDSA/PIDS guidelines; FDA infusion-rate precautions.</p>
+            <ul className="space-y-1.5">
+              <li>
+                Colin PJ et al. <em>Vancomycin pharmacokinetics throughout life.</em> Clin Pharmacokinet. 2019;58(6):767–780.{" "}
+                <a href="https://doi.org/10.1007/s40262-018-0727-5" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">DOI ↗</a>
+              </li>
+              <li>
+                Rybak MJ et al. <em>Therapeutic monitoring of vancomycin.</em> AJHP. 2020;77(11):835–864.{" "}
+                <a href="https://doi.org/10.1093/ajhp/zxaa036" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">DOI ↗</a>
+              </li>
+              <li>
+                <Link href="/references" className="text-blue-600 hover:underline font-medium">View full references &amp; equations</Link>
+              </li>
+            </ul>
           </div>
         </div>
       </details>

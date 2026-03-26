@@ -12,14 +12,34 @@ function formatMetric(value: number | null | undefined): string {
 }
 
 const Metric = ({ label, value, unit }: { label: string; value: string; unit: string }) => (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
-      <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</span>
-      <div className="mt-2 flex items-baseline gap-1.5">
-        <span className="text-3xl font-semibold tracking-tight text-slate-950 tabular-nums">{value}</span>
-        <span className="text-sm font-medium text-slate-500">{unit}</span>
-      </div>
+  <div
+    className="px-3 py-2.5"
+    style={{
+      border: "1px solid rgba(0,255,65,0.35)",
+      background: "#050505",
+    }}
+  >
+    <span
+      className="text-[10px] font-medium uppercase tracking-[0.2em] block"
+      style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}
+    >
+      {label}
+    </span>
+    <div className="mt-1 flex items-baseline gap-1">
+      <span
+        className="text-2xl font-bold tabular-nums mx-glow"
+        style={{
+          color: "#00ff41",
+          fontFamily: "'Share Tech Mono', monospace",
+          textShadow: "0 0 8px rgba(0,255,65,0.7)",
+        }}
+      >
+        {value}
+      </span>
+      <span className="text-xs" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>{unit}</span>
     </div>
-  );
+  </div>
+);
 
 export default function PrimaryMetricsCard({ auc24, peak, trough }: PrimaryMetricsCardProps) {
   return (

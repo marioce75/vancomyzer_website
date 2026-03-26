@@ -33,9 +33,9 @@ const FAQ_ITEMS = [
     a: "Verify the inputs used, the method applied, the timing and sufficiency of measured levels, assumptions affecting the estimate, uncertainty or limitation notes, and local protocol or institutional practice.",
   },
   {
-    q: "Does Vancomyzer replace local protocol, pharmacist review, or clinician judgment?",
+    q: "Does Vancomyzer™ replace local protocol, pharmacist review, or clinician judgment?",
     short: "No. It supports structured review but does not replace professional oversight.",
-    a: "No. Vancomyzer is designed to support structured review of model outputs and assumptions. Final interpretation and treatment decisions still require clinician judgment, pharmacist oversight, and local policy alignment.",
+    a: "No. Vancomyzer™ is designed to support structured review of model outputs and assumptions. Final interpretation and treatment decisions still require clinician judgment, pharmacist oversight, and local policy alignment.",
   },
   {
     q: "Can documentation drafts improve workflow?",
@@ -63,7 +63,7 @@ export default function FAQPage() {
               ? "one-level-reliability"
               : q === "What should clinicians verify before changing a regimen?"
                 ? "verify-before-change"
-                : q === "Does Vancomyzer replace local protocol, pharmacist review, or clinician judgment?"
+                : q === "Does Vancomyzer™ replace local protocol, pharmacist review, or clinician judgment?"
                   ? "replace-judgment"
                   : undefined;
 
