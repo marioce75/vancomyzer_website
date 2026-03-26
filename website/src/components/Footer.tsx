@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="border-t" style={{ borderTopColor: "#003b00", background: "#050505" }}>
+    <footer className="border-t" style={{ borderTopColor: "var(--color-border)", background: "var(--color-card)" }}>
       <div className="mx-auto max-w-7xl px-4 py-10">
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
 
@@ -18,20 +18,20 @@ export default function Footer() {
                 style={{ filter: "invert(1) sepia(1) saturate(3) hue-rotate(80deg)" }}
               />
               <div>
-                <span className="text-sm font-bold" style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }}>
+                <span className="text-sm font-bold" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
                   Vancomyzer™
                 </span>
-                <p className="text-[11px] leading-none mt-0.5" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>
+                <p className="text-[11px] leading-none mt-0.5" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
                   Engineered by <span className="font-semibold tracking-wide">Dōsys&trade;</span>
                 </p>
               </div>
             </div>
-            <p className="text-sm leading-6" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>
+            <p className="text-sm leading-6" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
               For use by qualified healthcare professionals only. Vancomyzer™ is a clinical decision-support tool and does not constitute medical advice. All dosing recommendations must be independently reviewed and validated by a licensed clinician prior to patient administration. Not a substitute for professional judgment, institutional protocols, or therapeutic drug monitoring.
             </p>
-            <p className="mt-4 text-xs" style={{ color: "#003b00", fontFamily: "'Share Tech Mono', monospace" }}>
+            <p className="mt-4 text-xs" style={{ color: "var(--color-border)", fontFamily: "'Share Tech Mono', monospace" }}>
               © 2026 Vancomyzer™. All Rights Reserved. &nbsp;·&nbsp;{" "}
-              <Link href="/disclaimer" className="underline" style={{ color: "#00a827" }}>Full Medical Disclaimer</Link>
+              <Link href="/disclaimer" className="underline" style={{ color: "var(--color-secondary)" }}>Full Medical Disclaimer</Link>
             </p>
           </div>
 
@@ -52,7 +52,7 @@ export default function Footer() {
                 key={href}
                 href={href}
                 className="transition"
-                style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}
+                style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
               >
                 {label}
               </Link>

@@ -27,16 +27,16 @@ export default function CTA({ variant, primary, className = "" }: CTAProps) {
       style={
         primary
           ? {
-              background: "#00ff41",
-              border: "1px solid #00ff41",
-              color: "#000000",
+              background: "var(--color-primary)",
+              border: "1px solid var(--color-primary)",
+              color: "var(--color-bg)",
               fontFamily: "'Share Tech Mono', monospace",
               fontWeight: 700,
             }
           : {
-              background: "#000000",
-              border: "1px solid rgba(0,255,65,0.4)",
-              color: "#00a827",
+              background: "var(--color-bg)",
+              border: "1px solid var(--color-primary-a40)",
+              color: "var(--color-secondary)",
               fontFamily: "'Share Tech Mono', monospace",
             }
       }

@@ -13,9 +13,9 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
     <header
       className="shrink-0 border-b"
       style={{
-        background: "#000000",
-        borderBottomColor: "#003b00",
-        boxShadow: "0 1px 0 rgba(0,255,65,0.2)",
+        background: "var(--color-bg)",
+        borderBottomColor: "var(--color-border)",
+        boxShadow: "0 1px 0 var(--color-primary-a20)",
       }}
     >
       <div className="mx-auto flex h-[68px] max-w-[1680px] items-center justify-between gap-6 px-5 lg:px-8">
@@ -33,14 +33,14 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           />
           <div className="min-w-0">
             <h1
-              className="text-[15px] font-bold tracking-tight whitespace-nowrap leading-tight transition-colors"
-              style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 8px rgba(0,255,65,0.5)" }}
+              className="font-bold whitespace-nowrap leading-tight transition-colors"
+              style={{ fontSize: "22px", letterSpacing: "4px", color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 10px var(--color-glow)" }}
             >
-              Vancomyzer<sup className="text-[8px] font-semibold ml-0.5 align-super" style={{ color: "#00a827" }}>™</sup>
+              VANCOMYZER<sup className="text-[9px] font-semibold ml-1 align-super" style={{ color: "var(--color-secondary)" }}>{"\u2122"}</sup>
             </h1>
-            <p className="text-[10px] font-medium leading-none mt-0.5 whitespace-nowrap" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>
-              Bayesian PK · <span style={{ color: "#003b00" }}>engineered by</span>{" "}
-              <span className="font-semibold tracking-wide" style={{ color: "#00a827" }}>Dōsys&trade;</span>
+            <p className="text-[10px] font-medium leading-none mt-0.5 whitespace-nowrap" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
+              Bayesian PK · <span style={{ color: "var(--color-border)" }}>engineered by</span>{" "}
+              <span className="font-semibold tracking-wide" style={{ color: "var(--color-secondary)" }}>Dōsys&trade;</span>
             </p>
           </div>
 
@@ -48,13 +48,13 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           <span
             className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap"
             style={{
-              border: "1px solid rgba(0,255,65,0.4)",
-              background: "rgba(0,255,65,0.05)",
-              color: "#00a827",
+              border: "1px solid var(--color-primary-a40)",
+              background: "var(--color-primary-a05)",
+              color: "var(--color-secondary)",
               fontFamily: "'Share Tech Mono', monospace",
             }}
           >
-            <span className="h-1.5 w-1.5 shrink-0 mx-blink" style={{ backgroundColor: "#00ff41", display: "inline-block" }} aria-hidden="true" />
+            <span className="h-1.5 w-1.5 shrink-0 mx-blink" style={{ backgroundColor: "var(--color-primary)", display: "inline-block" }} aria-hidden="true" />
             CLINICAL DECISION SUPPORT
           </span>
         </Link>
@@ -66,8 +66,8 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             role="tablist"
             aria-label="Calculation mode"
             style={{
-              border: "1px solid rgba(0,255,65,0.4)",
-              background: "#000000",
+              border: "1px solid var(--color-primary-a40)",
+              background: "var(--color-bg)",
             }}
           >
             {([
@@ -85,15 +85,15 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 style={
                   viewMode === value
                     ? {
-                        background: "#00ff41",
-                        color: "#000000",
+                        background: "var(--color-primary)",
+                        color: "var(--color-bg)",
                         fontFamily: "'Share Tech Mono', monospace",
                         textShadow: "none",
                       }
                     : {
                         background: "transparent",
-                        border: "1px solid #003b00",
-                        color: "#1a5c1a",
+                        border: "1px solid var(--color-border)",
+                        color: "var(--color-dim)",
                         fontFamily: "'Share Tech Mono', monospace",
                       }
                 }
@@ -109,16 +109,16 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           <Link
             href="/"
             className="px-3 py-1.5 text-sm font-medium transition"
-            style={{ color: "#00a827", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
+            style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,255,65,0.4)";
-              (e.currentTarget as HTMLElement).style.background = "#0a1a0a";
-              (e.currentTarget as HTMLElement).style.color = "#00ff41";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
+              (e.currentTarget as HTMLElement).style.background = "var(--color-highlight)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
               (e.currentTarget as HTMLElement).style.background = "transparent";
-              (e.currentTarget as HTMLElement).style.color = "#00a827";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
             }}
           >
             Home
@@ -126,16 +126,16 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           <Link
             href="/trust-evidence"
             className="px-3 py-1.5 text-sm font-medium transition"
-            style={{ color: "#00a827", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
+            style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,255,65,0.4)";
-              (e.currentTarget as HTMLElement).style.background = "#0a1a0a";
-              (e.currentTarget as HTMLElement).style.color = "#00ff41";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
+              (e.currentTarget as HTMLElement).style.background = "var(--color-highlight)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
               (e.currentTarget as HTMLElement).style.background = "transparent";
-              (e.currentTarget as HTMLElement).style.color = "#00a827";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
             }}
           >
             Methods
@@ -146,19 +146,19 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               onClick={onSettingsOpen}
               className="ml-1 p-2 transition"
               style={{
-                color: "#00a827",
+                color: "var(--color-secondary)",
                 border: "1px solid transparent",
                 fontFamily: "'Share Tech Mono', monospace",
               }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,255,65,0.4)";
-                (e.currentTarget as HTMLElement).style.background = "#0a1a0a";
-                (e.currentTarget as HTMLElement).style.color = "#00ff41";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
+                (e.currentTarget as HTMLElement).style.background = "var(--color-highlight)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "transparent";
                 (e.currentTarget as HTMLElement).style.background = "transparent";
-                (e.currentTarget as HTMLElement).style.color = "#00a827";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
               }}
               aria-label="Terminal settings"
               title="Terminal settings"

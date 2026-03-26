@@ -81,21 +81,21 @@ export default function DoseRecommendationCard({
                 className="shrink-0 flex flex-col items-center border px-3 py-2 text-center text-xs transition"
                 style={
                   isActive
-                    ? { background: "#00ff41", borderColor: "#00ff41", color: "#000000", fontFamily: "'Share Tech Mono', monospace" }
-                    : { background: "#000000", borderColor: "#003b00", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }
+                    ? { background: "var(--color-primary)", borderColor: "var(--color-primary)", color: "var(--color-bg)", fontFamily: "'Share Tech Mono', monospace" }
+                    : { background: "var(--color-bg)", borderColor: "var(--color-border)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }
                 }
               >
-                <span className="font-bold tabular-nums text-sm" style={isActive ? { color: "#000000" } : { color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }}>
+                <span className="font-bold tabular-nums text-sm" style={isActive ? { color: "var(--color-bg)" } : { color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
                   {opt.dose_mg} mg
                 </span>
-                <span className="font-medium" style={isActive ? { color: "#000000" } : { color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>
+                <span className="font-medium" style={isActive ? { color: "var(--color-bg)" } : { color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
                   q{opt.interval_hours}h
                 </span>
                 <span
                   className="mt-1 inline-flex border px-1.5 py-0.5 text-[10px] font-semibold leading-none"
                   style={isActive
-                    ? { borderColor: "rgba(0,0,0,0.3)", background: "rgba(0,0,0,0.15)", color: "#000000", fontFamily: "'Share Tech Mono', monospace" }
-                    : { borderColor: "rgba(0,255,65,0.3)", background: "rgba(0,255,65,0.05)", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }
+                    ? { borderColor: "rgba(0,0,0,0.3)", background: "rgba(0,0,0,0.15)", color: "var(--color-bg)", fontFamily: "'Share Tech Mono', monospace" }
+                    : { borderColor: "var(--color-primary-a30)", background: "var(--color-primary-a05)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }
                   }
                 >
                   {r.label}
@@ -112,35 +112,35 @@ export default function DoseRecommendationCard({
           <div
             className="px-4 py-3"
             style={{
-              background: "#000000",
-              border: "1px solid rgba(0,255,65,0.4)",
-              boxShadow: "0 0 16px rgba(0,255,65,0.06)",
+              background: "var(--color-bg)",
+              border: "1px solid var(--color-primary-a40)",
+              boxShadow: "0 0 16px var(--color-primary-a06)",
             }}
           >
             <div className="flex flex-wrap items-baseline gap-x-1.5">
               <span
                 className="text-4xl font-extrabold tabular-nums mx-glow"
-                style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 12px rgba(0,255,65,0.8)" }}
+                style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 12px var(--color-glow-strong)" }}
               >
                 {displayDose}
               </span>
-              <span className="text-xl font-semibold" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>mg</span>
-              <span className="text-base font-medium mx-1" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>every</span>
+              <span className="text-xl font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>mg</span>
+              <span className="text-base font-medium mx-1" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>every</span>
               <span
                 className="text-4xl font-extrabold tabular-nums mx-glow"
-                style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 12px rgba(0,255,65,0.8)" }}
+                style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 12px var(--color-glow-strong)" }}
               >
                 {displayInterval}
               </span>
-              <span className="text-xl font-semibold" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>h</span>
+              <span className="text-xl font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>h</span>
             </div>
-            <p className="mt-1 text-xs" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>{subline}</p>
+            <p className="mt-1 text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>{subline}</p>
             {displayAUC != null && range && (
               <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>AUC24</span>
-                <span className="tabular-nums text-sm font-bold" style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }}>{displayAUC}</span>
-                <span className="text-xs" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>mg·h/L</span>
-                <span className="inline-flex border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider" style={{ borderColor: "rgba(0,255,65,0.4)", background: "rgba(0,255,65,0.06)", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>
+                <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>AUC24</span>
+                <span className="tabular-nums text-sm font-bold" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>{displayAUC}</span>
+                <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>mg·h/L</span>
+                <span className="inline-flex border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider" style={{ borderColor: "var(--color-primary-a40)", background: "var(--color-primary-a06)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>
                   {range.label}
                 </span>
               </div>
@@ -153,7 +153,7 @@ export default function DoseRecommendationCard({
               type="button"
               onClick={onApplyRecommendation}
               className="px-3 py-1.5 text-xs font-semibold transition"
-              style={{ border: "1px solid rgba(0,255,65,0.4)", background: "rgba(0,255,65,0.05)", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}
+              style={{ border: "1px solid var(--color-primary-a40)", background: "var(--color-primary-a05)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
             >
               [APPLY RECOMMENDED]
             </button>
@@ -168,7 +168,7 @@ export default function DoseRecommendationCard({
       )}
 
       {calculationDetails?.review_status?.banner_body && (
-        <p className="text-xs leading-5 pt-2" style={{ color: "#1a5c1a", borderTop: "1px solid #003b00", fontFamily: "'Share Tech Mono', monospace" }}>
+        <p className="text-xs leading-5 pt-2" style={{ color: "var(--color-dim)", borderTop: "1px solid var(--color-border)", fontFamily: "'Share Tech Mono', monospace" }}>
           {calculationDetails.review_status.banner_body}
         </p>
       )}

@@ -13,7 +13,7 @@ export default function CalculatorActionBar({ onCalculate, onReset, disabled, hi
     <div className="mt-1 flex items-center justify-between gap-3">
       <p
         className="text-xs font-medium uppercase tracking-[0.16em]"
-        style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em" }}
+        style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em" }}
       >
         &gt; recalculate after any draft change
       </p>
@@ -23,19 +23,19 @@ export default function CalculatorActionBar({ onCalculate, onReset, disabled, hi
           onClick={onReset}
           className="px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2"
           style={{
-            border: "1px solid rgba(0,255,65,0.4)",
-            background: "#000000",
-            color: "#00a827",
+            border: "1px solid var(--color-primary-a40)",
+            background: "var(--color-bg)",
+            color: "var(--color-secondary)",
             fontFamily: "'Share Tech Mono', monospace",
           }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "#00ff41";
-            (e.currentTarget as HTMLButtonElement).style.color = "#00ff41";
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 8px rgba(0,255,65,0.3)";
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-primary)";
+            (e.currentTarget as HTMLButtonElement).style.color = "var(--color-primary)";
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 8px var(--color-primary-a30)";
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(0,255,65,0.4)";
-            (e.currentTarget as HTMLButtonElement).style.color = "#00a827";
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-primary-a40)";
+            (e.currentTarget as HTMLButtonElement).style.color = "var(--color-secondary)";
             (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
           }}
         >
@@ -66,20 +66,20 @@ export default function CalculatorActionBar({ onCalculate, onReset, disabled, hi
             disabled={disabled}
             className="inline-flex items-center gap-2 px-6 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60"
             style={{
-              background: "#00ff41",
-              border: "1px solid #00ff41",
-              color: "#000000",
+              background: "var(--color-primary)",
+              border: "1px solid var(--color-primary)",
+              color: "var(--color-bg)",
               fontFamily: "'Share Tech Mono', monospace",
-              boxShadow: disabled ? "none" : "0 0 12px rgba(0,255,65,0.4)",
+              boxShadow: disabled ? "none" : "0 0 12px var(--color-primary-a40)",
             }}
-            onMouseEnter={e => { if (!disabled) { (e.currentTarget as HTMLButtonElement).style.background = "#00cc33"; (e.currentTarget as HTMLButtonElement).style.borderColor = "#00cc33"; } }}
-            onMouseLeave={e => { if (!disabled) { (e.currentTarget as HTMLButtonElement).style.background = "#00ff41"; (e.currentTarget as HTMLButtonElement).style.borderColor = "#00ff41"; } }}
+            onMouseEnter={e => { if (!disabled) { (e.currentTarget as HTMLButtonElement).style.background = "var(--color-secondary)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-secondary)"; } }}
+            onMouseLeave={e => { if (!disabled) { (e.currentTarget as HTMLButtonElement).style.background = "var(--color-primary)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-primary)"; } }}
           >
             {disabled && (
               /* Terminal blink instead of spinner */
               <span
                 className="mx-blink text-sm font-bold"
-                style={{ color: "#000000", fontFamily: "'Share Tech Mono', monospace" }}
+                style={{ color: "var(--color-bg)", fontFamily: "'Share Tech Mono', monospace" }}
                 aria-hidden="true"
               >
                 _

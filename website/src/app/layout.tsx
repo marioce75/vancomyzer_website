@@ -3,9 +3,13 @@ import "./globals.css";
 import Providers from "./Providers";
 
 export const metadata: Metadata = {
-  title: "Vancomyzer™ — Transparent vancomycin dosing support",
+  title: "VANCOMYZER\u2122",
   description:
     "Vancomycin dosing support with visible assumptions, review-critical limitations, and clinician-readable outputs.",
+  icons: {
+    icon: { url: "/favicon.svg", type: "image/svg+xml" },
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

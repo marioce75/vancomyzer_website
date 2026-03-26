@@ -3,73 +3,62 @@
 @tailwind utilities;
 
 /* ── Matrix Clinical Terminal ────────────────────────────────────
-   Pure black background, Matrix green palette, monospace font.
+   Color-mode-aware design system. All colors read from CSS custom
+   properties set by MatrixSettingsContext.applySettingsToDom().
    ─────────────────────────────────────────────────────────────── */
 
 :root {
-  --mx-green:           #00ff41;
-  --mx-green-hover:     #00cc33;
-  --mx-green-dim:       #00a827;
-  --mx-green-muted:     #1a5c1a;
-  --mx-green-dark:      #003b00;
-  --mx-green-glow:      rgba(0,255,65,0.12);
-  --mx-green-border:    rgba(0,255,65,0.40);
-  --mx-black:           #000000;
-  --mx-card:            #050505;
-  --mx-input:           #0d0d0d;
-  --mx-highlight:       #0a1a0a;
+  /* Primary palette — overwritten at runtime by the settings context */
+  --color-primary:      #00ff41;
+  --color-secondary:    #00cc44;
+  --color-dim:          #009933;
+  --color-bg:           #000000;
+  --color-border:       #004422;
+  --color-card:         #050505;
+  --color-input:        #0d0d0d;
+  --color-highlight:    #0a1a0a;
+  --color-glow:         rgba(0,255,65,0.5);
+  --color-glow-strong:  rgba(0,255,65,0.8);
+  --color-primary-a05:  rgba(0,255,65,0.05);
+  --color-primary-a06:  rgba(0,255,65,0.06);
+  --color-primary-a08:  rgba(0,255,65,0.08);
+  --color-primary-a10:  rgba(0,255,65,0.10);
+  --color-primary-a12:  rgba(0,255,65,0.12);
+  --color-primary-a15:  rgba(0,255,65,0.15);
+  --color-primary-a20:  rgba(0,255,65,0.20);
+  --color-primary-a25:  rgba(0,255,65,0.25);
+  --color-primary-a30:  rgba(0,255,65,0.30);
+  --color-primary-a35:  rgba(0,255,65,0.35);
+  --color-primary-a40:  rgba(0,255,65,0.40);
+  --color-primary-a50:  rgba(0,255,65,0.50);
+
+  /* Fixed semantic colors — don't change with color mode */
   --mx-error:           #ff3333;
   --mx-error-dim:       rgba(255,51,51,0.12);
   --mx-error-border:    rgba(255,51,51,0.5);
   --mx-warn:            #ffaa00;
   --mx-warn-dim:        rgba(255,170,0,0.10);
   --mx-warn-border:     rgba(255,170,0,0.4);
-  --mx-ok:              #00ff41;
 
-  /* Remap all existing CSS vars to Matrix palette */
-  --text-primary:       #00ff41;
-  --text-secondary:     #00a827;
-  --text-muted:         #1a5c1a;
-  --navy-bg:            #000000;
-  --navy-card:          #050505;
-  --navy-card-raised:   #0a0a0a;
-  --navy-border:        #003b00;
-  --navy-border-strong: rgba(0,255,65,0.4);
-  --teal:               #00ff41;
-  --teal-light:         #00ff41;
-  --teal-glow:          rgba(0,255,65,0.08);
-  --teal-border:        rgba(0,255,65,0.4);
-  --vc-background:      #000000;
-  --vc-surface:         #050505;
-  --vc-surface-subtle:  #0a0a0a;
-  --vc-border:          #003b00;
-  --vc-border-strong:   rgba(0,255,65,0.4);
-  --vc-text:            #00ff41;
-  --vc-text-secondary:  #00a827;
-  --vc-text-muted:      #1a5c1a;
-  --vc-in-range:        #00ff41;
-  --vc-in-range-bg:     rgba(0,255,65,0.06);
-  --vc-in-range-border: rgba(0,255,65,0.35);
-  --vc-supra:           #ffaa00;
-  --vc-supra-bg:        rgba(255,170,0,0.08);
-  --vc-supra-border:    rgba(255,170,0,0.35);
-  --vc-danger:          #ff3333;
-  --vc-danger-bg:       rgba(255,51,51,0.08);
-  --vc-danger-border:   rgba(255,51,51,0.4);
-  --foreground:         #00ff41;
-  --background:         #000000;
+  /* Legacy aliases — kept for any components still referencing old names */
+  --mx-green:           var(--color-primary);
+  --text-primary:       var(--color-primary);
+  --foreground:         var(--color-primary);
+  --teal:               var(--color-primary);
+  --vc-text:            var(--color-primary);
+  --background:         var(--color-bg);
 }
 
 html {
-  background: #000000;
+  background: var(--color-bg);
 }
 
 /* ── Typography — monospace terminal font ────────────────────── */
 
 body {
   font-family: 'Share Tech Mono', 'Courier New', Courier, monospace;
-  color: #00ff41;
-  background: #000000;
+  color: var(--color-primary);
+  background: var(--color-bg);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -77,7 +66,6 @@ body {
 }
 
 /* ── Scanline CRT overlay ───────────────────────────────────────
-   Simulates horizontal scan lines of a CRT monitor.
    pointer-events: none — does not block any clicks.
    ─────────────────────────────────────────────────────────────── */
 
@@ -96,25 +84,14 @@ body::after {
   z-index: 9997;
 }
 
-/* When scanlines are off, hide the pseudo-element entirely */
-body.no-scanlines::after {
-  display: none;
-}
-
-/* Typewriter animation — disabled when toggle is off */
+body.no-scanlines::after { display: none; }
 body.no-typewriter .mx-fadeIn { animation: none !important; }
-
-/* Blinking cursor — disabled when toggle is off */
 body.no-blink .mx-blink { animation: none !important; opacity: 1 !important; }
-
-/* Graph animations — disabled when toggle is off */
 body.no-graph-anim .recharts-active-dot,
 body.no-graph-anim .recharts-line,
 body.no-graph-anim .recharts-area { transition: none !important; animation: none !important; }
 
-/* ── Sharp edges — zero border radius ───────────────────────────
-   Matrix terminals have no rounded corners anywhere.
-   ─────────────────────────────────────────────────────────────── */
+/* ── Sharp edges ─────────────────────────────────────────────── */
 
 *, *::before, *::after {
   border-radius: 0 !important;
@@ -128,8 +105,8 @@ body.no-graph-anim .recharts-area { transition: none !important; animation: none
 }
 
 @keyframes mx-glow-pulse {
-  0%, 100% { text-shadow: 0 0 4px rgba(0,255,65,0.6), 0 0 12px rgba(0,255,65,0.3); }
-  50%       { text-shadow: 0 0 8px rgba(0,255,65,1), 0 0 24px rgba(0,255,65,0.6), 0 0 40px rgba(0,255,65,0.2); }
+  0%, 100% { text-shadow: 0 0 4px var(--color-glow), 0 0 12px var(--color-primary-a30); }
+  50%       { text-shadow: 0 0 8px var(--color-primary), 0 0 24px var(--color-glow), 0 0 40px var(--color-primary-a20); }
 }
 
 @keyframes mx-fadeIn {
@@ -141,84 +118,84 @@ body.no-graph-anim .recharts-area { transition: none !important; animation: none
 .mx-glow   { animation: mx-glow-pulse 2.5s ease-in-out infinite; }
 .mx-fadeIn { animation: mx-fadeIn 0.25s ease-out forwards; }
 
-/* ── Global Matrix overrides for Tailwind utility classes ────── */
+/* ── Global Tailwind overrides — using CSS variables ─────────── */
 
-/* Surfaces → black */
-.bg-white         { background-color: #050505 !important; }
-.bg-slate-50      { background-color: #050505 !important; }
-.bg-slate-100     { background-color: #0a0a0a !important; }
-.bg-slate-200     { background-color: #0d0d0d !important; }
+/* Surfaces */
+.bg-white         { background-color: var(--color-card) !important; }
+.bg-slate-50      { background-color: var(--color-card) !important; }
+.bg-slate-100     { background-color: var(--color-highlight) !important; }
+.bg-slate-200     { background-color: var(--color-input) !important; }
 
-/* Text → Matrix green scale */
-.text-slate-950   { color: #00ff41 !important; }
-.text-slate-900   { color: #00ff41 !important; }
-.text-slate-800   { color: #00cc33 !important; }
-.text-slate-700   { color: #00a827 !important; }
-.text-slate-600   { color: #00a827 !important; }
-.text-slate-500   { color: #1a5c1a !important; }
-.text-slate-400   { color: #1a5c1a !important; }
-.text-slate-300   { color: #003b00 !important; }
+/* Text */
+.text-slate-950   { color: var(--color-primary) !important; }
+.text-slate-900   { color: var(--color-primary) !important; }
+.text-slate-800   { color: var(--color-secondary) !important; }
+.text-slate-700   { color: var(--color-secondary) !important; }
+.text-slate-600   { color: var(--color-secondary) !important; }
+.text-slate-500   { color: var(--color-dim) !important; }
+.text-slate-400   { color: var(--color-dim) !important; }
+.text-slate-300   { color: var(--color-border) !important; }
 
-/* Borders → dark green */
-.border-slate-100 { border-color: #003b00 !important; }
-.border-slate-200 { border-color: #003b00 !important; }
-.border-slate-300 { border-color: rgba(0,255,65,0.35) !important; }
-.border-slate-400 { border-color: rgba(0,255,65,0.5) !important; }
+/* Borders */
+.border-slate-100 { border-color: var(--color-border) !important; }
+.border-slate-200 { border-color: var(--color-border) !important; }
+.border-slate-300 { border-color: var(--color-primary-a35) !important; }
+.border-slate-400 { border-color: var(--color-primary-a50) !important; }
 
 /* Hover states */
-.hover\:bg-slate-50:hover   { background-color: #0a1a0a !important; }
-.hover\:bg-slate-100:hover  { background-color: #0a1a0a !important; }
-.hover\:border-slate-200:hover { border-color: rgba(0,255,65,0.5) !important; }
-.hover\:border-slate-400:hover { border-color: #00ff41 !important; }
-.hover\:text-slate-800:hover { color: #00ff41 !important; }
-.hover\:text-slate-900:hover { color: #00ff41 !important; }
+.hover\:bg-slate-50:hover   { background-color: var(--color-highlight) !important; }
+.hover\:bg-slate-100:hover  { background-color: var(--color-highlight) !important; }
+.hover\:border-slate-200:hover { border-color: var(--color-primary-a50) !important; }
+.hover\:border-slate-400:hover { border-color: var(--color-primary) !important; }
+.hover\:text-slate-800:hover { color: var(--color-primary) !important; }
+.hover\:text-slate-900:hover { color: var(--color-primary) !important; }
 
-/* Shadows → green glow */
-.shadow-sm    { box-shadow: 0 0 0 1px #003b00 !important; }
-.shadow       { box-shadow: 0 0 0 1px #003b00, 0 0 8px rgba(0,255,65,0.08) !important; }
-.shadow-md    { box-shadow: 0 0 0 1px rgba(0,255,65,0.3), 0 0 12px rgba(0,255,65,0.12) !important; }
+/* Shadows */
+.shadow-sm    { box-shadow: 0 0 0 1px var(--color-border) !important; }
+.shadow       { box-shadow: 0 0 0 1px var(--color-border), 0 0 8px var(--color-primary-a08) !important; }
+.shadow-md    { box-shadow: 0 0 0 1px var(--color-primary-a30), 0 0 12px var(--color-primary-a12) !important; }
 .shadow-inner { box-shadow: inset 0 1px 4px rgba(0,0,0,0.9) !important; }
 
-/* Focus rings → green */
-.focus\:ring-blue-500:focus  { --tw-ring-color: #00ff41 !important; }
-.focus\:border-blue-500:focus { border-color: #00ff41 !important; }
-.focus\:ring-blue-600:focus  { --tw-ring-color: #00ff41 !important; }
+/* Focus rings */
+.focus\:ring-blue-500:focus  { --tw-ring-color: var(--color-primary) !important; }
+.focus\:border-blue-500:focus { border-color: var(--color-primary) !important; }
+.focus\:ring-blue-600:focus  { --tw-ring-color: var(--color-primary) !important; }
 
-/* Blue → Matrix green */
-.bg-blue-800    { background-color: #00ff41 !important; }
-.bg-blue-900    { background-color: #00cc33 !important; }
-.bg-blue-600    { background-color: #00ff41 !important; }
-.bg-blue-50     { background-color: rgba(0,255,65,0.05) !important; }
-.bg-blue-100    { background-color: rgba(0,255,65,0.08) !important; }
-.border-blue-900 { border-color: #00cc33 !important; }
-.border-blue-300 { border-color: rgba(0,255,65,0.4) !important; }
-.border-blue-200 { border-color: rgba(0,255,65,0.25) !important; }
-.border-blue-100 { border-color: #003b00 !important; }
-.text-blue-950  { color: #00ff41 !important; }
-.text-blue-900  { color: #00ff41 !important; }
-.text-blue-800  { color: #00ff41 !important; }
-.text-blue-700  { color: #00a827 !important; }
-.text-blue-600  { color: #00a827 !important; }
-.text-blue-200  { color: rgba(0,255,65,0.7) !important; }
-.hover\:bg-blue-900:hover   { background-color: #00cc33 !important; }
-.hover\:bg-blue-50:hover    { background-color: rgba(0,255,65,0.08) !important; }
-.hover\:bg-blue-100:hover   { background-color: rgba(0,255,65,0.12) !important; }
-.hover\:text-blue-800:hover { color: #00ff41 !important; }
-.hover\:text-blue-600:hover { color: #00a827 !important; }
+/* Blue → primary */
+.bg-blue-800    { background-color: var(--color-primary) !important; }
+.bg-blue-900    { background-color: var(--color-secondary) !important; }
+.bg-blue-600    { background-color: var(--color-primary) !important; }
+.bg-blue-50     { background-color: var(--color-primary-a05) !important; }
+.bg-blue-100    { background-color: var(--color-primary-a08) !important; }
+.border-blue-900 { border-color: var(--color-secondary) !important; }
+.border-blue-300 { border-color: var(--color-primary-a40) !important; }
+.border-blue-200 { border-color: var(--color-primary-a25) !important; }
+.border-blue-100 { border-color: var(--color-border) !important; }
+.text-blue-950  { color: var(--color-primary) !important; }
+.text-blue-900  { color: var(--color-primary) !important; }
+.text-blue-800  { color: var(--color-primary) !important; }
+.text-blue-700  { color: var(--color-secondary) !important; }
+.text-blue-600  { color: var(--color-secondary) !important; }
+.text-blue-200  { color: var(--color-primary-a50) !important; }
+.hover\:bg-blue-900:hover   { background-color: var(--color-secondary) !important; }
+.hover\:bg-blue-50:hover    { background-color: var(--color-primary-a08) !important; }
+.hover\:bg-blue-100:hover   { background-color: var(--color-primary-a12) !important; }
+.hover\:text-blue-800:hover { color: var(--color-primary) !important; }
+.hover\:text-blue-600:hover { color: var(--color-secondary) !important; }
 
-/* Emerald → Matrix green */
-.bg-emerald-500   { background-color: #00ff41 !important; }
-.bg-emerald-600   { background-color: #00cc33 !important; }
-.text-emerald-950 { color: #00ff41 !important; }
-.text-emerald-900 { color: #00ff41 !important; }
-.text-emerald-800 { color: #00cc33 !important; }
-.text-emerald-700 { color: #00a827 !important; }
-.bg-emerald-50    { background-color: rgba(0,255,65,0.05) !important; }
-.bg-emerald-100   { background-color: rgba(0,255,65,0.08) !important; }
-.border-emerald-200 { border-color: rgba(0,255,65,0.25) !important; }
-.border-emerald-300 { border-color: rgba(0,255,65,0.4) !important; }
+/* Emerald → primary */
+.bg-emerald-500   { background-color: var(--color-primary) !important; }
+.bg-emerald-600   { background-color: var(--color-secondary) !important; }
+.text-emerald-950 { color: var(--color-primary) !important; }
+.text-emerald-900 { color: var(--color-primary) !important; }
+.text-emerald-800 { color: var(--color-secondary) !important; }
+.text-emerald-700 { color: var(--color-secondary) !important; }
+.bg-emerald-50    { background-color: var(--color-primary-a05) !important; }
+.bg-emerald-100   { background-color: var(--color-primary-a08) !important; }
+.border-emerald-200 { border-color: var(--color-primary-a25) !important; }
+.border-emerald-300 { border-color: var(--color-primary-a40) !important; }
 
-/* Amber / warning */
+/* Amber / warning — stays amber regardless of color mode */
 .bg-amber-50    { background-color: rgba(255,170,0,0.06) !important; }
 .bg-amber-100   { background-color: rgba(255,170,0,0.10) !important; }
 .bg-amber-200   { background-color: rgba(255,170,0,0.16) !important; }
@@ -235,7 +212,7 @@ body.no-graph-anim .recharts-area { transition: none !important; animation: none
 .text-amber-600 { color: #cc8800 !important; }
 .hover\:text-amber-900:hover { color: #ffaa00 !important; }
 
-/* Red / danger */
+/* Red / danger — stays red regardless of color mode */
 .bg-red-50       { background-color: rgba(255,51,51,0.06) !important; }
 .bg-red-600      { background-color: #ff3333 !important; }
 .border-red-200  { border-color: rgba(255,51,51,0.3) !important; }
@@ -254,35 +231,35 @@ body.no-graph-anim .recharts-area { transition: none !important; animation: none
 .border-rose-200 { border-color: rgba(255,51,51,0.3) !important; }
 .text-rose-700   { color: #ff6666 !important; }
 
-/* Violet → green (used in AUC shade legend) */
-.bg-violet-50      { background-color: rgba(0,255,65,0.05) !important; }
-.border-violet-200 { border-color: rgba(0,255,65,0.25) !important; }
-.text-violet-700   { color: #00a827 !important; }
+/* Violet → primary */
+.bg-violet-50      { background-color: var(--color-primary-a05) !important; }
+.border-violet-200 { border-color: var(--color-primary-a25) !important; }
+.text-violet-700   { color: var(--color-secondary) !important; }
 
 /* Semi-transparent white → dark */
 .bg-white\/70  { background-color: rgba(5,5,5,0.92) !important; }
 .bg-white\/95  { background-color: rgba(0,0,0,0.97) !important; }
 
-/* ── Input fields — Matrix terminal style ─────────────────────── */
+/* ── Input fields ────────────────────────────────────────────── */
 
 input, select, textarea {
-  background-color: #0d0d0d !important;
-  border-color: rgba(0,255,65,0.4) !important;
-  color: #00ff41 !important;
-  caret-color: #00ff41;
+  background-color: var(--color-input) !important;
+  border-color: var(--color-primary-a40) !important;
+  color: var(--color-primary) !important;
+  caret-color: var(--color-primary);
   font-family: 'Share Tech Mono', 'Courier New', monospace !important;
 }
 input::placeholder, textarea::placeholder {
-  color: #1a5c1a !important;
+  color: var(--color-dim) !important;
   opacity: 1;
 }
 select option {
-  background-color: #050505;
-  color: #00ff41;
+  background-color: var(--color-card);
+  color: var(--color-primary);
 }
 input:focus, select:focus, textarea:focus {
-  border-color: #00ff41 !important;
-  box-shadow: 0 0 0 1px #00ff41, 0 0 8px rgba(0,255,65,0.4) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 8px var(--color-primary-a40) !important;
   outline: none !important;
 }
 
@@ -295,48 +272,47 @@ input[type='number']::-webkit-outer-spin-button {
 }
 input[type='number'] { -moz-appearance: textfield; }
 
-/* ── Scrollbars — Matrix green ─────────────────────────────── */
+/* ── Scrollbars ──────────────────────────────────────────────── */
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0,255,65,0.3) transparent;
+  scrollbar-color: var(--color-primary-a30) transparent;
 }
 .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(0,255,65,0.22);
+  background: var(--color-primary-a20);
   border: 1px solid transparent;
   background-clip: padding-box;
 }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 
-/* ── Slate / Gray button variants not covered above ────────── */
+/* ── Slate / Gray button variants ────────────────────────────── */
 
-.bg-slate-950     { background-color: #000000 !important; }
-.hover\:bg-slate-800:hover { background-color: #0a1a0a !important; }
+.bg-slate-950     { background-color: var(--color-bg) !important; }
+.hover\:bg-slate-800:hover { background-color: var(--color-highlight) !important; }
 
-/* Gray → Matrix green scale */
-.bg-gray-900      { background-color: #000000 !important; }
-.bg-gray-800      { background-color: #050505 !important; }
-.bg-gray-100      { background-color: #0a0a0a !important; }
-.bg-gray-50       { background-color: #050505 !important; }
-.text-gray-900    { color: #00ff41 !important; }
-.text-gray-800    { color: #00cc33 !important; }
-.text-gray-700    { color: #00a827 !important; }
-.text-gray-600    { color: #00a827 !important; }
-.text-gray-500    { color: #1a5c1a !important; }
-.text-gray-400    { color: #1a5c1a !important; }
-.border-gray-50   { border-color: #003b00 !important; }
-.border-gray-100  { border-color: #003b00 !important; }
-.border-gray-200  { border-color: #003b00 !important; }
-.border-gray-300  { border-color: rgba(0,255,65,0.35) !important; }
-.border-gray-400  { border-color: rgba(0,255,65,0.5) !important; }
-.hover\:bg-gray-800:hover   { background-color: #0a1a0a !important; }
-.hover\:bg-gray-50:hover    { background-color: #0a1a0a !important; }
-.hover\:text-gray-900:hover { color: #00ff41 !important; }
-.focus-visible\:ring-gray-900 { --tw-ring-color: #00ff41 !important; }
-.focus-visible\:ring-gray-400 { --tw-ring-color: rgba(0,255,65,0.5) !important; }
+.bg-gray-900      { background-color: var(--color-bg) !important; }
+.bg-gray-800      { background-color: var(--color-card) !important; }
+.bg-gray-100      { background-color: var(--color-highlight) !important; }
+.bg-gray-50       { background-color: var(--color-card) !important; }
+.text-gray-900    { color: var(--color-primary) !important; }
+.text-gray-800    { color: var(--color-secondary) !important; }
+.text-gray-700    { color: var(--color-secondary) !important; }
+.text-gray-600    { color: var(--color-secondary) !important; }
+.text-gray-500    { color: var(--color-dim) !important; }
+.text-gray-400    { color: var(--color-dim) !important; }
+.border-gray-50   { border-color: var(--color-border) !important; }
+.border-gray-100  { border-color: var(--color-border) !important; }
+.border-gray-200  { border-color: var(--color-border) !important; }
+.border-gray-300  { border-color: var(--color-primary-a35) !important; }
+.border-gray-400  { border-color: var(--color-primary-a50) !important; }
+.hover\:bg-gray-800:hover   { background-color: var(--color-highlight) !important; }
+.hover\:bg-gray-50:hover    { background-color: var(--color-highlight) !important; }
+.hover\:text-gray-900:hover { color: var(--color-primary) !important; }
+.focus-visible\:ring-gray-900 { --tw-ring-color: var(--color-primary) !important; }
+.focus-visible\:ring-gray-400 { --tw-ring-color: var(--color-primary-a50) !important; }
 
-/* ── Range slider — Matrix styled ────────────────────────── */
+/* ── Range slider ────────────────────────────────────────────── */
 
 input[type='range'].mx-range-slider {
   -webkit-appearance: none;
@@ -344,7 +320,7 @@ input[type='range'].mx-range-slider {
   width: 100%;
   height: 4px;
   background: #1a1a1a !important;
-  border: 1px solid #003b00 !important;
+  border: 1px solid var(--color-border) !important;
   outline: none;
   cursor: pointer;
 }
@@ -353,35 +329,29 @@ input[type='range'].mx-range-slider::-webkit-slider-thumb {
   appearance: none;
   width: 14px;
   height: 14px;
-  background: var(--mx-green, #00ff41);
-  border: 1px solid var(--mx-green, #00ff41);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
   cursor: pointer;
-  box-shadow: 0 0 6px var(--mx-green-glow, rgba(0,255,65,0.3));
+  box-shadow: 0 0 6px var(--color-primary-a30);
 }
 input[type='range'].mx-range-slider::-moz-range-thumb {
   width: 14px;
   height: 14px;
-  background: var(--mx-green, #00ff41);
-  border: 1px solid var(--mx-green, #00ff41);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
   cursor: pointer;
-  box-shadow: 0 0 6px var(--mx-green-glow, rgba(0,255,65,0.3));
+  box-shadow: 0 0 6px var(--color-primary-a30);
 }
 input[type='range'].mx-range-slider::-webkit-slider-runnable-track {
   height: 4px;
-  background: linear-gradient(to right, var(--mx-green-dark, #003b00), var(--mx-green-dim, #00a827));
+  background: linear-gradient(to right, var(--color-border), var(--color-secondary));
 }
 input[type='range'].mx-range-slider::-moz-range-track {
   height: 4px;
-  background: linear-gradient(to right, var(--mx-green-dark, #003b00), var(--mx-green-dim, #00a827));
+  background: linear-gradient(to right, var(--color-border), var(--color-secondary));
   border: none;
 }
 input[type='range'].mx-range-slider:focus {
   box-shadow: none !important;
-  border-color: var(--mx-green, #00ff41) !important;
-}
-
-/* ── Settings-controlled font size base ──────────────────── */
-
-body {
-  font-size: calc(var(--mx-font-size-base, 14px) * var(--mx-text-scale, 1));
+  border-color: var(--color-primary) !important;
 }

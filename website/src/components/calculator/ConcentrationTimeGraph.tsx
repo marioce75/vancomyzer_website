@@ -58,11 +58,11 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   if (!active || !payload?.length) return null;
   const conc = payload.find((p) => p.name === "Concentration")?.value;
   return (
-    <div className="px-3 py-2 shadow-lg text-xs" style={{ background: "#000000", border: "1px solid rgba(0,255,65,0.5)", boxShadow: "0 0 12px rgba(0,255,65,0.2)", fontFamily: "'Share Tech Mono', monospace" }}>
-      <p className="font-semibold mb-1" style={{ color: "#00a827" }}>t = {label}h</p>
+    <div className="px-3 py-2 shadow-lg text-xs" style={{ background: "var(--color-bg)", border: "1px solid var(--color-primary-a50)", boxShadow: "0 0 12px var(--color-primary-a20)", fontFamily: "'Share Tech Mono', monospace" }}>
+      <p className="font-semibold mb-1" style={{ color: "var(--color-secondary)" }}>t = {label}h</p>
       {conc != null && (
-        <p className="tabular-nums" style={{ color: "#00ff41" }}>
-          <span className="font-bold" style={{ color: "#00ff41", textShadow: "0 0 6px rgba(0,255,65,0.8)" }}>{Number(conc).toFixed(1)}</span> mcg/mL
+        <p className="tabular-nums" style={{ color: "var(--color-primary)" }}>
+          <span className="font-bold" style={{ color: "var(--color-primary)", textShadow: "0 0 6px var(--color-glow-strong)" }}>{Number(conc).toFixed(1)}</span> mcg/mL
         </p>
       )}
     </div>
@@ -82,13 +82,13 @@ export default function ConcentrationTimeGraph({
   const hasData = curveData.length > 0 || measuredData.length > 0;
 
   if (!mounted) {
-    return <div className="h-[260px] border border-dashed animate-pulse" style={{ borderColor: "rgba(0,255,65,0.3)", background: "#050505" }} />;
+    return <div className="h-[260px] border border-dashed animate-pulse" style={{ borderColor: "var(--color-primary-a30)", background: "var(--color-card)" }} />;
   }
 
   if (!hasData) {
     return (
-      <div className="flex h-[260px] items-center justify-center border border-dashed text-sm" style={{ borderColor: "rgba(0,255,65,0.3)", background: "#050505", color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>
-        &gt; CONCENTRATION-TIME PROJECTION APPEARS HERE AFTER CALCULATION<span className="mx-blink" style={{ color: "#00ff41" }}>_</span>
+      <div className="flex h-[260px] items-center justify-center border border-dashed text-sm" style={{ borderColor: "var(--color-primary-a30)", background: "var(--color-card)", color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
+        &gt; CONCENTRATION-TIME PROJECTION APPEARS HERE AFTER CALCULATION<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span>
       </div>
     );
   }
@@ -106,15 +106,15 @@ export default function ConcentrationTimeGraph({
     <div className="flex flex-col gap-2 w-full" aria-label="Concentration-time graph">
       {/* Legend / badges row */}
       <div className="flex flex-wrap items-center gap-1.5">
-        <span className="px-2.5 py-0.5 text-[11px] font-medium" style={{ border: "1px solid #003b00", background: "#000000", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>
+        <span className="px-2.5 py-0.5 text-[11px] font-medium" style={{ border: "1px solid var(--color-border)", background: "var(--color-bg)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>
           {modelLabel}
         </span>
         {evidenceLabel && (
-          <span className="px-2.5 py-0.5 text-[11px] font-medium" style={{ border: "1px solid rgba(0,255,65,0.4)", background: "rgba(0,255,65,0.06)", color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }}>
+          <span className="px-2.5 py-0.5 text-[11px] font-medium" style={{ border: "1px solid var(--color-primary-a40)", background: "var(--color-primary-a06)", color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
             {evidenceLabel}
           </span>
         )}
-        <span className="px-2.5 py-0.5 text-[11px] font-medium" style={{ border: "1px solid rgba(0,255,65,0.3)", background: "rgba(0,255,65,0.06)", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>
+        <span className="px-2.5 py-0.5 text-[11px] font-medium" style={{ border: "1px solid var(--color-primary-a30)", background: "var(--color-primary-a06)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>
           ▓ Steady-state AUC zone
         </span>
         {measuredData.length > 0 && (
@@ -127,24 +127,24 @@ export default function ConcentrationTimeGraph({
       <div className="h-[240px] w-full min-w-0">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 6, right: 16, left: 0, bottom: 4 }}>
-            <CartesianGrid strokeDasharray="3 4" stroke="rgba(0,255,65,0.08)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 4" stroke="var(--color-primary-a08)" vertical={false} />
 
             <XAxis
               dataKey="time_hours"
               type="number"
               domain={[xMin, xMax]}
               tickFormatter={(v) => `${v}h`}
-              tick={{ fontSize: 10, fill: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}
-              stroke="#003b00"
-              label={{ value: "Time (hours)", position: "insideBottomRight", offset: -4, fontSize: 10, fill: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}
+              tick={{ fontSize: 10, fill: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
+              stroke="var(--color-border)"
+              label={{ value: "Time (hours)", position: "insideBottomRight", offset: -4, fontSize: 10, fill: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
             />
             <YAxis
               dataKey="concentration"
               type="number"
               domain={[0, yMax]}
-              tick={{ fontSize: 10, fill: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}
-              stroke="#003b00"
-              label={{ value: "mcg/mL", angle: -90, position: "insideLeft", offset: 8, fontSize: 10, fill: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}
+              tick={{ fontSize: 10, fill: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
+              stroke="var(--color-border)"
+              label={{ value: "mcg/mL", angle: -90, position: "insideLeft", offset: 8, fontSize: 10, fill: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
             />
 
             <Tooltip content={<CustomTooltip />} />
@@ -152,17 +152,17 @@ export default function ConcentrationTimeGraph({
             {/* Therapeutic trough range band — Matrix green reference lines */}
             <ReferenceLine
               y={TROUGH_HIGH}
-              stroke="#00a827"
+              stroke="var(--color-secondary)"
               strokeDasharray="5 3"
               strokeWidth={1.5}
-              label={{ value: `Trough max ${TROUGH_HIGH}`, position: "right", fontSize: 9, fill: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}
+              label={{ value: `Trough max ${TROUGH_HIGH}`, position: "right", fontSize: 9, fill: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
             />
             <ReferenceLine
               y={TROUGH_LOW}
-              stroke="#00a827"
+              stroke="var(--color-secondary)"
               strokeDasharray="5 3"
               strokeWidth={1.5}
-              label={{ value: `Trough min ${TROUGH_LOW}`, position: "right", fontSize: 9, fill: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}
+              label={{ value: `Trough min ${TROUGH_LOW}`, position: "right", fontSize: 9, fill: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
             />
 
             {/* Steady-state AUC shaded area */}
@@ -170,7 +170,7 @@ export default function ConcentrationTimeGraph({
               type="monotone"
               dataKey="aucShade"
               stroke="none"
-              fill="#00ff41"
+              fill="var(--color-primary)"
               fillOpacity={0.06}
               isAnimationActive={false}
               legendType="none"
@@ -181,10 +181,10 @@ export default function ConcentrationTimeGraph({
               type="monotone"
               dataKey="concentration"
               name="Concentration"
-              stroke="#00ff41"
+              stroke="var(--color-primary)"
               strokeWidth={2.5}
               dot={false}
-              activeDot={{ r: 4, fill: "#00ff41", stroke: "#000000", strokeWidth: 2 }}
+              activeDot={{ r: 4, fill: "var(--color-primary)", stroke: "var(--color-bg)", strokeWidth: 2 }}
               isAnimationActive={false}
             />
 
@@ -195,8 +195,8 @@ export default function ConcentrationTimeGraph({
                 x={p.time_hours}
                 y={p.concentration}
                 r={5}
-                fill="#00ff41"
-                stroke="#000000"
+                fill="var(--color-primary)"
+                stroke="var(--color-bg)"
                 strokeWidth={2}
               />
             ))}
@@ -206,16 +206,16 @@ export default function ConcentrationTimeGraph({
 
       {/* Compact legend + reference link */}
       <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-        <div className="flex flex-wrap gap-3 text-[10px]" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>
-          <span className="flex items-center gap-1"><span className="inline-block w-5 h-0.5" style={{ background: "#00ff41" }}></span> Predicted concentration</span>
-          <span className="flex items-center gap-1"><span className="inline-block w-5 h-0.5 border-t-2 border-dashed" style={{ borderColor: "#00a827" }}></span> Trough reference (10–20 mcg/mL)</span>
-          <span className="flex items-center gap-1"><span className="inline-block w-3 h-3" style={{ background: "rgba(0,255,65,0.2)", border: "1px solid rgba(0,255,65,0.4)" }}></span> Steady-state AUC zone</span>
-          {measuredData.length > 0 && <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5" style={{ background: "#00ff41", border: "1px solid #000000" }}></span> Measured level</span>}
+        <div className="flex flex-wrap gap-3 text-[10px]" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
+          <span className="flex items-center gap-1"><span className="inline-block w-5 h-0.5" style={{ background: "var(--color-primary)" }}></span> Predicted concentration</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-5 h-0.5 border-t-2 border-dashed" style={{ borderColor: "var(--color-secondary)" }}></span> Trough reference (10–20 mcg/mL)</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-3 h-3" style={{ background: "var(--color-primary-a20)", border: "1px solid var(--color-primary-a40)" }}></span> Steady-state AUC zone</span>
+          {measuredData.length > 0 && <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5" style={{ background: "var(--color-primary)", border: "1px solid var(--color-bg)" }}></span> Measured level</span>}
         </div>
         <Link
           href="/references"
           className="text-[10px] transition-colors shrink-0"
-          style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}
+          style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
         >
           References &amp; Methods
         </Link>

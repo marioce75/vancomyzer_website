@@ -32,7 +32,7 @@ export default function CalculatorErrorState({
   const fallbackText = fallbackLabel(fallbackWorkflow);
 
   return (
-    <div className="border p-4" style={{ borderColor: "rgba(255,51,51,0.5)", background: "#050505" }}>
+    <div className="border p-4" style={{ borderColor: "rgba(255,51,51,0.5)", background: "var(--color-card)" }}>
       <p className="text-sm font-semibold" style={{ color: "#ff3333", ...monoStyle }}>
         &gt; ERROR: {message}
       </p>

@@ -96,9 +96,9 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           width: 380,
           maxWidth: "100vw",
           height: "100%",
-          background: "#000000",
-          borderLeft: "1px solid #003b00",
-          boxShadow: "-4px 0 24px rgba(0,255,65,0.08)",
+          background: "var(--color-bg)",
+          borderLeft: "1px solid var(--color-border)",
+          boxShadow: "-4px 0 24px var(--color-primary-a08)",
           overflowY: "auto",
           transform: open ? "translateX(0)" : "translateX(100%)",
           transition: "transform 0.3s ease",
@@ -110,7 +110,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           className="flex items-center justify-between"
           style={{
             padding: "20px 20px 16px",
-            borderBottom: "1px solid #003b00",
+            borderBottom: "1px solid var(--color-border)",
           }}
         >
           <h2
@@ -119,8 +119,8 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               fontSize: 16,
               fontWeight: 700,
               letterSpacing: "0.08em",
-              color: "#00ff41",
-              textShadow: "0 0 10px rgba(0,255,65,0.6)",
+              color: "var(--color-primary)",
+              textShadow: "0 0 10px var(--color-glow-strong)",
               ...FONT,
             }}
           >
@@ -132,8 +132,8 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             aria-label="Close settings"
             style={{
               background: "transparent",
-              border: "1px solid #003b00",
-              color: "#00a827",
+              border: "1px solid var(--color-border)",
+              color: "var(--color-secondary)",
               width: 32,
               height: 32,
               display: "flex",
@@ -145,12 +145,12 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               ...FONT,
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,255,65,0.5)";
-              (e.currentTarget as HTMLElement).style.color = "#00ff41";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a50)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.borderColor = "#003b00";
-              (e.currentTarget as HTMLElement).style.color = "#00a827";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
             }}
           >
             ✕
@@ -174,9 +174,9 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     className="flex items-center gap-2"
                     style={{
                       padding: "10px 12px",
-                      background: active ? "rgba(0,255,65,0.06)" : "#050505",
-                      border: `1px solid ${active ? "#00ff41" : "#003b00"}`,
-                      color: active ? "#00ff41" : "#00a827",
+                      background: active ? "var(--color-primary-a06)" : "var(--color-card)",
+                      border: `1px solid ${active ? "var(--color-primary)" : "var(--color-border)"}`,
+                      color: active ? "var(--color-primary)" : "var(--color-secondary)",
                       cursor: "pointer",
                       textAlign: "left",
                       fontSize: 12,
@@ -214,9 +214,9 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     style={{
                       flex: 1,
                       padding: "8px 0",
-                      background: active ? "#00ff41" : "#050505",
-                      color: active ? "#000000" : "#00a827",
-                      border: active ? "1px solid #00ff41" : "1px solid #003b00",
+                      background: active ? "var(--color-primary)" : "var(--color-card)",
+                      color: active ? "var(--color-bg)" : "var(--color-secondary)",
+                      border: active ? "1px solid var(--color-primary)" : "1px solid var(--color-border)",
                       cursor: "pointer",
                       fontSize: 12,
                       fontWeight: active ? 700 : 500,
@@ -242,13 +242,13 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 return (
                   <div key={slider.key} style={{ opacity: disabled ? 0.35 : 1 }}>
                     <div className="flex items-center justify-between" style={{ marginBottom: 6 }}>
-                      <span style={{ fontSize: 12, color: "#00a827", ...FONT }}>
+                      <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
                         {slider.label}
                       </span>
                       <span
                         style={{
                           fontSize: 12,
-                          color: "#00ff41",
+                          color: "var(--color-primary)",
                           minWidth: 28,
                           textAlign: "right",
                           ...FONT,
@@ -287,7 +287,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     key={toggle.key}
                     className="flex items-center justify-between"
                   >
-                    <span style={{ fontSize: 12, color: "#00a827", ...FONT }}>
+                    <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
                       {toggle.label}
                     </span>
                     <button
@@ -300,9 +300,9 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                         width: 40,
                         height: 20,
                         padding: 0,
-                        background: on ? "#00ff41" : "#1a1a1a",
-                        border: on ? "none" : "1px solid #003b00",
-                        boxShadow: on ? "0 0 8px rgba(0,255,65,0.5)" : "none",
+                        background: on ? "var(--color-primary)" : "#1a1a1a",
+                        border: on ? "none" : "1px solid var(--color-border)",
+                        boxShadow: on ? "0 0 8px var(--color-primary-a50)" : "none",
                         cursor: "pointer",
                         flexShrink: 0,
                         transition: "background 0.2s, box-shadow 0.2s",
@@ -316,7 +316,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                           left: on ? 22 : 2,
                           width: 16,
                           height: 16,
-                          background: on ? "#000000" : "#003b00",
+                          background: on ? "var(--color-bg)" : "var(--color-border)",
                           transition: "left 0.2s",
                           display: "block",
                         }}
@@ -336,9 +336,9 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               style={{
                 width: "100%",
                 padding: "12px 0",
-                background: "#050505",
-                border: "1px solid #003b00",
-                color: "#00a827",
+                background: "var(--color-card)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-secondary)",
                 fontSize: 13,
                 letterSpacing: "0.06em",
                 cursor: "pointer",
@@ -346,13 +346,13 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 ...FONT,
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,255,65,0.5)";
-                (e.currentTarget as HTMLElement).style.color = "#00ff41";
-                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 12px rgba(0,255,65,0.15)";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a50)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 12px var(--color-primary-a15)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = "#003b00";
-                (e.currentTarget as HTMLElement).style.color = "#00a827";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
                 (e.currentTarget as HTMLElement).style.boxShadow = "none";
               }}
             >
@@ -374,7 +374,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
         fontSize: 11,
         fontWeight: 700,
         letterSpacing: "0.12em",
-        color: "#1a5c1a",
+        color: "var(--color-dim)",
         textTransform: "uppercase" as const,
         fontFamily: "'Share Tech Mono', monospace",
       }}

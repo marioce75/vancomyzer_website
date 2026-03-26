@@ -87,24 +87,24 @@ function SectionToggle({
       className="mt-3 flex w-full items-center justify-between border px-4 py-3 text-left transition first:mt-0"
       style={
         isActive
-          ? { background: "#0a1a0a", borderColor: "rgba(0,255,65,0.5)", borderLeft: "3px solid #00ff41" }
-          : { background: "#050505", borderColor: "#003b00" }
+          ? { background: "var(--color-highlight)", borderColor: "var(--color-primary-a50)", borderLeft: "3px solid var(--color-primary)" }
+          : { background: "var(--color-card)", borderColor: "var(--color-border)" }
       }
       onClick={() => onToggle(id)}
       aria-expanded={isActive}
       aria-controls={`section-panel-${id}`}
-      onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "#0a1a0a"; }}
-      onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "#050505"; }}
+      onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "var(--color-highlight)"; }}
+      onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "var(--color-card)"; }}
     >
       <div className="flex items-start gap-3">
         <span
           className="mt-0.5 inline-flex h-6 w-6 items-center justify-center border text-[11px] font-semibold"
           style={
             isActive
-              ? { border: "1px solid rgba(0,255,65,0.5)", background: "rgba(0,255,65,0.15)", color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }
+              ? { border: "1px solid var(--color-primary-a50)", background: "var(--color-primary-a15)", color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }
               : completed
-                ? { border: "1px solid rgba(0,255,65,0.4)", background: "rgba(0,255,65,0.05)", color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }
-                : { border: "1px solid #003b00", background: "#0a0a0a", color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }
+                ? { border: "1px solid var(--color-primary-a40)", background: "var(--color-primary-a05)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }
+                : { border: "1px solid var(--color-border)", background: "var(--color-input)", color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }
           }
         >
           {completed ? "OK" : "IN"}
@@ -112,13 +112,13 @@ function SectionToggle({
         <span>
           <span
             className="block text-sm font-semibold"
-            style={{ color: isActive ? "#00ff41" : "#00a827", fontFamily: "'Share Tech Mono', monospace" }}
+            style={{ color: isActive ? "var(--color-primary)" : "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
           >
             {title}
           </span>
           <span
             className="mt-0.5 block text-xs"
-            style={{ color: isActive ? "#00a827" : "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}
+            style={{ color: isActive ? "var(--color-secondary)" : "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
           >
             {subtitle}
           </span>
@@ -127,7 +127,7 @@ function SectionToggle({
       <span
         className="text-xs font-semibold uppercase tracking-[0.18em]"
         style={{
-          color: isActive ? "#00ff41" : completed ? "#00a827" : "#1a5c1a",
+          color: isActive ? "var(--color-primary)" : completed ? "var(--color-secondary)" : "var(--color-dim)",
           fontFamily: "'Share Tech Mono', monospace",
         }}
       >
@@ -146,7 +146,7 @@ function SectionPanel({ id, activeSection, children }: { id: string; activeSecti
       className={`overflow-hidden transition-all ${
         isActive ? "max-h-[2200px] px-4 pb-4 pt-3" : "max-h-0 px-4 pb-0 pt-0"
       }`}
-      style={{ background: "#050505", borderLeft: "1px solid #003b00", borderRight: "1px solid #003b00", borderBottom: isActive ? "1px solid #003b00" : "none" }}
+      style={{ background: "var(--color-card)", borderLeft: "1px solid var(--color-border)", borderRight: "1px solid var(--color-border)", borderBottom: isActive ? "1px solid var(--color-border)" : "none" }}
     >
       {children}
     </div>
@@ -171,36 +171,36 @@ function GraphReadinessState({
     : [patientReady, patientReady, patientReady];
 
   return (
-    <section className="overflow-hidden border" style={{ borderColor: "#003b00", background: "#050505" }}>
-      <div className="border-b px-6 py-5" style={{ borderBottomColor: "#003b00", background: "#000000" }}>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.24em]" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>&gt; MODEL-BACKED GRAPH ONLY</p>
-        <h2 className="mt-2 text-lg font-semibold tracking-tight" style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }}>Complete the inputs to generate the concentration-time profile.</h2>
-        <p className="mt-1.5 max-w-3xl text-sm leading-6" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>
+    <section className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+      <div className="border-b px-6 py-5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>&gt; MODEL-BACKED GRAPH ONLY</p>
+        <h2 className="mt-2 text-lg font-semibold tracking-tight" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>Complete the inputs to generate the concentration-time profile.</h2>
+        <p className="mt-1.5 max-w-3xl text-sm leading-6" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
           The chart appears only after the dosing engine returns a fully calculated PK profile - not from client-side estimates.
         </p>
       </div>
       <div className="grid gap-6 px-6 py-6 lg:grid-cols-[1.35fr_0.95fr]">
-        <div className="border px-5 py-5" style={{ borderColor: "rgba(0,255,65,0.25)", background: "rgba(0,255,65,0.04)" }}>
-          <p className="text-sm font-semibold" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>CLINICAL FRAMING</p>
-          <p className="mt-2 text-sm leading-6" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>
+        <div className="border px-5 py-5" style={{ borderColor: "var(--color-primary-a25)", background: "var(--color-primary-a05)" }}>
+          <p className="text-sm font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>CLINICAL FRAMING</p>
+          <p className="mt-2 text-sm leading-6" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
             The displayed profile represents the calculator&apos;s predicted vancomycin concentrations only after a full regimen calculation. AUC24 target attainment is assessed numerically from the PK model, not from a flat concentration band laid over the graph.
           </p>
         </div>
-        <div className="border px-5 py-5" style={{ borderColor: "#003b00", background: "#000000" }}>
-          <p className="text-sm font-semibold" style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }}>REQUIRED BEFORE GRAPHING</p>
+        <div className="border px-5 py-5" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}>
+          <p className="text-sm font-semibold" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>REQUIRED BEFORE GRAPHING</p>
           <div className="mt-4 space-y-3">
             {items.map((item, index) => (
-              <div key={item} className="flex items-start gap-3 border px-4 py-3" style={{ borderColor: "#003b00", background: "#050505" }}>
+              <div key={item} className="flex items-start gap-3 border px-4 py-3" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
                 <span
                   className="mt-0.5 inline-flex h-5 w-5 items-center justify-center text-[11px] font-bold"
                   style={states[index]
-                    ? { background: "rgba(0,255,65,0.1)", color: "#00ff41", border: "1px solid rgba(0,255,65,0.4)", fontFamily: "'Share Tech Mono', monospace" }
-                    : { background: "#0a0a0a", color: "#1a5c1a", border: "1px solid #003b00", fontFamily: "'Share Tech Mono', monospace" }
+                    ? { background: "var(--color-primary-a12)", color: "var(--color-primary)", border: "1px solid var(--color-primary-a40)", fontFamily: "'Share Tech Mono', monospace" }
+                    : { background: "var(--color-input)", color: "var(--color-dim)", border: "1px solid var(--color-border)", fontFamily: "'Share Tech Mono', monospace" }
                   }
                 >
                   {states[index] ? "✓" : index + 1}
                 </span>
-                <span className="text-sm" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>{item}</span>
+                <span className="text-sm" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>{item}</span>
               </div>
             ))}
           </div>
@@ -241,7 +241,7 @@ export default function CalculatorWorkspace() {
   // Layout State
   const [activeSection, setActiveSection] = useState<string>("patient");
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const { settings } = useMatrixSettings();
+  const { settings, playSound } = useMatrixSettings();
 
   // Pre-fill patient state from URL query params only (e.g. sample case link)
   // localStorage is intentionally NOT used — state should start fresh on every page load
@@ -288,6 +288,7 @@ export default function CalculatorWorkspace() {
   }, []);
 
   const handleCalculate = useCallback(async () => {
+    playSound("calculate");
     setError(null);
     setLoading(true);
     const request = buildRequest();
@@ -315,6 +316,7 @@ export default function CalculatorWorkspace() {
           recovery_guidance: Array.isArray(data.recovery_guidance) ? data.recovery_guidance : [],
           fallback_workflow: data.fallback_workflow === "initial_regimen" || data.fallback_workflow === "repeat_existing_regimen_sampling" ? data.fallback_workflow : undefined,
         });
+        playSound("error");
         return;
       }
 
@@ -340,10 +342,11 @@ export default function CalculatorWorkspace() {
       setLastCalculatedAt(Date.now());
       setSelectedFrequencyOption(null);
       setError(null);
+      playSound("success");
     } finally {
       setLoading(false);
     }
-  }, [buildRequest]);
+  }, [buildRequest, playSound]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -464,10 +467,10 @@ export default function CalculatorWorkspace() {
 
   const leftColumn = (
     <div className="flex flex-col h-full">
-      <div className="border p-5" style={{ borderTop: "3px solid #00ff41", borderLeft: "1px solid #003b00", borderRight: "1px solid #003b00", borderBottom: "1px solid #003b00", background: "#050505" }}>
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>&gt; CLINICAL DATA INTAKE</p>
-        <h2 className="mt-1.5 text-lg font-semibold tracking-tight" style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }}>Enter patient data to begin.</h2>
-        <p className="mt-1 text-sm leading-6" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>
+      <div className="border p-5" style={{ borderTop: "3px solid var(--color-primary)", borderLeft: "1px solid var(--color-border)", borderRight: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>&gt; CLINICAL DATA INTAKE</p>
+        <h2 className="mt-1.5 text-lg font-semibold tracking-tight" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>Enter patient data to begin.</h2>
+        <p className="mt-1 text-sm leading-6" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
           Complete each section. The Bayesian engine runs automatically once enough data is present.
         </p>
       </div>
@@ -597,10 +600,10 @@ export default function CalculatorWorkspace() {
         </div>
       </div>
 
-      <div className="sticky bottom-0 mt-auto border-t" style={{ borderTopColor: "#003b00", background: "#000000" }}>
+      <div className="sticky bottom-0 mt-auto border-t" style={{ borderTopColor: "var(--color-border)", background: "var(--color-bg)" }}>
         <CalculatorActionBar onCalculate={handleCalculate} onReset={handleReset} disabled={loading || rrt === null || rrt === true} hideCalculate={hideCalculate} />
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t px-4 py-2" style={{ borderTopColor: "#003b00" }}>
-          <span className="text-[10px]" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>© 2026 Vancomyzer™</span>
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t px-4 py-2" style={{ borderTopColor: "var(--color-border)" }}>
+          <span className="text-[10px]" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>© 2026 Vancomyzer™</span>
           {[
             { href: "/disclaimer", label: "Disclaimer" },
             { href: "/terms", label: "Terms" },
@@ -608,9 +611,9 @@ export default function CalculatorWorkspace() {
             { href: "/about", label: "About" },
             { href: "/contact", label: "Contact" },
           ].map(({ href, label }) => (
-            <a key={href} href={href} className="text-[10px] transition-colors" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#00a827"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#1a5c1a"; }}
+            <a key={href} href={href} className="text-[10px] transition-colors" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "var(--color-dim)"; }}
             >
               {label}
             </a>
@@ -622,10 +625,10 @@ export default function CalculatorWorkspace() {
 
   const rightColumn = (
     <div className="flex flex-col h-full gap-6">
-      <div className="border-l-4 border px-4 py-3 flex items-center gap-3" style={{ borderLeftColor: "#00ff41", borderColor: "#003b00", background: "#050505" }}>
+      <div className="border-l-4 border px-4 py-3 flex items-center gap-3" style={{ borderLeftColor: "var(--color-primary)", borderColor: "var(--color-border)", background: "var(--color-card)" }}>
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "#00ff41", fontFamily: "'Share Tech Mono', monospace" }}>&gt; ANALYSIS WORKSPACE</p>
-          <h2 className="text-sm font-semibold leading-snug" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>Model outputs, exposure metrics &amp; regimen guidance</h2>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>&gt; ANALYSIS WORKSPACE</p>
+          <h2 className="text-sm font-semibold leading-snug" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>Model outputs, exposure metrics &amp; regimen guidance</h2>
         </div>
       </div>
 
@@ -662,7 +665,7 @@ export default function CalculatorWorkspace() {
       )}
 
       {!loading && error && (
-        <div className="border p-6" style={{ background: "#050505", borderColor: "rgba(255,51,51,0.5)" }}>
+        <div className="border p-6" style={{ background: "var(--color-card)", borderColor: "rgba(255,51,51,0.5)" }}>
           <CalculatorErrorState message={error.message} details={error.details} limitations={error.limitations} recoveryGuidance={error.recovery_guidance} fallbackWorkflow={error.fallback_workflow} onSwitchToInitialRegimen={handleSwitchToInitialRegimen} />
         </div>
       )}
@@ -676,9 +679,9 @@ export default function CalculatorWorkspace() {
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
 
                 {/* Left: Suggested Dose with frequency tabs */}
-                <div className="overflow-hidden border" style={{ borderColor: "#003b00", background: "#050505" }}>
-                  <div className="flex items-center justify-between border-b px-3 py-2" style={{ borderBottomColor: "#003b00", background: "#000000" }}>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>SUGGESTED DOSE</span>
+                <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+                  <div className="flex items-center justify-between border-b px-3 py-2" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>SUGGESTED DOSE</span>
                     <div className="flex items-center gap-2">
                       {(activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note) && (
                         <button
@@ -718,9 +721,9 @@ export default function CalculatorWorkspace() {
                 </div>
 
                 {/* Right: Predicted PK metrics + kinetic params */}
-                <div className="overflow-hidden border" style={{ borderColor: "#003b00", background: "#050505" }}>
-                  <div className="border-b px-3 py-2" style={{ borderBottomColor: "#003b00", background: "#000000" }}>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>PREDICTED PK</span>
+                <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+                  <div className="border-b px-3 py-2" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>PREDICTED PK</span>
                   </div>
                   <div className="p-3 flex flex-col gap-3">
                     {(() => {
@@ -730,8 +733,8 @@ export default function CalculatorWorkspace() {
                       return <PrimaryMetricsCard auc24={auc24} peak={peak} trough={trough} />;
                     })()}
                     {visibleResult.calculation_details && (
-                      <div className="border px-3 py-2" style={{ borderColor: "#003b00", background: "#000000" }}>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-1.5" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>KINETIC PARAMETERS</p>
+                      <div className="border px-3 py-2" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-1.5" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>KINETIC PARAMETERS</p>
                         <DataFitReviewabilityPanel details={visibleResult.calculation_details} />
                       </div>
                     )}
@@ -740,9 +743,9 @@ export default function CalculatorWorkspace() {
               </div>
 
               {/* Row 2: Concentration-Time Graph — full width */}
-              <section className="overflow-hidden border" style={{ borderColor: "#003b00", background: "#050505" }}>
-                <div className="border-b px-3 py-2" style={{ borderBottomColor: "#003b00", background: "#000000" }}>
-                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] m-0" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>CONCENTRATION-TIME PROFILE</h2>
+              <section className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+                <div className="border-b px-3 py-2" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
+                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] m-0" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>CONCENTRATION-TIME PROFILE</h2>
                 </div>
                 <div className="p-3">
                   <ConcentrationTimeGraph
@@ -755,8 +758,8 @@ export default function CalculatorWorkspace() {
 
               {/* Row 3: Details (collapsed by default to keep screen clean) */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-6">
-                  <div className="border p-4" style={{ borderColor: "#003b00", background: "#050505" }}>
-                    <h3 className="text-sm font-semibold mb-3 border-b pb-2" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace", borderBottomColor: "#003b00" }}>CLINICAL INTERPRETATION</h3>
+                  <div className="border p-4" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+                    <h3 className="text-sm font-semibold mb-3 border-b pb-2" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace", borderBottomColor: "var(--color-border)" }}>CLINICAL INTERPRETATION</h3>
                     <InterpretationSummaryCard
                       interpretation_summary={
                         activeOption?.interpretation_summary ?? visibleResult.interpretation_summary
@@ -771,14 +774,14 @@ export default function CalculatorWorkspace() {
                     </div>
                   </div>
 
-                  <details className="group border p-4" style={{ borderColor: "#003b00", background: "#050505" }}>
-                    <summary className="cursor-pointer text-sm font-semibold flex items-center outline-none list-none" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>
-                      <svg className="w-4 h-4 mr-2 transition-transform group-open:rotate-90" style={{ color: "#1a5c1a" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <details className="group border p-4" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+                    <summary className="cursor-pointer text-sm font-semibold flex items-center outline-none list-none" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>
+                      <svg className="w-4 h-4 mr-2 transition-transform group-open:rotate-90" style={{ color: "var(--color-dim)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                       CALCULATION DETAILS &amp; DOCUMENTATION
                     </summary>
-                    <div className="mt-3 flex flex-col gap-3 border-t pt-3" style={{ borderTopColor: "#003b00" }}>
+                    <div className="mt-3 flex flex-col gap-3 border-t pt-3" style={{ borderTopColor: "var(--color-border)" }}>
                       <CalculationDetailsCard details={visibleResult.calculation_details} />
                       <QuickSummaryPreview
                         quick_summary={
@@ -798,11 +801,11 @@ export default function CalculatorWorkspace() {
             </div>
           ) : (
             <div className="flex flex-col gap-6 flex-1 h-full pb-8">
-              <section className="flex h-[220px] flex-col items-center justify-center border border-dashed p-8 text-center" style={{ borderColor: "rgba(0,255,65,0.3)", background: "#050505" }}>
-                <p className="text-lg font-medium" style={{ color: "#00a827", fontFamily: "'Share Tech Mono', monospace" }}>
-                  &gt; AWAITING INPUT<span className="mx-blink" style={{ color: "#00ff41" }}>_</span>
+              <section className="flex h-[220px] flex-col items-center justify-center border border-dashed p-8 text-center" style={{ borderColor: "var(--color-primary-a30)", background: "var(--color-card)" }}>
+                <p className="text-lg font-medium" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>
+                  &gt; AWAITING INPUT<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span>
                 </p>
-                <p className="mt-2 text-sm" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>Complete the required inputs to generate exposure metrics and a model-backed concentration profile.</p>
+                <p className="mt-2 text-sm" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>Complete the required inputs to generate exposure metrics and a model-backed concentration profile.</p>
               </section>
               <GraphReadinessState mode={mode} patientReady={patientReady} regimenReady={regimenReady} levelReady={levelReady} />
             </div>
@@ -813,7 +816,7 @@ export default function CalculatorWorkspace() {
   );
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden" style={{ background: "#000000", color: "#00ff41" }}>
+    <div className="flex h-screen flex-col overflow-hidden" style={{ background: "var(--color-bg)", color: "var(--color-primary)" }}>
       <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} />
       <div className="flex-1 overflow-hidden h-full">
         <CalculatorLayout left={leftColumn} right={rightColumn} />

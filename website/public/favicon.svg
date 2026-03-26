@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" fill="#000000"/>
+  <!-- Outer hexagon -->
+  <polygon points="32,6 54,17 54,39 32,50 10,39 10,17" fill="none" stroke="#00ff41" stroke-width="2.5"/>
+  <!-- Inner hexagon at 60% opacity -->
+  <polygon points="32,14 46,21.5 46,36.5 32,44 18,36.5 18,21.5" fill="none" stroke="#00ff41" stroke-width="1.5" opacity="0.6"/>
+  <!-- Bold V shape -->
+  <polyline points="20,20 32,40 44,20" fill="none" stroke="#00ff41" stroke-width="3.5" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- Node dots at outer hex corners -->
+  <circle cx="32" cy="6" r="2" fill="#00ff41"/>
+  <circle cx="54" cy="17" r="2" fill="#00ff41"/>
+  <circle cx="54" cy="39" r="2" fill="#00ff41"/>
+  <circle cx="32" cy="50" r="2" fill="#00ff41"/>
+  <circle cx="10" cy="39" r="2" fill="#00ff41"/>
+  <circle cx="10" cy="17" r="2" fill="#00ff41"/>
+</svg>

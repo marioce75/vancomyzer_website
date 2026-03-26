@@ -15,13 +15,13 @@ const Metric = ({ label, value, unit }: { label: string; value: string; unit: st
   <div
     className="px-3 py-2.5"
     style={{
-      border: "1px solid rgba(0,255,65,0.35)",
-      background: "#050505",
+      border: "1px solid var(--color-primary-a35)",
+      background: "var(--color-card)",
     }}
   >
     <span
       className="text-[10px] font-medium uppercase tracking-[0.2em] block"
-      style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}
+      style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
     >
       {label}
     </span>
@@ -29,14 +29,14 @@ const Metric = ({ label, value, unit }: { label: string; value: string; unit: st
       <span
         className="text-2xl font-bold tabular-nums mx-glow"
         style={{
-          color: "#00ff41",
+          color: "var(--color-primary)",
           fontFamily: "'Share Tech Mono', monospace",
-          textShadow: "0 0 8px rgba(0,255,65,0.7)",
+          textShadow: "0 0 8px var(--color-glow)",
         }}
       >
         {value}
       </span>
-      <span className="text-xs" style={{ color: "#1a5c1a", fontFamily: "'Share Tech Mono', monospace" }}>{unit}</span>
+      <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>{unit}</span>
     </div>
   </div>
 );
