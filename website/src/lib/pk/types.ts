@@ -82,10 +82,10 @@ export interface AdjustmentRecommendation {
   recommended_infusion_duration_hours?: number;
   infusion_duration_adjusted_for_safety?: boolean;
   infusion_safety_note?: string;
-  interpretation_summary: string;
-  assumptions: string[];
-  limitations: string[];
-  calculation_details: CalculationDetails;
+  interpretation_summary?: string;
+  assumptions?: string[];
+  limitations?: string[];
+  calculation_details?: CalculationDetails;
   frequency_options?: FrequencyOption[];
   documentation_preview?: {
     quick_summary: string;
@@ -101,12 +101,13 @@ export interface ExplanationInput {
 // ... more types
 export interface PosteriorFitDiagnostics {
   observation_count: number;
-  fit_quality: "not_applicable" | "weak" | "acceptable" | "good" | "excellent";
+  fit_quality: "not_applicable" | "prior_only" | "weak" | "moderate" | "acceptable" | "good" | "excellent";
   fit_quality_reason: string;
   uncertainty_label: "population_only" | "low" | "moderate" | "high" | "very_high";
   rms_error_mcg_ml?: number;
   mean_abs_error_mcg_ml?: number;
-  mean_rel_error_pct?: number;
-  cl_shift_pct?: number;
-  v1_shift_pct?: number;
+  max_abs_error_mcg_ml?: number;
+  mean_relative_error?: number;
+  posterior_shift_cl_pct?: number;
+  posterior_shift_v1_pct?: number;
 }
