@@ -11,7 +11,7 @@ interface FaqRef {
 
 interface FaqItem {
   question: string;
-  answer: string[];        // paragraphs
+  answer: (string | { formula: string })[];  // paragraphs or indented formula blocks
   refs: FaqRef[];
 }
 
@@ -19,7 +19,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Why doesn\u2019t Vancomyzer use Cockcroft-Gault?",
     answer: [
-      "Cockcroft-Gault estimates kidney function from age, weight, and creatinine \u2014 then feeds that estimate into a separate vancomycin equation. It introduces two layers of estimation before you even get a PK prediction. Vancomyzer skips that entirely by using serum creatinine directly as a covariate in the Colin 2019 model.",
+      "Cockcroft-Gault estimates kidney function from age, weight, sex, and serum creatinine \u2014 then feeds that estimate into a separate vancomycin equation. It introduces two layers of estimation before you even get a PK prediction. Vancomyzer skips that entirely by using serum creatinine directly as a covariate in the Colin 2019 model.",
     ],
     refs: [
       {
@@ -31,12 +31,16 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Why is Cockcroft-Gault considered outdated for vancomycin dosing?",
     answer: [
-      "It was developed in 1976 on 249 mostly male patients to estimate creatinine clearance \u2014 not to predict vancomycin pharmacokinetics. It systematically underperforms in elderly patients, low muscle mass, obesity, and critical illness. For a precision dosing tool, building on a 50-year-old renal estimate adds unnecessary error at the foundation.",
+      "It was developed in 1976 on 249 male patients to estimate creatinine clearance \u2014 not to predict vancomycin pharmacokinetics. It systematically underperforms in elderly patients, low muscle mass, obesity, and critical illness. The National Kidney Foundation no longer recommends it for clinical use because it was not expressed using standardized creatinine values \u2014 the assay used in its derivation was likely 10\u201320% higher than current methods, meaning CG-based calculations lead to higher drug dosing recommendations than originally intended.",
     ],
     refs: [
       {
         label: "Rybak MJ et al. Therapeutic monitoring of vancomycin for serious MRSA infections. ASHP/IDSA/SIDP 2020 Revised Consensus Guidelines.",
         url: "https://pubmed.ncbi.nlm.nih.gov/32191793/",
+      },
+      {
+        label: "National Kidney Foundation \u2014 Cockcroft-Gault Formula.",
+        url: "https://www.kidney.org/professionals/gfr_calculatorCoc",
       },
     ],
   },
@@ -80,6 +84,26 @@ const FAQ_ITEMS: FaqItem[] = [
     ],
   },
   {
+    question: "What about IBW \u2014 why does traditional dosing require it and why does Vancomyzer not?",
+    answer: [
+      "In traditional vancomycin dosing, determining the right dose requires answering a question that has no single correct answer: which body weight do you use?",
+      "Three options exist in clinical practice, each requiring its own calculation:",
+      "Total body weight (TBW): The patient\u2019s actual weight. Simple \u2014 but in obese patients, dosing on TBW can produce dangerously supratherapeutic levels. In one study of patients receiving TBW-based vancomycin dosing, 48% of patients with a BMI \u226535 were supratherapeutic on their first trough level.",
+      "Ideal body weight (IBW) \u2014 Devine formula: The weight a patient \u201cshould\u201d be based on height and sex.",
+      { formula: "Males:   50 kg + 2.3 kg per inch over 60 inches\nFemales: 45.5 kg + 2.3 kg per inch over 60 inches" },
+      "This requires height \u2014 a variable Cockcroft-Gault does not even include \u2014 adding yet another manual calculation step. And IBW alone can underestimate dose requirements in obese patients.",
+      "Adjusted body weight (AdjBW): IBW + 0.4 \u00d7 (TBW \u2212 IBW). Used when TBW exceeds IBW by more than 30%. Standard clinical dosing guidelines apply this formula when actual body weight is more than 30% above IBW.",
+      "The problem: This weight selection step \u2014 TBW vs IBW vs AdjBW \u2014 is debated, inconsistently applied between institutions, requires height that may not be reliably documented, and adds a third manual calculation on top of the CG estimate already in progress. The 2020 ASHP/IDSA guidelines moved toward recommending TBW for empiric dosing precisely because the IBW debate had no clear resolution.",
+      "How Colin 2019 eliminates this entirely: Vancomyzer takes the patient\u2019s actual body weight as entered and uses it directly as a covariate. The Bayesian model handles body size effects through its mathematical structure \u2014 not through a pre-dose weight classification step. When a measured level is entered, the posterior update further refines the individual PK estimate regardless of body composition. No height required. No IBW formula. No AdjBW calculation. No institutional debate about which weight to use.",
+    ],
+    refs: [
+      { label: "IBW Devine formula: Devine BJ. Drug Intell Clin Pharm. 1974;8:650-655", url: "https://pubmed.ncbi.nlm.nih.gov/1244564/" },
+      { label: "AdjBW and obesity dosing guidelines: UC Davis Adult IV Vancomycin Dosing Guidelines.", url: "https://health.ucdavis.edu/media-resources/antibiotic-stewardship/documents/pdfs/guidelines/vanc_dosing.pdf" },
+      { label: "Supratherapeutic levels with TBW dosing in obesity", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3764551/" },
+      { label: "Colin 2019 obesity validation", url: "https://pubmed.ncbi.nlm.nih.gov/33278242/" },
+    ],
+  },
+  {
     question: "How accurate is Colin 2019 compared to older methods?",
     answer: [
       "Independent evaluations consistently rank it among the top performers:",
@@ -95,7 +119,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Does Vancomyzer calculate CrCl anywhere?",
     answer: [
-      "No. CrCl is not calculated, displayed, or used internally anywhere in Vancomyzer. The Colin 2019 model takes age, weight, and SCr directly. This removes one source of estimation error and keeps the input set minimal and fast at bedside.",
+      "No. CrCl is not calculated, displayed, or used internally anywhere in Vancomyzer. The Colin 2019 model takes age, weight, and SCr directly \u2014 no IBW, no AdjBW, no CrCl. This removes multiple sources of estimation error and keeps the input set minimal and fast at bedside.",
     ],
     refs: [
       {
@@ -168,21 +192,45 @@ function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
         }}
       >
         <div style={{ padding: "0 20px 20px 20px" }}>
-          {item.answer.map((paragraph, i) => (
-            <p
-              key={i}
-              style={{
-                color: "var(--color-secondary)",
-                fontSize: 13,
-                lineHeight: 1.7,
-                fontFamily: "'Share Tech Mono', monospace",
-                marginTop: i === 0 ? 0 : 12,
-                whiteSpace: "pre-line",
-              }}
-            >
-              {paragraph}
-            </p>
-          ))}
+          {item.answer.map((block, i) => {
+            if (typeof block === "object" && "formula" in block) {
+              return (
+                <pre
+                  key={i}
+                  style={{
+                    color: "var(--color-primary)",
+                    fontSize: 12,
+                    lineHeight: 1.6,
+                    fontFamily: "'Share Tech Mono', monospace",
+                    marginTop: 8,
+                    marginBottom: 4,
+                    padding: "10px 14px",
+                    borderLeft: "2px solid var(--color-border)",
+                    background: "var(--color-highlight)",
+                    whiteSpace: "pre-wrap",
+                    overflowX: "auto",
+                  }}
+                >
+                  {block.formula}
+                </pre>
+              );
+            }
+            return (
+              <p
+                key={i}
+                style={{
+                  color: "var(--color-secondary)",
+                  fontSize: 13,
+                  lineHeight: 1.7,
+                  fontFamily: "'Share Tech Mono', monospace",
+                  marginTop: i === 0 ? 0 : 12,
+                  whiteSpace: "pre-line",
+                }}
+              >
+                {block}
+              </p>
+            );
+          })}
 
           <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: "6px 14px" }}>
             {item.refs.map((ref, i) => (

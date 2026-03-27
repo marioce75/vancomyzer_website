@@ -21,7 +21,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
       <div className="mx-auto flex h-[68px] max-w-[1680px] items-center justify-between gap-6 px-5 lg:px-8">
 
         {/* ── Brand ──────────────────────────────────────── */}
-        <Link href="/" className="flex items-center gap-3 min-w-0 flex-1 group">
+        <Link href="/" className="flex items-center gap-3 shrink-0 group">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/favicon.svg"
@@ -37,26 +37,44 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             >
               VANCOMYZER<sup className="text-[9px] font-semibold ml-1 align-super" style={{ color: "var(--color-secondary)" }}>{"\u2122"}</sup>
             </h1>
-            <p className="text-[10px] font-medium leading-none mt-0.5 whitespace-nowrap" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
-              Bayesian PK · <span style={{ color: "var(--color-border)" }}>engineered by</span>{" "}
-              <span className="font-semibold tracking-wide" style={{ color: "var(--color-secondary)" }}>Dōsys&trade;</span>
+            <p className="font-medium leading-none mt-0.5 whitespace-nowrap" style={{ fontSize: "12px", letterSpacing: "2px", color: "#00cc44", fontFamily: "'Share Tech Mono', monospace" }}>
+              BAYESIAN PK ·{" "}
+              <span style={{ fontSize: "11px", letterSpacing: "3px", color: "#00aa33" }}>
+                ENGINEERED BY{" "}
+                {/* TODO: Replace with window.open('https://dosys.com', '_blank') when URL is available */}
+                <span
+                  className="font-semibold"
+                  style={{ color: "inherit", textDecoration: "none", letterSpacing: "3px", cursor: "pointer" }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.color = "#00ff41";
+                    (e.currentTarget as HTMLElement).style.textDecoration = "underline";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.color = "inherit";
+                    (e.currentTarget as HTMLElement).style.textDecoration = "none";
+                  }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  D&#x14C;SYS&trade;
+                </span>
+              </span>
             </p>
           </div>
-
-          {/* Clinical decision support badge — desktop only */}
-          <span
-            className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap"
-            style={{
-              border: "1px solid var(--color-primary-a40)",
-              background: "var(--color-primary-a05)",
-              color: "var(--color-secondary)",
-              fontFamily: "'Share Tech Mono', monospace",
-            }}
-          >
-            <span className="h-1.5 w-1.5 shrink-0 mx-blink" style={{ backgroundColor: "var(--color-primary)", display: "inline-block" }} aria-hidden="true" />
-            CLINICAL DECISION SUPPORT
-          </span>
         </Link>
+
+        {/* Clinical decision support badge — desktop only */}
+        <span
+          className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap shrink-0"
+          style={{
+            border: "1px solid var(--color-primary-a40)",
+            background: "var(--color-primary-a05)",
+            color: "var(--color-secondary)",
+            fontFamily: "'Share Tech Mono', monospace",
+          }}
+        >
+          <span className="h-1.5 w-1.5 shrink-0 mx-blink" style={{ backgroundColor: "var(--color-primary)", display: "inline-block" }} aria-hidden="true" />
+          CLINICAL DECISION SUPPORT
+        </span>
 
         {/* ── Mode switcher ──────────────────────────────── */}
         <div className="flex flex-1 items-center justify-center">

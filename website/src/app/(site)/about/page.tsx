@@ -1,4 +1,3 @@
-import Link from "next/link";
 import CTA from "@/components/CTA";
 
 // Locked: practical not brand-heavy; CASE-001 and quick summary as support links; mission, philosophy, intended users
@@ -57,30 +56,11 @@ export default function AboutPage() {
         </p>
       </section>
 
-      {/* 5. How the tool supports review — CASE-001, quick summary, Trust & Evidence */}
-      <section className="mb-16">
-        <h2 className="text-xl font-semibold text-gray-900">
-          How the tool supports review
-        </h2>
-        <p className="mt-3 text-gray-600">
-          You can explore a sample case (stable adult with preserved renal
-          function), a documentation-ready summary, and the Trust & Evidence
-          page for assumptions, limitations, and review guidance.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-4">
-          <CTA variant="sampleCase" />
-          <CTA variant="documentationSummary" />
-          <CTA variant="trustEvidence" />
-        </div>
-      </section>
-
-      {/* 6. Final CTA */}
+      {/* Final CTA */}
       <section className="border-t border-gray-200 pt-12">
         <div className="flex flex-wrap gap-4">
           <CTA variant="sampleCase" primary />
           <CTA variant="trustEvidence" />
-          <CTA variant="exploreWorkflow" />
-          <CTA variant="documentationSummary" />
         </div>
       </section>
     </div>

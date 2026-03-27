@@ -11,11 +11,10 @@ export default function Footer() {
             <div className="flex items-center gap-3 mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/vancomyzer-logo.svg"
+                src="/favicon.svg"
                 alt="Vancomyzer™ logo"
                 width={32}
                 height={32}
-                style={{ filter: "invert(1) sepia(1) saturate(3) hue-rotate(80deg)" }}
               />
               <div>
                 <span className="text-sm font-bold" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>

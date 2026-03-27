@@ -44,6 +44,7 @@ const TOGGLES = [
   { key: "vancomycinRain" as const, label: "Vancomycin Rain" },
   { key: "graphAnimations" as const, label: "Graph Animations" },
   { key: "soundEffects" as const, label: "Sound Effects" },
+  { key: "whiteInputValues" as const, label: "White Input Numbers" },
 ] as const;
 
 /* ── Component ──────────────────────────────────────────────────── */
@@ -328,7 +329,37 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             </div>
           </section>
 
-          {/* ── 5. RESET ──────────────────────────────────────── */}
+          {/* ── 5. LIVE PREVIEW ────────────────────────────── */}
+          <section>
+            <SectionLabel>PREVIEW</SectionLabel>
+            <div
+              style={{
+                marginTop: 10,
+                padding: "12px 14px",
+                border: "1px solid var(--color-border)",
+                background: "var(--color-card)",
+                display: "flex",
+                alignItems: "baseline",
+                gap: 6,
+                ...FONT,
+              }}
+            >
+              <span style={{ fontSize: 11, color: "var(--color-dim)" }}>AUC24:</span>
+              <span
+                style={{
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: settings.whiteInputValues ? "#ffffff" : "var(--color-primary)",
+                  textShadow: `0 0 8px ${settings.whiteInputValues ? "rgba(255,255,255,0.5)" : "var(--color-glow)"}`,
+                }}
+              >
+                487
+              </span>
+              <span style={{ fontSize: 11, color: "var(--color-dim)" }}>mg·h/L</span>
+            </div>
+          </section>
+
+          {/* ── 6. RESET ──────────────────────────────────────── */}
           <section style={{ paddingTop: 4 }}>
             <button
               type="button"

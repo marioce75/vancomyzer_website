@@ -207,7 +207,17 @@ export default function PatientCharacteristicsForm({
           }`}
         >
           <span className="flex items-center gap-2">
-            <span>🛏</span> Bedbound/Geriatric Patient
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="12" width="18" height="3" fill="var(--color-primary)"/>
+              <rect x="1" y="5" width="2" height="10" fill="var(--color-primary)"/>
+              <rect x="17" y="9" width="2" height="6" fill="var(--color-primary)"/>
+              <line x1="3" y1="9" x2="17" y2="9" stroke="var(--color-primary)" strokeWidth="1" strokeDasharray="2 1"/>
+              <rect x="3" y="9" width="14" height="3" fill="var(--color-primary)" fillOpacity="0.3"/>
+              <rect x="4" y="6" width="4" height="3" rx="1" fill="var(--color-primary)"/>
+              <ellipse cx="12" cy="7.5" rx="2.5" ry="2" fill="none" stroke="var(--color-primary)" strokeWidth="1"/>
+              <rect x="2" y="15" width="1.5" height="3" fill="var(--color-primary)"/>
+              <rect x="16.5" y="15" width="1.5" height="3" fill="var(--color-primary)"/>
+            </svg> Bedbound/Geriatric Patient
           </span>
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${bedbound ? "bg-amber-300 text-amber-900" : "bg-slate-100 text-slate-400"}`}>
             {bedbound ? "ON" : "OFF"}

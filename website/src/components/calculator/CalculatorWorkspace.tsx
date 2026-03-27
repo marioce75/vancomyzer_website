@@ -35,7 +35,6 @@ import CalculationDetailsCard from "@/components/calculator/CalculationDetailsCa
 import DataFitReviewabilityPanel from "@/components/calculator/DataFitReviewabilityPanel";
 import RegimenSuggestionCard from "@/components/calculator/RegimenSuggestionCard";
 import SettingsPanel from "@/components/calculator/SettingsPanel";
-import VancomycinRain from "@/components/calculator/VancomycinRain";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 
 const defaultPatient = { age: 0, weight_kg: 0, serum_creatinine_mg_dl: 0 };
@@ -816,14 +815,11 @@ export default function CalculatorWorkspace() {
   );
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden" style={{ background: "var(--color-bg)", color: "var(--color-primary)" }}>
+    <div className="relative flex h-screen flex-col overflow-hidden" style={{ background: "transparent", color: "var(--color-primary)" }}>
       <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} />
       <div className="flex-1 overflow-hidden h-full">
         <CalculatorLayout left={leftColumn} right={rightColumn} />
       </div>
-      {settings.vancomycinRain && (
-        <VancomycinRain opacity={settings.rainOpacity} colorMode={settings.colorMode} />
-      )}
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );

@@ -123,7 +123,7 @@ export default function VancomycinRain({ opacity, colorMode }: VancomycinRainPro
         left: 0,
         width: "100vw",
         height: "100vh",
-        zIndex: 9996,
+        zIndex: 1,
         pointerEvents: "none",
         opacity: opacity / 100,
         willChange: "transform",

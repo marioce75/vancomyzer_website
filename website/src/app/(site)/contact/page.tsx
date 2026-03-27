@@ -22,7 +22,6 @@ export default function ContactPage() {
           >
             Request a workflow evaluation
           </a>
-          <CTA variant="sampleCase" />
         </div>
       </section>
 
@@ -107,7 +106,6 @@ export default function ContactPage() {
           >
             Contact us
           </a>
-          <CTA variant="sampleCase" />
           <CTA variant="documentationSummary" />
         </div>
       </section>

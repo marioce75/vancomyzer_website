@@ -58,11 +58,17 @@ html {
 body {
   font-family: 'Share Tech Mono', 'Courier New', Courier, monospace;
   color: var(--color-primary);
-  background: var(--color-bg);
+  background: transparent;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* App root is transparent so rain at z-index:0 shows through empty gaps.
+   Individual panels/cards/nav provide their own opaque backgrounds. */
+#app-root {
+  background: transparent;
 }
 
 /* ── Scanline CRT overlay ───────────────────────────────────────
@@ -90,6 +96,13 @@ body.no-blink .mx-blink { animation: none !important; opacity: 1 !important; }
 body.no-graph-anim .recharts-active-dot,
 body.no-graph-anim .recharts-line,
 body.no-graph-anim .recharts-area { transition: none !important; animation: none !important; }
+
+/* White input values — only typed values, not placeholders */
+body.input-values-white input:not(:placeholder-shown),
+body.input-values-white select,
+body.input-values-white textarea:not(:placeholder-shown) {
+  color: #ffffff !important;
+}
 
 /* ── Sharp edges ─────────────────────────────────────────────── */
 

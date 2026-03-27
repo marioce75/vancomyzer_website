@@ -24,6 +24,7 @@ export interface MatrixSettings {
   vancomycinRain: boolean;
   graphAnimations: boolean;
   soundEffects: boolean;
+  whiteInputValues: boolean;
   colorMode: "matrix-green" | "amber-terminal" | "high-contrast" | "clinical-blue";
   fontSize: "small" | "medium" | "large" | "extra-large";
 }
@@ -48,9 +49,10 @@ export const DEFAULT_SETTINGS: MatrixSettings = {
   scanlineEffect: true,
   typewriterAnimation: true,
   blinkingCursor: true,
-  vancomycinRain: false,
+  vancomycinRain: true,
   graphAnimations: true,
   soundEffects: false,
+  whiteInputValues: false,
   colorMode: "matrix-green",
   fontSize: "medium",
 };
@@ -300,6 +302,7 @@ function applySettingsToDom(settings: MatrixSettings): void {
   toggleClass("no-typewriter", !settings.typewriterAnimation);
   toggleClass("no-blink", !settings.blinkingCursor);
   toggleClass("no-graph-anim", !settings.graphAnimations);
+  toggleClass("input-values-white", settings.whiteInputValues);
 }
 
 // ---------------------------------------------------------------------------
