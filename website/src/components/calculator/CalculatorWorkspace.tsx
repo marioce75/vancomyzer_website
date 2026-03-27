@@ -35,6 +35,7 @@ import CalculationDetailsCard from "@/components/calculator/CalculationDetailsCa
 import DataFitReviewabilityPanel from "@/components/calculator/DataFitReviewabilityPanel";
 import RegimenSuggestionCard from "@/components/calculator/RegimenSuggestionCard";
 import SettingsPanel from "@/components/calculator/SettingsPanel";
+import DisclaimerModal from "@/components/calculator/DisclaimerModal";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 
 const defaultPatient = { age: 0, weight_kg: 0, serum_creatinine_mg_dl: 0 };
@@ -240,6 +241,7 @@ export default function CalculatorWorkspace() {
   // Layout State
   const [activeSection, setActiveSection] = useState<string>("patient");
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const { settings, playSound } = useMatrixSettings();
 
   // Pre-fill patient state from URL query params only (e.g. sample case link)
@@ -601,8 +603,22 @@ export default function CalculatorWorkspace() {
 
       <div className="sticky bottom-0 mt-auto border-t" style={{ borderTopColor: "var(--color-border)", background: "var(--color-bg)" }}>
         <CalculatorActionBar onCalculate={handleCalculate} onReset={handleReset} disabled={loading || rrt === null || rrt === true} hideCalculate={hideCalculate} />
+        {/* Inline disclaimer — always visible */}
+        <div className="border-t px-4 py-2" style={{ borderTopColor: "var(--color-border)" }}>
+          <p style={{ fontSize: 10, lineHeight: 1.6, color: "#007722", fontFamily: "'Share Tech Mono', monospace", margin: 0 }}>
+            Disclaimer: This tool is for informational purposes only and intended for use exclusively by licensed healthcare professionals. THE TOOL IS NOT INTENDED TO BE A SUBSTITUTE FOR PROFESSIONAL MEDICAL ADVICE, DOSING, DIAGNOSIS OR TREATMENT.{" "}
+            <span
+              style={{ color: "#00aa33", cursor: "pointer", textDecoration: "none" }}
+              onClick={() => setDisclaimerOpen(true)}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; }}
+            >
+              [See Full Disclaimer]
+            </span>
+          </p>
+        </div>
+        {/* Footer links + copyright */}
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t px-4 py-2" style={{ borderTopColor: "var(--color-border)" }}>
-          <span className="text-[10px]" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>© 2026 Vancomyzer™</span>
           {[
             { href: "/disclaimer", label: "Disclaimer" },
             { href: "/terms", label: "Terms" },
@@ -617,6 +633,11 @@ export default function CalculatorWorkspace() {
               {label}
             </a>
           ))}
+        </div>
+        <div className="border-t px-4 py-1.5" style={{ borderTopColor: "var(--color-border)", textAlign: "center" }}>
+          <span style={{ fontSize: 10, color: "#005522", fontFamily: "'Share Tech Mono', monospace" }}>
+            {"\u00A9"} 2026 Vancomyzer{"\u2122"} {"\u00B7"} Engineered by D{"\u014D"}sys{"\u2122"} {"\u00B7"} All Rights Reserved
+          </span>
         </div>
       </div>
     </div>
@@ -821,6 +842,7 @@ export default function CalculatorWorkspace() {
         <CalculatorLayout left={leftColumn} right={rightColumn} />
       </div>
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <DisclaimerModal open={disclaimerOpen} onClose={() => setDisclaimerOpen(false)} />
     </div>
   );
 }
