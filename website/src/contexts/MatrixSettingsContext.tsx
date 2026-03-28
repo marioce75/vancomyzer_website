@@ -49,7 +49,7 @@ export const DEFAULT_SETTINGS: MatrixSettings = {
   scanlineEffect: true,
   typewriterAnimation: true,
   blinkingCursor: true,
-  vancomycinRain: true,
+  vancomycinRain: false,
   graphAnimations: true,
   soundEffects: false,
   whiteInputValues: false,

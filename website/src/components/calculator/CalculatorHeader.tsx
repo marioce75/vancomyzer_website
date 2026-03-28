@@ -141,6 +141,23 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             Home
           </Link>
           <Link
+            href="/faq"
+            className="px-3 py-1.5 text-sm font-medium transition"
+            style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
+              (e.currentTarget as HTMLElement).style.background = "var(--color-highlight)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.borderColor = "transparent";
+              (e.currentTarget as HTMLElement).style.background = "transparent";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
+            }}
+          >
+            FAQ
+          </Link>
+          <Link
             href="/trust-evidence"
             className="px-3 py-1.5 text-sm font-medium transition"
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}

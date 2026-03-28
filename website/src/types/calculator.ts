@@ -88,6 +88,16 @@ export interface CalculateResponse {
     quick_summary: string;
     clinical_note: string;
   };
+  pk_parameters?: {
+    CL: number;
+    V1: number;
+    Q: number;
+    V2: number;
+    used_posterior_refinement: boolean;
+    scr: number;
+    age?: number;
+    weight_kg?: number;
+  };
 }
 
 export interface CalculateErrorResponse {

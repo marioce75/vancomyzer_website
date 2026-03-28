@@ -74,6 +74,7 @@ export function runExistingRegimenPipeline(
     "existing_regimen",
     engineOutput,
     recommendation,
-    explain
+    explain,
+    patient
   ) as ReturnType<typeof buildCalculateResponse>;
 }

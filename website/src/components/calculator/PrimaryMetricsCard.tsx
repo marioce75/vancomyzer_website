@@ -6,9 +6,14 @@ interface PrimaryMetricsCardProps {
   trough?: number | null;
 }
 
-function formatMetric(value: number | null | undefined): string {
+function formatAuc(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) return "—";
-  return Number(value).toFixed(1).replace(/\.0$/, "");
+  return Number(value).toFixed(1);
+}
+
+function formatConc(value: number | null | undefined): string {
+  if (value == null || Number.isNaN(value)) return "—";
+  return Number(value).toFixed(2);
 }
 
 const Metric = ({ label, value, unit }: { label: string; value: string; unit: string }) => (
@@ -44,9 +49,9 @@ const Metric = ({ label, value, unit }: { label: string; value: string; unit: st
 export default function PrimaryMetricsCard({ auc24, peak, trough }: PrimaryMetricsCardProps) {
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-      <Metric label="AUC24" value={formatMetric(auc24)} unit="mg·h/L" />
-      <Metric label="Peak" value={formatMetric(peak)} unit="mcg/mL" />
-      <Metric label="Trough" value={formatMetric(trough)} unit="mcg/mL" />
+      <Metric label="AUC24" value={formatAuc(auc24)} unit="mg·h/L" />
+      <Metric label="Peak" value={formatConc(peak)} unit="mcg/mL" />
+      <Metric label="Trough" value={formatConc(trough)} unit="mcg/mL" />
     </div>
   );
 }

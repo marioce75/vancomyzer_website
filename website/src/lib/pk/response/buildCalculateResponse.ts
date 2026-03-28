@@ -1,4 +1,4 @@
-import type { ExistingRegimenEngineOutput, AdjustmentRecommendation, ExplanationInput } from "../types";
+import type { ExistingRegimenEngineOutput, AdjustmentRecommendation, ExplanationInput, NormalizedPatient } from "../types";
 import { buildExistingRegimenReviewStatus } from "./buildReviewStatus";
 import { buildDocumentationPreview } from "../explain/buildDocumentationPreview";
 import { buildInterpretationSummary } from "../explain/buildInterpretationSummary";
@@ -14,7 +14,8 @@ export function buildCalculateResponse(
   recommendation_type: "existing_regimen",
   engineOutput: ExistingRegimenEngineOutput,
   recommendation: AdjustmentRecommendation,
-  explain: ExistingRegimenExplainOutput
+  explain: ExistingRegimenExplainOutput,
+  patient?: NormalizedPatient,
 ): Record<string, unknown> {
   const review_status = buildExistingRegimenReviewStatus(engineOutput);
 
@@ -66,6 +67,16 @@ export function buildCalculateResponse(
     limitations: explain.limitations,
     curve: engineOutput.curve,
     measured_levels: engineOutput.measured_levels,
+    pk_parameters: {
+      CL: engineOutput.CL,
+      V1: engineOutput.V1,
+      Q: engineOutput.Q,
+      V2: engineOutput.V2,
+      used_posterior_refinement: engineOutput.used_posterior_refinement,
+      scr: engineOutput.scr,
+      age: patient?.age,
+      weight_kg: patient?.weight_kg,
+    },
     frequency_options: enrichedFrequencyOptions,
     calculation_details: {
       method: engineOutput.used_posterior_refinement

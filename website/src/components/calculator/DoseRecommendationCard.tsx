@@ -18,6 +18,88 @@ interface DoseRecommendationCardProps {
   onSelectFrequency?: ((option: FrequencyOption) => void) | null;
 }
 
+const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" };
+
+function LoadingDoseGuidance({ doseMg, weightKg }: { doseMg: number; weightKg: number | null }) {
+  const [expanded, setExpanded] = React.useState(false);
+  // Standard loading dose: 25-30 mg/kg actual body weight (ASHP/IDSA 2020)
+  // Max single loading dose: 3000 mg
+  // Infusion rate: ≤10 mg/min (or 1g per 60 min minimum)
+  const wt = weightKg ?? 75; // fallback for display
+  const loadLow = Math.round(wt * 25 / 250) * 250; // round to nearest 250
+  const loadHigh = Math.min(3000, Math.round(wt * 30 / 250) * 250);
+  const loadSuggested = Math.min(3000, Math.round(wt * 25 / 250) * 250);
+  const infusionMinutes = Math.max(60, Math.ceil(loadSuggested / 10)); // ≤10 mg/min
+
+  return (
+    <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: 8 }}>
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-1.5 w-full text-left"
+        style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0, ...FONT }}
+      >
+        <svg
+          width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          style={{ color: "var(--color-dim)", transition: "transform 0.2s", transform: expanded ? "rotate(90deg)" : "rotate(0deg)" }}
+        >
+          <path d="M9 5l7 7-7 7" />
+        </svg>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-secondary)", letterSpacing: "0.08em", ...FONT }}>
+          SUGGESTED LOADING DOSE
+        </span>
+      </button>
+
+      {expanded && (
+        <div style={{ marginTop: 8, padding: "8px 10px", background: "var(--color-bg)", border: "1px solid var(--color-border)", ...FONT }}>
+          <div className="flex items-baseline gap-2">
+            <span style={{ fontSize: 20, fontWeight: 700, color: "var(--color-primary)", textShadow: "0 0 8px var(--color-glow)", ...FONT }}>
+              {loadSuggested}
+            </span>
+            <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>mg</span>
+            <span style={{ fontSize: 10, color: "var(--color-dim)", ...FONT }}>({loadLow}–{loadHigh} mg range)</span>
+          </div>
+
+          <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
+            <p style={{ fontSize: 10, color: "var(--color-dim)", margin: 0, ...FONT }}>
+              <span style={{ color: "var(--color-secondary)" }}>WHEN:</span> Consider when rapid therapeutic levels are needed — severe infections (endocarditis, meningitis, bacteremia) or critically ill patients where delayed attainment increases mortality risk.
+            </p>
+            <p style={{ fontSize: 10, color: "var(--color-dim)", margin: 0, ...FONT }}>
+              <span style={{ color: "var(--color-secondary)" }}>DOSE:</span> 25–30 mg/kg actual body weight. Calculated: 25 mg/kg × {wt} kg = {Math.round(wt * 25)} mg → rounded to <span style={{ color: "var(--color-primary)" }}>{loadSuggested} mg</span>.
+            </p>
+            <p style={{ fontSize: 10, color: "var(--color-dim)", margin: 0, ...FONT }}>
+              <span style={{ color: "var(--color-secondary)" }}>INFUSION:</span> Max rate 10 mg/min (FDA/ASHP). {loadSuggested} mg infused over ≥{infusionMinutes} min to reduce Red Man Syndrome risk.
+            </p>
+            <p style={{ fontSize: 10, color: "var(--color-dim)", margin: 0, ...FONT }}>
+              <span style={{ color: "var(--color-secondary)" }}>MAX:</span> 3,000 mg single dose. If calculated dose exceeds 3,000 mg, cap at 3,000 mg.
+            </p>
+          </div>
+
+          <p style={{ fontSize: 9, color: "#005522", fontStyle: "italic", marginTop: 8, ...FONT }}>
+            ASHP/IDSA/SIDP 2020: Loading doses of 25–30 mg/kg (based on actual body weight) can be used to facilitate rapid attainment of target AUC₂₄/MIC.
+          </p>
+        </div>
+      )}
+
+      {/* Clinical guidance — inside the expanded block */}
+      {expanded && (
+        <div style={{ marginTop: 8, padding: "10px 14px", borderLeft: "2px solid #004422", ...FONT }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "2px", margin: 0, ...FONT }}>
+            {">"} LOADING DOSE GUIDANCE
+          </p>
+          <p style={{ fontSize: 10, color: "#00cc44", lineHeight: 1.7, marginTop: 6, ...FONT }}>
+            Administer loading dose prior to first maintenance dose.{"\n"}
+            Draw first level 1.5–6h post-infusion end for early Bayesian{"\n"}
+            estimation, or peak + trough near dose 3–4 for highest accuracy.{"\n"}
+            Renal function and SCr should be reassessed within 24–48h.{"\n"}
+            Target AUC₂₄ 400–600 mg·h/L within 48h of initiation.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function aucRangeLabel(auc: number): { label: string; color: string } {
   if (auc >= 400 && auc <= 600) return { label: "In range", color: "text-emerald-700 bg-emerald-50 border-emerald-200" };
   if (auc > 600) return { label: "Above target", color: "text-amber-700 bg-amber-50 border-amber-200" };
@@ -167,10 +249,16 @@ export default function DoseRecommendationCard({
         </div>
       )}
 
+      {/* Loading dose guidance — patient-specific */}
+      {active && (
+        <LoadingDoseGuidance doseMg={active.dose_mg} weightKg={null} />
+      )}
+
       {calculationDetails?.review_status?.banner_body && (
-        <p className="text-xs leading-5 pt-2" style={{ color: "var(--color-dim)", borderTop: "1px solid var(--color-border)", fontFamily: "'Share Tech Mono', monospace" }}>
-          {calculationDetails.review_status.banner_body}
-        </p>
+        <div className="text-xs leading-5 pt-2" style={{ color: "var(--color-dim)", borderTop: "1px solid var(--color-border)", fontFamily: "'Share Tech Mono', monospace" }}>
+          <p style={{ margin: 0 }}>{calculationDetails.review_status.banner_body}</p>
+          <p style={{ margin: "4px 0 0 0" }}>Draw first level 1.5–6h post-infusion end (dose 1 acceptable) or peak + trough near dose 3–4 for highest AUC accuracy — target AUC₂₄ 400–600 mg·h/L within 48h per ASHP/IDSA 2020.</p>
+        </div>
       )}
     </div>
   );

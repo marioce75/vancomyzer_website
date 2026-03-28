@@ -110,6 +110,47 @@ body.input-values-white textarea:not(:placeholder-shown) {
   border-radius: 0 !important;
 }
 
+/* ── Shimmer border — green highlight traveling around the border ── */
+
+@keyframes mx-shimmer-border {
+  0%   { background-position: 0% 0%; }
+  25%  { background-position: 100% 0%; }
+  50%  { background-position: 100% 100%; }
+  75%  { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+.mx-shimmer-border {
+  position: relative;
+}
+
+.mx-shimmer-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 0%,
+    var(--color-border) 35%,
+    var(--color-primary) 50%,
+    var(--color-border) 65%,
+    var(--color-border) 100%
+  );
+  background-size: 300% 300%;
+  animation: mx-shimmer-border 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.mx-shimmer-border::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-card);
+  z-index: -1;
+  pointer-events: none;
+}
+
 /* ── CSS Animations ─────────────────────────────────────────── */
 
 @keyframes mx-blink {

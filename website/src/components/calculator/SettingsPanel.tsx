@@ -41,7 +41,7 @@ const TOGGLES = [
   { key: "scanlineEffect" as const, label: "Scanline Effect" },
   { key: "typewriterAnimation" as const, label: "Typewriter Animation" },
   { key: "blinkingCursor" as const, label: "Blinking Cursor" },
-  { key: "vancomycinRain" as const, label: "Vancomycin Rain" },
+  { key: "vancomycinRain" as const, label: "Vancomycin Rain (off by default)" },
   { key: "graphAnimations" as const, label: "Graph Animations" },
   { key: "soundEffects" as const, label: "Sound Effects" },
   { key: "whiteInputValues" as const, label: "White Input Numbers" },

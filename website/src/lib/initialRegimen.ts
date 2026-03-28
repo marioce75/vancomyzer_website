@@ -38,6 +38,16 @@ export interface InitialRegimenResult {
     quick_summary: string;
     clinical_note: string;
   };
+  pk_parameters: {
+    CL: number;
+    V1: number;
+    Q: number;
+    V2: number;
+    used_posterior_refinement: boolean;
+    scr: number;
+    age: number;
+    weight_kg: number;
+  };
 }
 
 const TARGET_AUC24_LOW = 400;
@@ -274,6 +284,16 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
     documentation_preview: {
       quick_summary,
       clinical_note,
+    },
+    pk_parameters: {
+      CL: prior.CL,
+      V1: prior.V1,
+      Q: prior.Q,
+      V2: prior.V2,
+      used_posterior_refinement: false,
+      scr: prior.scr,
+      age: patient.age,
+      weight_kg: patient.weight_kg,
     },
   };
 }

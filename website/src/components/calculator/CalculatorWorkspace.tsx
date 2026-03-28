@@ -36,6 +36,7 @@ import DataFitReviewabilityPanel from "@/components/calculator/DataFitReviewabil
 import RegimenSuggestionCard from "@/components/calculator/RegimenSuggestionCard";
 import SettingsPanel from "@/components/calculator/SettingsPanel";
 import DisclaimerModal from "@/components/calculator/DisclaimerModal";
+import PKParametersMath from "@/components/calculator/PKParametersMath";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 
 const defaultPatient = { age: 0, weight_kg: 0, serum_creatinine_mg_dl: 0 };
@@ -218,14 +219,18 @@ function getModeScopedFieldErrors(mode: CalculatorMode, fieldErrors?: Record<str
   return fieldErrors;
 }
 
+const SESSION_KEY = "vancomyzer_calculator_state";
+const EIGHT_HOURS = 8 * 60 * 60 * 1000;
+
 export default function CalculatorWorkspace() {
   const searchParams = useSearchParams();
+
   const [viewMode, setViewMode] = useState<WorkspaceViewMode>("empiric");
   const [mode, setMode] = useState<CalculatorMode>("initial_regimen");
-  const [patient, setPatient] = useState(defaultPatient);
-  const [rrt, setRrt] = useState<boolean | null>(null); // null = not yet answered
-  const [regimen, setRegimen] = useState(defaultRegimen);
-  const [levels, setLevels] = useState([{ ...defaultLevel }]);
+  const [patient, setPatient] = useState<typeof defaultPatient>(defaultPatient);
+  const [rrt, setRrt] = useState<boolean | null>(null);
+  const [regimen, setRegimen] = useState<CalculateRequestRegimen>(defaultRegimen);
+  const [levels, setLevels] = useState<(typeof defaultLevel)[]>([{ ...defaultLevel }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<CalculateErrorResponse | null>(null);
   const [result, setResult] = useState<CalculateResponse | null>(null);
@@ -244,8 +249,54 @@ export default function CalculatorWorkspace() {
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const { settings, playSound } = useMatrixSettings();
 
-  // Pre-fill patient state from URL query params only (e.g. sample case link)
-  // localStorage is intentionally NOT used — state should start fresh on every page load
+  // ── Restore from sessionStorage on mount (client-only) ──
+  const didRestoreRef = useRef(false);
+  useEffect(() => {
+    if (didRestoreRef.current) return;
+    didRestoreRef.current = true;
+    try {
+      const raw = sessionStorage.getItem(SESSION_KEY);
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      if (Date.now() - (s.timestamp ?? 0) > EIGHT_HOURS) {
+        sessionStorage.removeItem(SESSION_KEY);
+        return;
+      }
+      if (s.patient) setPatient(s.patient);
+      if (s.rrt !== undefined) setRrt(s.rrt);
+      if (s.regimen) setRegimen(s.regimen);
+      if (s.levels) setLevels(s.levels);
+      if (s.bedbound !== undefined) setBedbound(s.bedbound);
+      if (s.viewMode) setViewMode(s.viewMode);
+      if (s.mode) setMode(s.mode);
+      if (s.activeSection) setActiveSection(s.activeSection);
+      if (s.result) {
+        setResult(s.result);
+        setLastCalculatedAt(Date.now());
+      }
+      if (s.selectedFrequencyOption) setSelectedFrequencyOption(s.selectedFrequencyOption);
+    } catch { /* corrupted — ignore */ }
+  }, []);
+
+  // ── Persist to sessionStorage on every relevant state change ──
+  const hasMountedRef = useRef(false);
+  useEffect(() => {
+    // Skip first render to avoid saving defaults before restore runs
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+    try {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+        patient, rrt, regimen, levels, bedbound,
+        viewMode, mode, activeSection,
+        result, selectedFrequencyOption,
+        timestamp: Date.now(),
+      }));
+    } catch { /* storage full — ignore */ }
+  }, [patient, rrt, regimen, levels, bedbound, viewMode, mode, activeSection, result, selectedFrequencyOption]);
+
+  // Pre-fill patient state from URL query params (overrides session restore)
   const didPreFillRef = useRef(false);
   useEffect(() => {
     if (didPreFillRef.current) return;
@@ -339,11 +390,50 @@ export default function CalculatorWorkspace() {
         calculation_details: data.calculation_details,
         frequency_options: Array.isArray(data.frequency_options) ? data.frequency_options : [],
         documentation_preview: data.documentation_preview,
+        pk_parameters: data.pk_parameters,
       });
       setLastCalculatedAt(Date.now());
       setSelectedFrequencyOption(null);
       setError(null);
       playSound("success");
+
+      // ── PK Validation audit log ──
+      if (Array.isArray(data.curve) && data.curve.length > 1) {
+        const curveArr = data.curve as { time_hours: number; concentration: number }[];
+        // Find trough from curve (last local minimum)
+        let curveTrough = curveArr[curveArr.length - 1].concentration;
+        for (let i = 2; i < curveArr.length - 1; i++) {
+          if (curveArr[i].concentration <= curveArr[i - 1].concentration && curveArr[i].concentration <= curveArr[i + 1].concentration) {
+            curveTrough = curveArr[i].concentration;
+          }
+        }
+        // AUC by trapezoidal rule over last 24h
+        const tEnd = curveArr[curveArr.length - 1].time_hours;
+        const t24Start = Math.max(0, tEnd - 24);
+        const aucPts = curveArr.filter(p => p.time_hours >= t24Start);
+        let trapAuc = 0;
+        for (let i = 1; i < aucPts.length; i++) {
+          trapAuc += 0.5 * (aucPts[i - 1].concentration + aucPts[i].concentration) * (aucPts[i].time_hours - aucPts[i - 1].time_hours);
+        }
+        const panelTrough = data.trough ?? 0;
+        const panelAuc = data.auc24 ?? 0;
+        const troughMatch = Math.abs(panelTrough - curveTrough) < 0.5;
+        const aucDelta = Math.abs(panelAuc - trapAuc);
+        const aucMatch = aucDelta < 5;
+        console.log(
+          `\nVANCOMYZER PK VALIDATION\n========================\n` +
+          `Trough (panel):     ${Number(panelTrough).toFixed(2)} mg/L\n` +
+          `Trough (graph):     ${curveTrough.toFixed(2)} mg/L\n` +
+          `Match: ${troughMatch ? "✓ PASS" : "✗ FAIL (Δ=" + Math.abs(panelTrough - curveTrough).toFixed(2) + ")"}\n\n` +
+          `AUC24 (panel):      ${Number(panelAuc).toFixed(1)} mg·h/L\n` +
+          `AUC24 (trapezoid):  ${trapAuc.toFixed(1)} mg·h/L\n` +
+          `Δ: ${aucDelta.toFixed(1)} mg·h/L${aucMatch ? " — within tolerance" : " — EXCEEDS tolerance"}\n` +
+          `Match: ${aucMatch ? "✓ PASS" : "✗ FAIL"}\n\n` +
+          `Model: Colin 2019 Two-Compartment\n` +
+          `τ: ${data.recommended_interval_hours ?? "?"}h\n` +
+          `Infusion: ${data.recommended_infusion_duration_hours ?? "?"}h`
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -395,6 +485,7 @@ export default function CalculatorWorkspace() {
   }, [patient, mode, rrt, handleCalculate]);
 
   const handleReset = useCallback(() => {
+    sessionStorage.removeItem(SESSION_KEY);
     setPatient({ ...defaultPatient });
     setRegimen({ ...defaultRegimen });
     setLevels([{ ...defaultLevel }]);
@@ -406,7 +497,8 @@ export default function CalculatorWorkspace() {
     setSelectedFrequencyOption(null);
     setRrt(null);
     setActiveSection("patient");
-
+    setBedbound(false);
+    setBedboundDoseData(null);
   }, []);
 
   const fieldErrors = getModeScopedFieldErrors(mode, error?.field_errors);
@@ -468,7 +560,7 @@ export default function CalculatorWorkspace() {
 
   const leftColumn = (
     <div className="flex flex-col h-full">
-      <div className="border p-5" style={{ borderTop: "3px solid var(--color-primary)", borderLeft: "1px solid var(--color-border)", borderRight: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>
+      <div className="mx-shimmer-border border p-5" style={{ borderTop: "3px solid var(--color-primary)", borderLeft: "1px solid var(--color-border)", borderRight: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>
         <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>&gt; CLINICAL DATA INTAKE</p>
         <h2 className="mt-1.5 text-lg font-semibold tracking-tight" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>Enter patient data to begin.</h2>
         <p className="mt-1 text-sm leading-6" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
@@ -693,29 +785,30 @@ export default function CalculatorWorkspace() {
       {!loading && !error && (
         <CalculatorResultState hasResult={visibleResult != null}>
           {visibleResult ? (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
 
-              {/* Row 1: Suggested Dose (left) + Predicted PK + Kinetics (right) — compact, fits above fold */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+              {/* Row 1: Dose tabs + AUC/Peak/Trough — compact horizontal */}
+              <div className="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-3">
 
-                {/* Left: Suggested Dose with frequency tabs */}
+                {/* Left: Dose recommendation with frequency tabs */}
                 <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                  <div className="flex items-center justify-between border-b px-3 py-2" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>SUGGESTED DOSE</span>
+                  <div className="flex items-center justify-between border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
+                    <span className="text-[13px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>SUGGESTED DOSE<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span></span>
                     <div className="flex items-center gap-2">
                       {(activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note) && (
                         <button
                           type="button"
                           onClick={handleCopyNote}
-                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+                          className="border px-2 py-0.5 text-[10px] font-semibold transition-colors"
+                          style={{ borderColor: "var(--color-border)", background: "transparent", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
                         >
-                          {copySuccess ? "✓ Copied" : "Copy Clinical Note"}
+                          {copySuccess ? "COPIED" : "COPY NOTE"}
                         </button>
                       )}
                       <ResultScopeBanner recommendation_type={visibleResult.recommendation_type} />
                     </div>
                   </div>
-                  <div className="p-3">
+                  <div className="p-2">
                     <DoseRecommendationCard
                       recommended_dose={visibleResult.recommended_dose}
                       recommended_interval_hours={visibleResult.recommended_interval_hours}
@@ -740,34 +833,30 @@ export default function CalculatorWorkspace() {
                   </div>
                 </div>
 
-                {/* Right: Predicted PK metrics + kinetic params */}
-                <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                  <div className="border-b px-3 py-2" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>PREDICTED PK</span>
+                {/* Right: Predicted PK metrics — compact column */}
+                <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)", minWidth: 280 }}>
+                  <div className="border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>PREDICTED PK</span>
                   </div>
-                  <div className="p-3 flex flex-col gap-3">
+                  <div className="p-2 flex flex-col gap-2">
                     {(() => {
                       const auc24 = activeOption?.auc24 ?? visibleResult.auc24;
                       const peak  = activeOption?.peak  ?? visibleResult.peak;
                       const trough = activeOption?.trough ?? visibleResult.trough;
                       return <PrimaryMetricsCard auc24={auc24} peak={peak} trough={trough} />;
                     })()}
-                    {visibleResult.calculation_details && (
+                    {visibleResult.pk_parameters && (
                       <div className="border px-3 py-2" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-1.5" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>KINETIC PARAMETERS</p>
-                        <DataFitReviewabilityPanel details={visibleResult.calculation_details} />
+                        <PKParametersMath params={visibleResult.pk_parameters} />
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Row 2: Concentration-Time Graph — full width */}
+              {/* Row 2: Graph — immediately visible */}
               <section className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                <div className="border-b px-3 py-2" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] m-0" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>CONCENTRATION-TIME PROFILE</h2>
-                </div>
-                <div className="p-3">
+                <div className="p-2">
                   <ConcentrationTimeGraph
                     curve={activeOption?.curve ?? visibleResult.curve}
                     measured_levels={visibleResult.measured_levels}
@@ -776,48 +865,44 @@ export default function CalculatorWorkspace() {
                 </div>
               </section>
 
-              {/* Row 3: Details (collapsed by default to keep screen clean) */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-6">
-                  <div className="border p-4" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                    <h3 className="text-sm font-semibold mb-3 border-b pb-2" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace", borderBottomColor: "var(--color-border)" }}>CLINICAL INTERPRETATION</h3>
-                    <InterpretationSummaryCard
-                      interpretation_summary={
-                        activeOption?.interpretation_summary ?? visibleResult.interpretation_summary
-                      }
-                    />
-                    <div className="mt-3">
-                      <ClinicalSignalStrip
-                        auc24={activeOption?.auc24 ?? visibleResult.auc24}
-                        trough={activeOption?.trough ?? visibleResult.trough}
-                        details={visibleResult.calculation_details}
-                      />
-                    </div>
-                  </div>
+              {/* Row 3: Clinical Signal Strip */}
+              {visibleResult.calculation_details && (
+                <ClinicalSignalStrip
+                  auc24={activeOption?.auc24 ?? visibleResult.auc24}
+                  trough={activeOption?.trough ?? visibleResult.trough}
+                  details={visibleResult.calculation_details}
+                />
+              )}
 
-                  <details className="group border p-4" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                    <summary className="cursor-pointer text-sm font-semibold flex items-center outline-none list-none" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>
-                      <svg className="w-4 h-4 mr-2 transition-transform group-open:rotate-90" style={{ color: "var(--color-dim)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                      CALCULATION DETAILS &amp; DOCUMENTATION
-                    </summary>
-                    <div className="mt-3 flex flex-col gap-3 border-t pt-3" style={{ borderTopColor: "var(--color-border)" }}>
-                      <CalculationDetailsCard details={visibleResult.calculation_details} />
-                      <QuickSummaryPreview
-                        quick_summary={
-                          activeOption?.quick_summary ?? visibleResult.documentation_preview?.quick_summary
-                        }
-                      />
-                      <ClinicalNotePreview
-                        clinical_note={
-                          activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note
-                        }
-                      />
-                      <AssumptionsCard assumptions={visibleResult.assumptions} calculationDetails={visibleResult.calculation_details} />
-                      <LimitationsCard limitations={visibleResult.limitations} calculationDetails={visibleResult.calculation_details} />
-                    </div>
-                  </details>
+              {/* Row 4: Clinical Interpretation + Details — all collapsed */}
+              <details className="group border p-3" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+                <summary className="cursor-pointer text-[11px] font-semibold flex items-center outline-none list-none uppercase tracking-[0.1em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>
+                  <svg className="w-3.5 h-3.5 mr-2 transition-transform group-open:rotate-90" style={{ color: "var(--color-dim)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  CLINICAL INTERPRETATION &amp; DOCUMENTATION
+                </summary>
+                <div className="mt-3 flex flex-col gap-3 border-t pt-3" style={{ borderTopColor: "var(--color-border)" }}>
+                  <InterpretationSummaryCard
+                    interpretation_summary={
+                      activeOption?.interpretation_summary ?? visibleResult.interpretation_summary
+                    }
+                  />
+                  <CalculationDetailsCard details={visibleResult.calculation_details} />
+                  <QuickSummaryPreview
+                    quick_summary={
+                      activeOption?.quick_summary ?? visibleResult.documentation_preview?.quick_summary
+                    }
+                  />
+                  <ClinicalNotePreview
+                    clinical_note={
+                      activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note
+                    }
+                  />
+                  <AssumptionsCard assumptions={visibleResult.assumptions} calculationDetails={visibleResult.calculation_details} />
+                  <LimitationsCard limitations={visibleResult.limitations} calculationDetails={visibleResult.calculation_details} />
                 </div>
+              </details>
             </div>
           ) : (
             <div className="flex flex-col gap-6 flex-1 h-full pb-8">
