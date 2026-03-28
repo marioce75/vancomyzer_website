@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 
 interface VancomycinRainProps {
   opacity: number;
-  colorMode: "matrix-green" | "amber-terminal" | "high-contrast" | "clinical-blue";
+  colorMode: "matrix-green" | "amber-terminal" | "high-contrast" | "clinical-blue" | "basic";
 }
 
 const COLOR_MAP: Record<
@@ -15,6 +15,7 @@ const COLOR_MAP: Record<
   "amber-terminal": { primary: "#ffb000", fade: "rgba(255,176,0," },
   "high-contrast": { primary: "#ffffff", fade: "rgba(255,255,255," },
   "clinical-blue": { primary: "#00bfff", fade: "rgba(0,191,255," },
+  "basic": { primary: "#00c8b4", fade: "rgba(0,200,180," },
 };
 
 const SYMBOLS = ["OH", "NH", "C=O", "Cl", "\u03B1", "\u03B2", "\u03A3", "\u03BB", "\u03BC", "K"];

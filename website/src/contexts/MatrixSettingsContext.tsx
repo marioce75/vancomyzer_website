@@ -25,7 +25,7 @@ export interface MatrixSettings {
   graphAnimations: boolean;
   soundEffects: boolean;
   whiteInputValues: boolean;
-  colorMode: "matrix-green" | "amber-terminal" | "high-contrast" | "clinical-blue";
+  colorMode: "matrix-green" | "amber-terminal" | "high-contrast" | "clinical-blue" | "basic";
   fontSize: "small" | "medium" | "large" | "extra-large";
 }
 
@@ -183,6 +183,30 @@ const COLOR_PRESETS: Record<MatrixSettings["colorMode"], ColorPreset> = {
     "--color-primary-a40": "rgba(0,170,255,0.40)",
     "--color-primary-a50": "rgba(0,170,255,0.50)",
   },
+  "basic": {
+    "--color-primary": "#4ecdc4",
+    "--color-secondary": "#a8b2c1",
+    "--color-dim": "#6b7a8d",
+    "--color-bg": "#0d1117",
+    "--color-border": "rgba(0,200,180,0.35)",
+    "--color-card": "#1a2234",
+    "--color-input": "#141925",
+    "--color-highlight": "#1f2a3d",
+    "--color-glow": "rgba(0,212,180,0.4)",
+    "--color-glow-strong": "rgba(0,212,180,0.6)",
+    "--color-primary-a05": "rgba(0,200,180,0.05)",
+    "--color-primary-a06": "rgba(0,200,180,0.06)",
+    "--color-primary-a08": "rgba(0,200,180,0.08)",
+    "--color-primary-a10": "rgba(0,200,180,0.10)",
+    "--color-primary-a12": "rgba(0,200,180,0.12)",
+    "--color-primary-a15": "rgba(0,200,180,0.15)",
+    "--color-primary-a20": "rgba(0,200,180,0.20)",
+    "--color-primary-a25": "rgba(0,200,180,0.25)",
+    "--color-primary-a30": "rgba(0,200,180,0.30)",
+    "--color-primary-a35": "rgba(0,200,180,0.35)",
+    "--color-primary-a40": "rgba(0,200,180,0.40)",
+    "--color-primary-a50": "rgba(0,200,180,0.50)",
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -266,6 +290,19 @@ function applySettingsToDom(settings: MatrixSettings): void {
   rootStyle.setProperty("--teal", p);
   rootStyle.setProperty("--vc-text", p);
 
+  // --- Theme-specific font family ---
+  const isBasic = settings.colorMode === "basic";
+  const body = document.body;
+  if (isBasic) {
+    body.style.fontFamily = "'Inter', 'SF Pro Display', system-ui, sans-serif";
+    rootStyle.setProperty("--font-mono", "'JetBrains Mono', 'Fira Code', 'Courier New', monospace");
+    body.classList.add("theme-basic");
+  } else {
+    body.style.fontFamily = "'Share Tech Mono', 'Courier New', Courier, monospace";
+    rootStyle.setProperty("--font-mono", "'Share Tech Mono', 'Courier New', monospace");
+    body.classList.remove("theme-basic");
+  }
+
   // --- Font size on <html> for rem scaling ---
   rootStyle.setProperty("font-size", FONT_SIZE_MAP[settings.fontSize]);
 
@@ -276,12 +313,14 @@ function applySettingsToDom(settings: MatrixSettings): void {
     appRoot.style.filter = brightness < 100 ? `brightness(${brightness}%)` : "";
   }
 
-  // --- Background shade ---
-  const shade = Math.round((settings.backgroundShade / 100) * 0x1a);
-  const hex = shade.toString(16).padStart(2, "0");
-  const bgColor = `#${hex}${hex}${hex}`;
-  rootStyle.setProperty("--color-bg", bgColor);
-  rootStyle.setProperty("--background", bgColor);
+  // --- Background shade (skip for Basic theme which has its own bg) ---
+  if (!isBasic) {
+    const shade = Math.round((settings.backgroundShade / 100) * 0x1a);
+    const hex = shade.toString(16).padStart(2, "0");
+    const bgColor = `#${hex}${hex}${hex}`;
+    rootStyle.setProperty("--color-bg", bgColor);
+    rootStyle.setProperty("--background", bgColor);
+  }
 
   // --- Text size scale factor ---
   const textScale = 0.85 + (settings.textSize / 100) * 0.4;
@@ -294,7 +333,6 @@ function applySettingsToDom(settings: MatrixSettings): void {
   rootStyle.setProperty("--mx-rain-opacity", String(settings.rainOpacity / 100));
 
   // --- Toggle body classes ---
-  const body = document.body;
   const toggleClass = (cls: string, off: boolean) => {
     body.classList.toggle(cls, off);
   };

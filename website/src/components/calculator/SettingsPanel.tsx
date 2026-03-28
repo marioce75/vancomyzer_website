@@ -21,6 +21,7 @@ const COLOR_MODES = [
   { value: "amber-terminal" as const, label: "Amber Terminal", swatch: "#ffb000" },
   { value: "high-contrast" as const, label: "High Contrast", swatch: "#ffffff" },
   { value: "clinical-blue" as const, label: "Clinical Blue", swatch: "#00bfff" },
+  { value: "basic" as const, label: "Basic", swatch: "#4ecdc4" },
 ];
 
 const FONT_SIZES = [
@@ -332,31 +333,49 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           {/* ── 5. LIVE PREVIEW ────────────────────────────── */}
           <section>
             <SectionLabel>PREVIEW</SectionLabel>
-            <div
-              style={{
-                marginTop: 10,
-                padding: "12px 14px",
-                border: "1px solid var(--color-border)",
-                background: "var(--color-card)",
-                display: "flex",
-                alignItems: "baseline",
-                gap: 6,
-                ...FONT,
-              }}
-            >
-              <span style={{ fontSize: 11, color: "var(--color-dim)" }}>AUC24:</span>
-              <span
-                style={{
-                  fontSize: 22,
-                  fontWeight: 700,
-                  color: settings.whiteInputValues ? "#ffffff" : "var(--color-primary)",
-                  textShadow: `0 0 8px ${settings.whiteInputValues ? "rgba(255,255,255,0.5)" : "var(--color-glow)"}`,
-                }}
-              >
-                487
-              </span>
-              <span style={{ fontSize: 11, color: "var(--color-dim)" }}>mg·h/L</span>
-            </div>
+            {(() => {
+              const isBasic = settings.colorMode === "basic";
+              const valueColor = isBasic ? "#f0f4f8" : settings.whiteInputValues ? "#ffffff" : "var(--color-primary)";
+              const labelColor = isBasic ? "#4ecdc4" : "var(--color-dim)";
+              const unitColor = isBasic ? "#8892a4" : "var(--color-dim)";
+              const previewBg = isBasic ? "#1a2234" : "var(--color-card)";
+              const glowShadow = isBasic ? "none" : `0 0 8px ${settings.whiteInputValues ? "rgba(255,255,255,0.5)" : "var(--color-glow)"}`;
+              const numFont = isBasic ? "'JetBrains Mono', 'Fira Code', monospace" : "'Share Tech Mono', monospace";
+              return (
+                <div
+                  style={{
+                    marginTop: 10,
+                    padding: "12px 14px",
+                    border: "1px solid var(--color-border)",
+                    background: previewBg,
+                    ...FONT,
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                    <span style={{ fontSize: 11, color: labelColor, fontFamily: isBasic ? "Inter, system-ui, sans-serif" : undefined }}>
+                      AUC{"\u2082\u2084"}:
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 22,
+                        fontWeight: 700,
+                        color: valueColor,
+                        textShadow: glowShadow,
+                        fontFamily: numFont,
+                      }}
+                    >
+                      487
+                    </span>
+                    <span style={{ fontSize: 11, color: unitColor }}>mg·h/L</span>
+                  </div>
+                  {isBasic && (
+                    <p style={{ fontSize: 10, color: "#4ecdc4", marginTop: 4, opacity: 0.8, fontFamily: "Inter, system-ui, sans-serif" }}>
+                      WITHIN TARGET RANGE
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
           </section>
 
           {/* ── 6. RESET ──────────────────────────────────────── */}

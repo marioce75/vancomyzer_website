@@ -104,10 +104,47 @@ body.input-values-white textarea:not(:placeholder-shown) {
   color: #ffffff !important;
 }
 
-/* ── Sharp edges ─────────────────────────────────────────────── */
+/* ── Sharp edges (not applied in Basic theme) ────────────────── */
 
-*, *::before, *::after {
+*:not(.theme-basic *), *:not(.theme-basic *)::before, *:not(.theme-basic *)::after {
   border-radius: 0 !important;
+}
+
+/* ── Basic (Dōsys Clinical) theme overrides ──────────────────── */
+
+body.theme-basic {
+  font-family: 'Inter', 'SF Pro Display', system-ui, sans-serif !important;
+}
+body.theme-basic input,
+body.theme-basic select,
+body.theme-basic textarea {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+  color: #ffffff !important;
+  background-color: #141925 !important;
+  border-color: rgba(0,200,180,0.45) !important;
+  border-width: 1.5px !important;
+}
+body.theme-basic input:focus,
+body.theme-basic select:focus,
+body.theme-basic textarea:focus {
+  border-color: #00d4b4 !important;
+  box-shadow: 0 0 0 2px rgba(0,212,180,0.25), 0 0 8px rgba(0,212,180,0.15) !important;
+}
+body.theme-basic input::placeholder,
+body.theme-basic textarea::placeholder {
+  color: #5a6577 !important;
+}
+body.theme-basic .tabular-nums,
+body.theme-basic .mx-glow {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+}
+/* Brighter text for labels in Basic theme */
+body.theme-basic h1, body.theme-basic h2, body.theme-basic h3 {
+  color: #e2e8f0 !important;
+}
+/* Restore rounded corners in Basic theme */
+body.theme-basic *, body.theme-basic *::before, body.theme-basic *::after {
+  border-radius: revert !important;
 }
 
 /* ── Shimmer border — green highlight traveling around the border ── */
