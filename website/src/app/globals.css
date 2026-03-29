@@ -539,6 +539,16 @@ input, select, textarea {
   caret-color: var(--color-primary);
   font-family: 'Share Tech Mono', 'Courier New', monospace !important;
 }
+/* Basic theme input override — MUST appear after general input rule to win specificity */
+body.theme-basic input,
+body.theme-basic select,
+body.theme-basic textarea {
+  color: #1a202c !important;
+  background-color: #ffffff !important;
+  border-color: #a0aec0 !important;
+  caret-color: #1a202c !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+}
 input::placeholder, textarea::placeholder {
   color: var(--color-dim) !important;
   opacity: 1;
