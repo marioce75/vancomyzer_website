@@ -9,7 +9,7 @@ export default function DisclaimerPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">For Healthcare Professionals Only</h2>
           <p>
-            Vancomyzer™<sup>™</sup> is intended solely for use by qualified healthcare professionals, including licensed physicians, pharmacists, and other clinicians with appropriate training in vancomycin pharmacokinetics and therapeutic drug monitoring. This tool is <strong>not intended for use by patients, caregivers, or non-clinical personnel</strong>. If you are not a healthcare professional, do not use this tool — consult your physician or pharmacist for medication guidance.
+            Vancomyzer™ is intended solely for use by qualified healthcare professionals, including licensed physicians, pharmacists, and other clinicians with appropriate training in vancomycin pharmacokinetics and therapeutic drug monitoring. This tool is <strong>not intended for use by patients, caregivers, or non-clinical personnel</strong>. If you are not a healthcare professional, do not use this tool — consult your physician or pharmacist for medication guidance.
           </p>
         </section>
 

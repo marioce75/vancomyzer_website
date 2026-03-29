@@ -9,7 +9,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Acceptance of Terms</h2>
           <p>
-            By accessing or using Vancomyzer™<sup>™</sup>, you agree to be bound by these Terms of Use and the Medical Disclaimer. If you do not agree, do not use this tool.
+            By accessing or using Vancomyzer™, you agree to be bound by these Terms of Use and the Medical Disclaimer. If you do not agree, do not use this tool.
           </p>
         </section>
 
@@ -30,7 +30,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Intellectual Property</h2>
           <p>
-            All content, design, algorithms, and code comprising Vancomyzer™<sup>™</sup> are the exclusive intellectual property of their respective owners. All rights reserved. The Vancomyzer™ name and logo are trademarks. Unauthorized use of any intellectual property associated with this tool is prohibited.
+            All content, design, algorithms, and code comprising Vancomyzer™ are the exclusive intellectual property of their respective owners. All rights reserved. The Vancomyzer™ name and logo are trademarks. Unauthorized use of any intellectual property associated with this tool is prohibited.
           </p>
         </section>
 

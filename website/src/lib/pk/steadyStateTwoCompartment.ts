@@ -28,7 +28,10 @@ function computeConstants({ CL, V1, Q, V2 }: TwoCompartmentParameters) {
   const k21 = Q / V2;
 
   const sum_k = k10 + k12 + k21;
-  const discriminant = Math.sqrt(sum_k * sum_k - 4 * k10 * k21);
+  // Guard: discriminant must be non-negative for real eigenvalues.
+  // For physically valid PK parameters this always holds, but clamp to prevent NaN.
+  const disc_sq = sum_k * sum_k - 4 * k10 * k21;
+  const discriminant = Math.sqrt(Math.max(0, disc_sq));
   
   const alpha = (sum_k + discriminant) / 2;
   const beta = (sum_k - discriminant) / 2;

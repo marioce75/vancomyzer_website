@@ -17,11 +17,8 @@ const FONT: React.CSSProperties = {
 };
 
 const COLOR_MODES = [
+  { value: "basic" as const, label: "Basic (Clinical)", swatch: "#2b6cb0" },
   { value: "matrix-green" as const, label: "Matrix Green", swatch: "#00ff41" },
-  { value: "amber-terminal" as const, label: "Amber Terminal", swatch: "#ffb000" },
-  { value: "high-contrast" as const, label: "High Contrast", swatch: "#ffffff" },
-  { value: "clinical-blue" as const, label: "Clinical Blue", swatch: "#00bfff" },
-  { value: "basic" as const, label: "Basic", swatch: "#4ecdc4" },
 ];
 
 const FONT_SIZES = [
@@ -42,7 +39,7 @@ const TOGGLES = [
   { key: "scanlineEffect" as const, label: "Scanline Effect" },
   { key: "typewriterAnimation" as const, label: "Typewriter Animation" },
   { key: "blinkingCursor" as const, label: "Blinking Cursor" },
-  { key: "vancomycinRain" as const, label: "Vancomycin Rain (off by default)" },
+  { key: "vancomycinRain" as const, label: "Vancomyzer Rain (off by default)" },
   { key: "graphAnimations" as const, label: "Graph Animations" },
   { key: "soundEffects" as const, label: "Sound Effects" },
   { key: "whiteInputValues" as const, label: "White Input Numbers" },
@@ -283,11 +280,15 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             <SectionLabel>EFFECTS</SectionLabel>
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 10 }}>
               {TOGGLES.map((toggle) => {
-                const on = settings[toggle.key] as boolean;
+                const BASIC_FORCED_OFF = ["scanlineEffect", "typewriterAnimation", "blinkingCursor", "vancomycinRain", "whiteInputValues"];
+                const forcedOff = settings.colorMode === "basic" && BASIC_FORCED_OFF.includes(toggle.key);
+                const on = forcedOff ? false : (settings[toggle.key] as boolean);
                 return (
                   <div
                     key={toggle.key}
                     className="flex items-center justify-between"
+                    style={{ opacity: forcedOff ? 0.35 : 1 }}
+                    title={forcedOff ? "Not available in Basic theme" : undefined}
                   >
                     <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
                       {toggle.label}
@@ -296,7 +297,8 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                       type="button"
                       role="switch"
                       aria-checked={on}
-                      onClick={() => updateSetting(toggle.key, !on)}
+                      disabled={forcedOff}
+                      onClick={() => { if (!forcedOff) updateSetting(toggle.key, !on); }}
                       style={{
                         position: "relative",
                         width: 40,
@@ -305,12 +307,11 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                         background: on ? "var(--color-primary)" : "#1a1a1a",
                         border: on ? "none" : "1px solid var(--color-border)",
                         boxShadow: on ? "0 0 8px var(--color-primary-a50)" : "none",
-                        cursor: "pointer",
+                        cursor: forcedOff ? "not-allowed" : "pointer",
                         flexShrink: 0,
                         transition: "background 0.2s, box-shadow 0.2s",
                       }}
                     >
-                      {/* Toggle dot */}
                       <span
                         style={{
                           position: "absolute",
@@ -335,44 +336,57 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             <SectionLabel>PREVIEW</SectionLabel>
             {(() => {
               const isBasic = settings.colorMode === "basic";
-              const valueColor = isBasic ? "#f0f4f8" : settings.whiteInputValues ? "#ffffff" : "var(--color-primary)";
-              const labelColor = isBasic ? "#4ecdc4" : "var(--color-dim)";
-              const unitColor = isBasic ? "#8892a4" : "var(--color-dim)";
-              const previewBg = isBasic ? "#1a2234" : "var(--color-card)";
-              const glowShadow = isBasic ? "none" : `0 0 8px ${settings.whiteInputValues ? "rgba(255,255,255,0.5)" : "var(--color-glow)"}`;
-              const numFont = isBasic ? "'JetBrains Mono', 'Fira Code', monospace" : "'Share Tech Mono', monospace";
+              if (isBasic) {
+                return (
+                  <div
+                    style={{
+                      marginTop: 10,
+                      padding: "14px 16px",
+                      border: "1px solid #cbd5e0",
+                      background: "#ffffff",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                      borderRadius: 6,
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                      <span style={{ fontSize: 11, color: "#1a3a5c", fontWeight: 600, fontFamily: "Inter, system-ui, sans-serif" }}>
+                        AUC{"\u2082\u2084"}:
+                      </span>
+                      <span style={{ fontSize: 22, fontWeight: 700, color: "#1e4d8c", fontFamily: "'JetBrains Mono', monospace" }}>
+                        487
+                      </span>
+                      <span style={{ fontSize: 11, color: "#718096", fontFamily: "Inter, system-ui, sans-serif" }}>mg·h/L</span>
+                    </div>
+                    <p style={{ fontSize: 10, color: "#276749", fontWeight: 600, marginTop: 4, fontFamily: "Inter, system-ui, sans-serif" }}>
+                      WITHIN TARGET RANGE
+                    </p>
+                  </div>
+                );
+              }
               return (
                 <div
                   style={{
                     marginTop: 10,
                     padding: "12px 14px",
                     border: "1px solid var(--color-border)",
-                    background: previewBg,
+                    background: "var(--color-card)",
                     ...FONT,
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                    <span style={{ fontSize: 11, color: labelColor, fontFamily: isBasic ? "Inter, system-ui, sans-serif" : undefined }}>
-                      AUC{"\u2082\u2084"}:
-                    </span>
+                    <span style={{ fontSize: 11, color: "var(--color-dim)" }}>AUC24:</span>
                     <span
                       style={{
                         fontSize: 22,
                         fontWeight: 700,
-                        color: valueColor,
-                        textShadow: glowShadow,
-                        fontFamily: numFont,
+                        color: settings.whiteInputValues ? "#ffffff" : "var(--color-primary)",
+                        textShadow: `0 0 8px ${settings.whiteInputValues ? "rgba(255,255,255,0.5)" : "var(--color-glow)"}`,
                       }}
                     >
                       487
                     </span>
-                    <span style={{ fontSize: 11, color: unitColor }}>mg·h/L</span>
+                    <span style={{ fontSize: 11, color: "var(--color-dim)" }}>mg·h/L</span>
                   </div>
-                  {isBasic && (
-                    <p style={{ fontSize: 10, color: "#4ecdc4", marginTop: 4, opacity: 0.8, fontFamily: "Inter, system-ui, sans-serif" }}>
-                      WITHIN TARGET RANGE
-                    </p>
-                  )}
                 </div>
               );
             })()}

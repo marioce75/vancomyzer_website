@@ -31,7 +31,7 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
     const p = o.patient as Record<string, unknown>;
     if (typeof p.age !== "number" || Number.isNaN(p.age) || p.age < 18 || p.age > 120) field_errors["patient.age"] = "Adult calculator requires age 18-120.";
     if (typeof p.weight_kg !== "number" || Number.isNaN(p.weight_kg) || p.weight_kg < 30 || p.weight_kg > 400) field_errors["patient.weight_kg"] = "Weight must be 30-400 kg.";
-    if (typeof p.serum_creatinine_mg_dl !== "number" || Number.isNaN(p.serum_creatinine_mg_dl) || p.serum_creatinine_mg_dl < 0.1 || p.serum_creatinine_mg_dl > 15) field_errors["patient.serum_creatinine_mg_dl"] = "Scr must be 0.1-15 mg/dL.";
+    if (typeof p.serum_creatinine_mg_dl !== "number" || Number.isNaN(p.serum_creatinine_mg_dl) || p.serum_creatinine_mg_dl < 0.1 || p.serum_creatinine_mg_dl > 10) field_errors["patient.serum_creatinine_mg_dl"] = "Scr must be 0.1-10 mg/dL. For SCr >10, consult nephrology — PK model reliability is limited.";
   }
 
   if (resolvedMode === "existing_regimen") {

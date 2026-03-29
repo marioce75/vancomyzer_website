@@ -75,7 +75,7 @@ function LoadingDoseGuidance({ doseMg, weightKg }: { doseMg: number; weightKg: n
             </p>
           </div>
 
-          <p style={{ fontSize: 9, color: "#005522", fontStyle: "italic", marginTop: 8, ...FONT }}>
+          <p style={{ fontSize: 9, color: "var(--color-dim)", fontStyle: "italic", marginTop: 8, ...FONT }}>
             ASHP/IDSA/SIDP 2020: Loading doses of 25–30 mg/kg (based on actual body weight) can be used to facilitate rapid attainment of target AUC₂₄/MIC.
           </p>
         </div>
@@ -87,7 +87,7 @@ function LoadingDoseGuidance({ doseMg, weightKg }: { doseMg: number; weightKg: n
           <p style={{ fontSize: 10, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "2px", margin: 0, ...FONT }}>
             {">"} LOADING DOSE GUIDANCE
           </p>
-          <p style={{ fontSize: 10, color: "#00cc44", lineHeight: 1.7, marginTop: 6, ...FONT }}>
+          <p style={{ fontSize: 10, color: "var(--color-secondary)", lineHeight: 1.7, marginTop: 6, ...FONT }}>
             Administer loading dose prior to first maintenance dose.{"\n"}
             Draw first level 1.5–6h post-infusion end for early Bayesian{"\n"}
             estimation, or peak + trough near dose 3–4 for highest accuracy.{"\n"}
@@ -100,10 +100,22 @@ function LoadingDoseGuidance({ doseMg, weightKg }: { doseMg: number; weightKg: n
   );
 }
 
-function aucRangeLabel(auc: number): { label: string; color: string } {
-  if (auc >= 400 && auc <= 600) return { label: "In range", color: "text-emerald-700 bg-emerald-50 border-emerald-200" };
-  if (auc > 600) return { label: "Above target", color: "text-amber-700 bg-amber-50 border-amber-200" };
-  return { label: "Below target", color: "text-rose-700 bg-rose-50 border-rose-200" };
+function aucRangeLabel(auc: number): { label: string; color: string; badgeStyle: React.CSSProperties } {
+  if (auc >= 400 && auc <= 600) return {
+    label: "In range",
+    color: "text-emerald-700 bg-emerald-50 border-emerald-200",
+    badgeStyle: { background: "#ecfdf5", borderColor: "#6ee7b7", color: "#047857" },
+  };
+  if (auc > 600) return {
+    label: "Above target",
+    color: "text-amber-700 bg-amber-50 border-amber-200",
+    badgeStyle: { background: "#fffbeb", borderColor: "#fcd34d", color: "#92400e" },
+  };
+  return {
+    label: "Below target",
+    color: "text-rose-700 bg-rose-50 border-rose-200",
+    badgeStyle: { background: "#fff1f2", borderColor: "#fca5a5", color: "#991b1b" },
+  };
 }
 
 export default function DoseRecommendationCard({
@@ -176,8 +188,8 @@ export default function DoseRecommendationCard({
                 <span
                   className="mt-1 inline-flex border px-1.5 py-0.5 text-[10px] font-semibold leading-none"
                   style={isActive
-                    ? { borderColor: "rgba(0,0,0,0.3)", background: "rgba(0,0,0,0.15)", color: "var(--color-bg)", fontFamily: "'Share Tech Mono', monospace" }
-                    : { borderColor: "var(--color-primary-a30)", background: "var(--color-primary-a05)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }
+                    ? { borderColor: "rgba(0,0,0,0.3)", background: "rgba(0,0,0,0.15)", color: "var(--color-bg)" }
+                    : { ...r.badgeStyle }
                   }
                 >
                   {r.label}
@@ -222,7 +234,7 @@ export default function DoseRecommendationCard({
                 <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>AUC24</span>
                 <span className="tabular-nums text-sm font-bold" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>{displayAUC}</span>
                 <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>mg·h/L</span>
-                <span className="inline-flex border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider" style={{ borderColor: "var(--color-primary-a40)", background: "var(--color-primary-a06)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>
+                <span className="inline-flex border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider" style={{ ...range.badgeStyle }}>
                   {range.label}
                 </span>
               </div>

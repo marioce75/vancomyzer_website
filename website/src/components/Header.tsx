@@ -22,7 +22,7 @@ export default function Header() {
           <Link href="/" className="flex items-center gap-2.5 whitespace-nowrap" style={{ textDecoration: "none" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/favicon.svg" alt="Vancomyzer™" width={32} height={32} className="shrink-0" />
-            <span className="font-bold" style={{ fontSize: "18px", letterSpacing: "3px", color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 8px var(--color-glow)" }}>
+            <span className="font-bold" style={{ fontSize: "18px", letterSpacing: "3px", color: "var(--color-primary)", textShadow: "0 0 8px var(--color-glow)" }}>
               VANCOMYZER<sup className="text-[8px] font-semibold ml-0.5 align-super" style={{ color: "var(--color-secondary)" }}>{"\u2122"}</sup>
             </span>
           </Link>
@@ -46,7 +46,7 @@ export default function Header() {
                 <Link
                   href={href}
                   className="text-sm font-medium transition"
-                  style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
+                  style={{ color: "var(--color-secondary)" }}
                 >
                   {label}
                 </Link>

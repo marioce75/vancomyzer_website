@@ -84,9 +84,9 @@ export function validateExistingRegimenRequest(
 ): ValidationResult {
   const field_errors: Record<string, string> = {};
 
-  if (patient.age < 0 || Number.isNaN(patient.age)) field_errors["patient.age"] = "Must be a non-negative number.";
-  if (patient.weight_kg <= 0 || Number.isNaN(patient.weight_kg)) field_errors["patient.weight_kg"] = "Must be a positive number.";
-  if (patient.serum_creatinine_mg_dl <= 0 || Number.isNaN(patient.serum_creatinine_mg_dl)) field_errors["patient.serum_creatinine_mg_dl"] = "Must be a positive number greater than 0.";
+  if (patient.age < 18 || patient.age > 120 || Number.isNaN(patient.age)) field_errors["patient.age"] = "Adult calculator requires age 18-120.";
+  if (patient.weight_kg < 30 || patient.weight_kg > 400 || Number.isNaN(patient.weight_kg)) field_errors["patient.weight_kg"] = "Weight must be 30-400 kg.";
+  if (patient.serum_creatinine_mg_dl < 0.1 || patient.serum_creatinine_mg_dl > 10 || Number.isNaN(patient.serum_creatinine_mg_dl)) field_errors["patient.serum_creatinine_mg_dl"] = "SCr must be 0.1-10 mg/dL.";
 
   if (regimen.dose_mg <= 0) field_errors["regimen.dose_mg"] = "Must be a positive number.";
   if (regimen.interval_hours <= 0) field_errors["regimen.interval_hours"] = "Must be a positive number.";

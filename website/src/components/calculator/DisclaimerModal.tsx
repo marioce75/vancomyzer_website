@@ -154,7 +154,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
                 style={{
                   fontSize: 11,
                   lineHeight: 1.7,
-                  color: "#00cc44",
+                  color: "var(--color-secondary)",
                   margin: 0,
                   whiteSpace: "pre-line",
                   ...FONT,
@@ -168,7 +168,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
           <p
             style={{
               fontSize: 11,
-              color: "#005522",
+              color: "var(--color-dim)",
               textAlign: "center",
               marginTop: 16,
               ...FONT,

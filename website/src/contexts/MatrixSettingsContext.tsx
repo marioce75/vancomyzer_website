@@ -25,7 +25,7 @@ export interface MatrixSettings {
   graphAnimations: boolean;
   soundEffects: boolean;
   whiteInputValues: boolean;
-  colorMode: "matrix-green" | "amber-terminal" | "high-contrast" | "clinical-blue" | "basic";
+  colorMode: "basic" | "matrix-green";
   fontSize: "small" | "medium" | "large" | "extra-large";
 }
 
@@ -38,7 +38,7 @@ interface MatrixSettingsContextValue {
 }
 
 // ---------------------------------------------------------------------------
-// Defaults
+// Defaults — Basic is the default theme
 // ---------------------------------------------------------------------------
 
 export const DEFAULT_SETTINGS: MatrixSettings = {
@@ -53,12 +53,12 @@ export const DEFAULT_SETTINGS: MatrixSettings = {
   graphAnimations: true,
   soundEffects: false,
   whiteInputValues: false,
-  colorMode: "matrix-green",
+  colorMode: "basic",
   fontSize: "medium",
 };
 
 // ---------------------------------------------------------------------------
-// Color-mode presets — every variable the app needs
+// Color-mode presets
 // ---------------------------------------------------------------------------
 
 interface ColorPreset {
@@ -87,6 +87,30 @@ interface ColorPreset {
 }
 
 const COLOR_PRESETS: Record<MatrixSettings["colorMode"], ColorPreset> = {
+  "basic": {
+    "--color-primary": "#2b6cb0",
+    "--color-secondary": "#4a5568",
+    "--color-dim": "#718096",
+    "--color-bg": "#eaf1fb",
+    "--color-border": "#c7d4e8",
+    "--color-card": "#ffffff",
+    "--color-input": "#ffffff",
+    "--color-highlight": "#dce6f5",
+    "--color-glow": "rgba(43,108,176,0.15)",
+    "--color-glow-strong": "rgba(43,108,176,0.3)",
+    "--color-primary-a05": "rgba(43,108,176,0.05)",
+    "--color-primary-a06": "rgba(43,108,176,0.06)",
+    "--color-primary-a08": "rgba(43,108,176,0.08)",
+    "--color-primary-a10": "rgba(43,108,176,0.10)",
+    "--color-primary-a12": "rgba(43,108,176,0.12)",
+    "--color-primary-a15": "rgba(43,108,176,0.15)",
+    "--color-primary-a20": "rgba(43,108,176,0.20)",
+    "--color-primary-a25": "rgba(43,108,176,0.25)",
+    "--color-primary-a30": "rgba(43,108,176,0.30)",
+    "--color-primary-a35": "rgba(43,108,176,0.35)",
+    "--color-primary-a40": "rgba(43,108,176,0.40)",
+    "--color-primary-a50": "rgba(43,108,176,0.50)",
+  },
   "matrix-green": {
     "--color-primary": "#00ff41",
     "--color-secondary": "#00cc44",
@@ -111,106 +135,10 @@ const COLOR_PRESETS: Record<MatrixSettings["colorMode"], ColorPreset> = {
     "--color-primary-a40": "rgba(0,255,65,0.40)",
     "--color-primary-a50": "rgba(0,255,65,0.50)",
   },
-  "amber-terminal": {
-    "--color-primary": "#ffaa00",
-    "--color-secondary": "#cc8800",
-    "--color-dim": "#886600",
-    "--color-bg": "#000000",
-    "--color-border": "#442200",
-    "--color-card": "#0a0500",
-    "--color-input": "#0d0800",
-    "--color-highlight": "#1a0f00",
-    "--color-glow": "rgba(255,170,0,0.5)",
-    "--color-glow-strong": "rgba(255,170,0,0.8)",
-    "--color-primary-a05": "rgba(255,170,0,0.05)",
-    "--color-primary-a06": "rgba(255,170,0,0.06)",
-    "--color-primary-a08": "rgba(255,170,0,0.08)",
-    "--color-primary-a10": "rgba(255,170,0,0.10)",
-    "--color-primary-a12": "rgba(255,170,0,0.12)",
-    "--color-primary-a15": "rgba(255,170,0,0.15)",
-    "--color-primary-a20": "rgba(255,170,0,0.20)",
-    "--color-primary-a25": "rgba(255,170,0,0.25)",
-    "--color-primary-a30": "rgba(255,170,0,0.30)",
-    "--color-primary-a35": "rgba(255,170,0,0.35)",
-    "--color-primary-a40": "rgba(255,170,0,0.40)",
-    "--color-primary-a50": "rgba(255,170,0,0.50)",
-  },
-  "high-contrast": {
-    "--color-primary": "#ffffff",
-    "--color-secondary": "#cccccc",
-    "--color-dim": "#888888",
-    "--color-bg": "#000000",
-    "--color-border": "#444444",
-    "--color-card": "#0a0a0a",
-    "--color-input": "#111111",
-    "--color-highlight": "#1a1a1a",
-    "--color-glow": "rgba(255,255,255,0.5)",
-    "--color-glow-strong": "rgba(255,255,255,0.8)",
-    "--color-primary-a05": "rgba(255,255,255,0.05)",
-    "--color-primary-a06": "rgba(255,255,255,0.06)",
-    "--color-primary-a08": "rgba(255,255,255,0.08)",
-    "--color-primary-a10": "rgba(255,255,255,0.10)",
-    "--color-primary-a12": "rgba(255,255,255,0.12)",
-    "--color-primary-a15": "rgba(255,255,255,0.15)",
-    "--color-primary-a20": "rgba(255,255,255,0.20)",
-    "--color-primary-a25": "rgba(255,255,255,0.25)",
-    "--color-primary-a30": "rgba(255,255,255,0.30)",
-    "--color-primary-a35": "rgba(255,255,255,0.35)",
-    "--color-primary-a40": "rgba(255,255,255,0.40)",
-    "--color-primary-a50": "rgba(255,255,255,0.50)",
-  },
-  "clinical-blue": {
-    "--color-primary": "#00aaff",
-    "--color-secondary": "#0088cc",
-    "--color-dim": "#005588",
-    "--color-bg": "#000000",
-    "--color-border": "#002244",
-    "--color-card": "#000a0f",
-    "--color-input": "#001520",
-    "--color-highlight": "#001a2e",
-    "--color-glow": "rgba(0,170,255,0.5)",
-    "--color-glow-strong": "rgba(0,170,255,0.8)",
-    "--color-primary-a05": "rgba(0,170,255,0.05)",
-    "--color-primary-a06": "rgba(0,170,255,0.06)",
-    "--color-primary-a08": "rgba(0,170,255,0.08)",
-    "--color-primary-a10": "rgba(0,170,255,0.10)",
-    "--color-primary-a12": "rgba(0,170,255,0.12)",
-    "--color-primary-a15": "rgba(0,170,255,0.15)",
-    "--color-primary-a20": "rgba(0,170,255,0.20)",
-    "--color-primary-a25": "rgba(0,170,255,0.25)",
-    "--color-primary-a30": "rgba(0,170,255,0.30)",
-    "--color-primary-a35": "rgba(0,170,255,0.35)",
-    "--color-primary-a40": "rgba(0,170,255,0.40)",
-    "--color-primary-a50": "rgba(0,170,255,0.50)",
-  },
-  "basic": {
-    "--color-primary": "#4ecdc4",
-    "--color-secondary": "#a8b2c1",
-    "--color-dim": "#6b7a8d",
-    "--color-bg": "#0d1117",
-    "--color-border": "rgba(0,200,180,0.35)",
-    "--color-card": "#1a2234",
-    "--color-input": "#141925",
-    "--color-highlight": "#1f2a3d",
-    "--color-glow": "rgba(0,212,180,0.4)",
-    "--color-glow-strong": "rgba(0,212,180,0.6)",
-    "--color-primary-a05": "rgba(0,200,180,0.05)",
-    "--color-primary-a06": "rgba(0,200,180,0.06)",
-    "--color-primary-a08": "rgba(0,200,180,0.08)",
-    "--color-primary-a10": "rgba(0,200,180,0.10)",
-    "--color-primary-a12": "rgba(0,200,180,0.12)",
-    "--color-primary-a15": "rgba(0,200,180,0.15)",
-    "--color-primary-a20": "rgba(0,200,180,0.20)",
-    "--color-primary-a25": "rgba(0,200,180,0.25)",
-    "--color-primary-a30": "rgba(0,200,180,0.30)",
-    "--color-primary-a35": "rgba(0,200,180,0.35)",
-    "--color-primary-a40": "rgba(0,200,180,0.40)",
-    "--color-primary-a50": "rgba(0,200,180,0.50)",
-  },
 };
 
 // ---------------------------------------------------------------------------
-// Font-size mapping — applied directly to <html> for rem scaling
+// Font-size mapping
 // ---------------------------------------------------------------------------
 
 const FONT_SIZE_MAP: Record<MatrixSettings["fontSize"], string> = {
@@ -221,7 +149,7 @@ const FONT_SIZE_MAP: Record<MatrixSettings["fontSize"], string> = {
 };
 
 // ---------------------------------------------------------------------------
-// Sound effects — Web Audio API (no external files)
+// Sound effects — Web Audio API
 // ---------------------------------------------------------------------------
 
 let audioCtxSingleton: AudioContext | null = null;
@@ -246,25 +174,10 @@ function playTone(freq: number, durationMs: number, startDelay = 0) {
   osc.stop(ctx.currentTime + (startDelay + durationMs + 20) / 1000);
 }
 
-function soundKeyClick() {
-  playTone(800, 20);
-}
-
-function soundCalculate() {
-  playTone(440, 200, 0);
-  playTone(550, 200, 200);
-  playTone(660, 200, 400);
-}
-
-function soundSuccess() {
-  playTone(330, 150, 0);
-  playTone(440, 150, 150);
-}
-
-function soundError() {
-  playTone(300, 150, 0);
-  playTone(200, 300, 150);
-}
+function soundKeyClick() { playTone(800, 20); }
+function soundCalculate() { playTone(440, 200, 0); playTone(550, 200, 200); playTone(660, 200, 400); }
+function soundSuccess() { playTone(330, 150, 0); playTone(440, 150, 150); }
+function soundError() { playTone(300, 150, 0); playTone(200, 300, 150); }
 
 // ---------------------------------------------------------------------------
 // DOM application helper
@@ -275,6 +188,8 @@ function applySettingsToDom(settings: MatrixSettings): void {
 
   const root = document.documentElement;
   const rootStyle = root.style;
+  const body = document.body;
+  const isBasic = settings.colorMode === "basic";
   const preset = COLOR_PRESETS[settings.colorMode];
 
   // --- Color-mode CSS custom properties ---
@@ -282,7 +197,7 @@ function applySettingsToDom(settings: MatrixSettings): void {
     rootStyle.setProperty(key, preset[key]);
   });
 
-  // Legacy alias vars (for any remaining references)
+  // Legacy alias vars
   const p = preset["--color-primary"];
   rootStyle.setProperty("--mx-green", p);
   rootStyle.setProperty("--text-primary", p);
@@ -290,30 +205,30 @@ function applySettingsToDom(settings: MatrixSettings): void {
   rootStyle.setProperty("--teal", p);
   rootStyle.setProperty("--vc-text", p);
 
-  // --- Theme-specific font family ---
-  const isBasic = settings.colorMode === "basic";
-  const body = document.body;
+  // --- Theme class ---
   if (isBasic) {
-    body.style.fontFamily = "'Inter', 'SF Pro Display', system-ui, sans-serif";
-    rootStyle.setProperty("--font-mono", "'JetBrains Mono', 'Fira Code', 'Courier New', monospace");
     body.classList.add("theme-basic");
+    body.classList.remove("theme-matrix");
+    body.style.fontFamily = "'Inter', 'Helvetica Neue', 'Arial', system-ui, sans-serif";
+    rootStyle.setProperty("--font-mono", "'JetBrains Mono', 'Fira Code', 'Courier New', monospace");
   } else {
+    body.classList.add("theme-matrix");
+    body.classList.remove("theme-basic");
     body.style.fontFamily = "'Share Tech Mono', 'Courier New', Courier, monospace";
     rootStyle.setProperty("--font-mono", "'Share Tech Mono', 'Courier New', monospace");
-    body.classList.remove("theme-basic");
   }
 
-  // --- Font size on <html> for rem scaling ---
+  // --- Font size ---
   rootStyle.setProperty("font-size", FONT_SIZE_MAP[settings.fontSize]);
 
-  // --- Brightness filter on app root ---
-  const brightness = 40 + (settings.greenBrightness / 100) * 60; // range 40-100
+  // --- Brightness filter ---
+  const brightness = 40 + (settings.greenBrightness / 100) * 60;
   const appRoot = document.getElementById("app-root");
   if (appRoot) {
     appRoot.style.filter = brightness < 100 ? `brightness(${brightness}%)` : "";
   }
 
-  // --- Background shade (skip for Basic theme which has its own bg) ---
+  // --- Background shade (Matrix only) ---
   if (!isBasic) {
     const shade = Math.round((settings.backgroundShade / 100) * 0x1a);
     const hex = shade.toString(16).padStart(2, "0");
@@ -326,21 +241,31 @@ function applySettingsToDom(settings: MatrixSettings): void {
   const textScale = 0.85 + (settings.textSize / 100) * 0.4;
   rootStyle.setProperty("--mx-text-scale", String(textScale));
 
-  // --- Scanline opacity ---
-  rootStyle.setProperty("--mx-scanline-opacity", settings.scanlineEffect ? "0.10" : "0");
+  // --- Scanline opacity (forced off in Basic) ---
+  const scanlines = isBasic ? false : settings.scanlineEffect;
+  rootStyle.setProperty("--mx-scanline-opacity", scanlines ? "0.10" : "0");
 
   // --- Rain opacity ---
   rootStyle.setProperty("--mx-rain-opacity", String(settings.rainOpacity / 100));
 
-  // --- Toggle body classes ---
-  const toggleClass = (cls: string, off: boolean) => {
-    body.classList.toggle(cls, off);
-  };
-  toggleClass("no-scanlines", !settings.scanlineEffect);
-  toggleClass("no-typewriter", !settings.typewriterAnimation);
-  toggleClass("no-blink", !settings.blinkingCursor);
+  // --- Toggle body classes (Basic forces off scanlines, blink, typewriter) ---
+  const toggleClass = (cls: string, on: boolean) => { body.classList.toggle(cls, on); };
+  toggleClass("no-scanlines", isBasic || !settings.scanlineEffect);
+  toggleClass("no-typewriter", isBasic || !settings.typewriterAnimation);
+  toggleClass("no-blink", isBasic || !settings.blinkingCursor);
   toggleClass("no-graph-anim", !settings.graphAnimations);
   toggleClass("input-values-white", settings.whiteInputValues);
+}
+
+// ---------------------------------------------------------------------------
+// Migrate legacy colorMode values
+// ---------------------------------------------------------------------------
+
+function migrateColorMode(mode: string): MatrixSettings["colorMode"] {
+  if (mode === "matrix-green") return "matrix-green";
+  if (mode === "basic") return "basic";
+  // Amber, high-contrast, clinical-blue → migrate to basic
+  return "basic";
 }
 
 // ---------------------------------------------------------------------------
@@ -364,30 +289,43 @@ export function MatrixSettingsProvider({ children }: { children: React.ReactNode
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed: Partial<MatrixSettings> = JSON.parse(raw);
+        const parsed = JSON.parse(raw) as Partial<MatrixSettings> & { colorMode?: string };
+        // Migrate deleted themes
+        if (parsed.colorMode) {
+          parsed.colorMode = migrateColorMode(parsed.colorMode);
+        }
         setSettings((prev) => ({ ...prev, ...parsed }));
       }
     } catch {
-      // Corrupted or unavailable — fall back to defaults
+      // Corrupted — fall back to defaults
     }
     hasMounted.current = true;
     setMounted(true);
   }, []);
 
-  // Apply to DOM & persist whenever settings change (after mount)
+  // Apply to DOM & persist
   useEffect(() => {
     if (!hasMounted.current) return;
     applySettingsToDom(settings);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    } catch {
-      // Storage full — ignore
-    }
+    } catch { /* storage full */ }
   }, [settings, mounted]);
 
   const updateSetting = useCallback(
     <K extends keyof MatrixSettings>(key: K, value: MatrixSettings[K]) => {
-      setSettings((prev) => ({ ...prev, [key]: value }));
+      setSettings((prev) => {
+        const next = { ...prev, [key]: value };
+        // Switching to Basic forces off effects that are disabled in that theme
+        if (key === "colorMode" && value === "basic") {
+          next.vancomycinRain = false;
+          next.scanlineEffect = false;
+          next.typewriterAnimation = false;
+          next.blinkingCursor = false;
+          next.whiteInputValues = false;
+        }
+        return next;
+      });
     },
     [],
   );

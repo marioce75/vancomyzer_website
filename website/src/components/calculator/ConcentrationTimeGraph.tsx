@@ -122,6 +122,14 @@ function drawGraph(
   const secondary = getCSSColor("--color-secondary", "#00cc44");
   const dim = getCSSColor("--color-dim", "#009933");
   const border = getCSSColor("--color-border", "#004422");
+  const gridMajor = getCSSColor("--color-primary-a06", "rgba(0,255,65,0.06)");
+  const gridMinor = getCSSColor("--color-primary-a05", "rgba(0,255,65,0.03)");
+  const axisLine = getCSSColor("--color-primary-a50", "rgba(0,255,65,0.5)");
+  const axisOuter = getCSSColor("--color-primary-a30", "rgba(0,255,65,0.3)");
+  const aucFill = getCSSColor("--color-primary-a08", "rgba(0,255,65,0.08)");
+  const glowPath = getCSSColor("--color-primary-a15", "rgba(0,255,65,0.15)");
+  const crossV = getCSSColor("--color-primary-a40", "rgba(0,255,65,0.4)");
+  const crossH = getCSSColor("--color-primary-a20", "rgba(0,255,65,0.2)");
 
   const { xMin, xMax, yMin, yMax } = calcDomains(curve, measured, zoom);
   const gw = w - PAD.left - PAD.right;
@@ -133,35 +141,36 @@ function drawGraph(
   const fromY = (py: number) => yMax - ((py - PAD.top) / gh) * (yMax - yMin);
 
   // ─── Background ───
-  ctx.fillStyle = "#000000";
+  const bgColor = getCSSColor("--color-card", "#000000");
+  ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, w, h);
 
   // ─── Grid lines ───
   // Major vertical every 12h
   for (let t = 0; t <= xMax; t += 12) {
     const x = toX(t);
-    ctx.strokeStyle = t % 12 === 0 ? "rgba(0,255,65,0.06)" : "rgba(0,255,65,0.03)";
+    ctx.strokeStyle = t % 12 === 0 ? gridMajor : gridMinor;
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + gh); ctx.stroke();
   }
   // Minor vertical every 6h
   for (let t = 6; t <= xMax; t += 12) {
     const x = toX(t);
-    ctx.strokeStyle = "rgba(0,255,65,0.03)";
+    ctx.strokeStyle = gridMinor;
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + gh); ctx.stroke();
   }
   // Major horizontal every 5
   for (let c = 0; c <= yMax; c += 5) {
     const y = toY(c);
-    ctx.strokeStyle = "rgba(0,255,65,0.06)";
+    ctx.strokeStyle = gridMajor;
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gw, y); ctx.stroke();
   }
   // Minor horizontal every 2.5
   for (let c = 2.5; c <= yMax; c += 5) {
     const y = toY(c);
-    ctx.strokeStyle = "rgba(0,255,65,0.03)";
+    ctx.strokeStyle = gridMinor;
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gw, y); ctx.stroke();
   }
@@ -169,7 +178,7 @@ function drawGraph(
   // ─── Target range band ───
   const yTargetTop = toY(TARGET_HIGH);
   const yTargetBot = toY(TARGET_LOW);
-  ctx.fillStyle = "rgba(0,255,65,0.08)";
+  ctx.fillStyle = aucFill;
   ctx.fillRect(PAD.left, yTargetTop, gw, yTargetBot - yTargetTop);
   ctx.font = `9px ${FONT}`;
   ctx.fillStyle = dim;
@@ -197,7 +206,7 @@ function drawGraph(
   ctx.setLineDash([]);
 
   // ─── Axes ───
-  ctx.strokeStyle = "rgba(0,255,65,0.5)";
+  ctx.strokeStyle = axisLine;
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(PAD.left, PAD.top);
@@ -206,7 +215,7 @@ function drawGraph(
   ctx.stroke();
 
   // Outer border
-  ctx.strokeStyle = "rgba(0,255,65,0.3)";
+  ctx.strokeStyle = axisOuter;
   ctx.lineWidth = 1;
   ctx.strokeRect(PAD.left, PAD.top, gw, gh);
 
@@ -263,7 +272,7 @@ function drawGraph(
     const tStart = Math.max(0, tEnd - 24);
     const aucPts = curve.filter((p) => p.time_hours >= tStart);
     if (aucPts.length > 1) {
-      ctx.fillStyle = "rgba(0,255,65,0.08)";
+      ctx.fillStyle = aucFill;
       ctx.beginPath();
       ctx.moveTo(toX(aucPts[0].time_hours), toY(0));
       for (const p of aucPts) ctx.lineTo(toX(p.time_hours), toY(p.concentration));
@@ -277,7 +286,7 @@ function drawGraph(
   if (curve.length > 1) {
     const drawLen = Math.floor(curve.length * animProgress);
     if (drawLen > 1) {
-      ctx.strokeStyle = "rgba(0,255,65,0.15)";
+      ctx.strokeStyle = glowPath;
       ctx.lineWidth = 6;
       ctx.lineJoin = "round";
       ctx.beginPath();
@@ -395,11 +404,11 @@ function drawGraph(
   // ─── Crosshair + tooltip on hover ───
   if (mouse && mouse.x >= PAD.left && mouse.x <= PAD.left + gw && mouse.y >= PAD.top && mouse.y <= PAD.top + gh) {
     // Vertical hairline
-    ctx.strokeStyle = "rgba(0,255,65,0.4)";
+    ctx.strokeStyle = crossV;
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(mouse.x, PAD.top); ctx.lineTo(mouse.x, PAD.top + gh); ctx.stroke();
     // Horizontal hairline
-    ctx.strokeStyle = "rgba(0,255,65,0.2)";
+    ctx.strokeStyle = crossH;
     ctx.beginPath(); ctx.moveTo(PAD.left, mouse.y); ctx.lineTo(PAD.left + gw, mouse.y); ctx.stroke();
 
     if (curve.length > 0) {
@@ -422,7 +431,7 @@ function drawGraph(
       // Tooltip box
       const tx = mouse.x + 12;
       const ty = mouse.y - 50;
-      ctx.fillStyle = "rgba(0,0,0,0.92)";
+      ctx.fillStyle = bgColor;
       ctx.fillRect(tx, ty, 130, phase ? 48 : 36);
       ctx.strokeStyle = primary;
       ctx.lineWidth = 1;
@@ -445,7 +454,7 @@ function drawGraph(
       ctx.arc(mouse.x, toY(cInterp), 4, 0, Math.PI * 2);
       ctx.fillStyle = primary;
       ctx.fill();
-      ctx.strokeStyle = "#000000";
+      ctx.strokeStyle = bgColor;
       ctx.lineWidth = 2;
       ctx.stroke();
     }
@@ -572,7 +581,7 @@ export default function ConcentrationTimeGraph({
       <canvas
         ref={canvasRef}
         className="w-full"
-        style={{ height: 280, background: "#000000", cursor: "crosshair" }}
+        style={{ height: 280, background: "var(--color-card)", cursor: "crosshair" }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       />
@@ -586,7 +595,7 @@ export default function ConcentrationTimeGraph({
           <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44") }} /> Trough ref (10–20)
         </span>
         <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-          <span className="inline-block w-3 h-3" style={{ background: "rgba(0,255,65,0.08)", border: "1px solid rgba(0,255,65,0.2)" }} /> AUC₂₄
+          <span className="inline-block w-3 h-3" style={{ background: "var(--color-primary-a08)", border: "1px solid var(--color-primary-a20)" }} /> AUC₂₄
         </span>
         <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           ◆ Trough

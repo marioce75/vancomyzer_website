@@ -697,10 +697,10 @@ export default function CalculatorWorkspace() {
         <CalculatorActionBar onCalculate={handleCalculate} onReset={handleReset} disabled={loading || rrt === null || rrt === true} hideCalculate={hideCalculate} />
         {/* Inline disclaimer — always visible */}
         <div className="border-t px-4 py-2" style={{ borderTopColor: "var(--color-border)" }}>
-          <p style={{ fontSize: 10, lineHeight: 1.6, color: "#007722", fontFamily: "'Share Tech Mono', monospace", margin: 0 }}>
+          <p style={{ fontSize: 10, lineHeight: 1.6, color: "var(--color-dim)", fontFamily: "inherit", margin: 0 }}>
             Disclaimer: This tool is for informational purposes only and intended for use exclusively by licensed healthcare professionals. THE TOOL IS NOT INTENDED TO BE A SUBSTITUTE FOR PROFESSIONAL MEDICAL ADVICE, DOSING, DIAGNOSIS OR TREATMENT.{" "}
             <span
-              style={{ color: "#00aa33", cursor: "pointer", textDecoration: "none" }}
+              style={{ color: "var(--color-primary)", cursor: "pointer", textDecoration: "none" }}
               onClick={() => setDisclaimerOpen(true)}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; }}
@@ -727,7 +727,7 @@ export default function CalculatorWorkspace() {
           ))}
         </div>
         <div className="border-t px-4 py-1.5" style={{ borderTopColor: "var(--color-border)", textAlign: "center" }}>
-          <span style={{ fontSize: 10, color: "#005522", fontFamily: "'Share Tech Mono', monospace" }}>
+          <span style={{ fontSize: 10, color: "var(--color-dim)", fontFamily: "inherit" }}>
             {"\u00A9"} 2026 Vancomyzer{"\u2122"} {"\u00B7"} Engineered by D{"\u014D"}sys{"\u2122"} {"\u00B7"} All Rights Reserved
           </span>
         </div>

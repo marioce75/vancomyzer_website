@@ -315,7 +315,7 @@ export function fitPosteriorParameters(
     normalizedInput
   );
 
-  const success = Number.isFinite(bestCL) && Number.isFinite(bestV1);
+  const success = Number.isFinite(bestCL) && Number.isFinite(bestV1) && Number.isFinite(bestQ) && Number.isFinite(bestV2);
 
   return {
     CL_posterior: clamp(bestCL, priorCL * 0.1, priorCL * 10),

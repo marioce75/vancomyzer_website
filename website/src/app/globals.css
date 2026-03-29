@@ -110,42 +110,241 @@ body.input-values-white textarea:not(:placeholder-shown) {
   border-radius: 0 !important;
 }
 
-/* ── Basic (Dōsys Clinical) theme overrides ──────────────────── */
+/* ── Basic (Vigilanz/Meditech Clinical) theme overrides ──────────
+   These must override INLINE styles, so every property uses !important.
+   ─────────────────────────────────────────────────────────────────── */
 
 body.theme-basic {
-  font-family: 'Inter', 'SF Pro Display', system-ui, sans-serif !important;
+  font-family: 'Inter', 'Helvetica Neue', 'Arial', system-ui, sans-serif !important;
+  color: #1a202c !important;
+  background: #eaf1fb !important;
 }
+
+/* Rounded corners */
+body.theme-basic *, body.theme-basic *::before, body.theme-basic *::after {
+  border-radius: 6px !important;
+}
+body.theme-basic canvas { border-radius: 0 !important; }
+
+/* ── FORCE override inline styles on ALL elements ────────────── */
+/* These use [style] attribute + body.theme-basic to beat inline specificity */
+
+body.theme-basic [style] {
+  font-family: inherit !important;
+}
+body.theme-basic input[style],
+body.theme-basic select[style],
+body.theme-basic textarea[style] {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+}
+
+/* Text colors — override green/dim inline colors */
+body.theme-basic p[style],
+body.theme-basic span[style],
+body.theme-basic div[style],
+body.theme-basic h1[style],
+body.theme-basic h2[style],
+body.theme-basic h3[style],
+body.theme-basic a[style],
+body.theme-basic button[style],
+body.theme-basic label[style] {
+  text-shadow: none !important;
+}
+
+/* ── Input fields ────────────────────────────────────────────── */
+
 body.theme-basic input,
 body.theme-basic select,
 body.theme-basic textarea {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
-  color: #ffffff !important;
-  background-color: #141925 !important;
-  border-color: rgba(0,200,180,0.45) !important;
-  border-width: 1.5px !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  color: #1a202c !important;
+  background-color: #ffffff !important;
+  border: 1px solid #a0aec0 !important;
+  caret-color: #1a202c !important;
 }
 body.theme-basic input:focus,
 body.theme-basic select:focus,
 body.theme-basic textarea:focus {
-  border-color: #00d4b4 !important;
-  box-shadow: 0 0 0 2px rgba(0,212,180,0.25), 0 0 8px rgba(0,212,180,0.15) !important;
+  border-color: #2b6cb0 !important;
+  box-shadow: 0 0 0 2px rgba(43,108,176,0.25) !important;
+  outline: none !important;
 }
 body.theme-basic input::placeholder,
 body.theme-basic textarea::placeholder {
-  color: #5a6577 !important;
+  color: #a0aec0 !important;
 }
+body.theme-basic select option {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+}
+
+/* ── Numeric values — mono, no glow ──────────────────────────── */
+
 body.theme-basic .tabular-nums,
 body.theme-basic .mx-glow {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  animation: none !important;
+  text-shadow: none !important;
 }
-/* Brighter text for labels in Basic theme */
+
+/* ── Headings — deep navy ────────────────────────────────────── */
+
 body.theme-basic h1, body.theme-basic h2, body.theme-basic h3 {
-  color: #e2e8f0 !important;
+  color: #1a3a5c !important;
+  text-shadow: none !important;
 }
-/* Restore rounded corners in Basic theme */
-body.theme-basic *, body.theme-basic *::before, body.theme-basic *::after {
-  border-radius: revert !important;
+
+/* ── Panels, cards, sections — white bg with shadow ─────────── */
+
+body.theme-basic .border {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06) !important;
 }
+
+/* ── Disable Matrix animations ───────────────────────────────── */
+
+body.theme-basic .mx-blink { animation: none !important; opacity: 1 !important; }
+body.theme-basic .mx-glow-pulse { animation: none !important; }
+body.theme-basic .mx-fadeIn { animation: none !important; opacity: 1 !important; }
+body.theme-basic .mx-shimmer-border::before { animation: none !important; background: transparent !important; }
+
+/* ── Scrollbar — neutral gray ────────────────────────────────── */
+
+body.theme-basic .custom-scrollbar { scrollbar-color: #a0aec0 transparent; }
+body.theme-basic .custom-scrollbar::-webkit-scrollbar-thumb { background: #a0aec0; }
+
+/* VANCOMYZER title — muted slate blue matching screenshot 3 */
+body.theme-basic .vancomyzer-title {
+  color: #4a6fa5 !important;
+  text-shadow: none !important;
+  letter-spacing: 5px !important;
+}
+
+/* Dōsys brand — dark text with teal D accent matching screenshot 2 */
+body.theme-basic .dosys-brand {
+  color: #1a202c !important;
+  letter-spacing: 1px !important;
+  font-weight: 700 !important;
+}
+body.theme-basic .dosys-d {
+  color: #00c9b1 !important;
+}
+
+/* ── Range slider — clinical blue ────────────────────────────── */
+
+body.theme-basic input[type='range'].mx-range-slider {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e0 !important;
+}
+body.theme-basic input[type='range'].mx-range-slider::-webkit-slider-thumb {
+  background: #2b6cb0 !important;
+  border-color: #2b6cb0 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+}
+body.theme-basic input[type='range'].mx-range-slider::-moz-range-thumb {
+  background: #2b6cb0 !important;
+  border-color: #2b6cb0 !important;
+}
+body.theme-basic input[type='range'].mx-range-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #cbd5e0, #2b6cb0) !important;
+}
+body.theme-basic input[type='range'].mx-range-slider::-moz-range-track {
+  background: linear-gradient(to right, #cbd5e0, #2b6cb0) !important;
+}
+
+/* ── Basic theme: clinical warning/status color overrides ────── */
+/* Amber/warning — dark readable text on light warning backgrounds (UpToDate/Vigilanz style) */
+body.theme-basic .text-amber-950 { color: #92400e !important; }
+body.theme-basic .text-amber-900 { color: #92400e !important; }
+body.theme-basic .text-amber-800 { color: #92400e !important; }
+body.theme-basic .text-amber-700 { color: #b45309 !important; }
+body.theme-basic .text-amber-600 { color: #b45309 !important; }
+body.theme-basic .bg-amber-50    { background-color: #fffbeb !important; }
+body.theme-basic .bg-amber-100   { background-color: #fef3c7 !important; }
+body.theme-basic .bg-amber-200   { background-color: #fde68a !important; }
+body.theme-basic .bg-amber-300   { background-color: #fcd34d !important; }
+body.theme-basic .border-amber-200 { border-color: #fcd34d !important; }
+body.theme-basic .border-amber-300 { border-color: #f59e0b !important; }
+body.theme-basic .border-amber-500 { border-color: #d97706 !important; }
+
+/* Emerald/success — dark green text on light green bg */
+body.theme-basic .text-emerald-950 { color: #065f46 !important; }
+body.theme-basic .text-emerald-900 { color: #065f46 !important; }
+body.theme-basic .text-emerald-800 { color: #047857 !important; }
+body.theme-basic .text-emerald-700 { color: #059669 !important; }
+body.theme-basic .bg-emerald-50    { background-color: #ecfdf5 !important; }
+body.theme-basic .bg-emerald-100   { background-color: #d1fae5 !important; }
+body.theme-basic .border-emerald-200 { border-color: #a7f3d0 !important; }
+body.theme-basic .border-emerald-300 { border-color: #6ee7b7 !important; }
+
+/* Red/danger — dark red text on light red bg */
+body.theme-basic .text-red-950    { color: #991b1b !important; }
+body.theme-basic .text-red-900    { color: #991b1b !important; }
+body.theme-basic .text-red-800    { color: #991b1b !important; }
+body.theme-basic .text-red-700    { color: #b91c1c !important; }
+body.theme-basic .text-red-600    { color: #dc2626 !important; }
+body.theme-basic .bg-red-50       { background-color: #fef2f2 !important; }
+body.theme-basic .border-red-200  { border-color: #fecaca !important; }
+body.theme-basic .border-red-300  { border-color: #fca5a5 !important; }
+body.theme-basic .border-red-500  { border-color: #ef4444 !important; }
+
+/* Blue/info — deep blue text on light blue bg */
+body.theme-basic .text-blue-950  { color: #1e3a5f !important; }
+body.theme-basic .text-blue-900  { color: #1e3a5f !important; }
+body.theme-basic .text-blue-800  { color: #1e4d8c !important; }
+body.theme-basic .text-blue-700  { color: #2b6cb0 !important; }
+body.theme-basic .text-blue-600  { color: #3182ce !important; }
+body.theme-basic .bg-blue-50     { background-color: #ebf8ff !important; }
+body.theme-basic .bg-blue-100    { background-color: #bee3f8 !important; }
+body.theme-basic .border-blue-200 { border-color: #90cdf4 !important; }
+body.theme-basic .border-blue-300 { border-color: #63b3ed !important; }
+
+/* Slate/gray — proper dark text on white panels */
+body.theme-basic .text-slate-950 { color: #1a202c !important; }
+body.theme-basic .text-slate-900 { color: #1a202c !important; }
+body.theme-basic .text-slate-800 { color: #2d3748 !important; }
+body.theme-basic .text-slate-700 { color: #4a5568 !important; }
+body.theme-basic .text-slate-600 { color: #4a5568 !important; }
+body.theme-basic .text-slate-500 { color: #718096 !important; }
+body.theme-basic .text-slate-400 { color: #a0aec0 !important; }
+body.theme-basic .bg-white       { background-color: #ffffff !important; }
+body.theme-basic .bg-slate-50    { background-color: #f7fafc !important; }
+body.theme-basic .bg-slate-100   { background-color: #edf2f7 !important; }
+body.theme-basic .border-slate-200 { border-color: #e2e8f0 !important; }
+body.theme-basic .border-slate-300 { border-color: #cbd5e0 !important; }
+
+/* Shadows — clean clinical shadow instead of green glow */
+body.theme-basic .shadow-sm  { box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important; }
+body.theme-basic .shadow      { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08) !important; }
+body.theme-basic .shadow-md   { box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06) !important; }
+
+/* Rose */
+body.theme-basic .text-rose-700  { color: #be185d !important; }
+body.theme-basic .bg-rose-50     { background-color: #fff1f2 !important; }
+body.theme-basic .border-rose-200 { border-color: #fecdd3 !important; }
+
+/* Violet */
+body.theme-basic .text-violet-700  { color: #6d28d9 !important; }
+body.theme-basic .bg-violet-50     { background-color: #f5f3ff !important; }
+body.theme-basic .border-violet-200 { border-color: #ddd6fe !important; }
+
+/* Gray — proper dark values for buttons, proper light for backgrounds */
+body.theme-basic .text-gray-900 { color: #1a202c !important; }
+body.theme-basic .text-gray-800 { color: #2d3748 !important; }
+body.theme-basic .text-gray-700 { color: #4a5568 !important; }
+body.theme-basic .text-gray-600 { color: #4a5568 !important; }
+body.theme-basic .text-gray-500 { color: #718096 !important; }
+body.theme-basic .bg-gray-900   { background-color: #1e4d8c !important; }
+body.theme-basic .bg-gray-800   { background-color: #1a3a6e !important; }
+body.theme-basic .bg-gray-50    { background-color: #f7fafc !important; }
+body.theme-basic .bg-gray-100   { background-color: #edf2f7 !important; }
+body.theme-basic .hover\:bg-gray-800:hover { background-color: #1a3a6e !important; }
+body.theme-basic .border-gray-200 { border-color: #e2e8f0 !important; }
+body.theme-basic .border-gray-300 { border-color: #cbd5e0 !important; }
+body.theme-basic .focus-visible\:ring-gray-900 { --tw-ring-color: #1e4d8c !important; }
+
+/* Slate dark — buttons need dark navy in Basic */
+body.theme-basic .bg-slate-950  { background-color: #1e4d8c !important; }
+body.theme-basic .hover\:bg-slate-800:hover { background-color: #1a3a6e !important; }
 
 /* ── Shimmer border — green highlight traveling around the border ── */
 

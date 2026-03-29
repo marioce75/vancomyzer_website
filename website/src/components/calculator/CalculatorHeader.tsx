@@ -32,30 +32,30 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           />
           <div className="min-w-0">
             <h1
-              className="font-bold whitespace-nowrap leading-tight transition-colors"
-              style={{ fontSize: "22px", letterSpacing: "4px", color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 10px var(--color-glow)" }}
+              className="font-bold whitespace-nowrap leading-tight transition-colors vancomyzer-title"
+              style={{ fontSize: "22px", letterSpacing: "4px", color: "var(--color-primary)", textShadow: "0 0 10px var(--color-glow)" }}
             >
               VANCOMYZER<sup className="text-[9px] font-semibold ml-1 align-super" style={{ color: "var(--color-secondary)" }}>{"\u2122"}</sup>
             </h1>
-            <p className="font-medium leading-none mt-0.5 whitespace-nowrap" style={{ fontSize: "12px", letterSpacing: "2px", color: "#00cc44", fontFamily: "'Share Tech Mono', monospace" }}>
+            <p className="font-medium leading-none mt-0.5 whitespace-nowrap" style={{ fontSize: "12px", letterSpacing: "2px", color: "var(--color-secondary)" }}>
               BAYESIAN PK ·{" "}
-              <span style={{ fontSize: "11px", letterSpacing: "3px", color: "#00aa33" }}>
+              <span style={{ fontSize: "11px", letterSpacing: "3px", color: "var(--color-dim)" }}>
                 ENGINEERED BY{" "}
                 {/* TODO: Replace with window.open('https://dosys.com', '_blank') when URL is available */}
                 <span
-                  className="font-semibold"
+                  className="font-semibold dosys-brand"
                   style={{ color: "inherit", textDecoration: "none", letterSpacing: "3px", cursor: "pointer" }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.color = "#00ff41";
+                    (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
                     (e.currentTarget as HTMLElement).style.textDecoration = "underline";
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.color = "inherit";
+                    (e.currentTarget as HTMLElement).style.color = "";
                     (e.currentTarget as HTMLElement).style.textDecoration = "none";
                   }}
                   onClick={e => e.stopPropagation()}
                 >
-                  D&#x14C;SYS&trade;
+                  <span className="dosys-d">D</span>{"\u014D"}sys{"\u2122"}
                 </span>
               </span>
             </p>

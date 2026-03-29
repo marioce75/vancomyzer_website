@@ -140,11 +140,11 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
             {/* Equation (collapsible) */}
             {showMath && (
               <div style={{ marginTop: 3, overflow: "hidden" }}>
-                <p style={{ fontSize: 10, color: "#007722", lineHeight: 1.5, ...FONT, margin: 0 }}>
+                <p style={{ fontSize: 10, color: "var(--color-dim)", lineHeight: 1.5, ...FONT, margin: 0 }}>
                   {row.equation}
                 </p>
                 <p style={{ fontSize: 10, lineHeight: 1.5, ...FONT, margin: "2px 0 0 0" }}>
-                  <span style={{ color: "#00aa33" }}>{row.substitute(params)}</span>
+                  <span style={{ color: "var(--color-secondary)" }}>{row.substitute(params)}</span>
                   <span style={{ color: "var(--color-primary)" }}>
                     {" = "}{typeof value === "number" ? value.toFixed(1) : "?"} {row.unit}
                   </span>
@@ -157,23 +157,23 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
 
       {/* Bayesian posterior note */}
       {showMath && params.used_posterior_refinement && (
-        <p style={{ fontSize: 9, color: "#005522", fontStyle: "italic", marginTop: 6, ...FONT }}>
+        <p style={{ fontSize: 9, color: "var(--color-dim)", fontStyle: "italic", marginTop: 6, ...FONT }}>
           {"\u21B3"} Individual estimates updated from population priors via Bayesian posterior
         </p>
       )}
 
       {/* Reference citation */}
-      <div style={{ marginTop: 10, paddingTop: 6, borderTop: "1px solid #003311" }}>
-        <p style={{ fontSize: 9, color: "#004411", lineHeight: 1.5, ...FONT, margin: 0 }}>
+      <div style={{ marginTop: 10, paddingTop: 6, borderTop: "1px solid var(--color-border)" }}>
+        <p style={{ fontSize: 9, color: "var(--color-dim)", lineHeight: 1.5, ...FONT, margin: 0 }}>
           Colin PJ et al. Clin Pharmacokinet. 2019;58(6):767-780
         </p>
         <a
           href="https://doi.org/10.1007/s40262-018-0727-5"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ fontSize: 9, color: "#004411", ...FONT, textDecoration: "none" }}
+          style={{ fontSize: 9, color: "var(--color-dim)", ...FONT, textDecoration: "none" }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; (e.currentTarget as HTMLElement).style.color = "#004411"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; (e.currentTarget as HTMLElement).style.color = "var(--color-dim)"; }}
         >
           DOI: 10.1007/s40262-018-0727-5
         </a>

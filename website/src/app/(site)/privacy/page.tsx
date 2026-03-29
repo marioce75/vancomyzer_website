@@ -9,7 +9,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">No Collection of Patient Data</h2>
           <p>
-            Vancomyzer™<sup>™</sup> does not collect, store, transmit, or retain any patient information entered into the calculator. All pharmacokinetic calculations are performed locally within your browser session and are not sent to any server or third party. No patient data persists after your session ends.
+            Vancomyzer™ does not collect, store, transmit, or retain any patient information entered into the calculator. All pharmacokinetic calculations are performed locally within your browser session and are not sent to any server or third party. No patient data persists after your session ends.
           </p>
         </section>
 
