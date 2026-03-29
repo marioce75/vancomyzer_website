@@ -257,7 +257,11 @@ export default function DoseRecommendationCard({
 
       {infusion_safety_note && (
         <div className="rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
-          <strong>Note:</strong> {infusion_safety_note}
+          <strong>Note:</strong> {infusion_safety_note}{" "}
+          <span style={{ fontSize: 10 }}>
+            [<a href="https://www.accessdata.fda.gov/drugsatfda_docs/label/2017/050671s023lbl.pdf" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline" style={{ color: "inherit" }}>FDA Label</a>{" · "}
+            <a href="https://pubmed.ncbi.nlm.nih.gov/32191793/" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline" style={{ color: "inherit" }}>ASHP/IDSA 2020</a>]
+          </span>
         </div>
       )}
 
