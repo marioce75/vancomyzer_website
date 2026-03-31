@@ -91,11 +91,11 @@ const COLOR_PRESETS: Record<MatrixSettings["colorMode"], ColorPreset> = {
     "--color-primary": "#2b6cb0",
     "--color-secondary": "#4a5568",
     "--color-dim": "#718096",
-    "--color-bg": "#eaf1fb",
-    "--color-border": "#c7d4e8",
+    "--color-bg": "#e8ecf1",
+    "--color-border": "#c5cdd8",
     "--color-card": "#ffffff",
     "--color-input": "#ffffff",
-    "--color-highlight": "#dce6f5",
+    "--color-highlight": "#dae1ea",
     "--color-glow": "rgba(43,108,176,0.15)",
     "--color-glow-strong": "rgba(43,108,176,0.3)",
     "--color-primary-a05": "rgba(43,108,176,0.05)",
@@ -211,11 +211,16 @@ function applySettingsToDom(settings: MatrixSettings): void {
     body.classList.remove("theme-matrix");
     body.style.fontFamily = "'Inter', 'Helvetica Neue', 'Arial', system-ui, sans-serif";
     rootStyle.setProperty("--font-mono", "'JetBrains Mono', 'Fira Code', 'Courier New', monospace");
+    // Vigilanz-style dark navy nav bar
+    rootStyle.setProperty("--color-nav-bg", "#2c3e5a");
+    rootStyle.setProperty("--color-nav-border", "#1e2d45");
   } else {
     body.classList.add("theme-matrix");
     body.classList.remove("theme-basic");
     body.style.fontFamily = "'Share Tech Mono', 'Courier New', Courier, monospace";
     rootStyle.setProperty("--font-mono", "'Share Tech Mono', 'Courier New', monospace");
+    rootStyle.removeProperty("--color-nav-bg");
+    rootStyle.removeProperty("--color-nav-border");
   }
 
   // --- Font size ---

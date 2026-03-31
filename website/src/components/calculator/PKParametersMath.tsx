@@ -17,7 +17,6 @@ interface PKParametersMathProps {
   params: PKParams;
 }
 
-const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" };
 const STORAGE_KEY = "vancomyzer_show_math";
 
 const PARAM_ROWS: {
@@ -88,94 +87,97 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
 
   return (
     <div>
-      {/* Section header */}
-      <div className="flex items-center justify-between mb-2">
-        <p
-          className="text-[10px] font-semibold uppercase tracking-[0.14em]"
-          style={{ color: "var(--color-dim)", ...FONT }}
-        >
-          PK PARAMETERS (COLIN 2019)
+      {/* Header */}
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-[10px] font-bold uppercase tracking-[0.08em]" style={{ color: "var(--color-primary)", margin: 0 }}>
+          PK Parameters <span style={{ color: "var(--color-dim)", fontWeight: 500 }}>(Colin 2019)</span>
         </p>
         <button
           type="button"
           onClick={toggleMath}
           style={{
             fontSize: 9,
-            color: "var(--color-secondary)",
+            color: "var(--color-primary)",
             background: "transparent",
             border: "1px solid var(--color-border)",
             padding: "2px 8px",
             cursor: "pointer",
-            ...FONT,
+            fontWeight: 600,
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)"; }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
+            (e.currentTarget as HTMLElement).style.color = "var(--color-card, #fff)";
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = "transparent";
+            (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+          }}
         >
-          {showMath ? "[HIDE MATH]" : "[SHOW MATH]"}
+          {showMath ? "Hide Math" : "Show Math"}
         </button>
       </div>
 
-      {/* Parameter rows */}
-      {PARAM_ROWS.map((row, i) => {
-        const value = params[row.key];
-        return (
-          <div
-            key={row.key}
-            style={{
-              borderTop: i === 0 ? "none" : "1px solid #003311",
-              padding: "6px 0",
-            }}
-          >
-            {/* Name + value */}
-            <div className="flex items-baseline justify-between">
-              <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
-                {row.label}
-              </span>
-              <span style={{ fontSize: 13, color: "var(--color-primary)", fontWeight: 700, ...FONT }}>
-                {typeof value === "number" ? value.toFixed(1) : "—"}{" "}
-                <span style={{ fontSize: 10, color: "var(--color-dim)", fontWeight: 400 }}>{row.unit}</span>
-              </span>
-            </div>
-
-            {/* Equation (collapsible) */}
-            {showMath && (
-              <div style={{ marginTop: 3, overflow: "hidden" }}>
-                <p style={{ fontSize: 10, color: "var(--color-dim)", lineHeight: 1.5, ...FONT, margin: 0 }}>
-                  {row.equation}
-                </p>
-                <p style={{ fontSize: 10, lineHeight: 1.5, ...FONT, margin: "2px 0 0 0" }}>
-                  <span style={{ color: "var(--color-secondary)" }}>{row.substitute(params)}</span>
-                  <span style={{ color: "var(--color-primary)" }}>
-                    {" = "}{typeof value === "number" ? value.toFixed(1) : "?"} {row.unit}
-                  </span>
-                </p>
+      {/* Compact parameter grid — 2x2 when math hidden, stacked when shown */}
+      {!showMath ? (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
+          {PARAM_ROWS.map((row) => {
+            const value = params[row.key];
+            return (
+              <div key={row.key} className="flex items-baseline justify-between" style={{ padding: "3px 6px", background: "var(--color-highlight, rgba(0,0,0,0.03))", border: "1px solid var(--color-border)" }}>
+                <span style={{ fontSize: 11, color: "var(--color-secondary)", fontWeight: 600, fontFamily: "var(--font-mono, monospace)" }}>{row.label}</span>
+                <span style={{ fontSize: 13, color: "var(--color-primary)", fontWeight: 700, fontFamily: "var(--font-mono, monospace)" }}>
+                  {typeof value === "number" ? value.toFixed(1) : "\u2014"}{" "}
+                  <span style={{ fontSize: 9, color: "var(--color-dim)", fontWeight: 400 }}>{row.unit}</span>
+                </span>
               </div>
-            )}
-          </div>
-        );
-      })}
+            );
+          })}
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {PARAM_ROWS.map((row, i) => {
+            const value = params[row.key];
+            return (
+              <div key={row.key} style={{ borderTop: i === 0 ? "none" : "1px solid var(--color-border)", padding: "4px 0" }}>
+                <div className="flex items-baseline justify-between">
+                  <span style={{ fontSize: 12, color: "var(--color-secondary)", fontWeight: 600, fontFamily: "var(--font-mono, monospace)" }}>{row.label}</span>
+                  <span style={{ fontSize: 14, color: "var(--color-primary)", fontWeight: 700, fontFamily: "var(--font-mono, monospace)" }}>
+                    {typeof value === "number" ? value.toFixed(1) : "\u2014"}{" "}
+                    <span style={{ fontSize: 10, color: "var(--color-secondary)", fontWeight: 400 }}>{row.unit}</span>
+                  </span>
+                </div>
+                <div style={{ marginTop: 2, fontSize: 10, color: "var(--color-dim)", fontFamily: "var(--font-mono, monospace)", lineHeight: 1.4, overflow: "auto" }}>
+                  <div>{row.equation}</div>
+                  <div>
+                    <span style={{ color: "var(--color-secondary)" }}>{row.substitute(params)}</span>
+                    <span style={{ color: "var(--color-primary)", fontWeight: 600 }}> = {typeof value === "number" ? value.toFixed(1) : "?"} {row.unit}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-      {/* Bayesian posterior note */}
+      {/* Bayesian note */}
       {showMath && params.used_posterior_refinement && (
-        <p style={{ fontSize: 9, color: "var(--color-dim)", fontStyle: "italic", marginTop: 6, ...FONT }}>
-          {"\u21B3"} Individual estimates updated from population priors via Bayesian posterior
+        <p style={{ fontSize: 9, color: "var(--color-dim)", fontStyle: "italic", marginTop: 4, margin: 0 }}>
+          {"\u21B3"} Estimates updated via Bayesian posterior
         </p>
       )}
 
-      {/* Reference citation */}
-      <div style={{ marginTop: 10, paddingTop: 6, borderTop: "1px solid var(--color-border)" }}>
-        <p style={{ fontSize: 9, color: "var(--color-dim)", lineHeight: 1.5, ...FONT, margin: 0 }}>
-          Colin PJ et al. Clin Pharmacokinet. 2019;58(6):767-780
-        </p>
+      {/* Citation */}
+      <div style={{ marginTop: 6, paddingTop: 4, borderTop: "1px solid var(--color-border)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
+        <span style={{ fontSize: 9, color: "var(--color-dim)" }}>Colin PJ et al. <em>Clin Pharmacokinet.</em> 2019;58(6):767-780</span>
         <a
           href="https://doi.org/10.1007/s40262-018-0727-5"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ fontSize: 9, color: "var(--color-dim)", ...FONT, textDecoration: "none" }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; (e.currentTarget as HTMLElement).style.color = "var(--color-dim)"; }}
+          style={{ fontSize: 9, color: "var(--color-primary)", textDecoration: "none", fontWeight: 500 }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; }}
         >
-          DOI: 10.1007/s40262-018-0727-5
+          DOI {"\u2197"}
         </a>
       </div>
     </div>

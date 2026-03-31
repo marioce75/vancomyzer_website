@@ -156,7 +156,14 @@ function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
           cursor: "pointer",
           background: "transparent",
           border: "none",
+          transition: "background 0.15s",
           fontFamily: "'Share Tech Mono', monospace",
+        }}
+        onMouseEnter={(e) => {
+          if (!open) (e.currentTarget as HTMLElement).style.background = "var(--color-highlight, #dce4ef)";
+        }}
+        onMouseLeave={(e) => {
+          if (!open) (e.currentTarget as HTMLElement).style.background = "transparent";
         }}
       >
         <span
@@ -241,17 +248,14 @@ function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
                 rel="noopener noreferrer"
                 style={{
                   fontSize: 11,
-                  color: "#007722",
-                  fontFamily: "'Share Tech Mono', monospace",
+                  color: "var(--color-primary)",
                   textDecoration: "none",
                   letterSpacing: "0.02em",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
                   (e.currentTarget as HTMLElement).style.textDecoration = "underline";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = "#007722";
                   (e.currentTarget as HTMLElement).style.textDecoration = "none";
                 }}
               >
@@ -336,44 +340,48 @@ export default function FAQPage() {
           <a
             href="/calculator"
             style={{
-              fontSize: 12,
-              color: "var(--color-secondary)",
-              fontFamily: "'Share Tech Mono', monospace",
+              fontSize: 13,
+              color: "var(--color-card, #ffffff)",
               textDecoration: "none",
-              border: "1px solid var(--color-border)",
-              padding: "8px 16px",
+              border: "1px solid var(--color-primary)",
+              background: "var(--color-primary)",
+              padding: "10px 20px",
+              fontWeight: 600,
+              transition: "opacity 0.15s",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+              (e.currentTarget as HTMLElement).style.opacity = "0.85";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
+              (e.currentTarget as HTMLElement).style.opacity = "1";
             }}
           >
-            [ OPEN CALCULATOR ]
+            Open Calculator
           </a>
           <a
             href="/trust-evidence"
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--color-secondary)",
-              fontFamily: "'Share Tech Mono', monospace",
               textDecoration: "none",
               border: "1px solid var(--color-border)",
-              padding: "8px 16px",
+              background: "var(--color-card, #ffffff)",
+              padding: "10px 20px",
+              fontWeight: 500,
+              transition: "background 0.15s, border-color 0.15s, color 0.15s",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+              (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #ffffff)";
             }}
             onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "var(--color-card, #ffffff)";
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
               (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
             }}
           >
-            [ TRUST & EVIDENCE ]
+            Trust & Evidence
           </a>
         </div>
       </div>

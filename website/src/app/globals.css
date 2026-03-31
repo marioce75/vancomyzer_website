@@ -117,7 +117,115 @@ body.input-values-white textarea:not(:placeholder-shown) {
 body.theme-basic {
   font-family: 'Inter', 'Helvetica Neue', 'Arial', system-ui, sans-serif !important;
   color: #1a202c !important;
-  background: #eaf1fb !important;
+  background: #e8ecf1 !important;
+}
+
+/* ── Nav bar — dark navy (Vigilanz style) ────────────────────── */
+
+body.theme-basic header.shrink-0,
+body.theme-basic header[class*="shrink-0"] {
+  background: #2c3e5a !important;
+  border-bottom-color: #1e2d45 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+}
+body.theme-basic header.shrink-0 h1[class],
+body.theme-basic header.shrink-0 a[class],
+body.theme-basic header.shrink-0 button[class],
+body.theme-basic header.shrink-0 p[class],
+body.theme-basic header.shrink-0 span[class],
+body.theme-basic header[class*="shrink-0"] h1,
+body.theme-basic header[class*="shrink-0"] a,
+body.theme-basic header[class*="shrink-0"] button,
+body.theme-basic header[class*="shrink-0"] p,
+body.theme-basic header[class*="shrink-0"] span {
+  color: rgba(255,255,255,0.9) !important;
+  text-shadow: none !important;
+}
+body.theme-basic header[class*="shrink-0"] .vancomyzer-title {
+  color: #ffffff !important;
+}
+body.theme-basic header[class*="shrink-0"] .dosys-brand {
+  color: rgba(255,255,255,0.85) !important;
+  letter-spacing: 0 !important;
+  font-family: 'Inter', 'Helvetica Neue', sans-serif !important;
+}
+body.theme-basic header[class*="shrink-0"] .dosys-d {
+  color: #00c9b1 !important;
+}
+/* Mode tabs — active white on navy, inactive semi-transparent */
+body.theme-basic header[class*="shrink-0"] button[role="tab"][aria-selected="true"] {
+  background: #2b6cb0 !important;
+  color: #ffffff !important;
+}
+body.theme-basic header[class*="shrink-0"] button[role="tab"][aria-selected="false"] {
+  background: #d8dce3 !important;
+  color: #1a202c !important;
+  border-color: #c0c7d1 !important;
+  transition: background 0.15s !important;
+}
+body.theme-basic header[class*="shrink-0"] button[role="tab"][aria-selected="false"]:hover {
+  background: #3b6cb0 !important;
+  border-color: #3b6cb0 !important;
+  color: #ffffff !important;
+}
+/* Clinical decision support badge */
+body.theme-basic header[class*="shrink-0"] span[class*="tracking"] {
+  border-color: rgba(255,255,255,0.25) !important;
+  background: rgba(255,255,255,0.08) !important;
+  color: rgba(255,255,255,0.85) !important;
+}
+/* Settings gear */
+body.theme-basic header[class*="shrink-0"] svg {
+  color: rgba(255,255,255,0.7) !important;
+}
+
+/* ── Section toggles (Patient Info, Dosing, Levels, Method) ─── */
+
+body.theme-basic button[aria-expanded] {
+  background: #edf0f5 !important;
+  border-color: #c5cdd8 !important;
+  transition: background 0.15s, border-color 0.15s !important;
+}
+body.theme-basic button[aria-expanded="true"] {
+  background: #ffffff !important;
+  border-color: #2b6cb0 !important;
+  border-left: 3px solid #2b6cb0 !important;
+}
+body.theme-basic button[aria-expanded]:hover {
+  background: #dce4ef !important;
+  border-color: #3b6cb0 !important;
+}
+body.theme-basic button[aria-expanded="true"]:hover {
+  background: #f0f5ff !important;
+}
+
+/* Input fields — blue border on hover */
+body.theme-basic input:hover,
+body.theme-basic select:hover,
+body.theme-basic textarea:hover {
+  border-color: #3b6cb0 !important;
+  background-color: #f7f9ff !important;
+}
+
+/* Dose/option buttons — prominent blue hover */
+body.theme-basic .hover\:bg-blue-50:hover {
+  background-color: #2b6cb0 !important;
+  color: #ffffff !important;
+  border-color: #2b6cb0 !important;
+}
+
+/* Bedbound/toggle buttons — blue hover */
+body.theme-basic .hover\:bg-amber-50:hover {
+  background-color: #dce4ef !important;
+  border-color: #3b6cb0 !important;
+  color: #1a202c !important;
+}
+
+/* RRT / generic slate buttons — blue hover */
+body.theme-basic .hover\:bg-slate-100:hover {
+  background-color: #2b6cb0 !important;
+  color: #ffffff !important;
+  border-color: #2b6cb0 !important;
 }
 
 /* Rounded corners */

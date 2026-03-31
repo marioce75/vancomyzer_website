@@ -44,9 +44,11 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
       if (typeof r.infusion_duration_hours !== "number" || Number.isNaN(r.infusion_duration_hours) || r.infusion_duration_hours <= 0) field_errors["regimen.infusion_duration_hours"] = "Must be a positive number greater than 0.";
     }
 
-    if (!Array.isArray(o.levels) || o.levels.length === 0) {
+    // Loading dose simulation (doses_given=1) does not require measured levels
+    const isPulseDoseSimulation = o.regimen && typeof o.regimen === "object" && (o.regimen as Record<string, unknown>).doses_given === 1;
+    if (!isPulseDoseSimulation && (!Array.isArray(o.levels) || o.levels.length === 0)) {
       field_errors["levels"] = "At least one level is required for existing regimen evaluation.";
-    } else {
+    } else if (Array.isArray(o.levels) && o.levels.length > 0) {
       o.levels.forEach((lev: unknown, i: number) => {
         if (lev == null || typeof lev !== "object") {
           field_errors[`levels[${i}]`] = "Invalid level object.";

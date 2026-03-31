@@ -13,9 +13,9 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
     <header
       className="shrink-0 border-b"
       style={{
-        background: "var(--color-bg)",
-        borderBottomColor: "var(--color-border)",
-        boxShadow: "0 1px 0 var(--color-primary-a20)",
+        background: "var(--color-nav-bg, var(--color-bg))",
+        borderBottomColor: "var(--color-nav-border, var(--color-border))",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
       }}
     >
       <div className="mx-auto flex h-[68px] max-w-[1680px] items-center justify-between gap-6 px-5 lg:px-8">
@@ -35,7 +35,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               className="font-bold whitespace-nowrap leading-tight transition-colors vancomyzer-title"
               style={{ fontSize: "22px", letterSpacing: "4px", color: "var(--color-primary)", textShadow: "0 0 10px var(--color-glow)" }}
             >
-              VANCOMYZER<sup className="text-[9px] font-semibold ml-1 align-super" style={{ color: "var(--color-secondary)" }}>{"\u2122"}</sup>
+              VANCOMYZER{"\u2122"}
             </h1>
             <p className="font-medium leading-none mt-0.5 whitespace-nowrap" style={{ fontSize: "12px", letterSpacing: "2px", color: "var(--color-secondary)" }}>
               BAYESIAN PK ·{" "}
@@ -43,19 +43,17 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 ENGINEERED BY{" "}
                 {/* TODO: Replace with window.open('https://dosys.com', '_blank') when URL is available */}
                 <span
-                  className="font-semibold dosys-brand"
-                  style={{ color: "inherit", textDecoration: "none", letterSpacing: "3px", cursor: "pointer" }}
+                  className="dosys-brand"
+                  style={{ color: "inherit", textDecoration: "none", letterSpacing: "0px", textTransform: "none" as const, cursor: "pointer", fontFamily: "'Inter', 'Helvetica Neue', sans-serif", fontWeight: 700, fontSize: "12px" }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
-                    (e.currentTarget as HTMLElement).style.textDecoration = "underline";
+                    (e.currentTarget as HTMLElement).style.opacity = "0.8";
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.color = "";
-                    (e.currentTarget as HTMLElement).style.textDecoration = "none";
+                    (e.currentTarget as HTMLElement).style.opacity = "1";
                   }}
                   onClick={e => e.stopPropagation()}
                 >
-                  <span className="dosys-d">D</span>{"\u014D"}sys{"\u2122"}
+                  <span className="dosys-d" style={{ color: "#00c9b1", fontWeight: 700 }}>D</span><span style={{ fontWeight: 700 }}><span className="dosys-d" style={{ color: "#00c9b1" }}>{"\u014D"}</span>sys</span><sup style={{ fontSize: "7px", verticalAlign: "super", marginLeft: "1px" }}>{"\u2122"}</sup>
                 </span>
               </span>
             </p>

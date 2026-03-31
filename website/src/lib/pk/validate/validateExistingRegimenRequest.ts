@@ -107,9 +107,10 @@ export function validateExistingRegimenRequest(
   );
   const parsedCollectionTimes: Array<number | null> = [];
 
-  if (levels.length === 0) {
+  // Loading dose simulation (doses_given=1) may have no measured levels — prior-only prediction
+  if (levels.length === 0 && !isPulseDose) {
     field_errors["levels"] = "At least one level is required for existing regimen evaluation.";
-  } else {
+  } else if (levels.length > 0) {
     levels.forEach((l, i) => {
       if (l.value_mcg_ml <= 0 || Number.isNaN(l.value_mcg_ml)) {
         field_errors[`levels[${i}].value_mcg_ml`] = "Must be a positive measured concentration.";

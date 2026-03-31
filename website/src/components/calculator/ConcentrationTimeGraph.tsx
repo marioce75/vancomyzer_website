@@ -563,13 +563,29 @@ export default function ConcentrationTimeGraph({
             type="button"
             onClick={() => setZoom(z)}
             style={{
-              fontSize: 9,
+              fontSize: 10,
               fontFamily: FONT,
-              padding: "1px 6px",
+              padding: "2px 8px",
               cursor: "pointer",
+              fontWeight: zoom === z ? 700 : 500,
               border: zoom === z ? `1px solid ${getCSSColor("--color-primary", "#00ff41")}` : `1px solid ${getCSSColor("--color-border", "#004422")}`,
-              background: zoom === z ? getCSSColor("--color-primary-a12", "rgba(0,255,65,0.12)") : "transparent",
-              color: zoom === z ? getCSSColor("--color-primary", "#00ff41") : getCSSColor("--color-dim", "#009933"),
+              background: zoom === z ? getCSSColor("--color-primary", "#00ff41") : "transparent",
+              color: zoom === z ? getCSSColor("--color-card", "#000") : getCSSColor("--color-dim", "#009933"),
+              transition: "background 0.15s, color 0.15s, border-color 0.15s",
+            }}
+            onMouseEnter={e => {
+              if (zoom !== z) {
+                (e.currentTarget as HTMLElement).style.background = getCSSColor("--color-primary", "#2b6cb0");
+                (e.currentTarget as HTMLElement).style.color = getCSSColor("--color-card", "#fff");
+                (e.currentTarget as HTMLElement).style.borderColor = getCSSColor("--color-primary", "#2b6cb0");
+              }
+            }}
+            onMouseLeave={e => {
+              if (zoom !== z) {
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+                (e.currentTarget as HTMLElement).style.color = getCSSColor("--color-dim", "#009933");
+                (e.currentTarget as HTMLElement).style.borderColor = getCSSColor("--color-border", "#004422");
+              }
             }}
           >
             {z}H

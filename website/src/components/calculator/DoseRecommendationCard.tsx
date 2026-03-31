@@ -16,11 +16,13 @@ interface DoseRecommendationCardProps {
   onApplyRecommendation?: (() => void) | null;
   onApplyFrequency?: ((option: FrequencyOption) => void) | null;
   onSelectFrequency?: ((option: FrequencyOption) => void) | null;
+  onSimulateLoadingDose?: ((doseMg: number, intervalHours: number, infusionHours: number) => void) | null;
+  patientWeightKg?: number | null;
 }
 
 const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" };
 
-function LoadingDoseGuidance({ doseMg, weightKg }: { doseMg: number; weightKg: number | null }) {
+function LoadingDoseGuidance({ doseMg, weightKg, onSimulate }: { doseMg: number; weightKg: number | null; onSimulate?: ((doseMg: number, intervalHours: number, infusionHours: number) => void) | null }) {
   const [expanded, setExpanded] = React.useState(false);
   // Standard loading dose: 25-30 mg/kg actual body weight (ASHP/IDSA 2020)
   // Max single loading dose: 3000 mg
@@ -78,6 +80,26 @@ function LoadingDoseGuidance({ doseMg, weightKg }: { doseMg: number; weightKg: n
           <p style={{ fontSize: 9, color: "var(--color-dim)", fontStyle: "italic", marginTop: 8, ...FONT }}>
             ASHP/IDSA/SIDP 2020: Loading doses of 25–30 mg/kg (based on actual body weight) can be used to facilitate rapid attainment of target AUC₂₄/MIC.
           </p>
+
+          {onSimulate && (
+            <button
+              type="button"
+              onClick={() => {
+                const infHours = Math.max(1, Math.ceil(loadSuggested / 600 * 4) / 4); // round up to 0.25h, min 1h
+                onSimulate(loadSuggested, 12, infHours);
+              }}
+              className="mt-3 w-full py-2 text-xs font-bold uppercase tracking-wider transition-colors"
+              style={{
+                background: "var(--color-primary)",
+                color: "var(--color-card)",
+                border: "none",
+                cursor: "pointer",
+                letterSpacing: "0.1em",
+              }}
+            >
+              SIMULATE LOADING DOSE PK →
+            </button>
+          )}
         </div>
       )}
 
@@ -129,6 +151,8 @@ export default function DoseRecommendationCard({
   onApplyRecommendation,
   onApplyFrequency,
   onSelectFrequency,
+  onSimulateLoadingDose,
+  patientWeightKg,
 }: DoseRecommendationCardProps) {
   // Only display options with AUC24 strictly within 400–600 mg·h/L (ASHP/IDSA/SIDP 2020).
   // The backend already enforces this; this is a defensive client-side guard.
@@ -267,7 +291,7 @@ export default function DoseRecommendationCard({
 
       {/* Loading dose guidance — patient-specific */}
       {active && (
-        <LoadingDoseGuidance doseMg={active.dose_mg} weightKg={null} />
+        <LoadingDoseGuidance doseMg={active.dose_mg} weightKg={patientWeightKg ?? null} onSimulate={onSimulateLoadingDose} />
       )}
 
       {calculationDetails?.review_status?.banner_body && (

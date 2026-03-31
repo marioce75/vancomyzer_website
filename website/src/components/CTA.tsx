@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 export const CTA_LINKS = {
@@ -29,17 +31,29 @@ export default function CTA({ variant, primary, className = "" }: CTAProps) {
           ? {
               background: "var(--color-primary)",
               border: "1px solid var(--color-primary)",
-              color: "var(--color-bg)",
-              fontFamily: "'Share Tech Mono', monospace",
+              color: "var(--color-card, var(--color-bg))",
               fontWeight: 700,
             }
           : {
-              background: "var(--color-bg)",
-              border: "1px solid var(--color-primary-a40)",
+              background: "var(--color-card, #ffffff)",
+              border: "1px solid var(--color-border)",
               color: "var(--color-secondary)",
-              fontFamily: "'Share Tech Mono', monospace",
             }
       }
+      onMouseEnter={(e) => {
+        if (!primary) {
+          (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
+          (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary)";
+          (e.currentTarget as HTMLElement).style.color = "var(--color-card, #ffffff)";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!primary) {
+          (e.currentTarget as HTMLElement).style.background = "var(--color-card, #ffffff)";
+          (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
+          (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
+        }
+      }}
     >
       {label}
     </Link>

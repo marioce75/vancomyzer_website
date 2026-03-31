@@ -25,7 +25,6 @@ import InterpretationSummaryCard from "@/components/calculator/InterpretationSum
 import AssumptionsCard from "@/components/calculator/AssumptionsCard";
 import LimitationsCard from "@/components/calculator/LimitationsCard";
 import ConcentrationTimeGraph from "@/components/calculator/ConcentrationTimeGraph";
-import QuickSummaryPreview from "@/components/calculator/QuickSummaryPreview";
 import ClinicalNotePreview from "@/components/calculator/ClinicalNotePreview";
 import CalculatorLoadingState from "@/components/calculator/CalculatorLoadingState";
 import CalculatorErrorState from "@/components/calculator/CalculatorErrorState";
@@ -317,7 +316,9 @@ export default function CalculatorWorkspace() {
   const buildRequest = useCallback((): CalculateRequest => {
     const base = { mode, patient: { ...patient } };
     if (mode === "initial_regimen") return base;
-    return { ...base, regimen, levels };
+    // Filter out empty/zero levels (loading dose simulation has no measured levels)
+    const validLevels = levels.filter(l => l.value_mcg_ml > 0);
+    return { ...base, regimen, levels: validLevels };
   }, [mode, patient, regimen, levels]);
 
   const applyViewMode = useCallback((next: WorkspaceViewMode) => {
@@ -548,6 +549,38 @@ export default function CalculatorWorkspace() {
     // trigger stale-result detection and wipe the graph.
     setSelectedFrequencyOption(option);
   }, []);
+
+  const pendingLoadingDoseCalc = useRef(false);
+
+  const handleSimulateLoadingDose = useCallback((doseMg: number, intervalHours: number, infusionHours: number) => {
+    // Switch to existing_regimen mode with doses_given=1 (pulse/loading dose)
+    // This tells the engine to show a single-dose PK curve, not steady state
+    setViewMode("one_level");
+    setMode("existing_regimen");
+    setRegimen({
+      dose_mg: doseMg,
+      interval_hours: intervalHours,
+      infusion_duration_hours: infusionHours,
+      doses_given: 1,
+      target_auc24: 450,
+    });
+    // Loading dose simulation: no measured levels yet (prior-only prediction)
+    // API validation allows empty levels when doses_given=1
+    setLevels([{ ...defaultLevel }]);
+    setSelectedFrequencyOption(null);
+    setResult(null);
+    setError(null);
+    setActiveSection("levels");
+    pendingLoadingDoseCalc.current = true;
+  }, []);
+
+  // Auto-trigger calculation after loading dose state is set
+  useEffect(() => {
+    if (pendingLoadingDoseCalc.current && mode === "existing_regimen" && regimen.doses_given === 1) {
+      pendingLoadingDoseCalc.current = false;
+      void handleCalculate();
+    }
+  }, [mode, regimen, handleCalculate]);
 
   const handleCopyNote = useCallback(() => {
     const note = activeOption?.clinical_note ?? visibleResult?.documentation_preview?.clinical_note;
@@ -793,7 +826,7 @@ export default function CalculatorWorkspace() {
                 {/* Left: Dose recommendation with frequency tabs */}
                 <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
                   <div className="flex items-center justify-between border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                    <span className="text-[13px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>SUGGESTED DOSE<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span></span>
+                    <span className="text-[15px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--color-primary)" }}>SUGGESTED DOSE<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span></span>
                     <div className="flex items-center gap-2">
                       {(activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note) && (
                         <button
@@ -829,6 +862,8 @@ export default function CalculatorWorkspace() {
                         }));
                       }}
                       onSelectFrequency={handleSelectFrequency}
+                      onSimulateLoadingDose={handleSimulateLoadingDose}
+                      patientWeightKg={patient.weight_kg > 0 ? patient.weight_kg : null}
                     />
                   </div>
                 </div>
@@ -836,7 +871,7 @@ export default function CalculatorWorkspace() {
                 {/* Right: Predicted PK metrics — compact column */}
                 <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)", minWidth: 280 }}>
                   <div className="border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>PREDICTED PK</span>
+                    <span className="text-[13px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--color-primary)" }}>PREDICTED PK</span>
                   </div>
                   <div className="p-2 flex flex-col gap-2">
                     {(() => {
@@ -889,11 +924,6 @@ export default function CalculatorWorkspace() {
                     }
                   />
                   <CalculationDetailsCard details={visibleResult.calculation_details} />
-                  <QuickSummaryPreview
-                    quick_summary={
-                      activeOption?.quick_summary ?? visibleResult.documentation_preview?.quick_summary
-                    }
-                  />
                   <ClinicalNotePreview
                     clinical_note={
                       activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note
