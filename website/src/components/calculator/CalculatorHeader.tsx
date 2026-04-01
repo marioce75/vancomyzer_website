@@ -6,9 +6,11 @@ interface CalculatorHeaderProps {
   viewMode: WorkspaceViewMode;
   onViewModeChange: (mode: WorkspaceViewMode) => void;
   onSettingsOpen?: () => void;
+  userName?: string | null;
+  onLogout?: () => void;
 }
 
-export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen }: CalculatorHeaderProps) {
+export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen, userName, onLogout }: CalculatorHeaderProps) {
   return (
     <header
       className="shrink-0 border-b"
@@ -199,6 +201,36 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 <circle cx="12" cy="12" r="3" />
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
+            </button>
+          )}
+          {userName && (
+            <span className="ml-2 text-[11px] font-medium" style={{ color: "var(--color-dim)" }}>
+              {userName}
+            </span>
+          )}
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="ml-1 px-2 py-1 text-[11px] font-semibold transition"
+              style={{
+                color: "var(--color-secondary)",
+                border: "1px solid var(--color-border)",
+                background: "transparent",
+                cursor: "pointer",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.background = "#991b1b";
+                (e.currentTarget as HTMLElement).style.borderColor = "#991b1b";
+                (e.currentTarget as HTMLElement).style.color = "#ffffff";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
+              }}
+            >
+              LOGOUT
             </button>
           )}
         </div>

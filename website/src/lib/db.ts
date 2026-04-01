@@ -46,9 +46,15 @@ function getDb(): Database.Database {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       approved_at TEXT,
       approved_by TEXT,
-      last_login TEXT
+      last_login TEXT,
+      session_token TEXT
     );
   `);
+
+  // Add session_token column if upgrading from older schema
+  try {
+    _db.exec("ALTER TABLE users ADD COLUMN session_token TEXT");
+  } catch { /* column already exists */ }
 
   return _db;
 }
@@ -107,8 +113,21 @@ export function findUserByEmail(email: string): UserRow | undefined {
   return getDb().prepare("SELECT * FROM users WHERE email = ?").get(email) as UserRow | undefined;
 }
 
-export function updateLastLogin(id: number) {
-  getDb().prepare("UPDATE users SET last_login = datetime('now') WHERE id = ?").run(id);
+export function updateLastLogin(id: number, sessionToken?: string) {
+  if (sessionToken) {
+    getDb().prepare("UPDATE users SET last_login = datetime('now'), session_token = ? WHERE id = ?").run(sessionToken, id);
+  } else {
+    getDb().prepare("UPDATE users SET last_login = datetime('now') WHERE id = ?").run(id);
+  }
+}
+
+export function getSessionToken(id: number): string | null {
+  const row = getDb().prepare("SELECT session_token FROM users WHERE id = ?").get(id) as { session_token: string | null } | undefined;
+  return row?.session_token ?? null;
+}
+
+export function clearSessionToken(id: number) {
+  getDb().prepare("UPDATE users SET session_token = NULL WHERE id = ?").run(id);
 }
 
 export function setFirstLoginAcknowledged(id: number) {

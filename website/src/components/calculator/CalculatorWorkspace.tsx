@@ -37,6 +37,7 @@ import SettingsPanel from "@/components/calculator/SettingsPanel";
 import DisclaimerModal from "@/components/calculator/DisclaimerModal";
 import PKParametersMath from "@/components/calculator/PKParametersMath";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { printReport, type ReportData } from "@/lib/generateReport";
 
 const defaultPatient = { age: 0, weight_kg: 0, serum_creatinine_mg_dl: 0 };
@@ -248,6 +249,7 @@ export default function CalculatorWorkspace() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const { settings, playSound } = useMatrixSettings();
+  const { user, logout } = useAuth();
 
   // ── Restore from sessionStorage on mount (client-only) ──
   const didRestoreRef = useRef(false);
@@ -1007,7 +1009,7 @@ export default function CalculatorWorkspace() {
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden" style={{ background: "transparent", color: "var(--color-primary)" }}>
-      <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} />
+      <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} userName={user?.username} onLogout={logout} />
       <div className="flex-1 overflow-hidden h-full">
         <CalculatorLayout left={leftColumn} right={rightColumn} />
       </div>

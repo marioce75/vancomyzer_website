@@ -1,7 +1,8 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { findUserByLogin, updateLastLogin } from "@/lib/db";
+import crypto from "crypto";
+import { findUserByLogin, updateLastLogin, getSessionToken } from "@/lib/db";
 
 const handler = NextAuth({
   providers: [
@@ -30,8 +31,9 @@ const handler = NextAuth({
         const valid = await bcrypt.compare(credentials.password, user.password_hash);
         if (!valid) return null;
 
-        // Update last login
-        updateLastLogin(user.id);
+        // Generate unique session token — only this login is valid
+        const sessionToken = crypto.randomBytes(32).toString("hex");
+        updateLastLogin(user.id, sessionToken);
 
         return {
           id: String(user.id),
@@ -42,6 +44,7 @@ const handler = NextAuth({
           first_login_acknowledged: user.first_login_acknowledged,
           institution: user.institution,
           credentials: user.credentials,
+          sessionToken,
         };
       },
     }),
@@ -64,6 +67,7 @@ const handler = NextAuth({
         token.first_login_acknowledged = u.first_login_acknowledged;
         token.institution = u.institution;
         token.credentials = u.credentials;
+        token.sessionToken = u.sessionToken;
       }
       return token;
     },
@@ -76,6 +80,16 @@ const handler = NextAuth({
         (session.user as Record<string, unknown>).institution = token.institution;
         (session.user as Record<string, unknown>).credentials = token.credentials;
       }
+
+      // Single-session enforcement: verify this JWT's session token matches the DB
+      if (token.id && token.sessionToken) {
+        const dbToken = getSessionToken(Number(token.id));
+        if (dbToken && dbToken !== token.sessionToken) {
+          // Another login happened — invalidate this session
+          return { ...session, user: undefined, expires: new Date(0).toISOString() };
+        }
+      }
+
       return session;
     },
   },
