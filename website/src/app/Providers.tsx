@@ -1,6 +1,9 @@
 "use client";
 
 import { MatrixSettingsProvider, useMatrixSettings } from "@/contexts/MatrixSettingsContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { InstitutionalSettingsProvider } from "@/contexts/InstitutionalSettingsContext";
+import { SmartProvider } from "@/contexts/SmartContext";
 import VancomycinRain from "@/components/calculator/VancomycinRain";
 
 function RainLayer() {
@@ -11,11 +14,17 @@ function RainLayer() {
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <MatrixSettingsProvider>
-      <RainLayer />
-      <div id="app-root" style={{ minHeight: "100vh", position: "relative", zIndex: 2 }}>
-        {children}
-      </div>
-    </MatrixSettingsProvider>
+    <AuthProvider>
+      <SmartProvider>
+        <InstitutionalSettingsProvider>
+          <MatrixSettingsProvider>
+            <RainLayer />
+            <div id="app-root" style={{ minHeight: "100vh", position: "relative", zIndex: 2 }}>
+              {children}
+            </div>
+          </MatrixSettingsProvider>
+        </InstitutionalSettingsProvider>
+      </SmartProvider>
+    </AuthProvider>
   );
 }

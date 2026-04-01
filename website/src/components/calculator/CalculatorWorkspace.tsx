@@ -37,6 +37,7 @@ import SettingsPanel from "@/components/calculator/SettingsPanel";
 import DisclaimerModal from "@/components/calculator/DisclaimerModal";
 import PKParametersMath from "@/components/calculator/PKParametersMath";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
+import { printReport, type ReportData } from "@/lib/generateReport";
 
 const defaultPatient = { age: 0, weight_kg: 0, serum_creatinine_mg_dl: 0 };
 const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0 };
@@ -591,6 +592,42 @@ export default function CalculatorWorkspace() {
     }).catch(() => {/* clipboard not available */});
   }, [activeOption, visibleResult]);
 
+  const handleExportPDF = useCallback(() => {
+    if (!visibleResult) return;
+    const opt = activeOption;
+    const reportData: ReportData = {
+      age: patient.age,
+      weight_kg: patient.weight_kg,
+      serum_creatinine_mg_dl: patient.serum_creatinine_mg_dl,
+      mode: visibleResult.recommendation_type,
+      recommended_dose: opt ? String(opt.dose_mg) : visibleResult.recommended_dose,
+      recommended_interval_hours: opt?.interval_hours ?? visibleResult.recommended_interval_hours,
+      recommended_infusion_duration_hours: visibleResult.recommended_infusion_duration_hours,
+      auc24: opt?.auc24 ?? visibleResult.auc24,
+      peak: opt?.peak ?? visibleResult.peak,
+      trough: opt?.trough ?? visibleResult.trough,
+      pk_parameters: visibleResult.pk_parameters ? {
+        CL: visibleResult.pk_parameters.CL,
+        V1: visibleResult.pk_parameters.V1,
+        Q: visibleResult.pk_parameters.Q,
+        V2: visibleResult.pk_parameters.V2,
+        used_posterior_refinement: visibleResult.pk_parameters.used_posterior_refinement,
+      } : undefined,
+      interpretation_summary: opt?.interpretation_summary ?? visibleResult.interpretation_summary,
+      assumptions: visibleResult.assumptions,
+      limitations: visibleResult.limitations,
+      clinical_note: opt?.clinical_note ?? visibleResult.documentation_preview?.clinical_note,
+      frequency_options: visibleResult.frequency_options?.filter(o => o.auc24 >= 400 && o.auc24 <= 600).map(o => ({
+        dose_mg: o.dose_mg,
+        interval_hours: o.interval_hours,
+        auc24: o.auc24,
+        peak: o.peak,
+        trough: o.trough,
+      })),
+    };
+    printReport(reportData);
+  }, [visibleResult, activeOption, patient]);
+
   const leftColumn = (
     <div className="flex flex-col h-full">
       <div className="mx-shimmer-border border p-5" style={{ borderTop: "3px solid var(--color-primary)", borderLeft: "1px solid var(--color-border)", borderRight: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>
@@ -828,12 +865,30 @@ export default function CalculatorWorkspace() {
                   <div className="flex items-center justify-between border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
                     <span className="text-[15px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--color-primary)" }}>SUGGESTED DOSE<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span></span>
                     <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleExportPDF}
+                        className="border px-2 py-0.5 text-[10px] font-semibold transition-colors"
+                        style={{ borderColor: "var(--color-border)", background: "transparent", color: "var(--color-secondary)" }}
+                        onMouseEnter={e => {
+                          (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
+                          (e.currentTarget as HTMLElement).style.color = "var(--color-card, #fff)";
+                          (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary)";
+                        }}
+                        onMouseLeave={e => {
+                          (e.currentTarget as HTMLElement).style.background = "transparent";
+                          (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
+                          (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
+                        }}
+                      >
+                        EXPORT PDF
+                      </button>
                       {(activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note) && (
                         <button
                           type="button"
                           onClick={handleCopyNote}
                           className="border px-2 py-0.5 text-[10px] font-semibold transition-colors"
-                          style={{ borderColor: "var(--color-border)", background: "transparent", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
+                          style={{ borderColor: "var(--color-border)", background: "transparent", color: "var(--color-secondary)" }}
                         >
                           {copySuccess ? "COPIED" : "COPY NOTE"}
                         </button>

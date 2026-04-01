@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { computeInitialRegimen } from "@/lib/initialRegimen";
 import { runExistingRegimenPipeline } from "@/lib/pk/runExistingRegimenPipeline";
+import { logCalculation } from "@/lib/auditLog";
 
 type Mode = "initial_regimen" | "existing_regimen";
 
@@ -76,7 +77,74 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
   return { ok: true, data: body as RequestBody, mode: resolvedMode };
 }
 
+// ---------------------------------------------------------------------------
+// Helpers to extract audit-safe input/output data
+// ---------------------------------------------------------------------------
+
+function extractInputs(data: RequestBody, mode: Mode): {
+  age: number; weight_kg: number; serum_creatinine_mg_dl: number;
+  dose_mg?: number; interval_hours?: number; infusion_duration_hours?: number;
+  doses_given?: number; level_count: number;
+} {
+  const p = (data.patient ?? {}) as Record<string, unknown>;
+  const r = (data.regimen ?? {}) as Record<string, unknown>;
+  const levels = Array.isArray(data.levels) ? data.levels : [];
+
+  return {
+    age: (p.age as number) ?? 0,
+    weight_kg: (p.weight_kg as number) ?? 0,
+    serum_creatinine_mg_dl: (p.serum_creatinine_mg_dl as number) ?? 0,
+    ...(mode === "existing_regimen" ? {
+      dose_mg: (r.dose_mg as number) ?? undefined,
+      interval_hours: (r.interval_hours as number) ?? undefined,
+      infusion_duration_hours: (r.infusion_duration_hours as number) ?? undefined,
+      doses_given: (r.doses_given as number) ?? undefined,
+    } : {}),
+    level_count: levels.filter((l: unknown) => l && typeof l === "object" && (l as Record<string, unknown>).value_mcg_ml).length,
+  };
+}
+
+function extractOutputs(result: Record<string, unknown>): {
+  auc24: number; peak: number; trough: number;
+  recommended_dose: string; recommended_interval_hours: number;
+  frequency_options_count: number; used_posterior_refinement: boolean;
+  evidence_strength?: string;
+} {
+  const details = result.calculation_details as Record<string, unknown> | undefined;
+  const freqOpts = result.frequency_options as unknown[] | undefined;
+  const pkParams = result.pk_parameters as Record<string, unknown> | undefined;
+
+  return {
+    auc24: (result.auc24 as number) ?? 0,
+    peak: (result.peak as number) ?? 0,
+    trough: (result.trough as number) ?? 0,
+    recommended_dose: (result.recommended_dose as string) ?? "",
+    recommended_interval_hours: (result.recommended_interval_hours as number) ?? 0,
+    frequency_options_count: freqOpts?.length ?? 0,
+    used_posterior_refinement: (pkParams?.used_posterior_refinement as boolean) ?? false,
+    evidence_strength: (details?.evidence_strength as string) ?? undefined,
+  };
+}
+
+function extractPKParams(result: Record<string, unknown>): { CL: number; V1: number; Q: number; V2: number } | undefined {
+  const pk = result.pk_parameters as Record<string, unknown> | undefined;
+  if (!pk) return undefined;
+  return {
+    CL: Math.round(((pk.CL as number) ?? 0) * 100) / 100,
+    V1: Math.round(((pk.V1 as number) ?? 0) * 100) / 100,
+    Q: Math.round(((pk.Q as number) ?? 0) * 100) / 100,
+    V2: Math.round(((pk.V2 as number) ?? 0) * 100) / 100,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// POST handler
+// ---------------------------------------------------------------------------
+
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  const userEmail = request.headers.get("x-user-email") ?? "anonymous";
+
   let body: unknown;
   try {
     body = await request.json();
@@ -88,9 +156,27 @@ export async function POST(request: NextRequest) {
   }
 
   const validated = validateRequest(body);
+
+  // Log validation errors
   if (!validated.ok) {
+    logCalculation({
+      mode: "initial_regimen",
+      duration_ms: Date.now() - startTime,
+      status: "validation_error",
+      user_email: userEmail,
+      inputs: {
+        age: 0, weight_kg: 0, serum_creatinine_mg_dl: 0, level_count: 0,
+      },
+      error: {
+        type: validated.error.error_type,
+        message: validated.error.message,
+        field_errors: validated.error.field_errors,
+      },
+    });
     return NextResponse.json(validated.error, { status: 400 });
   }
+
+  const inputs = extractInputs(validated.data, validated.mode);
 
   if (validated.mode === "initial_regimen") {
     const p = validated.data.patient as Record<string, unknown>;
@@ -99,7 +185,19 @@ export async function POST(request: NextRequest) {
       weight_kg: p.weight_kg as number,
       serum_creatinine_mg_dl: p.serum_creatinine_mg_dl as number,
     };
-    return NextResponse.json(computeInitialRegimen(patient));
+    const result = computeInitialRegimen(patient) as unknown as Record<string, unknown>;
+
+    logCalculation({
+      mode: "initial_regimen",
+      duration_ms: Date.now() - startTime,
+      status: "success",
+      user_email: userEmail,
+      inputs,
+      outputs: extractOutputs(result),
+      pk_parameters: extractPKParams(result),
+    });
+
+    return NextResponse.json(result);
   }
 
   const result = runExistingRegimenPipeline({
@@ -107,7 +205,20 @@ export async function POST(request: NextRequest) {
     regimen: validated.data.regimen as Record<string, unknown>,
     levels: (validated.data.levels as Array<Record<string, unknown>>) ?? [],
   });
+
   if ("ok" in result && result.ok === false) {
+    logCalculation({
+      mode: "existing_regimen",
+      duration_ms: Date.now() - startTime,
+      status: "error",
+      user_email: userEmail,
+      inputs,
+      error: {
+        type: result.error_type as string,
+        message: result.message as string,
+        field_errors: result.field_errors as Record<string, string> | undefined,
+      },
+    });
     return NextResponse.json(
       {
         error_type: result.error_type,
@@ -119,5 +230,17 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
+
+  const resultObj = result as Record<string, unknown>;
+  logCalculation({
+    mode: "existing_regimen",
+    duration_ms: Date.now() - startTime,
+    status: "success",
+    user_email: userEmail,
+    inputs,
+    outputs: extractOutputs(resultObj),
+    pk_parameters: extractPKParams(resultObj),
+  });
+
   return NextResponse.json(result);
 }
