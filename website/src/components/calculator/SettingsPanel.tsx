@@ -29,7 +29,7 @@ const FONT_SIZES = [
 ];
 
 const SLIDERS = [
-  { key: "greenBrightness" as const, label: "Green Brightness" },
+  { key: "greenBrightness" as const, label: "Brightness" },
   { key: "backgroundShade" as const, label: "Background Shade" },
   { key: "textSize" as const, label: "Text Size" },
   { key: "rainOpacity" as const, label: "Rain Opacity" },
@@ -280,7 +280,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             <SectionLabel>EFFECTS</SectionLabel>
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 10 }}>
               {TOGGLES.map((toggle) => {
-                const BASIC_FORCED_OFF = ["scanlineEffect", "typewriterAnimation", "blinkingCursor", "vancomycinRain", "whiteInputValues"];
+                const BASIC_FORCED_OFF = ["scanlineEffect", "typewriterAnimation", "vancomycinRain", "whiteInputValues"];
                 const forcedOff = settings.colorMode === "basic" && BASIC_FORCED_OFF.includes(toggle.key);
                 const on = forcedOff ? false : (settings[toggle.key] as boolean);
                 return (

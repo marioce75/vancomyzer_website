@@ -257,7 +257,7 @@ function applySettingsToDom(settings: MatrixSettings): void {
   const toggleClass = (cls: string, on: boolean) => { body.classList.toggle(cls, on); };
   toggleClass("no-scanlines", isBasic || !settings.scanlineEffect);
   toggleClass("no-typewriter", isBasic || !settings.typewriterAnimation);
-  toggleClass("no-blink", isBasic || !settings.blinkingCursor);
+  toggleClass("no-blink", !settings.blinkingCursor);
   toggleClass("no-graph-anim", !settings.graphAnimations);
   toggleClass("input-values-white", settings.whiteInputValues);
 }
@@ -326,7 +326,6 @@ export function MatrixSettingsProvider({ children }: { children: React.ReactNode
           next.vancomycinRain = false;
           next.scanlineEffect = false;
           next.typewriterAnimation = false;
-          next.blinkingCursor = false;
           next.whiteInputValues = false;
         }
         return next;

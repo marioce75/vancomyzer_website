@@ -310,7 +310,7 @@ body.theme-basic .border {
 
 /* ── Disable Matrix animations ───────────────────────────────── */
 
-body.theme-basic .mx-blink { animation: none !important; opacity: 1 !important; }
+/* Blink animation allowed in Basic — used for cursor and CDS dot */
 body.theme-basic .mx-glow-pulse { animation: none !important; }
 body.theme-basic .mx-fadeIn { animation: none !important; opacity: 1 !important; }
 body.theme-basic .mx-shimmer-border::before { animation: none !important; background: transparent !important; }
