@@ -1,0 +1,39 @@
+Beyond the Hype: A Pragmatic Look at Machine ... - Blog - InsightRX
+  URL: https://blog.insight-rx.com/resources/beyond-the-hype-a-pragmatic-look-at-machine-learning-for-precision-dosing
+  Having to obtain FDA clearance adds considerable burden and cost to development and deployment of CDS. This means that ML-based CDS tools will need to show an ...
+
+Artificial Intelligence and Predictive Modelling for Precision Dosing ...
+  URL: https://pmc.ncbi.nlm.nih.gov/articles/PMC12845158/
+  For regulatory approval, AI-based dosing platforms typically fall under the classification of Software as a Medical Device (SaMD) or Clinical ...
+
+Toward Dynamic Prescribing Information: Codevelopment of ...
+  URL: https://accp1.onlinelibrary.wiley.com/doi/full/10.1002/cpdd.638
+  The case of otocog alpha is notable because a companion MIPD tool was recently approved by the U.S. Food and Drug Administration (FDA) via the ...
+
+CardioTag, a Wearable Cardiac Monitoring Device, Gets FDA ...
+  URL: https://www.empr.com/news/cardiotag-a-wearable-cardiac-monitoring-device-gets-fda-clearance/
+  Cardiosense receives FDA 510(k) clearance for the CardioTag™ device, paving the way for advanced cardiac function monitoring. News release.
+
+[XML] https://public-pages-files-2025.frontiersin.org/journals/pharmacology ...
+  URL: https://www.frontiersin.org/journals/pharmacology/articles/10.3389/fphar.2020.00759/xml
+  IDx-DR's diabetic retinopathy detection device received FDA clearance on April 11, 2018 <italic>via</italic> the De Novo (DEN180001) regulatory pathway ...
+
+[XLS] Archer Search Report - Texas Department of Information Resources
+  URL: https://dir.texas.gov/sites/default/files/2023-07/TX-RAMP%20Certified%20Cloud%20Products.xlsx
+  The firm's topic areas include aerospace, alternative energy, transportation, mechatronics, energy transformation, medical technology, and technical curricula.
+
+Health IT Business News - May 9, 2024
+  URL: https://www.healthitanswers.net/health-it-business-news-may-9-2024/
+  InsightRX – which provides cloud-based precision medicine software to optimize treatment decisions – announced the immediate availability of a ...
+
+GLP-1 + Gastrin Regenerative Medicine Therapies - LinkedIn
+  URL: https://www.linkedin.com/posts/sundaresh69_theraindx-glp-gastrin-activity-7404020120114720768-b3Uq
+  Very nice and meaningful description for the usage of GLP-1 as a combo therapy for diabetes and obesity treatment. Like.
+
+eCART vs Pathways - Curbside Health - AVIA Marketplace
+  URL: https://marketplace.aviahealth.com/compare/25724/24966
+  eCART received FDA 510(k) clearance in 2024, with clinical performance data of nearly two million hospitalizations from 21 hospitals, including an ...
+
+PathAI's Liver Portfolio Enhances MASH Trial Reproducibility with AI ...
+  URL: https://www.linkedin.com/posts/pathai_mash-liverdisease-clinicaltrials-activity-7414682275331743744-puG2
+  With FDA and EMA qualifications and trial-ready operations, our liver portfolio helps teams: ✓ Improve reproducibility and reduce reader ...

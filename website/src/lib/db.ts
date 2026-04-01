@@ -51,10 +51,10 @@ function getDb(): Database.Database {
     );
   `);
 
-  // Add session_token column if upgrading from older schema
-  try {
-    _db.exec("ALTER TABLE users ADD COLUMN session_token TEXT");
-  } catch { /* column already exists */ }
+  // Add columns if upgrading from older schema
+  try { _db.exec("ALTER TABLE users ADD COLUMN session_token TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN reset_token TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN reset_token_expires TEXT"); } catch { /* exists */ }
 
   return _db;
 }
@@ -132,6 +132,22 @@ export function clearSessionToken(id: number) {
 
 export function setFirstLoginAcknowledged(id: number) {
   getDb().prepare("UPDATE users SET first_login_acknowledged = 1 WHERE id = ?").run(id);
+}
+
+export function setResetToken(id: number, token: string, expiresAt: string) {
+  getDb().prepare("UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?").run(token, expiresAt, id);
+}
+
+export function findUserByResetToken(token: string): UserRow | undefined {
+  return getDb().prepare("SELECT * FROM users WHERE reset_token = ? AND reset_token_expires > datetime('now')").get(token) as UserRow | undefined;
+}
+
+export function clearResetToken(id: number) {
+  getDb().prepare("UPDATE users SET reset_token = NULL, reset_token_expires = NULL WHERE id = ?").run(id);
+}
+
+export function updatePassword(id: number, passwordHash: string) {
+  getDb().prepare("UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?").run(passwordHash, id);
 }
 
 export function approveUser(id: number, approvedBy: string) {

@@ -105,6 +105,58 @@ export async function sendApprovalNotification(user: {
 }
 
 /**
+ * Send password reset link to user.
+ */
+export async function sendPasswordResetEmail(user: {
+  full_name: string;
+  email: string;
+  resetToken: string;
+}) {
+  if (!process.env.SMTP_USER) {
+    console.log("[EMAIL] Skipped — SMTP not configured. Reset token:", user.resetToken);
+    return;
+  }
+
+  const baseUrl = process.env.NEXTAUTH_URL ?? "https://vancomyzer.com";
+  const resetUrl = `${baseUrl}/reset-password?token=${user.resetToken}`;
+
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: user.email,
+      subject: "Vancomyzer™ — Password Reset Request",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 500px;">
+          <h2 style="color: #1e4d8c; margin-bottom: 4px;">Password Reset</h2>
+          <p style="font-size: 14px; color: #2d3748;">
+            Hello ${user.full_name},
+          </p>
+          <p style="font-size: 14px; color: #2d3748;">
+            We received a request to reset your Vancomyzer™ password. Click the button below to set a new password.
+          </p>
+          <p style="margin-top: 16px;">
+            <a href="${resetUrl}"
+               style="display: inline-block; padding: 12px 28px; background: #1e4d8c; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 4px;">
+              Reset Password
+            </a>
+          </p>
+          <p style="margin-top: 16px; font-size: 12px; color: #718096;">
+            This link expires in 1 hour. If you did not request a password reset, you can safely ignore this email.
+          </p>
+          <p style="margin-top: 8px; font-size: 11px; color: #a0aec0; word-break: break-all;">
+            ${resetUrl}
+          </p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys™</p>
+        </div>
+      `,
+    });
+    console.log(`[EMAIL] Password reset sent to ${user.email}`);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send password reset:", err);
+  }
+}
+
+/**
  * Notify user that their account has been rejected/disabled.
  */
 export async function sendRejectionNotification(user: {

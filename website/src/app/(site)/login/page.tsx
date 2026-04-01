@@ -139,7 +139,12 @@ function LoginForm() {
           </button>
         </form>
 
-        <p style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "#718096" }}>
+        <p style={{ textAlign: "center", marginTop: 16, fontSize: 13 }}>
+          <Link href="/reset-password" style={{ color: "#718096", textDecoration: "none" }}>
+            Forgot password?
+          </Link>
+        </p>
+        <p style={{ textAlign: "center", marginTop: 8, fontSize: 13, color: "#718096" }}>
           Don&apos;t have an account?{" "}
           <Link href="/register" style={{ color: "#1e4d8c", textDecoration: "none", fontWeight: 600 }}>
             Register
