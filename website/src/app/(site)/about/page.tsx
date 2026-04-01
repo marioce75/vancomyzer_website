@@ -1,5 +1,3 @@
-import CTA from "@/components/CTA";
-
 // Locked: practical not brand-heavy; CASE-001 and quick summary as support links; mission, philosophy, intended users
 export default function AboutPage() {
   return (
@@ -39,9 +37,6 @@ export default function AboutPage() {
           <li>Clinician oversight over algorithmic authority</li>
           <li>Documentation clarity for communication</li>
         </ul>
-        <div className="mt-4">
-          <CTA variant="trustEvidence" />
-        </div>
       </section>
 
       {/* 4. Intended users */}
@@ -54,14 +49,6 @@ export default function AboutPage() {
           stewardship teams, hospital clinicians reviewing dosing workflows,
           and learners exploring vancomycin dosing interpretation.
         </p>
-      </section>
-
-      {/* Final CTA */}
-      <section className="border-t border-gray-200 pt-12">
-        <div className="flex flex-wrap gap-4">
-          <CTA variant="sampleCase" primary />
-          <CTA variant="trustEvidence" />
-        </div>
       </section>
     </div>
   );
