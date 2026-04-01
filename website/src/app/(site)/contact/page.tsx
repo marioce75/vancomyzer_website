@@ -74,12 +74,10 @@ export default function ContactPage() {
         </div>
         <div className="mt-4 flex flex-wrap gap-4">
           <CTA variant="sampleCase" primary />
-          <CTA variant="documentationSummary" />
-          <CTA variant="trustEvidence" />
         </div>
       </section>
 
-      {/* 5. Contact / evaluation CTA block — mailto for Phase 1 (no self-links) */}
+      {/* 5. Contact / evaluation CTA block */}
       <section id="inquiry" className="border-t border-gray-200 pt-12 scroll-mt-8">
         <p className="text-gray-600">
           Ready to discuss a workflow evaluation or have questions?
@@ -93,21 +91,6 @@ export default function ContactPage() {
             contact@vancomyzer.com
           </a>
         </p>
-        <div className="mt-4 flex flex-wrap gap-4">
-          <a
-            href="mailto:contact@vancomyzer.com?subject=Workflow%20evaluation%20request"
-            className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
-          >
-            Request a workflow evaluation
-          </a>
-          <a
-            href="mailto:contact@vancomyzer.com?subject=Vancomyzer™%20inquiry"
-            className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
-          >
-            Contact us
-          </a>
-          <CTA variant="documentationSummary" />
-        </div>
       </section>
     </div>
   );
