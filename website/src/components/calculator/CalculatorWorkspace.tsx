@@ -954,6 +954,7 @@ export default function CalculatorWorkspace() {
                     curve={activeOption?.curve ?? visibleResult.curve}
                     measured_levels={visibleResult.measured_levels}
                     calculationDetails={visibleResult.calculation_details}
+                    pk_model_name={visibleResult.pk_parameters?.pk_model_name}
                   />
                 </div>
               </section>

@@ -75,6 +75,12 @@ export interface PriorParameters {
   Q:  number;
   V2: number;
   scr: number;
+  model_name: "colin_2019" | "vancomyzer_obesity";
+  ffm_kg?: number;       // Fat-Free Mass — only set when obesity model is active
+  omega_CL?: number;     // IIV overrides for Bayesian MAP (obesity model uses Smit 2020 values)
+  omega_V1?: number;
+  omega_Q?: number;
+  omega_V2?: number;
 }
 
 /** SCRstd (Eq. 5): age-adjusted normal SCr as a function of PMA */
@@ -114,13 +120,22 @@ export function buildPriorParameters(
   // Uses FFM-based Vd (Smit 2020 + Zhang 2023) instead of TBW-based Colin 2019
   // ---------------------------------------------------------------------------
   if (patient.height_cm > 0 && (patient.sex === "male" || patient.sex === "female")) {
-    const { calculateBMI, selectPKModel, buildObesityPriors } = require("../obesityModel");
+    const { calculateBMI, selectPKModel, buildObesityPriors, calculateFFM, OBESITY_OMEGA } = require("../obesityModel");
     const bmi = calculateBMI(wt, patient.height_cm);
     if (bmi >= 40) {
       const model = selectPKModel(bmi);
       if (model === "vancomyzer_obesity") {
         const priors = buildObesityPriors(age, wt, patient.height_cm, scr, patient.sex);
-        return { CL: priors.CL, V1: priors.V1, Q: priors.Q, V2: priors.V2, scr };
+        const ffm = calculateFFM(wt, patient.height_cm, patient.sex);
+        return {
+          CL: priors.CL, V1: priors.V1, Q: priors.Q, V2: priors.V2, scr,
+          model_name: "vancomyzer_obesity" as const,
+          ffm_kg: ffm,
+          omega_CL: OBESITY_OMEGA.CL,
+          omega_V1: OBESITY_OMEGA.V1,
+          omega_Q: OBESITY_OMEGA.Q,
+          omega_V2: OBESITY_OMEGA.V2,
+        };
       }
     }
   }
@@ -147,5 +162,5 @@ export function buildPriorParameters(
   const V2 = THETA_V2 * FSize;
   const Q  = THETA_Q  * (FSize ** 0.75);
 
-  return { CL, V1, Q, V2, scr };
+  return { CL, V1, Q, V2, scr, model_name: "colin_2019" as const };
 }

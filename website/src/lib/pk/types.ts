@@ -62,6 +62,8 @@ export interface ExistingRegimenEngineOutput {
   V1: number;
   Q: number;
   V2: number;
+  model_name: "colin_2019" | "vancomyzer_obesity";
+  ffm_kg?: number;
 }
 
 export interface FrequencyOption {

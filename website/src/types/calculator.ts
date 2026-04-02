@@ -99,6 +99,8 @@ export interface CalculateResponse {
     scr: number;
     age?: number;
     weight_kg?: number;
+    pk_model_name?: "colin_2019" | "vancomyzer_obesity";
+    ffm_kg?: number;
   };
 }
 

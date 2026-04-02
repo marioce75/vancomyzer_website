@@ -22,6 +22,8 @@ export interface PosteriorEngineResult {
   scr: number;
   success: boolean;
   diagnostics: PosteriorFitDiagnostics;
+  model_name: "colin_2019" | "vancomyzer_obesity";
+  ffm_kg?: number;
 }
 
 export function runPosteriorEngine(
@@ -43,6 +45,8 @@ export function runPosteriorEngine(
         fit_quality_reason: "No measured levels were available for posterior fitting.",
         uncertainty_label: "population_only",
       },
+      model_name: prior.model_name,
+      ffm_kg: prior.ffm_kg,
     };
   }
 
@@ -56,6 +60,11 @@ export function runPosteriorEngine(
     tau: context.tau,
     T_inf: context.T_inf,
     observations,
+    // Pass obesity omega overrides when applicable
+    omega_CL: prior.omega_CL,
+    omega_V1: prior.omega_V1,
+    omega_Q: prior.omega_Q,
+    omega_V2: prior.omega_V2,
   });
 
   if (!fit.success) {
@@ -67,6 +76,8 @@ export function runPosteriorEngine(
       scr: prior.scr,
       success: false,
       diagnostics: fit.diagnostics,
+      model_name: prior.model_name,
+      ffm_kg: prior.ffm_kg,
     };
   }
 
@@ -78,5 +89,7 @@ export function runPosteriorEngine(
     scr: prior.scr,
     success: true,
     diagnostics: fit.diagnostics,
+    model_name: prior.model_name,
+    ffm_kg: prior.ffm_kg,
   };
 }

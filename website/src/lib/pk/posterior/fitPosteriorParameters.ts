@@ -19,6 +19,11 @@ export interface FitPosteriorInput {
   tau: number;
   T_inf: number;
   observations: NormalizedObservation[];
+  // Optional omega overrides — used by obesity model (Smit 2020 IIV values)
+  omega_CL?: number;
+  omega_V1?: number;
+  omega_Q?: number;
+  omega_V2?: number;
 }
 
 export interface FitPosteriorResult {
@@ -51,6 +56,12 @@ function objective(
 ): number {
   const { dose_mg, tau, T_inf, observations, priorCL, priorV1, priorQ, priorV2 } = input;
 
+  // Use omega overrides if provided (e.g., Smit 2020 IIV for obesity model)
+  const sdCL = input.omega_CL ?? PRIOR_LOG_CL_SD;
+  const sdV1 = input.omega_V1 ?? PRIOR_LOG_V1_SD;
+  const sdQ  = input.omega_Q  ?? PRIOR_LOG_Q_SD;
+  const sdV2 = input.omega_V2 ?? PRIOR_LOG_V2_SD;
+
   let nll = 0;
   for (const { time_in_interval, concentration } of observations) {
     const predicted = concentrationAtTime({
@@ -63,10 +74,10 @@ function objective(
 
   return (
     nll +
-    logPenalty(CL, priorCL, PRIOR_LOG_CL_SD) +
-    logPenalty(V1, priorV1, PRIOR_LOG_V1_SD) +
-    logPenalty(Q, priorQ, PRIOR_LOG_Q_SD) +
-    logPenalty(V2, priorV2, PRIOR_LOG_V2_SD)
+    logPenalty(CL, priorCL, sdCL) +
+    logPenalty(V1, priorV1, sdV1) +
+    logPenalty(Q, priorQ, sdQ) +
+    logPenalty(V2, priorV2, sdV2)
   );
 }
 

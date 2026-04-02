@@ -19,6 +19,8 @@ export function runExistingRegimenEngine(
     scr: posteriorScr,
     success: used_posterior_refinement,
     diagnostics: posterior_fit,
+    model_name,
+    ffm_kg,
   } = posteriorResult;
   const { dose_mg, interval_hours, infusion_duration_hours, doses_given, target_auc24 } = regimen;
   const tau = interval_hours;
@@ -56,7 +58,9 @@ export function runExistingRegimenEngine(
     ? `Non-steady-state analysis based on ${doses_given} dose${doses_given === 1 ? "" : "s"}.`
     : "Steady-state assumed (≥5 doses).";
 
-  const priorMsg = "Colin 2019 two-compartment adult population prior";
+  const priorMsg = model_name === "vancomyzer_obesity"
+    ? "Vancomyzer Obesity Model (Smit 2020 + Zhang 2023) two-compartment adult population prior"
+    : "Colin 2019 two-compartment adult population prior";
 
   const data_quality_note = used_posterior_refinement
     ? `Bounded MAP posterior update from measured level(s) using the ${priorMsg}. Fit quality: ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}). ${steadyStateNote}`
@@ -79,6 +83,8 @@ export function runExistingRegimenEngine(
     V1,
     Q,
     V2,
+    model_name,
+    ffm_kg,
     current_regimen_infusion_hours: T_inf,
     doses_given,
     target_auc24,

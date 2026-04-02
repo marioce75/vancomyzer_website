@@ -14,6 +14,7 @@ interface ConcentrationTimeGraphProps {
   curve?: CurvePoint[] | null;
   measured_levels?: CurvePoint[] | null;
   calculationDetails?: CalculationDetails | null;
+  pk_model_name?: "colin_2019" | "vancomyzer_obesity";
 }
 
 /* ── Constants ──────────────────────────────────────────────────── */
@@ -467,6 +468,7 @@ export default function ConcentrationTimeGraph({
   curve,
   measured_levels,
   calculationDetails,
+  pk_model_name,
 }: ConcentrationTimeGraphProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [zoom, setZoom] = useState(96);
@@ -529,7 +531,10 @@ export default function ConcentrationTimeGraph({
 
   const handleMouseLeave = useCallback(() => setMouse(null), []);
 
-  const modelLabel = calculationDetails?.method ? "Colin 2019" : "";
+  const modelLabel = calculationDetails?.method
+    ? (pk_model_name === "vancomyzer_obesity" ? "Vancomyzer Obesity Model" : "Colin 2019")
+    : "";
+  const modelSubLabel = pk_model_name === "vancomyzer_obesity" ? "Smit 2020 + Zhang 2023" : "";
   const evidenceLabel = calculationDetails?.evidence_strength ?? "";
 
   return (
@@ -548,6 +553,12 @@ export default function ConcentrationTimeGraph({
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{modelLabel}</span>
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>Two-Compartment</span>
+            {modelSubLabel && (
+              <>
+                <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
+                <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{modelSubLabel}</span>
+              </>
+            )}
           </>
         )}
         {evidenceLabel && (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { CalculateRequestPatient } from "@/types/calculator";
 import BedboundAdvisoryPanel, { BedboundDoseData } from "./BedboundAdvisoryPanel";
+import ObesityAdvisoryPanel from "./ObesityAdvisoryPanel";
 
 interface PatientCharacteristicsFormProps {
   value: CalculateRequestPatient;
@@ -183,21 +184,34 @@ export default function PatientCharacteristicsForm({
         </InputGroup>
       </FormRow>
 
-      {/* BMI display — auto-calculated, read-only */}
+      {/* BMI display + obesity advisory */}
       {value.weight_kg > 0 && value.height_cm > 0 && (() => {
         const h = value.height_cm / 100;
         const bmi = value.weight_kg / (h * h);
         if (!isFinite(bmi) || bmi <= 0) return null;
         const isObese = bmi >= 40;
+        const sex = value.sex as "male" | "female" | "";
+        // Compute FFM inline for display (Janmahasatian 2005)
+        let ffm = 0;
+        if (isObese && (sex === "male" || sex === "female")) {
+          ffm = sex === "male"
+            ? (9270 * value.weight_kg) / (6680 + 216 * bmi)
+            : (9270 * value.weight_kg) / (8780 + 244 * bmi);
+        }
         return (
-          <div className="flex items-center gap-2 text-xs" style={{ color: isObese ? "#92400e" : "var(--color-secondary)" }}>
-            <span style={{ fontWeight: 600 }}>BMI: {bmi.toFixed(1)} kg/m²</span>
-            {isObese && (
-              <span style={{ padding: "1px 6px", background: "#fffbeb", border: "1px solid #fcd34d", color: "#92400e", fontWeight: 600, fontSize: 10 }}>
-                CLASS III OBESITY — Obesity Model Active
-              </span>
+          <>
+            <div className="flex items-center gap-2 text-xs" style={{ color: isObese ? "#92400e" : "var(--color-secondary)" }}>
+              <span style={{ fontWeight: 600 }}>BMI: {bmi.toFixed(1)} kg/m²</span>
+              {isObese && (
+                <span style={{ padding: "1px 6px", background: "#fffbeb", border: "1px solid #fcd34d", color: "#92400e", fontWeight: 600, fontSize: 10 }}>
+                  OBESITY MODEL ACTIVE
+                </span>
+              )}
+            </div>
+            {isObese && (sex === "male" || sex === "female") && ffm > 0 && (
+              <ObesityAdvisoryPanel bmi={bmi} ffm_kg={ffm} sex={sex} />
             )}
-          </div>
+          </>
         );
       })()}
 

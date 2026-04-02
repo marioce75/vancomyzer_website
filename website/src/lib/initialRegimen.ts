@@ -49,6 +49,8 @@ export interface InitialRegimenResult {
     scr: number;
     age: number;
     weight_kg: number;
+    pk_model_name?: "colin_2019" | "vancomyzer_obesity";
+    ffm_kg?: number;
   };
 }
 
@@ -210,10 +212,16 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
   const peak = Math.round(choice.peak * 10) / 10;
   const trough = Math.round(choice.trough * 10) / 10;
 
+  const modelLabel = prior.model_name === "vancomyzer_obesity"
+    ? "Vancomyzer Obesity Model (Smit 2020 + Zhang 2023)"
+    : "Colin 2019";
+
   const interpretation_summary =
     `Initial regimen suggestion: ${recommended_dose} every ${choice.interval_hours} hours infused over ${safeInfusion.infusion_duration_hours} hours. ` +
     `Prior-based first-pass estimate: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
-    `SCr ${prior.scr} mg/dL (Colin 2019 direct renal covariate). If immediate severe-infection coverage is clinically necessary under local practice, a clinician may optionally consider an empiric loading-dose estimate around ${loadingDose.suggested_dose_mg} mg (${loadingDose.basis}) before maintenance dosing. ` +
+    `SCr ${prior.scr} mg/dL (${modelLabel} renal covariate).` +
+    (prior.ffm_kg ? ` FFM ${prior.ffm_kg.toFixed(1)} kg (Janmahasatian 2005) — V1 and V2 scaled to FFM.` : "") +
+    ` If immediate severe-infection coverage is clinically necessary under local practice, a clinician may optionally consider an empiric loading-dose estimate around ${loadingDose.suggested_dose_mg} mg (${loadingDose.basis}) before maintenance dosing. ` +
     `${safeInfusion.safety_note ? `${safeInfusion.safety_note} ` : ""}` +
     `No measured levels; re-evaluate after levels are available. Intended to support review, not replace clinician judgment.`;
 
@@ -298,6 +306,8 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
       scr: prior.scr,
       age: patient.age,
       weight_kg: patient.weight_kg,
+      pk_model_name: prior.model_name,
+      ffm_kg: prior.ffm_kg,
     },
   };
 }

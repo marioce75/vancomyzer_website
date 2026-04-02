@@ -76,6 +76,8 @@ export function buildCalculateResponse(
       scr: engineOutput.scr,
       age: patient?.age,
       weight_kg: patient?.weight_kg,
+      pk_model_name: engineOutput.model_name,
+      ffm_kg: engineOutput.ffm_kg,
     },
     frequency_options: enrichedFrequencyOptions,
     calculation_details: {
@@ -100,7 +102,7 @@ export function buildCalculateResponse(
             : "Multi-level workflow fit with explicit chronology; review still depends on coherent same-interval timing.",
       review_status,
       key_inputs: [
-        `SCr ${engineOutput.scr} mg/dL (Colin 2019 direct renal covariate)`,
+        `SCr ${engineOutput.scr} mg/dL (${engineOutput.model_name === "vancomyzer_obesity" ? "Obesity Model" : "Colin 2019"} renal covariate)`,
         `${engineOutput.level_count} measured level${engineOutput.level_count === 1 ? "" : "s"}`,
         `Current regimen ${engineOutput.current_regimen_dose_mg} mg q${engineOutput.current_regimen_interval_hours}h`,
       ],
