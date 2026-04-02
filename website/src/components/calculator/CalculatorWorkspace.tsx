@@ -8,6 +8,7 @@ import type {
   CalculateResponse,
   CalculateErrorResponse,
   CalculateRequestRegimen,
+  CalculateRequestPatient,
   FrequencyOption,
 } from "@/types/calculator";
 import type { BedboundDoseData } from "@/components/calculator/BedboundAdvisoryPanel";
@@ -40,7 +41,7 @@ import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { printReport, type ReportData } from "@/lib/generateReport";
 
-const defaultPatient = { age: 0, weight_kg: 0, serum_creatinine_mg_dl: 0 };
+const defaultPatient: CalculateRequestPatient = { age: 0, weight_kg: 0, height_cm: 0, sex: "", serum_creatinine_mg_dl: 0 };
 const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0 };
 const defaultLevel = { value_mcg_ml: 0, collection_time: "", time_since_last_dose_hours: 0 };
 
@@ -228,7 +229,7 @@ export default function CalculatorWorkspace() {
 
   const [viewMode, setViewMode] = useState<WorkspaceViewMode>("empiric");
   const [mode, setMode] = useState<CalculatorMode>("initial_regimen");
-  const [patient, setPatient] = useState<typeof defaultPatient>(defaultPatient);
+  const [patient, setPatient] = useState<CalculateRequestPatient>(defaultPatient);
   const [rrt, setRrt] = useState<boolean | null>(null);
   const [regimen, setRegimen] = useState<CalculateRequestRegimen>(defaultRegimen);
   const [levels, setLevels] = useState<(typeof defaultLevel)[]>([{ ...defaultLevel }]);
@@ -311,7 +312,7 @@ export default function CalculatorWorkspace() {
       const parsedScr = Number(scr);
       if (parsedAge > 0 && parsedWeight > 0 && parsedScr > 0) {
         didPreFillRef.current = true;
-        setPatient({ age: parsedAge, weight_kg: parsedWeight, serum_creatinine_mg_dl: parsedScr });
+        setPatient(prev => ({ ...prev, age: parsedAge, weight_kg: parsedWeight, serum_creatinine_mg_dl: parsedScr }));
       }
     }
   }, [searchParams]);

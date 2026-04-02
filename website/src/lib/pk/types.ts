@@ -7,6 +7,8 @@ import type { CalculationDetails } from "@/types/calculator";
 export interface NormalizedPatient {
   age: number;
   weight_kg: number;
+  height_cm: number;
+  sex: "male" | "female" | "";
   serum_creatinine_mg_dl: number;
 }
 

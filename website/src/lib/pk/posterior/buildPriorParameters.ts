@@ -109,6 +109,26 @@ export function buildPriorParameters(
   const scr = Math.max(MIN_SCR, patient.serum_creatinine_mg_dl);
   const age = Math.max(18, patient.age);
 
+  // ---------------------------------------------------------------------------
+  // Obesity Model Branch — activates when BMI ≥ 40 AND height/sex are provided
+  // Uses FFM-based Vd (Smit 2020 + Zhang 2023) instead of TBW-based Colin 2019
+  // ---------------------------------------------------------------------------
+  if (patient.height_cm > 0 && (patient.sex === "male" || patient.sex === "female")) {
+    const { calculateBMI, selectPKModel, buildObesityPriors } = require("../obesityModel");
+    const bmi = calculateBMI(wt, patient.height_cm);
+    if (bmi >= 40) {
+      const model = selectPKModel(bmi);
+      if (model === "vancomyzer_obesity") {
+        const priors = buildObesityPriors(age, wt, patient.height_cm, scr, patient.sex);
+        return { CL: priors.CL, V1: priors.V1, Q: priors.Q, V2: priors.V2, scr };
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Colin 2019 Model — default for non-obese patients (unchanged)
+  // ---------------------------------------------------------------------------
+
   // Adults: PMA = age_years + 40 weeks gestation (standard assumption)
   const PMA_yr = age + 40 / 52;
   const PMA_wk = PMA_yr * 52;

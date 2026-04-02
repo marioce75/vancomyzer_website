@@ -157,6 +157,50 @@ export default function PatientCharacteristicsForm({
         </InputGroup>
       </FormRow>
 
+      {/* Height + Sex — optional, enables obesity model when BMI ≥ 40 */}
+      <FormRow>
+        <InputGroup label="Height (cm)">
+          <input
+            type="number"
+            min={0}
+            inputMode="numeric"
+            value={value.height_cm || ""}
+            onChange={(e) => update("height_cm", e.target.value ? Number(e.target.value) : 0)}
+            className={inputClass(Boolean(fieldErrors["patient.height_cm"]))}
+            placeholder="e.g. 170"
+          />
+        </InputGroup>
+        <InputGroup label="Sex">
+          <select
+            value={value.sex || ""}
+            onChange={(e) => update("sex", e.target.value)}
+            className={inputClass(false)}
+          >
+            <option value="">— Select —</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </InputGroup>
+      </FormRow>
+
+      {/* BMI display — auto-calculated, read-only */}
+      {value.weight_kg > 0 && value.height_cm > 0 && (() => {
+        const h = value.height_cm / 100;
+        const bmi = value.weight_kg / (h * h);
+        if (!isFinite(bmi) || bmi <= 0) return null;
+        const isObese = bmi >= 40;
+        return (
+          <div className="flex items-center gap-2 text-xs" style={{ color: isObese ? "#92400e" : "var(--color-secondary)" }}>
+            <span style={{ fontWeight: 600 }}>BMI: {bmi.toFixed(1)} kg/m²</span>
+            {isObese && (
+              <span style={{ padding: "1px 6px", background: "#fffbeb", border: "1px solid #fcd34d", color: "#92400e", fontWeight: 600, fontSize: 10 }}>
+                CLASS III OBESITY — Obesity Model Active
+              </span>
+            )}
+          </div>
+        );
+      })()}
+
       {/* Renal Replacement Therapy guard */}
       <div className={`rounded-xl border px-4 py-3 ${rrt === null ? "border-amber-300 bg-amber-50" : "border-slate-200 bg-slate-50"}`}>
         <p className="text-sm font-medium text-slate-700 mb-1">

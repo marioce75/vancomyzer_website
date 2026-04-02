@@ -14,6 +14,8 @@ import type { CalculationDetails, FrequencyOption } from "@/types/calculator";
 interface Patient {
   age: number;
   weight_kg: number;
+  height_cm: number;
+  sex: "male" | "female" | "";
   serum_creatinine_mg_dl: number;
 }
 
@@ -177,6 +179,8 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
     {
       age: patient.age,
       weight_kg: patient.weight_kg,
+      height_cm: patient.height_cm ?? 0,
+      sex: patient.sex ?? "",
       serum_creatinine_mg_dl: patient.serum_creatinine_mg_dl,
     },
     {

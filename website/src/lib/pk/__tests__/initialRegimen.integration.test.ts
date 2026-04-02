@@ -8,7 +8,7 @@ function testProducesNonZeroExposure(): void {
   const result = computeInitialRegimen({
     age: 55,
     weight_kg: 70,
-    serum_creatinine_mg_dl: 1.0,
+    serum_creatinine_mg_dl: 1.0, height_cm: 0, sex: "" as const,
   });
 
   assert(result.auc24 > 0, "Initial regimen should return non-zero AUC24.");
@@ -55,12 +55,12 @@ function testScrAffectsClearanceAndExposure(): void {
   const normalScr = computeInitialRegimen({
     age: 55,
     weight_kg: 70,
-    serum_creatinine_mg_dl: 0.8,
+    serum_creatinine_mg_dl: 0.8, height_cm: 0, sex: "" as const,
   });
   const elevatedScr = computeInitialRegimen({
     age: 55,
     weight_kg: 70,
-    serum_creatinine_mg_dl: 2.5,
+    serum_creatinine_mg_dl: 2.5, height_cm: 0, sex: "" as const,
   });
 
   assert(
@@ -73,12 +73,12 @@ function testObesityAwareCrClSelectionChangesInitialRecommendation(): void {
   const nonObese = computeInitialRegimen({
     age: 60,
     weight_kg: 78,
-    serum_creatinine_mg_dl: 1.2,
+    serum_creatinine_mg_dl: 1.2, height_cm: 0, sex: "" as const,
   });
   const obese = computeInitialRegimen({
     age: 60,
     weight_kg: 130,
-    serum_creatinine_mg_dl: 1.2,
+    serum_creatinine_mg_dl: 1.2, height_cm: 0, sex: "" as const,
   });
 
   assert(
@@ -93,7 +93,7 @@ function testLoadingDoseGuidanceIsPresentAndBounded(): void {
   const result = computeInitialRegimen({
     age: 50,
     weight_kg: 140,
-    serum_creatinine_mg_dl: 0.9,
+    serum_creatinine_mg_dl: 0.9, height_cm: 0, sex: "" as const,
   });
 
   assert(
@@ -118,7 +118,7 @@ function testLowBodyWeightLoadingDoseIsNotArtificiallyFloored(): void {
   const result = computeInitialRegimen({
     age: 45,
     weight_kg: 30,
-    serum_creatinine_mg_dl: 0.8,
+    serum_creatinine_mg_dl: 0.8, height_cm: 0, sex: "" as const,
   });
 
   assert(

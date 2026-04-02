@@ -8,6 +8,8 @@ export type CalculatorMode = "initial_regimen" | "existing_regimen";
 export interface CalculateRequestPatient {
   age: number;
   weight_kg: number;
+  height_cm: number;
+  sex: "male" | "female" | "";
   serum_creatinine_mg_dl: number;
 }
 

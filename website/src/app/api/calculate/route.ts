@@ -32,6 +32,9 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
     const p = o.patient as Record<string, unknown>;
     if (typeof p.age !== "number" || Number.isNaN(p.age) || p.age < 18 || p.age > 120) field_errors["patient.age"] = "Adult calculator requires age 18-120.";
     if (typeof p.weight_kg !== "number" || Number.isNaN(p.weight_kg) || p.weight_kg < 30 || p.weight_kg > 400) field_errors["patient.weight_kg"] = "Weight must be 30-400 kg.";
+    // height_cm and sex are optional — needed for obesity model (BMI ≥ 40)
+    if (p.height_cm !== undefined && p.height_cm !== 0 && (typeof p.height_cm !== "number" || p.height_cm < 100 || p.height_cm > 250)) field_errors["patient.height_cm"] = "Height must be 100-250 cm.";
+    if (p.sex !== undefined && p.sex !== "" && p.sex !== "male" && p.sex !== "female") field_errors["patient.sex"] = "Sex must be 'male' or 'female'.";
     if (typeof p.serum_creatinine_mg_dl !== "number" || Number.isNaN(p.serum_creatinine_mg_dl) || p.serum_creatinine_mg_dl < 0.1 || p.serum_creatinine_mg_dl > 10) field_errors["patient.serum_creatinine_mg_dl"] = "Scr must be 0.1-10 mg/dL. For SCr >10, consult nephrology — PK model reliability is limited.";
   }
 
@@ -183,6 +186,8 @@ export async function POST(request: NextRequest) {
     const patient = {
       age: p.age as number,
       weight_kg: p.weight_kg as number,
+      height_cm: (p.height_cm as number) ?? 0,
+      sex: ((p.sex as string) === "male" || (p.sex as string) === "female" ? p.sex : "") as "male" | "female" | "",
       serum_creatinine_mg_dl: p.serum_creatinine_mg_dl as number,
     };
     const result = computeInitialRegimen(patient) as unknown as Record<string, unknown>;
