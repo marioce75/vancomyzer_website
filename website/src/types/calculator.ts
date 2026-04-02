@@ -69,11 +69,24 @@ export interface FrequencyOption {
   clinical_note?: string;
 }
 
+export type AucRangeStatus = "in_range" | "below_target" | "above_target";
+
+export interface ArcAdvisory {
+  detected: boolean;
+  crcl_ml_min?: number;
+  cl_l_h?: number;
+  required_tdd_mg?: number;
+  continuous_infusion_rate_mg_h?: number;
+  message?: string;
+}
+
 export interface CalculateResponse {
   recommendation_type: "initial_regimen" | "existing_regimen";
   auc24: number;
   peak: number;
   trough: number;
+  auc_range_status?: AucRangeStatus;
+  arc_advisory?: ArcAdvisory;
   recommended_dose: string;
   recommended_interval_hours: number;
   recommended_infusion_duration_hours?: number;

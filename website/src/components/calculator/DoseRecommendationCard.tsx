@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { CalculationDetails, FrequencyOption } from "@/types/calculator";
+import { CalculationDetails, FrequencyOption, AucRangeStatus, ArcAdvisory } from "@/types/calculator";
 
 interface DoseRecommendationCardProps {
   recommended_dose?: string | null;
@@ -18,6 +18,9 @@ interface DoseRecommendationCardProps {
   onSelectFrequency?: ((option: FrequencyOption) => void) | null;
   onSimulateLoadingDose?: ((doseMg: number, intervalHours: number, infusionHours: number) => void) | null;
   patientWeightKg?: number | null;
+  auc_range_status?: AucRangeStatus | null;
+  arc_advisory?: ArcAdvisory | null;
+  auc24?: number | null;
 }
 
 const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" };
@@ -153,11 +156,13 @@ export default function DoseRecommendationCard({
   onSelectFrequency,
   onSimulateLoadingDose,
   patientWeightKg,
+  auc_range_status,
+  arc_advisory,
+  auc24: rawAuc24,
 }: DoseRecommendationCardProps) {
-  // Only display options with AUC24 strictly within 400–600 mg·h/L (ASHP/IDSA/SIDP 2020).
-  // The backend already enforces this; this is a defensive client-side guard.
+  // Show all options with dose >= 500mg — include below-target options so user can see the best available
   const options = frequency_options?.filter(
-    (o) => o.dose_mg >= 500 && o.auc24 >= 400 && o.auc24 <= 600
+    (o) => o.dose_mg >= 500
   ) ?? [];
 
   const [activeIdx, setActiveIdx] = useState<number>(() => {
@@ -175,7 +180,8 @@ export default function DoseRecommendationCard({
   const displayDose = active ? String(active.dose_mg) : recommended_dose;
   const displayInterval = active ? active.interval_hours : recommended_interval_hours;
   const displayInfusionHours = active?.infusion_duration_hours ?? recommended_infusion_duration_hours ?? 1;
-  const displayAUC = active?.auc24 ?? null;
+  // Show AUC from active option, or fall back to the raw auc24 from the response
+  const displayAUC = active?.auc24 ?? rawAuc24 ?? null;
   const range = displayAUC != null ? aucRangeLabel(displayAUC) : null;
 
   const subline = `Infuse over ${displayInfusionHours} hour${displayInfusionHours === 1 ? "" : "s"}.`;
@@ -278,6 +284,48 @@ export default function DoseRecommendationCard({
           )}
         </div>
       </div>
+
+      {/* ARC Advisory — critical patient safety warning */}
+      {arc_advisory?.detected && (
+        <div className="rounded-lg border-2 px-4 py-3" style={{ borderColor: "#dc2626", background: "#fef2f2" }}>
+          <p className="text-sm font-bold" style={{ color: "#991b1b", margin: 0 }}>
+            ⚠ AUGMENTED RENAL CLEARANCE DETECTED
+          </p>
+          <div className="mt-2 space-y-1.5 text-xs" style={{ color: "#7f1d1d" }}>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              <span><strong>CrCl:</strong> {arc_advisory.crcl_ml_min} mL/min</span>
+              <span><strong>CL:</strong> {arc_advisory.cl_l_h} L/h</span>
+              <span><strong>Required TDD:</strong> ~{arc_advisory.required_tdd_mg?.toLocaleString()} mg/day</span>
+            </div>
+            <p style={{ margin: 0, lineHeight: 1.6 }}>
+              Standard intermittent dosing cannot achieve target AUC₂₄ of 400–600 mg·h/L with this clearance.
+            </p>
+            <div style={{ margin: 0, lineHeight: 1.6 }}>
+              <strong>Clinical options:</strong>
+              <ul style={{ margin: "4px 0 0 16px", padding: 0, listStyleType: "disc" }}>
+                <li>Continuous IV infusion: ~{arc_advisory.continuous_infusion_rate_mg_h} mg/hour (administer loading dose first)</li>
+                <li>Consult Infectious Diseases and/or nephrology</li>
+                <li>Obtain two vancomycin levels early (2–4h and 6–8h post-dose) to confirm individual PK parameters before proceeding</li>
+              </ul>
+            </div>
+            <p style={{ margin: 0, fontSize: 10, fontStyle: "italic" }}>
+              Reference: ASHP/IDSA/SIDP 2020 Guidelines — Augmented Renal Clearance
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Below-target warning (non-ARC) */}
+      {!arc_advisory?.detected && auc_range_status === "below_target" && rawAuc24 != null && (
+        <div className="rounded-lg border px-4 py-3" style={{ borderColor: "#fca5a5", background: "#fff1f2" }}>
+          <p className="text-sm font-bold" style={{ color: "#991b1b", margin: 0 }}>
+            AUC₂₄ BELOW TARGET
+          </p>
+          <p className="mt-1 text-xs" style={{ color: "#7f1d1d", margin: 0 }}>
+            Best available regimen achieves AUC₂₄ of {rawAuc24} mg·h/L, which is below the target range of 400–600 mg·h/L. Clinical review is required — consider more frequent dosing, higher doses, or continuous infusion.
+          </p>
+        </div>
+      )}
 
       {infusion_safety_note && (
         <div className="rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">

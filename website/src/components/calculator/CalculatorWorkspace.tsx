@@ -922,6 +922,9 @@ export default function CalculatorWorkspace() {
                       onSelectFrequency={handleSelectFrequency}
                       onSimulateLoadingDose={handleSimulateLoadingDose}
                       patientWeightKg={patient.weight_kg > 0 ? patient.weight_kg : null}
+                      auc_range_status={visibleResult.auc_range_status}
+                      arc_advisory={visibleResult.arc_advisory}
+                      auc24={visibleResult.auc24}
                     />
                   </div>
                 </div>

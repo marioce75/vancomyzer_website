@@ -19,11 +19,24 @@ interface Patient {
   serum_creatinine_mg_dl: number;
 }
 
+export type AucRangeStatus = "in_range" | "below_target" | "above_target";
+
+export interface ArcAdvisory {
+  detected: boolean;
+  crcl_ml_min?: number;
+  cl_l_h?: number;
+  required_tdd_mg?: number;
+  continuous_infusion_rate_mg_h?: number;
+  message?: string;
+}
+
 export interface InitialRegimenResult {
   recommendation_type: "initial_regimen";
   auc24: number;
   peak: number;
   trough: number;
+  auc_range_status: AucRangeStatus;
+  arc_advisory?: ArcAdvisory;
   recommended_dose: string;
   recommended_interval_hours: number;
   recommended_infusion_duration_hours: number;
@@ -57,21 +70,33 @@ export interface InitialRegimenResult {
 const TARGET_AUC24_LOW = 400;
 const TARGET_AUC24_HIGH = 600;
 const TARGET_AUC24_MID = 500;
-const DOSE_OPTIONS_MG = [250, 500, 750, 1000, 1250, 1500, 1750, 2000];
-const INTERVAL_OPTIONS_H = [8, 12, 24];
+
+// Expanded dose grid — includes higher doses for high-clearance patients
+const DOSE_OPTIONS_MG = [250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000];
+// Q6h added for high-clearance patients who need more frequent dosing
+const INTERVAL_OPTIONS_H = [6, 8, 12, 24];
 const DEFAULT_INFUSION_HOURS = 1;
 
-// Max TDD safety cap based on SCr (Colin 2019 uses SCr directly as renal covariate)
-// Higher SCr = worse renal function = lower max dose
+// Max single dose: 3000 mg per infusion (practical limit for intermittent dosing)
+const MAX_SINGLE_DOSE_MG = 3000;
+
+// Max TDD safety cap per ASHP/IDSA 2020 guidelines: 4500 mg/day hard ceiling
 function getMaxTdd(scr: number): number {
-  if (scr >= 3.5) return 1000;  // severely impaired
-  if (scr >= 2.0) return 2000;  // moderately impaired
-  if (scr >= 1.3) return 3000;  // mildly impaired
-  return 4500;                   // normal renal function
+  if (scr >= 3.5) return 1000;   // severely impaired
+  if (scr >= 2.0) return 2000;   // moderately impaired
+  if (scr >= 1.3) return 3000;   // mildly impaired
+  return 4500;                    // normal renal function — guideline max
 }
 
 const MAX_PEAK_MCG_ML = 80;
 const MAX_TROUGH_MCG_ML = 25;
+
+// CrCl estimation for ARC detection (Cockcroft-Gault)
+function estimateCrCl(age: number, weight_kg: number, scr: number, sex: "male" | "female" | ""): number {
+  if (age <= 0 || weight_kg <= 0 || scr <= 0) return 0;
+  const base = ((140 - age) * weight_kg) / (72 * scr);
+  return sex === "female" ? base * 0.85 : base;
+}
 
 function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, scr: number) {
   const candidates: {
@@ -83,14 +108,20 @@ function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, s
     inRange: boolean;
   }[] = [];
 
+  const maxTdd = getMaxTdd(scr);
+
   for (const interval_hours of INTERVAL_OPTIONS_H) {
     for (const dose_mg of DOSE_OPTIONS_MG) {
+      if (dose_mg > MAX_SINGLE_DOSE_MG) continue;
       const tdd = (dose_mg * 24) / interval_hours;
-      if (tdd > getMaxTdd(scr)) continue;
+      if (tdd > maxTdd) continue;
+      const infDuration = computeSafeInfusionDurationHours(dose_mg).infusion_duration_hours;
+      // Infusion must not exceed 2/3 of the dosing interval
+      if (infDuration > interval_hours * 0.67) continue;
       const exposure = simulateCandidateExposure(CL, V1, Q, V2, {
         dose_mg,
         interval_hours,
-        infusion_duration_hours: Math.min(DEFAULT_INFUSION_HOURS, interval_hours),
+        infusion_duration_hours: infDuration,
       });
       if (exposure.peak > MAX_PEAK_MCG_ML || exposure.trough > MAX_TROUGH_MCG_ML) continue;
       candidates.push({
@@ -108,22 +139,25 @@ function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, s
   const ranked = (inRangeCandidates.length > 0 ? inRangeCandidates : candidates).sort((a, b) => {
     const aucDelta = Math.abs(a.auc24 - TARGET_AUC24_MID) - Math.abs(b.auc24 - TARGET_AUC24_MID);
     if (aucDelta !== 0) return aucDelta;
+    // Prefer longer intervals (less burden) when AUC is comparable
+    if (a.interval_hours !== b.interval_hours) return b.interval_hours - a.interval_hours;
     const dailyDoseA = (a.dose_mg * 24) / a.interval_hours;
     const dailyDoseB = (b.dose_mg * 24) / b.interval_hours;
     return dailyDoseA - dailyDoseB;
   });
 
   const best = ranked.length > 0 ? ranked[0] : {
-    dose_mg: 1000,
-    interval_hours: 12,
+    // Fallback: pick highest feasible dose at shortest interval
+    dose_mg: 2000,
+    interval_hours: 8,
     auc24: simulateCandidateExposure(CL, V1, Q, V2, {
-      dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1,
+      dose_mg: 2000, interval_hours: 8, infusion_duration_hours: 2,
     }).auc24,
     peak: simulateCandidateExposure(CL, V1, Q, V2, {
-      dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1,
+      dose_mg: 2000, interval_hours: 8, infusion_duration_hours: 2,
     }).peak,
     trough: simulateCandidateExposure(CL, V1, Q, V2, {
-      dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1,
+      dose_mg: 2000, interval_hours: 8, infusion_duration_hours: 2,
     }).trough,
     inRange: false,
   };
@@ -176,6 +210,12 @@ function buildFrequencyOptions(
   return options;
 }
 
+function getAucRangeStatus(auc24: number): AucRangeStatus {
+  if (auc24 >= TARGET_AUC24_LOW && auc24 <= TARGET_AUC24_HIGH) return "in_range";
+  if (auc24 > TARGET_AUC24_HIGH) return "above_target";
+  return "below_target";
+}
+
 export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
   const prior = buildPriorParameters(
     {
@@ -212,23 +252,60 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
   const peak = Math.round(choice.peak * 10) / 10;
   const trough = Math.round(choice.trough * 10) / 10;
 
+  const auc_range_status = getAucRangeStatus(auc24);
+
+  // ARC detection
+  const crcl = estimateCrCl(patient.age, patient.weight_kg, patient.serum_creatinine_mg_dl, patient.sex || "male");
+  const required_tdd = TARGET_AUC24_MID * prior.CL;
+  const isArc = crcl > 150 && auc_range_status === "below_target";
+
+  let arc_advisory: ArcAdvisory | undefined;
+  if (isArc) {
+    const ci_rate = Math.round(TARGET_AUC24_MID * prior.CL / 24 * 10) / 10;
+    arc_advisory = {
+      detected: true,
+      crcl_ml_min: Math.round(crcl),
+      cl_l_h: Math.round(prior.CL * 10) / 10,
+      required_tdd_mg: Math.round(required_tdd),
+      continuous_infusion_rate_mg_h: ci_rate,
+      message:
+        `Augmented renal clearance detected (CrCl ${Math.round(crcl)} mL/min, CL ${prior.CL.toFixed(1)} L/h). ` +
+        `Standard intermittent dosing cannot achieve target AUC24 of 400\u2013600 mg\u00b7h/L. ` +
+        `Required TDD \u2248 ${Math.round(required_tdd).toLocaleString()} mg/day. ` +
+        `Consider continuous IV infusion (~${ci_rate} mg/h with loading dose) or consult Infectious Diseases/nephrology. ` +
+        `Obtain two vancomycin levels early (2\u20134h and 6\u20138h post-dose) to confirm individual PK.`,
+    };
+  }
+
   const modelLabel = prior.model_name === "vancomyzer_obesity"
     ? "Vancomyzer Obesity Model (Smit 2020 + Zhang 2023)"
     : "Colin 2019";
 
+  const arcNote = arc_advisory
+    ? ` WARNING: Augmented renal clearance detected (CrCl ${arc_advisory.crcl_ml_min} mL/min). Target AUC may not be achievable with standard intermittent dosing — consider continuous infusion.`
+    : "";
+
+  const belowTargetNote = (!arc_advisory && auc_range_status === "below_target")
+    ? ` NOTE: Best available regimen achieves AUC24 ${auc24} mg\u00b7h/L, which is below the target range of 400\u2013600. Clinical review is required.`
+    : "";
+
   const interpretation_summary =
     `Initial regimen suggestion: ${recommended_dose} every ${choice.interval_hours} hours infused over ${safeInfusion.infusion_duration_hours} hours. ` +
-    `Prior-based first-pass estimate: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
+    `Prior-based first-pass estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
     `SCr ${prior.scr} mg/dL (${modelLabel} renal covariate).` +
-    (prior.ffm_kg ? ` FFM ${prior.ffm_kg.toFixed(1)} kg (Janmahasatian 2005) — V1 and V2 scaled to FFM.` : "") +
+    (prior.ffm_kg ? ` FFM ${prior.ffm_kg.toFixed(1)} kg (Janmahasatian 2005) \u2014 V1 and V2 scaled to FFM.` : "") +
+    arcNote + belowTargetNote +
     ` If immediate severe-infection coverage is clinically necessary under local practice, a clinician may optionally consider an empiric loading-dose estimate around ${loadingDose.suggested_dose_mg} mg (${loadingDose.basis}) before maintenance dosing. ` +
     `${safeInfusion.safety_note ? `${safeInfusion.safety_note} ` : ""}` +
     `No measured levels; re-evaluate after levels are available. Intended to support review, not replace clinician judgment.`;
 
   const assumptions = [
-    "Serum creatinine (SCr) is used directly as the renal covariate in the Colin 2019 model — Cockcroft-Gault CrCl estimation is NOT used. CL scales with (0.83/SCr)^0.80 per the Colin 2019 published equations.",
-    "Adult prior model explicit in code: Colin 2019 two-compartment population prior.",
+    prior.model_name === "vancomyzer_obesity"
+      ? "Obesity model (Smit 2020 + Zhang 2023): V1 and V2 scaled to FFM (Janmahasatian 2005). CL uses TBW-based CrCl (Cockcroft-Gault)."
+      : "Serum creatinine (SCr) is used directly as the renal covariate in the Colin 2019 model \u2014 Cockcroft-Gault CrCl estimation is NOT used. CL scales with (0.83/SCr)^0.80 per the Colin 2019 published equations.",
+    `Adult prior model explicit in code: ${modelLabel} two-compartment population prior.`,
     "Initial regimen chosen from practical dose/interval candidates using the shared two-compartment steady-state PK model.",
+    "AUC24 = (dose \u00d7 24/\u03c4) / CL at steady state \u2014 standard linear PK relationship.",
     "Infusion duration constrained to a minimum of 60 minutes and a maximum rate of 10 mg/min in line with FDA labeling and guideline-based safety framing.",
     "Empiric loading-dose note, when shown, is a capped actual-body-weight estimate for clinician consideration and does not encode severity, indication, or critical-illness context.",
     "No measured vancomycin levels; no posterior or Bayesian update.",
@@ -237,35 +314,53 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
   const limitations = [
     "First-pass adult prior estimate only; no measured levels are available to individualize PK.",
     "Outputs are model-based prior predictions and should not be interpreted as patient-specific certainty.",
+    ...(auc_range_status === "below_target"
+      ? ["The best available intermittent regimen does not achieve the target AUC24 of 400\u2013600 mg\u00b7h/L. Clinical review and alternative dosing strategies (e.g., continuous infusion) may be required."]
+      : []),
     "Any loading-dose note is optional generic empiric support only and should not replace clinician judgment about infection severity, critical illness, low body weight, or institutional protocol.",
-    "Adult concentration limits (for example, dilution ≤5 mg/mL) were not enforced because infusion volume is not entered in this workflow.",
+    "Adult concentration limits (for example, dilution \u22645 mg/mL) were not enforced because infusion volume is not entered in this workflow.",
     "Clinical judgment, local protocols, and reassessment after levels remain essential.",
   ];
 
   const quick_summary = [
     `Initial regimen: ${recommended_dose} every ${choice.interval_hours} hours infused over ${safeInfusion.infusion_duration_hours} hours`,
-    `Prior-based estimate: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL`,
+    `Prior-based estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL`,
+    ...(auc_range_status !== "in_range" ? [`AUC24 STATUS: ${auc_range_status === "below_target" ? "BELOW TARGET" : "ABOVE TARGET"}`] : []),
     ...(safeInfusion.safety_note ? [safeInfusion.safety_note] : []),
-    `SCr: ${prior.scr} mg/dL (direct Colin 2019 covariate). Loading-dose considerations are optional, generic empiric support only, and should be reviewed separately from the maintenance suggestion. Assumptions and limitations apply.`,
+    `SCr: ${prior.scr} mg/dL (${modelLabel} renal covariate). Loading-dose considerations are optional, generic empiric support only, and should be reviewed separately from the maintenance suggestion. Assumptions and limitations apply.`,
   ].join("\n");
 
   const clinical_note = [
     "Vancomycin initial regimen suggestion (no levels).",
     `Dose: ${recommended_dose}; Interval: every ${choice.interval_hours} hours; Infusion: ${safeInfusion.infusion_duration_hours} hours.`,
-    `Prior-based estimate: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL.`,
+    `Prior-based estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL.`,
+    ...(auc_range_status !== "in_range" ? [`** AUC24 ${auc_range_status === "below_target" ? "BELOW" : "ABOVE"} TARGET (400\u2013600 mg\u00b7h/L) **`] : []),
+    ...(arc_advisory ? [`** ARC DETECTED: CrCl ${arc_advisory.crcl_ml_min} mL/min. Consider continuous infusion ~${arc_advisory.continuous_infusion_rate_mg_h} mg/h. **`] : []),
     ...(safeInfusion.safety_note ? [safeInfusion.safety_note] : []),
-    `SCr: ${prior.scr} mg/dL (Colin 2019 direct renal covariate — Cockcroft-Gault not used). Adult prior model: Colin 2019 two-compartment population prior.`,
+    `SCr: ${prior.scr} mg/dL (${modelLabel} renal covariate). Adult prior model: ${modelLabel} two-compartment population prior.`,
     `If rapid empiric attainment is clinically necessary under local practice, an optional actual-body-weight loading-dose estimate around ${loadingDose.suggested_dose_mg} mg may be considered (${loadingDose.basis}).`,
     "Limitations: no measured levels; reassess when levels are available. Do not overinterpret prior-only outputs as patient-specific precision.",
   ].join("\n");
 
   const review_status = buildInitialRegimenReviewStatus();
 
+  const caution_flags = [
+    "No posterior refinement from measured levels was applied.",
+    "Loading-dose language is optional generic empiric support, not patient-specific severity logic.",
+    ...(auc_range_status === "below_target"
+      ? ["AUC24 is BELOW the target range of 400\u2013600 mg\u00b7h/L \u2014 clinical review required."]
+      : []),
+    ...(arc_advisory ? ["Augmented renal clearance detected \u2014 standard intermittent dosing may be inadequate."] : []),
+    "Review assumptions, scope exclusions, and local protocol before acting.",
+  ];
+
   return {
     recommendation_type: "initial_regimen",
     auc24,
     peak,
     trough,
+    auc_range_status,
+    arc_advisory,
     recommended_dose,
     recommended_interval_hours: choice.interval_hours,
     recommended_infusion_duration_hours: safeInfusion.infusion_duration_hours,
@@ -283,15 +378,12 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
       data_quality_summary: "No measured levels entered; workflow fit depends on population-prior assumptions and patient-characteristic inputs only.",
       review_status,
       key_inputs: [
-        `SCr ${prior.scr} mg/dL (Colin 2019 direct renal covariate)`,
+        `SCr ${prior.scr} mg/dL (${modelLabel} renal covariate)`,
         `Weight ${patient.weight_kg} kg`,
         `Safety infusion duration ${safeInfusion.infusion_duration_hours} h`,
+        ...(crcl > 0 ? [`Estimated CrCl ${Math.round(crcl)} mL/min`] : []),
       ],
-      caution_flags: [
-        "No posterior refinement from measured levels was applied.",
-        "Loading-dose language is optional generic empiric support, not patient-specific severity logic.",
-        "Review assumptions, scope exclusions, and local protocol before acting.",
-      ],
+      caution_flags,
     },
     documentation_preview: {
       quick_summary,
