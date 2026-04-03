@@ -925,6 +925,8 @@ export default function CalculatorWorkspace() {
                       auc_range_status={visibleResult.auc_range_status}
                       arc_advisory={visibleResult.arc_advisory}
                       auc24={visibleResult.auc24}
+                      isPulseDose={regimen.doses_given === 1}
+                      loadingDoseMg={regimen.doses_given === 1 ? regimen.dose_mg : null}
                     />
                   </div>
                 </div>

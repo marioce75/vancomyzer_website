@@ -39,7 +39,9 @@ function buildSparseHighExposureNote(input: ExplanationInput): string {
 
 export function buildInterpretationSummary(input: ExplanationInput): string {
   const { engineOutput, recommendation } = input;
-  const { auc24, peak, trough, scr, current_regimen_dose_mg, current_regimen_interval_hours, data_quality_note, used_posterior_refinement, posterior_fit } = engineOutput;
+  const { auc24, peak, trough, scr, current_regimen_dose_mg, current_regimen_interval_hours, data_quality_note, used_posterior_refinement, posterior_fit, doses_given } = engineOutput;
+
+  const isPulseDose = doses_given === 1;
 
   const estimateType = used_posterior_refinement
     ? posterior_fit?.uncertainty_label === "high"
@@ -47,21 +49,34 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
       : "Posterior-updated estimate"
     : "First-pass population estimate";
 
+  const infusionDuration = recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1;
+  const infusionSafetyNote = recommendation.infusion_duration_adjusted_for_safety && recommendation.infusion_safety_note
+    ? ` ${recommendation.infusion_safety_note}`
+    : "";
+
+  // Loading dose simulation — different interpretation format
+  if (isPulseDose) {
+    return (
+      `Loading dose simulation: ${current_regimen_dose_mg} mg single dose. ` +
+      `${estimateType}: first-dose AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL (SCr ${scr} mg/dL). ` +
+      `Suggested maintenance regimen: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${infusionDuration} h. ` +
+      `Maintenance dose targets steady-state AUC24 400–600 mg·h/L.` +
+      `${infusionSafetyNote} ` +
+      `${data_quality_note} Draw first level 1.5–6h post-loading-dose infusion end for early Bayesian estimation. Intended to support review, not replace clinician judgment.`
+    );
+  }
+
   const conservativeRecommendationNote =
     posterior_fit?.fit_quality === "weak" || posterior_fit?.uncertainty_label === "high"
       ? " Recommendation kept conservative because posterior evidence is weak/high-uncertainty."
       : "";
   const changeExplanation = buildRegimenChangeExplanation(input);
   const sparseHighExposureNote = buildSparseHighExposureNote(input);
-  const infusionDuration = recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1;
-  const infusionSafetyNote = recommendation.infusion_duration_adjusted_for_safety && recommendation.infusion_safety_note
-    ? ` ${recommendation.infusion_safety_note}`
-    : "";
 
   return (
     `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. ` +
     `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
-    `One-compartment model (SCr ${scr} mg/dL). ` +
+    `Two-compartment model (SCr ${scr} mg/dL). ` +
     `Recommended adjustment: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${infusionDuration} h. ` +
     `${changeExplanation} ` +
     `Fit quality ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty ${posterior_fit?.uncertainty_label ?? "population_only"}.` +

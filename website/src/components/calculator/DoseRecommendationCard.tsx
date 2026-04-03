@@ -21,6 +21,8 @@ interface DoseRecommendationCardProps {
   auc_range_status?: AucRangeStatus | null;
   arc_advisory?: ArcAdvisory | null;
   auc24?: number | null;
+  isPulseDose?: boolean;
+  loadingDoseMg?: number | null;
 }
 
 const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" };
@@ -159,6 +161,8 @@ export default function DoseRecommendationCard({
   auc_range_status,
   arc_advisory,
   auc24: rawAuc24,
+  isPulseDose,
+  loadingDoseMg,
 }: DoseRecommendationCardProps) {
   // Show all options with dose >= 500mg — include below-target options so user can see the best available
   const options = frequency_options?.filter(
@@ -230,6 +234,18 @@ export default function DoseRecommendationCard({
         </div>
       )}
 
+      {/* Loading dose label — shown above maintenance recommendation */}
+      {isPulseDose && loadingDoseMg && (
+        <div className="px-4 py-2 rounded-lg border" style={{ borderColor: "#6ee7b7", background: "#ecfdf5" }}>
+          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "#047857", ...FONT }}>
+            LOADING DOSE: {loadingDoseMg} mg (single dose)
+          </span>
+          <p className="mt-1 text-[10px]" style={{ color: "#065f46", margin: 0, ...FONT }}>
+            Curve below shows first-dose PK. The following is the suggested maintenance regimen to follow:
+          </p>
+        </div>
+      )}
+
       {/* Active dose display */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
@@ -241,6 +257,11 @@ export default function DoseRecommendationCard({
               boxShadow: "0 0 16px var(--color-primary-a06)",
             }}
           >
+            {isPulseDose && (
+              <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--color-dim)", margin: "0 0 4px 0", ...FONT }}>
+                SUGGESTED MAINTENANCE REGIMEN
+              </p>
+            )}
             <div className="flex flex-wrap items-baseline gap-x-1.5">
               <span
                 className="text-4xl font-extrabold tabular-nums mx-glow"

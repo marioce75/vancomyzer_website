@@ -27,12 +27,14 @@ export function runExistingRegimenEngine(
   const T_inf = Math.min(Math.max(0, infusion_duration_hours), tau);
 
   const isNonSteadyState = doses_given !== undefined && doses_given < 5;
-  
-  // AUC24 is the same at steady state or non-steady-state for linear PK
+  const isPulseDose = doses_given === 1;
+
   const steadyStateExposure = computeExposure({ CL, V1, Q, V2, dose_mg, tau, T_inf });
   const curve = curvePoints({ CL, V1, Q, V2, dose_mg, tau, T_inf });
-  
-  // If non-steady-state, find the peak/trough for the Nth dose from the curve
+
+  // For steady-state, use the SS AUC24 = TDD/CL
+  // For non-steady-state, extract actual peak/trough from the Nth dose cycle in the curve
+  let auc24 = steadyStateExposure.auc24;
   let peak = steadyStateExposure.peak;
   let trough = steadyStateExposure.trough;
   if (isNonSteadyState) {
@@ -41,11 +43,23 @@ export function runExistingRegimenEngine(
     const doseCycle = curve.filter(p => p.time_hours >= doseStart && p.time_hours <= doseEnd);
     if (doseCycle.length > 0) {
       peak = Math.max(...doseCycle.map(p => p.concentration));
-      // Trough is concentration at end of interval for that specific dose cycle
       const endOfIntervalPoint = doseCycle.find(p => p.time_hours === doseEnd);
       if (endOfIntervalPoint) {
         trough = endOfIntervalPoint.concentration;
       }
+    }
+
+    // For a loading dose (dose 1), compute actual AUC over first interval via trapezoidal rule
+    // SS AUC overestimates single-dose exposure because it includes accumulation
+    if (isPulseDose && doseCycle.length > 1) {
+      let trapAuc = 0;
+      for (let i = 1; i < doseCycle.length; i++) {
+        const dt = doseCycle[i].time_hours - doseCycle[i - 1].time_hours;
+        const avgC = (doseCycle[i].concentration + doseCycle[i - 1].concentration) / 2;
+        trapAuc += dt * avgC;
+      }
+      // Scale to 24h equivalent for clinical comparison with AUC₂₄ target
+      auc24 = trapAuc * (24 / tau);
     }
   }
 
@@ -54,9 +68,11 @@ export function runExistingRegimenEngine(
     concentration: l.value_mcg_ml,
   }));
 
-    const steadyStateNote = isNonSteadyState
-    ? `Non-steady-state analysis based on ${doses_given} dose${doses_given === 1 ? "" : "s"}.`
-    : "Steady-state assumed (≥5 doses).";
+  const steadyStateNote = isPulseDose
+    ? "Loading dose simulation (single dose). AUC₂₄ is the first-dose extrapolation, not steady-state."
+    : isNonSteadyState
+      ? `Non-steady-state analysis based on ${doses_given} dose${doses_given === 1 ? "" : "s"}.`
+      : "Steady-state assumed (≥5 doses).";
 
   const priorMsg = model_name === "vancomyzer_obesity"
     ? "Vancomyzer Obesity Model (Smit 2020 + Zhang 2023) two-compartment adult population prior"
@@ -67,7 +83,7 @@ export function runExistingRegimenEngine(
     : `No posterior update applied; outputs from ${priorMsg}. Fit quality: ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}). ${steadyStateNote}`;
 
   return {
-    auc24: Math.round(steadyStateExposure.auc24 * 10) / 10,
+    auc24: Math.round(auc24 * 10) / 10,
     peak: Math.round(peak * 10) / 10,
     trough: Math.round(trough * 10) / 10,
     scr: posteriorScr,
