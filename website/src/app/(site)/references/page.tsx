@@ -56,9 +56,81 @@ export default function ReferencesPage() {
           </div>
         </section>
 
-        {/* Section 3 */}
+        {/* Section 3 — Obesity Model */}
         <section>
-          <h2 className="text-xl font-semibold text-slate-900 border-b border-slate-200 pb-2 mb-4">3. Two-Compartment PK Mathematics</h2>
+          <h2 className="text-xl font-semibold text-slate-900 border-b border-slate-200 pb-2 mb-4">3. Obesity Model — FFM-Based PK (BMI ≥ 40)</h2>
+          <p className="text-slate-700 leading-7">
+            For patients with BMI ≥ 40 kg/m², Vancomyzer™ activates an obesity-specific PK model. Vancomycin is hydrophilic and distributes poorly into adipose tissue, so volumes of distribution (V₁ and V₂) are scaled to Fat-Free Mass (FFM) rather than total body weight. Clearance remains TBW-based via Cockcroft-Gault CrCl, as renal elimination scales with total body weight. The model is derived from two population PK studies in obese adults, with FFM calculated using the Janmahasatian 2005 equations.
+          </p>
+
+          <div className="mt-4 space-y-3">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
+              <p className="text-sm font-semibold text-slate-800">Fat-Free Mass Equations — Janmahasatian 2005</p>
+              <p className="mt-1 text-sm text-slate-700 leading-6">
+                Janmahasatian S, Duffull SB, Ash S, Ward LC, Byrne NM, Green B.
+                <span className="italic"> Quantification of lean bodyweight.</span>
+                {" "}Clinical Pharmacokinetics. 2005;44(10):1051–1065.
+              </p>
+              <pre className="mt-2 bg-white rounded-lg p-3 text-xs overflow-x-auto leading-5">{`FFM (male)   = (9270 × TBW) / (6680 + 216 × BMI)
+FFM (female) = (9270 × TBW) / (8780 + 244 × BMI)`}</pre>
+              <a
+                href="https://doi.org/10.2165/00003088-200544100-00004"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-block text-sm text-blue-600 hover:underline"
+              >
+                DOI: 10.2165/00003088-200544100-00004 ↗
+              </a>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
+              <p className="text-sm font-semibold text-slate-800">Vancomycin PK in Obesity — Smit 2020</p>
+              <p className="mt-1 text-sm text-slate-700 leading-6">
+                Smit C, Wasmann RE, Goulooze SC, Touw DJ, de Cock RFW, van Dyk M, Krekels EHJ, Knibbe CAJ.
+                <span className="italic"> A prospective clinical study characterizing the influence of morbid obesity on the pharmacokinetics of vancomycin.</span>
+                {" "}British Journal of Clinical Pharmacology. 2020;86(2):303–317.
+              </p>
+              <pre className="mt-2 bg-white rounded-lg p-3 text-xs overflow-x-auto leading-5">{`V1 = 0.287 × FFM   (central volume — adipose excluded)
+V2 = 0.89  × FFM   (peripheral volume — adipose excluded)
+Q  = 1.23 L/h       (fixed intercompartmental clearance)
+CL = 0.0571 × CrCl + 0.0158 × TBW
+
+IIV (omega): ωCL = 0.29, ωV1 = 0.32, ωV2 = 0.28`}</pre>
+              <a
+                href="https://doi.org/10.1111/bcp.14144"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-block text-sm text-blue-600 hover:underline"
+              >
+                DOI: 10.1111/bcp.14144 ↗
+              </a>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
+              <p className="text-sm font-semibold text-slate-800">Vancomycin Dosing in Obesity — Zhang 2023</p>
+              <p className="mt-1 text-sm text-slate-700 leading-6">
+                Zhang T, Smith PB, Bhatt-Mehta V, Gonzalez D.
+                <span className="italic"> Vancomycin population pharmacokinetics in obese adults: a systematic review.</span>
+                {" "}Clinical Pharmacokinetics. 2024;63:79–91.
+              </p>
+              <p className="mt-1 text-sm text-slate-600 leading-6">
+                Systematic review confirming that FFM-based volume scaling improves vancomycin PK predictions in patients with BMI ≥ 40 kg/m² compared to TBW-based allometric scaling.
+              </p>
+              <a
+                href="https://doi.org/10.1007/s40262-023-01324-5"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-block text-sm text-blue-600 hover:underline"
+              >
+                DOI: 10.1007/s40262-023-01324-5 ↗
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 4 */}
+        <section>
+          <h2 className="text-xl font-semibold text-slate-900 border-b border-slate-200 pb-2 mb-4">4. Two-Compartment PK Mathematics</h2>
           <p className="text-slate-700 leading-7">
             The concentration-time equations and multi-dose superposition principle are derived from classical pharmacokinetic theory. The two-compartment model with IV infusion input is described in the following foundational texts:
           </p>
@@ -80,9 +152,9 @@ export default function ReferencesPage() {
           </div>
         </section>
 
-        {/* Section 4 — Formulas */}
+        {/* Section 5 — Formulas */}
         <section>
-          <h2 className="text-xl font-semibold text-slate-900 border-b border-slate-200 pb-2 mb-4">4. Key Equations Used</h2>
+          <h2 className="text-xl font-semibold text-slate-900 border-b border-slate-200 pb-2 mb-4">5. Key Equations Used</h2>
 
           <div className="space-y-6 text-sm text-slate-700">
 
