@@ -17,14 +17,19 @@ interface FaqItem {
 
 const FAQ_ITEMS: FaqItem[] = [
   {
-    question: "Why doesn\u2019t Vancomyzer use Cockcroft-Gault?",
+    question: "Why doesn\u2019t the Colin 2019 model use Cockcroft-Gault?",
     answer: [
-      "Cockcroft-Gault estimates kidney function from age, weight, sex, and serum creatinine \u2014 then feeds that estimate into a separate vancomycin equation. It introduces two layers of estimation before you even get a PK prediction. Vancomyzer skips that entirely by using serum creatinine directly as a covariate in the Colin 2019 model.",
+      "Cockcroft-Gault estimates kidney function from age, weight, sex, and serum creatinine \u2014 then feeds that estimate into a separate vancomycin equation. It introduces two layers of estimation before you even get a PK prediction. For non-obese patients (BMI < 40), Vancomyzer uses the Colin 2019 model, which takes serum creatinine directly as a covariate \u2014 no intermediate CrCl calculation required.",
+      "For patients with BMI \u2265 40, Vancomyzer activates a separate obesity model (Smit 2020 + Zhang 2023) that does use Cockcroft-Gault CrCl for clearance estimation. This is clinically appropriate because vancomycin clearance in obesity scales with total body weight via renal elimination, and CG with TBW is the established method in the obesity PK literature. The key difference: the obesity model uses CG intentionally for CL only, while volumes of distribution are scaled to Fat-Free Mass (FFM) \u2014 not total body weight.",
     ],
     refs: [
       {
         label: "Cockcroft DW, Gault MH. Prediction of creatinine clearance from serum creatinine. Nephron. 1976;16(1):31-41.",
         url: "https://pubmed.ncbi.nlm.nih.gov/1244564/",
+      },
+      {
+        label: "Smit C et al. Vancomycin PK in morbid obesity. Br J Clin Pharmacol. 2020;86(2):303-317.",
+        url: "https://doi.org/10.1111/bcp.14144",
       },
     ],
   },
@@ -94,20 +99,21 @@ const FAQ_ITEMS: FaqItem[] = [
       "This requires height \u2014 a variable Cockcroft-Gault does not even include \u2014 adding yet another manual calculation step. And IBW alone can underestimate dose requirements in obese patients.",
       "Adjusted body weight (AdjBW): IBW + 0.4 \u00d7 (TBW \u2212 IBW). Used when TBW exceeds IBW by more than 30%. Standard clinical dosing guidelines apply this formula when actual body weight is more than 30% above IBW.",
       "The problem: This weight selection step \u2014 TBW vs IBW vs AdjBW \u2014 is debated, inconsistently applied between institutions, requires height that may not be reliably documented, and adds a third manual calculation on top of the CG estimate already in progress. The 2020 ASHP/IDSA guidelines moved toward recommending TBW for empiric dosing precisely because the IBW debate had no clear resolution.",
-      "How Colin 2019 eliminates this entirely: Vancomyzer takes the patient\u2019s actual body weight as entered and uses it directly as a covariate. The Bayesian model handles body size effects through its mathematical structure \u2014 not through a pre-dose weight classification step. When a measured level is entered, the posterior update further refines the individual PK estimate regardless of body composition. No height required. No IBW formula. No AdjBW calculation. No institutional debate about which weight to use.",
+      "How Vancomyzer handles body size: For non-obese patients (BMI < 40), the Colin 2019 model takes actual body weight directly as a covariate \u2014 no IBW, no AdjBW, no height required. The Bayesian model handles body size effects through its mathematical structure. When a measured level is entered, the posterior update further refines the individual PK estimate regardless of body composition.",
+      "For patients with BMI \u2265 40, Vancomyzer activates an obesity-specific model that uses a more physiologically appropriate metric: Fat-Free Mass (FFM). FFM is calculated from height, weight, and sex using the Janmahasatian 2005 equations. Volumes of distribution are scaled to FFM because vancomycin is hydrophilic and distributes poorly into adipose tissue. This is more precise than IBW/AdjBW approximations \u2014 it uses a validated pharmacometric equation rather than a height-based rule of thumb.",
     ],
     refs: [
       { label: "IBW Devine formula: Devine BJ. Drug Intell Clin Pharm. 1974;8:650-655", url: "https://pubmed.ncbi.nlm.nih.gov/1244564/" },
       { label: "AdjBW and obesity dosing guidelines: UC Davis Adult IV Vancomycin Dosing Guidelines.", url: "https://health.ucdavis.edu/media-resources/antibiotic-stewardship/documents/pdfs/guidelines/vanc_dosing.pdf" },
       { label: "Supratherapeutic levels with TBW dosing in obesity", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3764551/" },
-      { label: "Colin 2019 obesity validation", url: "https://pubmed.ncbi.nlm.nih.gov/33278242/" },
+      { label: "Janmahasatian S et al. Quantification of lean bodyweight. Clin Pharmacokinet. 2005;44(10):1051-1065.", url: "https://doi.org/10.2165/00003088-200544100-00004" },
     ],
   },
   {
     question: "How accurate is Colin 2019 compared to older methods?",
     answer: [
       "Independent evaluations consistently rank it among the top performers:",
-      "\u2022 Outperformed 6 of 7 literature models in a McGill University Health Centre validation\n\u2022 Second best in a Belgian multicenter study of 169 patients and 923 TDM samples\n\u2022 Identified as one of two best-transferable models in a head-to-head comparison of 7 vancomycin PopPK models\n\u2022 Validated across ICU, general ward, and outpatient settings in multiple countries\n\u2022 Performs comparably or better than obesity-specific models even in obese patients, without requiring a separate model",
+      "\u2022 Outperformed 6 of 7 literature models in a McGill University Health Centre validation\n\u2022 Second best in a Belgian multicenter study of 169 patients and 923 TDM samples\n\u2022 Identified as one of two best-transferable models in a head-to-head comparison of 7 vancomycin PopPK models\n\u2022 Validated across ICU, general ward, and outpatient settings in multiple countries\n\u2022 For patients with BMI \u2265 40, Vancomyzer supplements Colin 2019 with an FFM-based obesity model (Smit 2020 + Zhang 2023) that scales V\u2081 and V\u2082 to fat-free mass for more accurate volume estimation in morbid obesity",
     ],
     refs: [
       { label: "Belgian multicenter validation", url: "https://pubmed.ncbi.nlm.nih.gov/35341931/" },
@@ -119,13 +125,33 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Does Vancomyzer calculate CrCl anywhere?",
     answer: [
-      "No. CrCl is not calculated, displayed, or used internally anywhere in Vancomyzer. The Colin 2019 model takes age, weight, and SCr directly \u2014 no IBW, no AdjBW, no CrCl. This removes multiple sources of estimation error and keeps the input set minimal and fast at bedside.",
+      "For non-obese patients (BMI < 40): No. The Colin 2019 model takes age, weight, and SCr directly as covariates \u2014 no CrCl, no IBW, no AdjBW. This removes multiple sources of estimation error and keeps the input set minimal.",
+      "For patients with BMI \u2265 40: Yes. The obesity model uses Cockcroft-Gault with total body weight to estimate CrCl for the clearance equation (CL = 0.0571 \u00d7 CrCl + 0.0158 \u00d7 TBW). This is standard practice in the obesity PK literature \u2014 renal elimination of vancomycin scales with total body weight, and CG-TBW is the established estimator in this population. The CrCl value is shown in the clinical advisory panel when the obesity model activates.",
+      "Volumes of distribution in the obesity model are NOT based on CrCl or TBW \u2014 they use Fat-Free Mass (FFM) from the Janmahasatian 2005 equations, because vancomycin distributes into lean tissue, not adipose.",
     ],
     refs: [
       {
         label: "Colin PJ et al. Clin Pharmacokinet. 2019.",
         url: "https://doi.org/10.1007/s40262-018-0727-5",
       },
+      {
+        label: "Smit C et al. Br J Clin Pharmacol. 2020;86(2):303-317.",
+        url: "https://doi.org/10.1111/bcp.14144",
+      },
+    ],
+  },
+  {
+    question: "What is Fat-Free Mass (FFM) and why does the obesity model use it?",
+    answer: [
+      "Fat-Free Mass is the portion of body weight that is not adipose tissue \u2014 it includes muscle, bone, organs, and water. FFM is calculated using the Janmahasatian 2005 equations, which require weight, height, and sex:",
+      { formula: "FFM (male)   = (9270 \u00d7 TBW) / (6680 + 216 \u00d7 BMI)\nFFM (female) = (9270 \u00d7 TBW) / (8780 + 244 \u00d7 BMI)" },
+      "Vancomycin is a hydrophilic glycopeptide \u2014 it distributes into plasma and interstitial fluid but poorly penetrates adipose tissue. In patients with BMI \u2265 40, total body weight dramatically overestimates the volume available for drug distribution. Scaling V\u2081 and V\u2082 to FFM instead of TBW produces more accurate volume estimates and prevents overdosing.",
+      "The Vancomyzer obesity model (derived from Smit 2020 and Zhang 2023) uses FFM for volumes of distribution while retaining TBW-based CrCl for clearance \u2014 reflecting the physiological reality that drug distribution is lean-tissue-limited but renal elimination scales with total body mass.",
+    ],
+    refs: [
+      { label: "Janmahasatian S et al. Quantification of lean bodyweight. Clin Pharmacokinet. 2005;44(10):1051-1065.", url: "https://doi.org/10.2165/00003088-200544100-00004" },
+      { label: "Smit C et al. Br J Clin Pharmacol. 2020;86(2):303-317.", url: "https://doi.org/10.1111/bcp.14144" },
+      { label: "Zhang T et al. Clin Pharmacokinet. 2024;63:79-91.", url: "https://doi.org/10.1007/s40262-023-01324-5" },
     ],
   },
 ];
