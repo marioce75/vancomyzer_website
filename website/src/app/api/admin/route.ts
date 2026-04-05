@@ -50,14 +50,14 @@ export async function POST(request: NextRequest) {
   if (action === "approve") {
     approveUser(userId, adminUsername);
     console.log(`[ADMIN] User ${user.username} approved by ${adminUsername}`);
-    sendApprovalNotification({ full_name: user.full_name, email: user.email, username: user.username });
+    await sendApprovalNotification({ full_name: user.full_name, email: user.email, username: user.username });
     return NextResponse.json({ ok: true, message: `${user.username} approved. Notification email sent.` });
   }
 
   if (action === "disable") {
     disableUser(userId);
     console.log(`[ADMIN] User ${user.username} disabled by ${adminUsername}`);
-    sendRejectionNotification({ full_name: user.full_name, email: user.email, username: user.username });
+    await sendRejectionNotification({ full_name: user.full_name, email: user.email, username: user.username });
     return NextResponse.json({ ok: true, message: `${user.username} disabled. Notification email sent.` });
   }
 

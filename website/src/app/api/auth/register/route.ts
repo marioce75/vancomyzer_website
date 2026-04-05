@@ -80,9 +80,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Registration failed." }, { status: 500 });
   }
 
-  // Log registration + notify admin
+  // Log registration + notify admin (must await to prevent serverless early exit)
   console.log(`[REGISTER] New registration: ${username} (${email}) — pending approval`);
-  sendRegistrationNotification({
+  await sendRegistrationNotification({
     full_name: full_name!.trim(),
     credentials: credentials!.trim(),
     institution: (institution ?? "").trim() || null,
