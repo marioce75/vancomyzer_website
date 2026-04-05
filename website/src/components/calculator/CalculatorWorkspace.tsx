@@ -47,17 +47,6 @@ const defaultLevel = { value_mcg_ml: 0, collection_time: "", time_since_last_dos
 
 type WorkspaceViewMode = "empiric" | "one_level" | "two_levels";
 
-const patientCompletionItems = [
-  "Age, weight, and serum creatinine",
-  "Adult patient only",
-  "Inputs complete enough for a model-backed initial regimen calculation",
-];
-
-const existingRegimenCompletionItems = [
-  "Current dose, interval, and infusion duration",
-  "At least one measured vancomycin level",
-  "Collection timing coherent with the entered dosing history",
-];
 
 function hasPatientCoreData(patient: typeof defaultPatient): boolean {
   return (
@@ -156,62 +145,6 @@ function SectionPanel({ id, activeSection, children }: { id: string; activeSecti
   );
 }
 
-function GraphReadinessState({
-  mode,
-  patientReady,
-  regimenReady,
-  levelReady,
-}: {
-  mode: CalculatorMode;
-  patientReady: boolean;
-  regimenReady: boolean;
-  levelReady: boolean;
-}) {
-  const isExistingRegimen = mode === "existing_regimen";
-  const items = isExistingRegimen ? existingRegimenCompletionItems : patientCompletionItems;
-  const states = isExistingRegimen
-    ? [patientReady, regimenReady, levelReady]
-    : [patientReady, patientReady, patientReady];
-
-  return (
-    <section className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-      <div className="border-b px-6 py-5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>&gt; MODEL-BACKED GRAPH ONLY</p>
-        <h2 className="mt-2 text-lg font-semibold tracking-tight" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>Complete the inputs to generate the concentration-time profile.</h2>
-        <p className="mt-1.5 max-w-3xl text-sm leading-6" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
-          The chart appears only after the dosing engine returns a fully calculated PK profile - not from client-side estimates.
-        </p>
-      </div>
-      <div className="grid gap-6 px-6 py-6 lg:grid-cols-[1.35fr_0.95fr]">
-        <div className="border px-5 py-5" style={{ borderColor: "var(--color-primary-a25)", background: "var(--color-primary-a05)" }}>
-          <p className="text-sm font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>CLINICAL FRAMING</p>
-          <p className="mt-2 text-sm leading-6" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
-            The displayed profile represents the calculator&apos;s predicted vancomycin concentrations only after a full regimen calculation. AUC24 target attainment is assessed numerically from the PK model, not from a flat concentration band laid over the graph.
-          </p>
-        </div>
-        <div className="border px-5 py-5" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}>
-          <p className="text-sm font-semibold" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>REQUIRED BEFORE GRAPHING</p>
-          <div className="mt-4 space-y-3">
-            {items.map((item, index) => (
-              <div key={item} className="flex items-start gap-3 border px-4 py-3" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                <span
-                  className="mt-0.5 inline-flex h-5 w-5 items-center justify-center text-[11px] font-bold"
-                  style={states[index]
-                    ? { background: "var(--color-primary-a12)", color: "var(--color-primary)", border: "1px solid var(--color-primary-a40)", fontFamily: "'Share Tech Mono', monospace" }
-                    : { background: "var(--color-input)", color: "var(--color-dim)", border: "1px solid var(--color-border)", fontFamily: "'Share Tech Mono', monospace" }
-                  }
-                >
-                  {states[index] ? "✓" : index + 1}
-                </span>
-                <span className="text-sm" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function getModeScopedFieldErrors(mode: CalculatorMode, fieldErrors?: Record<string, string>): Record<string, string> {
   if (!fieldErrors) return {};
@@ -999,14 +932,87 @@ export default function CalculatorWorkspace() {
               </details>
             </div>
           ) : (
-            <div className="flex flex-col gap-6 flex-1 h-full pb-8">
-              <section className="flex h-[220px] flex-col items-center justify-center border border-dashed p-8 text-center" style={{ borderColor: "var(--color-primary-a30)", background: "var(--color-card)" }}>
-                <p className="text-lg font-medium" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>
-                  &gt; AWAITING INPUT<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span>
-                </p>
-                <p className="mt-2 text-sm" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>Complete the required inputs to generate exposure metrics and a model-backed concentration profile.</p>
+            /* ── Empty state: zeroed layout mirroring the populated calculator ── */
+            <div className="flex flex-col gap-3">
+
+              {/* Row 1: Dose + PK panels — zeroed */}
+              <div className="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-3">
+
+                {/* Left: Dose recommendation placeholder */}
+                <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+                  <div className="flex items-center justify-between border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
+                    <span className="text-[15px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--color-primary)" }}>SUGGESTED DOSE<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span></span>
+                    <div className="flex items-center gap-2">
+                      <span className="border px-2 py-0.5 text-[10px] font-semibold" style={{ borderColor: "var(--color-border)", color: "var(--color-dim)", opacity: 0.4 }}>EXPORT PDF</span>
+                      <span className="border px-2 py-0.5 text-[10px] font-semibold" style={{ borderColor: "var(--color-border)", color: "var(--color-dim)", opacity: 0.4 }}>COPY NOTE</span>
+                    </div>
+                  </div>
+                  <div className="p-2">
+                    {/* Safety guardrails — always applicable */}
+                    <section className="border-l-4 border-amber-500 bg-amber-50 px-3 py-2 mb-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h2 className="text-sm font-semibold text-amber-950">Safety guardrails</h2>
+                          <ul className="mt-1 space-y-1 text-xs text-amber-900">
+                            <li>Adult intermittent IV workflow only.</li>
+                            <li>Not for pediatrics, dialysis-specific, or continuous infusion.</li>
+                            <li>Prior-only maintenance support; not patient-specific severity direction.</li>
+                          </ul>
+                        </div>
+                        <a href="/trust-evidence" className="text-xs font-medium text-amber-950 underline hover:no-underline">Evidence</a>
+                      </div>
+                    </section>
+
+                    {/* Greyed-out frequency option placeholders */}
+                    <div className="flex gap-1.5 pb-2">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="shrink-0 flex flex-col items-center border px-3 py-2 text-center" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)", opacity: 0.35, minWidth: 72 }}>
+                          <span className="font-bold text-sm" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>&mdash; mg</span>
+                          <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>q&mdash;h</span>
+                          <span className="mt-1 inline-flex border px-1.5 py-0.5 text-[10px] font-semibold leading-none" style={{ borderColor: "var(--color-border)", color: "var(--color-dim)" }}>&mdash;</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Zeroed dose display */}
+                    <div className="px-4 py-3" style={{ background: "var(--color-bg)", border: "1px solid var(--color-primary-a40)", boxShadow: "0 0 16px var(--color-primary-a06)", opacity: 0.4 }}>
+                      <div className="flex flex-wrap items-baseline gap-x-1.5">
+                        <span className="text-4xl font-extrabold tabular-nums" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>&mdash;</span>
+                        <span className="text-xl font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>mg</span>
+                        <span className="text-base font-medium mx-1" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>every</span>
+                        <span className="text-4xl font-extrabold tabular-nums" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>&mdash;</span>
+                        <span className="text-xl font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>h</span>
+                      </div>
+                      <p className="mt-1 text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>Infuse over &mdash; hours.</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>AUC24</span>
+                        <span className="tabular-nums text-sm font-bold" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>&mdash;</span>
+                        <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>mg·h/L</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Predicted PK — zeroed */}
+                <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)", minWidth: 280 }}>
+                  <div className="border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
+                    <span className="text-[13px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--color-primary)" }}>PREDICTED PK</span>
+                  </div>
+                  <div className="p-2 flex flex-col gap-2">
+                    <PrimaryMetricsCard auc24={null} peak={null} trough={null} />
+                    <div className="border px-3 py-2" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}>
+                      <PKParametersMath params={{ CL: 0, V1: 0, Q: 0, V2: 0, used_posterior_refinement: false, scr: 0 }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Graph — empty axes with no curve */}
+              <section className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+                <div className="p-2">
+                  <ConcentrationTimeGraph curve={[]} measured_levels={[]} calculationDetails={null} />
+                </div>
               </section>
-              <GraphReadinessState mode={mode} patientReady={patientReady} regimenReady={regimenReady} levelReady={levelReady} />
             </div>
           )}
         </CalculatorResultState>
