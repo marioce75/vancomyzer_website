@@ -164,9 +164,9 @@ export default function DoseRecommendationCard({
   isPulseDose,
   loadingDoseMg,
 }: DoseRecommendationCardProps) {
-  // Show all options with dose >= 500mg — include below-target options so user can see the best available
+  // Show options that are in-range or below-target only — never show above-target options
   const options = frequency_options?.filter(
-    (o) => o.dose_mg >= 500
+    (o) => o.dose_mg >= 500 && o.auc24 <= 600
   ) ?? [];
 
   const [activeIdx, setActiveIdx] = useState<number>(() => {
