@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 import { listPendingUsers, listActiveUsers, approveUser, disableUser, findUserById } from "@/lib/db";
 import { sendApprovalNotification, sendRejectionNotification } from "@/lib/email";
 
 async function requireAdmin() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session?.user) return null;
   const role = (session.user as Record<string, unknown>).role;
   if (role !== "admin") return null;
