@@ -1,97 +1,227 @@
-import Link from "next/link";
-import CTA from "@/components/CTA";
+"use client";
 
-// Locked: evaluator-oriented not sales-heavy; CASE-002; clinical note export; demo-first before inquiry; no ROI/productivity/superiority claims
+import { useState } from "react";
+import Link from "next/link";
+
+const channels = [
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+        <polyline points="22,6 12,13 2,6" />
+      </svg>
+    ),
+    title: "Hospital & institutional",
+    email: "contact@vancomyzer.com",
+    description: "Pilot requests, BAA inquiries, pharmacy director demos, pricing for departments and health systems.",
+  },
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    ),
+    title: "Research & academic",
+    email: "contact@dosys.health",
+    description: "Research partnership inquiries, NIH STTR collaboration, PK model discussion, publication co-authorship.",
+  },
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+    title: "Clinical support",
+    subtitle: "Response in < 1 business day",
+    description: "Calculator questions, clinical edge cases, and dosing workflow guidance.",
+  },
+];
+
+const topics = [
+  { value: "hospital", label: "Hospital / institutional pilot" },
+  { value: "research", label: "Research & academic collaboration" },
+  { value: "clinical", label: "Clinical support question" },
+  { value: "other", label: "Other" },
+];
+
 export default function ContactPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [topic, setTopic] = useState("hospital");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, topic, message }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Failed to send inquiry.");
+      } else {
+        setSuccess(true);
+      }
+    } catch {
+      setError("Network error. Please try again or email us directly.");
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
-      {/* 1. Page introduction */}
-      <section className="mb-16">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          Contact / Institutional
-        </h1>
-        <p className="mt-4 text-gray-600">
-          This page is for teams and evaluators who want to understand whether
-          Vancomyzer™ is relevant for their workflow. We recommend reviewing
-          sample materials before reaching out.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-4">
-          <a
-            href="mailto:contact@vancomyzer.com?subject=Workflow%20evaluation%20request"
-            className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
+      {/* Header */}
+      <p className="text-sm font-semibold uppercase tracking-widest text-teal-600">
+        Contact · Dōsys LLC
+      </p>
+      <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
+        Reach the team behind Vancomyzer™
+      </h1>
+      <p className="mt-4 text-gray-600 leading-7">
+        Built by an ICU pharmacist. Backed by evidence. Available to every hospital.
+      </p>
+      <p className="text-gray-600">
+        Choose the right channel for your inquiry below.
+      </p>
+
+      {/* Channel cards */}
+      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        {channels.map((ch) => (
+          <div
+            key={ch.title}
+            className="rounded-lg border border-gray-200 bg-white p-5 flex flex-col gap-3"
           >
-            Request a workflow evaluation
-          </a>
-        </div>
-      </section>
+            <span className="text-teal-500">{ch.icon}</span>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">{ch.title}</h3>
+              {ch.email ? (
+                <a
+                  href={`mailto:${ch.email}`}
+                  className="text-sm text-teal-600 hover:underline"
+                >
+                  {ch.email}
+                </a>
+              ) : ch.subtitle ? (
+                <p className="text-sm font-medium text-teal-600">{ch.subtitle}</p>
+              ) : null}
+            </div>
+            <p className="text-sm text-gray-500 leading-relaxed">{ch.description}</p>
+          </div>
+        ))}
+      </div>
 
-      {/* 2. Who this is for */}
-      <section className="mb-16">
-        <h2 className="text-xl font-semibold text-gray-900">
-          Who this is for
-        </h2>
-        <p className="mt-3 text-gray-600">
-          Antimicrobial stewardship teams, ICU and ID pharmacists, clinicians
-          involved in vancomycin dosing review, and clinical leaders evaluating
-          workflow support tools.
-        </p>
-      </section>
+      {/* Inquiry form */}
+      <div className="mt-10 rounded-lg border border-gray-200 bg-white p-6 sm:p-8">
+        {success ? (
+          <div className="text-center py-8">
+            <div className="text-3xl mb-3">✓</div>
+            <h2 className="text-lg font-semibold text-gray-900">Inquiry sent</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Thank you for reaching out. We will respond within 1 business day.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-900">Send an inquiry</h2>
+              <span className="text-xs text-gray-400">All fields required</span>
+            </div>
 
-      {/* 3. Why teams may care */}
-      <section className="mb-16">
-        <h2 className="text-xl font-semibold text-gray-900">
-          Why teams may care
-        </h2>
-        <ul className="mt-4 space-y-2 text-gray-600">
-          <li>Workflow clarity and interpretability of outputs</li>
-          <li>Visible assumptions and limitations</li>
-          <li>Documentation-ready summaries</li>
-        </ul>
-        <p className="mt-4 text-gray-600">
-          The product is designed to support workflow review and
-          communication, with an emphasis on transparency and clinician-readable
-          design.
-        </p>
-      </section>
+            {error && (
+              <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                {error}
+              </div>
+            )}
 
-      {/* 4. What evaluators should review first — CASE-002, clinical note, Trust & Evidence */}
-      <section className="mb-16">
-        <h2 className="text-xl font-semibold text-gray-900">
-          What evaluators should review first
-        </h2>
-        <p className="mt-3 text-gray-600">
-          A case with renal function instability (CASE-002) illustrates how
-          changing renal function affects interpretation, assumptions, and
-          caution notes. A clinical-note style export shows how richer
-          documentation can support review.
-        </p>
-        <div className="mt-4 rounded-md border border-gray-200 bg-gray-50 p-4 font-mono text-sm text-gray-700">
-          <p>Patient/scenario: Renal function instability</p>
-          <p>Inputs used: Example input summary placeholder</p>
-          <p>Method: Bayesian/AUC-guided example method</p>
-          <p>Recommendation: Example regimen placeholder</p>
-          <p>Assumptions / Limitations / Safety notes: Example notes for clinician review</p>
-        </div>
-        <div className="mt-4 flex flex-wrap gap-4">
-          <CTA variant="sampleCase" primary />
-        </div>
-      </section>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    placeholder="Full name"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="you@hospital.org"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  />
+                </div>
+              </div>
 
-      {/* 5. Contact / evaluation CTA block */}
-      <section id="inquiry" className="border-t border-gray-200 pt-12 scroll-mt-8">
-        <p className="text-gray-600">
-          Ready to discuss a workflow evaluation or have questions?
-        </p>
-        <p className="mt-2 text-sm text-gray-600">
-          Email:{" "}
-          <a
-            href="mailto:contact@vancomyzer.com?subject=Vancomyzer™%20inquiry"
-            className="font-medium text-gray-900 underline hover:no-underline"
-          >
-            contact@vancomyzer.com
-          </a>
-        </p>
-      </section>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                  Topic
+                </label>
+                <select
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 bg-white"
+                >
+                  {topics.map((t) => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                  Message
+                </label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  required
+                  rows={4}
+                  placeholder="Tell us about your institution and what you're looking for..."
+                  className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 resize-vertical"
+                />
+              </div>
+
+              <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
+                <p className="text-xs text-gray-400">
+                  By submitting you agree to our{" "}
+                  <Link href="/privacy" className="underline hover:text-gray-600">
+                    privacy policy
+                  </Link>.
+                </p>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? "Sending..." : "Submit inquiry"}
+                </button>
+              </div>
+            </form>
+          </>
+        )}
+      </div>
     </div>
   );
 }
