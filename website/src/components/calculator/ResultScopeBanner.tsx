@@ -24,7 +24,7 @@ export default function ResultScopeBanner({
             )}
           </ul>
         </div>
-        <a href="/trust-evidence" className="text-xs font-medium text-amber-950 underline hover:no-underline">
+        <a href="/references" className="text-xs font-medium text-amber-950 underline hover:no-underline">
           Evidence
         </a>
       </div>

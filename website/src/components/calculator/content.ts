@@ -88,12 +88,12 @@ export function reviewabilityFaqHref(details: CalculationDetails): string {
 
 export function reviewabilityTrustHref(details: CalculationDetails): string {
   if (details.review_status.level === "caution") {
-    return "/trust-evidence#uncertainty";
+    return "/references";
   }
   if (details.review_status.level === "prior_only") {
-    return "/trust-evidence#what-clinicians-should-review";
+    return "/references";
   }
-  return "/trust-evidence#what-you-can-inspect";
+  return "/references";
 }
 
 export function fallbackLabel(

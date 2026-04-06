@@ -38,7 +38,6 @@ export default function Footer() {
           <nav className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm md:grid-cols-3">
             {[
               { href: "/calculator", label: "Calculator" },
-              { href: "/trust-evidence", label: "Trust & Evidence" },
               { href: "/references", label: "References" },
               { href: "/faq", label: "FAQ" },
               { href: "/about", label: "About" },

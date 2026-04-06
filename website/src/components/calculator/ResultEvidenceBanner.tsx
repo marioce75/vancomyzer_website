@@ -70,8 +70,8 @@ export default function ResultEvidenceBanner({
         <a href="/faq" className={`font-medium underline hover:no-underline ${tone.title}`}>
           FAQ
         </a>
-        <a href="/trust-evidence" className={`font-medium underline hover:no-underline ${tone.title}`}>
-          Trust &amp; Evidence
+        <a href="/references" className={`font-medium underline hover:no-underline ${tone.title}`}>
+          References
         </a>
       </div>
     </section>

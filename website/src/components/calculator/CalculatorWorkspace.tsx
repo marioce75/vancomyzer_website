@@ -959,7 +959,7 @@ export default function CalculatorWorkspace() {
                             <li>Prior-only maintenance support; not patient-specific severity direction.</li>
                           </ul>
                         </div>
-                        <a href="/trust-evidence" className="text-xs font-medium text-amber-950 underline hover:no-underline">Evidence</a>
+                        <a href="/references" className="text-xs font-medium text-amber-950 underline hover:no-underline">Evidence</a>
                       </div>
                     </section>
 

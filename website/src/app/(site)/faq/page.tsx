@@ -385,7 +385,7 @@ export default function FAQPage() {
             Open Calculator
           </a>
           <a
-            href="/trust-evidence"
+            href="/references"
             style={{
               fontSize: 13,
               color: "var(--color-secondary)",
@@ -407,7 +407,7 @@ export default function FAQPage() {
               (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
             }}
           >
-            Trust & Evidence
+            References
           </a>
         </div>
       </div>

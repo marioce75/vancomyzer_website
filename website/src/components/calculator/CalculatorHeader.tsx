@@ -158,7 +158,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             FAQ
           </Link>
           <Link
-            href="/trust-evidence"
+            href="/references"
             className="px-3 py-1.5 text-sm font-medium transition"
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
