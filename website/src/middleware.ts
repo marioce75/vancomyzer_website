@@ -15,11 +15,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protected pages — require session
-  const protectedPages = ["/", "/calculator", "/admin"];
+  const protectedPages = ["/", "/calculator", "/admin", "/research"];
   const needsPageAuth = protectedPages.some(p => pathname === p || pathname.startsWith(p + "/"));
 
   // Protected APIs — require session
-  const protectedAPIs = ["/api/calculate", "/api/audit", "/api/admin"];
+  const protectedAPIs = ["/api/calculate", "/api/audit", "/api/admin", "/api/research"];
   const needsAPIAuth = protectedAPIs.some(p => pathname.startsWith(p));
 
   if (needsPageAuth && !token) {
@@ -30,8 +30,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized — please log in." }, { status: 401 });
   }
 
-  // Admin pages — require admin role
-  if (pathname.startsWith("/admin") && token?.role !== "admin") {
+  // Admin + Research pages — require admin role (silently redirect non-admins)
+  if ((pathname.startsWith("/admin") || pathname.startsWith("/research")) && token?.role !== "admin") {
     return NextResponse.redirect(new URL("/calculator", request.url));
   }
 
@@ -58,5 +58,7 @@ export const config = {
     "/api/calculate/:path*",
     "/api/audit/:path*",
     "/api/admin/:path*",
+    "/research/:path*",
+    "/api/research/:path*",
   ],
 };
