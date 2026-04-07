@@ -12,6 +12,7 @@ const navItems = [
   { label: "Market Intel", href: "/admin/dashboard/market-intelligence", icon: "📡" },
   { label: "Policy", href: "/admin/dashboard/policy", icon: "📋" },
   { label: "System", href: "/admin/dashboard/system", icon: "⚙️" },
+  { label: "Calculator", href: "/calculator", icon: "🧮" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -30,11 +31,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className="fixed left-0 top-0 h-screen flex flex-col justify-between"
         style={{ width: 220, background: "#1e4d8c" }}>
         <div>
-          {/* Logo */}
-          <div className="px-5 pt-6 pb-2">
+          {/* Logo — links back to calculator */}
+          <Link href="/calculator" className="block px-5 pt-6 pb-2 hover:opacity-80 transition-opacity">
             <span className="text-white font-bold text-lg tracking-tight">Vancomyzer</span>
             <span className="text-blue-200 text-xs ml-1">Admin</span>
-          </div>
+          </Link>
           {username && (
             <div className="px-5 pb-4">
               <span className="text-blue-200 text-xs">{username}</span>
