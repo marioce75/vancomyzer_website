@@ -7,10 +7,11 @@ interface CalculatorHeaderProps {
   onViewModeChange: (mode: WorkspaceViewMode) => void;
   onSettingsOpen?: () => void;
   userName?: string | null;
+  userRole?: string | null;
   onLogout?: () => void;
 }
 
-export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen, userName, onLogout }: CalculatorHeaderProps) {
+export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen, userName, userRole, onLogout }: CalculatorHeaderProps) {
   return (
     <header
       className="shrink-0 border-b"
@@ -174,6 +175,23 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           >
             Methods
           </Link>
+          {userRole === "admin" && (
+            <Link
+              href="/admin/dashboard"
+              className="px-3 py-1.5 text-sm font-medium transition"
+              style={{ color: "#047857", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace", fontWeight: 700 }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = "#047857";
+                (e.currentTarget as HTMLElement).style.background = "#ecfdf5";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = "transparent";
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+              }}
+            >
+              Dashboard
+            </Link>
+          )}
           {onSettingsOpen && (
             <button
               type="button"
