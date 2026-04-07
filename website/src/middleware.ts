@@ -35,9 +35,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/calculator", request.url));
   }
 
-  // MFA gate (SOC 2 A1): admin users with MFA enabled must verify before accessing admin functions
-  // Allow: /mfa-verify page, /api/auth/mfa/verify endpoint, /api/auth/ endpoints, /calculator
-  if (token?.mfaPending && !token?.mfaVerified) {
+  // MFA gate (SOC 2 A1): admin users with MFA enabled AND pending must verify
+  // Only triggers when mfaPending is explicitly true (not undefined/null/false)
+  // Admins who haven't set up MFA yet (mfaPending=false) go straight through
+  if (token?.mfaPending === true && token?.mfaVerified !== true) {
     const mfaAllowed = pathname === "/mfa-verify" || pathname.startsWith("/api/auth/") || pathname === "/calculator" || pathname.startsWith("/api/calculate");
     if (!mfaAllowed && (pathname.startsWith("/admin") || pathname.startsWith("/research"))) {
       return NextResponse.redirect(new URL("/mfa-verify", request.url));
