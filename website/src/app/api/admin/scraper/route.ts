@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { getRecentRuns, getLatestRun, getRecentPosts, getHighSignalPosts, getCompetitorChanges, getAllPosts } from "@/lib/scraper/db";
+import { getRecentRuns, getLatestRun, getRecentPosts, getHighSignalPosts, getCompetitorChanges, getAllPosts, getLatestAiReport, getAiReports } from "@/lib/scraper/db";
 import { logSecurityEvent } from "@/lib/db";
 
 // Track whether a scrape is currently running (server-side singleton)
@@ -27,6 +27,28 @@ export async function GET(request: NextRequest) {
   // Status check for polling
   if (action === "status") {
     return NextResponse.json({ running: scraperRunning, startedAt: scraperStartedAt });
+  }
+
+  // AI Analyst report
+  if (action === "ai_report") {
+    const report = getLatestAiReport();
+    return NextResponse.json(report ?? { message: "No AI analysis yet. Run the scraper first." });
+  }
+
+  if (action === "ai_reports") {
+    const reports = getAiReports(10);
+    return NextResponse.json({ reports });
+  }
+
+  // Trigger AI analyst on demand (without re-scraping)
+  if (action === "run_analyst") {
+    try {
+      const { runAiAnalyst } = await import("@/lib/scraper/aiAnalyst");
+      const reportId = await runAiAnalyst();
+      return NextResponse.json({ ok: true, reportId });
+    } catch (err) {
+      return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    }
   }
 
   // Export endpoints
@@ -62,8 +84,9 @@ export async function GET(request: NextRequest) {
   const latest = getLatestRun();
   const highSignal = getHighSignalPosts(200, 30);
   const competitorChanges = getCompetitorChanges(30);
+  const aiReport = getLatestAiReport();
 
-  return NextResponse.json({ runs, latest, highSignal, competitorChanges, scraperRunning, scraperStartedAt });
+  return NextResponse.json({ runs, latest, highSignal, competitorChanges, aiReport, scraperRunning, scraperStartedAt });
 }
 
 // POST: trigger scrape run — fire-and-forget (runs in background on the server)

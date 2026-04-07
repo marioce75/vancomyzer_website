@@ -30,6 +30,16 @@ interface DashboardData {
   latest: AnalysisRun | null;
   highSignal: HighSignalPost[];
   competitorChanges: { competitor_name: string; url: string; scraped_at: string }[];
+  aiReport?: {
+    id: number;
+    report_date: string;
+    executive_brief: string;
+    market_opportunities: string;
+    competitive_gaps: string;
+    innovation_ideas: string;
+    strategic_recommendations: string;
+    risk_signals: string;
+  } | null;
   scraperRunning?: boolean;
   scraperStartedAt?: string | null;
 }
@@ -284,6 +294,151 @@ export default function MarketIntelligencePage() {
           ))}
         </div>
       )}
+
+      {/* AI Market Research Analyst */}
+      <div className={`${card} border-indigo-200`}>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className={heading + " mb-0"}>AI Market Research Analyst</h2>
+          <button
+            onClick={async () => {
+              const res = await fetch("/api/admin/scraper?action=run_analyst");
+              if (res.ok) fetchData();
+            }}
+            className="px-3 py-1 text-xs font-semibold text-indigo-700 border border-indigo-300 rounded hover:bg-indigo-50"
+          >
+            Re-run Analysis
+          </button>
+        </div>
+
+        {!data?.aiReport ? (
+          <p className="text-sm text-gray-400">No AI analysis yet. Run the scraper to generate insights.</p>
+        ) : (
+          <div className="space-y-4">
+            {/* Executive Brief */}
+            <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-lg">
+              <p className="text-xs font-bold text-indigo-800 uppercase tracking-wider mb-1">Executive Brief</p>
+              <p className="text-sm text-indigo-900 leading-relaxed">{data.aiReport.executive_brief || "—"}</p>
+              <p className="text-xs text-indigo-400 mt-2">Generated: {new Date(data.aiReport.report_date).toLocaleString()}</p>
+            </div>
+
+            {/* Market Opportunities */}
+            {(() => {
+              const opps = JSON.parse(data.aiReport.market_opportunities || "[]") as { title: string; description: string; priority: string; action_items?: string[] }[];
+              if (opps.length === 0) return null;
+              return (
+                <div>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Market Opportunities</p>
+                  <div className="space-y-2">
+                    {opps.map((o, i) => (
+                      <div key={i} className="border border-gray-100 rounded p-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${o.priority === "high" ? "bg-red-100 text-red-700" : o.priority === "medium" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"}`}>{o.priority}</span>
+                          <span className="text-sm font-semibold text-gray-900">{o.title}</span>
+                        </div>
+                        <p className="text-xs text-gray-600 mt-1 leading-relaxed">{o.description}</p>
+                        {o.action_items && o.action_items.length > 0 && (
+                          <ul className="mt-1 text-xs text-gray-500 list-disc pl-4">
+                            {o.action_items.map((a, j) => <li key={j}>{a}</li>)}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Competitive Gaps */}
+            {(() => {
+              const gaps = JSON.parse(data.aiReport.competitive_gaps || "[]") as { competitor: string; gap: string; vancomyzer_advantage: string; action: string }[];
+              if (gaps.length === 0) return null;
+              return (
+                <div>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Competitive Gaps</p>
+                  <div className="space-y-2">
+                    {gaps.map((g, i) => (
+                      <div key={i} className="border border-gray-100 rounded p-3 text-xs">
+                        <span className="font-bold text-gray-900">{g.competitor}</span>
+                        <span className="text-gray-400"> — </span>
+                        <span className="text-gray-700">{g.gap}</span>
+                        <p className="text-green-700 mt-1">Vancomyzer advantage: {g.vancomyzer_advantage}</p>
+                        <p className="text-gray-500">Action: {g.action}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Innovation Ideas */}
+            {(() => {
+              const ideas = JSON.parse(data.aiReport.innovation_ideas || "[]") as { idea: string; rationale: string; effort: string; impact: string; timeline: string }[];
+              if (ideas.length === 0) return null;
+              return (
+                <div>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Innovation Ideas</p>
+                  <div className="space-y-2">
+                    {ideas.map((idea, i) => (
+                      <div key={i} className="border border-gray-100 rounded p-3 text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-gray-900">{idea.idea}</span>
+                          <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${idea.impact === "high" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>{idea.impact} impact</span>
+                          <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-blue-50 text-blue-600">{idea.effort} effort</span>
+                        </div>
+                        <p className="text-gray-600 mt-1">{idea.rationale}</p>
+                        <p className="text-gray-400 mt-1">Timeline: {idea.timeline}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Strategic Recommendations */}
+            {(() => {
+              const recs = JSON.parse(data.aiReport.strategic_recommendations || "[]") as { recommendation: string; rationale: string; priority: number; timeline: string }[];
+              if (recs.length === 0) return null;
+              return (
+                <div>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Strategic Recommendations</p>
+                  <ol className="space-y-2 list-decimal pl-4">
+                    {recs.sort((a, b) => a.priority - b.priority).map((r, i) => (
+                      <li key={i} className="text-xs text-gray-700">
+                        <span className="font-semibold">{r.recommendation}</span>
+                        <span className="text-gray-400"> — {r.timeline}</span>
+                        <p className="text-gray-500 mt-0.5">{r.rationale}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              );
+            })()}
+
+            {/* Risk Signals */}
+            {(() => {
+              const risks = JSON.parse(data.aiReport.risk_signals || "[]") as { risk: string; severity: string; evidence: string; mitigation: string }[];
+              if (risks.length === 0) return null;
+              return (
+                <div>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Risk Signals</p>
+                  <div className="space-y-2">
+                    {risks.map((r, i) => (
+                      <div key={i} className={`border rounded p-3 text-xs ${r.severity === "high" ? "border-red-200 bg-red-50" : r.severity === "medium" ? "border-amber-200 bg-amber-50" : "border-gray-100"}`}>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${r.severity === "high" ? "bg-red-200 text-red-800" : r.severity === "medium" ? "bg-amber-200 text-amber-800" : "bg-gray-200 text-gray-700"}`}>{r.severity}</span>
+                          <span className="font-semibold text-gray-900">{r.risk}</span>
+                        </div>
+                        <p className="text-gray-600 mt-1">Evidence: {r.evidence}</p>
+                        <p className="text-gray-500 mt-1">Mitigation: {r.mitigation}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+      </div>
 
       {/* Export Center */}
       <div className={card}>

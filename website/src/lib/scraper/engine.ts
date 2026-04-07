@@ -356,8 +356,16 @@ export async function runFullScrape(): Promise<{
   const newPosts = reddit.newPosts + discovery.newPosts + pubmed.newPosts;
   const duration = (Date.now() - startTime) / 1000;
 
-  // Run analysis
+  // Run keyword analysis
   const runId = runAnalysis(total, newPosts, duration);
+
+  // Run AI Market Research Analyst
+  try {
+    const { runAiAnalyst } = await import("./aiAnalyst");
+    await runAiAnalyst(runId);
+  } catch (err) {
+    console.error("[SCRAPER] AI Analyst failed (non-blocking):", err);
+  }
 
   console.log(`[SCRAPER] Complete: ${newPosts} new posts, ${duration.toFixed(1)}s, run #${runId}`);
 

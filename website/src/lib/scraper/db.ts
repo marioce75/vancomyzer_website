@@ -60,6 +60,20 @@ export function ensureScraperTables(): void {
       scraped_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS ai_analyst_reports (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      run_id INTEGER,
+      report_date TEXT NOT NULL DEFAULT (datetime('now')),
+      market_opportunities TEXT DEFAULT '[]',
+      competitive_gaps TEXT DEFAULT '[]',
+      innovation_ideas TEXT DEFAULT '[]',
+      strategic_recommendations TEXT DEFAULT '[]',
+      risk_signals TEXT DEFAULT '[]',
+      executive_brief TEXT DEFAULT '',
+      raw_prompt TEXT DEFAULT '',
+      raw_response TEXT DEFAULT ''
+    );
+
     CREATE INDEX IF NOT EXISTS idx_scraper_posts_source ON scraper_posts(source, post_id);
     CREATE INDEX IF NOT EXISTS idx_scraper_posts_scraped ON scraper_posts(scraped_at);
   `);
@@ -162,6 +176,47 @@ export function getRecentRuns(limit = 10): ScraperAnalysisRow[] {
 export function getLatestRun(): ScraperAnalysisRow | undefined {
   ensureScraperTables();
   return db.prepare("SELECT * FROM scraper_analysis ORDER BY run_date DESC LIMIT 1").get() as ScraperAnalysisRow | undefined;
+}
+
+// ---------------------------------------------------------------------------
+// AI Analyst Reports
+// ---------------------------------------------------------------------------
+
+export interface AiAnalystReport {
+  id: number;
+  run_id: number | null;
+  report_date: string;
+  market_opportunities: string;
+  competitive_gaps: string;
+  innovation_ideas: string;
+  strategic_recommendations: string;
+  risk_signals: string;
+  executive_brief: string;
+  raw_prompt: string;
+  raw_response: string;
+}
+
+export function insertAiReport(report: Omit<AiAnalystReport, "id" | "report_date">): number {
+  ensureScraperTables();
+  const result = db.prepare(`INSERT INTO ai_analyst_reports
+    (run_id, market_opportunities, competitive_gaps, innovation_ideas,
+     strategic_recommendations, risk_signals, executive_brief, raw_prompt, raw_response)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    report.run_id, report.market_opportunities, report.competitive_gaps,
+    report.innovation_ideas, report.strategic_recommendations,
+    report.risk_signals, report.executive_brief, report.raw_prompt, report.raw_response
+  );
+  return Number(result.lastInsertRowid);
+}
+
+export function getLatestAiReport(): AiAnalystReport | undefined {
+  ensureScraperTables();
+  return db.prepare("SELECT * FROM ai_analyst_reports ORDER BY report_date DESC LIMIT 1").get() as AiAnalystReport | undefined;
+}
+
+export function getAiReports(limit = 10): AiAnalystReport[] {
+  ensureScraperTables();
+  return db.prepare("SELECT * FROM ai_analyst_reports ORDER BY report_date DESC LIMIT ?").all(limit) as AiAnalystReport[];
 }
 
 // ---------------------------------------------------------------------------
