@@ -11,7 +11,12 @@ import {
   POSITIVE_WORDS, NEGATIVE_WORDS,
 } from "./sources";
 
-const COMPETITORS = ["InsightRX", "DoseMeRx", "VancoCalc", "Vancomyzer"];
+const COMPETITORS = [
+  "InsightRX", "DoseMeRx", "DoseMe", "VancoCalc", "Vancomyzer",
+  "MwPharm", "DosOpt", "PrecisePK", "ID-ODS", "Pmetrics",
+  "NONMEM", "Monolix", "PKanalix", "TDMx", "BestDose",
+  "AutoKinetics", "MwPharm++", "TCIWorks", "SmartDose",
+];
 
 const COUNTRIES = [
   "United States", "USA", "US", "Canada", "UK", "United Kingdom", "Australia",

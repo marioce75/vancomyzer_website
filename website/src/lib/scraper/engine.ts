@@ -7,7 +7,7 @@
 
 import crypto from "crypto";
 import { insertPost, logRequest, getLatestSnapshot, insertSnapshot } from "./db";
-import { REDDIT_SOURCES, PUBMED_SEARCHES, COMPETITOR_URLS } from "./sources";
+import { REDDIT_SOURCES, PUBMED_SEARCHES, COMPETITOR_URLS, COMPETITOR_DISCOVERY_TERMS } from "./sources";
 import { runAnalysis } from "./analysis";
 
 const USER_AGENT = "Dosys Health LLC-MarketResearch/1.0";
@@ -210,6 +210,115 @@ async function scrapeCompetitors(): Promise<{ changes: { name: string; url: stri
 }
 
 // ---------------------------------------------------------------------------
+// Competitor Discovery — find new/unknown TDM software from Reddit
+// ---------------------------------------------------------------------------
+
+async function scrapeCompetitorDiscovery(): Promise<{ total: number; newPosts: number }> {
+  let total = 0;
+  let newPosts = 0;
+
+  // Search general subreddits for TDM/dosing software discussions
+  const discoverySubreddits = ["pharmacy", "medicine", "healthIT", "clinicalpharmacology"];
+
+  for (const sub of discoverySubreddits) {
+    for (const term of COMPETITOR_DISCOVERY_TERMS) {
+      console.log(`[SCRAPER] Competitor discovery r/${sub} — "${term}"`);
+      const n = await scrapeRedditSubreddit(sub, term);
+      total += 100;
+      newPosts += n;
+      await sleep(1500);
+    }
+  }
+
+  return { total, newPosts };
+}
+
+// ---------------------------------------------------------------------------
+// Competitor Product Page Scraper — extract features and offerings
+// ---------------------------------------------------------------------------
+
+async function scrapeCompetitorProducts(): Promise<{
+  profiles: { name: string; url: string; content: string; features: string[] }[];
+}> {
+  const profiles: { name: string; url: string; content: string; features: string[] }[] = [];
+
+  const featureKeywords = [
+    "bayesian", "AUC", "precision dosing", "model-informed", "MIPD",
+    "real-time", "EHR integration", "EPIC", "Cerner", "FHIR", "HL7",
+    "FDA cleared", "FDA approved", "CE marked", "machine learning", "AI",
+    "population PK", "vancomycin", "aminoglycoside", "tacrolimus",
+    "gentamicin", "tobramycin", "phenytoin", "continuous infusion",
+    "mobile", "cloud", "SaaS", "on-premise", "dashboard", "reporting",
+    "clinical decision support", "CDS", "antimicrobial stewardship",
+    "therapeutic drug monitoring", "TDM", "renal", "obesity", "pediatric",
+    "neonatal", "oncology", "transplant", "free trial", "pricing",
+    "per-patient", "subscription", "enterprise", "hospital",
+  ];
+
+  for (const comp of COMPETITOR_URLS) {
+    const productUrl = (comp as { productUrl?: string }).productUrl ?? comp.url;
+    console.log(`[SCRAPER] Scraping product page: ${comp.name} — ${productUrl}`);
+    const res = await fetchWithLog(productUrl);
+
+    if (!res.ok) {
+      console.log(`[SCRAPER] ${comp.name} product page ${res.status} — skipping`);
+      continue;
+    }
+
+    // Strip HTML to plain text (simple extraction)
+    const plainText = res.text
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .substring(0, 5000)
+      .trim();
+
+    // Extract which features they mention
+    const detectedFeatures: string[] = [];
+    for (const kw of featureKeywords) {
+      if (plainText.toLowerCase().includes(kw.toLowerCase())) {
+        detectedFeatures.push(kw);
+      }
+    }
+
+    profiles.push({
+      name: comp.name,
+      url: productUrl,
+      content: plainText.substring(0, 2000),
+      features: detectedFeatures,
+    });
+
+    // Also save as a post for the analysis engine to pick up
+    insertPost({
+      source: "competitor_product",
+      source_identifier: comp.name,
+      post_id: `product-${comp.name}-${new Date().toISOString().split("T")[0]}`,
+      title: `${comp.name} Product Page — ${detectedFeatures.length} features detected`,
+      body_text: `Features: ${detectedFeatures.join(", ")}\n\n${plainText.substring(0, 1500)}`,
+      url: productUrl,
+      upvote_count: 0,
+      comment_count: 0,
+      published_at: new Date().toISOString(),
+      top_comments: "[]",
+    });
+
+    // Also check blog/news for changes
+    const hash = crypto.createHash("md5").update(res.text).digest("hex");
+    const prev = getLatestSnapshot(comp.name, productUrl);
+    const changed = prev ? prev.content_hash !== hash : false;
+    insertSnapshot(comp.name, productUrl, hash, changed);
+    if (changed) {
+      console.log(`[SCRAPER] PRODUCT CHANGE: ${comp.name}`);
+    }
+
+    await sleep(1500);
+  }
+
+  return { profiles };
+}
+
+// ---------------------------------------------------------------------------
 // Full Run
 // ---------------------------------------------------------------------------
 
@@ -218,24 +327,33 @@ export async function runFullScrape(): Promise<{
   newPosts: number;
   duration: number;
   changes: { name: string; url: string }[];
+  competitorProfiles: { name: string; features: string[] }[];
   runId: number;
 }> {
   const startTime = Date.now();
   console.log("[SCRAPER] Starting full scrape run...");
 
-  // Reddit
+  // Reddit — clinical discussions
   const reddit = await scrapeReddit();
-  console.log(`[SCRAPER] Reddit: ${reddit.newPosts} new posts`);
+  console.log(`[SCRAPER] Reddit clinical: ${reddit.newPosts} new posts`);
+
+  // Reddit — competitor discovery
+  const discovery = await scrapeCompetitorDiscovery();
+  console.log(`[SCRAPER] Competitor discovery: ${discovery.newPosts} new posts`);
 
   // PubMed
   const pubmed = await scrapePubMed();
   console.log(`[SCRAPER] PubMed: ${pubmed.newPosts} new articles`);
 
-  // Competitors
+  // Competitor page monitoring (change detection)
   const competitors = await scrapeCompetitors();
 
-  const total = reddit.total + pubmed.total;
-  const newPosts = reddit.newPosts + pubmed.newPosts;
+  // Competitor product page deep scrape (features extraction)
+  const products = await scrapeCompetitorProducts();
+  console.log(`[SCRAPER] Product pages: ${products.profiles.length} competitors profiled`);
+
+  const total = reddit.total + discovery.total + pubmed.total;
+  const newPosts = reddit.newPosts + discovery.newPosts + pubmed.newPosts;
   const duration = (Date.now() - startTime) / 1000;
 
   // Run analysis
@@ -243,5 +361,10 @@ export async function runFullScrape(): Promise<{
 
   console.log(`[SCRAPER] Complete: ${newPosts} new posts, ${duration.toFixed(1)}s, run #${runId}`);
 
-  return { total, newPosts, duration, changes: competitors.changes, runId };
+  return {
+    total, newPosts, duration,
+    changes: competitors.changes,
+    competitorProfiles: products.profiles.map(p => ({ name: p.name, features: p.features })),
+    runId,
+  };
 }

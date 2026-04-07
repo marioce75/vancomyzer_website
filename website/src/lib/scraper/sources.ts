@@ -38,10 +38,26 @@ export const PUBMED_SEARCHES = [
   { query: "tacrolimus therapeutic drug monitoring software", minDate: "2023/01/01" },
 ];
 
+// Known competitors — monitor their pages for changes and new content
 export const COMPETITOR_URLS = [
-  { name: "InsightRX", url: "https://www.insight-rx.com/blog/" },
-  { name: "DoseMeRx", url: "https://doseme-rx.com/vancomycin/articles" },
-  { name: "VancoCalc", url: "https://www.vancocalc.com" },
+  { name: "InsightRX", url: "https://www.insight-rx.com/blog/", productUrl: "https://www.insight-rx.com/platform/" },
+  { name: "DoseMeRx", url: "https://doseme-rx.com/vancomycin/articles", productUrl: "https://doseme-rx.com/our-solution" },
+  { name: "VancoCalc", url: "https://www.vancocalc.com", productUrl: "https://www.vancocalc.com" },
+  { name: "MwPharm++", url: "https://www.mediware.cz/en/mwpharm-online/", productUrl: "https://www.mediware.cz/en/mwpharm-online/" },
+  { name: "DosOpt", url: "https://dosopt.com", productUrl: "https://dosopt.com" },
+  { name: "PrecisePK", url: "https://www.precisepk.com", productUrl: "https://www.precisepk.com" },
+  { name: "ID-ODS", url: "https://www.id-ods.com", productUrl: "https://www.id-ods.com" },
+];
+
+// Search terms specifically for discovering competitors and new TDM software
+export const COMPETITOR_DISCOVERY_TERMS = [
+  "TDM software", "dosing software", "vancomycin calculator", "AUC calculator",
+  "Bayesian dosing tool", "drug dosing app", "pharmacokinetic software",
+  "clinical pharmacology software", "dosing platform", "precision dosing",
+  "model-informed precision dosing", "MIPD software", "PK software",
+  "therapeutic drug monitoring app", "TDM tool", "dosing calculator",
+  "InsightRX alternative", "DoseMe alternative", "vancomycin AUC tool",
+  "best TDM software", "pharmacy dosing software", "PK/PD software",
 ];
 
 export const TRACKED_DRUGS = [

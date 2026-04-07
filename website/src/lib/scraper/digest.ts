@@ -14,10 +14,16 @@ export async function sendWeeklyDigest(run: ScraperAnalysisRow): Promise<void> {
   const painPoints = JSON.parse(run.top_pain_points || "[]") as { text: string; count: number }[];
   const drugMentions = JSON.parse(run.drug_mentions || "{}") as Record<string, number>;
   const topPosts = JSON.parse(run.top_posts || "[]") as { title: string; url: string; upvote_count: number }[];
+  const competitorMentions = JSON.parse(run.competitor_mentions || "{}") as Record<string, { count: number; positive: number; neutral: number; negative: number; posts: string[] }>;
 
   const topDrugs = Object.entries(drugMentions)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
+
+  // Filter competitors with mentions > 0
+  const activeCompetitors = Object.entries(competitorMentions)
+    .filter(([, d]) => d.count > 0)
+    .sort((a, b) => b[1].count - a[1].count);
 
   const dateStr = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
@@ -58,6 +64,25 @@ export async function sendWeeklyDigest(run: ScraperAnalysisRow): Promise<void> {
           <tr style="background:#f7fafc"><th style="padding:4px 8px;text-align:left">Drug</th><th style="padding:4px 8px;text-align:right">Mentions</th></tr>
           ${drugsHtml}
         </table>
+
+        ${activeCompetitors.length > 0 ? `
+        <h2 style="font-size:14px;color:#1e4d8c;margin:16px 0 8px">Competitor Intelligence</h2>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <tr style="background:#f7fafc">
+            <th style="padding:4px 8px;text-align:left">Competitor</th>
+            <th style="padding:4px 8px;text-align:right">Mentions</th>
+            <th style="padding:4px 8px;text-align:center">Sentiment</th>
+          </tr>
+          ${activeCompetitors.slice(0, 8).map(([name, d]) => {
+            const sentimentLabel = d.positive > d.negative ? "🟢 Positive" : d.negative > d.positive ? "🔴 Negative" : "⚪ Neutral";
+            return `<tr>
+              <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;font-weight:600">${name}</td>
+              <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:right">${d.count}</td>
+              <td style="padding:4px 8px;border-bottom:1px solid #e2e8f0;text-align:center;font-size:11px">${sentimentLabel} (+${d.positive} / -${d.negative})</td>
+            </tr>${d.posts.length > 0 ? `<tr><td colspan="3" style="padding:2px 8px 8px;font-size:11px;color:#718096;border-bottom:1px solid #e2e8f0">Recent: ${d.posts.slice(0, 2).join(" · ")}</td></tr>` : ""}`;
+          }).join("")}
+        </table>
+        ` : ""}
 
         ${topPostsHtml ? `
         <h2 style="font-size:14px;color:#1e4d8c;margin:16px 0 8px">High Signal Posts</h2>
