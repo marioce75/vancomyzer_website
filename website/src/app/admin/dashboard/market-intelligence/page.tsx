@@ -30,6 +30,8 @@ interface DashboardData {
   latest: AnalysisRun | null;
   highSignal: HighSignalPost[];
   competitorChanges: { competitor_name: string; url: string; scraped_at: string }[];
+  scraperRunning?: boolean;
+  scraperStartedAt?: string | null;
 }
 
 const card = "bg-white border border-gray-200 rounded-lg p-5";
@@ -49,22 +51,52 @@ export default function MarketIntelligencePage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  // Poll for scraper status when running
+  useEffect(() => {
+    if (!running) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch("/api/admin/scraper?action=status");
+        if (res.ok) {
+          const status = await res.json();
+          if (!status.running) {
+            setRunning(false);
+            setRunResult("Scrape complete. Refreshing data...");
+            fetchData();
+          }
+        }
+      } catch { /* ignore */ }
+    }, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval);
+  }, [running, fetchData]);
+
+  // Check if scraper is already running on page load
+  useEffect(() => {
+    if (data?.scraperRunning) {
+      setRunning(true);
+      setRunResult("Scraper is running in the background...");
+    }
+  }, [data]);
+
   const handleRunScraper = async () => {
     setRunning(true);
-    setRunResult("");
+    setRunResult("Scraper started — running in the background. You can navigate away safely.");
     try {
       const res = await fetch("/api/admin/scraper", { method: "POST" });
       const result = await res.json();
-      if (res.ok) {
-        setRunResult(`Scrape complete: ${result.newPosts} new posts in ${result.duration?.toFixed(1)}s`);
-        fetchData();
-      } else {
-        setRunResult(`Failed: ${result.error}`);
+      if (!res.ok) {
+        if (res.status === 409) {
+          setRunResult("Scraper is already running. Please wait for it to finish.");
+        } else {
+          setRunResult(`Failed to start: ${result.error}`);
+          setRunning(false);
+        }
       }
-    } catch (err) {
-      setRunResult("Network error.");
+      // Don't setRunning(false) here — the poll loop handles completion
+    } catch {
+      setRunResult("Failed to start scraper.");
+      setRunning(false);
     }
-    setRunning(false);
   };
 
   const download = (action: string) => {

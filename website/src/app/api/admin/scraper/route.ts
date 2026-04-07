@@ -4,6 +4,10 @@ import { authOptions } from "@/lib/authOptions";
 import { getRecentRuns, getLatestRun, getRecentPosts, getHighSignalPosts, getCompetitorChanges, getAllPosts } from "@/lib/scraper/db";
 import { logSecurityEvent } from "@/lib/db";
 
+// Track whether a scrape is currently running (server-side singleton)
+let scraperRunning = false;
+let scraperStartedAt: string | null = null;
+
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return null;
@@ -19,6 +23,11 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const action = searchParams.get("action");
+
+  // Status check for polling
+  if (action === "status") {
+    return NextResponse.json({ running: scraperRunning, startedAt: scraperStartedAt });
+  }
 
   // Export endpoints
   if (action === "export_posts_csv") {
@@ -54,13 +63,17 @@ export async function GET(request: NextRequest) {
   const highSignal = getHighSignalPosts(200, 30);
   const competitorChanges = getCompetitorChanges(30);
 
-  return NextResponse.json({ runs, latest, highSignal, competitorChanges });
+  return NextResponse.json({ runs, latest, highSignal, competitorChanges, scraperRunning, scraperStartedAt });
 }
 
-// POST: trigger scrape run
-export async function POST(request: NextRequest) {
+// POST: trigger scrape run — fire-and-forget (runs in background on the server)
+export async function POST() {
   const admin = await requireAdmin();
   if (!admin) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+
+  if (scraperRunning) {
+    return NextResponse.json({ ok: false, message: "Scraper is already running.", startedAt: scraperStartedAt }, { status: 409 });
+  }
 
   logSecurityEvent({
     user_id: Number(admin.id),
@@ -69,41 +82,70 @@ export async function POST(request: NextRequest) {
     severity: "info",
   });
 
-  // Run scraper in background (don't block the response)
-  try {
-    const { runFullScrape } = await import("@/lib/scraper/engine");
-    const result = await runFullScrape();
+  // Mark as running and return immediately — scrape continues in background
+  scraperRunning = true;
+  scraperStartedAt = new Date().toISOString();
 
-    // Send digest if configured
+  // Fire-and-forget: DO NOT await — this runs after the response is sent
+  (async () => {
     try {
-      const { getLatestRun: getLR } = await import("@/lib/scraper/db");
-      const { sendWeeklyDigest } = await import("@/lib/scraper/digest");
-      const latestRun = getLR();
-      if (latestRun) await sendWeeklyDigest(latestRun);
+      const { runFullScrape } = await import("@/lib/scraper/engine");
+      const result = await runFullScrape();
+      console.log(`[SCRAPER] Background run complete: ${result.newPosts} new posts in ${result.duration.toFixed(1)}s`);
+
+      // Send email digest
+      try {
+        const { getLatestRun: getLR } = await import("@/lib/scraper/db");
+        const { sendWeeklyDigest } = await import("@/lib/scraper/digest");
+        const latestRun = getLR();
+        if (latestRun) await sendWeeklyDigest(latestRun);
+      } catch (err) {
+        console.error("[SCRAPER] Digest failed:", err);
+      }
     } catch (err) {
-      console.error("[SCRAPER] Digest failed:", err);
+      console.error("[SCRAPER] Background run failed:", err);
+
+      // Log failure
+      try {
+        const { insertAnalysisRun } = await import("@/lib/scraper/db");
+        insertAnalysisRun({
+          run_date: new Date().toISOString(),
+          total_posts_scraped: 0,
+          new_posts_this_run: 0,
+          top_pain_points: "[]",
+          drug_mentions: "{}",
+          competitor_mentions: "{}",
+          top_posts: "[]",
+          geographic_signals: "{}",
+          run_duration_seconds: 0,
+          status: "failed",
+          error_message: (err as Error).message,
+        });
+      } catch { /* ignore */ }
+
+      // Send failure alert email
+      try {
+        const nodemailer = await import("nodemailer");
+        if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+          const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST ?? "smtp.gmail.com",
+            port: Number(process.env.SMTP_PORT ?? 465),
+            secure: true,
+            auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+          });
+          await transporter.sendMail({
+            from: `"Dōsys Scraper Alert" <${process.env.SMTP_USER}>`,
+            to: "mario@dosys.health",
+            subject: `Scraper Run Failed — ${new Date().toLocaleDateString()}`,
+            text: `Scraper failed: ${(err as Error).message}`,
+          });
+        }
+      } catch { /* ignore */ }
+    } finally {
+      scraperRunning = false;
+      scraperStartedAt = null;
     }
+  })();
 
-    return NextResponse.json({ ok: true, ...result });
-  } catch (err) {
-    console.error("[SCRAPER] Run failed:", err);
-
-    // Log failure
-    const { insertAnalysisRun } = await import("@/lib/scraper/db");
-    insertAnalysisRun({
-      run_date: new Date().toISOString(),
-      total_posts_scraped: 0,
-      new_posts_this_run: 0,
-      top_pain_points: "[]",
-      drug_mentions: "{}",
-      competitor_mentions: "{}",
-      top_posts: "[]",
-      geographic_signals: "{}",
-      run_duration_seconds: 0,
-      status: "failed",
-      error_message: (err as Error).message,
-    });
-
-    return NextResponse.json({ error: "Scrape failed.", details: (err as Error).message }, { status: 500 });
-  }
+  return NextResponse.json({ ok: true, message: "Scraper started in background. Check status or refresh the dashboard." });
 }
