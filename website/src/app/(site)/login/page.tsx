@@ -35,6 +35,8 @@ function LoginForm() {
         setError("Your account is pending approval. You will be notified by email when access is granted.");
       } else if (result.error === "DISABLED") {
         setError("Your account has been disabled. Contact your administrator.");
+      } else if (result.error === "LOCKED") {
+        setError("Account temporarily locked due to too many failed attempts. Try again in 15 minutes.");
       } else {
         setError("Incorrect username or password.");
       }

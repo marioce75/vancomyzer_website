@@ -15,11 +15,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protected pages — require session
-  const protectedPages = ["/", "/calculator", "/admin", "/research"];
+  const protectedPages = ["/", "/calculator", "/admin", "/research", "/mfa-verify"];
   const needsPageAuth = protectedPages.some(p => pathname === p || pathname.startsWith(p + "/"));
 
   // Protected APIs — require session
-  const protectedAPIs = ["/api/calculate", "/api/audit", "/api/admin", "/api/research"];
+  const protectedAPIs = ["/api/calculate", "/api/audit", "/api/admin", "/api/research", "/api/auth/mfa"];
   const needsAPIAuth = protectedAPIs.some(p => pathname.startsWith(p));
 
   if (needsPageAuth && !token) {
@@ -33,6 +33,15 @@ export async function middleware(request: NextRequest) {
   // Admin + Research pages — require admin role (silently redirect non-admins)
   if ((pathname.startsWith("/admin") || pathname.startsWith("/research")) && token?.role !== "admin") {
     return NextResponse.redirect(new URL("/calculator", request.url));
+  }
+
+  // MFA gate (SOC 2 A1): admin users with MFA enabled must verify before accessing admin functions
+  // Allow: /mfa-verify page, /api/auth/mfa/verify endpoint, /api/auth/ endpoints, /calculator
+  if (token?.mfaPending && !token?.mfaVerified) {
+    const mfaAllowed = pathname === "/mfa-verify" || pathname.startsWith("/api/auth/") || pathname === "/calculator" || pathname.startsWith("/api/calculate");
+    if (!mfaAllowed && (pathname.startsWith("/admin") || pathname.startsWith("/research"))) {
+      return NextResponse.redirect(new URL("/mfa-verify", request.url));
+    }
   }
 
   // Pass user info in headers for downstream API routes
@@ -55,9 +64,11 @@ export const config = {
     "/admin/:path*",
     "/login",
     "/register",
+    "/mfa-verify",
     "/api/calculate/:path*",
     "/api/audit/:path*",
     "/api/admin/:path*",
+    "/api/auth/mfa/:path*",
     "/research/:path*",
     "/api/research/:path*",
   ],

@@ -56,6 +56,30 @@ function getDb(): Database.Database {
   try { _db.exec("ALTER TABLE users ADD COLUMN reset_token TEXT"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE users ADD COLUMN reset_token_expires TEXT"); } catch { /* exists */ }
 
+  // SOC 2 columns: MFA + account lockout
+  try { _db.exec("ALTER TABLE users ADD COLUMN mfa_secret TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN mfa_enabled INTEGER DEFAULT 0"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN mfa_verified_at TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN failed_login_attempts INTEGER DEFAULT 0"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN locked_until TEXT"); } catch { /* exists */ }
+
+  // Security audit log (append-only)
+  _db.exec(`
+    CREATE TABLE IF NOT EXISTS security_audit_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp TEXT NOT NULL DEFAULT (datetime('now')),
+      user_id INTEGER,
+      username TEXT,
+      action TEXT NOT NULL,
+      ip_address TEXT,
+      user_agent TEXT,
+      details TEXT DEFAULT '{}',
+      severity TEXT DEFAULT 'info' CHECK (severity IN ('info', 'warn', 'error', 'critical'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_security_audit_timestamp ON security_audit_log(timestamp);
+    CREATE INDEX IF NOT EXISTS idx_security_audit_action ON security_audit_log(action);
+  `);
+
   return _db;
 }
 
@@ -93,6 +117,12 @@ export interface UserRow {
   approved_at: string | null;
   approved_by: string | null;
   last_login: string | null;
+  // SOC 2 fields
+  mfa_secret: string | null;
+  mfa_enabled: number;
+  mfa_verified_at: string | null;
+  failed_login_attempts: number;
+  locked_until: string | null;
 }
 
 export function findUserByLogin(usernameOrEmail: string): UserRow | undefined {
@@ -164,4 +194,111 @@ export function listPendingUsers(): UserRow[] {
 
 export function listActiveUsers(): UserRow[] {
   return getDb().prepare("SELECT * FROM users WHERE status = 'active' ORDER BY last_login DESC").all() as UserRow[];
+}
+
+export function listAllUsers(): UserRow[] {
+  return getDb().prepare("SELECT * FROM users ORDER BY created_at DESC").all() as UserRow[];
+}
+
+// ---------------------------------------------------------------------------
+// Account Lockout (SOC 2 A2)
+// ---------------------------------------------------------------------------
+
+export function incrementFailedLogins(id: number): number {
+  getDb().prepare("UPDATE users SET failed_login_attempts = COALESCE(failed_login_attempts, 0) + 1 WHERE id = ?").run(id);
+  const row = getDb().prepare("SELECT failed_login_attempts FROM users WHERE id = ?").get(id) as { failed_login_attempts: number } | undefined;
+  return row?.failed_login_attempts ?? 0;
+}
+
+export function resetFailedLogins(id: number) {
+  getDb().prepare("UPDATE users SET failed_login_attempts = 0, locked_until = NULL WHERE id = ?").run(id);
+}
+
+export function lockAccount(id: number, minutes: number) {
+  const until = new Date(Date.now() + minutes * 60 * 1000).toISOString();
+  getDb().prepare("UPDATE users SET locked_until = ? WHERE id = ?").run(until, id);
+}
+
+export function isAccountLocked(id: number): boolean {
+  const row = getDb().prepare("SELECT locked_until FROM users WHERE id = ?").get(id) as { locked_until: string | null } | undefined;
+  if (!row?.locked_until) return false;
+  return new Date(row.locked_until) > new Date();
+}
+
+export function unlockAccount(id: number) {
+  getDb().prepare("UPDATE users SET locked_until = NULL, failed_login_attempts = 0 WHERE id = ?").run(id);
+}
+
+// ---------------------------------------------------------------------------
+// MFA (SOC 2 A1)
+// ---------------------------------------------------------------------------
+
+export function setMfaSecret(id: number, secret: string) {
+  getDb().prepare("UPDATE users SET mfa_secret = ? WHERE id = ?").run(secret, id);
+}
+
+export function enableMfa(id: number) {
+  getDb().prepare("UPDATE users SET mfa_enabled = 1, mfa_verified_at = datetime('now') WHERE id = ?").run(id);
+}
+
+export function disableMfa(id: number) {
+  getDb().prepare("UPDATE users SET mfa_enabled = 0, mfa_secret = NULL, mfa_verified_at = NULL WHERE id = ?").run(id);
+}
+
+export function setMfaVerifiedAt(id: number) {
+  getDb().prepare("UPDATE users SET mfa_verified_at = datetime('now') WHERE id = ?").run(id);
+}
+
+// ---------------------------------------------------------------------------
+// Security Audit Log (SOC 2 A4) — append-only
+// ---------------------------------------------------------------------------
+
+export function logSecurityEvent(event: {
+  user_id?: number | null;
+  username?: string | null;
+  action: string;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  details?: string;
+  severity?: "info" | "warn" | "error" | "critical";
+}) {
+  getDb().prepare(`INSERT INTO security_audit_log (user_id, username, action, ip_address, user_agent, details, severity)
+    VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    event.user_id ?? null,
+    event.username ?? null,
+    event.action,
+    event.ip_address ?? null,
+    event.user_agent ?? null,
+    event.details ?? "{}",
+    event.severity ?? "info"
+  );
+}
+
+export interface SecurityAuditRow {
+  id: number;
+  timestamp: string;
+  user_id: number | null;
+  username: string | null;
+  action: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  details: string;
+  severity: string;
+}
+
+export function getSecurityEvents(limit = 200): SecurityAuditRow[] {
+  return getDb().prepare("SELECT * FROM security_audit_log ORDER BY timestamp DESC LIMIT ?").all(limit) as SecurityAuditRow[];
+}
+
+export function getSecuritySummary() {
+  const total = (getDb().prepare("SELECT COUNT(*) as cnt FROM security_audit_log").get() as { cnt: number }).cnt;
+  const failedLogins24h = (getDb().prepare(
+    "SELECT COUNT(*) as cnt FROM security_audit_log WHERE action = 'LOGIN_FAILED' AND timestamp > datetime('now', '-1 day')"
+  ).get() as { cnt: number }).cnt;
+  const lockedAccounts = (getDb().prepare(
+    "SELECT COUNT(*) as cnt FROM users WHERE locked_until IS NOT NULL AND locked_until > datetime('now')"
+  ).get() as { cnt: number }).cnt;
+  const lastEvent = getDb().prepare("SELECT * FROM security_audit_log ORDER BY timestamp DESC LIMIT 1").get() as SecurityAuditRow | undefined;
+
+  return { total, failedLogins24h, lockedAccounts, lastEvent };
 }
