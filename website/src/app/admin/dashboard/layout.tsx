@@ -9,6 +9,7 @@ const navItems = [
   { label: "Users", href: "/admin/dashboard/users", icon: "👤" },
   { label: "Research", href: "/admin/dashboard/research", icon: "🔬" },
   { label: "Security", href: "/admin/dashboard/security", icon: "🔒" },
+  { label: "Market Intel", href: "/admin/dashboard/market-intelligence", icon: "📡" },
   { label: "Policy", href: "/admin/dashboard/policy", icon: "📋" },
   { label: "System", href: "/admin/dashboard/system", icon: "⚙️" },
 ];
