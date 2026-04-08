@@ -502,12 +502,12 @@ export default function CalculatorWorkspace() {
       target_auc24: 450,
     });
     // Loading dose simulation: no measured levels yet (prior-only prediction)
-    // API validation allows empty levels when doses_given=1
     setLevels([{ ...defaultLevel }]);
     setSelectedFrequencyOption(null);
     setResult(null);
     setError(null);
-    setActiveSection("levels");
+    // Don't jump to levels tab — keep user in context, results appear in the right panel
+    // The left panel stays where it is so the user isn't disoriented
     pendingLoadingDoseCalc.current = true;
   }, []);
 

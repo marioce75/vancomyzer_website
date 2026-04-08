@@ -29,14 +29,22 @@ const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" }
 
 function LoadingDoseGuidance({ doseMg, weightKg, onSimulate }: { doseMg: number; weightKg: number | null; onSimulate?: ((doseMg: number, intervalHours: number, infusionHours: number) => void) | null }) {
   const [expanded, setExpanded] = React.useState(false);
-  // Standard loading dose: 25-30 mg/kg actual body weight (ASHP/IDSA 2020)
-  // Max single loading dose: 3000 mg
-  // Infusion rate: ≤10 mg/min (or 1g per 60 min minimum)
-  const wt = weightKg ?? 75; // fallback for display
-  const loadLow = Math.round(wt * 25 / 250) * 250; // round to nearest 250
+  const wt = weightKg ?? 75;
+  const defaultDose = Math.min(3000, Math.round(wt * 25 / 250) * 250);
+  const loadLow = Math.round(wt * 25 / 250) * 250;
   const loadHigh = Math.min(3000, Math.round(wt * 30 / 250) * 250);
-  const loadSuggested = Math.min(3000, Math.round(wt * 25 / 250) * 250);
-  const infusionMinutes = Math.max(60, Math.ceil(loadSuggested / 10)); // ≤10 mg/min
+
+  // Editable loading dose parameters
+  const [customDose, setCustomDose] = React.useState(defaultDose);
+  const [customInterval, setCustomInterval] = React.useState(12);
+
+  // Auto-calculate infusion duration (≤10 mg/min, min 60 min)
+  const infusionMinutes = Math.max(60, Math.ceil(customDose / 10));
+  const infusionHours = Math.max(1, Math.ceil(infusionMinutes / 60 * 4) / 4);
+  const rateExceeded = customDose / infusionMinutes > 10;
+
+  // Update default dose when weight changes
+  React.useEffect(() => { setCustomDose(defaultDose); }, [defaultDose]);
 
   return (
     <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: 8 }}>
@@ -53,74 +61,97 @@ function LoadingDoseGuidance({ doseMg, weightKg, onSimulate }: { doseMg: number;
           <path d="M9 5l7 7-7 7" />
         </svg>
         <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-secondary)", letterSpacing: "0.08em", ...FONT }}>
-          SUGGESTED LOADING DOSE
+          LOADING DOSE CONFIGURATOR
         </span>
       </button>
 
       {expanded && (
-        <div style={{ marginTop: 8, padding: "8px 10px", background: "var(--color-bg)", border: "1px solid var(--color-border)", ...FONT }}>
-          <div className="flex items-baseline gap-2">
-            <span style={{ fontSize: 20, fontWeight: 700, color: "var(--color-primary)", textShadow: "0 0 8px var(--color-glow)", ...FONT }}>
-              {loadSuggested}
-            </span>
-            <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>mg</span>
-            <span style={{ fontSize: 10, color: "var(--color-dim)", ...FONT }}>({loadLow}–{loadHigh} mg range)</span>
-          </div>
-
-          <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
-            <p style={{ fontSize: 10, color: "var(--color-dim)", margin: 0, ...FONT }}>
-              <span style={{ color: "var(--color-secondary)" }}>WHEN:</span> Consider when rapid therapeutic levels are needed — severe infections (endocarditis, meningitis, bacteremia) or critically ill patients where delayed attainment increases mortality risk.
-            </p>
-            <p style={{ fontSize: 10, color: "var(--color-dim)", margin: 0, ...FONT }}>
-              <span style={{ color: "var(--color-secondary)" }}>DOSE:</span> 25–30 mg/kg actual body weight. Calculated: 25 mg/kg × {wt} kg = {Math.round(wt * 25)} mg → rounded to <span style={{ color: "var(--color-primary)" }}>{loadSuggested} mg</span>.
-            </p>
-            <p style={{ fontSize: 10, color: "var(--color-dim)", margin: 0, ...FONT }}>
-              <span style={{ color: "var(--color-secondary)" }}>INFUSION:</span> Max rate 10 mg/min (FDA/ASHP). {loadSuggested} mg infused over ≥{infusionMinutes} min to reduce Red Man Syndrome risk.
-            </p>
-            <p style={{ fontSize: 10, color: "var(--color-dim)", margin: 0, ...FONT }}>
-              <span style={{ color: "var(--color-secondary)" }}>MAX:</span> 3,000 mg single dose. If calculated dose exceeds 3,000 mg, cap at 3,000 mg.
-            </p>
-          </div>
-
-          <p style={{ fontSize: 9, color: "var(--color-dim)", fontStyle: "italic", marginTop: 8, ...FONT }}>
-            ASHP/IDSA/SIDP 2020: Loading doses of 25–30 mg/kg (based on actual body weight) can be used to facilitate rapid attainment of target AUC₂₄/MIC.
+        <div style={{ marginTop: 8, padding: "12px 14px", background: "var(--color-bg)", border: "1px solid var(--color-border)", ...FONT }}>
+          {/* Clinical context */}
+          <p style={{ fontSize: 10, color: "var(--color-dim)", margin: "0 0 10px", lineHeight: 1.6, ...FONT }}>
+            Consider when rapid therapeutic levels are needed — severe infections or critically ill patients.
+            ASHP/IDSA 2020: 25–30 mg/kg actual body weight, max 3,000 mg.
           </p>
 
+          {/* Suggested range */}
+          <div className="flex items-baseline gap-2 mb-3">
+            <span style={{ fontSize: 10, color: "var(--color-secondary)", ...FONT }}>Suggested range:</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-primary)", ...FONT }}>{loadLow}–{loadHigh} mg</span>
+            <span style={{ fontSize: 9, color: "var(--color-dim)", ...FONT }}>(25–30 mg/kg × {wt} kg)</span>
+          </div>
+
+          {/* Editable dose */}
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label style={{ fontSize: 9, fontWeight: 600, color: "var(--color-secondary)", display: "block", marginBottom: 3, ...FONT }}>
+                LOADING DOSE (mg)
+              </label>
+              <select
+                value={customDose}
+                onChange={e => setCustomDose(Number(e.target.value))}
+                style={{
+                  width: "100%", padding: "6px 8px", fontSize: 14, fontWeight: 700,
+                  border: "1px solid var(--color-border)", background: "var(--color-card)",
+                  color: "var(--color-primary)", ...FONT,
+                }}
+              >
+                {[1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000].map(d => (
+                  <option key={d} value={d}>
+                    {d} mg {d === defaultDose ? "(suggested)" : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 9, fontWeight: 600, color: "var(--color-secondary)", display: "block", marginBottom: 3, ...FONT }}>
+                THEN MAINTAIN Q (hours)
+              </label>
+              <select
+                value={customInterval}
+                onChange={e => setCustomInterval(Number(e.target.value))}
+                style={{
+                  width: "100%", padding: "6px 8px", fontSize: 14, fontWeight: 700,
+                  border: "1px solid var(--color-border)", background: "var(--color-card)",
+                  color: "var(--color-primary)", ...FONT,
+                }}
+              >
+                {[6, 8, 12, 24].map(h => (
+                  <option key={h} value={h}>Q{h}h</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Auto-calculated infusion */}
+          <div className="flex items-center gap-3 mb-3" style={{ fontSize: 10, color: "var(--color-dim)", ...FONT }}>
+            <span>Infusion: <strong style={{ color: "var(--color-secondary)" }}>{infusionHours}h</strong> ({infusionMinutes} min)</span>
+            <span>Rate: <strong style={{ color: rateExceeded ? "#dc2626" : "var(--color-secondary)" }}>{(customDose / (infusionMinutes / 60)).toFixed(0)} mg/h</strong></span>
+            {rateExceeded && <span style={{ color: "#dc2626", fontWeight: 700 }}>⚠ Exceeds 10 mg/min</span>}
+          </div>
+
+          {/* Simulate button */}
           {onSimulate && (
             <button
               type="button"
-              onClick={() => {
-                const infHours = Math.max(1, Math.ceil(loadSuggested / 600 * 4) / 4); // round up to 0.25h, min 1h
-                onSimulate(loadSuggested, 12, infHours);
-              }}
-              className="mt-3 w-full py-2 text-xs font-bold uppercase tracking-wider transition-colors"
+              onClick={() => onSimulate(customDose, customInterval, infusionHours)}
+              className="w-full py-2.5 text-xs font-bold uppercase tracking-wider transition-colors"
               style={{
-                background: "var(--color-primary)",
-                color: "var(--color-card)",
-                border: "none",
-                cursor: "pointer",
-                letterSpacing: "0.1em",
+                background: "var(--color-primary)", color: "var(--color-card)",
+                border: "none", cursor: "pointer", letterSpacing: "0.1em",
               }}
             >
-              SIMULATE LOADING DOSE PK →
+              SIMULATE {customDose} mg LOADING DOSE PK →
             </button>
           )}
-        </div>
-      )}
 
-      {/* Clinical guidance — inside the expanded block */}
-      {expanded && (
-        <div style={{ marginTop: 8, padding: "10px 14px", borderLeft: "2px solid #004422", ...FONT }}>
-          <p style={{ fontSize: 10, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "2px", margin: 0, ...FONT }}>
-            {">"} LOADING DOSE GUIDANCE
-          </p>
-          <p style={{ fontSize: 10, color: "var(--color-secondary)", lineHeight: 1.7, marginTop: 6, ...FONT }}>
-            Administer loading dose prior to first maintenance dose.{"\n"}
-            Draw first level 1.5–6h post-infusion end for early Bayesian{"\n"}
-            estimation, or peak + trough near dose 3–4 for highest accuracy.{"\n"}
-            Renal function and SCr should be reassessed within 24–48h.{"\n"}
-            Target AUC₂₄ 400–600 mg·h/L within 48h of initiation.
-          </p>
+          {/* Guidance */}
+          <div style={{ marginTop: 10, paddingTop: 8, borderTop: "1px solid var(--color-border)" }}>
+            <p style={{ fontSize: 9, color: "var(--color-dim)", lineHeight: 1.7, margin: 0, ...FONT }}>
+              After loading dose: draw first level 1.5–6h post-infusion end for early Bayesian estimation,
+              or peak + trough near dose 3–4 for highest accuracy.
+              Target AUC₂₄ 400–600 mg·h/L within 48h per ASHP/IDSA 2020.
+            </p>
+          </div>
         </div>
       )}
     </div>
