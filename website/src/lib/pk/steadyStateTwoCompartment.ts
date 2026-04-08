@@ -115,9 +115,9 @@ export function curvePoints(input: SteadyStateInput, step_hours: number = 0.5): 
   const { tau } = input;
   const { beta } = computeConstants(input);
 
-  // Determine number of doses needed to show near-steady-state
+  // Determine number of doses needed to show near-steady-state (≥5 half-lives)
   const halfLifeBeta = 0.693 / beta;
-  const n_doses = Math.max(6, Math.ceil((4 * halfLifeBeta) / tau) + 2);
+  const n_doses = Math.max(10, Math.ceil((5 * halfLifeBeta) / tau) + 2);
   const total_time = n_doses * tau;
 
   // Build time points: uniform grid + key pharmacokinetic landmarks (end of each infusion, start of each dose)
@@ -185,9 +185,9 @@ export function loadingDoseCurvePoints(
   const halfLifeBeta = 0.693 / beta;
 
   // First maintenance dose starts after the loading dose interval
-  // Use maintTau as the gap between loading and first maintenance
   const firstMaintTime = maintTau;
-  const n_maint = Math.max(6, Math.ceil((4 * halfLifeBeta) / maintTau) + 2);
+  // Ensure enough doses to visibly approach steady state (≥5 half-lives, min 10 maintenance doses)
+  const n_maint = Math.max(10, Math.ceil((5 * halfLifeBeta) / maintTau) + 2);
   const total_time = firstMaintTime + n_maint * maintTau;
 
   // Build dose schedule: [{ time, dose_mg, T_inf }]

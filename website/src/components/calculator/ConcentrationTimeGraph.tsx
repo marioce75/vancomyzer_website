@@ -568,7 +568,7 @@ export default function ConcentrationTimeGraph({
           </>
         )}
         <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
-        {[24, 48, 96].map((z) => (
+        {[24, 48, 96, 168].map((z) => (
           <button
             key={z}
             type="button"
