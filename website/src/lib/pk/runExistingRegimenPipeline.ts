@@ -1,3 +1,4 @@
+import { loadingDoseCurvePoints } from "./steadyStateTwoCompartment";
 import { normalizePatient } from "./normalize/normalizePatient";
 import { normalizeRegimen } from "./normalize/normalizeRegimen";
 import { normalizeLevels } from "./normalize/normalizeLevels";
@@ -61,6 +62,26 @@ export function runExistingRegimenPipeline(
 
   const engineOutput = runExistingRegimenEngine({ patient, regimen, levels });
   const recommendation = buildAdjustmentRecommendation(engineOutput);
+
+  // For loading dose: rebuild the curve using the ACTUAL recommended maintenance regimen
+  // so the graph matches what's displayed as the suggested maintenance
+  if (regimen.doses_given === 1 && recommendation.recommended_dose) {
+    const maintDoseMg = parseInt(recommendation.recommended_dose.replace(/\D/g, ""), 10);
+    const maintTau = recommendation.recommended_interval_hours;
+    const maintTinf = recommendation.recommended_infusion_duration_hours ?? 1;
+    if (maintDoseMg > 0 && maintTau > 0) {
+      const { CL, V1, Q, V2 } = engineOutput;
+      engineOutput.curve = loadingDoseCurvePoints(
+        { CL, V1, Q, V2 },
+        regimen.dose_mg,                                        // loading dose
+        Math.min(regimen.infusion_duration_hours, regimen.interval_hours), // loading infusion
+        maintDoseMg,                                            // maintenance dose
+        maintTau,                                               // maintenance interval
+        maintTinf,                                              // maintenance infusion
+      );
+    }
+  }
+
   const explanationInput: ExplanationInput = { engineOutput, recommendation };
 
   const explain = {
