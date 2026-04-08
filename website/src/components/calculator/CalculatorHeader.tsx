@@ -130,8 +130,8 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
-              (e.currentTarget as HTMLElement).style.background = "var(--color-highlight)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+              (e.currentTarget as HTMLElement).style.background = "rgba(30,77,140,0.08)";
+              (e.currentTarget as HTMLElement).style.color = "#1a202c";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -147,8 +147,8 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
-              (e.currentTarget as HTMLElement).style.background = "var(--color-highlight)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+              (e.currentTarget as HTMLElement).style.background = "rgba(30,77,140,0.08)";
+              (e.currentTarget as HTMLElement).style.color = "#1a202c";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -164,8 +164,8 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
-              (e.currentTarget as HTMLElement).style.background = "var(--color-highlight)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+              (e.currentTarget as HTMLElement).style.background = "rgba(30,77,140,0.08)";
+              (e.currentTarget as HTMLElement).style.color = "#1a202c";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -204,8 +204,8 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               }}
               onMouseEnter={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
-                (e.currentTarget as HTMLElement).style.background = "var(--color-highlight)";
-                (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
+                (e.currentTarget as HTMLElement).style.background = "rgba(30,77,140,0.08)";
+                (e.currentTarget as HTMLElement).style.color = "#1a202c";
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "transparent";
