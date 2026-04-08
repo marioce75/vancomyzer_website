@@ -109,8 +109,20 @@ export default function MarketIntelligencePage() {
     }
   };
 
-  const download = (action: string) => {
-    window.open(`/api/admin/scraper?action=${action}`, "_blank");
+  const download = async (action: string) => {
+    try {
+      const res = await fetch(`/api/admin/scraper?action=${action}`);
+      if (!res.ok) { alert("Download failed: " + (await res.text())); return; }
+      const contentType = res.headers.get("content-type") ?? "";
+      const blob = await res.blob();
+      const ext = contentType.includes("csv") ? "csv" : "json";
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `vancomyzer-${action}-${new Date().toISOString().split("T")[0]}.${ext}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch { alert("Download failed."); }
   };
 
   if (loading) return <div className="p-8 text-gray-500">Loading market intelligence...</div>;
