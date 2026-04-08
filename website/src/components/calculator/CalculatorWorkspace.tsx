@@ -872,28 +872,27 @@ export default function CalculatorWorkspace() {
                   <div className="p-2 flex flex-col gap-2">
                     {(() => {
                       const isPulse = regimen.doses_given === 1;
-                      // In pulse/loading dose mode: always show loading dose metrics, not maintenance tab
-                      const auc24 = isPulse ? visibleResult.auc24 : (activeOption?.auc24 ?? visibleResult.auc24);
-                      const peak  = isPulse ? visibleResult.peak  : (activeOption?.peak  ?? visibleResult.peak);
-                      const trough = isPulse ? visibleResult.trough : (activeOption?.trough ?? visibleResult.trough);
-                      return (
-                        <>
-                          {isPulse && (
+                      if (isPulse) {
+                        // Loading dose mode: show maintenance steady-state metrics for selected tab
+                        const maint = activeOption ?? visibleResult.frequency_options?.find(o => o.is_recommended) ?? null;
+                        const auc24 = maint?.auc24 ?? visibleResult.auc24;
+                        const peak = maint?.peak ?? visibleResult.peak;
+                        const trough = maint?.trough ?? visibleResult.trough;
+                        const label = maint ? `${maint.dose_mg}mg Q${maint.interval_hours}h` : "";
+                        return (
+                          <>
                             <p className="text-[9px] font-bold uppercase tracking-wider text-center" style={{ color: "var(--color-dim)", margin: 0, fontFamily: "'Share Tech Mono', monospace" }}>
-                              LOADING DOSE FIRST-DOSE PK
+                              STEADY-STATE PK {label && `— ${label}`}
                             </p>
-                          )}
-                          <PrimaryMetricsCard auc24={auc24} peak={peak} trough={trough} />
-                          {isPulse && activeOption && (
-                            <div className="border-t pt-2 mt-1" style={{ borderTopColor: "var(--color-border)" }}>
-                              <p className="text-[9px] font-bold uppercase tracking-wider text-center mb-1" style={{ color: "var(--color-dim)", margin: 0, fontFamily: "'Share Tech Mono', monospace" }}>
-                                MAINTENANCE STEADY-STATE ({activeOption.dose_mg}mg Q{activeOption.interval_hours}h)
-                              </p>
-                              <PrimaryMetricsCard auc24={activeOption.auc24} peak={activeOption.peak} trough={activeOption.trough} />
-                            </div>
-                          )}
-                        </>
-                      );
+                            <PrimaryMetricsCard auc24={auc24} peak={peak} trough={trough} />
+                          </>
+                        );
+                      }
+                      // Normal mode
+                      const auc24 = activeOption?.auc24 ?? visibleResult.auc24;
+                      const peak  = activeOption?.peak  ?? visibleResult.peak;
+                      const trough = activeOption?.trough ?? visibleResult.trough;
+                      return <PrimaryMetricsCard auc24={auc24} peak={peak} trough={trough} />;
                     })()}
                     {visibleResult.pk_parameters && (
                       <div className="border px-3 py-2" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}>
@@ -908,7 +907,7 @@ export default function CalculatorWorkspace() {
               <section className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
                 <div className="p-2">
                   <ConcentrationTimeGraph
-                    curve={regimen.doses_given === 1 ? visibleResult.curve : (activeOption?.curve ?? visibleResult.curve)}
+                    curve={activeOption?.curve ?? visibleResult.curve}
                     measured_levels={visibleResult.measured_levels}
                     calculationDetails={visibleResult.calculation_details}
                     pk_model_name={visibleResult.pk_parameters?.pk_model_name}
