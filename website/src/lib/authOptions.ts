@@ -114,6 +114,9 @@ export const authOptions: NextAuthOptions = {
           mfaVerified: false,
           mfaEnabled: user.mfa_enabled === 1,
           lastActivity: Date.now(),
+          subscriptionTier: user.subscription_tier ?? "free",
+          institutionalAccountId: user.institutional_account_id,
+          institutionalRole: user.institutional_role ?? "user",
         };
       },
     }),
@@ -141,6 +144,9 @@ export const authOptions: NextAuthOptions = {
         token.mfaVerified = u.mfaVerified;
         token.mfaEnabled = u.mfaEnabled;
         token.lastActivity = u.lastActivity;
+        token.subscriptionTier = u.subscriptionTier;
+        token.institutionalAccountId = u.institutionalAccountId;
+        token.institutionalRole = u.institutionalRole;
       }
 
       // Update lastActivity on every token refresh (session check)
@@ -178,6 +184,9 @@ export const authOptions: NextAuthOptions = {
         (session.user as Record<string, unknown>).mfaPending = token.mfaPending;
         (session.user as Record<string, unknown>).mfaVerified = token.mfaVerified;
         (session.user as Record<string, unknown>).mfaEnabled = token.mfaEnabled;
+        (session.user as Record<string, unknown>).subscriptionTier = token.subscriptionTier;
+        (session.user as Record<string, unknown>).institutionalAccountId = token.institutionalAccountId;
+        (session.user as Record<string, unknown>).institutionalRole = token.institutionalRole;
       }
 
       // Single-session enforcement

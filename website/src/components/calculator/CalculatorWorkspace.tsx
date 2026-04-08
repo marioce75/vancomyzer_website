@@ -37,6 +37,7 @@ import RegimenSuggestionCard from "@/components/calculator/RegimenSuggestionCard
 import SettingsPanel from "@/components/calculator/SettingsPanel";
 import DisclaimerModal from "@/components/calculator/DisclaimerModal";
 import PKParametersMath from "@/components/calculator/PKParametersMath";
+import NoteExportGate from "@/components/calculator/NoteExportGate";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { printReport, type ReportData } from "@/lib/generateReport";
@@ -561,8 +562,8 @@ export default function CalculatorWorkspace() {
         trough: o.trough,
       })),
     };
-    printReport(reportData);
-  }, [visibleResult, activeOption, patient]);
+    printReport(reportData, user?.subscriptionTier ?? "free");
+  }, [visibleResult, activeOption, patient, user?.subscriptionTier]);
 
   const leftColumn = (
     <div className="flex flex-col h-full">
@@ -820,14 +821,11 @@ export default function CalculatorWorkspace() {
                         EXPORT PDF
                       </button>
                       {(activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note) && (
-                        <button
-                          type="button"
-                          onClick={handleCopyNote}
-                          className="border px-2 py-0.5 text-[10px] font-semibold transition-colors"
-                          style={{ borderColor: "var(--color-border)", background: "transparent", color: "var(--color-secondary)" }}
-                        >
-                          {copySuccess ? "COPIED" : "COPY NOTE"}
-                        </button>
+                        <NoteExportGate
+                          tier={user?.subscriptionTier ?? "free"}
+                          onCopy={handleCopyNote}
+                          noteText={activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note ?? ""}
+                        />
                       )}
                       <ResultScopeBanner recommendation_type={visibleResult.recommendation_type} />
                     </div>

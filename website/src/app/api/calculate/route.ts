@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { computeInitialRegimen } from "@/lib/initialRegimen";
 import { runExistingRegimenPipeline } from "@/lib/pk/runExistingRegimenPipeline";
 import { logCalculation } from "@/lib/auditLog";
+import { logCalculationEntry, getUserTier, isPaidTier, findUserByLogin } from "@/lib/db";
 
 type Mode = "initial_regimen" | "existing_regimen";
 
@@ -201,6 +202,28 @@ export async function POST(request: NextRequest) {
       outputs: extractOutputs(result),
       pk_parameters: extractPKParams(result),
     });
+
+    // Calculation log for paid tier users (no patient identifiers)
+    try {
+      const dbUser = findUserByLogin(userEmail);
+      if (dbUser && isPaidTier(getUserTier(dbUser.id))) {
+        const pk = result.pk_parameters as Record<string, unknown> | undefined;
+        logCalculationEntry({
+          user_id: dbUser.id,
+          institutional_account_id: dbUser.institutional_account_id,
+          workflow_type: "empiric",
+          pk_model: (pk?.pk_model_name as string) ?? "colin_2019",
+          obesity_model_active: (pk?.pk_model_name === "vancomyzer_obesity") ? 1 : 0,
+          bmi_above_40: (pk?.pk_model_name === "vancomyzer_obesity") ? 1 : 0,
+          dose_mg: parseInt(String(result.recommended_dose ?? "0")),
+          interval_hours: result.recommended_interval_hours as number ?? null,
+          auc24: result.auc24 as number ?? null,
+          peak: result.peak as number ?? null,
+          trough: result.trough as number ?? null,
+          auc_in_range: ((result.auc24 as number) >= 400 && (result.auc24 as number) <= 600) ? 1 : 0,
+        });
+      }
+    } catch { /* non-blocking */ }
 
     return NextResponse.json(result);
   }

@@ -63,6 +63,53 @@ function getDb(): Database.Database {
   try { _db.exec("ALTER TABLE users ADD COLUMN failed_login_attempts INTEGER DEFAULT 0"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE users ADD COLUMN locked_until TEXT"); } catch { /* exists */ }
 
+  // Subscription tier columns
+  try { _db.exec("ALTER TABLE users ADD COLUMN subscription_tier TEXT DEFAULT 'free'"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN subscription_status TEXT DEFAULT 'active'"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN subscription_expiry TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN institutional_account_id INTEGER"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN institutional_role TEXT DEFAULT 'user'"); } catch { /* exists */ }
+
+  // Institutional accounts table
+  _db.exec(`
+    CREATE TABLE IF NOT EXISTS institutional_accounts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      institution_name TEXT NOT NULL,
+      billing_email TEXT NOT NULL,
+      plan_tier TEXT NOT NULL DEFAULT 'department' CHECK (plan_tier IN ('department', 'hospital', 'enterprise')),
+      seats_allocated INTEGER NOT NULL DEFAULT 20,
+      seats_used INTEGER NOT NULL DEFAULT 0,
+      subscription_start TEXT NOT NULL DEFAULT (datetime('now')),
+      subscription_expiry TEXT,
+      baa_status TEXT DEFAULT 'not_requested' CHECK (baa_status IN ('not_requested', 'pending', 'active')),
+      baa_requested_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
+  // Calculation log (no patient identifiers)
+  _db.exec(`
+    CREATE TABLE IF NOT EXISTS calculation_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      institutional_account_id INTEGER,
+      calculated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      workflow_type TEXT NOT NULL,
+      pk_model TEXT NOT NULL DEFAULT 'colin_2019',
+      obesity_model_active INTEGER DEFAULT 0,
+      bmi_above_40 INTEGER DEFAULT 0,
+      dose_mg INTEGER,
+      interval_hours INTEGER,
+      auc24 REAL,
+      peak REAL,
+      trough REAL,
+      auc_in_range INTEGER DEFAULT 0
+    );
+    CREATE INDEX IF NOT EXISTS idx_calc_log_user ON calculation_log(user_id);
+    CREATE INDEX IF NOT EXISTS idx_calc_log_inst ON calculation_log(institutional_account_id);
+    CREATE INDEX IF NOT EXISTS idx_calc_log_date ON calculation_log(calculated_at);
+  `);
+
   // Security audit log (append-only)
   _db.exec(`
     CREATE TABLE IF NOT EXISTS security_audit_log (
@@ -123,6 +170,12 @@ export interface UserRow {
   mfa_verified_at: string | null;
   failed_login_attempts: number;
   locked_until: string | null;
+  // Subscription fields
+  subscription_tier: "free" | "department" | "hospital" | "enterprise";
+  subscription_status: "active" | "expired" | "trial" | "cancelled";
+  subscription_expiry: string | null;
+  institutional_account_id: number | null;
+  institutional_role: "user" | "admin";
 }
 
 export function findUserByLogin(usernameOrEmail: string): UserRow | undefined {
@@ -301,4 +354,176 @@ export function getSecuritySummary() {
   const lastEvent = getDb().prepare("SELECT * FROM security_audit_log ORDER BY timestamp DESC LIMIT 1").get() as SecurityAuditRow | undefined;
 
   return { total, failedLogins24h, lockedAccounts, lastEvent };
+}
+
+// ---------------------------------------------------------------------------
+// Subscription Tier Helpers
+// ---------------------------------------------------------------------------
+
+export function getUserTier(userId: number): "free" | "department" | "hospital" | "enterprise" {
+  const row = getDb().prepare("SELECT subscription_tier FROM users WHERE id = ?").get(userId) as { subscription_tier: string } | undefined;
+  return (row?.subscription_tier as "free" | "department" | "hospital" | "enterprise") ?? "free";
+}
+
+export function isPaidTier(tier: string): boolean {
+  return tier === "department" || tier === "hospital" || tier === "enterprise";
+}
+
+export function setUserTier(userId: number, tier: string, expiry?: string) {
+  getDb().prepare("UPDATE users SET subscription_tier = ?, subscription_expiry = ? WHERE id = ?").run(tier, expiry ?? null, userId);
+}
+
+export function setUserInstitution(userId: number, institutionalAccountId: number, role: string = "user") {
+  getDb().prepare("UPDATE users SET institutional_account_id = ?, institutional_role = ? WHERE id = ?").run(institutionalAccountId, role, userId);
+}
+
+// ---------------------------------------------------------------------------
+// Institutional Accounts
+// ---------------------------------------------------------------------------
+
+export interface InstitutionalAccountRow {
+  id: number;
+  institution_name: string;
+  billing_email: string;
+  plan_tier: string;
+  seats_allocated: number;
+  seats_used: number;
+  subscription_start: string;
+  subscription_expiry: string | null;
+  baa_status: string;
+  baa_requested_at: string | null;
+  created_at: string;
+}
+
+export function createInstitutionalAccount(account: Omit<InstitutionalAccountRow, "id" | "seats_used" | "created_at">): number {
+  const result = getDb().prepare(`INSERT INTO institutional_accounts
+    (institution_name, billing_email, plan_tier, seats_allocated, subscription_start, subscription_expiry, baa_status)
+    VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    account.institution_name, account.billing_email, account.plan_tier,
+    account.seats_allocated, account.subscription_start, account.subscription_expiry,
+    account.baa_status ?? "not_requested"
+  );
+  return Number(result.lastInsertRowid);
+}
+
+export function getInstitutionalAccount(id: number): InstitutionalAccountRow | undefined {
+  return getDb().prepare("SELECT * FROM institutional_accounts WHERE id = ?").get(id) as InstitutionalAccountRow | undefined;
+}
+
+export function listInstitutionalAccounts(): InstitutionalAccountRow[] {
+  return getDb().prepare("SELECT * FROM institutional_accounts ORDER BY created_at DESC").all() as InstitutionalAccountRow[];
+}
+
+export function updateBaaStatus(id: number, status: string) {
+  getDb().prepare("UPDATE institutional_accounts SET baa_status = ?, baa_requested_at = CASE WHEN ? = 'pending' THEN datetime('now') ELSE baa_requested_at END WHERE id = ?").run(status, status, id);
+}
+
+export function getInstitutionUsers(institutionalAccountId: number): UserRow[] {
+  return getDb().prepare("SELECT * FROM users WHERE institutional_account_id = ?").all(institutionalAccountId) as UserRow[];
+}
+
+export function recountSeats(institutionalAccountId: number) {
+  const count = (getDb().prepare("SELECT COUNT(*) as cnt FROM users WHERE institutional_account_id = ?").get(institutionalAccountId) as { cnt: number }).cnt;
+  getDb().prepare("UPDATE institutional_accounts SET seats_used = ? WHERE id = ?").run(count, institutionalAccountId);
+}
+
+// ---------------------------------------------------------------------------
+// Calculation Log (no patient identifiers)
+// ---------------------------------------------------------------------------
+
+export interface CalcLogEntry {
+  id: number;
+  user_id: number;
+  institutional_account_id: number | null;
+  calculated_at: string;
+  workflow_type: string;
+  pk_model: string;
+  obesity_model_active: number;
+  bmi_above_40: number;
+  dose_mg: number | null;
+  interval_hours: number | null;
+  auc24: number | null;
+  peak: number | null;
+  trough: number | null;
+  auc_in_range: number;
+}
+
+export function logCalculationEntry(entry: Omit<CalcLogEntry, "id" | "calculated_at">) {
+  getDb().prepare(`INSERT INTO calculation_log
+    (user_id, institutional_account_id, workflow_type, pk_model, obesity_model_active,
+     bmi_above_40, dose_mg, interval_hours, auc24, peak, trough, auc_in_range)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    entry.user_id, entry.institutional_account_id, entry.workflow_type,
+    entry.pk_model, entry.obesity_model_active, entry.bmi_above_40,
+    entry.dose_mg, entry.interval_hours, entry.auc24, entry.peak,
+    entry.trough, entry.auc_in_range
+  );
+}
+
+export function getCalcLog(filters?: {
+  institutional_account_id?: number;
+  user_id?: number;
+  start_date?: string;
+  end_date?: string;
+  workflow_type?: string;
+  pk_model?: string;
+  limit?: number;
+}): CalcLogEntry[] {
+  const conditions: string[] = [];
+  const params: unknown[] = [];
+
+  if (filters?.institutional_account_id) {
+    conditions.push("institutional_account_id = ?");
+    params.push(filters.institutional_account_id);
+  }
+  if (filters?.user_id) {
+    conditions.push("user_id = ?");
+    params.push(filters.user_id);
+  }
+  if (filters?.start_date) {
+    conditions.push("calculated_at >= ?");
+    params.push(filters.start_date);
+  }
+  if (filters?.end_date) {
+    conditions.push("calculated_at <= ?");
+    params.push(filters.end_date);
+  }
+  if (filters?.workflow_type) {
+    conditions.push("workflow_type = ?");
+    params.push(filters.workflow_type);
+  }
+  if (filters?.pk_model) {
+    conditions.push("pk_model = ?");
+    params.push(filters.pk_model);
+  }
+
+  const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const limit = filters?.limit ?? 500;
+  params.push(limit);
+
+  return getDb().prepare(`SELECT * FROM calculation_log ${where} ORDER BY calculated_at DESC LIMIT ?`).all(...params) as CalcLogEntry[];
+}
+
+export function getCalcLogSummary(institutionalAccountId: number) {
+  const thisMonth = (getDb().prepare(
+    "SELECT COUNT(*) as cnt FROM calculation_log WHERE institutional_account_id = ? AND calculated_at >= datetime('now', 'start of month')"
+  ).get(institutionalAccountId) as { cnt: number }).cnt;
+
+  const thisWeek = (getDb().prepare(
+    "SELECT COUNT(*) as cnt FROM calculation_log WHERE institutional_account_id = ? AND calculated_at >= datetime('now', '-7 days')"
+  ).get(institutionalAccountId) as { cnt: number }).cnt;
+
+  const obesityPct = (getDb().prepare(
+    "SELECT ROUND(AVG(obesity_model_active) * 100, 1) as pct FROM calculation_log WHERE institutional_account_id = ? AND calculated_at >= datetime('now', 'start of month')"
+  ).get(institutionalAccountId) as { pct: number | null })?.pct ?? 0;
+
+  const aucInRangePct = (getDb().prepare(
+    "SELECT ROUND(AVG(auc_in_range) * 100, 1) as pct FROM calculation_log WHERE institutional_account_id = ? AND calculated_at >= datetime('now', 'start of month')"
+  ).get(institutionalAccountId) as { pct: number | null })?.pct ?? 0;
+
+  const uniqueUsers = (getDb().prepare(
+    "SELECT COUNT(DISTINCT user_id) as cnt FROM calculation_log WHERE institutional_account_id = ? AND calculated_at >= datetime('now', 'start of month')"
+  ).get(institutionalAccountId) as { cnt: number }).cnt;
+
+  return { thisMonth, thisWeek, obesityPct, aucInRangePct, uniqueUsers };
 }
