@@ -34,9 +34,8 @@ function LoadingDoseGuidance({ doseMg, weightKg, onSimulate }: { doseMg: number;
   const loadLow = Math.round(wt * 25 / 250) * 250;
   const loadHigh = Math.min(3000, Math.round(wt * 30 / 250) * 250);
 
-  // Editable loading dose parameters
+  // Editable loading dose
   const [customDose, setCustomDose] = React.useState(defaultDose);
-  const [customInterval, setCustomInterval] = React.useState(12);
 
   // Auto-calculate infusion duration (≤10 mg/min, min 60 min)
   const infusionMinutes = Math.max(60, Math.ceil(customDose / 10));
@@ -81,45 +80,25 @@ function LoadingDoseGuidance({ doseMg, weightKg, onSimulate }: { doseMg: number;
           </div>
 
           {/* Editable dose */}
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <div>
-              <label style={{ fontSize: 9, fontWeight: 600, color: "var(--color-secondary)", display: "block", marginBottom: 3, ...FONT }}>
-                LOADING DOSE (mg)
-              </label>
-              <select
-                value={customDose}
-                onChange={e => setCustomDose(Number(e.target.value))}
-                style={{
-                  width: "100%", padding: "6px 8px", fontSize: 14, fontWeight: 700,
-                  border: "1px solid var(--color-border)", background: "var(--color-card)",
-                  color: "var(--color-primary)", ...FONT,
-                }}
-              >
-                {[1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000].map(d => (
-                  <option key={d} value={d}>
-                    {d} mg {d === defaultDose ? "(suggested)" : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label style={{ fontSize: 9, fontWeight: 600, color: "var(--color-secondary)", display: "block", marginBottom: 3, ...FONT }}>
-                THEN MAINTAIN Q (hours)
-              </label>
-              <select
-                value={customInterval}
-                onChange={e => setCustomInterval(Number(e.target.value))}
-                style={{
-                  width: "100%", padding: "6px 8px", fontSize: 14, fontWeight: 700,
-                  border: "1px solid var(--color-border)", background: "var(--color-card)",
-                  color: "var(--color-primary)", ...FONT,
-                }}
-              >
-                {[6, 8, 12, 24].map(h => (
-                  <option key={h} value={h}>Q{h}h</option>
-                ))}
-              </select>
-            </div>
+          <div className="mb-3">
+            <label style={{ fontSize: 9, fontWeight: 600, color: "var(--color-secondary)", display: "block", marginBottom: 3, ...FONT }}>
+              LOADING DOSE (mg)
+            </label>
+            <select
+              value={customDose}
+              onChange={e => setCustomDose(Number(e.target.value))}
+              style={{
+                width: "100%", padding: "8px 10px", fontSize: 16, fontWeight: 700,
+                border: "1px solid var(--color-border)", background: "var(--color-card)",
+                color: "var(--color-primary)", ...FONT,
+              }}
+            >
+              {[1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000].map(d => (
+                <option key={d} value={d}>
+                  {d} mg {d === defaultDose ? "(suggested)" : ""}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Auto-calculated infusion */}
@@ -133,7 +112,7 @@ function LoadingDoseGuidance({ doseMg, weightKg, onSimulate }: { doseMg: number;
           {onSimulate && (
             <button
               type="button"
-              onClick={() => onSimulate(customDose, customInterval, infusionHours)}
+              onClick={() => onSimulate(customDose, 12, infusionHours)}
               className="w-full py-2.5 text-xs font-bold uppercase tracking-wider transition-colors"
               style={{
                 background: "var(--color-primary)", color: "var(--color-card)",
