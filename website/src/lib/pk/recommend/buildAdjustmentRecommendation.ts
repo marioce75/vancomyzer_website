@@ -1,7 +1,7 @@
 import type { ExistingRegimenEngineOutput, AdjustmentRecommendation, FrequencyOption } from "../types";
 import { simulateCandidateExposure } from "./simulateCandidateExposure";
 import { computeSafeInfusionDurationHours } from "./infusionSafety";
-import { curvePoints } from "../steadyStateTwoCompartment";
+import { curvePoints, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
 
 const TARGET_AUC24_LOW = 400;
 const TARGET_AUC24_HIGH = 600;
@@ -132,7 +132,8 @@ function collectFrequencyOptions(
   CL: number, V1: number, Q: number, V2: number,
   infusion_hours: number,
   recommended: { dose_mg: number; interval_hours: number },
-  targetAucMid: number = TARGET_AUC24_MID
+  targetAucMid: number = TARGET_AUC24_MID,
+  loadingDose?: { dose_mg: number; T_inf: number }
 ): FrequencyOption[] {
   const allCandidates: { dose_mg: number; interval_hours: number; auc24: number; peak: number; trough: number; inRange: boolean }[] = [];
 
@@ -175,10 +176,17 @@ function collectFrequencyOptions(
     if (!pick.inRange) return;
     const infusion = computeSafeInfusionDurationHours(pick.dose_mg);
     const T_inf = infusion.infusion_duration_hours;
-    const optCurve = curvePoints(
-      { CL, V1, Q, V2, dose_mg: pick.dose_mg, tau: interval, T_inf },
-      0.25
-    );
+    const optCurve = loadingDose
+      ? loadingDoseCurvePoints(
+          { CL, V1, Q, V2 },
+          loadingDose.dose_mg, loadingDose.T_inf,
+          pick.dose_mg, interval, T_inf,
+          0.25
+        )
+      : curvePoints(
+          { CL, V1, Q, V2, dose_mg: pick.dose_mg, tau: interval, T_inf },
+          0.25
+        );
     options.push({
       dose_mg: pick.dose_mg,
       interval_hours: interval,
@@ -290,7 +298,8 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
   base.frequency_options = collectFrequencyOptions(
     CL, V1, Q, V2, infusion_hours,
     { dose_mg: Number.isFinite(recDose) ? recDose : current_regimen_dose_mg, interval_hours: base.recommended_interval_hours },
-    targetAucMid
+    targetAucMid,
+    isPulseDose ? { dose_mg: current_regimen_dose_mg, T_inf: Math.min(infusion_hours, current_regimen_interval_hours) } : undefined
   );
 
   return base;
