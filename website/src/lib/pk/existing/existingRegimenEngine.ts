@@ -3,7 +3,8 @@
  */
 
 import { runPosteriorEngine } from "../posterior/posteriorEngine";
-import { computeExposure, curvePoints } from "../steadyStateTwoCompartment";
+import { computeExposure, curvePoints, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
+import { computeSafeInfusionDurationHours } from "../recommend/infusionSafety";
 import type { ExistingRegimenEngineInput, ExistingRegimenEngineOutput } from "../types";
 
 export function runExistingRegimenEngine(
@@ -30,7 +31,44 @@ export function runExistingRegimenEngine(
   const isPulseDose = doses_given === 1;
 
   const steadyStateExposure = computeExposure({ CL, V1, Q, V2, dose_mg, tau, T_inf });
-  const curve = curvePoints({ CL, V1, Q, V2, dose_mg, tau, T_inf });
+
+  // For loading dose: build a realistic curve showing loading → maintenance transition
+  // For regular regimens: use standard multi-dose accumulation curve
+  let curve: { time_hours: number; concentration: number }[];
+  if (isPulseDose) {
+    // Calculate what the maintenance dose will be (simple AUC-proportional scaling)
+    const targetAuc = target_auc24 ?? 450;
+    // Best maintenance: find dose at Q8h or Q12h that hits target AUC
+    const maintIntervals = [8, 12, 24];
+    let bestMaintDose = 500;
+    let bestMaintTau = 12;
+    let bestMaintTinf = 1;
+    let bestAucDiff = Infinity;
+    for (const mTau of maintIntervals) {
+      const idealDose = Math.round((targetAuc * CL * mTau / 24) / 250) * 250;
+      const clampedDose = Math.max(250, Math.min(2000, idealDose));
+      const mTinf = computeSafeInfusionDurationHours(clampedDose).infusion_duration_hours;
+      const mExposure = computeExposure({ CL, V1, Q, V2, dose_mg: clampedDose, tau: mTau, T_inf: mTinf });
+      const diff = Math.abs(mExposure.auc24 - targetAuc);
+      if (diff < bestAucDiff) {
+        bestAucDiff = diff;
+        bestMaintDose = clampedDose;
+        bestMaintTau = mTau;
+        bestMaintTinf = mTinf;
+      }
+    }
+
+    curve = loadingDoseCurvePoints(
+      { CL, V1, Q, V2 },
+      dose_mg,     // loading dose
+      T_inf,       // loading infusion duration
+      bestMaintDose, // maintenance dose
+      bestMaintTau,  // maintenance interval
+      bestMaintTinf, // maintenance infusion duration
+    );
+  } else {
+    curve = curvePoints({ CL, V1, Q, V2, dose_mg, tau, T_inf });
+  }
 
   // For steady-state, use the SS AUC24 = TDD/CL
   // For non-steady-state, extract actual peak/trough from the Nth dose cycle in the curve

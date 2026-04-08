@@ -161,3 +161,87 @@ export function curvePoints(input: SteadyStateInput, step_hours: number = 0.5): 
 
   return points;
 }
+
+/**
+ * Generate a concentration-time curve for a loading dose followed by maintenance doses.
+ *
+ * Dose 1 uses the loading dose parameters (loadDose_mg, loadT_inf).
+ * Subsequent doses use the maintenance parameters (maintDose_mg, maintTau, maintT_inf).
+ * The maintenance doses start at t = maintTau after the loading dose.
+ *
+ * This produces a realistic clinical curve showing rapid attainment from
+ * the loading dose followed by steady-state accumulation of maintenance.
+ */
+export function loadingDoseCurvePoints(
+  params: TwoCompartmentParameters,
+  loadDose_mg: number,
+  loadT_inf: number,
+  maintDose_mg: number,
+  maintTau: number,
+  maintT_inf: number,
+  step_hours: number = 0.5
+): CurvePoint[] {
+  const { beta } = computeConstants(params);
+  const halfLifeBeta = 0.693 / beta;
+
+  // First maintenance dose starts after the loading dose interval
+  // Use maintTau as the gap between loading and first maintenance
+  const firstMaintTime = maintTau;
+  const n_maint = Math.max(6, Math.ceil((4 * halfLifeBeta) / maintTau) + 2);
+  const total_time = firstMaintTime + n_maint * maintTau;
+
+  // Build dose schedule: [{ time, dose_mg, T_inf }]
+  const doseSchedule: { time: number; dose_mg: number; T_inf: number }[] = [];
+  // Loading dose at t=0
+  doseSchedule.push({ time: 0, dose_mg: loadDose_mg, T_inf: loadT_inf });
+  // Maintenance doses
+  for (let k = 0; k < n_maint; k++) {
+    doseSchedule.push({
+      time: firstMaintTime + k * maintTau,
+      dose_mg: maintDose_mg,
+      T_inf: maintT_inf,
+    });
+  }
+
+  // Build time grid
+  const times = new Set<number>();
+  for (let t = 0; t <= total_time + 1e-9; t += step_hours) {
+    times.add(Math.round(t * 1000) / 1000);
+  }
+  for (const d of doseSchedule) {
+    times.add(d.time);
+    times.add(d.time + d.T_inf); // end of infusion
+    // Trough just before next dose
+    const idx = doseSchedule.indexOf(d);
+    if (idx < doseSchedule.length - 1) {
+      times.add(doseSchedule[idx + 1].time);
+    }
+  }
+
+  const sortedTimes = Array.from(times).sort((a, b) => a - b);
+  const points: CurvePoint[] = [];
+
+  for (const t of sortedTimes) {
+    if (t > total_time + 1e-9) break;
+
+    let concentration = 0;
+    for (const d of doseSchedule) {
+      if (t < d.time) break;
+      // Create input for this specific dose
+      const doseInput: SteadyStateInput = {
+        ...params,
+        dose_mg: d.dose_mg,
+        tau: maintTau, // not used by singleDoseConcentration, but needed for type
+        T_inf: d.T_inf,
+      };
+      concentration += singleDoseConcentration(doseInput, t - d.time);
+    }
+
+    points.push({
+      time_hours: t,
+      concentration: Math.max(0, concentration),
+    });
+  }
+
+  return points;
+}
