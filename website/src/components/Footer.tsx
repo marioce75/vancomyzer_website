@@ -11,7 +11,7 @@ export default function Footer() {
             <div className="flex items-center gap-3 mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/favicon.svg"
+                src="/logo-signal.svg"
                 alt="Vancomyzer™ logo"
                 width={32}
                 height={32}

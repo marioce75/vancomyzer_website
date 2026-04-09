@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 
 type WorkspaceViewMode = "empiric" | "one_level" | "two_levels";
 
@@ -12,6 +13,8 @@ interface CalculatorHeaderProps {
 }
 
 export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen, userName, userRole, onLogout }: CalculatorHeaderProps) {
+  const { settings } = useMatrixSettings();
+  const logoSrc = settings.colorMode === "matrix-green" ? "/favicon.svg" : "/logo-signal.svg";
   return (
     <header
       className="shrink-0 border-b"
@@ -27,7 +30,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
         <Link href="/" className="flex items-center gap-3 shrink-0 group">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/favicon.svg"
+            src={logoSrc}
             alt="Vancomyzer™"
             width={36}
             height={36}

@@ -66,7 +66,7 @@ function ResetPasswordForm() {
       }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/favicon.svg" alt="Vancomyzer" width={48} height={48} style={{ margin: "0 auto 12px" }} />
+          <img src="/logo-signal.svg" alt="Vancomyzer" width={48} height={48} style={{ margin: "0 auto 12px" }} />
           <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1e4d8c", margin: 0 }}>
             {token ? "Set New Password" : "Forgot Password"}
           </h1>

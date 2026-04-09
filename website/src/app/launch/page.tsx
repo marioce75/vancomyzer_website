@@ -118,7 +118,7 @@ function LaunchContent() {
         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/favicon.svg" alt="Vancomyzer" width={48} height={48} style={{ margin: "0 auto 16px" }} />
+        <img src="/logo-signal.svg" alt="Vancomyzer" width={48} height={48} style={{ margin: "0 auto 16px" }} />
         <h1 style={{ fontSize: 18, fontWeight: 700, color: "var(--color-primary)", marginBottom: 8 }}>
           VANCOMYZER{"\u2122"} SMART Launch
         </h1>
