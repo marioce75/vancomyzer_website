@@ -182,14 +182,16 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             <Link
               href="/admin/dashboard"
               className="px-3 py-1.5 text-sm font-medium transition"
-              style={{ color: "#047857", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace", fontWeight: 700 }}
+              style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace", fontWeight: 700 }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = "#047857";
-                (e.currentTarget as HTMLElement).style.background = "#ecfdf5";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
+                (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "transparent";
                 (e.currentTarget as HTMLElement).style.background = "transparent";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
               }}
             >
               Dashboard
@@ -207,9 +209,8 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               }}
               onMouseEnter={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
-                (e.currentTarget as HTMLElement).style.background = "rgba(30,77,140,0.08)";
+                (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
                 (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
-              (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "transparent";

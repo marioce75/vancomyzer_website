@@ -43,6 +43,8 @@
   /* Legacy aliases — kept for any components still referencing old names */
   --mx-green:           var(--color-primary);
   --text-primary:       var(--color-primary);
+  --text-secondary:     var(--color-secondary);
+  --text-muted:         var(--color-dim);
   --foreground:         var(--color-primary);
   --teal:               var(--color-primary);
   --vc-text:            var(--color-primary);

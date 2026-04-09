@@ -38,7 +38,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Link>
           {username && (
             <div className="px-5 pb-4">
-              <span className="text-blue-200 text-xs">{username}</span>
+              <span className="text-white text-xs font-medium">{username}</span>
             </div>
           )}
 
@@ -63,12 +63,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Bottom */}
         <div className="px-3 pb-5 flex flex-col gap-2">
-          <Link href="/" className="text-blue-200 hover:text-white text-xs px-3 py-1 transition-colors">
-            Back to Calculator
+          <Link href="/calculator" className="text-white hover:text-blue-100 text-xs font-medium px-3 py-1.5 transition-colors hover:bg-white/10 rounded">
+            ← Back to Calculator
           </Link>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="text-left text-blue-200 hover:text-white text-xs px-3 py-1 transition-colors"
+            className="text-left text-white hover:text-blue-100 text-xs font-medium px-3 py-1.5 transition-colors hover:bg-white/10 rounded"
           >
             Logout
           </button>
