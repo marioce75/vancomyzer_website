@@ -10,14 +10,14 @@ interface CalculatorActionBarProps {
 
 export default function CalculatorActionBar({ onCalculate, onReset, disabled, hideCalculate }: CalculatorActionBarProps) {
   return (
-    <div className="mt-1 flex items-center justify-between gap-3">
+    <div className="mt-1 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
       <p
-        className="text-xs font-medium uppercase tracking-[0.16em]"
+        className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.16em] text-center"
         style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em" }}
       >
-        &gt; recalculate after any draft change
+        &gt; recalculate after{"\n"}any draft change
       </p>
-      <div className="flex justify-end gap-3">
+      <div className="flex justify-center gap-3">
         <button
           type="button"
           onClick={onReset}
