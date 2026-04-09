@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const FROM = `"Vancomyzer™" <${process.env.SMTP_USER ?? "noreply@vancomyzer.com"}>`;
+const FROM = `"Vancomyzer™" <${process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "noreply@vancomyzer.com"}>`;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "";
 
 // ---------------------------------------------------------------------------

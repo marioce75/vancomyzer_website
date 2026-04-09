@@ -76,6 +76,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, message: `${user.username} account unlocked.` });
   }
 
+  if (action === "resend_approval") {
+    await sendApprovalNotification({ full_name: user.full_name, email: user.email, username: user.username });
+    console.log(`[ADMIN] Approval email resent to ${user.email} by ${adminUsername}`);
+    return NextResponse.json({ ok: true, message: `Approval email resent to ${user.email}.` });
+  }
+
   if (action === "force_reset") {
     // Generate a reset token and send password reset email
     const crypto = require("crypto");

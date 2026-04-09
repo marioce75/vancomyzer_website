@@ -205,9 +205,14 @@ export default function UsersPage() {
                           </button>
                         )}
                         {u.status === "active" && (
+                          <>
                           <button onClick={() => handleForceReset(u.id)} className="px-2 py-0.5 text-[10px] font-semibold text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
                             RESET PW
                           </button>
+                          <button onClick={() => handleAction("resend_approval", u.id)} className="px-2 py-0.5 text-[10px] font-semibold text-blue-700 bg-blue-100 rounded hover:bg-blue-200">
+                            RESEND EMAIL
+                          </button>
+                          </>
                         )}
                       </div>
                     </td>
