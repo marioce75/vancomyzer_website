@@ -1037,9 +1037,9 @@ export default function CalculatorWorkspace() {
   );
 
   return (
-    <div className="relative flex h-screen flex-col overflow-hidden" style={{ background: "transparent", color: "var(--color-primary)" }}>
+    <div className="relative flex h-screen flex-col overflow-hidden xl:overflow-hidden" style={{ background: "transparent", color: "var(--color-primary)" }}>
       <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} userName={user?.username} userRole={user?.role} onLogout={logout} />
-      <div className="flex-1 overflow-hidden h-full">
+      <div className="flex-1 overflow-auto xl:overflow-hidden h-full">
         <CalculatorLayout left={leftColumn} right={rightColumn} />
       </div>
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
