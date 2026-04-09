@@ -28,7 +28,7 @@ const Label = ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: str
 );
 
 const FormRow = ({ children }: { children: React.ReactNode }) => (
-  <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
     {children}
   </div>
 );

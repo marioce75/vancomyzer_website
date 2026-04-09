@@ -2,6 +2,14 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./Providers";
 
+import type { Viewport } from "next";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   title: "VANCOMYZER\u2122",
   description:

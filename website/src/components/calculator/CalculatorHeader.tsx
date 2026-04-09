@@ -24,26 +24,26 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
         boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
       }}
     >
-      <div className="mx-auto flex h-[68px] max-w-[1680px] items-center justify-between gap-6 px-5 lg:px-8">
+      <div className="mx-auto flex h-12 sm:h-14 lg:h-[68px] max-w-[1680px] items-center justify-between gap-2 sm:gap-4 lg:gap-6 px-3 sm:px-5 lg:px-8">
 
         {/* ── Brand ──────────────────────────────────────── */}
-        <Link href="/" className="flex items-center gap-3 shrink-0 group">
+        <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0 group">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logoSrc}
             alt="Vancomyzer™"
-            width={36}
-            height={36}
-            className="shrink-0 transition-opacity group-hover:opacity-85"
+            width={28}
+            height={28}
+            className="shrink-0 transition-opacity group-hover:opacity-85 sm:w-9 sm:h-9"
           />
-          <div className="min-w-0">
+          <div className="min-w-0 hidden sm:block">
             <h1
               className="font-bold whitespace-nowrap leading-tight transition-colors vancomyzer-title"
               style={{ fontSize: "22px", letterSpacing: "4px", color: "var(--color-primary)", textShadow: "0 0 10px var(--color-glow)" }}
             >
               VANCOMYZER{"\u2122"}
             </h1>
-            <p className="font-medium leading-none mt-0.5 whitespace-nowrap" style={{ fontSize: "12px", letterSpacing: "2px", color: "var(--color-secondary)" }}>
+            <p className="font-medium leading-none mt-0.5 whitespace-nowrap hidden lg:block" style={{ fontSize: "12px", letterSpacing: "2px", color: "var(--color-secondary)" }}>
               BAYESIAN PK ·{" "}
               <span style={{ fontSize: "11px", letterSpacing: "3px", color: "var(--color-dim)" }}>
                 ENGINEERED BY{" "}
@@ -102,7 +102,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 role="tab"
                 aria-selected={viewMode === value}
                 onClick={() => onViewModeChange(value)}
-                className="px-4 py-1.5 text-sm font-semibold transition-all"
+                className="px-2.5 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold transition-all"
                 style={
                   viewMode === value
                     ? {
@@ -126,7 +126,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
         </div>
 
         {/* ── Nav ───────────────────────────────────────── */}
-        <div className="flex flex-1 items-center justify-end gap-2">
+        <div className="hidden md:flex flex-1 items-center justify-end gap-2">
           <Link
             href="/"
             className="px-3 py-1.5 text-sm font-medium transition"
@@ -252,6 +252,18 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
                 (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
               }}
+            >
+              LOGOUT
+            </button>
+          )}
+        </div>
+
+        {/* ── Mobile logout (visible when nav is hidden) ─── */}
+        <div className="flex md:hidden items-center gap-1">
+          {onLogout && (
+            <button type="button" onClick={onLogout}
+              className="px-2 py-1.5 text-[10px] font-semibold"
+              style={{ color: "var(--color-secondary)", border: "1px solid var(--color-border)", background: "transparent", cursor: "pointer" }}
             >
               LOGOUT
             </button>
