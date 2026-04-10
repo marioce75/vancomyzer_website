@@ -593,8 +593,7 @@ export function importHistoricalData(): { imported: number; errors: string[] } {
 
   // 2. Import from database
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const dbMod = require("./db") as typeof import("./db");
+    const dbMod = require("./db") as typeof import("./db"); // dynamic require for standalone script compat
     dbMod.ensureScraperTables();
     const runs = dbMod.getRecentRuns(100);
     const allPosts = dbMod.getAllPosts();
