@@ -6,11 +6,32 @@
  */
 
 import crypto from "crypto";
-import { insertPost, logRequest, getLatestSnapshot, insertSnapshot } from "./db";
+import { insertPost, logRequest, getLatestSnapshot, insertSnapshot, getRunById } from "./db";
+import type { ScraperPost } from "./db";
 import { REDDIT_SOURCES, PUBMED_SEARCHES, COMPETITOR_URLS, COMPETITOR_DISCOVERY_TERMS } from "./sources";
 import { runAnalysis } from "./analysis";
+import { saveRunToFiles, type RawPost } from "./filePersistence";
 
 const USER_AGENT = "Dosys Health LLC-MarketResearch/1.0";
+
+// Collect every post fetched during a run for file persistence
+let _collected: RawPost[] = [];
+
+function trackAndInsert(post: Omit<ScraperPost, "id" | "scraped_at">): boolean {
+  _collected.push({
+    source: post.source,
+    source_identifier: post.source_identifier,
+    post_id: post.post_id,
+    title: post.title,
+    body_text: post.body_text,
+    url: post.url,
+    upvote_count: post.upvote_count,
+    comment_count: post.comment_count,
+    published_at: post.published_at,
+    top_comments: post.top_comments,
+  });
+  return insertPost(post);
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -78,7 +99,7 @@ async function scrapeRedditSubreddit(subreddit: string, term: string): Promise<n
 
   for (const post of posts) {
     const p = post.data;
-    const inserted = insertPost({
+    const inserted = trackAndInsert({
       source: "reddit",
       source_identifier: subreddit,
       post_id: p.id,
@@ -154,7 +175,7 @@ async function scrapePubMed(): Promise<{ total: number; newPosts: number }> {
       const article = results[pmid];
       if (!article?.title) continue;
 
-      const inserted = insertPost({
+      const inserted = trackAndInsert({
         source: "pubmed",
         source_identifier: "pubmed",
         post_id: pmid,
@@ -290,7 +311,7 @@ async function scrapeCompetitorProducts(): Promise<{
     });
 
     // Also save as a post for the analysis engine to pick up
-    insertPost({
+    trackAndInsert({
       source: "competitor_product",
       source_identifier: comp.name,
       post_id: `product-${comp.name}-${new Date().toISOString().split("T")[0]}`,
@@ -331,6 +352,7 @@ export async function runFullScrape(): Promise<{
   runId: number;
 }> {
   const startTime = Date.now();
+  _collected = [];
   console.log("[SCRAPER] Starting full scrape run...");
 
   // Reddit — clinical discussions
@@ -358,6 +380,17 @@ export async function runFullScrape(): Promise<{
 
   // Run keyword analysis
   const runId = runAnalysis(total, newPosts, duration);
+
+  // File persistence — save to market_intelligence/
+  try {
+    const analysisRow = getRunById(runId);
+    if (analysisRow) {
+      const { filesWritten, errors } = saveRunToFiles([..._collected], analysisRow);
+      console.log(`[SCRAPER] File persistence: ${filesWritten.length} files written${errors.length > 0 ? `, ${errors.length} error(s)` : ""}`);
+    }
+  } catch (err) {
+    console.error("[SCRAPER] File persistence failed (non-blocking):", err);
+  }
 
   // Run AI Market Research Analyst
   try {

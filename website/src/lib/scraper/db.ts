@@ -178,6 +178,11 @@ export function getLatestRun(): ScraperAnalysisRow | undefined {
   return db.prepare("SELECT * FROM scraper_analysis ORDER BY run_date DESC LIMIT 1").get() as ScraperAnalysisRow | undefined;
 }
 
+export function getRunById(runId: number): ScraperAnalysisRow | undefined {
+  ensureScraperTables();
+  return db.prepare("SELECT * FROM scraper_analysis WHERE run_id = ?").get(runId) as ScraperAnalysisRow | undefined;
+}
+
 // ---------------------------------------------------------------------------
 // AI Analyst Reports
 // ---------------------------------------------------------------------------

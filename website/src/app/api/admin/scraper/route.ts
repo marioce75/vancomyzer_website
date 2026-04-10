@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { getRecentRuns, getLatestRun, getRecentPosts, getHighSignalPosts, getCompetitorChanges, getAllPosts, getLatestAiReport, getAiReports } from "@/lib/scraper/db";
 import { logSecurityEvent } from "@/lib/db";
+import { archiveReport } from "@/lib/scraper/filePersistence";
 
 // Track whether a scrape is currently running (server-side singleton)
 let scraperRunning = false;
@@ -58,13 +59,18 @@ export async function GET(request: NextRequest) {
     const rows = posts.map(p =>
       [p.source, p.source_identifier, p.post_id, `"${(p.title ?? "").replace(/"/g, '""')}"`, p.url, p.upvote_count, p.comment_count, p.published_at].join(",")
     );
-    return new Response([header, ...rows].join("\n"), {
+    const csv = [header, ...rows].join("\n");
+    try { archiveReport(csv, "scraper-posts", "csv"); } catch { /* non-critical */ }
+    return new Response(csv, {
       headers: { "Content-Type": "text/csv", "Content-Disposition": `attachment; filename="scraper-posts-${new Date().toISOString().split("T")[0]}.csv"` },
     });
   }
 
   if (action === "export_summary_json") {
     const latest = getLatestRun();
+    if (latest) {
+      try { archiveReport(JSON.stringify(latest, null, 2), "summary", "json"); } catch { /* non-critical */ }
+    }
     return NextResponse.json(latest ?? { message: "No runs yet." });
   }
 
@@ -74,7 +80,9 @@ export async function GET(request: NextRequest) {
     const rows = all.map(p =>
       [p.id, p.source, p.source_identifier, p.post_id, `"${(p.title ?? "").replace(/"/g, '""')}"`, `"${(p.body_text ?? "").replace(/"/g, '""').substring(0, 200)}"`, p.url, p.upvote_count, p.comment_count, p.published_at, p.scraped_at].join(",")
     );
-    return new Response([header, ...rows].join("\n"), {
+    const csv = [header, ...rows].join("\n");
+    try { archiveReport(csv, "all-posts", "csv"); } catch { /* non-critical */ }
+    return new Response(csv, {
       headers: { "Content-Type": "text/csv", "Content-Disposition": `attachment; filename="all-posts-${new Date().toISOString().split("T")[0]}.csv"` },
     });
   }

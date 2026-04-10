@@ -4,3 +4,4 @@ telegram_agent.log
 website/.next/
 website/node_modules/
 website/tsconfig.tsbuildinfo
+market_intelligence/reports/

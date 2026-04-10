@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 
 interface AnalysisRun {
   run_id: number;
@@ -150,6 +151,19 @@ export default function MarketIntelligencePage() {
             {running ? "Running..." : "Run Scraper Now"}
           </button>
         </div>
+      </div>
+
+      {/* Tab bar */}
+      <div className="flex gap-1 border-b border-gray-200">
+        <span className="px-4 py-2 text-sm font-medium text-teal-700 border-b-2 border-teal-600">
+          Dashboard
+        </span>
+        <Link
+          href="/admin/dashboard/market-intelligence/files"
+          className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+        >
+          Files
+        </Link>
       </div>
 
       {runResult && (

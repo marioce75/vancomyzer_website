@@ -30,15 +30,23 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Commit and push results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add market_intelligence/ website/data/
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Automated scraper run $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            SUMMARY_FILE="market_intelligence/.last_run_summary"
+            if [ -f "$SUMMARY_FILE" ]; then
+              RUN_DATE=$(grep '^date=' "$SUMMARY_FILE" | cut -d= -f2)
+              POST_COUNT=$(grep '^posts=' "$SUMMARY_FILE" | cut -d= -f2)
+              git commit -m "Scraper run ${RUN_DATE} — ${POST_COUNT} posts"
+            else
+              git commit -m "Scraper run $(date -u +%Y-%m-%d)"
+            fi
             git push
           fi
