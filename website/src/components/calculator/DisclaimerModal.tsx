@@ -76,13 +76,15 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
     >
       <div
         style={{
-          background: "#000",
-          border: "1px solid var(--color-primary)",
+          background: "#ffffff",
+          border: "1px solid #e2e8f0",
+          borderRadius: 8,
           maxWidth: 600,
           width: "90vw",
           maxHeight: "80vh",
           display: "flex",
           flexDirection: "column",
+          boxShadow: "0 25px 50px rgba(0,0,0,0.25)",
           ...FONT,
         }}
         onClick={(e) => e.stopPropagation()}
@@ -94,7 +96,10 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
             alignItems: "center",
             justifyContent: "space-between",
             padding: "16px 20px",
-            borderBottom: "1px solid var(--color-border)",
+            borderBottom: "1px solid #e2e8f0",
+            background: "#f8fafc",
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
           }}
         >
           <h2
@@ -103,7 +108,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
               fontSize: 14,
               fontWeight: 700,
               letterSpacing: "0.12em",
-              color: "var(--color-primary)",
+              color: "#00d4aa",
               ...FONT,
             }}
           >
@@ -113,21 +118,15 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
             type="button"
             onClick={onClose}
             style={{
-              background: "transparent",
-              border: "1px solid var(--color-border)",
-              color: "var(--color-secondary)",
-              padding: "4px 12px",
+              background: "#1e4d8c",
+              border: "none",
+              color: "#ffffff",
+              padding: "6px 16px",
               fontSize: 11,
+              fontWeight: 600,
               cursor: "pointer",
+              borderRadius: 4,
               ...FONT,
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
             }}
           >
             [ CLOSE ]
@@ -135,15 +134,15 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
         </div>
 
         {/* Scrollable content */}
-        <div style={{ overflowY: "auto", padding: "20px", flex: 1 }}>
+        <div style={{ overflowY: "auto", padding: "20px", flex: 1, background: "#ffffff" }}>
           {SECTIONS.map((section) => (
             <div key={section.heading} style={{ marginBottom: 24 }}>
               <h3
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: "0.1em",
-                  color: "var(--color-primary)",
+                  color: "#00d4aa",
                   marginBottom: 8,
                   ...FONT,
                 }}
@@ -152,9 +151,9 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
               </h3>
               <p
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   lineHeight: 1.7,
-                  color: "var(--color-secondary)",
+                  color: "#1a1a1a",
                   margin: 0,
                   whiteSpace: "pre-line",
                   ...FONT,
@@ -168,7 +167,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
           <p
             style={{
               fontSize: 11,
-              color: "var(--color-dim)",
+              color: "#718096",
               textAlign: "center",
               marginTop: 16,
               ...FONT,

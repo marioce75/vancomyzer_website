@@ -46,9 +46,16 @@
   --text-secondary:     var(--color-secondary);
   --text-muted:         var(--color-dim);
   --foreground:         var(--color-primary);
-  --teal:               var(--color-primary);
+  --teal:               #00d4aa;
+  --teal-light:         #00d4aa;
+  --teal-border:        rgba(0,212,170,0.3);
+  --teal-glow:          rgba(0,212,170,0.1);
   --vc-text:            var(--color-primary);
   --background:         var(--color-bg);
+  /* Calendar + input panel backgrounds */
+  --navy-card-raised:   var(--color-card);
+  --navy-border:        var(--color-border);
+  --navy-border-strong: var(--color-border);
 }
 
 html {

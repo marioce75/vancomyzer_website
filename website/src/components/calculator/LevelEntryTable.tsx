@@ -268,7 +268,7 @@ export default function LevelEntryTable({
                         onChange={(v) => updateDateTime(i, "levelDate", v)}
                         hasError={Boolean(timeError || collectionError)}
                       />
-                      <p style={{color:"var(--color-dim)"}} className="text-[10px] mt-0.5">Date (MM / DD / YYYY)</p>
+                      <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[10px] mt-0.5">Date (MM / DD / YYYY)</p>
                     </div>
                     <div>
                       <div className="flex gap-1">
@@ -292,11 +292,11 @@ export default function LevelEntryTable({
                           Now
                         </button>
                       </div>
-                      <p style={{color:"var(--color-dim)"}} className="text-[10px] mt-0.5">Military time (HH:MM)</p>
+                      <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[10px] mt-0.5">Military time (HH:MM)</p>
                       {dt.levelTimeErr && <p className="text-[10px] text-red-600">{dt.levelTimeErr}</p>}
                     </div>
                   </div>
-                  <p style={{color:"var(--color-dim)"}} className="text-[11px] mt-1">Exact date and time blood was drawn</p>
+                  <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[11px] mt-1">Exact date and time blood was drawn</p>
                 </div>
 
                 {/* Cross-midnight banner */}
@@ -319,7 +319,7 @@ export default function LevelEntryTable({
                         onChange={(v) => updateDateTime(i, "doseDate", v)}
                         hasError={false}
                       />
-                      <p style={{color:"var(--color-dim)"}} className="text-[10px] mt-0.5">Date (MM / DD / YYYY)</p>
+                      <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[10px] mt-0.5">Date (MM / DD / YYYY)</p>
                     </div>
                     <div>
                       <div className="flex gap-1">
@@ -343,11 +343,11 @@ export default function LevelEntryTable({
                           Now
                         </button>
                       </div>
-                      <p style={{color:"var(--color-dim)"}} className="text-[10px] mt-0.5">Military time (HH:MM)</p>
+                      <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[10px] mt-0.5">Military time (HH:MM)</p>
                       {dt.doseTimeErr && <p className="text-[10px] text-red-600">{dt.doseTimeErr}</p>}
                     </div>
                   </div>
-                  <p style={{color:"var(--color-dim)"}} className="text-[11px] mt-1">Start of the <strong>most recent</strong> infusion before this level was drawn</p>
+                  <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[11px] mt-1">Start of the <strong>most recent</strong> infusion before this level was drawn</p>
                 </div>
 
                 {/* Live hours post-dose preview */}

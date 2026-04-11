@@ -83,9 +83,9 @@ function CalendarPopup({ selectedDate, anchorEl, onSelect, onClose }: CalendarPo
       ref={popupRef}
       style={{
         position: "absolute", top, left, zIndex: 9999,
-        background: 'var(--navy-card-raised)',
-        border: '1px solid var(--navy-border-strong)',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(13,148,136,0.15)',
+        background: 'var(--navy-card-raised, #ffffff)',
+        border: '1px solid var(--navy-border-strong, #cbd5e0)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.05)',
       }}
       className="w-60 rounded-xl p-3 select-none"
     >
