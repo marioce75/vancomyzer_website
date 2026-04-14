@@ -34,7 +34,7 @@ export default function CalculatorErrorState({
   return (
     <div className="border p-4" style={{ borderColor: "rgba(255,51,51,0.5)", background: "var(--color-card)" }}>
       <p className="text-sm font-semibold" style={{ color: "#ff3333", ...monoStyle }}>
-        &gt; ERROR: {message}
+        ERROR: {message}
       </p>
 
       {details && details.length > 0 && (
@@ -47,7 +47,7 @@ export default function CalculatorErrorState({
 
       {(recoveryGuidance?.length || fallbackText) && (
         <div className="mt-3 border p-3" style={{ borderColor: "rgba(255,170,0,0.4)", background: "rgba(255,170,0,0.06)" }}>
-          <p className="text-sm font-medium" style={{ color: "#ffaa00", ...monoStyle }}>&gt; NEXT STEP</p>
+          <p className="text-sm font-medium" style={{ color: "#ffaa00", ...monoStyle }}>NEXT STEP</p>
           {recoveryGuidance && recoveryGuidance.length > 0 && (
             <ul className="mt-1 list-none space-y-1 pl-4 text-sm" style={{ color: "#cc8800", ...monoStyle }}>
               {recoveryGuidance.map((item, i) => (
@@ -71,7 +71,7 @@ export default function CalculatorErrorState({
 
       {limitations && limitations.length > 0 && (
         <details className="mt-3 text-sm" style={{ color: "#cc8800", ...monoStyle }}>
-          <summary className="cursor-pointer font-medium" style={{ color: "#ffaa00" }}>&gt; LIMITATIONS</summary>
+          <summary className="cursor-pointer font-medium" style={{ color: "#ffaa00" }}>LIMITATIONS</summary>
           <ul className="mt-2 list-none space-y-1 pl-4">
             {limitations.map((l, i) => (
               <li key={i}><span style={{ color: "#ffaa00" }}>- </span>{l}</li>

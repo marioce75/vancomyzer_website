@@ -15,7 +15,7 @@ export default function CalculatorActionBar({ onCalculate, onReset, disabled, hi
         className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.16em] text-center"
         style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em" }}
       >
-        &gt; recalculate after{"\n"}any draft change
+        recalculate after{"\n"}any draft change
       </p>
       <div className="flex justify-center gap-3">
         <button

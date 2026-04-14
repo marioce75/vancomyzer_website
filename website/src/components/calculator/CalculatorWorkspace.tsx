@@ -629,7 +629,7 @@ export default function CalculatorWorkspace() {
   const leftColumn = (
     <div className="flex flex-col h-full">
       <div className="mx-shimmer-border border p-5" style={{ borderTop: "3px solid var(--color-primary)", borderLeft: "1px solid var(--color-border)", borderRight: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>&gt; CLINICAL DATA INTAKE</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>CLINICAL DATA INTAKE</p>
         <h2 className="mt-1.5 text-lg font-semibold tracking-tight" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
           <TypewriterLoop text="Enter patient data to begin." interval={5000} />
         </h2>
@@ -809,7 +809,7 @@ export default function CalculatorWorkspace() {
     <div className="flex flex-col h-full gap-6">
       <div className="border-l-4 border px-4 py-3 flex items-center gap-3" style={{ borderLeftColor: "var(--color-primary)", borderColor: "var(--color-border)", background: "var(--color-card)" }}>
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>&gt; ANALYSIS WORKSPACE</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>ANALYSIS WORKSPACE</p>
           <h2 className="text-sm font-semibold leading-snug" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>Model outputs, exposure metrics &amp; regimen guidance</h2>
         </div>
       </div>
