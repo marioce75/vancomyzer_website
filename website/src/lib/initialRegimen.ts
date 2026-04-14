@@ -71,14 +71,15 @@ const TARGET_AUC24_LOW = 400;
 const TARGET_AUC24_HIGH = 600;
 const TARGET_AUC24_MID = 500;
 
-// Expanded dose grid — includes higher doses for high-clearance patients
-const DOSE_OPTIONS_MG = [250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000];
+// Dose grid capped at 2000 mg per IDSA/ASHP 2020 guideline (15–20 mg/kg, institutional cap 2000 mg)
+const DOSE_OPTIONS_MG = [250, 500, 750, 1000, 1250, 1500, 1750, 2000];
 // Q6h added for high-clearance patients who need more frequent dosing
 const INTERVAL_OPTIONS_H = [6, 8, 12, 24];
 const DEFAULT_INFUSION_HOURS = 1;
 
-// Max single dose: 3000 mg per infusion (practical limit for intermittent dosing)
-const MAX_SINGLE_DOSE_MG = 3000;
+// Max single maintenance dose: 2000 mg per IDSA/ASHP 2020 guideline institutional standard
+// (Loading dose max of 3000 mg is separate — see buildEmpiricLoadingDose.ts)
+const MAX_SINGLE_DOSE_MG = 2000;
 
 // Max TDD safety cap per ASHP/IDSA 2020 guidelines: 4500 mg/day hard ceiling
 function getMaxTdd(scr: number): number {
