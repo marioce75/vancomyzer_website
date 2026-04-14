@@ -271,9 +271,9 @@ export default function DatePartInput({ value, onChange, hasError }: DatePartInp
         onClick={() => setIsCalendarOpen(o => !o)}
         className="ml-1 flex h-[40px] w-8 shrink-0 items-center justify-center rounded border transition"
         style={{
-          border: '1px solid var(--navy-border-strong)',
-          background: 'rgba(255,255,255,0.04)',
-          color: 'var(--teal-light)',
+          border: '1px solid var(--color-border)',
+          background: 'var(--color-card)',
+          color: '#ffffff',
         }}
         aria-label="Open date picker"
       >
