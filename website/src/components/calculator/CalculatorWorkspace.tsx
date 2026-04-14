@@ -1000,13 +1000,6 @@ export default function CalculatorWorkspace() {
                       activeOption?.interpretation_summary ?? visibleResult.interpretation_summary
                     }
                   />
-                  <CalculationDetailsCard details={visibleResult.calculation_details} />
-                  <ClinicalNotePreview
-                    clinical_note={
-                      activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note
-                    }
-                  />
-                  <AssumptionsCard assumptions={visibleResult.assumptions} calculationDetails={visibleResult.calculation_details} />
                   <LimitationsCard limitations={visibleResult.limitations} calculationDetails={visibleResult.calculation_details} />
                 </div>
               </details>
