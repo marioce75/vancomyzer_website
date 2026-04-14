@@ -48,6 +48,37 @@ const defaultLevel = { value_mcg_ml: 0, collection_time: "", time_since_last_dos
 
 type WorkspaceViewMode = "empiric" | "one_level" | "two_levels";
 
+function TypewriterLoop({ text, interval = 5000 }: { text: string; interval?: number }) {
+  const [displayed, setDisplayed] = useState("");
+  const [phase, setPhase] = useState<"typing" | "visible" | "erasing">("typing");
+  const idxRef = useRef(0);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    if (phase === "typing") {
+      if (idxRef.current < text.length) {
+        timer = setTimeout(() => {
+          idxRef.current += 1;
+          setDisplayed(text.slice(0, idxRef.current));
+        }, 60);
+      } else {
+        timer = setTimeout(() => setPhase("erasing"), interval);
+      }
+    } else if (phase === "erasing") {
+      if (idxRef.current > 0) {
+        timer = setTimeout(() => {
+          idxRef.current -= 1;
+          setDisplayed(text.slice(0, idxRef.current));
+        }, 30);
+      } else {
+        timer = setTimeout(() => setPhase("typing"), 400);
+      }
+    }
+    return () => clearTimeout(timer);
+  }, [displayed, phase, text, interval]);
+
+  return <span className="mx-typewriter">{displayed}</span>;
+}
 
 function hasPatientCoreData(patient: typeof defaultPatient): boolean {
   return (
@@ -93,11 +124,9 @@ function SectionToggle({
         <span
           className="mt-0.5 inline-flex h-6 w-6 items-center justify-center border text-[11px] font-semibold"
           style={
-            isActive
-              ? { border: "1px solid var(--color-primary-a50)", background: "var(--color-primary-a15)", color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }
-              : completed
-                ? { border: "1px solid var(--color-primary-a40)", background: "var(--color-primary-a05)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }
-                : { border: "1px solid var(--color-border)", background: "var(--color-input)", color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }
+            completed
+              ? { border: "1px solid #6ee7b7", background: "#ecfdf5", color: "#047857", fontFamily: "'Share Tech Mono', monospace" }
+              : { border: "1px solid #fcd34d", background: "#fffbeb", color: "#92400e", fontFamily: "'Share Tech Mono', monospace" }
           }
         >
           {completed ? "OK" : "IN"}
@@ -178,6 +207,16 @@ export default function CalculatorWorkspace() {
   const [lastInputChangedAt, setLastInputChangedAt] = useState<number | null>(null);
   const [lastCalculatedAt, setLastCalculatedAt] = useState<number | null>(null);
   const [selectedFrequencyOption, setSelectedFrequencyOption] = useState<FrequencyOption | null>(null);
+
+  // Snapshot of state before loading dose simulation — enables undo
+  const preLoadingDoseState = useRef<{
+    viewMode: WorkspaceViewMode;
+    mode: CalculatorMode;
+    regimen: CalculateRequestRegimen;
+    levels: (typeof defaultLevel)[];
+    result: CalculateResponse | null;
+    selectedFrequencyOption: FrequencyOption | null;
+  } | null>(null);
 
   // Layout State
   const [activeSection, setActiveSection] = useState<string>("patient");
@@ -491,6 +530,15 @@ export default function CalculatorWorkspace() {
   const pendingLoadingDoseCalc = useRef(false);
 
   const handleSimulateLoadingDose = useCallback((doseMg: number, intervalHours: number, infusionHours: number) => {
+    // Snapshot current state so we can undo back to initial regimen results
+    preLoadingDoseState.current = {
+      viewMode,
+      mode,
+      regimen: { ...regimen },
+      levels: levels.map(l => ({ ...l })),
+      result,
+      selectedFrequencyOption,
+    };
     // Switch to existing_regimen mode with doses_given=1 (pulse/loading dose)
     // This tells the engine to show a single-dose PK curve, not steady state
     setViewMode("one_level");
@@ -510,6 +558,19 @@ export default function CalculatorWorkspace() {
     // Don't jump to levels tab — keep user in context, results appear in the right panel
     // The left panel stays where it is so the user isn't disoriented
     pendingLoadingDoseCalc.current = true;
+  }, [viewMode, mode, regimen, levels, result, selectedFrequencyOption]);
+
+  const handleUndoLoadingDose = useCallback(() => {
+    const snap = preLoadingDoseState.current;
+    if (!snap) return;
+    setViewMode(snap.viewMode);
+    setMode(snap.mode);
+    setRegimen(snap.regimen);
+    setLevels(snap.levels);
+    setResult(snap.result);
+    setSelectedFrequencyOption(snap.selectedFrequencyOption);
+    setError(null);
+    preLoadingDoseState.current = null;
   }, []);
 
   // Auto-trigger calculation after loading dose state is set
@@ -569,7 +630,9 @@ export default function CalculatorWorkspace() {
     <div className="flex flex-col h-full">
       <div className="mx-shimmer-border border p-5" style={{ borderTop: "3px solid var(--color-primary)", borderLeft: "1px solid var(--color-border)", borderRight: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>
         <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>&gt; CLINICAL DATA INTAKE</p>
-        <h2 className="mt-1.5 text-lg font-semibold tracking-tight" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>Enter patient data to begin.</h2>
+        <h2 className="mt-1.5 text-lg font-semibold tracking-tight" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
+          <TypewriterLoop text="Enter patient data to begin." interval={5000} />
+        </h2>
         <p className="mt-1 text-sm leading-6" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
           Complete each section. The Bayesian engine runs automatically once enough data is present.
         </p>
@@ -858,6 +921,7 @@ export default function CalculatorWorkspace() {
                       auc24={visibleResult.auc24}
                       isPulseDose={regimen.doses_given === 1}
                       loadingDoseMg={regimen.doses_given === 1 ? regimen.dose_mg : null}
+                      onUndoLoadingDose={preLoadingDoseState.current ? handleUndoLoadingDose : undefined}
                     />
                   </div>
                 </div>

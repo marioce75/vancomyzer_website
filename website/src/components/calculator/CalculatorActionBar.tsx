@@ -39,7 +39,7 @@ export default function CalculatorActionBar({ onCalculate, onReset, disabled, hi
             (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
           }}
         >
-          [RESET]
+          RESET
         </button>
 
         {hideCalculate ? (
@@ -85,7 +85,7 @@ export default function CalculatorActionBar({ onCalculate, onReset, disabled, hi
                 _
               </span>
             )}
-            {disabled ? "CALCULATING_" : "[CALCULATE]"}
+            {disabled ? "CALCULATING_" : "CALCULATE"}
           </button>
         )}
       </div>

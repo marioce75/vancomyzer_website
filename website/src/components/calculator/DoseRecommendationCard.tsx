@@ -23,6 +23,7 @@ interface DoseRecommendationCardProps {
   auc24?: number | null;
   isPulseDose?: boolean;
   loadingDoseMg?: number | null;
+  onUndoLoadingDose?: (() => void);
 }
 
 const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" };
@@ -173,6 +174,7 @@ export default function DoseRecommendationCard({
   auc24: rawAuc24,
   isPulseDose,
   loadingDoseMg,
+  onUndoLoadingDose,
 }: DoseRecommendationCardProps) {
   // Show options that are in-range or below-target only — never show above-target options
   const options = frequency_options?.filter(
@@ -247,9 +249,29 @@ export default function DoseRecommendationCard({
       {/* Loading dose label — shown above maintenance recommendation */}
       {isPulseDose && loadingDoseMg && (
         <div className="px-4 py-2 rounded-lg border" style={{ borderColor: "#6ee7b7", background: "#ecfdf5" }}>
-          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "#047857", ...FONT }}>
-            LOADING DOSE: {loadingDoseMg} mg (single dose)
-          </span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "#047857", ...FONT }}>
+              LOADING DOSE: {loadingDoseMg} mg (single dose)
+            </span>
+            {onUndoLoadingDose && (
+              <button
+                type="button"
+                onClick={onUndoLoadingDose}
+                className="shrink-0 border px-2 py-0.5 text-[10px] font-semibold transition-colors"
+                style={{ borderColor: "#fca5a5", background: "#fff1f2", color: "#991b1b", ...FONT }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.background = "#991b1b";
+                  (e.currentTarget as HTMLElement).style.color = "#fff";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.background = "#fff1f2";
+                  (e.currentTarget as HTMLElement).style.color = "#991b1b";
+                }}
+              >
+                UNDO
+              </button>
+            )}
+          </div>
           <p className="mt-1 text-[10px]" style={{ color: "#065f46", margin: 0, ...FONT }}>
             Curve below shows first-dose PK. The following is the suggested maintenance regimen to follow:
           </p>
@@ -310,7 +332,7 @@ export default function DoseRecommendationCard({
               className="px-3 py-1.5 text-xs font-semibold transition"
               style={{ border: "1px solid var(--color-primary-a40)", background: "var(--color-primary-a05)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
             >
-              [APPLY RECOMMENDED]
+              APPLY RECOMMENDED
             </button>
           )}
         </div>

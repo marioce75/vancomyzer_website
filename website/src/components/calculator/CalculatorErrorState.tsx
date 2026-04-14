@@ -63,7 +63,7 @@ export default function CalculatorErrorState({
               className="mt-3 inline-flex items-center border px-3 py-2 text-sm font-medium transition"
               style={{ borderColor: "rgba(255,170,0,0.5)", background: "rgba(255,170,0,0.08)", color: "#ffaa00", ...monoStyle }}
             >
-              [SWITCH TO INITIAL REGIMEN]
+              SWITCH TO INITIAL REGIMEN
             </button>
           )}
         </div>
