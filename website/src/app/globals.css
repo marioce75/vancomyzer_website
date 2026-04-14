@@ -521,17 +521,10 @@ body.theme-basic .hover\:bg-slate-800:hover { background-color: #1a3a6e !importa
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes mx-typewriter-cursor {
-  0%, 49% { border-right-color: var(--color-primary); }
-  50%, 100% { border-right-color: transparent; }
-}
-
 .mx-typewriter {
   display: inline-block;
   overflow: hidden;
   white-space: nowrap;
-  border-right: 2px solid var(--color-primary);
-  animation: mx-typewriter-cursor 0.8s step-end infinite;
 }
 
 .mx-blink  { animation: mx-blink 1s step-end infinite; }
