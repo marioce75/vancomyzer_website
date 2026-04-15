@@ -163,16 +163,43 @@ function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, s
     inRange: false,
   };
 
-  // Build frequency options: best candidate per interval
-  const frequencyOptions = buildFrequencyOptions(candidates, best, CL, V1, Q, V2);
+  return { best, candidates };
+}
 
-  return { best, frequencyOptions };
+interface FrequencyOptionContext {
+  scr: number;
+  modelLabel: string;
+  ffm_kg?: number;
+  loadingDoseMg: number;
+  loadingDoseBasis: string;
+  arcNote: string;
+}
+
+function buildOptionInterpretation(
+  opt: { dose_mg: number; interval_hours: number; auc24: number; peak: number; trough: number },
+  infDurationHours: number,
+  ctx: FrequencyOptionContext,
+): string {
+  const aucStatus = getAucRangeStatus(opt.auc24);
+  const belowNote = aucStatus === "below_target"
+    ? ` NOTE: This regimen achieves AUC24 ${opt.auc24} mg\u00b7h/L, which is below the target range of 400\u2013600. Clinical review is required.`
+    : "";
+  return (
+    `Initial regimen option: ${opt.dose_mg} mg every ${opt.interval_hours} hours infused over ${infDurationHours} hours. ` +
+    `Prior-based first-pass estimate: AUC24 ${opt.auc24} mg\u00b7h/L; peak ${opt.peak} mcg/mL; trough ${opt.trough} mcg/mL. ` +
+    `SCr ${ctx.scr} mg/dL (${ctx.modelLabel} renal covariate).` +
+    (ctx.ffm_kg ? ` FFM ${ctx.ffm_kg.toFixed(1)} kg (Janmahasatian 2005) \u2014 V1 and V2 scaled to FFM.` : "") +
+    ctx.arcNote + belowNote +
+    ` If immediate severe-infection coverage is clinically necessary under local practice, a clinician may optionally consider an empiric loading-dose estimate around ${ctx.loadingDoseMg} mg (${ctx.loadingDoseBasis}) before maintenance dosing. ` +
+    `No measured levels; re-evaluate after levels are available. Intended to support review, not replace clinician judgment.`
+  );
 }
 
 function buildFrequencyOptions(
   candidates: { dose_mg: number; interval_hours: number; auc24: number; peak: number; trough: number; inRange: boolean }[],
   recommended: { dose_mg: number; interval_hours: number },
-  CL: number, V1: number, Q: number, V2: number
+  CL: number, V1: number, Q: number, V2: number,
+  ctx: FrequencyOptionContext,
 ): FrequencyOption[] {
   const byInterval = new Map<number, typeof candidates>();
   for (const c of candidates) {
@@ -194,15 +221,23 @@ function buildFrequencyOptions(
       { CL, V1, Q, V2, dose_mg: pick.dose_mg, tau: interval, T_inf },
       0.25
     );
+    const auc24 = Math.round(pick.auc24 * 10) / 10;
+    const peak = Math.round(pick.peak * 10) / 10;
+    const trough = Math.round(pick.trough * 10) / 10;
     options.push({
       dose_mg: pick.dose_mg,
       interval_hours: interval,
-      auc24: Math.round(pick.auc24 * 10) / 10,
-      peak: Math.round(pick.peak * 10) / 10,
-      trough: Math.round(pick.trough * 10) / 10,
+      auc24,
+      peak,
+      trough,
       infusion_duration_hours: T_inf,
       is_recommended: pick.dose_mg === recommended.dose_mg && interval === recommended.interval_hours,
       curve: optCurve,
+      interpretation_summary: buildOptionInterpretation(
+        { dose_mg: pick.dose_mg, interval_hours: interval, auc24, peak, trough },
+        T_inf,
+        ctx,
+      ),
     });
   });
 
@@ -233,7 +268,7 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
     }
   );
 
-  const { best: choice, frequencyOptions } = chooseInitialCandidate(prior.CL, prior.V1, prior.Q, prior.V2, prior.scr);
+  const { best: choice, candidates } = chooseInitialCandidate(prior.CL, prior.V1, prior.Q, prior.V2, prior.scr);
   const safeInfusion = computeSafeInfusionDurationHours(choice.dose_mg);
   const loadingDose = buildEmpiricLoadingDose({ actual_body_weight_kg: patient.weight_kg });
   const curve = curvePoints(
@@ -285,6 +320,16 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
   const arcNote = arc_advisory
     ? ` WARNING: Augmented renal clearance detected (CrCl ${arc_advisory.crcl_ml_min} mL/min). Target AUC may not be achievable with standard intermittent dosing — consider continuous infusion.`
     : "";
+
+  const freqCtx: FrequencyOptionContext = {
+    scr: prior.scr,
+    modelLabel,
+    ffm_kg: prior.ffm_kg,
+    loadingDoseMg: loadingDose.suggested_dose_mg,
+    loadingDoseBasis: loadingDose.basis,
+    arcNote,
+  };
+  const frequencyOptions = buildFrequencyOptions(candidates, choice, prior.CL, prior.V1, prior.Q, prior.V2, freqCtx);
 
   const belowTargetNote = (!arc_advisory && auc_range_status === "below_target")
     ? ` NOTE: Best available regimen achieves AUC24 ${auc24} mg\u00b7h/L, which is below the target range of 400\u2013600. Clinical review is required.`
