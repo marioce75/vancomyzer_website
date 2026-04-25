@@ -8,6 +8,7 @@ import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 interface SettingsPanelProps {
   open: boolean;
   onClose: () => void;
+  isAdmin?: boolean;
 }
 
 /* ── Constants ──────────────────────────────────────────────────── */
@@ -47,7 +48,7 @@ const TOGGLES = [
 
 /* ── Component ──────────────────────────────────────────────────── */
 
-export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
+export default function SettingsPanel({ open, onClose, isAdmin }: SettingsPanelProps) {
   const { settings, updateSetting, resetToDefaults, mounted } = useMatrixSettings();
 
   /* Escape key handler */
@@ -163,7 +164,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           <section>
             <SectionLabel>COLOR MODE</SectionLabel>
             <div className="grid grid-cols-2 gap-2" style={{ marginTop: 10 }}>
-              {COLOR_MODES.map((mode) => {
+              {COLOR_MODES.filter((mode) => isAdmin || mode.value !== "matrix-green").map((mode) => {
                 const active = settings.colorMode === mode.value;
                 return (
                   <button
