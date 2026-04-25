@@ -1,24 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <!-- Outer hexagon — black outline behind green -->
-  <polygon points="32,6 54,17 54,39 32,50 10,39 10,17" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
-  <polygon points="32,6 54,17 54,39 32,50 10,39 10,17" fill="none" stroke="#00ff41" stroke-width="2.5"/>
-  <!-- Inner hexagon — black outline behind green -->
-  <polygon points="32,14 46,21.5 46,36.5 32,44 18,36.5 18,21.5" fill="none" stroke="#1a1a1a" stroke-width="2.5" opacity="0.6"/>
-  <polygon points="32,14 46,21.5 46,36.5 32,44 18,36.5 18,21.5" fill="none" stroke="#00ff41" stroke-width="1.5" opacity="0.6"/>
-  <!-- Bold V shape — black outline behind green -->
-  <polyline points="20,20 32,40 44,20" fill="none" stroke="#1a1a1a" stroke-width="4.5" stroke-linecap="square" stroke-linejoin="miter"/>
-  <polyline points="20,20 32,40 44,20" fill="none" stroke="#00ff41" stroke-width="3.5" stroke-linecap="square" stroke-linejoin="miter"/>
-  <!-- Node dots — black outline behind green -->
+  <!-- Outer pentagon — 5 dimensions of the evaluation framework -->
+  <polygon points="32,6 57,24 47,53 17,53 7,24" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+  <polygon points="32,6 57,24 47,53 17,53 7,24" fill="none" stroke="#00ff41" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Inner pentagon -->
+  <polygon points="32,14 49,26 43,47 21,47 15,26" fill="none" stroke="#1a1a1a" stroke-width="2.5" opacity="0.6" stroke-linejoin="round"/>
+  <polygon points="32,14 49,26 43,47 21,47 15,26" fill="none" stroke="#00ff41" stroke-width="1.5" opacity="0.6" stroke-linejoin="round"/>
+  <!-- Bold V shape -->
+  <polyline points="22,22 32,42 42,22" fill="none" stroke="#1a1a1a" stroke-width="4.5" stroke-linecap="square" stroke-linejoin="miter"/>
+  <polyline points="22,22 32,42 42,22" fill="none" stroke="#00ff41" stroke-width="3.5" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- 5 node dots — one per evaluation dimension -->
   <circle cx="32" cy="6" r="2.8" fill="#1a1a1a"/>
-  <circle cx="54" cy="17" r="2.8" fill="#1a1a1a"/>
-  <circle cx="54" cy="39" r="2.8" fill="#1a1a1a"/>
-  <circle cx="32" cy="50" r="2.8" fill="#1a1a1a"/>
-  <circle cx="10" cy="39" r="2.8" fill="#1a1a1a"/>
-  <circle cx="10" cy="17" r="2.8" fill="#1a1a1a"/>
+  <circle cx="57" cy="24" r="2.8" fill="#1a1a1a"/>
+  <circle cx="47" cy="53" r="2.8" fill="#1a1a1a"/>
+  <circle cx="17" cy="53" r="2.8" fill="#1a1a1a"/>
+  <circle cx="7" cy="24" r="2.8" fill="#1a1a1a"/>
   <circle cx="32" cy="6" r="2" fill="#00ff41"/>
-  <circle cx="54" cy="17" r="2" fill="#00ff41"/>
-  <circle cx="54" cy="39" r="2" fill="#00ff41"/>
-  <circle cx="32" cy="50" r="2" fill="#00ff41"/>
-  <circle cx="10" cy="39" r="2" fill="#00ff41"/>
-  <circle cx="10" cy="17" r="2" fill="#00ff41"/>
+  <circle cx="57" cy="24" r="2" fill="#00ff41"/>
+  <circle cx="47" cy="53" r="2" fill="#00ff41"/>
+  <circle cx="17" cy="53" r="2" fill="#00ff41"/>
+  <circle cx="7" cy="24" r="2" fill="#00ff41"/>
 </svg>
