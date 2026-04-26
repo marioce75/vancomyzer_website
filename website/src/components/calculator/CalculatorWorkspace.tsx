@@ -38,6 +38,7 @@ import SettingsPanel from "@/components/calculator/SettingsPanel";
 import DisclaimerModal from "@/components/calculator/DisclaimerModal";
 import PKParametersMath from "@/components/calculator/PKParametersMath";
 import NoteExportGate from "@/components/calculator/NoteExportGate";
+import PdfExportGate from "@/components/calculator/PdfExportGate";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { printReport, type ReportData } from "@/lib/generateReport";
@@ -865,24 +866,10 @@ export default function CalculatorWorkspace() {
                   <div className="flex items-center justify-between border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
                     <span className="text-[15px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--color-primary)" }}>SUGGESTED DOSE<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span></span>
                     <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={handleExportPDF}
-                        className="border px-2 py-0.5 text-[10px] font-semibold transition-colors"
-                        style={{ borderColor: "var(--color-border)", background: "transparent", color: "var(--color-secondary)" }}
-                        onMouseEnter={e => {
-                          (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-                          (e.currentTarget as HTMLElement).style.color = "var(--color-card, #fff)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary)";
-                        }}
-                        onMouseLeave={e => {
-                          (e.currentTarget as HTMLElement).style.background = "transparent";
-                          (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
-                        }}
-                      >
-                        EXPORT PDF
-                      </button>
+                      <PdfExportGate
+                        tier={user?.subscriptionTier ?? "free"}
+                        onExport={handleExportPDF}
+                      />
                       {(activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note) && (
                         <NoteExportGate
                           tier={user?.subscriptionTier ?? "free"}
