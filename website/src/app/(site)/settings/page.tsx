@@ -92,6 +92,13 @@ export default function InstitutionalSettingsPage() {
 
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px 80px" }}>
+      <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16 }}>
+        <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Institutional Settings</span>
+        <span style={{ color: "var(--color-border)" }}>·</span>
+        <Link href="/settings/billing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
+          Billing &amp; Subscription
+        </Link>
+      </div>
       <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}>
         Institutional Settings
       </h1>
