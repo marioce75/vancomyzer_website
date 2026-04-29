@@ -22,8 +22,18 @@ export async function middleware(request: NextRequest) {
   const protectedPages = ["/", "/calculator", "/admin", "/research", "/mfa-verify"];
   const needsPageAuth = protectedPages.some(p => pathname === p || pathname.startsWith(p + "/"));
 
-  // Protected APIs — require session
-  const protectedAPIs = ["/api/calculate", "/api/audit", "/api/admin", "/api/research", "/api/auth/mfa"];
+  // Protected APIs — require session.
+  // Note: /api/billing/webhook is INTENTIONALLY excluded — Stripe calls
+  // it without a user session, signature verification gates it instead.
+  const protectedAPIs = [
+    "/api/calculate",
+    "/api/audit",
+    "/api/admin",
+    "/api/research",
+    "/api/auth/mfa",
+    "/api/billing/checkout",
+    "/api/billing/portal",
+  ];
   const needsAPIAuth = protectedAPIs.some(p => pathname.startsWith(p));
 
   if (needsPageAuth && !token) {
@@ -76,5 +86,7 @@ export const config = {
     "/api/auth/mfa/:path*",
     "/research/:path*",
     "/api/research/:path*",
+    "/api/billing/checkout",
+    "/api/billing/portal",
   ],
 };

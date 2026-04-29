@@ -71,6 +71,13 @@ function getDb(): Database.Database {
   try { _db.exec("ALTER TABLE users ADD COLUMN institutional_account_id INTEGER"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE users ADD COLUMN institutional_role TEXT DEFAULT 'user'"); } catch { /* exists */ }
 
+  // Stripe billing columns (Phase 4)
+  try { _db.exec("ALTER TABLE users ADD COLUMN stripe_customer_id TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN stripe_subscription_id TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN stripe_price_id TEXT"); } catch { /* exists */ }
+  try { _db.exec("CREATE INDEX IF NOT EXISTS idx_users_stripe_customer ON users(stripe_customer_id)"); } catch { /* exists */ }
+  try { _db.exec("CREATE INDEX IF NOT EXISTS idx_users_stripe_subscription ON users(stripe_subscription_id)"); } catch { /* exists */ }
+
   // Institutional accounts table
   _db.exec(`
     CREATE TABLE IF NOT EXISTS institutional_accounts (
@@ -173,10 +180,14 @@ export interface UserRow {
   locked_until: string | null;
   // Subscription fields
   subscription_tier: TierId;
-  subscription_status: "active" | "expired" | "trial" | "cancelled";
+  subscription_status: string;
   subscription_expiry: string | null;
   institutional_account_id: number | null;
   institutional_role: "user" | "admin";
+  // Stripe billing fields (Phase 4)
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  stripe_price_id: string | null;
 }
 
 export function findUserByLogin(usernameOrEmail: string): UserRow | undefined {
@@ -372,6 +383,55 @@ export function isPaidTier(tier: string): boolean {
 
 export function setUserTier(userId: number, tier: string, expiry?: string) {
   getDb().prepare("UPDATE users SET subscription_tier = ?, subscription_expiry = ? WHERE id = ?").run(tier, expiry ?? null, userId);
+}
+
+// ---------------------------------------------------------------------------
+// Stripe billing helpers (Phase 4)
+// ---------------------------------------------------------------------------
+
+export function setStripeCustomerId(userId: number, customerId: string) {
+  getDb().prepare("UPDATE users SET stripe_customer_id = ? WHERE id = ?").run(customerId, userId);
+}
+
+export function findUserByStripeCustomerId(customerId: string): UserRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM users WHERE stripe_customer_id = ?")
+    .get(customerId) as UserRow | undefined;
+}
+
+export function findUserByStripeSubscriptionId(subscriptionId: string): UserRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM users WHERE stripe_subscription_id = ?")
+    .get(subscriptionId) as UserRow | undefined;
+}
+
+export interface SubscriptionUpdate {
+  tier: TierId;
+  status: string;
+  expiry: string | null;
+  stripeSubscriptionId: string | null;
+  stripePriceId: string | null;
+}
+
+export function applySubscriptionUpdate(userId: number, update: SubscriptionUpdate) {
+  getDb()
+    .prepare(
+      `UPDATE users
+       SET subscription_tier = ?,
+           subscription_status = ?,
+           subscription_expiry = ?,
+           stripe_subscription_id = ?,
+           stripe_price_id = ?
+       WHERE id = ?`,
+    )
+    .run(
+      update.tier,
+      update.status,
+      update.expiry,
+      update.stripeSubscriptionId,
+      update.stripePriceId,
+      userId,
+    );
 }
 
 export function setUserInstitution(userId: number, institutionalAccountId: number, role: string = "user") {
