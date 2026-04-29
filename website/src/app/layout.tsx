@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./Providers";
+import RegulatoryFooter from "@/components/RegulatoryFooter";
 
 import type { Viewport } from "next";
 
@@ -40,7 +41,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col antialiased" suppressHydrationWarning>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="flex-1">{children}</div>
+          <RegulatoryFooter />
+        </Providers>
       </body>
     </html>
   );
