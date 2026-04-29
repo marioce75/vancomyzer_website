@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { hasFeature, upgradeTargetFor } from "@/lib/tiers";
 
 interface NoteExportGateProps {
   tier: string;
@@ -17,15 +18,16 @@ export default function NoteExportGate({ tier, onCopy, noteText }: NoteExportGat
     return () => clearTimeout(timer);
   }, [showMessage]);
 
-  const isPaid = tier === "department" || tier === "hospital" || tier === "enterprise";
+  const allowed = hasFeature(tier, "export.note.copy");
+  const upgradeTier = upgradeTargetFor("export.note.copy");
 
   const handleClick = useCallback(() => {
-    if (isPaid) {
+    if (allowed) {
       onCopy();
     } else {
       setShowMessage(true);
     }
-  }, [isPaid, onCopy]);
+  }, [allowed, onCopy]);
 
   return (
     <div>
@@ -48,13 +50,13 @@ export default function NoteExportGate({ tier, onCopy, noteText }: NoteExportGat
           className="mt-2 text-xs leading-relaxed"
           style={{ color: "var(--color-secondary)" }}
         >
-          Clinical note export is available on Department and Hospital plans.
+          Clinical note export is available on {upgradeTier.name} and higher plans.
           Contact{" "}
           <a
-            href="mailto:contact@vancomyzer.com"
+            href="mailto:info@dosys.health"
             style={{ color: "#0d9488", textDecoration: "underline" }}
           >
-            contact@vancomyzer.com
+            info@dosys.health
           </a>
         </p>
       )}

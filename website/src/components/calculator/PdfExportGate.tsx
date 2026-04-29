@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { hasFeature, upgradeTargetFor } from "@/lib/tiers";
 
 interface PdfExportGateProps {
   tier: string;
@@ -16,15 +17,16 @@ export default function PdfExportGate({ tier, onExport }: PdfExportGateProps) {
     return () => clearTimeout(timer);
   }, [showMessage]);
 
-  const isPaid = tier === "department" || tier === "hospital" || tier === "enterprise";
+  const allowed = hasFeature(tier, "export.pdf");
+  const upgradeTier = upgradeTargetFor("export.pdf");
 
   const handleClick = useCallback(() => {
-    if (isPaid) {
+    if (allowed) {
       onExport();
     } else {
       setShowMessage(true);
     }
-  }, [isPaid, onExport]);
+  }, [allowed, onExport]);
 
   return (
     <div>
@@ -52,13 +54,13 @@ export default function PdfExportGate({ tier, onExport }: PdfExportGateProps) {
           className="mt-2 text-xs leading-relaxed"
           style={{ color: "var(--color-secondary)" }}
         >
-          PDF export is available on Department and Hospital plans.
+          PDF export is available on {upgradeTier.name} and higher plans.
           Contact{" "}
           <a
-            href="mailto:contact@vancomyzer.com"
+            href="mailto:info@dosys.health"
             style={{ color: "#0d9488", textDecoration: "underline" }}
           >
-            contact@vancomyzer.com
+            info@dosys.health
           </a>
         </p>
       )}

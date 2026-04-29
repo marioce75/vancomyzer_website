@@ -1,6 +1,7 @@
 import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
+import { isPaidTier as tierIsPaid, normalizeTier, type TierId } from "./tiers";
 
 // Render persistent disk at /data; fallback to local ./data for development
 const DATA_DIR = fs.existsSync("/data") ? "/data" : path.join(process.cwd(), "data");
@@ -171,7 +172,7 @@ export interface UserRow {
   failed_login_attempts: number;
   locked_until: string | null;
   // Subscription fields
-  subscription_tier: "free" | "department" | "hospital" | "enterprise";
+  subscription_tier: TierId;
   subscription_status: "active" | "expired" | "trial" | "cancelled";
   subscription_expiry: string | null;
   institutional_account_id: number | null;
@@ -360,13 +361,13 @@ export function getSecuritySummary() {
 // Subscription Tier Helpers
 // ---------------------------------------------------------------------------
 
-export function getUserTier(userId: number): "free" | "department" | "hospital" | "enterprise" {
+export function getUserTier(userId: number): TierId {
   const row = getDb().prepare("SELECT subscription_tier FROM users WHERE id = ?").get(userId) as { subscription_tier: string } | undefined;
-  return (row?.subscription_tier as "free" | "department" | "hospital" | "enterprise") ?? "free";
+  return normalizeTier(row?.subscription_tier);
 }
 
 export function isPaidTier(tier: string): boolean {
-  return tier === "department" || tier === "hospital" || tier === "enterprise";
+  return tierIsPaid(tier);
 }
 
 export function setUserTier(userId: number, tier: string, expiry?: string) {

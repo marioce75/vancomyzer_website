@@ -2,6 +2,7 @@
 
 import { SessionProvider, useSession, signOut } from "next-auth/react";
 import React, { createContext, useContext } from "react";
+import { normalizeTier, type TierId } from "@/lib/tiers";
 
 export interface AuthUser {
   id: string;
@@ -12,7 +13,7 @@ export interface AuthUser {
   institution: string | null;
   credentials: string;
   first_login_acknowledged: number;
-  subscriptionTier: "free" | "department" | "hospital" | "enterprise";
+  subscriptionTier: TierId;
   institutionalAccountId: number | null;
   institutionalRole: "user" | "admin";
 }
@@ -41,7 +42,7 @@ function AuthInner({ children }: { children: React.ReactNode }) {
     institution: (session.user as Record<string, unknown>).institution as string ?? null,
     credentials: (session.user as Record<string, unknown>).credentials as string ?? "",
     first_login_acknowledged: (session.user as Record<string, unknown>).first_login_acknowledged as number ?? 0,
-    subscriptionTier: ((session.user as Record<string, unknown>).subscriptionTier as string ?? "free") as "free" | "department" | "hospital" | "enterprise",
+    subscriptionTier: normalizeTier((session.user as Record<string, unknown>).subscriptionTier),
     institutionalAccountId: (session.user as Record<string, unknown>).institutionalAccountId as number ?? null,
     institutionalRole: ((session.user as Record<string, unknown>).institutionalRole as string ?? "user") as "user" | "admin",
   } : null;
