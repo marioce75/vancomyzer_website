@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { computeInitialRegimen } from "@/lib/initialRegimen";
 import { runExistingRegimenPipeline } from "@/lib/pk/runExistingRegimenPipeline";
 import { logCalculation } from "@/lib/auditLog";
-import { logCalculationEntry, getUserTier, isPaidTier, findUserByLogin } from "@/lib/db";
+import { logCalculationEntry, getUserTier, findUserByLogin } from "@/lib/db";
+import { hasFeature } from "@/lib/tiers";
+import { validateCaseId } from "@/lib/calculationHistory";
 
 type Mode = "initial_regimen" | "existing_regimen";
 
@@ -11,6 +13,7 @@ interface RequestBody {
   patient?: unknown;
   regimen?: unknown;
   levels?: unknown;
+  case_id?: unknown;
 }
 
 function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mode } | { ok: false; error: { error_type: "validation_error"; message: string; field_errors?: Record<string, string> } } {
@@ -159,6 +162,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Validate optional case_id BEFORE doing any PK work — reject PHI-shaped
+  // input early so it never enters our processing pipeline.
+  const caseIdResult = validateCaseId((body as RequestBody | null | undefined)?.case_id);
+  if (!caseIdResult.ok) {
+    return NextResponse.json(
+      { error_type: "validation_error", message: caseIdResult.reason, field_errors: { case_id: caseIdResult.reason } },
+      { status: 400 },
+    );
+  }
+  const caseId = caseIdResult.value;
+
   const validated = validateRequest(body);
 
   // Log validation errors
@@ -203,27 +217,9 @@ export async function POST(request: NextRequest) {
       pk_parameters: extractPKParams(result),
     });
 
-    // Calculation log for paid tier users (no patient identifiers)
-    try {
-      const dbUser = findUserByLogin(userEmail);
-      if (dbUser && isPaidTier(getUserTier(dbUser.id))) {
-        const pk = result.pk_parameters as Record<string, unknown> | undefined;
-        logCalculationEntry({
-          user_id: dbUser.id,
-          institutional_account_id: dbUser.institutional_account_id,
-          workflow_type: "empiric",
-          pk_model: (pk?.pk_model_name as string) ?? "colin_2019",
-          obesity_model_active: (pk?.pk_model_name === "vancomyzer_obesity") ? 1 : 0,
-          bmi_above_40: (pk?.pk_model_name === "vancomyzer_obesity") ? 1 : 0,
-          dose_mg: parseInt(String(result.recommended_dose ?? "0")),
-          interval_hours: result.recommended_interval_hours as number ?? null,
-          auc24: result.auc24 as number ?? null,
-          peak: result.peak as number ?? null,
-          trough: result.trough as number ?? null,
-          auc_in_range: ((result.auc24 as number) >= 400 && (result.auc24 as number) <= 600) ? 1 : 0,
-        });
-      }
-    } catch { /* non-blocking */ }
+    // Calculation history — gated on history.calculation feature
+    // (Pro+, no patient identifiers, includes optional case_id)
+    persistCalculation(userEmail, "empiric", result, caseId);
 
     return NextResponse.json(result);
   }
@@ -270,5 +266,51 @@ export async function POST(request: NextRequest) {
     pk_parameters: extractPKParams(resultObj),
   });
 
+  // Calculation history — gated on history.calculation feature
+  persistCalculation(userEmail, "existing", resultObj, caseId);
+
   return NextResponse.json(result);
+}
+
+/**
+ * Persist a single calculation to calculation_log for users with the
+ * history.calculation feature (Individual Pro and above). Non-blocking —
+ * errors are swallowed so a DB issue never breaks the calc response.
+ * Stores derived fields only; no patient identifiers.
+ */
+function persistCalculation(
+  userEmail: string,
+  workflowType: string,
+  result: Record<string, unknown>,
+  caseId: string | null,
+) {
+  try {
+    if (userEmail === "anonymous") return;
+    const dbUser = findUserByLogin(userEmail);
+    if (!dbUser) return;
+    const tier = getUserTier(dbUser.id);
+    if (!hasFeature(tier, "history.calculation")) return;
+
+    const pk = result.pk_parameters as Record<string, unknown> | undefined;
+    const auc24 = result.auc24 as number | undefined;
+    const dose = parseInt(String(result.recommended_dose ?? "0"));
+    logCalculationEntry({
+      user_id: dbUser.id,
+      institutional_account_id: dbUser.institutional_account_id,
+      workflow_type: workflowType,
+      pk_model: (pk?.pk_model_name as string) ?? "colin_2019",
+      obesity_model_active: pk?.pk_model_name === "vancomyzer_obesity" ? 1 : 0,
+      bmi_above_40: pk?.pk_model_name === "vancomyzer_obesity" ? 1 : 0,
+      dose_mg: Number.isFinite(dose) ? dose : null,
+      interval_hours: (result.recommended_interval_hours as number) ?? null,
+      auc24: typeof auc24 === "number" ? auc24 : null,
+      peak: (result.peak as number) ?? null,
+      trough: (result.trough as number) ?? null,
+      auc_in_range: typeof auc24 === "number" && auc24 >= 400 && auc24 <= 600 ? 1 : 0,
+      case_id: caseId,
+      tier_at_time: tier,
+    });
+  } catch (err) {
+    console.warn("[calculation-history] persist failed:", err);
+  }
 }

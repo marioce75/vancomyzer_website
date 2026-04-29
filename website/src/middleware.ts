@@ -33,6 +33,7 @@ export async function middleware(request: NextRequest) {
     "/api/auth/mfa",
     "/api/billing/checkout",
     "/api/billing/portal",
+    "/api/history",
   ];
   const needsAPIAuth = protectedAPIs.some(p => pathname.startsWith(p));
 
@@ -88,5 +89,6 @@ export const config = {
     "/api/research/:path*",
     "/api/billing/checkout",
     "/api/billing/portal",
+    "/api/history",
   ],
 };

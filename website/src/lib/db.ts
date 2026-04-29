@@ -78,6 +78,12 @@ function getDb(): Database.Database {
   try { _db.exec("CREATE INDEX IF NOT EXISTS idx_users_stripe_customer ON users(stripe_customer_id)"); } catch { /* exists */ }
   try { _db.exec("CREATE INDEX IF NOT EXISTS idx_users_stripe_subscription ON users(stripe_subscription_id)"); } catch { /* exists */ }
 
+  // Calculation history columns (Phase 6) — extend calculation_log
+  // case_id: optional clinician-supplied tracking string (NO PHI; sanitized at write time)
+  // tier_at_time: tier the user was on when the calc ran (audit trail)
+  try { _db.exec("ALTER TABLE calculation_log ADD COLUMN case_id TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE calculation_log ADD COLUMN tier_at_time TEXT"); } catch { /* exists */ }
+
   // Institutional accounts table
   _db.exec(`
     CREATE TABLE IF NOT EXISTS institutional_accounts (
@@ -507,18 +513,97 @@ export interface CalcLogEntry {
   peak: number | null;
   trough: number | null;
   auc_in_range: number;
+  case_id: string | null;
+  tier_at_time: string | null;
 }
 
 export function logCalculationEntry(entry: Omit<CalcLogEntry, "id" | "calculated_at">) {
   getDb().prepare(`INSERT INTO calculation_log
     (user_id, institutional_account_id, workflow_type, pk_model, obesity_model_active,
-     bmi_above_40, dose_mg, interval_hours, auc24, peak, trough, auc_in_range)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+     bmi_above_40, dose_mg, interval_hours, auc24, peak, trough, auc_in_range,
+     case_id, tier_at_time)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
     entry.user_id, entry.institutional_account_id, entry.workflow_type,
     entry.pk_model, entry.obesity_model_active, entry.bmi_above_40,
     entry.dose_mg, entry.interval_hours, entry.auc24, entry.peak,
-    entry.trough, entry.auc_in_range
+    entry.trough, entry.auc_in_range,
+    entry.case_id ?? null, entry.tier_at_time ?? null,
   );
+}
+
+/**
+ * User-facing calculation history for the /settings/history page.
+ * Returns rows for the requesting user only — never cross-user.
+ */
+export function listCalculationHistory(
+  userId: number,
+  opts?: { limit?: number; offset?: number; workflow_type?: string; case_id_search?: string },
+): CalcLogEntry[] {
+  const limit = Math.max(1, Math.min(opts?.limit ?? 50, 500));
+  const offset = Math.max(0, opts?.offset ?? 0);
+  const conditions: string[] = ["user_id = ?"];
+  const params: unknown[] = [userId];
+
+  if (opts?.workflow_type) {
+    conditions.push("workflow_type = ?");
+    params.push(opts.workflow_type);
+  }
+  if (opts?.case_id_search) {
+    conditions.push("case_id LIKE ?");
+    params.push(`%${opts.case_id_search}%`);
+  }
+
+  return getDb()
+    .prepare(
+      `SELECT * FROM calculation_log
+       WHERE ${conditions.join(" AND ")}
+       ORDER BY calculated_at DESC
+       LIMIT ? OFFSET ?`,
+    )
+    .all(...params, limit, offset) as CalcLogEntry[];
+}
+
+/** Total row count for pagination — same filters as listCalculationHistory. */
+export function countCalculationHistory(
+  userId: number,
+  opts?: { workflow_type?: string; case_id_search?: string },
+): number {
+  const conditions: string[] = ["user_id = ?"];
+  const params: unknown[] = [userId];
+
+  if (opts?.workflow_type) {
+    conditions.push("workflow_type = ?");
+    params.push(opts.workflow_type);
+  }
+  if (opts?.case_id_search) {
+    conditions.push("case_id LIKE ?");
+    params.push(`%${opts.case_id_search}%`);
+  }
+
+  const row = getDb()
+    .prepare(`SELECT COUNT(*) as n FROM calculation_log WHERE ${conditions.join(" AND ")}`)
+    .get(...params) as { n: number };
+  return row?.n ?? 0;
+}
+
+/**
+ * 90-day retention enforcement. Lazy — runs at most once per process per
+ * 24h window. Cheap idempotent DELETE; safe if multiple processes run it.
+ */
+let _lastPurgeAt = 0;
+const PURGE_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+export function purgeOldCalculationsIfNeeded() {
+  const now = Date.now();
+  if (now - _lastPurgeAt < PURGE_INTERVAL_MS) return;
+  _lastPurgeAt = now;
+  try {
+    getDb()
+      .prepare("DELETE FROM calculation_log WHERE calculated_at < datetime('now', '-90 days')")
+      .run();
+  } catch (err) {
+    console.warn("[calculation-history] purge failed:", err);
+  }
 }
 
 export function getCalcLog(filters?: {
