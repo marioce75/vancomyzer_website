@@ -14,6 +14,8 @@ export interface AuthUser {
   credentials: string;
   first_login_acknowledged: number;
   subscriptionTier: TierId;
+  subscriptionStatus: string;
+  subscriptionExpiry: string | null;
   institutionalAccountId: number | null;
   institutionalRole: "user" | "admin";
 }
@@ -43,6 +45,8 @@ function AuthInner({ children }: { children: React.ReactNode }) {
     credentials: (session.user as Record<string, unknown>).credentials as string ?? "",
     first_login_acknowledged: (session.user as Record<string, unknown>).first_login_acknowledged as number ?? 0,
     subscriptionTier: normalizeTier((session.user as Record<string, unknown>).subscriptionTier),
+    subscriptionStatus: ((session.user as Record<string, unknown>).subscriptionStatus as string) ?? "active",
+    subscriptionExpiry: ((session.user as Record<string, unknown>).subscriptionExpiry as string | null) ?? null,
     institutionalAccountId: (session.user as Record<string, unknown>).institutionalAccountId as number ?? null,
     institutionalRole: ((session.user as Record<string, unknown>).institutionalRole as string ?? "user") as "user" | "admin",
   } : null;

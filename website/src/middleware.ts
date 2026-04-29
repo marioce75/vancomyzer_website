@@ -10,7 +10,11 @@ export async function middleware(request: NextRequest) {
   });
 
   // Already logged in → redirect away from login/register
-  if (token && (pathname === "/login" || pathname === "/register")) {
+  // Exception: allow /login?magic=... through so the magic-link sign-in
+  // can replace the existing session (handles the case where a user
+  // clicks a link from a different account or a re-issued link).
+  const isMagicLinkAttempt = pathname === "/login" && request.nextUrl.searchParams.has("magic");
+  if (token && !isMagicLinkAttempt && (pathname === "/login" || pathname === "/register")) {
     return NextResponse.redirect(new URL("/calculator", request.url));
   }
 

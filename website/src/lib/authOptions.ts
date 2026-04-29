@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import {
   findUserByLogin,
+  findUserByEmail,
+  findUserById,
   updateLastLogin,
   getSessionToken,
   incrementFailedLogins,
@@ -12,6 +14,8 @@ import {
   isAccountLocked,
   logSecurityEvent,
 } from "@/lib/db";
+import { verifyMagicLinkToken } from "@/lib/magicLink";
+import { normalizeTier } from "@/lib/tiers";
 
 const LOCKOUT_THRESHOLD = 5;
 const LOCKOUT_DURATION_MIN = 15;
@@ -120,6 +124,86 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+    CredentialsProvider({
+      id: "magic-link",
+      name: "Magic Link",
+      credentials: {
+        token: { label: "Magic Link Token", type: "text" },
+      },
+      async authorize(credentials) {
+        const token = credentials?.token;
+        if (!token) return null;
+
+        const verified = verifyMagicLinkToken(token);
+        if (!verified) {
+          logSecurityEvent({
+            action: "MAGIC_LINK_FAILED",
+            details: JSON.stringify({ reason: "invalid_or_expired" }),
+            severity: "warn",
+          });
+          return null;
+        }
+
+        const user = findUserByEmail(verified.email);
+        if (!user) {
+          logSecurityEvent({
+            action: "MAGIC_LINK_FAILED",
+            username: verified.email,
+            details: JSON.stringify({ reason: "user_not_found" }),
+            severity: "warn",
+          });
+          return null;
+        }
+
+        if (isAccountLocked(user.id)) {
+          logSecurityEvent({
+            user_id: user.id,
+            username: user.username,
+            action: "MAGIC_LINK_FAILED",
+            details: JSON.stringify({ reason: "locked" }),
+            severity: "warn",
+          });
+          throw new Error("LOCKED");
+        }
+
+        if (user.status === "pending") throw new Error("PENDING");
+        if (user.status === "disabled") throw new Error("DISABLED");
+        if (user.status !== "active") return null;
+
+        resetFailedLogins(user.id);
+        const sessionToken = crypto.randomBytes(32).toString("hex");
+        updateLastLogin(user.id, sessionToken);
+
+        const mfaPending = user.role === "admin" && user.mfa_enabled === 1;
+
+        logSecurityEvent({
+          user_id: user.id,
+          username: user.username,
+          action: "LOGIN_SUCCESS",
+          details: JSON.stringify({ method: "magic-link", role: user.role, mfa_pending: mfaPending }),
+          severity: "info",
+        });
+
+        return {
+          id: String(user.id),
+          name: user.full_name,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+          first_login_acknowledged: user.first_login_acknowledged,
+          institution: user.institution,
+          credentials: user.credentials,
+          sessionToken,
+          mfaPending,
+          mfaVerified: false,
+          mfaEnabled: user.mfa_enabled === 1,
+          lastActivity: Date.now(),
+          subscriptionTier: user.subscription_tier ?? "free",
+          institutionalAccountId: user.institutional_account_id,
+          institutionalRole: user.institutional_role ?? "user",
+        };
+      },
+    }),
   ],
   session: {
     strategy: "jwt",
@@ -184,9 +268,29 @@ export const authOptions: NextAuthOptions = {
         (session.user as Record<string, unknown>).mfaPending = token.mfaPending;
         (session.user as Record<string, unknown>).mfaVerified = token.mfaVerified;
         (session.user as Record<string, unknown>).mfaEnabled = token.mfaEnabled;
-        (session.user as Record<string, unknown>).subscriptionTier = token.subscriptionTier;
         (session.user as Record<string, unknown>).institutionalAccountId = token.institutionalAccountId;
         (session.user as Record<string, unknown>).institutionalRole = token.institutionalRole;
+
+        // Always re-read subscription tier/status from DB so Stripe
+        // webhook updates take effect on the next request, not at next
+        // sign-in. JWT stays minimal; DB is source of truth for billing.
+        if (token.id) {
+          try {
+            const fresh = findUserById(Number(token.id));
+            (session.user as Record<string, unknown>).subscriptionTier = normalizeTier(fresh?.subscription_tier);
+            (session.user as Record<string, unknown>).subscriptionStatus = fresh?.subscription_status ?? "active";
+            (session.user as Record<string, unknown>).subscriptionExpiry = fresh?.subscription_expiry ?? null;
+          } catch {
+            // DB read failure — fall back to JWT-cached tier
+            (session.user as Record<string, unknown>).subscriptionTier = normalizeTier(token.subscriptionTier);
+            (session.user as Record<string, unknown>).subscriptionStatus = "active";
+            (session.user as Record<string, unknown>).subscriptionExpiry = null;
+          }
+        } else {
+          (session.user as Record<string, unknown>).subscriptionTier = normalizeTier(token.subscriptionTier);
+          (session.user as Record<string, unknown>).subscriptionStatus = "active";
+          (session.user as Record<string, unknown>).subscriptionExpiry = null;
+        }
       }
 
       // Single-session enforcement

@@ -1,21 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
 
+function magicErrorMessage(code: string | null): string {
+  switch (code) {
+    case "missing": return "Sign-in link missing. Request a new one below.";
+    case "invalid": return "Sign-in link expired or invalid. Request a new one below.";
+    default: return "";
+  }
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const expired = searchParams.get("expired") === "true";
+  const magicToken = searchParams.get("magic");
+  const magicError = searchParams.get("magic_error");
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(expired ? "Your session has expired. Please log in again." : "");
+  const [error, setError] = useState(
+    expired ? "Your session has expired. Please log in again." : magicErrorMessage(magicError)
+  );
   const [loading, setLoading] = useState(false);
+
+  // Magic-link form state
+  const [magicEmail, setMagicEmail] = useState("");
+  const [magicSending, setMagicSending] = useState(false);
+  const [magicSent, setMagicSent] = useState(false);
+  const [showMagic, setShowMagic] = useState(false);
+
+  // Auto-complete magic-link sign-in when redirected with ?magic=<token>
+  const magicAttemptedRef = useRef(false);
+  useEffect(() => {
+    if (!magicToken || magicAttemptedRef.current) return;
+    magicAttemptedRef.current = true;
+    setLoading(true);
+    signIn("magic-link", { token: magicToken, redirect: false }).then(result => {
+      setLoading(false);
+      if (result?.error) {
+        if (result.error === "PENDING") setError("Your account is pending approval.");
+        else if (result.error === "DISABLED") setError("Your account has been disabled.");
+        else if (result.error === "LOCKED") setError("Account temporarily locked. Try again in 15 minutes.");
+        else setError("Sign-in link expired or invalid. Request a new one below.");
+        return;
+      }
+      router.push("/calculator");
+      router.refresh();
+    });
+  }, [magicToken, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +83,29 @@ function LoginForm() {
 
     router.push("/calculator");
     router.refresh();
+  };
+
+  const handleMagicSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setMagicSending(true);
+    try {
+      const res = await fetch("/api/auth/magic-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: magicEmail }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setError(body.error ?? "Could not send sign-in link. Try again.");
+      } else {
+        setMagicSent(true);
+      }
+    } catch {
+      setError("Network error. Try again.");
+    } finally {
+      setMagicSending(false);
+    }
   };
 
   return (
@@ -140,6 +201,67 @@ function LoginForm() {
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
+
+        <div style={{ position: "relative", margin: "20px 0 16px", textAlign: "center" }}>
+          <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: 0 }} />
+          <span style={{
+            position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",
+            background: "#ffffff", padding: "0 12px", fontSize: 11, color: "#718096", letterSpacing: "0.05em",
+          }}>OR</span>
+        </div>
+
+        {magicSent ? (
+          <div style={{
+            padding: "12px 14px", marginBottom: 4,
+            background: "#ecfdf5", border: "1px solid #6ee7b7", color: "#065f46", fontSize: 13, borderRadius: 4,
+            lineHeight: 1.5,
+          }}>
+            <strong>Check your email.</strong> If an account exists for that email, a sign-in link has been sent. The link expires in 15 minutes.
+          </div>
+        ) : showMagic ? (
+          <form onSubmit={handleMagicSubmit}>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>
+              Email address
+            </label>
+            <input
+              type="email"
+              value={magicEmail}
+              onChange={e => setMagicEmail(e.target.value)}
+              required
+              autoComplete="email"
+              placeholder="you@hospital.org"
+              style={{
+                width: "100%", padding: "10px 12px", fontSize: 14, marginBottom: 10,
+                border: "1px solid #a0aec0", background: "#ffffff", color: "#1a202c",
+                boxSizing: "border-box", borderRadius: 4,
+              }}
+            />
+            <button
+              type="submit"
+              disabled={magicSending}
+              style={{
+                width: "100%", padding: "10px", fontSize: 13, fontWeight: 600,
+                background: "#0d9488", color: "#ffffff", border: "none",
+                cursor: magicSending ? "wait" : "pointer", opacity: magicSending ? 0.7 : 1,
+                borderRadius: 4,
+              }}
+            >
+              {magicSending ? "Sending link..." : "Email me a sign-in link"}
+            </button>
+          </form>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowMagic(true)}
+            style={{
+              width: "100%", padding: "10px", fontSize: 13, fontWeight: 500,
+              background: "#ffffff", color: "#0d9488", border: "1px solid #0d9488",
+              cursor: "pointer", borderRadius: 4,
+            }}
+          >
+            Sign in with email link instead
+          </button>
+        )}
 
         <p style={{ textAlign: "center", marginTop: 16, fontSize: 13 }}>
           <Link href="/reset-password" style={{ color: "#718096", textDecoration: "none" }}>
