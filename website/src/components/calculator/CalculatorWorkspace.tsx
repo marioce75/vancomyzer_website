@@ -222,7 +222,12 @@ export default function CalculatorWorkspace() {
 
   // Optional clinician-supplied tracking string for calculation history.
   // Persisted only if the user has the history.calculation feature (Pro+).
+  // Held in a ref alongside state so updates don't churn the buildRequest
+  // callback identity — if it did, every keystroke would retrigger the
+  // auto-recalc useEffect and write a row per character typed.
   const [caseId, setCaseId] = useState<string>("");
+  const caseIdRef = useRef<string>("");
+  useEffect(() => { caseIdRef.current = caseId; }, [caseId]);
   const { allowed: canSaveHistory } = useFeature("history.calculation");
 
   // Layout State
@@ -298,14 +303,14 @@ export default function CalculatorWorkspace() {
   }, [searchParams]);
 
   const buildRequest = useCallback((): CalculateRequest => {
-    const trimmedCaseId = caseId.trim();
+    const trimmedCaseId = caseIdRef.current.trim();
     const caseIdField = canSaveHistory && trimmedCaseId.length > 0 ? { case_id: trimmedCaseId } : {};
     const base = { mode, patient: { ...patient }, ...caseIdField };
     if (mode === "initial_regimen") return base;
     // Filter out empty/zero levels (loading dose simulation has no measured levels)
     const validLevels = levels.filter(l => l.value_mcg_ml > 0);
     return { ...base, regimen, levels: validLevels };
-  }, [mode, patient, regimen, levels, caseId, canSaveHistory]);
+  }, [mode, patient, regimen, levels, canSaveHistory]);
 
   const applyViewMode = useCallback((next: WorkspaceViewMode) => {
     setViewMode(next);
@@ -326,11 +331,12 @@ export default function CalculatorWorkspace() {
     }
   }, []);
 
-  const handleCalculate = useCallback(async () => {
+  const handleCalculate = useCallback(async (opts?: { intent?: "auto" | "explicit" }) => {
+    const intent = opts?.intent ?? "explicit";
     playSound("calculate");
     setError(null);
     setLoading(true);
-    const request = buildRequest();
+    const request = { ...buildRequest(), intent };
 
     try {
       console.log("[Vancomyzer] submitting levels:", JSON.stringify(request.levels));
@@ -466,7 +472,7 @@ export default function CalculatorWorkspace() {
     const hasPatientCore = patient.age > 0 && patient.weight_kg > 0 && patient.serum_creatinine_mg_dl > 0;
     if (!hasPatientCore || mode !== "initial_regimen" || rrt === null || rrt === true) return;
     const timer = window.setTimeout(() => {
-      void handleCalculate();
+      void handleCalculate({ intent: "auto" });
     }, 700);
     return () => window.clearTimeout(timer);
   }, [patient, mode, rrt, handleCalculate]);

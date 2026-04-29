@@ -14,6 +14,7 @@ interface RequestBody {
   regimen?: unknown;
   levels?: unknown;
   case_id?: unknown;
+  intent?: unknown;
 }
 
 function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mode } | { ok: false; error: { error_type: "validation_error"; message: string; field_errors?: Record<string, string> } } {
@@ -173,6 +174,12 @@ export async function POST(request: NextRequest) {
   }
   const caseId = caseIdResult.value;
 
+  // History persistence is gated on explicit intent. Auto-debounced recalcs
+  // fired during data entry are not user-confirmed clinical actions, so we
+  // don't pollute history with them. Defaults to "explicit" when absent so
+  // older clients (or curl) still get logged.
+  const intent = (body as RequestBody | null | undefined)?.intent === "auto" ? "auto" : "explicit";
+
   const validated = validateRequest(body);
 
   // Log validation errors
@@ -218,8 +225,11 @@ export async function POST(request: NextRequest) {
     });
 
     // Calculation history — gated on history.calculation feature
-    // (Pro+, no patient identifiers, includes optional case_id)
-    persistCalculation(userEmail, "empiric", result, caseId);
+    // (Pro+, no patient identifiers, includes optional case_id).
+    // Auto-recalc never persists; only explicit user action does.
+    if (intent === "explicit") {
+      persistCalculation(userEmail, "empiric", result, caseId);
+    }
 
     return NextResponse.json(result);
   }
@@ -266,8 +276,11 @@ export async function POST(request: NextRequest) {
     pk_parameters: extractPKParams(resultObj),
   });
 
-  // Calculation history — gated on history.calculation feature
-  persistCalculation(userEmail, "existing", resultObj, caseId);
+  // Calculation history — gated on history.calculation feature.
+  // Auto-recalc never persists; only explicit user action does.
+  if (intent === "explicit") {
+    persistCalculation(userEmail, "existing", resultObj, caseId);
+  }
 
   return NextResponse.json(result);
 }

@@ -34,6 +34,13 @@ export interface CalculateRequest {
   levels?: CalculateRequestLevel[];
   /** Optional clinician-supplied tracking string. Pro+ only. NO PHI. */
   case_id?: string;
+  /**
+   * "explicit" = user clicked Calculate / pressed Cmd+Enter / completed a
+   *              loading-dose simulation → eligible for history persistence.
+   * "auto"     = debounced recalc fired by an input change → never persisted.
+   * Defaults to "explicit" when absent for backward compatibility.
+   */
+  intent?: "explicit" | "auto";
 }
 
 export type ReviewStatusLevel = "prior_only" | "caution" | "supported";
