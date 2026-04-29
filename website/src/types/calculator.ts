@@ -32,6 +32,8 @@ export interface CalculateRequest {
   patient: CalculateRequestPatient;
   regimen?: CalculateRequestRegimen;
   levels?: CalculateRequestLevel[];
+  /** Optional clinician-supplied tracking string. Pro+ only. NO PHI. */
+  case_id?: string;
 }
 
 export type ReviewStatusLevel = "prior_only" | "caution" | "supported";

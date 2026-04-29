@@ -6,11 +6,51 @@ interface CalculatorActionBarProps {
   disabled?: boolean;
   /** When true, the Calculate button is hidden entirely (e.g. bedbound Phase 1 — awaiting level). */
   hideCalculate?: boolean;
+  /** When true, render the optional Case ID input (Pro+ users only). */
+  showCaseId?: boolean;
+  caseId?: string;
+  onCaseIdChange?: (value: string) => void;
 }
 
-export default function CalculatorActionBar({ onCalculate, onReset, disabled, hideCalculate }: CalculatorActionBarProps) {
+export default function CalculatorActionBar({
+  onCalculate,
+  onReset,
+  disabled,
+  hideCalculate,
+  showCaseId,
+  caseId,
+  onCaseIdChange,
+}: CalculatorActionBarProps) {
   return (
-    <div className="mt-1 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+    <div className="mt-1 flex flex-col items-center gap-2">
+      {showCaseId && (
+        <div className="flex w-full max-w-md items-center gap-2">
+          <label
+            htmlFor="case-id-input"
+            className="text-[10px] uppercase tracking-[0.16em] shrink-0"
+            style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em" }}
+            title="Optional clinician-supplied tracking string. Saved to your calculation history. Do not enter PHI."
+          >
+            case id
+          </label>
+          <input
+            id="case-id-input"
+            type="text"
+            value={caseId ?? ""}
+            onChange={e => onCaseIdChange?.(e.target.value)}
+            placeholder="optional · e.g. ICU bed 12 · NO PHI"
+            maxLength={64}
+            className="flex-1 px-2 py-1 text-xs"
+            style={{
+              border: "1px solid var(--color-border)",
+              background: "var(--color-card)",
+              color: "var(--color-primary)",
+              fontFamily: "'Share Tech Mono', monospace",
+            }}
+          />
+        </div>
+      )}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
       <p
         className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.16em] text-center"
         style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em" }}
@@ -88,6 +128,7 @@ export default function CalculatorActionBar({ onCalculate, onReset, disabled, hi
             {disabled ? "CALCULATING_" : "CALCULATE"}
           </button>
         )}
+      </div>
       </div>
     </div>
   );

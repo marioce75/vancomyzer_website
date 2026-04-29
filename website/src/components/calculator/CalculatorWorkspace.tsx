@@ -41,6 +41,7 @@ import NoteExportGate from "@/components/calculator/NoteExportGate";
 import PdfExportGate from "@/components/calculator/PdfExportGate";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFeature } from "@/hooks/useFeature";
 import { printReport, type ReportData } from "@/lib/generateReport";
 
 const defaultPatient: CalculateRequestPatient = { age: 0, weight_kg: 0, height_cm: 0, sex: "", serum_creatinine_mg_dl: 0 };
@@ -219,6 +220,11 @@ export default function CalculatorWorkspace() {
     selectedFrequencyOption: FrequencyOption | null;
   } | null>(null);
 
+  // Optional clinician-supplied tracking string for calculation history.
+  // Persisted only if the user has the history.calculation feature (Pro+).
+  const [caseId, setCaseId] = useState<string>("");
+  const { allowed: canSaveHistory } = useFeature("history.calculation");
+
   // Layout State
   const [activeSection, setActiveSection] = useState<string>("patient");
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -292,12 +298,14 @@ export default function CalculatorWorkspace() {
   }, [searchParams]);
 
   const buildRequest = useCallback((): CalculateRequest => {
-    const base = { mode, patient: { ...patient } };
+    const trimmedCaseId = caseId.trim();
+    const caseIdField = canSaveHistory && trimmedCaseId.length > 0 ? { case_id: trimmedCaseId } : {};
+    const base = { mode, patient: { ...patient }, ...caseIdField };
     if (mode === "initial_regimen") return base;
     // Filter out empty/zero levels (loading dose simulation has no measured levels)
     const validLevels = levels.filter(l => l.value_mcg_ml > 0);
     return { ...base, regimen, levels: validLevels };
-  }, [mode, patient, regimen, levels]);
+  }, [mode, patient, regimen, levels, caseId, canSaveHistory]);
 
   const applyViewMode = useCallback((next: WorkspaceViewMode) => {
     setViewMode(next);
@@ -765,7 +773,15 @@ export default function CalculatorWorkspace() {
       </div>
 
       <div className="sticky bottom-0 mt-auto border-t" style={{ borderTopColor: "var(--color-border)", background: "var(--color-bg)" }}>
-        <CalculatorActionBar onCalculate={handleCalculate} onReset={handleReset} disabled={loading || rrt === null || rrt === true} hideCalculate={hideCalculate} />
+        <CalculatorActionBar
+          onCalculate={handleCalculate}
+          onReset={handleReset}
+          disabled={loading || rrt === null || rrt === true}
+          hideCalculate={hideCalculate}
+          showCaseId={canSaveHistory}
+          caseId={caseId}
+          onCaseIdChange={setCaseId}
+        />
         {/* Inline disclaimer — always visible */}
         <div className="border-t px-4 py-2" style={{ borderTopColor: "var(--color-border)" }}>
           <p style={{ fontSize: 10, lineHeight: 1.6, color: "var(--color-dim)", fontFamily: "inherit", margin: 0 }}>
