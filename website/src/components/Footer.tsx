@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LEGAL_LINKS } from "@/lib/legalLinks";
 
 export default function Footer() {
   return (
@@ -35,27 +36,55 @@ export default function Footer() {
           </div>
 
           {/* Nav links */}
-          <nav className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm md:grid-cols-3">
-            {[
-              { href: "/calculator", label: "Calculator" },
-              { href: "/references", label: "References" },
-              { href: "/faq", label: "FAQ" },
-              { href: "/about", label: "About" },
-              { href: "/contact", label: "Contact" },
-              { href: "/disclaimer", label: "Medical Disclaimer" },
-              { href: "/privacy", label: "Privacy" },
-              { href: "/terms", label: "Terms" },
-            ].map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="transition"
-                style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
+          <div className="grid gap-6 sm:grid-cols-2 text-sm">
+            {/* In-app navigation */}
+            <nav className="grid grid-cols-2 gap-x-6 gap-y-2">
+              {[
+                { href: "/calculator", label: "Calculator" },
+                { href: "/references", label: "References" },
+                { href: "/faq", label: "FAQ" },
+                { href: "/about", label: "About" },
+                { href: "/contact", label: "Contact" },
+                { href: "/pricing", label: "Pricing" },
+              ].map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="transition"
+                  style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Legal — canonical documents on dosys.health */}
+            <nav className="flex flex-col gap-2">
+              <span
+                className="text-[10px] font-bold uppercase tracking-[0.18em]"
+                style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
               >
-                {label}
-              </Link>
-            ))}
-          </nav>
+                Legal · dosys.health
+              </span>
+              {[
+                { href: LEGAL_LINKS.disclaimer, label: "Medical Disclaimer" },
+                { href: LEGAL_LINKS.privacy, label: "Privacy Policy" },
+                { href: LEGAL_LINKS.terms, label: "Terms of Use" },
+                { href: LEGAL_LINKS.baa, label: "BAA" },
+              ].map(({ href, label }) => (
+                <a
+                  key={href}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition"
+                  style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
+                >
+                  {label} ↗
+                </a>
+              ))}
+            </nav>
+          </div>
         </div>
       </div>
     </footer>

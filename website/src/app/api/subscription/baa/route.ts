@@ -75,6 +75,7 @@ export async function POST() {
         `Billing email: ${account.billing_email}`,
         `Requested by: ${user.full_name} (${user.email})`,
         ``,
+        `Canonical BAA: https://dosys.health/legal/baa`,
         `Please prepare and send the BAA to the billing contact.`,
       ].join("\n"),
     });

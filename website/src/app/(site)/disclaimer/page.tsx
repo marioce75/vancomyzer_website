@@ -1,8 +1,13 @@
+import CanonicalDocCallout from "@/components/CanonicalDocCallout";
+import { LEGAL_LINKS } from "@/lib/legalLinks";
+
 export default function DisclaimerPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <h1 className="text-3xl font-bold tracking-tight text-slate-900">Medical Disclaimer</h1>
       <p className="mt-2 text-sm text-slate-500">Last updated: March 2026</p>
+
+      <CanonicalDocCallout docName="Medical Disclaimer" href={LEGAL_LINKS.disclaimer} />
 
       <div className="mt-8 space-y-8 text-slate-700">
 
