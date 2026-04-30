@@ -7,7 +7,7 @@
  *
  * Behavior:
  *   - Free tier: tiled diagonal SVG overlay + footer upgrade banner
- *   - Individual Pro / Department / Hospital / Enterprise: nothing
+ *   - Individual Pro / Department / Hospital: nothing
  *
  * Watermark must NOT obscure clinical data — opacity stays low,
  * pointer-events disabled, and a low z-index relative to error/UI

@@ -5,7 +5,7 @@ import { TIERS, type TierId } from "@/lib/tiers";
 export const metadata: Metadata = {
   title: "Pricing — Vancomyzer™",
   description:
-    "Vancomyzer™ subscription plans for individual clinicians, departments, and enterprise health systems.",
+    "Vancomyzer™ subscription plans for individual clinicians, hospital departments, and full hospital deployments.",
 };
 
 /**
@@ -13,11 +13,11 @@ export const metadata: Metadata = {
  * lib/tiers.ts so feature lists and pricing labels can never drift
  * from the gates that enforce them.
  *
- * Hospital is intentionally omitted from the visible grid — it's a
- * legacy DB slot kept for backward compatibility, not a tier we sell.
- * Department and Enterprise cover the org-scale market.
+ * Four tiers: Free, Individual Pro (self-serve), Department (5–20
+ * seats), Hospital (institution-wide with EMR/SSO/SOC 2/BAA).
+ * Enterprise was retired; its features merged into Hospital.
  */
-const VISIBLE_TIERS: TierId[] = ["free", "individual_pro", "department", "enterprise"];
+const VISIBLE_TIERS: TierId[] = ["free", "individual_pro", "department", "hospital"];
 
 const RECOMMENDED_TIER: TierId = "individual_pro";
 
@@ -42,7 +42,7 @@ function buildCards(): CardModel[] {
       cta = { label: "Start 14-Day Trial", href: "/settings/billing", external: false };
       ctaSubLabel = "card required upfront · cancel anytime";
     } else {
-      // Department + Enterprise — sales-driven, route to dosys.health/contact
+      // Department + Hospital — sales-driven, route to dosys.health/contact
       cta = { label: tier.cta.label, href: tier.cta.href, external: true };
     }
 

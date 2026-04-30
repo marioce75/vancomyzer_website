@@ -11,7 +11,7 @@
  * commitment under 21st Century Cures Act §3060.
  */
 
-export type TierId = "free" | "individual_pro" | "department" | "hospital" | "enterprise";
+export type TierId = "free" | "individual_pro" | "department" | "hospital";
 
 export type FeatureId =
   // Output / export
@@ -25,11 +25,11 @@ export type FeatureId =
   | "org.admin_panel"
   | "org.audit_log"
   | "org.invite_users"
-  // Enterprise infra
-  | "enterprise.emr_integration"
-  | "enterprise.custom_branding"
-  | "enterprise.baa"
-  | "enterprise.sso";
+  // Hospital-tier infra (formerly Enterprise — merged into Hospital)
+  | "hospital.emr_integration"
+  | "hospital.custom_branding"
+  | "hospital.baa"
+  | "hospital.sso";
 
 export type Cta = {
   /** Action label users see on the upgrade button. */
@@ -115,29 +115,9 @@ export const TIERS: Record<TierId, TierConfig> = {
     paid: true,
   },
   hospital: {
-    // Legacy tier slot kept for backward compatibility with the existing
-    // database CHECK constraint. Treated equivalent to Department for
-    // gating purposes until Phase 4 migration cleans this up.
     id: "hospital",
     name: "Hospital",
     priceLabel: "Contact for pricing",
-    audience: "Multi-department hospital deployments",
-    features: [
-      "Everything in Department",
-      "Hospital-wide deployment",
-      "Custom integration support",
-    ],
-    cta: {
-      label: "Contact Sales",
-      href: `${CONTACT_URL}?type=hospital`,
-      external: true,
-    },
-    paid: true,
-  },
-  enterprise: {
-    id: "enterprise",
-    name: "Enterprise",
-    priceLabel: "$10K–$25K/year",
     audience: "Health systems + EMR integration",
     features: [
       "Everything in Department",
@@ -146,12 +126,13 @@ export const TIERS: Record<TierId, TierConfig> = {
       "SLA & uptime guarantee",
       "SOC 2 compliance documentation",
       "Business Associate Agreement (BAA)",
+      "SSO / SAML",
       "Dedicated account manager",
       "White-glove onboarding",
     ],
     cta: {
       label: "Request Proposal",
-      href: `${CONTACT_URL}?type=enterprise`,
+      href: `${CONTACT_URL}?type=hospital`,
       external: true,
     },
     paid: true,
@@ -166,8 +147,7 @@ const TIER_RANK: Record<TierId, number> = {
   free: 0,
   individual_pro: 1,
   department: 2,
-  hospital: 2,
-  enterprise: 3,
+  hospital: 3,
 };
 
 const FEATURE_MIN_TIER: Record<FeatureId, TierId> = {
@@ -186,21 +166,28 @@ const FEATURE_MIN_TIER: Record<FeatureId, TierId> = {
   "org.audit_log": "department",
   "org.invite_users": "department",
 
-  // Enterprise
-  "enterprise.emr_integration": "enterprise",
-  "enterprise.custom_branding": "enterprise",
-  "enterprise.baa": "enterprise",
-  "enterprise.sso": "enterprise",
+  // Hospital (formerly Enterprise — merged here)
+  "hospital.emr_integration": "hospital",
+  "hospital.custom_branding": "hospital",
+  "hospital.baa": "hospital",
+  "hospital.sso": "hospital",
 };
 
-/** Defensive fallback when a session/cookie is missing. */
+/**
+ * Defensive fallback when a session/cookie is missing or carries a
+ * tier value we no longer support.
+ *
+ * The Enterprise tier was retired and its features merged into Hospital.
+ * Any stored "enterprise" values are coerced to "hospital" so existing
+ * accounts keep their entitlements without a DB migration.
+ */
 export function normalizeTier(value: unknown): TierId {
+  if (value === "enterprise") return "hospital";
   if (
     value === "free" ||
     value === "individual_pro" ||
     value === "department" ||
-    value === "hospital" ||
-    value === "enterprise"
+    value === "hospital"
   ) {
     return value;
   }

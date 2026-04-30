@@ -56,12 +56,12 @@ const DEFAULT_COPY: Partial<Record<FeatureId, { title: string; description: stri
   "org.admin_panel": {
     title: "Team management is a Department feature",
     description:
-      "Invite teammates, manage roles, and view your institution's calculation audit log. Available on Department and Enterprise plans.",
+      "Invite teammates, manage roles, and view your institution's calculation audit log. Available on Department and Hospital plans.",
   },
   "org.invite_users": {
     title: "Invitations are a Department feature",
     description:
-      "Add teammates to your shared workspace. Available on Department and Enterprise plans.",
+      "Add teammates to your shared workspace. Available on Department and Hospital plans.",
   },
 };
 
@@ -93,7 +93,7 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
   const headline = title ?? copy.title;
   const body = description ?? copy.description;
 
-  // Department / Enterprise CTAs go to dosys.health/contact (sales).
+  // Department / Hospital CTAs go to dosys.health/contact (sales).
   // Individual Pro CTA goes to /settings/billing (self-serve checkout).
   const isSelfServe = upgradeTier.id === "individual_pro";
   const primaryHref = isSelfServe ? "/settings/billing" : upgradeTier.cta.href;

@@ -30,7 +30,7 @@ export function getStripe(): Stripe {
  * Map a Stripe price ID back to the tier it represents. Used by the
  * webhook handler to translate subscription events into our tier
  * vocabulary. Currently only Individual Pro has Stripe price IDs;
- * Department/Enterprise are sales-driven and assigned manually.
+ * Department/Hospital are sales-driven and assigned manually.
  */
 export function tierForPriceId(priceId: string | null | undefined): TierId | null {
   if (!priceId) return null;

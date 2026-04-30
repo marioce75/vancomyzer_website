@@ -38,7 +38,7 @@ export default function CompliancePage() {
 
   useEffect(() => {
     if (status === "loading" || authLoading) return;
-    if (!user || (tier !== "hospital" && tier !== "enterprise")) {
+    if (!user || tier !== "hospital") {
       router.replace("/pricing");
     }
   }, [user, tier, status, authLoading, router]);
@@ -51,7 +51,7 @@ export default function CompliancePage() {
     );
   }
 
-  if (!user || (tier !== "hospital" && tier !== "enterprise")) {
+  if (!user || tier !== "hospital") {
     return null;
   }
 
@@ -64,7 +64,7 @@ export default function CompliancePage() {
         SOC 2 Compliance Documentation
       </h1>
       <p className="mt-2 text-sm" style={{ color: "var(--color-secondary)" }}>
-        Available to Hospital and Enterprise plan subscribers.
+        Available to Hospital plan subscribers.
       </p>
 
       <div className="mt-8 space-y-4">

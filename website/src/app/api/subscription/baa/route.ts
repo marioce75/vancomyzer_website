@@ -6,7 +6,7 @@ import nodemailer from "nodemailer";
 
 /**
  * POST /api/subscription/baa — Request a BAA for the user's institutional account.
- * Requires hospital or enterprise tier.
+ * Requires hospital tier.
  */
 export async function POST() {
   const session = await getServerSession(authOptions);
@@ -21,9 +21,9 @@ export async function POST() {
   }
 
   const tier = user.subscription_tier ?? "free";
-  if (tier !== "hospital" && tier !== "enterprise") {
+  if (tier !== "hospital") {
     return NextResponse.json(
-      { error: "BAA requests require a Hospital or Enterprise plan." },
+      { error: "BAA requests require a Hospital plan." },
       { status: 403 }
     );
   }

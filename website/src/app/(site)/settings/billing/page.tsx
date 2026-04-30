@@ -329,7 +329,7 @@ function BillingPageInner() {
         </div>
       )}
 
-      {/* Department / Enterprise hint */}
+      {/* Department / Hospital hint */}
       <div style={{
         padding: 16,
         background: "var(--color-card)",
@@ -346,7 +346,7 @@ function BillingPageInner() {
           rel="noopener noreferrer"
           style={{ color: "var(--color-primary)", textDecoration: "underline" }}
         >
-          Department &amp; Enterprise plans
+          Department &amp; Hospital plans
         </a>{" "}
         on dosys.health.
       </div>
