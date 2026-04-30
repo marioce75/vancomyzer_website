@@ -734,6 +734,141 @@ export function purgeOldCalculationsIfNeeded() {
   }
 }
 
+/**
+ * System-wide calculation feed for superadmin dashboards. Joins user
+ * + institutional account names so the table can show readable labels
+ * instead of raw IDs. Never returns PHI.
+ */
+export interface SuperadminCalcRow {
+  id: number;
+  calculated_at: string;
+  user_id: number;
+  username: string | null;
+  user_email: string | null;
+  full_name: string | null;
+  institutional_account_id: number | null;
+  institution_name: string | null;
+  workflow_type: string;
+  pk_model: string;
+  obesity_model_active: number;
+  dose_mg: number | null;
+  interval_hours: number | null;
+  auc24: number | null;
+  peak: number | null;
+  trough: number | null;
+  auc_in_range: number;
+  case_id: string | null;
+  tier_at_time: string | null;
+}
+
+export function listSuperadminCalcFeed(filters?: {
+  institutional_account_id?: number;
+  user_email?: string;
+  workflow_type?: string;
+  pk_model?: string;
+  start_date?: string;
+  end_date?: string;
+  limit?: number;
+  offset?: number;
+}): SuperadminCalcRow[] {
+  const conditions: string[] = [];
+  const params: unknown[] = [];
+
+  if (filters?.institutional_account_id) {
+    conditions.push("cl.institutional_account_id = ?");
+    params.push(filters.institutional_account_id);
+  }
+  if (filters?.user_email) {
+    conditions.push("u.email LIKE ?");
+    params.push(`%${filters.user_email.toLowerCase()}%`);
+  }
+  if (filters?.workflow_type) {
+    conditions.push("cl.workflow_type = ?");
+    params.push(filters.workflow_type);
+  }
+  if (filters?.pk_model) {
+    conditions.push("cl.pk_model = ?");
+    params.push(filters.pk_model);
+  }
+  if (filters?.start_date) {
+    conditions.push("cl.calculated_at >= ?");
+    params.push(filters.start_date);
+  }
+  if (filters?.end_date) {
+    conditions.push("cl.calculated_at <= ?");
+    params.push(filters.end_date);
+  }
+
+  const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const limit = Math.max(1, Math.min(filters?.limit ?? 100, 1000));
+  const offset = Math.max(0, filters?.offset ?? 0);
+
+  return getDb()
+    .prepare(
+      `SELECT cl.id, cl.calculated_at, cl.user_id,
+              u.username, u.email AS user_email, u.full_name,
+              cl.institutional_account_id,
+              ia.institution_name,
+              cl.workflow_type, cl.pk_model, cl.obesity_model_active,
+              cl.dose_mg, cl.interval_hours, cl.auc24, cl.peak, cl.trough,
+              cl.auc_in_range, cl.case_id, cl.tier_at_time
+       FROM calculation_log cl
+       LEFT JOIN users u ON u.id = cl.user_id
+       LEFT JOIN institutional_accounts ia ON ia.id = cl.institutional_account_id
+       ${where}
+       ORDER BY cl.calculated_at DESC
+       LIMIT ? OFFSET ?`,
+    )
+    .all(...params, limit, offset) as SuperadminCalcRow[];
+}
+
+export function countSuperadminCalcFeed(filters?: {
+  institutional_account_id?: number;
+  user_email?: string;
+  workflow_type?: string;
+  pk_model?: string;
+  start_date?: string;
+  end_date?: string;
+}): number {
+  const conditions: string[] = [];
+  const params: unknown[] = [];
+
+  if (filters?.institutional_account_id) {
+    conditions.push("cl.institutional_account_id = ?");
+    params.push(filters.institutional_account_id);
+  }
+  if (filters?.user_email) {
+    conditions.push("u.email LIKE ?");
+    params.push(`%${filters.user_email.toLowerCase()}%`);
+  }
+  if (filters?.workflow_type) {
+    conditions.push("cl.workflow_type = ?");
+    params.push(filters.workflow_type);
+  }
+  if (filters?.pk_model) {
+    conditions.push("cl.pk_model = ?");
+    params.push(filters.pk_model);
+  }
+  if (filters?.start_date) {
+    conditions.push("cl.calculated_at >= ?");
+    params.push(filters.start_date);
+  }
+  if (filters?.end_date) {
+    conditions.push("cl.calculated_at <= ?");
+    params.push(filters.end_date);
+  }
+
+  const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const row = getDb()
+    .prepare(
+      `SELECT COUNT(*) as n FROM calculation_log cl
+       LEFT JOIN users u ON u.id = cl.user_id
+       ${where}`,
+    )
+    .get(...params) as { n: number };
+  return row?.n ?? 0;
+}
+
 export function getCalcLog(filters?: {
   institutional_account_id?: number;
   user_id?: number;
