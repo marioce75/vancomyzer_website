@@ -163,6 +163,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 { href: "/settings", label: "Institutional Settings" },
                 { href: "/settings/billing", label: "Billing & Subscription" },
                 { href: "/settings/history", label: "Calculation History" },
+                { href: "/team", label: "Team Management" },
               ].map(({ href, label }) => (
                 <Link
                   key={href}

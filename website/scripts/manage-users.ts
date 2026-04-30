@@ -123,9 +123,89 @@ async function main() {
       break;
     }
 
+    case "make-team": {
+      // One-shot Department test setup:
+      //   - Creates institutional_accounts row (or reuses existing by name)
+      //   - Promotes the named user to that institution + admin role + tier
+      // Usage:
+      //   npx tsx scripts/manage-users.ts make-team \
+      //     --username pharm \
+      //     --institution "Test Hospital" \
+      //     --seats 10 \
+      //     --tier department
+      const { username, institution, seats, tier } = opts;
+      if (!username || !institution) {
+        console.error("Required: --username --institution. Optional: --seats (default 10), --tier (default department)");
+        process.exit(1);
+      }
+
+      // Ensure institutional_accounts table exists (if a fresh DB)
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS institutional_accounts (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          institution_name TEXT NOT NULL,
+          billing_email TEXT NOT NULL,
+          plan_tier TEXT NOT NULL DEFAULT 'department' CHECK (plan_tier IN ('department', 'hospital', 'enterprise')),
+          seats_allocated INTEGER NOT NULL DEFAULT 5,
+          seats_used INTEGER NOT NULL DEFAULT 0,
+          subscription_start TEXT NOT NULL DEFAULT (datetime('now')),
+          subscription_expiry TEXT,
+          baa_status TEXT DEFAULT 'not_requested' CHECK (baa_status IN ('not_requested', 'pending', 'active')),
+          baa_requested_at TEXT,
+          created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
+      // Ensure subscription/institutional columns exist on users
+      try { db.exec("ALTER TABLE users ADD COLUMN subscription_tier TEXT DEFAULT 'free'"); } catch { /* exists */ }
+      try { db.exec("ALTER TABLE users ADD COLUMN subscription_status TEXT DEFAULT 'active'"); } catch { /* exists */ }
+      try { db.exec("ALTER TABLE users ADD COLUMN institutional_account_id INTEGER"); } catch { /* exists */ }
+      try { db.exec("ALTER TABLE users ADD COLUMN institutional_role TEXT DEFAULT 'user'"); } catch { /* exists */ }
+
+      const user = db.prepare("SELECT id, email FROM users WHERE username = ?").get(username) as { id: number; email: string } | undefined;
+      if (!user) { console.error(`✗ User '${username}' not found. Create them first with the 'add' command.`); process.exit(1); }
+
+      const planTier = tier ?? "department";
+      if (!["department", "hospital", "enterprise"].includes(planTier)) {
+        console.error(`✗ tier must be 'department', 'hospital', or 'enterprise' (got '${planTier}')`);
+        process.exit(1);
+      }
+
+      const seatsAllocated = Number(seats ?? 10);
+      if (!Number.isInteger(seatsAllocated) || seatsAllocated < 1) {
+        console.error(`✗ seats must be a positive integer (got '${seats}')`);
+        process.exit(1);
+      }
+
+      let account = db.prepare("SELECT id FROM institutional_accounts WHERE institution_name = ?").get(institution) as { id: number } | undefined;
+      if (!account) {
+        const result = db.prepare(
+          `INSERT INTO institutional_accounts (institution_name, billing_email, plan_tier, seats_allocated)
+           VALUES (?, ?, ?, ?)`,
+        ).run(institution, user.email, planTier, seatsAllocated);
+        account = { id: Number(result.lastInsertRowid) };
+        console.log(`✓ Created institutional account #${account.id} '${institution}' (${planTier}, ${seatsAllocated} seats).`);
+      } else {
+        db.prepare("UPDATE institutional_accounts SET plan_tier = ?, seats_allocated = ? WHERE id = ?").run(planTier, seatsAllocated, account.id);
+        console.log(`✓ Updated existing institutional account #${account.id} '${institution}' (${planTier}, ${seatsAllocated} seats).`);
+      }
+
+      db.prepare("UPDATE users SET institutional_account_id = ?, institutional_role = 'admin', subscription_tier = ? WHERE id = ?")
+        .run(account.id, planTier, user.id);
+
+      // Recount seats
+      const cnt = (db.prepare("SELECT COUNT(*) as cnt FROM users WHERE institutional_account_id = ?").get(account.id) as { cnt: number }).cnt;
+      db.prepare("UPDATE institutional_accounts SET seats_used = ? WHERE id = ?").run(cnt, account.id);
+
+      console.log(`✓ User '${username}' bound to '${institution}' as institutional admin (tier: ${planTier}, ${cnt}/${seatsAllocated} seats used).`);
+      console.log(`  Sign in as '${username}' and visit /team to see the admin panel.`);
+      break;
+    }
+
     default:
-      console.log("Commands: add, list, approve, disable, reset-password");
+      console.log("Commands: add, list, approve, disable, reset-password, make-team");
       console.log("Example: npx tsx scripts/manage-users.ts add --username admin --name \"Admin\" --credentials \"Admin\" --email \"admin@example.com\" --password \"Pass123!\" --role admin");
+      console.log("Example: npx tsx scripts/manage-users.ts make-team --username pharm --institution \"Test Hospital\" --seats 10 --tier department");
   }
 }
 

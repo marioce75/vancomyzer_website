@@ -495,6 +495,134 @@ export function recountSeats(institutionalAccountId: number) {
 }
 
 // ---------------------------------------------------------------------------
+// Team / Department admin helpers (Phase 7)
+// ---------------------------------------------------------------------------
+
+export interface TeamMemberRow {
+  id: number;
+  username: string;
+  email: string;
+  full_name: string;
+  credentials: string;
+  status: string;
+  institutional_role: "user" | "admin";
+  last_login: string | null;
+  created_at: string;
+}
+
+/** Return a slim member view for the team panel — no password hashes, no PHI. */
+export function listTeamMembers(institutionalAccountId: number): TeamMemberRow[] {
+  return getDb()
+    .prepare(
+      `SELECT id, username, email, full_name, credentials, status,
+              institutional_role, last_login, created_at
+       FROM users
+       WHERE institutional_account_id = ?
+       ORDER BY institutional_role DESC, last_login DESC`,
+    )
+    .all(institutionalAccountId) as TeamMemberRow[];
+}
+
+/** Look up a single team member, scoped to the inviter's institution. */
+export function findTeamMember(
+  institutionalAccountId: number,
+  userId: number,
+): UserRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM users WHERE institutional_account_id = ? AND id = ?")
+    .get(institutionalAccountId, userId) as UserRow | undefined;
+}
+
+/** Remove a member from the institution — they revert to free/no institution. */
+export function removeFromInstitution(userId: number) {
+  getDb()
+    .prepare(
+      `UPDATE users SET institutional_account_id = NULL,
+                        institutional_role = 'user',
+                        subscription_tier = 'free'
+       WHERE id = ?`,
+    )
+    .run(userId);
+}
+
+export function setInstitutionalRole(userId: number, role: "user" | "admin") {
+  getDb().prepare("UPDATE users SET institutional_role = ? WHERE id = ?").run(role, userId);
+}
+
+/**
+ * Create a new institution-bound user from an admin invite. Status is
+ * 'active' immediately so the magic-link sign-in works on first click.
+ * Caller is responsible for seat-cap pre-check.
+ */
+export function createInvitedTeamMember(input: {
+  email: string;
+  full_name: string;
+  credentials: string;
+  password_hash: string;
+  institutional_account_id: number;
+  subscription_tier: TierId;
+}): number {
+  const username = input.email.split("@")[0].slice(0, 32) + "_" + String(Date.now()).slice(-6);
+  const result = getDb()
+    .prepare(
+      `INSERT INTO users (
+         username, email, password_hash, full_name, credentials,
+         status, role, institutional_account_id, institutional_role,
+         subscription_tier, agreed_disclaimer, agreed_terms,
+         confirmed_hcp, confirmed_age
+       ) VALUES (?, ?, ?, ?, ?, 'active', 'pharmacist', ?, 'user', ?, 1, 1, 1, 1)`,
+    )
+    .run(
+      username,
+      input.email.toLowerCase().trim(),
+      input.password_hash,
+      input.full_name,
+      input.credentials,
+      input.institutional_account_id,
+      input.subscription_tier,
+    );
+  return Number(result.lastInsertRowid);
+}
+
+export interface AuditFeedRow {
+  id: number;
+  calculated_at: string;
+  user_id: number;
+  username: string | null;
+  full_name: string | null;
+  workflow_type: string;
+  pk_model: string;
+  dose_mg: number | null;
+  interval_hours: number | null;
+  auc24: number | null;
+  peak: number | null;
+  trough: number | null;
+  auc_in_range: number;
+  case_id: string | null;
+}
+
+/** Institution-scoped audit feed. Joins user info; never returns PHI. */
+export function listInstitutionAuditFeed(
+  institutionalAccountId: number,
+  opts?: { limit?: number; offset?: number },
+): AuditFeedRow[] {
+  const limit = Math.max(1, Math.min(opts?.limit ?? 100, 500));
+  const offset = Math.max(0, opts?.offset ?? 0);
+  return getDb()
+    .prepare(
+      `SELECT cl.id, cl.calculated_at, cl.user_id, u.username, u.full_name,
+              cl.workflow_type, cl.pk_model, cl.dose_mg, cl.interval_hours,
+              cl.auc24, cl.peak, cl.trough, cl.auc_in_range, cl.case_id
+       FROM calculation_log cl
+       LEFT JOIN users u ON u.id = cl.user_id
+       WHERE cl.institutional_account_id = ?
+       ORDER BY cl.calculated_at DESC
+       LIMIT ? OFFSET ?`,
+    )
+    .all(institutionalAccountId, limit, offset) as AuditFeedRow[];
+}
+
+// ---------------------------------------------------------------------------
 // Calculation Log (no patient identifiers)
 // ---------------------------------------------------------------------------
 
