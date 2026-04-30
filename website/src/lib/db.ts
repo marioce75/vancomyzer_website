@@ -259,6 +259,20 @@ export function disableUser(id: number) {
   getDb().prepare("UPDATE users SET status = 'disabled' WHERE id = ?").run(id);
 }
 
+export function reactivateUser(id: number) {
+  getDb().prepare("UPDATE users SET status = 'active' WHERE id = ?").run(id);
+}
+
+/** Hard-delete a user. Use with care — irreversible. */
+export function deleteUser(id: number) {
+  getDb().prepare("DELETE FROM users WHERE id = ?").run(id);
+}
+
+/** Change a user's system role between 'admin' and 'pharmacist'. */
+export function setUserRole(id: number, role: "admin" | "pharmacist") {
+  getDb().prepare("UPDATE users SET role = ? WHERE id = ?").run(role, id);
+}
+
 export function listPendingUsers(): UserRow[] {
   return getDb().prepare("SELECT * FROM users WHERE status = 'pending' ORDER BY created_at DESC").all() as UserRow[];
 }

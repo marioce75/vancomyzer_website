@@ -16,6 +16,9 @@ interface UserRecord {
   failed_login_attempts: number;
   locked_until: string | null;
   created_at: string;
+  subscription_tier: string;
+  institutional_account_id: number | null;
+  institutional_role: string;
 }
 
 export default function UsersPage() {
@@ -29,10 +32,15 @@ export default function UsersPage() {
       const res = await fetch("/api/admin");
       if (res.ok) {
         const data = await res.json();
-        const all: UserRecord[] = [
-          ...(data.pending ?? []).map((u: Record<string, unknown>) => ({ ...u, status: "pending", role: "pharmacist", mfa_enabled: 0, failed_login_attempts: 0, locked_until: null, last_login: null })),
-          ...(data.active ?? []).map((u: Record<string, unknown>) => ({ ...u, status: "active", mfa_enabled: u.mfa_enabled ?? 0, failed_login_attempts: u.failed_login_attempts ?? 0, locked_until: u.locked_until ?? null })),
-        ];
+        // Use the flat data.users array (includes pending + active + disabled).
+        // Falls back to the legacy split shape if a stale server is up.
+        const all: UserRecord[] = data.users
+          ? (data.users as UserRecord[])
+          : [
+              ...(data.pending ?? []).map((u: Record<string, unknown>) => ({ ...u, status: "pending", role: "pharmacist", mfa_enabled: 0, failed_login_attempts: 0, locked_until: null, last_login: null })),
+              ...(data.active ?? []).map((u: Record<string, unknown>) => ({ ...u, status: "active", mfa_enabled: u.mfa_enabled ?? 0, failed_login_attempts: u.failed_login_attempts ?? 0, locked_until: u.locked_until ?? null })),
+              ...(data.disabled ?? []).map((u: Record<string, unknown>) => ({ ...u, status: "disabled" })),
+            ];
         setUsers(all);
       }
     } catch { /* ignore */ }
@@ -48,6 +56,23 @@ export default function UsersPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, userId }),
+      });
+      const data = await res.json();
+      setMessage(data.message ?? data.error ?? "Done.");
+      fetchUsers();
+    } catch {
+      setMessage("Request failed.");
+    }
+  };
+
+  // Variant for actions that need extra fields (set_role, set_tier, delete).
+  const handleActionWithBody = async (body: Record<string, unknown>) => {
+    setMessage("");
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       setMessage(data.message ?? data.error ?? "Done.");
@@ -194,9 +219,14 @@ export default function UsersPage() {
                             </button>
                           </>
                         )}
-                        {u.status === "active" && u.role !== "admin" && (
+                        {u.status === "active" && (
                           <button onClick={() => handleAction("disable", u.id)} className="px-2 py-0.5 text-[10px] font-semibold text-white bg-red-700 rounded hover:bg-red-800">
                             DISABLE
+                          </button>
+                        )}
+                        {u.status === "disabled" && (
+                          <button onClick={() => handleAction("reactivate", u.id)} className="px-2 py-0.5 text-[10px] font-semibold text-white bg-green-700 rounded hover:bg-green-800">
+                            REACTIVATE
                           </button>
                         )}
                         {isLocked(u) && (
@@ -206,14 +236,47 @@ export default function UsersPage() {
                         )}
                         {u.status === "active" && (
                           <>
-                          <button onClick={() => handleForceReset(u.id)} className="px-2 py-0.5 text-[10px] font-semibold text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
-                            RESET PW
-                          </button>
-                          <button onClick={() => handleAction("resend_approval", u.id)} className="px-2 py-0.5 text-[10px] font-semibold text-blue-700 bg-blue-100 rounded hover:bg-blue-200">
-                            RESEND EMAIL
-                          </button>
+                            <button onClick={() => handleForceReset(u.id)} className="px-2 py-0.5 text-[10px] font-semibold text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+                              RESET PW
+                            </button>
+                            <button onClick={() => handleAction("resend_approval", u.id)} className="px-2 py-0.5 text-[10px] font-semibold text-blue-700 bg-blue-100 rounded hover:bg-blue-200">
+                              RESEND EMAIL
+                            </button>
+                            <button
+                              onClick={() => {
+                                const next = u.role === "admin" ? "pharmacist" : "admin";
+                                if (confirm(`Change ${u.username}'s system role: ${u.role} → ${next}?`)) {
+                                  void handleActionWithBody({ action: "set_role", userId: u.id, role: next });
+                                }
+                              }}
+                              className="px-2 py-0.5 text-[10px] font-semibold text-purple-800 bg-purple-100 rounded hover:bg-purple-200"
+                            >
+                              {u.role === "admin" ? "DEMOTE" : "PROMOTE"}
+                            </button>
+                            <button
+                              onClick={() => {
+                                const tier = prompt(`Set tier for ${u.username}\nfree | individual_pro | department | hospital`, u.subscription_tier);
+                                if (tier && tier !== u.subscription_tier) {
+                                  void handleActionWithBody({ action: "set_tier", userId: u.id, tier });
+                                }
+                              }}
+                              className="px-2 py-0.5 text-[10px] font-semibold text-teal-800 bg-teal-100 rounded hover:bg-teal-200"
+                              title={`Current tier: ${u.subscription_tier}`}
+                            >
+                              TIER
+                            </button>
                           </>
                         )}
+                        <button
+                          onClick={() => {
+                            if (confirm(`PERMANENTLY DELETE ${u.username} (${u.email})?\nThis cannot be undone.`)) {
+                              void handleActionWithBody({ action: "delete", userId: u.id });
+                            }
+                          }}
+                          className="px-2 py-0.5 text-[10px] font-semibold text-white bg-red-900 rounded hover:bg-red-950"
+                        >
+                          DELETE
+                        </button>
                       </div>
                     </td>
                   </tr>
