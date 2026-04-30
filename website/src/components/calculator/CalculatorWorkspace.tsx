@@ -39,6 +39,7 @@ import DisclaimerModal from "@/components/calculator/DisclaimerModal";
 import PKParametersMath from "@/components/calculator/PKParametersMath";
 import NoteExportGate from "@/components/calculator/NoteExportGate";
 import PdfExportGate from "@/components/calculator/PdfExportGate";
+import UpgradeBanner from "@/components/UpgradeBanner";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFeature } from "@/hooks/useFeature";
@@ -1012,6 +1013,9 @@ export default function CalculatorWorkspace() {
                   <LimitationsCard limitations={visibleResult.limitations} calculationDetails={visibleResult.calculation_details} />
                 </div>
               </details>
+
+              {/* Free-tier upgrade prompt — self-gates, dismissible per session */}
+              <UpgradeBanner />
             </div>
           ) : (
             /* ── Empty state: zeroed layout mirroring the populated calculator ── */

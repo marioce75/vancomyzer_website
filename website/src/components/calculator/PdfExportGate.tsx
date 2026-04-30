@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { hasFeature, upgradeTargetFor } from "@/lib/tiers";
+import { useState, useCallback } from "react";
+import { hasFeature } from "@/lib/tiers";
+import UpgradeModal from "@/components/UpgradeModal";
 
 interface PdfExportGateProps {
   tier: string;
@@ -9,22 +10,14 @@ interface PdfExportGateProps {
 }
 
 export default function PdfExportGate({ tier, onExport }: PdfExportGateProps) {
-  const [showMessage, setShowMessage] = useState(false);
-
-  useEffect(() => {
-    if (!showMessage) return;
-    const timer = setTimeout(() => setShowMessage(false), 8000);
-    return () => clearTimeout(timer);
-  }, [showMessage]);
-
+  const [modalOpen, setModalOpen] = useState(false);
   const allowed = hasFeature(tier, "export.pdf");
-  const upgradeTier = upgradeTargetFor("export.pdf");
 
   const handleClick = useCallback(() => {
     if (allowed) {
       onExport();
     } else {
-      setShowMessage(true);
+      setModalOpen(true);
     }
   }, [allowed, onExport]);
 
@@ -49,21 +42,7 @@ export default function PdfExportGate({ tier, onExport }: PdfExportGateProps) {
         EXPORT PDF
       </button>
 
-      {showMessage && (
-        <p
-          className="mt-2 text-xs leading-relaxed"
-          style={{ color: "var(--color-secondary)" }}
-        >
-          PDF export is available on {upgradeTier.name} and higher plans.
-          Contact{" "}
-          <a
-            href="mailto:info@dosys.health"
-            style={{ color: "#0d9488", textDecoration: "underline" }}
-          >
-            info@dosys.health
-          </a>
-        </p>
-      )}
+      <UpgradeModal open={modalOpen} onClose={() => setModalOpen(false)} feature="export.pdf" />
     </div>
   );
 }
