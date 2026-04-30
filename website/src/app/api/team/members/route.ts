@@ -41,6 +41,20 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  try {
+    return await handleInvite(req);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    const stack = err instanceof Error ? err.stack : undefined;
+    console.error("[team-invite] handler crashed:", message, stack);
+    return NextResponse.json(
+      { error: `Invite failed: ${message}` },
+      { status: 500 },
+    );
+  }
+}
+
+async function handleInvite(req: Request): Promise<NextResponse> {
   const gate = await requireInstitutionalAdmin();
   if (!gate.ok) return gate.response;
 
