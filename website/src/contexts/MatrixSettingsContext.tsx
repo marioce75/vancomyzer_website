@@ -25,7 +25,8 @@ export interface MatrixSettings {
   graphAnimations: boolean;
   soundEffects: boolean;
   whiteInputValues: boolean;
-  colorMode: "basic" | "matrix-green";
+  /** Single theme — matrix-green removed. Kept for forward-compat in storage. */
+  colorMode: "basic";
   fontSize: "small" | "medium" | "large" | "extra-large";
 }
 
@@ -111,30 +112,6 @@ const COLOR_PRESETS: Record<MatrixSettings["colorMode"], ColorPreset> = {
     "--color-primary-a40": "rgba(43,108,176,0.40)",
     "--color-primary-a50": "rgba(43,108,176,0.50)",
   },
-  "matrix-green": {
-    "--color-primary": "#00ff41",
-    "--color-secondary": "#00cc44",
-    "--color-dim": "#009933",
-    "--color-bg": "#000000",
-    "--color-border": "#004422",
-    "--color-card": "#050505",
-    "--color-input": "#0d0d0d",
-    "--color-highlight": "#0a1a0a",
-    "--color-glow": "rgba(0,255,65,0.5)",
-    "--color-glow-strong": "rgba(0,255,65,0.8)",
-    "--color-primary-a05": "rgba(0,255,65,0.05)",
-    "--color-primary-a06": "rgba(0,255,65,0.06)",
-    "--color-primary-a08": "rgba(0,255,65,0.08)",
-    "--color-primary-a10": "rgba(0,255,65,0.10)",
-    "--color-primary-a12": "rgba(0,255,65,0.12)",
-    "--color-primary-a15": "rgba(0,255,65,0.15)",
-    "--color-primary-a20": "rgba(0,255,65,0.20)",
-    "--color-primary-a25": "rgba(0,255,65,0.25)",
-    "--color-primary-a30": "rgba(0,255,65,0.30)",
-    "--color-primary-a35": "rgba(0,255,65,0.35)",
-    "--color-primary-a40": "rgba(0,255,65,0.40)",
-    "--color-primary-a50": "rgba(0,255,65,0.50)",
-  },
 };
 
 // ---------------------------------------------------------------------------
@@ -189,10 +166,9 @@ function applySettingsToDom(settings: MatrixSettings): void {
   const root = document.documentElement;
   const rootStyle = root.style;
   const body = document.body;
-  const isBasic = settings.colorMode === "basic";
-  const preset = COLOR_PRESETS[settings.colorMode];
+  const preset = COLOR_PRESETS.basic;
 
-  // --- Color-mode CSS custom properties ---
+  // --- Color-mode CSS custom properties (basic theme only) ---
   (Object.keys(preset) as (keyof ColorPreset)[]).forEach((key) => {
     rootStyle.setProperty(key, preset[key]);
   });
@@ -205,23 +181,13 @@ function applySettingsToDom(settings: MatrixSettings): void {
   rootStyle.setProperty("--teal", p);
   rootStyle.setProperty("--vc-text", p);
 
-  // --- Theme class ---
-  if (isBasic) {
-    body.classList.add("theme-basic");
-    body.classList.remove("theme-matrix");
-    body.style.fontFamily = "'Inter', 'Helvetica Neue', 'Arial', system-ui, sans-serif";
-    rootStyle.setProperty("--font-mono", "'JetBrains Mono', 'Fira Code', 'Courier New', monospace");
-    // Vigilanz-style dark navy nav bar
-    rootStyle.setProperty("--color-nav-bg", "#2c3e5a");
-    rootStyle.setProperty("--color-nav-border", "#1e2d45");
-  } else {
-    body.classList.add("theme-matrix");
-    body.classList.remove("theme-basic");
-    body.style.fontFamily = "'Share Tech Mono', 'Courier New', Courier, monospace";
-    rootStyle.setProperty("--font-mono", "'Share Tech Mono', 'Courier New', monospace");
-    rootStyle.removeProperty("--color-nav-bg");
-    rootStyle.removeProperty("--color-nav-border");
-  }
+  // --- Theme class (always basic) ---
+  body.classList.add("theme-basic");
+  body.classList.remove("theme-matrix");
+  body.style.fontFamily = "'Inter', 'Helvetica Neue', 'Arial', system-ui, sans-serif";
+  rootStyle.setProperty("--font-mono", "'JetBrains Mono', 'Fira Code', 'Courier New', monospace");
+  rootStyle.setProperty("--color-nav-bg", "#2c3e5a");
+  rootStyle.setProperty("--color-nav-border", "#1e2d45");
 
   // --- Font size ---
   rootStyle.setProperty("font-size", FONT_SIZE_MAP[settings.fontSize]);
@@ -233,30 +199,20 @@ function applySettingsToDom(settings: MatrixSettings): void {
     appRoot.style.filter = brightness < 100 ? `brightness(${brightness}%)` : "";
   }
 
-  // --- Background shade (Matrix only) ---
-  if (!isBasic) {
-    const shade = Math.round((settings.backgroundShade / 100) * 0x1a);
-    const hex = shade.toString(16).padStart(2, "0");
-    const bgColor = `#${hex}${hex}${hex}`;
-    rootStyle.setProperty("--color-bg", bgColor);
-    rootStyle.setProperty("--background", bgColor);
-  }
-
   // --- Text size scale factor ---
   const textScale = 0.85 + (settings.textSize / 100) * 0.4;
   rootStyle.setProperty("--mx-text-scale", String(textScale));
 
-  // --- Scanline opacity (forced off in Basic) ---
-  const scanlines = isBasic ? false : settings.scanlineEffect;
-  rootStyle.setProperty("--mx-scanline-opacity", scanlines ? "0.10" : "0");
+  // --- Scanline opacity (always off in basic) ---
+  rootStyle.setProperty("--mx-scanline-opacity", "0");
 
   // --- Rain opacity ---
   rootStyle.setProperty("--mx-rain-opacity", String(settings.rainOpacity / 100));
 
-  // --- Toggle body classes (Basic forces off scanlines, blink, typewriter) ---
+  // --- Toggle body classes (basic forces off scanlines + typewriter) ---
   const toggleClass = (cls: string, on: boolean) => { body.classList.toggle(cls, on); };
-  toggleClass("no-scanlines", isBasic || !settings.scanlineEffect);
-  toggleClass("no-typewriter", isBasic || !settings.typewriterAnimation);
+  toggleClass("no-scanlines", true);
+  toggleClass("no-typewriter", true);
   toggleClass("no-blink", !settings.blinkingCursor);
   toggleClass("no-graph-anim", !settings.graphAnimations);
   toggleClass("input-values-white", settings.whiteInputValues);
@@ -266,10 +222,8 @@ function applySettingsToDom(settings: MatrixSettings): void {
 // Migrate legacy colorMode values
 // ---------------------------------------------------------------------------
 
-function migrateColorMode(mode: string): MatrixSettings["colorMode"] {
-  if (mode === "matrix-green") return "matrix-green";
-  if (mode === "basic") return "basic";
-  // Amber, high-contrast, clinical-blue → migrate to basic
+function migrateColorMode(_mode: string): MatrixSettings["colorMode"] {
+  // Matrix-green theme removed; all stored values collapse to basic.
   return "basic";
 }
 
@@ -319,17 +273,7 @@ export function MatrixSettingsProvider({ children }: { children: React.ReactNode
 
   const updateSetting = useCallback(
     <K extends keyof MatrixSettings>(key: K, value: MatrixSettings[K]) => {
-      setSettings((prev) => {
-        const next = { ...prev, [key]: value };
-        // Switching to Basic forces off effects that are disabled in that theme
-        if (key === "colorMode" && value === "basic") {
-          next.vancomycinRain = false;
-          next.scanlineEffect = false;
-          next.typewriterAnimation = false;
-          next.whiteInputValues = false;
-        }
-        return next;
-      });
+      setSettings((prev) => ({ ...prev, [key]: value }));
     },
     [],
   );

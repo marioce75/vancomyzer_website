@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 
 type WorkspaceViewMode = "empiric" | "one_level" | "two_levels";
 
@@ -13,8 +12,7 @@ interface CalculatorHeaderProps {
 }
 
 export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen, userName, userRole, onLogout }: CalculatorHeaderProps) {
-  const { settings } = useMatrixSettings();
-  const logoSrc = settings.colorMode === "matrix-green" ? "/favicon.svg" : "/logo-signal.svg";
+  const logoSrc = "/logo-signal.svg";
   return (
     <header
       className="shrink-0 border-b"

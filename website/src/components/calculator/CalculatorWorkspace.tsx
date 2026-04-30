@@ -1108,7 +1108,7 @@ export default function CalculatorWorkspace() {
       <div className="flex-1 overflow-auto xl:overflow-hidden h-full">
         <CalculatorLayout left={leftColumn} right={rightColumn} />
       </div>
-      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} isAdmin={user?.role === "admin"} />
+      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <DisclaimerModal open={disclaimerOpen} onClose={() => setDisclaimerOpen(false)} />
     </div>
   );

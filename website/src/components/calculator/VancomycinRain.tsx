@@ -4,14 +4,13 @@ import { useEffect, useRef } from "react";
 
 interface VancomycinRainProps {
   opacity: number;
-  colorMode: "basic" | "matrix-green";
+  colorMode: "basic";
 }
 
 const COLOR_MAP: Record<
   VancomycinRainProps["colorMode"],
   { primary: string; fade: string }
 > = {
-  "matrix-green": { primary: "#00ff41", fade: "rgba(0,255,65," },
   "basic": { primary: "#2b6cb0", fade: "rgba(43,108,176," },
 };
 

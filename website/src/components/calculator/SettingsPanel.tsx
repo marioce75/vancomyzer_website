@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 
 /* ── Types ──────────────────────────────────────────────────────── */
@@ -8,7 +9,6 @@ import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 interface SettingsPanelProps {
   open: boolean;
   onClose: () => void;
-  isAdmin?: boolean;
 }
 
 /* ── Constants ──────────────────────────────────────────────────── */
@@ -16,11 +16,6 @@ interface SettingsPanelProps {
 const FONT: React.CSSProperties = {
   fontFamily: "'Share Tech Mono', monospace",
 };
-
-const COLOR_MODES = [
-  { value: "basic" as const, label: "Basic (Clinical)", swatch: "#2b6cb0" },
-  { value: "matrix-green" as const, label: "Matrix Green", swatch: "#00ff41" },
-];
 
 const FONT_SIZES = [
   { value: "small" as const, label: "Small" },
@@ -48,7 +43,7 @@ const TOGGLES = [
 
 /* ── Component ──────────────────────────────────────────────────── */
 
-export default function SettingsPanel({ open, onClose, isAdmin }: SettingsPanelProps) {
+export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const { settings, updateSetting, resetToDefaults, mounted } = useMatrixSettings();
 
   /* Escape key handler */
@@ -160,43 +155,33 @@ export default function SettingsPanel({ open, onClose, isAdmin }: SettingsPanelP
         {/* ── Body ──────────────────────────────────────────────── */}
         <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 28 }}>
 
-          {/* ── 1. COLOR MODE ─────────────────────────────────── */}
+          {/* ── 1. ACCOUNT ────────────────────────────────────── */}
           <section>
-            <SectionLabel>COLOR MODE</SectionLabel>
-            <div className="grid grid-cols-2 gap-2" style={{ marginTop: 10 }}>
-              {COLOR_MODES.filter((mode) => isAdmin || mode.value !== "matrix-green").map((mode) => {
-                const active = settings.colorMode === mode.value;
-                return (
-                  <button
-                    key={mode.value}
-                    type="button"
-                    onClick={() => updateSetting("colorMode", mode.value)}
-                    className="flex items-center gap-2"
-                    style={{
-                      padding: "10px 12px",
-                      background: active ? "var(--color-primary-a06)" : "var(--color-card)",
-                      border: `1px solid ${active ? "var(--color-primary)" : "var(--color-border)"}`,
-                      color: active ? "var(--color-primary)" : "var(--color-secondary)",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      fontSize: 12,
-                      ...FONT,
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: 12,
-                        height: 12,
-                        display: "inline-block",
-                        background: mode.swatch,
-                        flexShrink: 0,
-                        boxShadow: active ? `0 0 6px ${mode.swatch}` : "none",
-                      }}
-                    />
-                    <span>{mode.label}</span>
-                  </button>
-                );
-              })}
+            <SectionLabel>ACCOUNT</SectionLabel>
+            <div className="flex flex-col gap-1.5" style={{ marginTop: 10 }}>
+              {[
+                { href: "/settings", label: "Institutional Settings" },
+                { href: "/settings/billing", label: "Billing & Subscription" },
+                { href: "/settings/history", label: "Calculation History" },
+              ].map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={onClose}
+                  style={{
+                    display: "block",
+                    padding: "10px 12px",
+                    background: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-secondary)",
+                    textDecoration: "none",
+                    fontSize: 12,
+                    ...FONT,
+                  }}
+                >
+                  {label} →
+                </Link>
+              ))}
             </div>
           </section>
 
@@ -282,7 +267,7 @@ export default function SettingsPanel({ open, onClose, isAdmin }: SettingsPanelP
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 10 }}>
               {TOGGLES.map((toggle) => {
                 const BASIC_FORCED_OFF = ["scanlineEffect", "typewriterAnimation", "vancomycinRain", "whiteInputValues"];
-                const forcedOff = settings.colorMode === "basic" && BASIC_FORCED_OFF.includes(toggle.key);
+                const forcedOff = BASIC_FORCED_OFF.includes(toggle.key);
                 const on = forcedOff ? false : (settings[toggle.key] as boolean);
                 return (
                   <div
@@ -335,20 +320,16 @@ export default function SettingsPanel({ open, onClose, isAdmin }: SettingsPanelP
           {/* ── 5. LIVE PREVIEW ────────────────────────────── */}
           <section>
             <SectionLabel>PREVIEW</SectionLabel>
-            {(() => {
-              const isBasic = settings.colorMode === "basic";
-              if (isBasic) {
-                return (
-                  <div
-                    style={{
-                      marginTop: 10,
-                      padding: "14px 16px",
-                      border: "1px solid #cbd5e0",
-                      background: "#ffffff",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
-                      borderRadius: 6,
-                    }}
-                  >
+            <div
+              style={{
+                marginTop: 10,
+                padding: "14px 16px",
+                border: "1px solid #cbd5e0",
+                background: "#ffffff",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                borderRadius: 6,
+              }}
+            >
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                       <span style={{ fontSize: 11, color: "#1a3a5c", fontWeight: 600, fontFamily: "Inter, system-ui, sans-serif" }}>
                         AUC{"\u2082\u2084"}:
@@ -358,39 +339,10 @@ export default function SettingsPanel({ open, onClose, isAdmin }: SettingsPanelP
                       </span>
                       <span style={{ fontSize: 11, color: "#718096", fontFamily: "Inter, system-ui, sans-serif" }}>mg·h/L</span>
                     </div>
-                    <p style={{ fontSize: 10, color: "#276749", fontWeight: 600, marginTop: 4, fontFamily: "Inter, system-ui, sans-serif" }}>
-                      WITHIN TARGET RANGE
-                    </p>
-                  </div>
-                );
-              }
-              return (
-                <div
-                  style={{
-                    marginTop: 10,
-                    padding: "12px 14px",
-                    border: "1px solid var(--color-border)",
-                    background: "var(--color-card)",
-                    ...FONT,
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                    <span style={{ fontSize: 11, color: "var(--color-dim)" }}>AUC24:</span>
-                    <span
-                      style={{
-                        fontSize: 22,
-                        fontWeight: 700,
-                        color: settings.whiteInputValues ? "#ffffff" : "var(--color-primary)",
-                        textShadow: `0 0 8px ${settings.whiteInputValues ? "rgba(255,255,255,0.5)" : "var(--color-glow)"}`,
-                      }}
-                    >
-                      487
-                    </span>
-                    <span style={{ fontSize: 11, color: "var(--color-dim)" }}>mg·h/L</span>
-                  </div>
-                </div>
-              );
-            })()}
+              <p style={{ fontSize: 10, color: "#276749", fontWeight: 600, marginTop: 4, fontFamily: "Inter, system-ui, sans-serif" }}>
+                WITHIN TARGET RANGE
+              </p>
+            </div>
           </section>
 
           {/* ── 6. RESET ──────────────────────────────────────── */}
