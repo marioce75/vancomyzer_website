@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { Fragment, useEffect, useCallback } from "react";
 
 interface DisclaimerModalProps {
   open: boolean;
@@ -8,6 +8,38 @@ interface DisclaimerModalProps {
 }
 
 const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" };
+
+/**
+ * Replace each occurrence of "Dōsys™" / "DŌSYS™" inside a legal body
+ * paragraph with a clickable link to dosys.health. Match-preserving — the
+ * exact original text (including ™ and any case) is rendered inside the
+ * anchor so the legal copy reads identically.
+ */
+function linkifyDosys(text: string): React.ReactNode {
+  // Cover both casings of the brand mark used in the legal copy:
+  //   "Dōsys™" (mixed case) and "DŌSYS™" (all caps in the liability section).
+  const re = /(D[Ōō](?:SYS|sys)™)/g;
+  const parts: React.ReactNode[] = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    parts.push(
+      <a
+        key={`d-${m.index}`}
+        href="https://dosys.health"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: "inherit", textDecoration: "underline" }}
+      >
+        {m[0]}
+      </a>,
+    );
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.map((p, i) => <Fragment key={i}>{p}</Fragment>);
+}
 
 const SECTIONS = [
   {
@@ -159,7 +191,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
                   ...FONT,
                 }}
               >
-                {section.body}
+                {linkifyDosys(section.body)}
               </p>
             </div>
           ))}

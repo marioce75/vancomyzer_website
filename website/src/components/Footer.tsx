@@ -22,7 +22,16 @@ export default function Footer() {
                   Vancomyzer™
                 </span>
                 <p className="text-[11px] leading-none mt-0.5" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
-                  Engineered by <span className="font-semibold tracking-wide">Dōsys&trade;</span>
+                  Engineered by{" "}
+                  <a
+                    href="https://dosys.health"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold tracking-wide hover:underline"
+                    style={{ color: "inherit" }}
+                  >
+                    Dōsys&trade;
+                  </a>
                 </p>
               </div>
             </div>

@@ -340,7 +340,7 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
   </div>
 
   <div class="footer">
-    <span>\u00a9 ${new Date().getFullYear()} Vancomyzer\u2122 \u00b7 Engineered by D\u014Dsys\u2122</span>
+    <span>\u00a9 ${new Date().getFullYear()} Vancomyzer\u2122 \u00b7 Engineered by <a href="https://dosys.health" style="color:inherit;text-decoration:underline">D\u014Dsys\u2122</a></span>
     <span>Generated: ${now}</span>
   </div>
 

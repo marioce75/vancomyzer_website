@@ -822,7 +822,16 @@ export default function CalculatorWorkspace() {
         </div>
         <div className="border-t px-4 py-1.5" style={{ borderTopColor: "var(--color-border)", textAlign: "center" }}>
           <span style={{ fontSize: 10, color: "var(--color-dim)", fontFamily: "inherit" }}>
-            {"\u00A9"} 2026 Vancomyzer{"\u2122"} {"\u00B7"} Engineered by D{"\u014D"}sys{"\u2122"} {"\u00B7"} All Rights Reserved
+            {"\u00A9"} 2026 Vancomyzer{"\u2122"} {"\u00B7"} Engineered by{" "}
+            <a
+              href="https://dosys.health"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "inherit", textDecoration: "underline" }}
+            >
+              D{"\u014D"}sys{"\u2122"}
+            </a>{" "}
+            {"\u00B7"} All Rights Reserved
           </span>
         </div>
       </div>

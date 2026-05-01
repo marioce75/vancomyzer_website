@@ -83,7 +83,15 @@ export default function ContactPage() {
     <div className="mx-auto max-w-4xl px-4 py-12">
       {/* Header */}
       <p className="text-sm font-semibold uppercase tracking-widest text-teal-600">
-        Contact · Dōsys LLC
+        Contact ·{" "}
+        <a
+          href="https://dosys.health"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
+          Dōsys LLC
+        </a>
       </p>
       <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
         Reach the team behind Vancomyzer™

@@ -50,7 +50,7 @@ export async function sendRegistrationNotification(user: {
           <p style="margin-top: 16px; font-size: 13px; color: #4a5568;">
             Log in to the <a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/admin" style="color: #1e4d8c;">Admin Panel</a> to approve or reject.
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys™</p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });
@@ -94,7 +94,7 @@ export async function sendApprovalNotification(user: {
               Sign In to Vancomyzer
             </a>
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys™</p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });
@@ -146,7 +146,7 @@ export async function sendPasswordResetEmail(user: {
           <p style="margin-top: 8px; font-size: 11px; color: #a0aec0; word-break: break-all;">
             ${resetUrl}
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys™</p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });
@@ -184,7 +184,7 @@ export async function sendRejectionNotification(user: {
             Your Vancomyzer™ registration was not approved at this time.
             If you believe this is an error, please contact your administrator.
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys™</p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });
