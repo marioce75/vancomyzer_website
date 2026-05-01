@@ -1,4 +1,7 @@
+'use client'
+
 import Link from "next/link";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 
 type WorkspaceViewMode = "empiric" | "one_level" | "two_levels";
 
@@ -13,6 +16,14 @@ interface CalculatorHeaderProps {
 
 export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen, userName, userRole, onLogout }: CalculatorHeaderProps) {
   const logoSrc = "/logo-signal.svg";
+  const { status: trialStatus } = useTrialStatus();
+  const pilotBadge = trialStatus?.isConverted
+    ? 'Pro'
+    : trialStatus?.isExpired
+    ? 'Expired'
+    : trialStatus
+    ? `Day ${trialStatus.daysElapsed}`
+    : null;
   return (
     <header
       className="shrink-0 border-b"
@@ -199,6 +210,35 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               }}
             >
               Dashboard
+            </Link>
+          )}
+          {userName && (
+            <Link
+              href="/dashboard/pilot"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition"
+              style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
+                (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = "transparent";
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
+              }}
+            >
+              My Pilot
+              {pilotBadge && (
+                <span style={{
+                  fontSize: 9, fontWeight: 700, padding: "1px 5px",
+                  background: trialStatus?.isConverted ? "var(--color-primary)" : trialStatus?.isExpired ? "#ef4444" : "var(--color-secondary-a20, rgba(0,212,170,0.15))",
+                  color: trialStatus?.isExpired ? "#fff" : "var(--color-primary)",
+                  letterSpacing: "0.04em",
+                }}>
+                  {pilotBadge}
+                </span>
+              )}
             </Link>
           )}
           {onSettingsOpen && (

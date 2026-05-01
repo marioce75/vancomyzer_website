@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protected pages — require session
-  const protectedPages = ["/", "/calculator", "/admin", "/research", "/mfa-verify"];
+  const protectedPages = ["/", "/calculator", "/admin", "/research", "/mfa-verify", "/dashboard"];
   const needsPageAuth = protectedPages.some(p => pathname === p || pathname.startsWith(p + "/"));
 
   // Protected APIs — require session.
@@ -35,6 +35,7 @@ export async function middleware(request: NextRequest) {
     "/api/billing/portal",
     "/api/history",
     "/api/team",
+    "/api/trial",
   ];
   const needsAPIAuth = protectedAPIs.some(p => pathname.startsWith(p));
 
@@ -92,5 +93,7 @@ export const config = {
     "/api/billing/portal",
     "/api/history",
     "/api/team/:path*",
+    "/dashboard/:path*",
+    "/api/trial/:path*",
   ],
 };

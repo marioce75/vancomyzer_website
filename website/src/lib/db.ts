@@ -141,6 +141,50 @@ function getDb(): Database.Database {
     CREATE INDEX IF NOT EXISTS idx_security_audit_action ON security_audit_log(action);
   `);
 
+  // 90-day pilot trial tables
+  _db.exec(`
+    CREATE TABLE IF NOT EXISTS trials (
+      id TEXT PRIMARY KEY,
+      user_id INTEGER NOT NULL UNIQUE,
+      started_at TEXT NOT NULL DEFAULT (datetime('now')),
+      expires_at TEXT NOT NULL,
+      phase TEXT NOT NULL DEFAULT 'PHASE_1',
+      status TEXT NOT NULL DEFAULT 'ACTIVE',
+      report_generated_at TEXT,
+      report_url TEXT,
+      converted_at TEXT,
+      stripe_session_id TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_trials_user ON trials(user_id);
+    CREATE INDEX IF NOT EXISTS idx_trials_status ON trials(status);
+
+    CREATE TABLE IF NOT EXISTS trial_cases (
+      id TEXT PRIMARY KEY,
+      trial_id TEXT NOT NULL,
+      user_id INTEGER NOT NULL,
+      logged_at TEXT NOT NULL DEFAULT (datetime('now')),
+      age_group TEXT NOT NULL DEFAULT 'unknown',
+      weight_category TEXT NOT NULL,
+      bmi REAL NOT NULL DEFAULT 0,
+      obesity_model_used INTEGER NOT NULL DEFAULT 0,
+      estimation_mode TEXT NOT NULL,
+      indication_category TEXT,
+      icu_patient INTEGER NOT NULL DEFAULT 0,
+      target_auc_achieved INTEGER,
+      calculated_auc REAL,
+      auc_in_400_600 INTEGER,
+      recommended_dose REAL,
+      recommended_interval REAL,
+      notes TEXT,
+      FOREIGN KEY (trial_id) REFERENCES trials(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_trial_cases_trial ON trial_cases(trial_id);
+    CREATE INDEX IF NOT EXISTS idx_trial_cases_user ON trial_cases(user_id);
+  `);
+
   return _db;
 }
 
@@ -949,4 +993,125 @@ export function getCalcLogSummary(institutionalAccountId: number) {
   ).get(institutionalAccountId) as { cnt: number }).cnt;
 
   return { thisMonth, thisWeek, obesityPct, aucInRangePct, uniqueUsers };
+}
+
+// ---------------------------------------------------------------------------
+// Trial system helpers
+// ---------------------------------------------------------------------------
+
+export interface TrialRow {
+  id: string;
+  user_id: number;
+  started_at: string;
+  expires_at: string;
+  phase: string;
+  status: string;
+  report_generated_at: string | null;
+  report_url: string | null;
+  converted_at: string | null;
+  stripe_session_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TrialCaseRow {
+  id: string;
+  trial_id: string;
+  user_id: number;
+  logged_at: string;
+  age_group: string;
+  weight_category: string;
+  bmi: number;
+  obesity_model_used: number;
+  estimation_mode: string;
+  indication_category: string | null;
+  icu_patient: number;
+  target_auc_achieved: number | null;
+  calculated_auc: number | null;
+  auc_in_400_600: number | null;
+  recommended_dose: number | null;
+  recommended_interval: number | null;
+  notes: string | null;
+}
+
+export function findTrialByUserId(userId: number): TrialRow | undefined {
+  return getDb().prepare("SELECT * FROM trials WHERE user_id = ?").get(userId) as TrialRow | undefined;
+}
+
+export function findTrialById(id: string): TrialRow | undefined {
+  return getDb().prepare("SELECT * FROM trials WHERE id = ?").get(id) as TrialRow | undefined;
+}
+
+export function createTrial(userId: number, startedAt: Date, expiresAt: Date): TrialRow {
+  const id = crypto.randomUUID();
+  getDb().prepare(
+    `INSERT INTO trials (id, user_id, started_at, expires_at, phase, status)
+     VALUES (?, ?, ?, ?, 'PHASE_1', 'ACTIVE')`
+  ).run(id, userId, startedAt.toISOString(), expiresAt.toISOString());
+  return getDb().prepare("SELECT * FROM trials WHERE id = ?").get(id) as TrialRow;
+}
+
+export function updateTrialPhase(userId: number, phase: string) {
+  getDb().prepare(
+    "UPDATE trials SET phase = ?, updated_at = datetime('now') WHERE user_id = ?"
+  ).run(phase, userId);
+}
+
+export function updateTrialStatus(userId: number, status: string) {
+  getDb().prepare(
+    "UPDATE trials SET status = ?, updated_at = datetime('now') WHERE user_id = ?"
+  ).run(status, userId);
+}
+
+export function updateTrialReport(userId: number, reportUrl: string) {
+  getDb().prepare(
+    "UPDATE trials SET report_url = ?, report_generated_at = datetime('now'), updated_at = datetime('now') WHERE user_id = ?"
+  ).run(reportUrl, userId);
+}
+
+export function convertTrial(userId: number) {
+  getDb().prepare(
+    "UPDATE trials SET status = 'CONVERTED', converted_at = datetime('now'), updated_at = datetime('now') WHERE user_id = ?"
+  ).run(userId);
+}
+
+export function listTrialCases(trialId: string): TrialCaseRow[] {
+  return getDb().prepare("SELECT * FROM trial_cases WHERE trial_id = ? ORDER BY logged_at ASC").all(trialId) as TrialCaseRow[];
+}
+
+export function insertTrialCase(data: Omit<TrialCaseRow, 'id' | 'logged_at'>): void {
+  const id = crypto.randomUUID();
+  getDb().prepare(
+    `INSERT INTO trial_cases (
+      id, trial_id, user_id, age_group, weight_category, bmi, obesity_model_used,
+      estimation_mode, indication_category, icu_patient, target_auc_achieved,
+      calculated_auc, auc_in_400_600, recommended_dose, recommended_interval, notes
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).run(
+    id, data.trial_id, data.user_id, data.age_group, data.weight_category,
+    data.bmi, data.obesity_model_used ? 1 : 0, data.estimation_mode,
+    data.indication_category ?? null, data.icu_patient ? 1 : 0,
+    data.target_auc_achieved ?? null, data.calculated_auc ?? null,
+    data.auc_in_400_600 ?? null, data.recommended_dose ?? null,
+    data.recommended_interval ?? null, data.notes ?? null
+  );
+}
+
+export function listAllActiveTrials(): (TrialRow & { email: string | null; full_name: string | null })[] {
+  return getDb().prepare(
+    `SELECT t.*, u.email, u.full_name
+     FROM trials t
+     LEFT JOIN users u ON u.id = t.user_id
+     WHERE t.status = 'ACTIVE'
+     ORDER BY t.started_at DESC`
+  ).all() as (TrialRow & { email: string | null; full_name: string | null })[];
+}
+
+export function listAllTrials(): (TrialRow & { email: string | null; full_name: string | null })[] {
+  return getDb().prepare(
+    `SELECT t.*, u.email, u.full_name
+     FROM trials t
+     LEFT JOIN users u ON u.id = t.user_id
+     ORDER BY t.started_at DESC`
+  ).all() as (TrialRow & { email: string | null; full_name: string | null })[];
 }

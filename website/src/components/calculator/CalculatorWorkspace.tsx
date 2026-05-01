@@ -44,6 +44,7 @@ import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFeature } from "@/hooks/useFeature";
 import { printReport, type ReportData } from "@/lib/generateReport";
+import { useCaseLogger } from "@/lib/trial/useCaseLogger";
 
 const defaultPatient: CalculateRequestPatient = { age: 0, weight_kg: 0, height_cm: 0, sex: "", serum_creatinine_mg_dl: 0 };
 const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0 };
@@ -192,6 +193,8 @@ const EIGHT_HOURS = 8 * 60 * 60 * 1000;
 
 export default function CalculatorWorkspace() {
   const searchParams = useSearchParams();
+
+  const { logCase } = useCaseLogger();
 
   const [viewMode, setViewMode] = useState<WorkspaceViewMode>("empiric");
   const [mode, setMode] = useState<CalculatorMode>("initial_regimen");
@@ -390,6 +393,19 @@ export default function CalculatorWorkspace() {
       setSelectedFrequencyOption(null);
       setError(null);
       playSound("success");
+
+      // ── Trial case logger (silent, non-blocking) ──
+      logCase({
+        bmi: patient.height_cm && patient.height_cm > 0
+          ? patient.weight_kg / Math.pow(patient.height_cm / 100, 2)
+          : 0,
+        obesityModelUsed: data.pk_parameters?.pk_model_name === "vancomyzer_obesity",
+        estimationMode: viewMode === "empiric" ? "empiric" : viewMode === "one_level" ? "single_level" : "two_level",
+        icuPatient: bedbound,
+        calculatedAuc: typeof data.auc24 === "number" ? data.auc24 : undefined,
+        recommendedDose: typeof data.recommended_dose === "string" ? parseFloat(data.recommended_dose) : undefined,
+        recommendedInterval: typeof data.recommended_interval_hours === "number" ? data.recommended_interval_hours : undefined,
+      });
 
       // ── PK Validation audit log ──
       if (Array.isArray(data.curve) && data.curve.length > 1) {
