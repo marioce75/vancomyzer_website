@@ -41,7 +41,10 @@ function buildRecoveryGuidance(fieldErrors: Record<string, string>): {
     values.some(
       (msg) =>
         msg.includes("more than one dosing interval") ||
-        msg.includes("inconsistent with reported time_since_last_dose_hours")
+        // Match both legacy ("...time_since_last_dose_hours") and current
+        // ("...time post-dose") wordings of the chronology error so this
+        // branch keeps firing even if the user-facing copy gets reworded.
+        msg.includes("inconsistent with reported time")
     )
   ) {
     guidance.add("This looks more like irregular, delayed, held, or cross-interval dosing history than routine steady state.");
