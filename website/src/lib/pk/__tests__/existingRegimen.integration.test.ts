@@ -70,11 +70,22 @@ function testCase6(): void {
   const result = runExistingRegimenPipeline({ patient: defaultPatient, regimen: { dose_mg: 1000, interval_hours, infusion_duration_hours: 1 }, levels: [{ value_mcg_ml: 15, collection_time: "", time_since_last_dose_hours: 4 }] });
   assert(!("ok" in result && result.ok === false), "Case 6: expected success");
   const r = result as { auc24: number; curve: { time_hours: number; concentration: number }[] };
-  const tau = interval_hours;
-  const at0 = r.curve[0].concentration;
-  const atTauPoint = r.curve.find((p) => Math.abs(p.time_hours - tau) < 0.6);
-  assert(atTauPoint != null, "Case 6: curve point at tau");
-  assert(Math.abs(at0 - atTauPoint!.concentration) < 2, "Case 6: curve roughly periodic");
+
+  // Steady-state periodicity: consecutive dosing intervals should match
+  // closely once the patient has accumulated for ≥5 half-lives. The curve
+  // starts at dose #1 (zero drug onboard) and accumulates — t=0 vs t=τ
+  // are the WORST place to check periodicity. Compare two adjacent
+  // intervals near the END of the curve, where steady state holds.
+  const lastT = r.curve[r.curve.length - 1].time_hours;
+  const targetEarly = lastT - interval_hours * 2;
+  const targetLate = lastT - interval_hours;
+  const pointEarly = r.curve.find((p) => Math.abs(p.time_hours - targetEarly) < 0.6);
+  const pointLate = r.curve.find((p) => Math.abs(p.time_hours - targetLate) < 0.6);
+  assert(pointEarly != null && pointLate != null, "Case 6: late-curve sample points present");
+  assert(
+    Math.abs(pointEarly!.concentration - pointLate!.concentration) < 1,
+    "Case 6: curve roughly periodic at steady state",
+  );
 }
 
 function testCase7(): void {
