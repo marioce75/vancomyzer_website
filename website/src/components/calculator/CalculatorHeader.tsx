@@ -45,20 +45,26 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               BAYESIAN PK ·{" "}
               <span style={{ fontSize: "11px", letterSpacing: "3px", color: "var(--color-dim)" }}>
                 ENGINEERED BY{" "}
-                {/* TODO: Replace with window.open('https://dosys.com', '_blank') when URL is available */}
-                <span
+                <button
+                  type="button"
+                  aria-label="Visit dosys.health"
                   className="dosys-brand"
-                  style={{ color: "inherit", textDecoration: "none", letterSpacing: "0px", textTransform: "none" as const, cursor: "pointer", fontFamily: "'Inter', 'Helvetica Neue', sans-serif", fontWeight: 700, fontSize: "12px" }}
+                  style={{ background: "transparent", border: "none", padding: 0, color: "inherit", textDecoration: "none", letterSpacing: "0px", textTransform: "none" as const, cursor: "pointer", fontFamily: "'Inter', 'Helvetica Neue', sans-serif", fontWeight: 700, fontSize: "12px" }}
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLElement).style.opacity = "0.8";
                   }}
                   onMouseLeave={e => {
                     (e.currentTarget as HTMLElement).style.opacity = "1";
                   }}
-                  onClick={e => e.stopPropagation()}
+                  onClick={e => {
+                    // Stop propagation so the parent <Link href="/"> doesn't fire
+                    e.stopPropagation();
+                    e.preventDefault();
+                    window.open("https://dosys.health", "_blank", "noopener,noreferrer");
+                  }}
                 >
                   <span className="dosys-d" style={{ color: "#00c9b1", fontWeight: 700 }}>D</span><span style={{ fontWeight: 700 }}><span className="dosys-d" style={{ color: "#00c9b1" }}>{"\u014D"}</span>sys</span><sup style={{ fontSize: "7px", verticalAlign: "super", marginLeft: "1px" }}>{"\u2122"}</sup>
-                </span>
+                </button>
               </span>
             </p>
           </div>
