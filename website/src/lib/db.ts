@@ -1251,3 +1251,62 @@ export function updatePilotApplicationStatus(args: {
     )
     .run(args.status, args.reviewed_by, args.review_notes ?? null, args.id);
 }
+
+export function setPilotApplicationTenant(id: number, tenantId: number): void {
+  getDb()
+    .prepare("UPDATE pilot_applications SET tenant_id = ? WHERE id = ?")
+    .run(tenantId, id);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Pilot provisioning helpers (Phase 2)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Create the institution-admin user for a freshly-provisioned hospital pilot.
+ * Mirrors createInvitedTeamMember but sets institutional_role='admin' so the
+ * applicant can invite their own team. password_hash is a random unguessable
+ * value — they sign in via magic link only.
+ */
+export function createPilotPrimaryUser(input: {
+  email: string;
+  full_name: string;
+  credentials: string;
+  password_hash: string;
+  institutional_account_id: number;
+}): number {
+  const username = input.email.split("@")[0].slice(0, 32) + "_" + String(Date.now()).slice(-6);
+  const result = getDb()
+    .prepare(
+      `INSERT INTO users (
+         username, email, password_hash, full_name, credentials,
+         status, role, institutional_account_id, institutional_role,
+         subscription_tier, agreed_disclaimer, agreed_terms,
+         confirmed_hcp, confirmed_age
+       ) VALUES (?, ?, ?, ?, ?, 'active', 'pharmacist', ?, 'admin', 'hospital', 1, 1, 1, 1)`,
+    )
+    .run(
+      username,
+      input.email.toLowerCase().trim(),
+      input.password_hash,
+      input.full_name,
+      input.credentials,
+      input.institutional_account_id,
+    );
+  return Number(result.lastInsertRowid);
+}
+
+/** Set the expiry on an institutional_accounts row. Pass null to clear. */
+export function setInstitutionExpiry(institutionalAccountId: number, expiry: string | null): void {
+  getDb()
+    .prepare("UPDATE institutional_accounts SET subscription_expiry = ? WHERE id = ?")
+    .run(expiry, institutionalAccountId);
+}
+
+/** Disable every user linked to an institutional_account (revocation). */
+export function disableInstitutionUsers(institutionalAccountId: number): number {
+  const result = getDb()
+    .prepare("UPDATE users SET status = 'disabled' WHERE institutional_account_id = ?")
+    .run(institutionalAccountId);
+  return result.changes;
+}

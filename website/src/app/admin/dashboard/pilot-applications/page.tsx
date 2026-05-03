@@ -17,6 +17,7 @@ interface PilotApplication {
   reviewed_at: string | null;
   reviewed_by: number | null;
   review_notes: string | null;
+  tenant_id: number | null;
   created_at: string;
 }
 
@@ -27,11 +28,18 @@ const STATUS_BADGE: Record<PilotApplication["status"], string> = {
   archived: "bg-gray-100 text-gray-700",
 };
 
+const DEFAULT_SEATS = 10;
+const DEFAULT_DAYS = 90;
+
 export default function PilotApplicationsPage() {
   const [applications, setApplications] = useState<PilotApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected" | "archived">("pending");
+  const [approveTarget, setApproveTarget] = useState<PilotApplication | null>(null);
+  const [seats, setSeats] = useState(DEFAULT_SEATS);
+  const [days, setDays] = useState(DEFAULT_DAYS);
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchApplications = useCallback(async () => {
     try {
@@ -50,14 +58,14 @@ export default function PilotApplicationsPage() {
     fetchApplications();
   }, [fetchApplications]);
 
-  const review = async (id: number, status: "approved" | "rejected" | "archived") => {
-    const notes = status === "rejected" ? prompt("Reason (optional):") ?? "" : "";
+  const post = async (body: Record<string, unknown>) => {
+    setSubmitting(true);
     setMessage("");
     try {
       const res = await fetch("/api/admin/pilot-applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status, notes }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       setMessage(data.message ?? data.error ?? "Done.");
@@ -65,6 +73,33 @@ export default function PilotApplicationsPage() {
     } catch {
       setMessage("Request failed.");
     }
+    setSubmitting(false);
+  };
+
+  const openApprove = (a: PilotApplication) => {
+    setApproveTarget(a);
+    setSeats(DEFAULT_SEATS);
+    setDays(DEFAULT_DAYS);
+  };
+
+  const confirmApprove = async () => {
+    if (!approveTarget) return;
+    await post({ id: approveTarget.id, status: "approved", seats, durationDays: days });
+    setApproveTarget(null);
+  };
+
+  const reject = async (id: number) => {
+    const reason = prompt("Reason for rejection (sent to applicant if you confirm):");
+    if (reason === null) return; // user cancelled
+    await post({ id, status: "rejected", notes: reason });
+  };
+
+  const archive = (id: number) => post({ id, status: "archived" });
+
+  const revoke = (a: PilotApplication) => {
+    if (!confirm(`Revoke pilot for ${a.hospital_name}? All linked users will be disabled and the applicant will be emailed.`)) return;
+    const notes = prompt("Internal note for the audit log (optional):") ?? "";
+    void post({ id: a.id, action: "revoke", notes });
   };
 
   const visible =
@@ -120,6 +155,7 @@ export default function PilotApplicationsPage() {
                 <th className="px-3 py-2 text-left font-semibold">Beds</th>
                 <th className="px-3 py-2 text-left font-semibold">Monitoring</th>
                 <th className="px-3 py-2 text-left font-semibold">Status</th>
+                <th className="px-3 py-2 text-left font-semibold">Tenant</th>
                 <th className="px-3 py-2 text-left font-semibold">Received</th>
                 <th className="px-3 py-2 text-left font-semibold">Actions</th>
               </tr>
@@ -144,6 +180,9 @@ export default function PilotApplicationsPage() {
                       {a.status}
                     </span>
                   </td>
+                  <td className="px-3 py-2 text-gray-600">
+                    {a.tenant_id ? `#${a.tenant_id}` : "—"}
+                  </td>
                   <td className="px-3 py-2 text-gray-500">
                     {new Date(a.created_at).toLocaleString()}
                   </td>
@@ -152,24 +191,36 @@ export default function PilotApplicationsPage() {
                       {a.status === "pending" && (
                         <>
                           <button
-                            onClick={() => review(a.id, "approved")}
-                            className="px-2 py-0.5 text-[10px] font-semibold text-white bg-green-700 rounded hover:bg-green-800"
-                            title="Phase 1: marks status only. Provisioning lands in Phase 2."
+                            onClick={() => openApprove(a)}
+                            disabled={submitting}
+                            className="px-2 py-0.5 text-[10px] font-semibold text-white bg-green-700 rounded hover:bg-green-800 disabled:opacity-50"
                           >
                             APPROVE
                           </button>
                           <button
-                            onClick={() => review(a.id, "rejected")}
-                            className="px-2 py-0.5 text-[10px] font-semibold text-white bg-red-700 rounded hover:bg-red-800"
+                            onClick={() => reject(a.id)}
+                            disabled={submitting}
+                            className="px-2 py-0.5 text-[10px] font-semibold text-white bg-red-700 rounded hover:bg-red-800 disabled:opacity-50"
                           >
                             REJECT
                           </button>
                         </>
                       )}
-                      {(a.status === "approved" || a.status === "rejected") && (
+                      {a.status === "approved" && a.tenant_id && (
                         <button
-                          onClick={() => review(a.id, "archived")}
-                          className="px-2 py-0.5 text-[10px] font-semibold text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+                          onClick={() => revoke(a)}
+                          disabled={submitting}
+                          className="px-2 py-0.5 text-[10px] font-semibold text-white bg-red-700 rounded hover:bg-red-800 disabled:opacity-50"
+                          title="Disables all linked users and ends the pilot."
+                        >
+                          REVOKE PILOT
+                        </button>
+                      )}
+                      {(a.status === "rejected" || (a.status === "approved" && !a.tenant_id)) && (
+                        <button
+                          onClick={() => archive(a.id)}
+                          disabled={submitting}
+                          className="px-2 py-0.5 text-[10px] font-semibold text-gray-700 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                         >
                           ARCHIVE
                         </button>
@@ -192,8 +243,66 @@ export default function PilotApplicationsPage() {
       )}
 
       <p className="mt-4 text-xs text-gray-500">
-        Phase 1: APPROVE/REJECT records the decision only. Phase 2 will auto-provision a hospital-tier sandbox tenant and send the magic-link onboarding email on approval.
+        APPROVE provisions a Hospital-tier sandbox tenant and emails a magic-link sign-in to the applicant.
+        REJECT sends a polite decline. REVOKE PILOT disables all linked users and ends the pilot mid-cycle.
       </p>
+
+      {/* APPROVE modal — choose seats + duration */}
+      {approveTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h2 className="text-lg font-bold text-gray-900 mb-1">
+              Approve pilot for {approveTarget.hospital_name}?
+            </h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Provisions a hospital-tier sandbox and sends a magic-link sign-in email to {approveTarget.email}.
+            </p>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <label className="block">
+                <span className="text-xs font-semibold text-gray-700">Seats</span>
+                <input
+                  type="number"
+                  value={seats}
+                  min={1}
+                  max={500}
+                  onChange={(e) => setSeats(Number(e.target.value) || DEFAULT_SEATS)}
+                  className="mt-1 w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs font-semibold text-gray-700">Pilot duration (days)</span>
+                <input
+                  type="number"
+                  value={days}
+                  min={1}
+                  max={365}
+                  onChange={(e) => setDays(Number(e.target.value) || DEFAULT_DAYS)}
+                  className="mt-1 w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                />
+              </label>
+            </div>
+            <p className="text-xs text-gray-500 mb-4">
+              Pilot ends {new Date(Date.now() + days * 86400000).toLocaleDateString()}.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setApproveTarget(null)}
+                disabled={submitting}
+                className="px-3 py-1.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmApprove}
+                disabled={submitting}
+                className="px-3 py-1.5 text-sm font-semibold text-white bg-green-700 rounded hover:bg-green-800 disabled:opacity-50"
+              >
+                {submitting ? "Provisioning…" : "Approve & Provision"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

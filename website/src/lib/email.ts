@@ -230,6 +230,154 @@ export async function sendPilotApplicationNotification(app: {
 }
 
 /**
+ * Welcome a freshly-provisioned hospital pilot.
+ * BCC pilot@dosys.health (override via PILOT_NOTIFICATION_EMAIL) so sales
+ * can do white-glove onboarding in parallel.
+ */
+export async function sendPilotWelcomeEmail(args: {
+  applicantName: string;
+  applicantEmail: string;
+  hospitalName: string;
+  magicLinkUrl: string;
+  pilotEndsAt: string; // ISO-8601
+  isNewUser: boolean;
+}) {
+  if (!process.env.SMTP_USER) {
+    console.log(`[EMAIL] Skipped — SMTP not configured. Pilot welcome for ${args.applicantEmail}`);
+    return;
+  }
+  const bcc = process.env.PILOT_NOTIFICATION_EMAIL ?? ADMIN_EMAIL;
+  const endsHuman = new Date(args.pilotEndsAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const escape = (s: string | null | undefined) =>
+    String(s ?? "")
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: args.applicantEmail,
+      bcc: bcc || undefined,
+      subject: `Your Vancomyzer™ Hospital Pilot is Ready — ${args.hospitalName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 540px;">
+          <h2 style="color: #047857; margin-bottom: 4px;">Your Hospital Pilot is Ready ✓</h2>
+          <p style="font-size: 14px; color: #2d3748;">Hello ${escape(args.applicantName)},</p>
+          <p style="font-size: 14px; color: #2d3748;">
+            Your 90-day Vancomyzer™ pilot for <strong>${escape(args.hospitalName)}</strong> has been approved
+            and provisioned. Click below to sign in${args.isNewUser ? " (no password needed)" : ""}.
+          </p>
+          <p style="margin-top: 18px;">
+            <a href="${args.magicLinkUrl}"
+               style="display: inline-block; padding: 12px 28px; background: #1e4d8c; color: #ffffff;
+                      text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 4px;">
+              Sign In to Vancomyzer
+            </a>
+          </p>
+          <p style="margin-top: 12px; font-size: 12px; color: #718096;">
+            This sign-in link expires in 15 minutes. Request a new one any time at
+            <a href="https://vancomyzer.com/login">vancomyzer.com/login</a>.
+          </p>
+          <p style="margin-top: 18px; font-size: 13px; color: #2d3748;">
+            <strong>Pilot details:</strong> Hospital tier · 10 seats · ends <strong>${escape(endsHuman)}</strong>.
+            From the admin panel inside the app, you can invite your team and view audit logs immediately.
+          </p>
+          <p style="margin-top: 18px; font-size: 12px; color: #718096;">
+            Questions? Reply to this email — your message reaches the Dōsys™ pilot team directly.
+          </p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">
+            Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
+          </p>
+        </div>
+      `,
+    });
+    console.log(`[EMAIL] Pilot welcome sent to ${args.applicantEmail} (BCC ${bcc || "none"})`);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send pilot welcome:", err);
+  }
+}
+
+/** Polite generic decline sent on REJECT. */
+export async function sendPilotDeclineEmail(args: {
+  applicantName: string;
+  applicantEmail: string;
+  hospitalName: string;
+}) {
+  if (!process.env.SMTP_USER) {
+    console.log(`[EMAIL] Skipped — SMTP not configured. Pilot decline for ${args.applicantEmail}`);
+    return;
+  }
+  const escape = (s: string) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: args.applicantEmail,
+      subject: "About your Vancomyzer™ Pilot Application",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 540px;">
+          <p style="font-size: 14px; color: #2d3748;">Hello ${escape(args.applicantName)},</p>
+          <p style="font-size: 14px; color: #2d3748;">
+            Thank you for your interest in piloting Vancomyzer™ at ${escape(args.hospitalName)}.
+            After reviewing your application, we won't be moving forward with a pilot at this time.
+          </p>
+          <p style="font-size: 14px; color: #2d3748;">
+            We appreciate your interest and welcome you to use the free version of Vancomyzer at any time at
+            <a href="https://vancomyzer.com">vancomyzer.com</a>. If your circumstances change, you're
+            welcome to reapply down the road.
+          </p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">
+            Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
+          </p>
+        </div>
+      `,
+    });
+    console.log(`[EMAIL] Pilot decline sent to ${args.applicantEmail}`);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send pilot decline:", err);
+  }
+}
+
+/** Sent when a pilot is revoked mid-cycle. Brief, blames nothing. */
+export async function sendPilotRevokedEmail(args: {
+  applicantName: string;
+  applicantEmail: string;
+  hospitalName: string;
+}) {
+  if (!process.env.SMTP_USER) {
+    console.log(`[EMAIL] Skipped — SMTP not configured. Pilot revoked for ${args.applicantEmail}`);
+    return;
+  }
+  const escape = (s: string) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: args.applicantEmail,
+      subject: "Vancomyzer™ Pilot Access Update",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 540px;">
+          <p style="font-size: 14px; color: #2d3748;">Hello ${escape(args.applicantName)},</p>
+          <p style="font-size: 14px; color: #2d3748;">
+            Your Vancomyzer™ pilot for ${escape(args.hospitalName)} has been ended.
+            Please reach out to the Dōsys™ team if you'd like to discuss next steps.
+          </p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">
+            Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
+          </p>
+        </div>
+      `,
+    });
+    console.log(`[EMAIL] Pilot revocation sent to ${args.applicantEmail}`);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send pilot revocation:", err);
+  }
+}
+
+/**
  * Notify user that their account has been rejected/disabled.
  */
 export async function sendRejectionNotification(user: {
