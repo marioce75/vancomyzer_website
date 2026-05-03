@@ -165,8 +165,8 @@ function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
     <div
       style={{
         borderLeft: open ? "2px solid var(--color-primary)" : "2px solid transparent",
-        background: open ? "var(--color-card)" : "transparent",
-        transition: "background 0.2s, border-color 0.2s",
+        background: open ? "var(--color-card)" : "#f4f7fa",
+        transition: "background 0.15s, border-color 0.2s",
       }}
     >
       <button
@@ -186,7 +186,7 @@ function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
           fontFamily: "'Share Tech Mono', monospace",
         }}
         onMouseEnter={(e) => {
-          if (!open) (e.currentTarget as HTMLElement).style.background = "var(--color-highlight, #dce4ef)";
+          if (!open) (e.currentTarget as HTMLElement).style.background = "#dbeafe";
         }}
         onMouseLeave={(e) => {
           if (!open) (e.currentTarget as HTMLElement).style.background = "transparent";
@@ -337,6 +337,7 @@ export default function FAQPage() {
         <div
           style={{
             border: "1px solid var(--color-border)",
+            background: "var(--color-card)",
             display: "flex",
             flexDirection: "column",
           }}

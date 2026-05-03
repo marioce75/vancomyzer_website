@@ -221,22 +221,19 @@ export default function DoseRecommendationCard({
                 className="shrink-0 flex flex-col items-center border px-3 py-2 text-center text-xs transition"
                 style={
                   isActive
-                    ? { background: "var(--color-primary)", borderColor: "var(--color-primary)", color: "var(--color-bg)", fontFamily: "'Share Tech Mono', monospace" }
-                    : { background: "var(--color-bg)", borderColor: "var(--color-border)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }
+                    ? { background: "#fff", borderColor: "var(--color-primary)", color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }
+                    : { background: "#fff", borderColor: "var(--color-border)", color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }
                 }
               >
-                <span className="font-bold tabular-nums text-sm" style={isActive ? { color: "var(--color-bg)" } : { color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
+                <span className="font-bold tabular-nums text-sm" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
                   {opt.dose_mg} mg
                 </span>
-                <span className="font-medium" style={isActive ? { color: "var(--color-bg)" } : { color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
+                <span className="font-medium" style={isActive ? { color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" } : { color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
                   q{opt.interval_hours}h
                 </span>
                 <span
                   className="mt-1 inline-flex border px-1.5 py-0.5 text-[10px] font-semibold leading-none"
-                  style={isActive
-                    ? { borderColor: "rgba(0,0,0,0.3)", background: "rgba(0,0,0,0.15)", color: "var(--color-bg)" }
-                    : { ...r.badgeStyle }
-                  }
+                  style={{ ...r.badgeStyle }}
                 >
                   {r.label}
                 </span>

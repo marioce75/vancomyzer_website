@@ -184,7 +184,7 @@ export default function UsersPage() {
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
                         u.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-700"
                       }`}>
-                        {u.role}
+                        {u.role === "admin" ? "superadmin" : u.role}
                       </span>
                     </td>
                     <td className="px-3 py-2">
@@ -245,7 +245,9 @@ export default function UsersPage() {
                             <button
                               onClick={() => {
                                 const next = u.role === "admin" ? "pharmacist" : "admin";
-                                if (confirm(`Change ${u.username}'s system role: ${u.role} → ${next}?`)) {
+                                const displayCurrent = u.role === "admin" ? "superadmin" : u.role;
+                                const displayNext = next === "admin" ? "superadmin" : next;
+                                if (confirm(`Change ${u.username}'s system role: ${displayCurrent} → ${displayNext}?`)) {
                                   void handleActionWithBody({ action: "set_role", userId: u.id, role: next });
                                 }
                               }}
