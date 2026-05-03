@@ -17,6 +17,20 @@ interface FaqItem {
 
 const FAQ_ITEMS: FaqItem[] = [
   {
+    question: "Where does Vancomyzer\u2019s pharmacokinetic data come from?",
+    answer: [
+      "Vancomyzer\u2019s default adult prior is the Colin 2019 two-compartment population PK model, which itself is a pooled analysis of 14 published vancomycin studies covering patients from neonates through the elderly. Covariates: postmenstrual age, weight, and serum creatinine. The full source-study table is in Table 1 of the paper (open-access, CC BY-NC).",
+      "For patients with BMI \u2265 40, Vancomyzer switches to an obesity model derived from Smit 2020 (morbid-obesity vancomycin PK) and Zhang 2024 (external validation), with Fat-Free Mass calculated from the Janmahasatian 2005 equations.",
+      "All four references are linked below \u2014 nothing in the calculator is built on undisclosed or proprietary data.",
+    ],
+    refs: [
+      { label: "Colin PJ et al. Vancomycin Pharmacokinetics Throughout Life \u2014 Pooled Population Analysis (14 studies). Clin Pharmacokinet. 2019;58(6):767-780.", url: "https://doi.org/10.1007/s40262-018-0727-5" },
+      { label: "Smit C et al. Vancomycin PK in morbid obesity. Br J Clin Pharmacol. 2020;86(2):303-317.", url: "https://doi.org/10.1111/bcp.14144" },
+      { label: "Zhang T et al. External validation of the obesity vancomycin model. Clin Pharmacokinet. 2024;63:79-91.", url: "https://doi.org/10.1007/s40262-023-01324-5" },
+      { label: "Janmahasatian S et al. Quantification of lean bodyweight (FFM equations). Clin Pharmacokinet. 2005;44(10):1051-1065.", url: "https://doi.org/10.2165/00003088-200544100-00004" },
+    ],
+  },
+  {
     question: "Why doesn\u2019t the Colin 2019 model use Cockcroft-Gault?",
     answer: [
       "Cockcroft-Gault estimates kidney function from age, weight, sex, and serum creatinine \u2014 then feeds that estimate into a separate vancomycin equation. It introduces two layers of estimation before you even get a PK prediction. For non-obese patients (BMI < 40), Vancomyzer uses the Colin 2019 model, which takes serum creatinine directly as a covariate \u2014 no intermediate CrCl calculation required.",
