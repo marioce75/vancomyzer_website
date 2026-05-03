@@ -28,14 +28,12 @@ const SLIDERS = [
   { key: "greenBrightness" as const, label: "Brightness" },
   { key: "backgroundShade" as const, label: "Background Shade" },
   { key: "textSize" as const, label: "Text Size" },
-  { key: "rainOpacity" as const, label: "Rain Opacity" },
 ] as const;
 
 const TOGGLES = [
   { key: "scanlineEffect" as const, label: "Scanline Effect" },
   { key: "typewriterAnimation" as const, label: "Typewriter Animation" },
   { key: "blinkingCursor" as const, label: "Blinking Cursor" },
-  { key: "vancomycinRain" as const, label: "Vancomyzer Rain (off by default)" },
   { key: "graphAnimations" as const, label: "Graph Animations" },
   { key: "soundEffects" as const, label: "Sound Effects" },
   { key: "whiteInputValues" as const, label: "White Input Numbers" },
@@ -221,12 +219,10 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             <SectionLabel>DISPLAY</SectionLabel>
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 16 }}>
               {SLIDERS.map((slider) => {
-                const disabled =
-                  slider.key === "rainOpacity" && !settings.vancomycinRain;
                 const value = settings[slider.key] as number;
 
                 return (
-                  <div key={slider.key} style={{ opacity: disabled ? 0.35 : 1 }}>
+                  <div key={slider.key}>
                     <div className="flex items-center justify-between" style={{ marginBottom: 6 }}>
                       <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
                         {slider.label}
@@ -250,11 +246,10 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                       max={100}
                       step={1}
                       value={value}
-                      disabled={disabled}
                       onChange={(e) =>
                         updateSetting(slider.key, Number(e.target.value))
                       }
-                      style={{ width: "100%", cursor: disabled ? "not-allowed" : "pointer" }}
+                      style={{ width: "100%", cursor: "pointer" }}
                     />
                   </div>
                 );
@@ -267,7 +262,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             <SectionLabel>EFFECTS</SectionLabel>
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 10 }}>
               {TOGGLES.map((toggle) => {
-                const BASIC_FORCED_OFF = ["scanlineEffect", "typewriterAnimation", "vancomycinRain", "whiteInputValues"];
+                const BASIC_FORCED_OFF = ["scanlineEffect", "typewriterAnimation", "whiteInputValues"];
                 const forcedOff = BASIC_FORCED_OFF.includes(toggle.key);
                 const on = forcedOff ? false : (settings[toggle.key] as boolean);
                 return (
