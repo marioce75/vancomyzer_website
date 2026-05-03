@@ -9,6 +9,7 @@ const navItems = [
   { label: "Overview", href: "/admin/dashboard", icon: "📊" },
   { label: "Users", href: "/admin/dashboard/users", icon: "👤" },
   { label: "Calculations", href: "/admin/dashboard/calculations", icon: "🧪" },
+  { label: "Pilot Applications", href: "/admin/dashboard/pilot-applications", icon: "🏥" },
   { label: "Research", href: "/admin/dashboard/research", icon: "🔬" },
   { label: "Security", href: "/admin/dashboard/security", icon: "🔒" },
   { label: "Market Intel", href: "/admin/dashboard/market-intelligence", icon: "📡" },

@@ -157,6 +157,79 @@ export async function sendPasswordResetEmail(user: {
 }
 
 /**
+ * Notify sales of a new pilot application from dosys.health/pilot.
+ * Recipient resolution: PILOT_NOTIFICATION_EMAIL → ADMIN_EMAIL.
+ * Failure here must NOT fail the ingest request — caller logs and continues.
+ */
+export async function sendPilotApplicationNotification(app: {
+  id: number;
+  contact_name: string;
+  contact_title: string;
+  hospital_name: string;
+  email: string;
+  phone: string | null;
+  bed_count: number | null;
+  current_monitoring: string | null;
+  submitted_at: string;
+  source: string;
+}) {
+  const recipient = process.env.PILOT_NOTIFICATION_EMAIL ?? ADMIN_EMAIL;
+  if (!recipient || !process.env.SMTP_USER) {
+    console.log(
+      `[EMAIL] Skipped — SMTP not configured. Pilot application id=${app.id} hospital="${app.hospital_name}"`,
+    );
+    return;
+  }
+
+  const baseUrl = process.env.NEXTAUTH_URL ?? "https://vancomyzer.com";
+  const reviewUrl = `${baseUrl}/admin/dashboard/pilot-applications`;
+
+  const escape = (s: string | null | undefined) =>
+    String(s ?? "—")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: recipient,
+      subject: `[Vancomyzer] New pilot application — ${app.hospital_name}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 540px;">
+          <h2 style="color: #1e4d8c; margin-bottom: 4px;">New Pilot Application</h2>
+          <p style="font-size: 13px; color: #4a5568; margin-top: 4px;">
+            Application <strong>#${app.id}</strong> · received via ${escape(app.source)}
+          </p>
+          <table style="font-size: 14px; border-collapse: collapse; width: 100%; margin-top: 8px;">
+            <tr><td style="padding: 6px 12px; color: #718096; width: 160px;">Hospital</td><td style="padding: 6px 12px; font-weight: 600;">${escape(app.hospital_name)}</td></tr>
+            <tr><td style="padding: 6px 12px; color: #718096;">Contact</td><td style="padding: 6px 12px;">${escape(app.contact_name)}, ${escape(app.contact_title)}</td></tr>
+            <tr><td style="padding: 6px 12px; color: #718096;">Email</td><td style="padding: 6px 12px;"><a href="mailto:${escape(app.email)}">${escape(app.email)}</a></td></tr>
+            <tr><td style="padding: 6px 12px; color: #718096;">Phone</td><td style="padding: 6px 12px;">${escape(app.phone)}</td></tr>
+            <tr><td style="padding: 6px 12px; color: #718096;">Beds</td><td style="padding: 6px 12px;">${app.bed_count ?? "—"}</td></tr>
+            <tr><td style="padding: 6px 12px; color: #718096;">Current monitoring</td><td style="padding: 6px 12px;">${escape(app.current_monitoring)}</td></tr>
+            <tr><td style="padding: 6px 12px; color: #718096;">Submitted at</td><td style="padding: 6px 12px;">${escape(app.submitted_at)}</td></tr>
+          </table>
+          <p style="margin-top: 18px;">
+            <a href="${reviewUrl}"
+               style="display: inline-block; padding: 10px 22px; background: #1e4d8c; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px;">
+              Review in Admin Panel
+            </a>
+          </p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
+        </div>
+      `,
+    });
+    console.log(
+      `[EMAIL] Pilot-application notification sent to ${recipient} for application id=${app.id}`,
+    );
+  } catch (err) {
+    console.error("[EMAIL] Failed to send pilot-application notification:", err);
+  }
+}
+
+/**
  * Notify user that their account has been rejected/disabled.
  */
 export async function sendRejectionNotification(user: {

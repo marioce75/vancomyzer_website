@@ -185,6 +185,36 @@ function getDb(): Database.Database {
     CREATE INDEX IF NOT EXISTS idx_trial_cases_user ON trial_cases(user_id);
   `);
 
+  // Pilot applications — B2B hospital lead intake from dosys.health/pilot.
+  // Distinct from `users` (account holders) and `institutional_accounts`
+  // (billing entities); these are pre-account leads.
+  _db.exec(`
+    CREATE TABLE IF NOT EXISTS pilot_applications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      contact_name TEXT NOT NULL,
+      contact_title TEXT NOT NULL,
+      hospital_name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT,
+      bed_count INTEGER,
+      current_monitoring TEXT,
+      source TEXT NOT NULL DEFAULT 'dosys.health/pilot',
+      submitted_at TEXT NOT NULL,
+      idempotency_key TEXT NOT NULL UNIQUE,
+      status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'approved', 'rejected', 'archived')),
+      reviewed_at TEXT,
+      reviewed_by INTEGER,
+      review_notes TEXT,
+      tenant_id INTEGER,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (reviewed_by) REFERENCES users(id),
+      FOREIGN KEY (tenant_id) REFERENCES institutional_accounts(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_pilot_apps_status ON pilot_applications(status);
+    CREATE INDEX IF NOT EXISTS idx_pilot_apps_created ON pilot_applications(created_at);
+  `);
+
   return _db;
 }
 
@@ -1114,4 +1144,110 @@ export function listAllTrials(): (TrialRow & { email: string | null; full_name: 
      LEFT JOIN users u ON u.id = t.user_id
      ORDER BY t.started_at DESC`
   ).all() as (TrialRow & { email: string | null; full_name: string | null })[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Pilot applications (B2B hospital lead intake from dosys.health/pilot)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type PilotApplicationStatus = "pending" | "approved" | "rejected" | "archived";
+
+export interface PilotApplicationRow {
+  id: number;
+  contact_name: string;
+  contact_title: string;
+  hospital_name: string;
+  email: string;
+  phone: string | null;
+  bed_count: number | null;
+  current_monitoring: string | null;
+  source: string;
+  submitted_at: string;
+  idempotency_key: string;
+  status: PilotApplicationStatus;
+  reviewed_at: string | null;
+  reviewed_by: number | null;
+  review_notes: string | null;
+  tenant_id: number | null;
+  created_at: string;
+}
+
+export interface CreatePilotApplicationInput {
+  contact_name: string;
+  contact_title: string;
+  hospital_name: string;
+  email: string;
+  phone?: string | null;
+  bed_count?: number | null;
+  current_monitoring?: string | null;
+  source: string;
+  submitted_at: string;
+  idempotency_key: string;
+}
+
+export function findPilotApplicationByIdempotencyKey(
+  key: string,
+): PilotApplicationRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM pilot_applications WHERE idempotency_key = ?")
+    .get(key) as PilotApplicationRow | undefined;
+}
+
+export function createPilotApplication(input: CreatePilotApplicationInput): number {
+  const result = getDb()
+    .prepare(
+      `INSERT INTO pilot_applications
+        (contact_name, contact_title, hospital_name, email, phone, bed_count,
+         current_monitoring, source, submitted_at, idempotency_key)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .run(
+      input.contact_name,
+      input.contact_title,
+      input.hospital_name,
+      input.email,
+      input.phone ?? null,
+      input.bed_count ?? null,
+      input.current_monitoring ?? null,
+      input.source,
+      input.submitted_at,
+      input.idempotency_key,
+    );
+  return Number(result.lastInsertRowid);
+}
+
+export function getPilotApplicationById(id: number): PilotApplicationRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM pilot_applications WHERE id = ?")
+    .get(id) as PilotApplicationRow | undefined;
+}
+
+export function listPilotApplications(filter?: {
+  status?: PilotApplicationStatus;
+}): PilotApplicationRow[] {
+  if (filter?.status) {
+    return getDb()
+      .prepare(
+        "SELECT * FROM pilot_applications WHERE status = ? ORDER BY created_at DESC",
+      )
+      .all(filter.status) as PilotApplicationRow[];
+  }
+  return getDb()
+    .prepare("SELECT * FROM pilot_applications ORDER BY created_at DESC")
+    .all() as PilotApplicationRow[];
+}
+
+export function updatePilotApplicationStatus(args: {
+  id: number;
+  status: PilotApplicationStatus;
+  reviewed_by: number;
+  review_notes?: string | null;
+}): void {
+  getDb()
+    .prepare(
+      `UPDATE pilot_applications
+       SET status = ?, reviewed_at = datetime('now'), reviewed_by = ?, review_notes = ?
+       WHERE id = ?`,
+    )
+    .run(args.status, args.reviewed_by, args.review_notes ?? null, args.id);
 }
