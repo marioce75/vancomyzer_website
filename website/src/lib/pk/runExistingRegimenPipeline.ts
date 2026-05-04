@@ -59,6 +59,7 @@ export function runExistingRegimenPipeline(
       fallback_workflow: validation.fallback_workflow,
     };
   }
+  const timing_warnings = validation.warnings ?? [];
 
   const engineOutput = runExistingRegimenEngine({ patient, regimen, levels });
   const recommendation = buildAdjustmentRecommendation(engineOutput);
@@ -91,11 +92,15 @@ export function runExistingRegimenPipeline(
     documentation_preview: buildDocumentationPreview(explanationInput),
   };
 
-  return buildCalculateResponse(
+  const response = buildCalculateResponse(
     "existing_regimen",
     engineOutput,
     recommendation,
     explain,
-    patient
+    patient,
   ) as ReturnType<typeof buildCalculateResponse>;
+  if (timing_warnings.length > 0) {
+    (response as Record<string, unknown>).timing_warnings = timing_warnings;
+  }
+  return response;
 }

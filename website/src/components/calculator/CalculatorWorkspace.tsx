@@ -853,6 +853,22 @@ export default function CalculatorWorkspace() {
         </div>
       )}
 
+      {/* Late-draw timing advisory — surfaced whenever the validator detected an
+          overshoot but accepted the inputs (within tolerance, or non-SS path). */}
+      {visibleResult?.timing_warnings && visibleResult.timing_warnings.length > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex gap-3">
+          <span className="text-base shrink-0">⏱️</span>
+          <div>
+            <p className="text-xs font-semibold text-amber-900">Lab Timing Advisory</p>
+            <ul className="mt-1 text-xs text-amber-800 leading-5 list-disc pl-4 space-y-0.5">
+              {visibleResult.timing_warnings.map((w, i) => (
+                <li key={i}>{w}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
       {/* Age >65 advisory — non-blocking, shown whenever age is entered */}
       {patient.age > 65 && !rrt && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex gap-3">

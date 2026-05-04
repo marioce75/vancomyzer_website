@@ -6,7 +6,7 @@ const MIN_POST_INFUSION_PULSE_DOSE_HOURS = 2.0; // ASHP 2020: post-distributive 
 const MAX_INFUSION_FRACTION_OF_INTERVAL = 0.8;
 
 export type ValidationResult =
-  | { ok: true }
+  | { ok: true; warnings?: string[] }
   | {
       ok: false;
       error_type: "validation_error";
@@ -15,6 +15,17 @@ export type ValidationResult =
       recovery_guidance?: string[];
       fallback_workflow?: "initial_regimen" | "repeat_existing_regimen_sampling";
     };
+
+/**
+ * Late-draw tolerance for steady-state regimens. Real-world lab draws drift
+ * by handoff variability; rejecting a 12-min overshoot on a 12h interval is
+ * clinically wrong. Tolerance = min(1h, 25% × interval). Beyond this, the
+ * validator falls back to its existing rejection so genuine data-entry
+ * mistakes (e.g., 24h on a q12h regimen) still produce a recovery prompt.
+ */
+function lateDrawToleranceHours(interval: number): number {
+  return Math.min(1.0, 0.25 * interval);
+}
 
 function parseCollectionTimeHours(value: string): number | null {
   if (!value.trim()) return null;
@@ -104,11 +115,17 @@ export function validateExistingRegimenRequest(
 
   const interval_hours = regimen.interval_hours;
   const isPulseDose = regimen.doses_given === 1;
+  // Non-SS path matches the engine's threshold (existingRegimenEngine: doses_given < 5).
+  // For non-SS, the multi-dose accumulation math does not require time ≤ interval —
+  // a level drawn after the interval is just an extended trough.
+  const isNonSteadyState = regimen.doses_given !== undefined && regimen.doses_given < 5;
+  const tolerance = lateDrawToleranceHours(interval_hours);
   const infusion_hours = Math.min(
     Math.max(0, regimen.infusion_duration_hours),
     interval_hours || 1
   );
   const parsedCollectionTimes: Array<number | null> = [];
+  const warnings: string[] = [];
 
   // Loading dose simulation (doses_given=1) may have no measured levels — prior-only prediction
   if (levels.length === 0 && !isPulseDose) {
@@ -121,10 +138,35 @@ export function validateExistingRegimenRequest(
       if (l.time_since_last_dose_hours < 0) {
         field_errors[`levels[${i}].time_since_last_dose_hours`] = "Must be non-negative.";
       }
-      // For steady-state (not pulse dose), the level must be within the dosing interval.
+      // Late-draw handling. Differs by SS vs non-SS path:
+      //   • Pulse dose (doses_given=1): no constraint (existing behavior).
+      //   • Non-SS (doses_given 2–4): never reject. Always interpret as extended
+      //     trough; emit a soft or strong advisory based on overshoot magnitude.
+      //   • SS (doses_given ≥ 5): tolerate up to min(1h, 25%×τ) — accept with
+      //     advisory. Beyond tolerance: reject (existing behavior + recovery).
       if (!isPulseDose && interval_hours > 0 && l.time_since_last_dose_hours > interval_hours) {
-        field_errors[`levels[${i}].time_since_last_dose_hours`] =
-          "Must be within the dosing interval for a repeating steady-state regimen (time_since_last_dose_hours ≤ interval_hours).";
+        const overshoot = l.time_since_last_dose_hours - interval_hours;
+        const overshootStr = overshoot.toFixed(2).replace(/\.?0+$/, "");
+        if (isNonSteadyState) {
+          if (overshoot <= tolerance) {
+            warnings.push(
+              `Level for dose ${i + 1} drawn ${overshootStr} h after the dosing interval — interpreted as a late trough. Common nursing-handoff variability.`,
+            );
+          } else {
+            warnings.push(
+              `Level for dose ${i + 1} drawn ${overshootStr} h past the dosing interval. Treated as an extended trough; the posterior fit will rely heavily on the population prior. Verify the dose times if this is unexpected.`,
+            );
+          }
+        } else if (overshoot <= tolerance) {
+          // Steady-state, within tolerance — accept with advisory.
+          warnings.push(
+            `Level for dose ${i + 1} drawn ${overshootStr} h after the dosing interval — interpreted as a late trough. Common nursing-handoff variability.`,
+          );
+        } else {
+          // Steady-state, beyond tolerance — keep the existing reject + recovery path.
+          field_errors[`levels[${i}].time_since_last_dose_hours`] =
+            `Must be within the dosing interval for a repeating steady-state regimen (time_since_last_dose_hours ≤ interval_hours + ${tolerance.toFixed(2)} h tolerance for late draws).`;
+        }
       }
       if (l.time_since_last_dose_hours < infusion_hours) {
         field_errors[`levels[${i}].time_since_last_dose_hours`] =
@@ -196,5 +238,5 @@ export function validateExistingRegimenRequest(
     };
   }
 
-  return { ok: true };
+  return warnings.length > 0 ? { ok: true, warnings } : { ok: true };
 }

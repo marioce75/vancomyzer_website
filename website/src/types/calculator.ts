@@ -96,6 +96,8 @@ export interface CalculateResponse {
   trough: number;
   auc_range_status?: AucRangeStatus;
   arc_advisory?: ArcAdvisory;
+  /** Soft warnings about input timing — e.g., late lab draws within tolerance. */
+  timing_warnings?: string[];
   recommended_dose: string;
   recommended_interval_hours: number;
   recommended_infusion_duration_hours?: number;

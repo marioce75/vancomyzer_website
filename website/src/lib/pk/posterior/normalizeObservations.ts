@@ -48,11 +48,18 @@ export function normalizeObservations(
   const observations: NormalizedObservation[] = levels.map((l) => {
     const time_hours = Math.max(0, l.time_since_last_dose_hours);
     const concentration = Math.max(0, l.value_mcg_ml);
-    return {
-      time_hours,
-      concentration,
-      time_in_interval: timeInInterval(time_hours, effectiveTau),
-    };
+    // For non-pulse-dose (SS or multi-dose accumulation) workflows: when the
+    // level was drawn slightly past the dosing interval (a "late trough" — the
+    // next dose hasn't been given yet), wrapping via modulo would put it at
+    // the next cycle's peak time, which is the wrong physical interpretation.
+    // Clamp to tau instead so the SS posterior fitter sees it as the trough.
+    let time_in_interval: number;
+    if (!isPulseDose && tau > 0 && time_hours > tau) {
+      time_in_interval = tau;
+    } else {
+      time_in_interval = timeInInterval(time_hours, effectiveTau);
+    }
+    return { time_hours, concentration, time_in_interval };
   });
   return {
     observations,

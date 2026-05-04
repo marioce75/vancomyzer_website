@@ -337,6 +337,107 @@ function testCase22(): void {
   assert(r22e.auc24 > 0, "Case 22e: AUC24 must be positive for late pulse dose level");
 }
 
+function testCase23(): void {
+  // Late lab draw — clinical reality. Tolerance = min(1h, 25% × interval).
+  // For non-SS (doses_given < 5), no rejection regardless of overshoot —
+  // multi-dose accumulation math handles arbitrary draw times.
+  // For SS (doses_given ≥ 5), within tolerance accept + warning; beyond reject.
+
+  // 23a: Mario's exact case — q12h, doses_given=2, level drawn 12 min late
+  // (time_since=12.2). Must succeed and surface a timing_warning.
+  const marioCase = runExistingRegimenPipeline({
+    patient: { age: 69, weight_kg: 78.18, serum_creatinine_mg_dl: 2.62 },
+    regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1, doses_given: 2 },
+    levels: [{ value_mcg_ml: 8.2, collection_time: "", time_since_last_dose_hours: 12.2 }],
+  });
+  assert(
+    !("ok" in marioCase && marioCase.ok === false),
+    "Case 23a: 12-min late trough on q12h non-SS workflow must produce a recommendation",
+  );
+  const r23a = marioCase as { auc24: number; trough: number; timing_warnings?: string[] };
+  assert(r23a.auc24 > 0 && r23a.trough > 0, "Case 23a: must produce positive exposure metrics");
+  assert(
+    Array.isArray(r23a.timing_warnings) && r23a.timing_warnings.length > 0,
+    "Case 23a: timing_warnings must be present for the late draw",
+  );
+  assert(
+    r23a.timing_warnings![0].toLowerCase().includes("late trough"),
+    "Case 23a: warning text must explain the late-trough interpretation",
+  );
+
+  // 23b: SS path within tolerance — q12h, doses_given=6, draw at 12.5h.
+  // Tolerance = min(1, 0.25×12) = 1h. Overshoot 0.5h ≤ 1h → accept + warn.
+  const ssWithinTolerance = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1, doses_given: 6 },
+    levels: [{ value_mcg_ml: 12, collection_time: "", time_since_last_dose_hours: 12.5 }],
+  });
+  assert(
+    !("ok" in ssWithinTolerance && ssWithinTolerance.ok === false),
+    "Case 23b: SS late draw within tolerance (0.5h overshoot, 1h tolerance) must succeed",
+  );
+  const r23b = ssWithinTolerance as { timing_warnings?: string[] };
+  assert(
+    Array.isArray(r23b.timing_warnings) && r23b.timing_warnings.length > 0,
+    "Case 23b: SS within-tolerance late draw must surface a timing_warning",
+  );
+
+  // 23c: SS path beyond tolerance — q12h, doses_given=6, draw at 13.5h.
+  // Overshoot 1.5h > 1h tolerance → must reject.
+  const ssBeyondTolerance = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1, doses_given: 6 },
+    levels: [{ value_mcg_ml: 12, collection_time: "", time_since_last_dose_hours: 13.5 }],
+  });
+  assert(
+    "ok" in ssBeyondTolerance && ssBeyondTolerance.ok === false,
+    "Case 23c: SS late draw beyond tolerance (1.5h overshoot > 1h tolerance) must reject",
+  );
+
+  // 23d: SS short interval — q4h, doses_given=6, draw at 4.9h.
+  // Tolerance = min(1, 0.25×4) = 1h. Overshoot 0.9h ≤ 1h → accept.
+  const ssShortInterval = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 500, interval_hours: 4, infusion_duration_hours: 1, doses_given: 6 },
+    levels: [{ value_mcg_ml: 18, collection_time: "", time_since_last_dose_hours: 4.9 }],
+  });
+  assert(
+    !("ok" in ssShortInterval && ssShortInterval.ok === false),
+    "Case 23d: SS q4h with 0.9h overshoot must succeed (1h cap, 25%×4=1h)",
+  );
+
+  // 23e: Non-SS extreme overshoot — q12h, doses_given=2, draw at 24h.
+  // Must succeed (non-SS path never rejects) AND surface the stronger advisory.
+  const nonSsExtreme = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1, doses_given: 2 },
+    levels: [{ value_mcg_ml: 4, collection_time: "", time_since_last_dose_hours: 24 }],
+  });
+  assert(
+    !("ok" in nonSsExtreme && nonSsExtreme.ok === false),
+    "Case 23e: non-SS extreme overshoot (12h past interval) must not reject",
+  );
+  const r23e = nonSsExtreme as { timing_warnings?: string[] };
+  assert(
+    Array.isArray(r23e.timing_warnings)
+      && r23e.timing_warnings.some((w) => w.toLowerCase().includes("posterior fit will rely heavily on the population prior")),
+    "Case 23e: extreme overshoot must surface the stronger 'relies on prior' advisory",
+  );
+
+  // 23f: Regression — Case 3's scenario stays rejected. SS, q8h, draw at 10h
+  // (overshoot 2h, tolerance min(1, 0.25×8)=1h → reject). Doses_given undefined
+  // defaults to SS path.
+  const regressionRejection = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1000, interval_hours: 8, infusion_duration_hours: 1 },
+    levels: [{ value_mcg_ml: 5, collection_time: "", time_since_last_dose_hours: 10 }],
+  });
+  assert(
+    "ok" in regressionRejection && regressionRejection.ok === false,
+    "Case 23f: SS overshoot beyond tolerance (2h > 1h) must still reject (regression of Case 3)",
+  );
+}
+
 export function runExistingRegimenTests(): void {
   testCase1();
   testCase2();
@@ -360,9 +461,10 @@ export function runExistingRegimenTests(): void {
   testCase20();
   testCase21();
   testCase22();
+  testCase23();
 }
 
 if (typeof process !== "undefined" && process.argv[1]?.includes("existingRegimen.integration.test")) {
   runExistingRegimenTests();
-  console.log("All 22 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, and pulse-dose single-dose Bayesian workflow.");
+  console.log("All 23 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, and late-lab-draw tolerance with non-SS multi-dose accumulation.");
 }
