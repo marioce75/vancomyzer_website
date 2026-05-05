@@ -52,7 +52,22 @@ function LoadingDoseGuidance({ doseMg, weightKg, onSimulate }: { doseMg: number;
         type="button"
         onClick={() => setExpanded(!expanded)}
         className="flex items-center gap-1.5 w-full text-left"
-        style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0, ...FONT }}
+        style={{
+          background: "#dbeafe",
+          border: "1px solid #bfdbfe",
+          cursor: "pointer",
+          padding: "8px 10px",
+          transition: "background 0.15s, border-color 0.15s",
+          ...FONT,
+        }}
+        onMouseEnter={e => {
+          (e.currentTarget as HTMLElement).style.background = "#bfdbfe";
+          (e.currentTarget as HTMLElement).style.borderColor = "#93c5fd";
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLElement).style.background = "#dbeafe";
+          (e.currentTarget as HTMLElement).style.borderColor = "#bfdbfe";
+        }}
       >
         <svg
           width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -224,6 +239,16 @@ export default function DoseRecommendationCard({
                     ? { background: "#fff", borderColor: "var(--color-primary)", color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }
                     : { background: "#fff", borderColor: "var(--color-border)", color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }
                 }
+                onMouseEnter={e => {
+                  if (isActive) return;
+                  (e.currentTarget as HTMLElement).style.background = "#dbeafe";
+                  (e.currentTarget as HTMLElement).style.borderColor = "#93c5fd";
+                }}
+                onMouseLeave={e => {
+                  if (isActive) return;
+                  (e.currentTarget as HTMLElement).style.background = "#fff";
+                  (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
+                }}
               >
                 <span className="font-bold tabular-nums text-sm" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
                   {opt.dose_mg} mg
