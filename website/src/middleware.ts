@@ -35,6 +35,7 @@ export async function middleware(request: NextRequest) {
     "/api/billing/portal",
     "/api/history",
     "/api/team",
+    "/api/bug-report",
   ];
   const needsAPIAuth = protectedAPIs.some(p => pathname.startsWith(p));
 
@@ -92,5 +93,6 @@ export const config = {
     "/api/billing/portal",
     "/api/history",
     "/api/team/:path*",
+    "/api/bug-report",
   ],
 };

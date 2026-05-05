@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import Link from "next/link";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 
@@ -43,6 +43,44 @@ const TOGGLES = [
 
 export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const { settings, updateSetting, resetToDefaults, mounted } = useMatrixSettings();
+
+  /* Bug-report form state */
+  const [bugDescription, setBugDescription] = useState("");
+  const [bugStatus, setBugStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
+  const [bugMessage, setBugMessage] = useState("");
+
+  const submitBugReport = useCallback(async () => {
+    const trimmed = bugDescription.trim();
+    if (trimmed.length < 5) {
+      setBugStatus("error");
+      setBugMessage("Please describe the bug in at least a few words.");
+      return;
+    }
+    setBugStatus("sending");
+    setBugMessage("");
+    try {
+      const res = await fetch("/api/bug-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: trimmed,
+          pageUrl: typeof window !== "undefined" ? window.location.href : null,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBugStatus("ok");
+        setBugMessage(data.message ?? "Report sent. Thank you.");
+        setBugDescription("");
+      } else {
+        setBugStatus("error");
+        setBugMessage(data.error ?? "Could not send report. Please try again.");
+      }
+    } catch {
+      setBugStatus("error");
+      setBugMessage("Network error. Please try again.");
+    }
+  }, [bugDescription]);
 
   /* Escape key handler */
   const handleEscape = useCallback(
@@ -341,7 +379,77 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             </div>
           </section>
 
-          {/* ── 6. RESET ──────────────────────────────────────── */}
+          {/* ── 6. REPORT A BUG ─────────────────────────────── */}
+          <section>
+            <SectionLabel>REPORT A BUG</SectionLabel>
+            <p style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 6, lineHeight: 1.5, ...FONT }}>
+              Describe what happened. Your name, email, current page, and browser are attached automatically so the team can reply.
+            </p>
+            <textarea
+              value={bugDescription}
+              onChange={(e) => {
+                setBugDescription(e.target.value);
+                if (bugStatus !== "idle") {
+                  setBugStatus("idle");
+                  setBugMessage("");
+                }
+              }}
+              maxLength={4000}
+              rows={5}
+              placeholder="e.g., The trough value didn't update after I changed the dose…"
+              disabled={bugStatus === "sending"}
+              style={{
+                width: "100%",
+                marginTop: 8,
+                padding: "10px 12px",
+                background: "var(--color-card)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-secondary)",
+                fontSize: 12,
+                lineHeight: 1.5,
+                resize: "vertical",
+                outline: "none",
+                ...FONT,
+              }}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>
+              <span style={{ fontSize: 10, color: "var(--color-dim)", ...FONT }}>
+                {bugDescription.length}/4000
+              </span>
+              <button
+                type="button"
+                onClick={submitBugReport}
+                disabled={bugStatus === "sending" || bugDescription.trim().length < 5}
+                style={{
+                  padding: "8px 18px",
+                  background: bugStatus === "sending" || bugDescription.trim().length < 5 ? "var(--color-card)" : "var(--color-primary)",
+                  border: "1px solid var(--color-primary)",
+                  color: bugStatus === "sending" || bugDescription.trim().length < 5 ? "var(--color-dim)" : "var(--color-bg)",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  cursor: bugStatus === "sending" || bugDescription.trim().length < 5 ? "not-allowed" : "pointer",
+                  ...FONT,
+                }}
+              >
+                {bugStatus === "sending" ? "SENDING…" : "SEND REPORT"}
+              </button>
+            </div>
+            {bugMessage && (
+              <p
+                style={{
+                  marginTop: 8,
+                  fontSize: 11,
+                  color: bugStatus === "ok" ? "#047857" : "#b91c1c",
+                  ...FONT,
+                }}
+              >
+                {bugMessage}
+              </p>
+            )}
+          </section>
+
+          {/* ── 7. RESET ──────────────────────────────────────── */}
           <section style={{ paddingTop: 4 }}>
             <button
               type="button"

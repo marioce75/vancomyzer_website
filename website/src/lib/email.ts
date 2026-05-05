@@ -341,6 +341,66 @@ export async function sendPilotDeclineEmail(args: {
   }
 }
 
+/**
+ * In-app bug report.
+ * Recipient resolution: BUG_REPORT_EMAIL → PILOT_NOTIFICATION_EMAIL → ADMIN_EMAIL.
+ * Failure logs and returns false; the API caller surfaces a generic error.
+ */
+export async function sendBugReport(args: {
+  description: string;
+  reporter: { username: string; email: string; full_name: string };
+  userAgent: string | null;
+  pageUrl: string | null;
+}): Promise<boolean> {
+  const recipient =
+    process.env.BUG_REPORT_EMAIL ??
+    process.env.PILOT_NOTIFICATION_EMAIL ??
+    ADMIN_EMAIL;
+  if (!recipient || !process.env.SMTP_USER) {
+    console.log(`[EMAIL] Skipped — SMTP not configured. Bug report from ${args.reporter.username}`);
+    return false;
+  }
+
+  const escape = (s: string | null | undefined) =>
+    String(s ?? "—")
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  // Render description with line breaks preserved
+  const descriptionHtml = escape(args.description).replace(/\n/g, "<br>");
+
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: recipient,
+      replyTo: args.reporter.email,
+      subject: `[Vancomyzer] Bug report — ${args.reporter.username}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 560px;">
+          <h2 style="color: #1e4d8c; margin-bottom: 4px;">Bug Report</h2>
+          <table style="font-size: 13px; border-collapse: collapse; width: 100%; margin-top: 8px;">
+            <tr><td style="padding: 5px 12px; color: #718096; width: 130px;">Reporter</td><td style="padding: 5px 12px;">${escape(args.reporter.full_name)} <span style="color:#a0aec0;">(${escape(args.reporter.username)})</span></td></tr>
+            <tr><td style="padding: 5px 12px; color: #718096;">Email</td><td style="padding: 5px 12px;"><a href="mailto:${escape(args.reporter.email)}">${escape(args.reporter.email)}</a></td></tr>
+            <tr><td style="padding: 5px 12px; color: #718096;">Page</td><td style="padding: 5px 12px; font-family: monospace; font-size: 12px;">${escape(args.pageUrl)}</td></tr>
+            <tr><td style="padding: 5px 12px; color: #718096; vertical-align: top;">User-Agent</td><td style="padding: 5px 12px; font-size: 11px; color: #4a5568;">${escape(args.userAgent)}</td></tr>
+            <tr><td style="padding: 5px 12px; color: #718096;">Submitted</td><td style="padding: 5px 12px; font-size: 12px;">${new Date().toISOString()}</td></tr>
+          </table>
+          <div style="margin-top: 14px; padding: 12px 14px; background: #f7fafc; border-left: 3px solid #1e4d8c; font-size: 13px; color: #2d3748; line-height: 1.6;">
+            ${descriptionHtml}
+          </div>
+          <p style="margin-top: 14px; font-size: 11px; color: #718096;">
+            Reply directly to this email — it will reach the reporter.
+          </p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
+        </div>
+      `,
+    });
+    console.log(`[EMAIL] Bug report from ${args.reporter.username} sent to ${recipient}`);
+    return true;
+  } catch (err) {
+    console.error("[EMAIL] Failed to send bug report:", err);
+    return false;
+  }
+}
+
 /** Sent when a pilot is revoked mid-cycle. Brief, blames nothing. */
 export async function sendPilotRevokedEmail(args: {
   applicantName: string;
