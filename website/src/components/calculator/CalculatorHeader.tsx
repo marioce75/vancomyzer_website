@@ -31,9 +31,9 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           <img
             src={logoSrc}
             alt="Vancomyzer™"
-            width={28}
+            width={96}
             height={28}
-            className="shrink-0 transition-opacity group-hover:opacity-85 sm:w-9 sm:h-9"
+            className="shrink-0 transition-opacity group-hover:opacity-85 sm:w-[124px] sm:h-9"
           />
           <div className="min-w-0 hidden sm:block">
             <h1

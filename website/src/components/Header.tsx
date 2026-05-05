@@ -26,7 +26,7 @@ export default function Header() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 whitespace-nowrap" style={{ textDecoration: "none" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-signal.svg" alt="Vancomyzer™" width={28} height={28} className="shrink-0 sm:w-8 sm:h-8" />
+            <img src="/logo-signal.svg" alt="Vancomyzer™" width={96} height={28} className="shrink-0 sm:w-[124px] sm:h-9" />
             <span className="font-bold text-[15px] sm:text-lg" style={{ letterSpacing: "3px", color: "var(--color-primary)", textShadow: "0 0 8px var(--color-glow)" }}>
               VANCOMYZER<sup className="text-[7px] sm:text-[8px] font-semibold ml-0.5 align-super" style={{ color: "var(--color-secondary)" }}>{"\u2122"}</sup>
             </span>

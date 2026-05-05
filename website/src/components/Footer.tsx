@@ -14,8 +14,8 @@ export default function Footer() {
               <img
                 src="/logo-signal.svg"
                 alt="Vancomyzer™ logo"
-                width={32}
-                height={32}
+                width={120}
+                height={36}
               />
               <div>
                 <span className="text-sm font-bold" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>

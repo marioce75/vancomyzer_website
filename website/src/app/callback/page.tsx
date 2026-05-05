@@ -121,7 +121,7 @@ function CallbackContent() {
         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo-signal.svg" alt="Vancomyzer" width={48} height={48} style={{ margin: "0 auto 16px" }} />
+        <img src="/logo-signal.svg" alt="Vancomyzer" width={160} height={48} style={{ margin: "0 auto 16px", display: "block" }} />
         {error ? (
           <>
             <h1 style={{ fontSize: 18, fontWeight: 700, color: "#991b1b", marginBottom: 8 }}>Authorization Failed</h1>
