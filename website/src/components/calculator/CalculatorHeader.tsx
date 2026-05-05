@@ -263,8 +263,17 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           )}
         </div>
 
-        {/* ── Mobile logout (visible when nav is hidden) ─── */}
+        {/* ── Mobile actions (visible when nav is hidden) ─── */}
         <div className="flex md:hidden items-center gap-1">
+          {userRole === "admin" && (
+            <Link
+              href="/admin/dashboard"
+              className="px-2 py-1.5 text-[10px] font-semibold"
+              style={{ color: "var(--color-secondary)", border: "1px solid var(--color-primary-a40)", background: "transparent", textDecoration: "none" }}
+            >
+              DASHBOARD
+            </Link>
+          )}
           {onLogout && (
             <button type="button" onClick={onLogout}
               className="px-2 py-1.5 text-[10px] font-semibold"
