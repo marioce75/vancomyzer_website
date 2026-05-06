@@ -120,10 +120,6 @@ function LoginForm() {
         borderRadius: 8,
       }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 12px" }}>
-            <img src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
-          </a>
           <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1e4d8c", margin: 0 }}>
             Sign in to Vancomyzer
           </h1>
