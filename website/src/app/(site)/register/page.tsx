@@ -113,7 +113,9 @@ export default function RegisterPage() {
       }}>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-signal.svg" alt="Vancomyzer" width={160} height={48} style={{ margin: "0 auto 12px", display: "block" }} />
+          <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 12px" }}>
+            <img src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
+          </a>
           <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1e4d8c", margin: 0 }}>
             {step === 1 ? "Create an Account" : "Legal Agreements"}
           </h1>

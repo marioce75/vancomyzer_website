@@ -24,11 +24,13 @@ export default function Header() {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-3 sm:gap-6 px-3 sm:px-4 py-3">
         <div className="flex items-center gap-2 sm:gap-3">
-          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 whitespace-nowrap" style={{ textDecoration: "none" }}>
+          <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-signal.svg" alt="Vancomyzer™" width={96} height={28} className="shrink-0 sm:w-[124px] sm:h-9" />
+            <img src="/logo-signal.svg" alt="Dōsys™" width={96} height={28} className="shrink-0 sm:w-[124px] sm:h-9" />
+          </a>
+          <Link href="/" className="whitespace-nowrap" style={{ textDecoration: "none" }}>
             <span className="font-bold text-[15px] sm:text-lg" style={{ letterSpacing: "3px", color: "var(--color-primary)", textShadow: "0 0 8px var(--color-glow)" }}>
-              VANCOMYZER<sup className="text-[7px] sm:text-[8px] font-semibold ml-0.5 align-super" style={{ color: "var(--color-secondary)" }}>{"\u2122"}</sup>
+              VANCOMYZER<sup className="text-[7px] sm:text-[8px] font-semibold ml-0.5 align-super" style={{ color: "var(--color-secondary)" }}>{"™"}</sup>
             </span>
           </Link>
           <span

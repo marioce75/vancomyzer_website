@@ -11,12 +11,14 @@ export default function Footer() {
           <div className="max-w-xl">
             <div className="flex items-center gap-3 mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/logo-signal.svg"
-                alt="Vancomyzer™ logo"
-                width={120}
-                height={36}
-              />
+              <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health">
+                <img
+                  src="/logo-signal.svg"
+                  alt="Dōsys™"
+                  width={120}
+                  height={36}
+                />
+              </a>
               <div>
                 <span className="text-sm font-bold" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
                   Vancomyzer™
