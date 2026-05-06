@@ -336,7 +336,8 @@ body.theme-basic .vancomyzer-title {
   letter-spacing: 5px !important;
 }
 
-/* Dōsys brand — dark text with teal D accent matching screenshot 2 */
+/* Dōsys brand — dark text with teal ō accent. The .dosys-d class is now
+   only applied to the ō glyph; the D and the rest stay parent-colored. */
 body.theme-basic .dosys-brand {
   color: #1a202c !important;
   letter-spacing: 1px !important;

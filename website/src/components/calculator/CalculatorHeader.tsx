@@ -64,7 +64,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                     window.open("https://dosys.health", "_blank", "noopener,noreferrer");
                   }}
                 >
-                  <span className="dosys-d" style={{ color: "#00c9b1", fontWeight: 700 }}>D</span><span style={{ fontWeight: 700 }}><span className="dosys-d" style={{ color: "#00c9b1" }}>{"\u014D"}</span>sys</span><sup style={{ fontSize: "7px", verticalAlign: "super", marginLeft: "1px" }}>{"\u2122"}</sup>
+                  <span style={{ fontWeight: 700 }}>D<span className="dosys-d" style={{ color: "#00c9b1" }}>{"\u014D"}</span>sys</span><sup style={{ fontSize: "7px", verticalAlign: "super", marginLeft: "1px" }}>{"\u2122"}</sup>
                 </button>
               </span>
             </p>
