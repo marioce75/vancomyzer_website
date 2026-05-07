@@ -26,22 +26,6 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
       <div className="mx-auto flex h-12 sm:h-14 lg:h-[68px] max-w-[1680px] items-center justify-between gap-2 sm:gap-4 lg:gap-6 px-3 sm:px-5 lg:px-8">
 
         {/* ── Brand ──────────────────────────────────────── */}
-        <a
-          href="https://dosys.health"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Visit dosys.health"
-          className="shrink-0 group"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={logoSrc}
-            alt="Dōsys™"
-            width={96}
-            height={28}
-            className="shrink-0 transition-opacity group-hover:opacity-85 sm:w-[124px] sm:h-9"
-          />
-        </a>
         <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0 group" style={{ textDecoration: "none" }}>
           <div className="min-w-0 hidden sm:block">
             <h1
