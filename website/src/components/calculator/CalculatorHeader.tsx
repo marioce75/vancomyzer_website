@@ -23,7 +23,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
         boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
       }}
     >
-      <div className="mx-auto flex h-12 sm:h-14 lg:h-[68px] max-w-[1680px] items-center justify-between gap-2 sm:gap-4 lg:gap-6 px-3 sm:px-5 lg:px-8">
+      <div className="flex h-12 sm:h-14 lg:h-[68px] items-center justify-between gap-2 sm:gap-4 lg:gap-6 pl-3 pr-3 sm:pr-5 lg:pr-8">
 
         {/* ── Brand ──────────────────────────────────────── */}
         <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0 group" style={{ textDecoration: "none" }}>
