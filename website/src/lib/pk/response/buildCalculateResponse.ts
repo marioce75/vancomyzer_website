@@ -2,6 +2,8 @@ import type { ExistingRegimenEngineOutput, AdjustmentRecommendation, Explanation
 import { buildExistingRegimenReviewStatus } from "./buildReviewStatus";
 import { buildDocumentationPreview } from "../explain/buildDocumentationPreview";
 import { buildInterpretationSummary } from "../explain/buildInterpretationSummary";
+import { curvePoints, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
+import { computeSafeInfusionDurationHours } from "../recommend/infusionSafety";
 
 export interface ExistingRegimenExplainOutput {
   interpretation_summary: string;
@@ -21,7 +23,10 @@ export function buildCalculateResponse(
 
   // Enrich each frequency option with per-option documentation so the frontend
   // can sync ALL output sections (interpretation text, quick summary, clinical note)
-  // to whichever dose option the pharmacist has selected.
+  // to whichever dose option the pharmacist has selected. Each option also gets
+  // its own pre-computed concentration-time curve so clicking a tab swaps the
+  // chart line without an extra round-trip.
+  const isPulseDose = engineOutput.doses_given === 1;
   const enrichedFrequencyOptions = (recommendation.frequency_options ?? []).map((opt) => {
     const optInput: ExplanationInput = {
       engineOutput: {
@@ -44,8 +49,34 @@ export function buildCalculateResponse(
     };
     const optDocs = buildDocumentationPreview(optInput);
     const optInterpretation = buildInterpretationSummary(optInput);
+
+    // Per-option curve. For pulse-dose, plot loading→option-as-maintenance so
+    // the chart updates coherently when the user clicks alternative regimens.
+    const optTinf = opt.infusion_duration_hours
+      ?? computeSafeInfusionDurationHours(opt.dose_mg).infusion_duration_hours;
+    const params = {
+      CL: engineOutput.CL,
+      V1: engineOutput.V1,
+      Q: engineOutput.Q,
+      V2: engineOutput.V2,
+    };
+    const optCurve = isPulseDose
+      ? loadingDoseCurvePoints(
+          params,
+          engineOutput.current_regimen_dose_mg,                        // loading dose = what the patient actually got
+          engineOutput.current_regimen_infusion_hours ?? optTinf,      // loading infusion
+          opt.dose_mg, opt.interval_hours, optTinf,                    // option as maintenance
+        )
+      : curvePoints({
+          ...params,
+          dose_mg: opt.dose_mg,
+          tau: opt.interval_hours,
+          T_inf: Math.min(optTinf, opt.interval_hours),
+        });
+
     return {
       ...opt,
+      curve: optCurve,
       interpretation_summary: optInterpretation,
       quick_summary: optDocs.quick_summary,
       clinical_note: optDocs.clinical_note,
@@ -117,5 +148,7 @@ export function buildCalculateResponse(
       ],
     },
     documentation_preview: explain.documentation_preview,
+    curve_engine_recommended: engineOutput.curve_engine_recommended,
+    fit_diagnostic: engineOutput.fit_diagnostic,
   };
 }

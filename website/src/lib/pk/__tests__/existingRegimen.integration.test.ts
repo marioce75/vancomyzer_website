@@ -438,6 +438,40 @@ function testCase23(): void {
   );
 }
 
+function testCase24(): void {
+  // Real-patient regression. 34F, 62.1 kg, SCr 2.61 (compromised renal),
+  // 500 mg single dose, 1 h infusion. Level drawn 16.12 h post-dose came
+  // back at 17.7 mcg/mL — well above what the population prior alone
+  // would predict. The Bayesian posterior MUST shift the patient's V1
+  // (and possibly CL) such that the predicted concentration at the
+  // measured time is within ±15% of 17.7. The previously-buggy fit
+  // converged to near-prior values, leaving a >50% residual.
+  const result = runExistingRegimenPipeline({
+    patient: { age: 34, weight_kg: 62.1, serum_creatinine_mg_dl: 2.61 },
+    regimen: { dose_mg: 500, interval_hours: 24, infusion_duration_hours: 1, doses_given: 1 },
+    levels: [{ value_mcg_ml: 17.7, collection_time: "", time_since_last_dose_hours: 16.12 }],
+  });
+  assert(
+    !("ok" in result && result.ok === false),
+    "Case 24: real-patient single-level pulse dose must succeed",
+  );
+  const r = result as {
+    pk_parameters: { CL: number; V1: number };
+    fit_diagnostic?: { posterior_predicted_at_levels?: { observed: number; predicted: number; relative_error: number }[]; max_relative_error?: number };
+  };
+  assert(
+    Array.isArray(r.fit_diagnostic?.posterior_predicted_at_levels)
+      && r.fit_diagnostic!.posterior_predicted_at_levels!.length === 1,
+    "Case 24: per-level posterior predictions must be exposed for diagnostic logging",
+  );
+  const obsRow = r.fit_diagnostic!.posterior_predicted_at_levels![0];
+  const relErr = Math.abs(obsRow.predicted - obsRow.observed) / obsRow.observed;
+  assert(
+    relErr <= 0.15,
+    `Case 24: posterior fit must converge — predicted ${obsRow.predicted.toFixed(1)} vs observed ${obsRow.observed} (relative error ${(relErr * 100).toFixed(0)}%, must be ≤ 15%)`,
+  );
+}
+
 export function runExistingRegimenTests(): void {
   testCase1();
   testCase2();
@@ -462,9 +496,10 @@ export function runExistingRegimenTests(): void {
   testCase21();
   testCase22();
   testCase23();
+  testCase24();
 }
 
 if (typeof process !== "undefined" && process.argv[1]?.includes("existingRegimen.integration.test")) {
   runExistingRegimenTests();
-  console.log("All 23 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, and late-lab-draw tolerance with non-SS multi-dose accumulation.");
+  console.log("All 24 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, and late-lab-draw tolerance with non-SS multi-dose accumulation.");
 }

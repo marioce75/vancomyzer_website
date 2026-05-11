@@ -102,5 +102,22 @@ export function runExistingRegimenPipeline(
   if (timing_warnings.length > 0) {
     (response as Record<string, unknown>).timing_warnings = timing_warnings;
   }
+
+  // Fit-quality advisory — when the posterior MAP fit can't reproduce the
+  // observed level within 25% relative error, the patient's true PK differs
+  // substantially from anything the prior + level can constrain. Surface it
+  // so the clinician knows not to over-interpret the recommendation.
+  const FIT_QUALITY_THRESHOLD = 0.25;
+  const diag = engineOutput.fit_diagnostic;
+  if (diag && diag.max_relative_error > FIT_QUALITY_THRESHOLD) {
+    const worst = diag.posterior_predicted_at_levels.reduce(
+      (acc, r) => (r.relative_error > acc.relative_error ? r : acc),
+      diag.posterior_predicted_at_levels[0],
+    );
+    (response as Record<string, unknown>).fit_quality_warnings = [
+      `Posterior fit cannot fully explain the measured level (predicted ${worst.predicted.toFixed(1)} mcg/mL vs observed ${worst.observed.toFixed(1)} mcg/mL — ${(worst.relative_error * 100).toFixed(0)}% error). Patient PK appears to differ substantially from the population prior. Recommend a confirmatory level before adjusting the dose.`,
+    ];
+  }
+
   return response;
 }

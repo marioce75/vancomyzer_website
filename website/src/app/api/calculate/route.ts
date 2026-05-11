@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { computeInitialRegimen } from "@/lib/initialRegimen";
 import { runExistingRegimenPipeline } from "@/lib/pk/runExistingRegimenPipeline";
 import { logCalculation } from "@/lib/auditLog";
-import { logCalculationEntry, getUserTier, findUserByLogin } from "@/lib/db";
+import { logCalculationEntry, getUserTier, findUserByLogin, logSecurityEvent } from "@/lib/db";
 import { hasFeature } from "@/lib/tiers";
 import { validateCaseId } from "@/lib/calculationHistory";
 
@@ -276,6 +276,36 @@ export async function POST(request: NextRequest) {
     pk_parameters: extractPKParams(resultObj),
   });
 
+  // Bayesian fit diagnostic — log prior↔posterior shifts and per-level
+  // residuals so we can quantify fit quality across real cases. No PHI;
+  // PK parameters and residuals only.
+  const fitDiag = resultObj.fit_diagnostic as Record<string, unknown> | undefined;
+  if (fitDiag) {
+    try {
+      const dbUser = userEmail !== "anonymous" ? findUserByLogin(userEmail) : undefined;
+      logSecurityEvent({
+        user_id: dbUser?.id ?? null,
+        username: dbUser?.username ?? userEmail,
+        action: "BAYESIAN_FIT_DIAGNOSTIC",
+        details: JSON.stringify({
+          prior_CL: round2(fitDiag.prior_CL),
+          prior_V1: round2(fitDiag.prior_V1),
+          posterior_CL: round2(fitDiag.posterior_CL),
+          posterior_V1: round2(fitDiag.posterior_V1),
+          posterior_shift_cl_pct: round2(fitDiag.posterior_shift_cl_pct),
+          posterior_shift_v1_pct: round2(fitDiag.posterior_shift_v1_pct),
+          max_relative_error: round2(fitDiag.max_relative_error),
+          per_level: fitDiag.posterior_predicted_at_levels,
+          doses_given: inputs.doses_given,
+          level_count: inputs.level_count,
+        }),
+        severity: "info",
+      });
+    } catch (err) {
+      console.warn("[bayesian-fit-diagnostic] log failed:", err);
+    }
+  }
+
   // Calculation history — gated on history.calculation feature.
   // Auto-recalc never persists; only explicit user action does.
   if (intent === "explicit") {
@@ -283,6 +313,10 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json(result);
+}
+
+function round2(v: unknown): number | null {
+  return typeof v === "number" && Number.isFinite(v) ? Math.round(v * 100) / 100 : null;
 }
 
 /**

@@ -209,6 +209,9 @@ export default function CalculatorWorkspace() {
   const [lastInputChangedAt, setLastInputChangedAt] = useState<number | null>(null);
   const [lastCalculatedAt, setLastCalculatedAt] = useState<number | null>(null);
   const [selectedFrequencyOption, setSelectedFrequencyOption] = useState<FrequencyOption | null>(null);
+  // Pulse-dose only: lets the user flip the chart between their entered
+  // regimen (default) and the engine's auto-recommended adjustment.
+  const [showEngineRecommended, setShowEngineRecommended] = useState(false);
 
   // Snapshot of state before loading dose simulation — enables undo
   const preLoadingDoseState = useRef<{
@@ -869,6 +872,23 @@ export default function CalculatorWorkspace() {
         </div>
       )}
 
+      {/* Fit-quality advisory — the posterior MAP fit can't explain the measured
+          level within ~25% relative error. The patient's true PK differs from
+          everything the population prior + this level can constrain. */}
+      {visibleResult?.fit_quality_warnings && visibleResult.fit_quality_warnings.length > 0 && (
+        <div className="rounded-xl border border-amber-300 bg-amber-100 px-4 py-3 flex gap-3">
+          <span className="text-base shrink-0">⚠️</span>
+          <div>
+            <p className="text-xs font-semibold text-amber-900">Fit Quality Advisory</p>
+            <ul className="mt-1 text-xs text-amber-900 leading-5 list-disc pl-4 space-y-0.5">
+              {visibleResult.fit_quality_warnings.map((w, i) => (
+                <li key={i}>{w}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
       {/* Age >65 advisory — non-blocking, shown whenever age is entered */}
       {patient.age > 65 && !rrt && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex gap-3">
@@ -1001,9 +1021,47 @@ export default function CalculatorWorkspace() {
 
               {/* Row 2: Graph — immediately visible */}
               <section className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+                {/* Pulse-dose curve toggle: lets the clinician compare the
+                    profile of their entered regimen vs. the engine's auto-
+                    recommended adjustment for this patient's posterior PK. */}
+                {visibleResult.curve_engine_recommended && !activeOption && (
+                  <div className="flex items-center justify-between gap-2 border-b px-3 py-2 text-xs"
+                    style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
+                    <span style={{ color: "var(--color-secondary)" }}>Showing curve for:</span>
+                    <div className="inline-flex rounded-md border" style={{ borderColor: "var(--color-border)" }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowEngineRecommended(false)}
+                        className="px-3 py-1 text-xs font-semibold"
+                        style={{
+                          background: !showEngineRecommended ? "var(--color-primary)" : "transparent",
+                          color: !showEngineRecommended ? "var(--color-card)" : "var(--color-secondary)",
+                        }}
+                      >
+                        Your regimen ({visibleResult.pk_parameters?.age != null ? `${visibleResult.recommended_dose ?? regimen.dose_mg} mg q${regimen.interval_hours}h` : "as entered"})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowEngineRecommended(true)}
+                        className="px-3 py-1 text-xs font-semibold"
+                        style={{
+                          background: showEngineRecommended ? "var(--color-primary)" : "transparent",
+                          color: showEngineRecommended ? "var(--color-card)" : "var(--color-secondary)",
+                        }}
+                      >
+                        Engine recommendation
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <div className="p-2">
                   <ConcentrationTimeGraph
-                    curve={activeOption?.curve ?? visibleResult.curve}
+                    curve={
+                      activeOption?.curve
+                      ?? (showEngineRecommended && visibleResult.curve_engine_recommended
+                          ? visibleResult.curve_engine_recommended
+                          : visibleResult.curve)
+                    }
                     measured_levels={visibleResult.measured_levels}
                     calculationDetails={visibleResult.calculation_details}
                     pk_model_name={visibleResult.pk_parameters?.pk_model_name}

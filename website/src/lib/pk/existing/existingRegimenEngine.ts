@@ -22,6 +22,9 @@ export function runExistingRegimenEngine(
     diagnostics: posterior_fit,
     model_name,
     ffm_kg,
+    prior_CL,
+    prior_V1,
+    per_level_residuals,
   } = posteriorResult;
   const { dose_mg, interval_hours, infusion_duration_hours, doses_given, target_auc24 } = regimen;
   const tau = interval_hours;
@@ -35,10 +38,25 @@ export function runExistingRegimenEngine(
   // For loading dose: build a realistic curve showing loading → maintenance transition
   // For regular regimens: use standard multi-dose accumulation curve
   let curve: { time_hours: number; concentration: number }[];
+  let curve_engine_recommended: { time_hours: number; concentration: number }[] | undefined;
   if (isPulseDose) {
-    // Calculate what the maintenance dose will be (simple AUC-proportional scaling)
+    // PRIMARY curve = user's entered regimen continued forward (loading +
+    // same-dose maintenance at the user's interval). This is what the
+    // clinician asked: "If I continue 500mg q24h, what does the profile
+    // look like for THIS patient?" — the previously-default behavior of
+    // showing the engine's auto-pick instead is now the optional toggle.
+    curve = loadingDoseCurvePoints(
+      { CL, V1, Q, V2 },
+      dose_mg,
+      T_inf,
+      dose_mg,    // maintenance dose = loading dose (user is continuing the same regimen)
+      tau,        // maintenance interval = user's interval
+      T_inf,      // maintenance infusion = same as loading
+    );
+
+    // Engine's optimized maintenance recommendation, computed as a separate
+    // curve so the UI can offer a toggle to compare.
     const targetAuc = target_auc24 ?? 450;
-    // Best maintenance: find dose at Q8h or Q12h that hits target AUC
     const maintIntervals = [8, 12, 24];
     let bestMaintDose = 500;
     let bestMaintTau = 12;
@@ -57,14 +75,10 @@ export function runExistingRegimenEngine(
         bestMaintTinf = mTinf;
       }
     }
-
-    curve = loadingDoseCurvePoints(
+    curve_engine_recommended = loadingDoseCurvePoints(
       { CL, V1, Q, V2 },
-      dose_mg,     // loading dose
-      T_inf,       // loading infusion duration
-      bestMaintDose, // maintenance dose
-      bestMaintTau,  // maintenance interval
-      bestMaintTinf, // maintenance infusion duration
+      dose_mg, T_inf,
+      bestMaintDose, bestMaintTau, bestMaintTinf,
     );
   } else {
     curve = curvePoints({ CL, V1, Q, V2, dose_mg, tau, T_inf });
@@ -120,6 +134,22 @@ export function runExistingRegimenEngine(
     ? `Bounded MAP posterior update from measured level(s) using the ${priorMsg}. Fit quality: ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}). ${steadyStateNote}`
     : `No posterior update applied; outputs from ${priorMsg}. Fit quality: ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}). ${steadyStateNote}`;
 
+  const maxRelativeError = per_level_residuals.length > 0
+    ? Math.max(...per_level_residuals.map((r) => r.relative_error))
+    : 0;
+  const fit_diagnostic = used_posterior_refinement
+    ? {
+        prior_CL,
+        prior_V1,
+        posterior_CL: CL,
+        posterior_V1: V1,
+        posterior_shift_cl_pct: prior_CL > 0 ? Math.abs((CL - prior_CL) / prior_CL) * 100 : 0,
+        posterior_shift_v1_pct: prior_V1 > 0 ? Math.abs((V1 - prior_V1) / prior_V1) * 100 : 0,
+        posterior_predicted_at_levels: per_level_residuals,
+        max_relative_error: maxRelativeError,
+      }
+    : undefined;
+
   return {
     auc24: Math.round(auc24 * 10) / 10,
     peak: Math.round(peak * 10) / 10,
@@ -128,6 +158,7 @@ export function runExistingRegimenEngine(
     current_regimen_dose_mg: dose_mg,
     current_regimen_interval_hours: interval_hours,
     curve,
+    curve_engine_recommended,
     measured_levels,
     level_count: levels.length,
     data_quality_note,
@@ -142,5 +173,6 @@ export function runExistingRegimenEngine(
     current_regimen_infusion_hours: T_inf,
     doses_given,
     target_auc24,
+    fit_diagnostic,
   };
 }

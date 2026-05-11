@@ -1,6 +1,6 @@
 import { buildPriorParameters } from "./buildPriorParameters";
 import { normalizeObservations } from "./normalizeObservations";
-import { fitPosteriorParameters } from "./fitPosteriorParameters";
+import { fitPosteriorParameters, type PerLevelResidual } from "./fitPosteriorParameters";
 import type {
   NormalizedPatient,
   NormalizedRegimen,
@@ -24,6 +24,14 @@ export interface PosteriorEngineResult {
   diagnostics: PosteriorFitDiagnostics;
   model_name: "colin_2019" | "vancomyzer_obesity";
   ffm_kg?: number;
+  /** Population-prior values used as the MAP starting point. Exposed so
+   *  the API route can log prior↔posterior shifts to the audit log. */
+  prior_CL: number;
+  prior_V1: number;
+  prior_Q: number;
+  prior_V2: number;
+  /** Observed-vs-posterior-predicted residuals per measured level. */
+  per_level_residuals: PerLevelResidual[];
 }
 
 export function runPosteriorEngine(
@@ -47,6 +55,11 @@ export function runPosteriorEngine(
       },
       model_name: prior.model_name,
       ffm_kg: prior.ffm_kg,
+      prior_CL: prior.CL,
+      prior_V1: prior.V1,
+      prior_Q: prior.Q,
+      prior_V2: prior.V2,
+      per_level_residuals: [],
     };
   }
 
@@ -78,6 +91,11 @@ export function runPosteriorEngine(
       diagnostics: fit.diagnostics,
       model_name: prior.model_name,
       ffm_kg: prior.ffm_kg,
+      prior_CL: prior.CL,
+      prior_V1: prior.V1,
+      prior_Q: prior.Q,
+      prior_V2: prior.V2,
+      per_level_residuals: fit.per_level_residuals,
     };
   }
 
@@ -91,5 +109,10 @@ export function runPosteriorEngine(
     diagnostics: fit.diagnostics,
     model_name: prior.model_name,
     ffm_kg: prior.ffm_kg,
+    prior_CL: prior.CL,
+    prior_V1: prior.V1,
+    prior_Q: prior.Q,
+    prior_V2: prior.V2,
+    per_level_residuals: fit.per_level_residuals,
   };
 }

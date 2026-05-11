@@ -26,6 +26,12 @@ export interface FitPosteriorInput {
   omega_V2?: number;
 }
 
+export interface PerLevelResidual {
+  observed: number;
+  predicted: number;
+  relative_error: number;
+}
+
 export interface FitPosteriorResult {
   CL_posterior: number;
   V1_posterior: number;
@@ -33,6 +39,7 @@ export interface FitPosteriorResult {
   V2_posterior: number;
   success: boolean;
   diagnostics: PosteriorFitDiagnostics;
+  per_level_residuals: PerLevelResidual[];
 }
 
 function clamp(value: number, low: number, high: number): number {
@@ -81,19 +88,22 @@ function objective(
   );
 }
 
-// Simple Nelder-Mead optimization for 4 parameters in log-space
+// Simple Nelder-Mead optimization for 4 parameters in log-space.
+// Configurable initial step lets the multi-start wrapper try a wider simplex
+// when the data demands a large posterior shift (extreme single-level cases).
 function nelderMeadLogSpace(
   initValues: number[],
   input: FitPosteriorInput,
   maxIters = 200,
-  tolerance = 1e-4
+  tolerance = 1e-4,
+  initialStep = 0.5,
 ): number[] {
   const n = initValues.length;
   // Initialize simplex
   let simplex = [initValues.map(Math.log)];
   for (let i = 0; i < n; i++) {
     const pt = [...simplex[0]];
-    pt[i] += 0.1; // Initial step
+    pt[i] += initialStep;
     simplex.push(pt);
   }
 
@@ -295,6 +305,7 @@ export function fitPosteriorParameters(
         "Posterior fitting inputs were insufficient, so outputs remained on the population prior.",
         "population_only"
       ),
+      per_level_residuals: [],
     };
   }
 
@@ -318,24 +329,70 @@ export function fitPosteriorParameters(
         "No positive measured levels were available for posterior fitting.",
         "population_only"
       ),
+      per_level_residuals: [],
     };
   }
 
-  const [bestCL, bestV1, bestQ, bestV2] = nelderMeadLogSpace(
-    [priorCL, priorV1, priorQ, priorV2],
-    normalizedInput
+  // Multi-start MAP optimization. A single Nelder-Mead run from the prior
+  // converges to local minima on extreme single-level cases (very small Vd,
+  // augmented or impaired clearance). Try several spread starting points
+  // and keep the lowest-objective result. The optimizer is cheap, so a few
+  // restarts cost milliseconds and substantially expand the basin reached.
+  const startingPoints: Array<[number, number, number, number]> = [
+    [priorCL, priorV1, priorQ, priorV2],            // prior — covers typical cases
+    [priorCL * 0.4, priorV1 * 0.5, priorQ, priorV2], // small Vd / low CL — covers Mario's scenario
+    [priorCL * 2.5, priorV1 * 1.5, priorQ, priorV2], // augmented clearance / large Vd
+    [priorCL * 0.4, priorV1, priorQ, priorV2],       // CL-only suppression
+    [priorCL, priorV1 * 0.5, priorQ, priorV2],       // V1-only contraction
+  ];
+
+  let bestPoint: number[] = [priorCL, priorV1, priorQ, priorV2];
+  let bestScore = Infinity;
+  for (const start of startingPoints) {
+    const candidate = nelderMeadLogSpace(start, normalizedInput);
+    if (
+      !Number.isFinite(candidate[0]) || !Number.isFinite(candidate[1])
+      || !Number.isFinite(candidate[2]) || !Number.isFinite(candidate[3])
+    ) continue;
+    const score = objective(candidate[0], candidate[1], candidate[2], candidate[3], normalizedInput);
+    if (score < bestScore) {
+      bestScore = score;
+      bestPoint = candidate;
+    }
+  }
+
+  const [bestCL, bestV1, bestQ, bestV2] = bestPoint;
+  const success = Number.isFinite(bestCL) && Number.isFinite(bestV1) && Number.isFinite(bestQ) && Number.isFinite(bestV2)
+    && Number.isFinite(bestScore);
+
+  const finalCL = clamp(bestCL, priorCL * 0.1, priorCL * 10);
+  const finalV1 = clamp(bestV1, priorV1 * 0.1, priorV1 * 10);
+  const finalQ  = clamp(bestQ,  priorQ  * 0.1, priorQ  * 10);
+  const finalV2 = clamp(bestV2, priorV2 * 0.1, priorV2 * 10);
+
+  // Per-level residuals — observed vs posterior-predicted concentration at
+  // the recorded time-in-interval. Surfaced so the API route can log fit
+  // quality and the UI can warn the clinician when no fit explains the data.
+  const per_level_residuals: PerLevelResidual[] = normalizedInput.observations.map(
+    ({ time_in_interval, concentration }) => {
+      const predicted = concentrationAtTime({
+        CL: finalCL, V1: finalV1, Q: finalQ, V2: finalV2,
+        dose_mg, tau, T_inf: T_infClamped, t: time_in_interval,
+      });
+      const relative_error = concentration > 0 ? Math.abs(predicted - concentration) / concentration : 0;
+      return { observed: concentration, predicted, relative_error };
+    },
   );
 
-  const success = Number.isFinite(bestCL) && Number.isFinite(bestV1) && Number.isFinite(bestQ) && Number.isFinite(bestV2);
-
   return {
-    CL_posterior: clamp(bestCL, priorCL * 0.1, priorCL * 10),
-    V1_posterior: clamp(bestV1, priorV1 * 0.1, priorV1 * 10),
-    Q_posterior: clamp(bestQ, priorQ * 0.1, priorQ * 10),
-    V2_posterior: clamp(bestV2, priorV2 * 0.1, priorV2 * 10),
+    CL_posterior: finalCL,
+    V1_posterior: finalV1,
+    Q_posterior: finalQ,
+    V2_posterior: finalV2,
     success,
     diagnostics: summarizeDiagnostics(
       normalizedInput, bestCL, bestV1, bestQ, bestV2, success
     ),
+    per_level_residuals,
   };
 }

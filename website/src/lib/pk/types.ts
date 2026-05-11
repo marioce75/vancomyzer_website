@@ -42,6 +42,23 @@ export interface PosteriorEngineResult {
   diagnostics: PosteriorFitDiagnostics;
 }
 
+export interface PosteriorPredictedAtLevel {
+  observed: number;
+  predicted: number;
+  relative_error: number;
+}
+
+export interface FitDiagnostic {
+  prior_CL: number;
+  prior_V1: number;
+  posterior_CL: number;
+  posterior_V1: number;
+  posterior_shift_cl_pct: number;
+  posterior_shift_v1_pct: number;
+  posterior_predicted_at_levels: PosteriorPredictedAtLevel[];
+  max_relative_error: number;
+}
+
 export interface ExistingRegimenEngineOutput {
   auc24: number;
   peak: number;
@@ -53,6 +70,10 @@ export interface ExistingRegimenEngineOutput {
   doses_given?: number;
   target_auc24?: number;
   curve: { time_hours: number; concentration: number }[];
+  /** Alternate curve when in pulse-dose mode: the engine's auto-recommended
+   *  maintenance regimen, plotted alongside the user-entered regimen so the
+   *  UI can offer a toggle between them. */
+  curve_engine_recommended?: { time_hours: number; concentration: number }[];
   measured_levels: { time_hours: number; concentration: number }[];
   level_count: number;
   data_quality_note: string;
@@ -64,6 +85,7 @@ export interface ExistingRegimenEngineOutput {
   V2: number;
   model_name: "colin_2019" | "vancomyzer_obesity";
   ffm_kg?: number;
+  fit_diagnostic?: FitDiagnostic;
 }
 
 export interface FrequencyOption {

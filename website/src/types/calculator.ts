@@ -98,6 +98,23 @@ export interface CalculateResponse {
   arc_advisory?: ArcAdvisory;
   /** Soft warnings about input timing — e.g., late lab draws within tolerance. */
   timing_warnings?: string[];
+  /** Surfaced when the posterior fit can't explain the level within tolerance. */
+  fit_quality_warnings?: string[];
+  /** Alternate concentration-time curve when in pulse-dose mode — the
+   *  engine's auto-recommended maintenance regimen. The primary `curve`
+   *  reflects the user's entered regimen. */
+  curve_engine_recommended?: { time_hours: number; concentration: number }[];
+  /** Posterior fit diagnostic — prior/posterior values + per-level residuals. */
+  fit_diagnostic?: {
+    prior_CL: number;
+    prior_V1: number;
+    posterior_CL: number;
+    posterior_V1: number;
+    posterior_shift_cl_pct: number;
+    posterior_shift_v1_pct: number;
+    posterior_predicted_at_levels: { observed: number; predicted: number; relative_error: number }[];
+    max_relative_error: number;
+  };
   recommended_dose: string;
   recommended_interval_hours: number;
   recommended_infusion_duration_hours?: number;
