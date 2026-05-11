@@ -33,17 +33,20 @@ export function normalizeObservations(
     tau || 1
   );
 
-  // For pulse-dose (single dose given), the level may be drawn beyond one tau.
-  // Using time_hours % tau would wrap the time incorrectly and compute the
-  // wrong steady-state concentration. Instead, use an effectiveTau large enough
-  // that no modulo wrap occurs — this makes concentrationAtTime approximate a
-  // true single-dose profile (accumulation factor → 1 as tau → ∞).
+  // For pulse-dose (single dose given), the patient hasn't reached steady
+  // state — only one dose has accumulated. The fitter's SS math must collapse
+  // to single-dose math, which happens as tau → ∞ (accumulation factor → 1
+  // and no modulo wrap of time-in-interval). The previous bound
+  //   Math.max(tau, maxLevelTime + 1)
+  // didn't actually achieve this — for a q24h regimen with a level drawn at
+  // 16h, effectiveTau stayed at 24h, and the SS accumulation factor was 3.4×
+  // the single-dose value, biasing the fit toward "no shift needed" even
+  // when the curve plotter (which uses real multi-dose schedule math) showed
+  // far less drug at that time. Force a very large effectiveTau here so SS
+  // math = single-dose math regardless of the user's entered interval.
   const isPulseDose = regimen.doses_given === 1;
-  const maxLevelTime = levels.reduce(
-    (max, l) => Math.max(max, Math.max(0, l.time_since_last_dose_hours)),
-    0
-  );
-  const effectiveTau = isPulseDose ? Math.max(tau, maxLevelTime + 1) : tau;
+  const PULSE_DOSE_EFFECTIVE_TAU_HOURS = 10000;
+  const effectiveTau = isPulseDose ? PULSE_DOSE_EFFECTIVE_TAU_HOURS : tau;
 
   const observations: NormalizedObservation[] = levels.map((l) => {
     const time_hours = Math.max(0, l.time_since_last_dose_hours);
