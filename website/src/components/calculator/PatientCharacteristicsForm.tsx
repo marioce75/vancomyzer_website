@@ -209,7 +209,15 @@ export default function PatientCharacteristicsForm({
               )}
             </div>
             {isObese && (sex === "male" || sex === "female") && ffm > 0 && (
-              <ObesityAdvisoryPanel bmi={bmi} ffm_kg={ffm} sex={sex} />
+              <ObesityAdvisoryPanel
+                bmi={bmi}
+                ffm_kg={ffm}
+                sex={sex}
+                age={value.age}
+                weight_kg={value.weight_kg}
+                height_cm={value.height_cm}
+                scr_mg_dl={value.serum_creatinine_mg_dl}
+              />
             )}
           </>
         );
