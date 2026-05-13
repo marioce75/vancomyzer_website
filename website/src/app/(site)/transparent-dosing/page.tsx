@@ -270,6 +270,18 @@ export default function TransparentDosingPage() {
             Bayesian magic. Anyone with a graduate-level pharmacometrics course can audit the engine.
             That is the point.
           </p>
+          <Link
+            href="/transparent-dosing/equations"
+            className="mt-6 inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
+            style={{
+              background: "#0f172a",
+              color: "#00c9b1",
+              border: "1px solid #1e293b",
+              letterSpacing: "0.08em",
+            }}
+          >
+            ▶ Full derivations &amp; equations
+          </Link>
         </div>
       </section>
 
