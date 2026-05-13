@@ -25,6 +25,10 @@ export interface MatrixSettings {
   graphAnimations: boolean;
   soundEffects: boolean;
   whiteInputValues: boolean;
+  /** Teaching Mode — when on, inline "Why" expandables appear next to result
+   *  sections to explain PK concepts in plain language. Off by default to
+   *  keep the workflow lean for experienced clinicians. */
+  teachingMode: boolean;
   /** Single theme — matrix-green removed. Kept for forward-compat in storage. */
   colorMode: "basic";
   fontSize: "small" | "medium" | "large" | "extra-large";
@@ -54,6 +58,7 @@ export const DEFAULT_SETTINGS: MatrixSettings = {
   graphAnimations: true,
   soundEffects: false,
   whiteInputValues: false,
+  teachingMode: false,
   colorMode: "basic",
   fontSize: "medium",
 };

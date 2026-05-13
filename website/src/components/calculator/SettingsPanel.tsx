@@ -351,6 +351,51 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             </div>
           </section>
 
+          {/* ── 4b. TEACHING MODE ──────────────────────────── */}
+          <section>
+            <SectionLabel>TEACHING MODE</SectionLabel>
+            <div className="flex items-center justify-between" style={{ marginTop: 10 }}>
+              <div style={{ flex: 1, paddingRight: 12 }}>
+                <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
+                  Show inline &ldquo;Why&rdquo; explanations
+                </span>
+                <p style={{ fontSize: 10, color: "var(--color-dim)", marginTop: 2, lineHeight: 1.4, ...FONT }}>
+                  Adds expandable PK-concept notes next to AUC, dose recommendation, and Bayesian fit results.
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={settings.teachingMode}
+                onClick={() => updateSetting("teachingMode", !settings.teachingMode)}
+                style={{
+                  position: "relative",
+                  width: 40,
+                  height: 20,
+                  padding: 0,
+                  background: settings.teachingMode ? "var(--color-primary)" : "#1a1a1a",
+                  border: `1px solid ${settings.teachingMode ? "var(--color-primary)" : "var(--color-border)"}`,
+                  cursor: "pointer",
+                  flexShrink: 0,
+                  transition: "background 0.2s, border-color 0.2s",
+                }}
+              >
+                <span
+                  style={{
+                    position: "absolute",
+                    top: 1,
+                    left: settings.teachingMode ? 21 : 1,
+                    width: 16,
+                    height: 16,
+                    background: settings.teachingMode ? "var(--color-bg)" : "var(--color-border)",
+                    transition: "left 0.2s",
+                    display: "block",
+                  }}
+                />
+              </button>
+            </div>
+          </section>
+
           {/* ── 5. LIVE PREVIEW ────────────────────────────── */}
           <section>
             <SectionLabel>PREVIEW</SectionLabel>

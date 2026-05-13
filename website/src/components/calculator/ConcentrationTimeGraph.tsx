@@ -15,6 +15,31 @@ interface ConcentrationTimeGraphProps {
   measured_levels?: CurvePoint[] | null;
   calculationDetails?: CalculationDetails | null;
   pk_model_name?: "colin_2019" | "vancomyzer_obesity";
+  /** Posterior fit uncertainty — drives the width of the shaded confidence
+   *  band drawn around the predicted curve. Honest visualization of how much
+   *  the engine can claim to know about THIS patient given the data. */
+  uncertainty_label?: "population_only" | "low" | "moderate" | "high" | "very_high";
+}
+
+/**
+ * Approximate ±band width as a fraction of the predicted concentration.
+ *
+ * This is a v0 visualization — we propagate the qualitative uncertainty label
+ * (the fitter already produces) into a band width rather than computing a true
+ * Bayesian credible interval from the posterior covariance. The chosen factors
+ * are conservative-by-default (population_only widest, low narrowest), framed
+ * around clinical assay imprecision (~15% even for a perfect model) and the
+ * IIV in the published priors.
+ */
+function uncertaintyBandFactor(label: ConcentrationTimeGraphProps["uncertainty_label"]): number {
+  switch (label) {
+    case "low":             return 0.10;
+    case "moderate":        return 0.18;
+    case "high":            return 0.28;
+    case "very_high":       return 0.40;
+    case "population_only": return 0.35;
+    default:                return 0;
+  }
 }
 
 /* ── Constants ──────────────────────────────────────────────────── */
@@ -108,6 +133,7 @@ function drawGraph(
   zoom: number,
   mouse: { x: number; y: number } | null,
   animProgress: number,
+  bandFactor: number,
 ) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -266,6 +292,29 @@ function drawGraph(
   ctx.beginPath();
   ctx.rect(PAD.left, PAD.top, gw, gh);
   ctx.clip();
+
+  // ─── Confidence band (translucent shaded region around predicted curve) ───
+  // Width is derived from the posterior fit's uncertainty_label so the visual
+  // honestly reflects how much the engine can claim to know about THIS patient.
+  // No level fitted = widest; multiple coherent levels = narrowest.
+  if (bandFactor > 0 && curve.length > 1) {
+    const drawLen = Math.floor(curve.length * animProgress);
+    if (drawLen > 1) {
+      ctx.fillStyle = "rgba(30, 77, 140, 0.10)"; // navy, low alpha — readable on light bg
+      ctx.beginPath();
+      // Upper edge: curve × (1 + bandFactor)
+      ctx.moveTo(toX(curve[0].time_hours), toY(curve[0].concentration * (1 + bandFactor)));
+      for (let i = 1; i < drawLen; i++) {
+        ctx.lineTo(toX(curve[i].time_hours), toY(curve[i].concentration * (1 + bandFactor)));
+      }
+      // Lower edge: curve × (1 - bandFactor), traversed in reverse
+      for (let i = drawLen - 1; i >= 0; i--) {
+        ctx.lineTo(toX(curve[i].time_hours), toY(Math.max(0, curve[i].concentration * (1 - bandFactor))));
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
 
   // ─── AUC shading (last 24h of curve) ───
   if (curve.length > 2) {
@@ -469,7 +518,9 @@ export default function ConcentrationTimeGraph({
   measured_levels,
   calculationDetails,
   pk_model_name,
+  uncertainty_label,
 }: ConcentrationTimeGraphProps) {
+  const bandFactor = uncertaintyBandFactor(uncertainty_label);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [zoom, setZoom] = useState(96);
   const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
@@ -516,13 +567,13 @@ export default function ConcentrationTimeGraph({
       if (!running) return;
       const canvas = canvasRef.current;
       if (canvas) {
-        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0);
+        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandFactor);
       }
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
     return () => { running = false; };
-  }, [curveData, measuredData, zoom, mouse]);
+  }, [curveData, measuredData, zoom, mouse, bandFactor]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -618,6 +669,16 @@ export default function ConcentrationTimeGraph({
         <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span className="inline-block w-4 h-0.5" style={{ background: getCSSColor("--color-primary", "#00ff41") }} /> Predicted
         </span>
+        {bandFactor > 0 && (
+          <span
+            className="flex items-center gap-1 text-[8px]"
+            style={{ color: getCSSColor("--color-dim", "#009933") }}
+            title={`±${(bandFactor * 100).toFixed(0)}% band — ${uncertainty_label?.replace(/_/g, " ") ?? "uncertainty"} fit`}
+          >
+            <span className="inline-block w-3 h-3" style={{ background: "rgba(30, 77, 140, 0.10)", border: "1px solid rgba(30, 77, 140, 0.25)" }} />
+            Confidence band (±{(bandFactor * 100).toFixed(0)}%, {uncertainty_label?.replace(/_/g, " ") ?? "—"})
+          </span>
+        )}
         <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44") }} /> Trough ref (10–20)
         </span>

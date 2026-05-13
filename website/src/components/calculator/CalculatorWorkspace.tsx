@@ -21,6 +21,7 @@ import LevelEntryTable from "@/components/calculator/LevelEntryTable";
 import CalculatorActionBar from "@/components/calculator/CalculatorActionBar";
 import PrimaryMetricsCard from "@/components/calculator/PrimaryMetricsCard";
 import DoseRecommendationCard from "@/components/calculator/DoseRecommendationCard";
+import TeachingNote from "@/components/calculator/TeachingNote";
 import ClinicalSignalStrip from "@/components/calculator/ClinicalSignalStrip";
 import InterpretationSummaryCard from "@/components/calculator/InterpretationSummaryCard";
 import AssumptionsCard from "@/components/calculator/AssumptionsCard";
@@ -977,6 +978,13 @@ export default function CalculatorWorkspace() {
                       loadingDoseMg={regimen.doses_given === 1 ? regimen.dose_mg : null}
                       onUndoLoadingDose={preLoadingDoseState.current ? handleUndoLoadingDose : undefined}
                     />
+                    <TeachingNote label="Why this dose?">
+                      The engine searches dose × interval combinations on the bounded grid (250–2000 mg, q6h–q48h)
+                      and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target.
+                      Peak and trough are forward-predicted from the patient&rsquo;s posterior PK (or population prior if no
+                      level is fit) using the two-compartment model. The recommendation always favors options that stay
+                      within target rather than ones that hit midpoint exactly outside the window.
+                    </TeachingNote>
                   </div>
                 </div>
 
@@ -1015,6 +1023,22 @@ export default function CalculatorWorkspace() {
                         <PKParametersMath params={visibleResult.pk_parameters} />
                       </div>
                     )}
+                    <TeachingNote label="What are CL, V₁, Q, V₂?">
+                      <p style={{ marginTop: 0 }}>
+                        Vancomycin distributes through two compartments: a central one (the bloodstream + well-perfused
+                        organs) and a peripheral one (less-perfused tissues). The four PK parameters describe this:
+                      </p>
+                      <ul style={{ marginTop: 6, paddingLeft: 18, listStyle: "disc" }}>
+                        <li><strong>CL</strong> — clearance (L/h). How fast the body eliminates the drug. Falls with renal impairment and with age (Colin 2019 FDecline).</li>
+                        <li><strong>V₁</strong> — central volume (L). Initial dilution space at the end of infusion; drives peak concentration.</li>
+                        <li><strong>Q</strong> — intercompartmental clearance (L/h). Speed of redistribution between central and peripheral.</li>
+                        <li><strong>V₂</strong> — peripheral volume (L). Where the drug temporarily &ldquo;hides&rdquo;; it slowly returns to central as the central level falls.</li>
+                      </ul>
+                      <p style={{ marginTop: 6 }}>
+                        When you enter a measured level, the Bayesian MAP fit shifts these parameters from the population
+                        prior toward your patient&rsquo;s individual values — bounded so a single observation can&rsquo;t over-fit.
+                      </p>
+                    </TeachingNote>
                   </div>
                 </div>
               </div>
@@ -1065,6 +1089,18 @@ export default function CalculatorWorkspace() {
                     measured_levels={visibleResult.measured_levels}
                     calculationDetails={visibleResult.calculation_details}
                     pk_model_name={visibleResult.pk_parameters?.pk_model_name}
+                    uncertainty_label={(() => {
+                      // Derive band width from what's exposed on the response.
+                      // No posterior refinement → widest band (prior-only).
+                      // Posterior + 1 level → moderate band; 2+ levels → narrow.
+                      // Evidence-strength hints (e.g., "high uncertainty") tighten it.
+                      if (!visibleResult.pk_parameters?.used_posterior_refinement) return "population_only";
+                      const evidence = visibleResult.calculation_details?.evidence_strength ?? "";
+                      if (evidence.includes("high uncertainty")) return "high";
+                      const levelCount = visibleResult.measured_levels?.length ?? 0;
+                      if (levelCount >= 2) return "low";
+                      return "moderate";
+                    })()}
                   />
                 </div>
               </section>
@@ -1076,6 +1112,41 @@ export default function CalculatorWorkspace() {
                   trough={activeOption?.trough ?? visibleResult.trough}
                   details={visibleResult.calculation_details}
                 />
+              )}
+
+              <TeachingNote label="What is AUC₂₄, and why 400–600?">
+                <p style={{ marginTop: 0 }}>
+                  <strong>AUC₂₄</strong> is the area under the concentration-time curve over 24 hours
+                  (mg·h/L). For vancomycin, it&rsquo;s the exposure metric that best correlates with
+                  both efficacy against MRSA and the risk of acute kidney injury.
+                </p>
+                <p style={{ marginTop: 6 }}>
+                  The 2020 ASHP/IDSA/PIDS/SIDP consensus guideline recommends a target of
+                  <strong> 400–600 mg·h/L</strong>. Below 400 → underdosed (risk of treatment failure
+                  and resistance selection). Above 600 → significant nephrotoxicity risk, especially
+                  if sustained beyond 48 hours. The trough number alone is no longer the recommended
+                  target — AUC integrates the entire dosing interval and is more clinically meaningful.
+                </p>
+              </TeachingNote>
+
+              {visibleResult.pk_parameters?.used_posterior_refinement && (
+                <TeachingNote label="How does Bayesian feedback work?">
+                  <p style={{ marginTop: 0 }}>
+                    The engine starts with a population prior — what we&rsquo;d expect for an &ldquo;average&rdquo;
+                    patient with this age, weight, and SCr (Colin 2019, pooled from 14 studies).
+                    When you enter a measured level, MAP-Bayesian estimation shifts the patient&rsquo;s individual
+                    PK parameters toward values that better explain the measurement, while a log-normal
+                    prior penalty keeps the shift bounded — a single observation can&rsquo;t override what
+                    decades of pop-PK data say is physiologically plausible.
+                  </p>
+                  <p style={{ marginTop: 6 }}>
+                    With one level the fit is bounded by the prior; with two or more well-timed levels
+                    (peak + trough) the fit becomes much more individualized and the recommendation
+                    can deviate further from population averages. If the residual stays large, you&rsquo;ll
+                    see a yellow Fit Quality Advisory — that&rsquo;s a signal to draw a confirmatory level
+                    rather than over-trust the recommendation.
+                  </p>
+                </TeachingNote>
               )}
 
               {/* Row 4: Clinical Interpretation + Details — all collapsed */}
