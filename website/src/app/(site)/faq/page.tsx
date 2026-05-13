@@ -400,7 +400,7 @@ export default function FAQPage() {
             Open Calculator
           </a>
           <a
-            href="/references"
+            href="/transparent-dosing"
             style={{
               fontSize: 13,
               color: "var(--color-secondary)",

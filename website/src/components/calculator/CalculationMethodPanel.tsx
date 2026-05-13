@@ -74,7 +74,7 @@ export default function CalculationMethodPanel({
                 <a href="https://doi.org/10.1093/ajhp/zxaa036" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">DOI ↗</a>
               </li>
               <li>
-                <Link href="/references" className="text-blue-600 hover:underline font-medium">View full references &amp; equations</Link>
+                <Link href="/transparent-dosing" className="text-blue-600 hover:underline font-medium">View full references &amp; equations</Link>
               </li>
             </ul>
           </div>

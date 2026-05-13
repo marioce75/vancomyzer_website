@@ -88,12 +88,12 @@ export function reviewabilityFaqHref(details: CalculationDetails): string {
 
 export function reviewabilityTrustHref(details: CalculationDetails): string {
   if (details.review_status.level === "caution") {
-    return "/references";
+    return "/transparent-dosing";
   }
   if (details.review_status.level === "prior_only") {
-    return "/references";
+    return "/transparent-dosing";
   }
-  return "/references";
+  return "/transparent-dosing";
 }
 
 export function fallbackLabel(

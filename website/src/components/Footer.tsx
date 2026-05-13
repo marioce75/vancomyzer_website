@@ -52,7 +52,7 @@ export default function Footer() {
             <nav className="grid grid-cols-2 gap-x-6 gap-y-2">
               {[
                 { href: "/calculator", label: "Calculator" },
-                { href: "/references", label: "References" },
+                { href: "/transparent-dosing", label: "Transparency" },
                 { href: "/faq", label: "FAQ" },
                 { href: "/about", label: "About" },
                 { href: "/contact", label: "Contact" },
