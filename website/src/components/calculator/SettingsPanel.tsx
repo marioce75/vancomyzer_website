@@ -31,12 +31,8 @@ const SLIDERS = [
 ] as const;
 
 const TOGGLES = [
-  { key: "scanlineEffect" as const, label: "Scanline Effect" },
-  { key: "typewriterAnimation" as const, label: "Typewriter Animation" },
   { key: "blinkingCursor" as const, label: "Blinking Cursor" },
-  { key: "graphAnimations" as const, label: "Graph Animations" },
   { key: "soundEffects" as const, label: "Sound Effects" },
-  { key: "whiteInputValues" as const, label: "White Input Numbers" },
 ] as const;
 
 /* ── Component ──────────────────────────────────────────────────── */
@@ -300,15 +296,11 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             <SectionLabel>EFFECTS</SectionLabel>
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 10 }}>
               {TOGGLES.map((toggle) => {
-                const BASIC_FORCED_OFF = ["scanlineEffect", "typewriterAnimation", "whiteInputValues"];
-                const forcedOff = BASIC_FORCED_OFF.includes(toggle.key);
-                const on = forcedOff ? false : (settings[toggle.key] as boolean);
+                const on = settings[toggle.key] as boolean;
                 return (
                   <div
                     key={toggle.key}
                     className="flex items-center justify-between"
-                    style={{ opacity: forcedOff ? 0.35 : 1 }}
-                    title={forcedOff ? "Not available in Basic theme" : undefined}
                   >
                     <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
                       {toggle.label}
@@ -317,8 +309,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                       type="button"
                       role="switch"
                       aria-checked={on}
-                      disabled={forcedOff}
-                      onClick={() => { if (!forcedOff) updateSetting(toggle.key, !on); }}
+                      onClick={() => updateSetting(toggle.key, !on)}
                       style={{
                         position: "relative",
                         width: 40,
@@ -327,7 +318,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                         background: on ? "var(--color-primary)" : "#1a1a1a",
                         border: on ? "none" : "1px solid var(--color-border)",
                         boxShadow: on ? "0 0 8px var(--color-primary-a50)" : "none",
-                        cursor: forcedOff ? "not-allowed" : "pointer",
+                        cursor: "pointer",
                         flexShrink: 0,
                         transition: "background 0.2s, box-shadow 0.2s",
                       }}

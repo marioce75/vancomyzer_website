@@ -18,13 +18,9 @@ export interface MatrixSettings {
   backgroundShade: number;
   textSize: number;
   rainOpacity: number;
-  scanlineEffect: boolean;
-  typewriterAnimation: boolean;
   blinkingCursor: boolean;
   vancomycinRain: boolean;
-  graphAnimations: boolean;
   soundEffects: boolean;
-  whiteInputValues: boolean;
   /** Teaching Mode — when on, inline "Why" expandables appear next to result
    *  sections to explain PK concepts in plain language. Off by default to
    *  keep the workflow lean for experienced clinicians. */
@@ -51,13 +47,9 @@ export const DEFAULT_SETTINGS: MatrixSettings = {
   backgroundShade: 0,
   textSize: 50,
   rainOpacity: 70,
-  scanlineEffect: true,
-  typewriterAnimation: true,
   blinkingCursor: true,
   vancomycinRain: false,
-  graphAnimations: true,
   soundEffects: false,
-  whiteInputValues: false,
   teachingMode: false,
   colorMode: "basic",
   fontSize: "medium",
@@ -214,13 +206,8 @@ function applySettingsToDom(settings: MatrixSettings): void {
   // --- Rain opacity ---
   rootStyle.setProperty("--mx-rain-opacity", String(settings.rainOpacity / 100));
 
-  // --- Toggle body classes (basic forces off scanlines + typewriter) ---
-  const toggleClass = (cls: string, on: boolean) => { body.classList.toggle(cls, on); };
-  toggleClass("no-scanlines", true);
-  toggleClass("no-typewriter", true);
-  toggleClass("no-blink", !settings.blinkingCursor);
-  toggleClass("no-graph-anim", !settings.graphAnimations);
-  toggleClass("input-values-white", settings.whiteInputValues);
+  // --- Toggle body classes — only those still tied to live CSS rules ---
+  body.classList.toggle("no-blink", !settings.blinkingCursor);
 }
 
 // ---------------------------------------------------------------------------
