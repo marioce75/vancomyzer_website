@@ -50,7 +50,7 @@ D\u014Dsys\u2122 makes no representations or warranties regarding the accuracy, 
   },
   {
     heading: "NOT MEDICAL ADVICE",
-    body: `The tool is for informational purposes only and intended for use only by licensed healthcare professionals. THE TOOL IS NOT INTENDED TO BE A SUBSTITUTE FOR PROFESSIONAL MEDICAL ADVICE, DOSING, DIAGNOSIS OR TREATMENT. D\u014Dsys\u2122 does not guarantee the accuracy or benefits of using this tool. Healthcare professionals who use this tool must exercise their own independent clinical judgment as to vancomycin dosage. Non-health professionals should always seek the immediate advice of their physician or qualified healthcare provider.`,
+    body: `Vancomyzer\u2122 is intended to support, not replace, clinical judgment. Every recommendation produced by the tool must be independently evaluated by a qualified clinician against the patient\u2019s clinical status, institutional protocols, product labeling, and current therapeutic drug monitoring before any change to therapy is initiated. Healthcare professionals who use this tool retain full responsibility for the clinical decisions they make. This tool is not designed for, and should not be used by, patients, caregivers, or other non-clinical users \u2014 they should consult their physician or pharmacist for medication guidance.`,
   },
   {
     heading: "REGULATORY STATUS",

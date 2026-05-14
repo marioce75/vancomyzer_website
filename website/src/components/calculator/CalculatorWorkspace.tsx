@@ -795,7 +795,7 @@ export default function CalculatorWorkspace() {
         {/* Inline disclaimer — always visible */}
         <div className="border-t px-4 py-2" style={{ borderTopColor: "var(--color-border)" }}>
           <p style={{ fontSize: 10, lineHeight: 1.6, color: "var(--color-dim)", fontFamily: "inherit", margin: 0 }}>
-            Disclaimer: This tool is for informational purposes only and intended for use exclusively by licensed healthcare professionals. THE TOOL IS NOT INTENDED TO BE A SUBSTITUTE FOR PROFESSIONAL MEDICAL ADVICE, DOSING, DIAGNOSIS OR TREATMENT.{" "}
+            Vancomyzer&trade; is non-device clinical decision support under 21st Century Cures Act §3060, intended for licensed healthcare professionals only. Every recommendation must be independently verified by a clinician prior to patient administration. Not FDA-cleared as a medical device, and not a substitute for clinical judgment, institutional protocols, or therapeutic drug monitoring.{" "}
             <span
               style={{ color: "var(--color-primary)", cursor: "pointer", textDecoration: "none" }}
               onClick={() => setDisclaimerOpen(true)}
