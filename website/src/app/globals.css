@@ -767,3 +767,22 @@ input[type='range'].mx-range-slider:focus {
   box-shadow: none !important;
   border-color: var(--color-primary) !important;
 }
+
+/* ── Marketing manifesto: light text on dark sections ─────────────
+   The basic-theme body cascade `color: #1a202c !important` beats
+   inline white styles, so dark hero/CTA sections render unreadable.
+   Mark those sections with `.manifesto-dark` and let the heading +
+   paragraph colors actually be light, as designed. */
+body.theme-basic .manifesto-dark h1,
+body.theme-basic .manifesto-dark h2,
+body.theme-basic .manifesto-dark h3 {
+  color: #ffffff !important;
+}
+body.theme-basic .manifesto-dark p,
+body.theme-basic .manifesto-dark li,
+body.theme-basic .manifesto-dark ul {
+  color: #cbd5e1 !important;
+}
+body.theme-basic .manifesto-dark a {
+  color: #00c9b1 !important;
+}

@@ -105,7 +105,7 @@ export default function TransparentDosingPage() {
   return (
     <main style={{ background: "#f8fafc", color: "#0f172a" }}>
       {/* ── HERO ───────────────────────────────────────────── */}
-      <section className="px-6 py-20 sm:py-28" style={{ background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)" }}>
+      <section className="manifesto-dark px-6 py-20 sm:py-28" style={{ background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)" }}>
         <div className="mx-auto max-w-4xl">
           <p
             className="mb-6 text-xs font-bold uppercase tracking-[0.18em]"
@@ -369,7 +369,7 @@ export default function TransparentDosingPage() {
       </section>
 
       {/* ── CTA ─────────────────────────────────────────────── */}
-      <section className="px-6 py-20" style={{ background: "#0f172a", color: "#ffffff" }}>
+      <section className="manifesto-dark px-6 py-20" style={{ background: "#0f172a", color: "#ffffff" }}>
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ color: "#ffffff" }}>
             Open the calculator.

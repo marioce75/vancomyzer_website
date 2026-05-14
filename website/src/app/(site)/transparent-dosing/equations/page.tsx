@@ -18,7 +18,7 @@ export default function EquationsPage() {
   return (
     <main style={{ background: "#f8fafc", color: "#0f172a" }}>
       {/* ── HEADER ─────────────────────────────────────────── */}
-      <section className="px-6 py-16" style={{ background: "#0f172a" }}>
+      <section className="manifesto-dark px-6 py-16" style={{ background: "#0f172a" }}>
         <div className="mx-auto max-w-4xl">
           <Link
             href="/transparent-dosing"
@@ -353,7 +353,7 @@ Prior log-SDs (default):
       </section>
 
       {/* ── FOUNDATIONAL TEXTS + DISCLAIMER ────────────────── */}
-      <section className="px-6 py-16" style={{ background: "#0f172a" }}>
+      <section className="manifesto-dark px-6 py-16" style={{ background: "#0f172a" }}>
         <div className="mx-auto max-w-4xl">
           <h2 className="text-xl font-bold tracking-tight" style={{ color: "#ffffff" }}>
             Foundational texts
