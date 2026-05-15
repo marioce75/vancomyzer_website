@@ -19,6 +19,9 @@ export type FeatureId =
   | "export.note.copy"
   | "export.note.unwatermarked"
   | "export.custom_institution"
+  // Interpretation surfaces (paywall — the prose is copy-paste equivalent
+  // to export.note.copy, so it's gated to the same tier)
+  | "interpretation.why_this_result"
   // Persistence
   | "history.calculation"
   // Org / multi-user
@@ -159,6 +162,7 @@ const FEATURE_MIN_TIER: Record<FeatureId, TierId> = {
   "export.note.copy": "individual_pro",
   "export.note.unwatermarked": "individual_pro",
   "export.custom_institution": "individual_pro",
+  "interpretation.why_this_result": "individual_pro",
   "history.calculation": "individual_pro",
 
   // Department

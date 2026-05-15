@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import FeatureGate from "@/components/FeatureGate";
 import type {
   CalculatorMode,
   CalculateRequest,
@@ -1158,11 +1160,34 @@ export default function CalculatorWorkspace() {
                   CLINICAL INTERPRETATION &amp; DOCUMENTATION
                 </summary>
                 <div className="mt-3 flex flex-col gap-3 border-t pt-3" style={{ borderTopColor: "var(--color-border)" }}>
-                  <InterpretationSummaryCard
-                    interpretation_summary={
-                      activeOption?.interpretation_summary ?? visibleResult.interpretation_summary
+                  <FeatureGate
+                    feature="interpretation.why_this_result"
+                    fallback={
+                      <div className="rounded-lg border px-4 py-3" style={{ borderColor: "#bfdbfe", background: "#eff6ff" }}>
+                        <p className="text-sm font-semibold" style={{ color: "#1e40af" }}>
+                          Why this result — Individual Pro
+                        </p>
+                        <p className="mt-1 text-xs leading-relaxed" style={{ color: "#1e3a8a" }}>
+                          The plain-language clinical reasoning behind each recommendation
+                          (drivers, evidence, caveats) is part of the documentation suite on
+                          Individual Pro and above — alongside Copy Note and Export PDF.
+                        </p>
+                        <Link
+                          href="/pricing"
+                          className="mt-2 inline-block text-xs font-semibold underline"
+                          style={{ color: "#1e40af" }}
+                        >
+                          See pricing →
+                        </Link>
+                      </div>
                     }
-                  />
+                  >
+                    <InterpretationSummaryCard
+                      interpretation_summary={
+                        activeOption?.interpretation_summary ?? visibleResult.interpretation_summary
+                      }
+                    />
+                  </FeatureGate>
                   <LimitationsCard limitations={visibleResult.limitations} calculationDetails={visibleResult.calculation_details} />
                 </div>
               </details>
