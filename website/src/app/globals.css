@@ -783,18 +783,22 @@ body.theme-basic .manifesto-dark li,
 body.theme-basic .manifesto-dark ul {
   color: #cbd5e1 !important;
 }
-/* Inline text-style links render teal — but explicitly NOT buttons.
-   Buttons get their own color rules below. */
-body.theme-basic .manifesto-dark a:not(.cta-primary):not(.cta-outline) {
+/* Default text-style links in dark sections render teal. */
+body.theme-basic .manifesto-dark a {
   color: #00c9b1 !important;
 }
 
-/* Primary CTA button — teal background, dark text. */
+/* Primary CTA button — teal background, dark text. Higher specificity
+   (one extra class) wins over the default-link rule above. Forcing
+   background-color too so the visual doesn't depend on inline style. */
 body.theme-basic .manifesto-dark a.cta-primary {
   color: #0f172a !important;
+  background-color: #00c9b1 !important;
 }
 
-/* Outline CTA button — transparent background, white text. */
+/* Outline CTA button — transparent background, white text, light border. */
 body.theme-basic .manifesto-dark a.cta-outline {
   color: #ffffff !important;
+  background-color: transparent !important;
+  border-color: #cbd5e1 !important;
 }
