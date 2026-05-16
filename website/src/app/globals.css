@@ -783,6 +783,18 @@ body.theme-basic .manifesto-dark li,
 body.theme-basic .manifesto-dark ul {
   color: #cbd5e1 !important;
 }
-body.theme-basic .manifesto-dark a {
+/* Inline text-style links render teal — but explicitly NOT buttons.
+   Buttons get their own color rules below. */
+body.theme-basic .manifesto-dark a:not(.cta-primary):not(.cta-outline) {
   color: #00c9b1 !important;
+}
+
+/* Primary CTA button — teal background, dark text. */
+body.theme-basic .manifesto-dark a.cta-primary {
+  color: #0f172a !important;
+}
+
+/* Outline CTA button — transparent background, white text. */
+body.theme-basic .manifesto-dark a.cta-outline {
+  color: #ffffff !important;
 }

@@ -382,14 +382,14 @@ Prior log-SDs (default):
           <div className="mt-10 flex gap-4">
             <Link
               href="/transparent-dosing"
-              className="inline-block rounded-md px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition"
+              className="cta-primary inline-block rounded-md px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition"
               style={{ background: "#00c9b1", color: "#0f172a", letterSpacing: "0.08em" }}
             >
               ← Back to manifesto
             </Link>
             <Link
               href="/register"
-              className="inline-block rounded-md border-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition"
+              className="cta-outline inline-block rounded-md border-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition"
               style={{ borderColor: "#cbd5e1", color: "#ffffff", letterSpacing: "0.08em" }}
             >
               Try the calculator →

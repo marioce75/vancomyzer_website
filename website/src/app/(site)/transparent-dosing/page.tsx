@@ -127,14 +127,14 @@ export default function TransparentDosingPage() {
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Link
               href="/register"
-              className="inline-block rounded-md px-6 py-3 text-center text-sm font-bold uppercase tracking-wider transition"
+              className="cta-primary inline-block rounded-md px-6 py-3 text-center text-sm font-bold uppercase tracking-wider transition"
               style={{ background: "#00c9b1", color: "#0f172a", letterSpacing: "0.08em" }}
             >
               Try Vancomyzer free →
             </Link>
             <Link
               href="/faq"
-              className="inline-block rounded-md border-2 px-6 py-3 text-center text-sm font-bold uppercase tracking-wider transition"
+              className="cta-outline inline-block rounded-md border-2 px-6 py-3 text-center text-sm font-bold uppercase tracking-wider transition"
               style={{ borderColor: "#cbd5e1", color: "#ffffff", letterSpacing: "0.08em" }}
             >
               Read the methods →
@@ -381,14 +381,14 @@ export default function TransparentDosingPage() {
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4">
             <Link
               href="/register"
-              className="inline-block rounded-md px-8 py-3 text-sm font-bold uppercase tracking-wider transition"
+              className="cta-primary inline-block rounded-md px-8 py-3 text-sm font-bold uppercase tracking-wider transition"
               style={{ background: "#00c9b1", color: "#0f172a", letterSpacing: "0.08em" }}
             >
               Start free →
             </Link>
             <Link
               href="/pricing"
-              className="inline-block rounded-md border-2 px-8 py-3 text-sm font-bold uppercase tracking-wider transition"
+              className="cta-outline inline-block rounded-md border-2 px-8 py-3 text-sm font-bold uppercase tracking-wider transition"
               style={{ borderColor: "#cbd5e1", color: "#ffffff", letterSpacing: "0.08em" }}
             >
               See pricing
