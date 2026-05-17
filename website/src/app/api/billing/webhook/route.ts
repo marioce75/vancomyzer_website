@@ -26,6 +26,7 @@ import {
   getStripe,
   tierForPriceId,
   localStatusFromStripe,
+  seatsForDepartmentPriceId,
 } from "@/lib/stripe";
 import {
   applySubscriptionUpdate,
@@ -38,6 +39,7 @@ import {
   createInstitutionalAccount,
   setInstitutionStripeCustomer,
   applyInstitutionSubscriptionUpdate,
+  setInstitutionSeatsAllocated,
   setUserInstitution,
   setUserTier,
   recountSeats,
@@ -213,13 +215,22 @@ async function handleDepartmentSubscriptionEvent(sub: Stripe.Subscription) {
     return;
   }
 
-  // Subsequent fire — just sync subscription state on the institution row.
+  // Subsequent fire — sync subscription state on the institution row.
   applyInstitutionSubscriptionUpdate(institution.id, {
     status,
     expiry,
     stripeSubscriptionId: sub.id,
     stripePriceId: priceId,
   });
+
+  // Re-derive seats_allocated from the price ID. This is what lets a
+  // Small→Large upgrade (or Large→Small downgrade) automatically bump
+  // the seat cap on the institution row without a manual update.
+  const newSeatCap = seatsForDepartmentPriceId(priceId);
+  const seatCapChanged = newSeatCap != null && newSeatCap !== institution.seats_allocated;
+  if (seatCapChanged) {
+    setInstitutionSeatsAllocated(institution.id, newSeatCap);
+  }
 
   logSecurityEvent({
     user_id: null,
@@ -232,6 +243,8 @@ async function handleDepartmentSubscriptionEvent(sub: Stripe.Subscription) {
       status,
       expiry,
       price_id: priceId,
+      seats_allocated: seatCapChanged ? newSeatCap : institution.seats_allocated,
+      seats_cap_changed: seatCapChanged,
     }),
     severity: "info",
   });

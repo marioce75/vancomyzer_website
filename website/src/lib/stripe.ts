@@ -56,6 +56,18 @@ export function departmentPriceIdForSeats(seats: number): string | undefined {
 }
 
 /**
+ * Inverse mapping: given a Department price ID, how many seats does it
+ * allocate? Used by the webhook to re-derive seats_allocated whenever a
+ * subscription changes price (Small ↔ Large).
+ */
+export function seatsForDepartmentPriceId(priceId: string | null | undefined): number | null {
+  if (!priceId) return null;
+  if (priceId === process.env.STRIPE_PRICE_DEPARTMENT_SMALL) return 10;
+  if (priceId === process.env.STRIPE_PRICE_DEPARTMENT_LARGE) return 20;
+  return null;
+}
+
+/**
  * Translate a Stripe subscription status into our local
  * subscription_status column convention. We only treat "active",
  * "trialing", and "past_due" as access-granting; everything else

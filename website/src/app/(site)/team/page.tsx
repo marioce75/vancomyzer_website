@@ -80,6 +80,42 @@ export default function TeamPage() {
   const [auditLoading, setAuditLoading] = useState(false);
   const [showAudit, setShowAudit] = useState(false);
 
+  // Department tier-change state — used by the seat-cap upgrade/downgrade flow
+  const [tierChanging, setTierChanging] = useState(false);
+  const [tierMsg, setTierMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
+  const changeTier = useCallback(async (target: "small" | "large") => {
+    setTierChanging(true);
+    setTierMsg(null);
+    try {
+      const res = await fetch("/api/billing/department-upgrade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setTierMsg({ type: "err", text: body.error ?? "Plan change failed." });
+        return;
+      }
+      setTierMsg({ type: "ok", text: body.message ?? "Plan updated." });
+      // Reload after a short delay so the webhook has time to write the new cap
+      setTimeout(() => { void (async () => {
+        try {
+          const r = await fetch("/api/team/members");
+          if (r.ok) {
+            const data = await r.json();
+            setSeats({ used: data.seats_used, allocated: data.seats_allocated });
+          }
+        } catch { /* ignore */ }
+      })(); }, 2500);
+    } catch {
+      setTierMsg({ type: "err", text: "Network error." });
+    } finally {
+      setTierChanging(false);
+    }
+  }, []);
+
   const loadMembers = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
@@ -252,32 +288,81 @@ export default function TeamPage() {
       {/* Seats summary */}
       {seats && (
         <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
           padding: "12px 16px",
           marginBottom: 20,
           background: "var(--color-card)",
           border: "1px solid var(--color-border)",
           borderRadius: 6,
         }}>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-dim)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-              Seats
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-dim)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                Seats
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "var(--color-primary)", marginTop: 2 }}>
+                {seats.used} <span style={{ color: "var(--color-secondary)", fontWeight: 400, fontSize: 14 }}>/ {seats.allocated}</span>
+                <span style={{ marginLeft: 10, fontSize: 11, fontWeight: 400, color: "var(--color-secondary)" }}>
+                  ({seats.allocated === 10 ? "Up to 10 — $500/mo" : seats.allocated === 20 ? "Up to 20 — $1,000/mo" : "Custom plan"})
+                </span>
+              </div>
             </div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: "var(--color-primary)", marginTop: 2 }}>
-              {seats.used} <span style={{ color: "var(--color-secondary)", fontWeight: 400, fontSize: 14 }}>/ {seats.allocated}</span>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {seats.allocated === 10 && (
+                <button
+                  type="button"
+                  onClick={() => changeTier("large")}
+                  disabled={tierChanging}
+                  style={{
+                    padding: "8px 14px",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    background: tierChanging ? "var(--color-border)" : "#0d9488",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: 4,
+                    cursor: tierChanging ? "wait" : "pointer",
+                    letterSpacing: "0.04em",
+                    textTransform: "uppercase",
+                  }}
+                  title="Switch to the 20-seat plan ($1,000/mo). Prorated through Stripe."
+                >
+                  {tierChanging ? "Updating…" : "Upgrade to 20 seats →"}
+                </button>
+              )}
+              {seats.allocated === 20 && seats.used <= 10 && (
+                <button
+                  type="button"
+                  onClick={() => changeTier("small")}
+                  disabled={tierChanging}
+                  style={{
+                    padding: "8px 14px",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    background: "transparent",
+                    color: "var(--color-secondary)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: 4,
+                    cursor: tierChanging ? "wait" : "pointer",
+                  }}
+                  title="Switch back to the 10-seat plan ($500/mo). Refunded difference prorated through Stripe."
+                >
+                  {tierChanging ? "Updating…" : "← Downgrade to 10 seats"}
+                </button>
+              )}
             </div>
           </div>
-          {seats.used >= seats.allocated && (
-            <a
-              href="https://dosys.health/contact?type=department"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ fontSize: 12, color: "var(--color-primary)", textDecoration: "underline" }}
+          {tierMsg && (
+            <p
+              style={{
+                marginTop: 8,
+                marginBottom: 0,
+                fontSize: 12,
+                color: tierMsg.type === "ok" ? "#047857" : "#b91c1c",
+                lineHeight: 1.5,
+              }}
             >
-              Expand seats
-            </a>
+              {tierMsg.text}
+            </p>
           )}
         </div>
       )}

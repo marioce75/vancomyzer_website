@@ -651,6 +651,12 @@ export function applyInstitutionSubscriptionUpdate(
     .run(update.status, update.expiry, update.stripeSubscriptionId, update.stripePriceId, id);
 }
 
+export function setInstitutionSeatsAllocated(id: number, seats: number): void {
+  getDb()
+    .prepare("UPDATE institutional_accounts SET seats_allocated = ? WHERE id = ?")
+    .run(seats, id);
+}
+
 // ---------------------------------------------------------------------------
 // Team / Department admin helpers (Phase 7)
 // ---------------------------------------------------------------------------
