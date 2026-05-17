@@ -222,39 +222,65 @@ export default function PricingClient() {
                 ))}
               </ul>
 
-              {tier.cta.external ? (
-                <a
-                  href={tier.cta.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block rounded-md px-4 py-2.5 text-center text-sm font-semibold transition"
-                  style={{
-                    background: isFeatured ? "#0d9488" : "transparent",
-                    color: isFeatured ? "#ffffff" : "#0d9488",
-                    border: isFeatured ? "none" : "1px solid #0d9488",
-                  }}
-                >
-                  {tier.cta.label}
-                </a>
-              ) : (
-                <Link
-                  href={tier.cta.href}
-                  className="block rounded-md px-4 py-2.5 text-center text-sm font-semibold transition"
-                  style={{
-                    background: isFeatured ? "#0d9488" : "transparent",
-                    color: isFeatured ? "#ffffff" : "#0d9488",
-                    border: isFeatured ? "none" : "1px solid #0d9488",
-                  }}
-                >
-                  {tier.cta.label}
-                </Link>
-              )}
+              {(() => {
+                // Filled-style (featured: Individual Pro) vs outlined-style (all others).
+                // Hover darkens to teal-700 across the board; outlined fills in on hover.
+                const baseStyle: React.CSSProperties = isFeatured
+                  ? { background: "#0d9488", color: "#ffffff", border: "1px solid #0d9488" }
+                  : { background: "transparent", color: "#0d9488", border: "1px solid #0d9488" };
+                const hoverStyle: React.CSSProperties = {
+                  background: "#0f766e",
+                  color: "#ffffff",
+                  border: "1px solid #0f766e",
+                };
+                const onEnter = (e: React.MouseEvent<HTMLElement>) => {
+                  const el = e.currentTarget;
+                  el.style.background = hoverStyle.background as string;
+                  el.style.color = hoverStyle.color as string;
+                  el.style.border = hoverStyle.border as string;
+                };
+                const onLeave = (e: React.MouseEvent<HTMLElement>) => {
+                  const el = e.currentTarget;
+                  el.style.background = baseStyle.background as string;
+                  el.style.color = baseStyle.color as string;
+                  el.style.border = baseStyle.border as string;
+                };
+                const btnClass = "block rounded-md px-4 py-2.5 text-center text-sm font-semibold transition";
 
-              {tier.ctaSubLabel && (
-                <p className="mt-2 text-center text-[11px]" style={{ color: "var(--color-secondary)" }}>
-                  {tier.ctaSubLabel}
-                </p>
-              )}
+                return tier.cta.external ? (
+                  <a
+                    href={tier.cta.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={btnClass}
+                    style={baseStyle}
+                    onMouseEnter={onEnter}
+                    onMouseLeave={onLeave}
+                  >
+                    {tier.cta.label}
+                  </a>
+                ) : (
+                  <Link
+                    href={tier.cta.href}
+                    className={btnClass}
+                    style={baseStyle}
+                    onMouseEnter={onEnter}
+                    onMouseLeave={onLeave}
+                  >
+                    {tier.cta.label}
+                  </Link>
+                );
+              })()}
+
+              {/* Sub-label slot always reserved so the CTA button lands at
+                  the same y-coordinate across all four cards, regardless of
+                  whether this tier has a sub-label. */}
+              <p
+                className="mt-2 min-h-[18px] text-center text-[11px]"
+                style={{ color: "var(--color-secondary)" }}
+              >
+                {tier.ctaSubLabel ?? ""}
+              </p>
             </div>
           );
         })}
