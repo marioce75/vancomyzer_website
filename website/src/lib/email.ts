@@ -300,6 +300,68 @@ export async function sendPilotWelcomeEmail(args: {
   }
 }
 
+/**
+ * Self-serve Department signup confirmation.
+ * Sent when the Stripe webhook successfully provisions a new institutional
+ * account from /upgrade/department. Includes a magic-link sign-in for the
+ * purchasing user (who is the institution admin).
+ */
+export async function sendDepartmentWelcomeEmail(args: {
+  adminName: string;
+  adminEmail: string;
+  institutionName: string;
+  seats: number;
+  trialEndsAt: string | null;
+  magicLinkUrl: string;
+}) {
+  if (!process.env.SMTP_USER) {
+    console.log(`[EMAIL] Skipped — SMTP not configured. Department welcome for ${args.adminEmail}`);
+    return;
+  }
+  const trialLine = args.trialEndsAt
+    ? `Your 14-day free trial runs until <strong>${new Date(args.trialEndsAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</strong>.`
+    : "Your subscription is active.";
+  const escape = (s: string) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: args.adminEmail,
+      bcc: process.env.PILOT_NOTIFICATION_EMAIL ?? ADMIN_EMAIL ?? undefined,
+      subject: `Welcome to Vancomyzer™ Department — ${args.institutionName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 540px;">
+          <h2 style="color: #047857; margin-bottom: 4px;">Your Department is set up ✓</h2>
+          <p style="font-size: 14px; color: #2d3748;">Hello ${escape(args.adminName)},</p>
+          <p style="font-size: 14px; color: #2d3748;">
+            Vancomyzer™ Department has been activated for <strong>${escape(args.institutionName)}</strong>
+            with up to <strong>${args.seats}</strong> seats. You are the institution admin —
+            you can invite teammates, manage seats, and view the audit log from the admin panel.
+          </p>
+          <p style="font-size: 14px; color: #2d3748;">${trialLine}</p>
+          <p style="margin-top: 18px;">
+            <a href="${args.magicLinkUrl}"
+               style="display: inline-block; padding: 12px 28px; background: #1e4d8c; color: #ffffff;
+                      text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 4px;">
+              Sign In and Set Up Your Team
+            </a>
+          </p>
+          <p style="margin-top: 12px; font-size: 12px; color: #718096;">
+            This sign-in link expires in 15 minutes. Request a new one any time at
+            <a href="https://vancomyzer.com/login">vancomyzer.com/login</a>.
+          </p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">
+            Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
+          </p>
+        </div>
+      `,
+    });
+    console.log(`[EMAIL] Department welcome sent to ${args.adminEmail} for ${args.institutionName}`);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send Department welcome:", err);
+  }
+}
+
 /** Polite generic decline sent on REJECT. */
 export async function sendPilotDeclineEmail(args: {
   applicantName: string;

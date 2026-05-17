@@ -40,7 +40,19 @@ export function tierForPriceId(priceId: string | null | undefined): TierId | nul
   ) {
     return "individual_pro";
   }
+  if (
+    priceId === process.env.STRIPE_PRICE_DEPARTMENT_SMALL ||
+    priceId === process.env.STRIPE_PRICE_DEPARTMENT_LARGE
+  ) {
+    return "department";
+  }
   return null;
+}
+
+/** Resolve the Department SKU price ID from the requested seat count. */
+export function departmentPriceIdForSeats(seats: number): string | undefined {
+  if (seats <= 10) return process.env.STRIPE_PRICE_DEPARTMENT_SMALL;
+  return process.env.STRIPE_PRICE_DEPARTMENT_LARGE;
 }
 
 /**
@@ -85,6 +97,12 @@ export function describePrice(priceId: string | null | undefined): string {
   }
   if (priceId === process.env.STRIPE_PRICE_PRO_ANNUAL) {
     return `${TIERS.individual_pro.name} · annual`;
+  }
+  if (priceId === process.env.STRIPE_PRICE_DEPARTMENT_SMALL) {
+    return `${TIERS.department.name} · up to 10 seats`;
+  }
+  if (priceId === process.env.STRIPE_PRICE_DEPARTMENT_LARGE) {
+    return `${TIERS.department.name} · up to 20 seats`;
   }
   return "Subscription";
 }

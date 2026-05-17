@@ -100,6 +100,13 @@ function getDb(): Database.Database {
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `);
+  // Self-serve Department-tier Stripe columns (added v2026.05).
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN stripe_customer_id TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN stripe_subscription_id TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN stripe_price_id TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN subscription_status TEXT"); } catch { /* exists */ }
+  try { _db.exec("CREATE INDEX IF NOT EXISTS idx_inst_stripe_customer ON institutional_accounts(stripe_customer_id)"); } catch { /* exists */ }
+  try { _db.exec("CREATE INDEX IF NOT EXISTS idx_inst_stripe_subscription ON institutional_accounts(stripe_subscription_id)"); } catch { /* exists */ }
 
   // Calculation log (no patient identifiers)
   _db.exec(`
@@ -548,15 +555,32 @@ export interface InstitutionalAccountRow {
   baa_status: string;
   baa_requested_at: string | null;
   created_at: string;
+  // Self-serve Department Stripe linkage
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  stripe_price_id: string | null;
+  subscription_status: string | null;
 }
 
-export function createInstitutionalAccount(account: Omit<InstitutionalAccountRow, "id" | "seats_used" | "created_at">): number {
+export type CreateInstitutionalAccountInput =
+  & Omit<InstitutionalAccountRow,
+      "id" | "seats_used" | "created_at"
+      | "stripe_customer_id" | "stripe_subscription_id" | "stripe_price_id" | "subscription_status">
+  & Partial<Pick<InstitutionalAccountRow,
+      "stripe_customer_id" | "stripe_subscription_id" | "stripe_price_id" | "subscription_status">>;
+
+export function createInstitutionalAccount(account: CreateInstitutionalAccountInput): number {
   const result = getDb().prepare(`INSERT INTO institutional_accounts
-    (institution_name, billing_email, plan_tier, seats_allocated, subscription_start, subscription_expiry, baa_status)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    (institution_name, billing_email, plan_tier, seats_allocated, subscription_start, subscription_expiry, baa_status,
+     stripe_customer_id, stripe_subscription_id, stripe_price_id, subscription_status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
     account.institution_name, account.billing_email, account.plan_tier,
     account.seats_allocated, account.subscription_start, account.subscription_expiry,
-    account.baa_status ?? "not_requested"
+    account.baa_status ?? "not_requested",
+    account.stripe_customer_id ?? null,
+    account.stripe_subscription_id ?? null,
+    account.stripe_price_id ?? null,
+    account.subscription_status ?? null,
   );
   return Number(result.lastInsertRowid);
 }
@@ -580,6 +604,51 @@ export function getInstitutionUsers(institutionalAccountId: number): UserRow[] {
 export function recountSeats(institutionalAccountId: number) {
   const count = (getDb().prepare("SELECT COUNT(*) as cnt FROM users WHERE institutional_account_id = ?").get(institutionalAccountId) as { cnt: number }).cnt;
   getDb().prepare("UPDATE institutional_accounts SET seats_used = ? WHERE id = ?").run(count, institutionalAccountId);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Self-serve Department-tier Stripe helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function findInstitutionByStripeCustomerId(customerId: string): InstitutionalAccountRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM institutional_accounts WHERE stripe_customer_id = ?")
+    .get(customerId) as InstitutionalAccountRow | undefined;
+}
+
+export function findInstitutionByStripeSubscriptionId(subscriptionId: string): InstitutionalAccountRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM institutional_accounts WHERE stripe_subscription_id = ?")
+    .get(subscriptionId) as InstitutionalAccountRow | undefined;
+}
+
+export function setInstitutionStripeCustomer(id: number, customerId: string): void {
+  getDb()
+    .prepare("UPDATE institutional_accounts SET stripe_customer_id = ? WHERE id = ?")
+    .run(customerId, id);
+}
+
+export interface InstitutionSubscriptionUpdate {
+  status: string | null;
+  expiry: string | null;
+  stripeSubscriptionId: string | null;
+  stripePriceId: string | null;
+}
+
+export function applyInstitutionSubscriptionUpdate(
+  id: number,
+  update: InstitutionSubscriptionUpdate,
+): void {
+  getDb()
+    .prepare(
+      `UPDATE institutional_accounts
+       SET subscription_status = ?,
+           subscription_expiry = ?,
+           stripe_subscription_id = ?,
+           stripe_price_id = ?
+       WHERE id = ?`,
+    )
+    .run(update.status, update.expiry, update.stripeSubscriptionId, update.stripePriceId, id);
 }
 
 // ---------------------------------------------------------------------------

@@ -31,8 +31,20 @@ import {
   applySubscriptionUpdate,
   findUserByStripeCustomerId,
   findUserByStripeSubscriptionId,
+  findUserByLogin,
+  findUserByEmail,
+  findInstitutionByStripeCustomerId,
+  findInstitutionByStripeSubscriptionId,
+  createInstitutionalAccount,
+  setInstitutionStripeCustomer,
+  applyInstitutionSubscriptionUpdate,
+  setUserInstitution,
+  setUserTier,
+  recountSeats,
   logSecurityEvent,
 } from "@/lib/db";
+import { sendDepartmentWelcomeEmail } from "@/lib/email";
+import { issueMagicLinkToken } from "@/lib/magicLink";
 
 // Stripe's signed payload must be read as the raw body — Next.js gives
 // us that via req.text(). Do NOT use req.json() here.
@@ -47,8 +59,15 @@ function expiryFromSubscription(sub: Stripe.Subscription): string | null {
 }
 
 async function handleSubscriptionEvent(sub: Stripe.Subscription) {
-  // Resolve the user. Prefer subscription metadata.user_id (set at
-  // checkout); fall back to customer lookup.
+  // Branch: Department (institution-owned) subscriptions go through their
+  // own provisioning flow. Detected via metadata.kind === "department"
+  // set at checkout.
+  if (sub.metadata?.kind === "department") {
+    return handleDepartmentSubscriptionEvent(sub);
+  }
+
+  // Default: Individual Pro (user-owned). Resolve the user via
+  // subscription.id first, then customer.id as fallback.
   const metaUserId = sub.metadata?.user_id;
   let user = metaUserId ? findUserByStripeSubscriptionId(sub.id) : undefined;
   if (!user && typeof sub.customer === "string") {
@@ -85,6 +104,145 @@ async function handleSubscriptionEvent(sub: Stripe.Subscription) {
     }),
     severity: "info",
   });
+}
+
+/**
+ * Department subscription provisioning + sync.
+ *
+ * - First fire (subscription.created): create institutional_accounts row,
+ *   link admin user to it as institution admin, upgrade their tier, send
+ *   welcome email with magic-link sign-in.
+ * - Subsequent fires (subscription.updated): just sync subscription_status
+ *   + expiry + price_id on the institution row.
+ *
+ * Idempotent: institution lookup by stripe_subscription_id prevents
+ * double-provisioning if Stripe replays the event.
+ */
+async function handleDepartmentSubscriptionEvent(sub: Stripe.Subscription) {
+  const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer?.id;
+  if (!customerId) {
+    console.warn(`[stripe-webhook] department sub ${sub.id} has no customer id. Ignoring.`);
+    return;
+  }
+
+  const institutionName = sub.metadata?.institution_name ?? "Unknown institution";
+  const adminEmail = sub.metadata?.admin_email ?? "";
+  const adminUserId = sub.metadata?.admin_user_id ? Number(sub.metadata.admin_user_id) : null;
+  const seats = sub.metadata?.seats ? Math.max(5, Math.min(20, Number(sub.metadata.seats))) : 20;
+
+  const priceId = sub.items.data[0]?.price?.id ?? null;
+  const status = localStatusFromStripe(sub.status);
+  const expiry = expiryFromSubscription(sub);
+
+  // Idempotency check — has this subscription already been provisioned?
+  let institution = findInstitutionByStripeSubscriptionId(sub.id)
+    ?? findInstitutionByStripeCustomerId(customerId);
+
+  if (!institution) {
+    // First fire — provision the institution.
+    const adminUser = (adminUserId ? findInstitutionAdminCandidate(adminUserId, adminEmail) : null)
+      ?? (adminEmail ? findUserByEmail(adminEmail) : null)
+      ?? (adminEmail ? findUserByLogin(adminEmail) : null);
+    if (!adminUser) {
+      console.warn(
+        `[stripe-webhook] department sub ${sub.id} — admin user not found (id=${adminUserId} email=${adminEmail}). Subscription will be created without a linked admin.`,
+      );
+    }
+
+    const institutionId = createInstitutionalAccount({
+      institution_name: institutionName,
+      billing_email: adminEmail || (adminUser?.email ?? ""),
+      plan_tier: "department",
+      seats_allocated: seats,
+      subscription_start: new Date().toISOString(),
+      subscription_expiry: expiry,
+      baa_status: "not_requested",
+      baa_requested_at: null,
+      stripe_customer_id: customerId,
+      stripe_subscription_id: sub.id,
+      stripe_price_id: priceId,
+      subscription_status: status,
+    });
+    setInstitutionStripeCustomer(institutionId, customerId);
+    applyInstitutionSubscriptionUpdate(institutionId, {
+      status,
+      expiry,
+      stripeSubscriptionId: sub.id,
+      stripePriceId: priceId,
+    });
+
+    if (adminUser) {
+      setUserInstitution(adminUser.id, institutionId, "admin");
+      setUserTier(adminUser.id, "department", expiry ?? undefined);
+      recountSeats(institutionId);
+
+      // Welcome email — failure is non-fatal; the institution is provisioned regardless.
+      try {
+        const magicLinkToken = issueMagicLinkToken(adminUser.email);
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXTAUTH_URL ?? "https://vancomyzer.com";
+        const magicLinkUrl = `${baseUrl}/api/auth/magic-link/callback?token=${encodeURIComponent(magicLinkToken)}`;
+        await sendDepartmentWelcomeEmail({
+          adminName: adminUser.full_name ?? adminUser.username,
+          adminEmail: adminUser.email,
+          institutionName,
+          seats,
+          trialEndsAt: expiry,
+          magicLinkUrl,
+        });
+      } catch (err) {
+        console.error("[stripe-webhook] department welcome email failed (non-fatal):", err);
+      }
+    }
+
+    logSecurityEvent({
+      user_id: adminUser?.id ?? null,
+      username: adminUser?.username ?? null,
+      action: "DEPARTMENT_PROVISIONED",
+      details: JSON.stringify({
+        institution_id: institutionId,
+        institution_name: institutionName,
+        stripe_subscription_id: sub.id,
+        stripe_customer_id: customerId,
+        seats,
+        status,
+        expiry,
+        price_id: priceId,
+      }),
+      severity: "info",
+    });
+    return;
+  }
+
+  // Subsequent fire — just sync subscription state on the institution row.
+  applyInstitutionSubscriptionUpdate(institution.id, {
+    status,
+    expiry,
+    stripeSubscriptionId: sub.id,
+    stripePriceId: priceId,
+  });
+
+  logSecurityEvent({
+    user_id: null,
+    username: null,
+    action: "DEPARTMENT_SUBSCRIPTION_UPDATED",
+    details: JSON.stringify({
+      institution_id: institution.id,
+      institution_name: institution.institution_name,
+      stripe_subscription_id: sub.id,
+      status,
+      expiry,
+      price_id: priceId,
+    }),
+    severity: "info",
+  });
+}
+
+function findInstitutionAdminCandidate(userId: number, _email: string) {
+  // Local helper — keep import surface tight in the webhook handler.
+  // userId lookup is preferred since metadata carries it; email fallback
+  // is handled at the caller.
+  const { findUserById } = require("@/lib/db") as typeof import("@/lib/db");
+  return findUserById(userId);
 }
 
 async function handleSubscriptionDeleted(sub: Stripe.Subscription) {

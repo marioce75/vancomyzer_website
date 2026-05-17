@@ -63,16 +63,34 @@ const TIERS: TierCard[] = [
     badge: "Most Popular",
   },
   {
-    name: "Department / Hospital",
-    audience: "Hospital pharmacy departments and health systems",
+    name: "Department",
+    audience: "Hospital pharmacy departments — self-serve",
+    scope: "5–20 seats · 14-day free trial",
+    price: {
+      annual: { amount: "$500 / $1,000", suffix: "/mo · ≤10 seats or 11–20 seats" },
+    },
+    features: [
+      "Everything in Individual Pro",
+      "Up to 10 seats — $500/month",
+      "11–20 seats — $1,000/month",
+      "Admin panel with user management & audit logs",
+      "Shared calculation history across the team",
+      "Priority email support (24-hour SLA)",
+      "Onboarding assistance",
+    ],
+    cta: { label: "Start 14-Day Trial", href: "/upgrade/department" },
+    ctaSubLabel: "card required upfront · cancel anytime",
+  },
+  {
+    name: "Hospital",
+    audience: "Health systems with EMR + BAA requirements",
     scope: "Scoped to your institution",
     price: {
       annual: { amount: "Custom", suffix: "" },
     },
     features: [
-      "Everything in Individual Pro",
-      "Unlimited user seats with admin panel",
-      "User management, roles, and audit logs",
+      "Everything in Department",
+      "Unlimited user seats",
       "EMR integration (HL7 / FHIR — Epic, Cerner, others)",
       "Custom hospital branding on outputs",
       "SLA & uptime guarantee",
@@ -89,7 +107,7 @@ export default function PricingClient() {
   const [cycle, setCycle] = useState<BillingCycle>("annual");
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-16">
+    <main className="mx-auto max-w-7xl px-4 py-16">
       {/* Header */}
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: "var(--color-primary)" }}>
@@ -138,7 +156,7 @@ export default function PricingClient() {
       </div>
 
       {/* Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {TIERS.map((tier) => {
           const isFeatured = tier.badge === "Most Popular";
           const cyclePrice = cycle === "monthly" && tier.price.monthly ? tier.price.monthly : tier.price.annual;
