@@ -84,6 +84,27 @@ export default function TeamPage() {
   const [tierChanging, setTierChanging] = useState(false);
   const [tierMsg, setTierMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
+  // Stripe Customer Portal handoff for the institution's subscription
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  const openBillingPortal = useCallback(async () => {
+    setPortalLoading(true);
+    setTierMsg(null);
+    try {
+      const res = await fetch("/api/billing/department-portal", { method: "POST" });
+      const body = await res.json();
+      if (!res.ok || !body.url) {
+        setTierMsg({ type: "err", text: body.error ?? "Could not open billing portal." });
+        return;
+      }
+      window.location.href = body.url;
+    } catch {
+      setTierMsg({ type: "err", text: "Network error opening billing portal." });
+    } finally {
+      setPortalLoading(false);
+    }
+  }, []);
+
   const changeTier = useCallback(async (target: "small" | "large") => {
     setTierChanging(true);
     setTierMsg(null);
@@ -207,7 +228,14 @@ export default function TeamPage() {
   };
 
   const handleRoleToggle = async (id: number, currentRole: "user" | "admin") => {
+    const target = members?.find(m => m.id === id);
+    const label = target?.full_name || target?.email || `member ${id}`;
     const newRole = currentRole === "admin" ? "user" : "admin";
+    const prompt =
+      newRole === "admin"
+        ? `Promote ${label} to admin? They'll be able to invite, remove, change roles, and manage billing.`
+        : `Demote ${label} to user? They'll lose admin powers immediately.`;
+    if (!confirm(prompt)) return;
     const res = await fetch(`/api/team/members/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -349,6 +377,24 @@ export default function TeamPage() {
                   {tierChanging ? "Updating…" : "← Downgrade to 10 seats"}
                 </button>
               )}
+              <button
+                type="button"
+                onClick={openBillingPortal}
+                disabled={portalLoading}
+                style={{
+                  padding: "8px 14px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  background: "transparent",
+                  color: "var(--color-primary)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: 4,
+                  cursor: portalLoading ? "wait" : "pointer",
+                }}
+                title="Update payment method, view invoices, or cancel your subscription. Opens the Stripe-hosted billing portal."
+              >
+                {portalLoading ? "Opening…" : "Manage billing →"}
+              </button>
             </div>
           </div>
           {tierMsg && (
@@ -470,21 +516,45 @@ export default function TeamPage() {
                     <td style={{ padding: "10px 12px", color: "var(--color-secondary)" }}>{m.email}</td>
                     <td style={{ padding: "10px 12px", color: "var(--color-secondary)" }}>{m.credentials}</td>
                     <td style={{ padding: "10px 12px" }}>
-                      <button
-                        type="button"
-                        onClick={() => handleRoleToggle(m.id, m.institutional_role)}
-                        style={{
-                          padding: "2px 10px", fontSize: 11, fontWeight: 600,
-                          background: m.institutional_role === "admin" ? "#dbeafe" : "var(--color-bg)",
-                          color: m.institutional_role === "admin" ? "#1e3a8a" : "var(--color-secondary)",
-                          border: `1px solid ${m.institutional_role === "admin" ? "#93c5fd" : "var(--color-border)"}`,
-                          borderRadius: 4,
-                          cursor: "pointer",
-                        }}
-                        title="Click to toggle"
-                      >
-                        {m.institutional_role === "admin" ? "ADMIN" : "USER"}
-                      </button>
+                      {String(m.id) === user.id ? (
+                        <span
+                          style={{
+                            display: "inline-block",
+                            padding: "2px 10px",
+                            fontSize: 11,
+                            fontWeight: 600,
+                            background: "#dbeafe",
+                            color: "#1e3a8a",
+                            border: "1px solid #93c5fd",
+                            borderRadius: 4,
+                          }}
+                          title="You can't change your own role. Ask another admin to demote you."
+                        >
+                          ADMIN
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleRoleToggle(m.id, m.institutional_role)}
+                          style={{
+                            padding: "2px 10px",
+                            fontSize: 11,
+                            fontWeight: 600,
+                            background: m.institutional_role === "admin" ? "#dbeafe" : "var(--color-bg)",
+                            color: m.institutional_role === "admin" ? "#1e3a8a" : "var(--color-secondary)",
+                            border: `1px solid ${m.institutional_role === "admin" ? "#93c5fd" : "var(--color-border)"}`,
+                            borderRadius: 4,
+                            cursor: "pointer",
+                          }}
+                          title={
+                            m.institutional_role === "admin"
+                              ? `Click to demote ${m.full_name || m.email} to user. (The team must keep at least one admin.)`
+                              : `Click to promote ${m.full_name || m.email} to admin. Admins can invite, remove, change roles, and manage billing.`
+                          }
+                        >
+                          {m.institutional_role === "admin" ? "ADMIN ⇄" : "USER ⇄"}
+                        </button>
+                      )}
                     </td>
                     <td style={{ padding: "10px 12px", color: "var(--color-secondary)" }}>
                       {m.last_login ? fmtDate(m.last_login) : <span style={{ color: "var(--color-dim)" }}>never</span>}
