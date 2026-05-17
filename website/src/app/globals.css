@@ -146,7 +146,9 @@ body.theme-basic header[class*="shrink-0"] .dosys-brand {
   letter-spacing: 0 !important;
   font-family: 'Inter', 'Helvetica Neue', sans-serif !important;
 }
-body.theme-basic header[class*="shrink-0"] .dosys-d {
+body.theme-basic header[class*="shrink-0"] .dosys-d,
+body.theme-basic header[class*="shrink-0"] .dosys-brand .dosys-d,
+body.theme-basic header[class*="shrink-0"] button.dosys-brand span .dosys-d {
   color: #00c9b1 !important;
 }
 /* Mode tabs — active white on navy, inactive semi-transparent */
