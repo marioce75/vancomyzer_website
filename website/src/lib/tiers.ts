@@ -24,14 +24,14 @@ export type FeatureId =
   | "interpretation.why_this_result"
   // Persistence
   | "history.calculation"
-  // Org / multi-user
+  // Org / multi-user (Department+)
   | "org.admin_panel"
   | "org.audit_log"
   | "org.invite_users"
+  | "org.baa"
   // Hospital-tier infra (formerly Enterprise — merged into Hospital)
   | "hospital.emr_integration"
   | "hospital.custom_branding"
-  | "hospital.baa"
   | "hospital.sso";
 
 export type Cta = {
@@ -169,11 +169,15 @@ const FEATURE_MIN_TIER: Record<FeatureId, TierId> = {
   "org.admin_panel": "department",
   "org.audit_log": "department",
   "org.invite_users": "department",
+  // BAA is unlocked at Department because small hospital pharmacies
+  // running pilots on the Department plan still need a Business
+  // Associate Agreement on file before their legal team will let
+  // them feed PHI into the calculator (even though we don't persist it).
+  "org.baa": "department",
 
   // Hospital (formerly Enterprise — merged here)
   "hospital.emr_integration": "hospital",
   "hospital.custom_branding": "hospital",
-  "hospital.baa": "hospital",
   "hospital.sso": "hospital",
 };
 

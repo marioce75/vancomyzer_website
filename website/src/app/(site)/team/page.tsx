@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import BaaCard from "@/components/team/BaaCard";
 
 interface MemberRow {
   id: number;
@@ -83,6 +84,10 @@ export default function TeamPage() {
   // Department tier-change state — used by the seat-cap upgrade/downgrade flow
   const [tierChanging, setTierChanging] = useState(false);
   const [tierMsg, setTierMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
+  // BAA status surfaced from <BaaCard /> so we can render a sticky banner
+  // at the top of the page while a submitted BAA is awaiting countersign.
+  const [baaStatus, setBaaStatus] = useState<"not_requested" | "pending" | "active" | null>(null);
 
   // Stripe Customer Portal handoff for the institution's subscription
   const [portalLoading, setPortalLoading] = useState(false);
@@ -313,6 +318,28 @@ export default function TeamPage() {
         Invite teammates, manage roles, and view your institution&apos;s calculation audit log. No PHI is stored.
       </p>
 
+      {/* BAA pending banner — shown until Dōsys countersigns */}
+      {baaStatus === "pending" && (
+        <div
+          role="status"
+          style={{
+            padding: "10px 14px",
+            marginBottom: 16,
+            background: "#dbeafe",
+            border: "1px solid #93c5fd",
+            color: "#1e3a8a",
+            fontSize: 12,
+            borderRadius: 4,
+            lineHeight: 1.55,
+          }}
+        >
+          <strong>BAA awaiting countersign.</strong> We received your signed Business Associate
+          Agreement. Dōsys Health LLC will countersign within one business day and email the
+          fully-executed copy to your signer. Calculator access is not gated on this — your team
+          can continue working.
+        </div>
+      )}
+
       {/* Seats summary */}
       {seats && (
         <div style={{
@@ -412,6 +439,13 @@ export default function TeamPage() {
           )}
         </div>
       )}
+
+      {/* Business Associate Agreement card */}
+      <BaaCard
+        institutionName={institutionName || "your institution"}
+        fallbackSignerEmail={user?.email ?? ""}
+        onStatusChange={(s) => setBaaStatus(s.status)}
+      />
 
       {/* Invite form */}
       <section style={{

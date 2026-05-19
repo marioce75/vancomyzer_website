@@ -108,6 +108,17 @@ function getDb(): Database.Database {
   try { _db.exec("CREATE INDEX IF NOT EXISTS idx_inst_stripe_customer ON institutional_accounts(stripe_customer_id)"); } catch { /* exists */ }
   try { _db.exec("CREATE INDEX IF NOT EXISTS idx_inst_stripe_subscription ON institutional_accounts(stripe_subscription_id)"); } catch { /* exists */ }
 
+  // Self-serve BAA flow columns (added v2026.05).
+  // baa_status was already ('not_requested', 'pending', 'active'). 'pending' now means
+  // "customer uploaded signed PDF, awaiting Dōsys countersign". 'active' means fully executed.
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN baa_signer_name TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN baa_signer_title TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN baa_signer_email TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN baa_signed_at TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN baa_countersigned_at TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN baa_document_path TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE institutional_accounts ADD COLUMN baa_template_version TEXT"); } catch { /* exists */ }
+
   // Calculation log (no patient identifiers)
   _db.exec(`
     CREATE TABLE IF NOT EXISTS calculation_log (
@@ -560,14 +571,26 @@ export interface InstitutionalAccountRow {
   stripe_subscription_id: string | null;
   stripe_price_id: string | null;
   subscription_status: string | null;
+  // Self-serve BAA signing flow
+  baa_signer_name: string | null;
+  baa_signer_title: string | null;
+  baa_signer_email: string | null;
+  baa_signed_at: string | null;
+  baa_countersigned_at: string | null;
+  baa_document_path: string | null;
+  baa_template_version: string | null;
 }
 
 export type CreateInstitutionalAccountInput =
   & Omit<InstitutionalAccountRow,
       "id" | "seats_used" | "created_at"
-      | "stripe_customer_id" | "stripe_subscription_id" | "stripe_price_id" | "subscription_status">
+      | "stripe_customer_id" | "stripe_subscription_id" | "stripe_price_id" | "subscription_status"
+      | "baa_signer_name" | "baa_signer_title" | "baa_signer_email"
+      | "baa_signed_at" | "baa_countersigned_at" | "baa_document_path" | "baa_template_version">
   & Partial<Pick<InstitutionalAccountRow,
-      "stripe_customer_id" | "stripe_subscription_id" | "stripe_price_id" | "subscription_status">>;
+      "stripe_customer_id" | "stripe_subscription_id" | "stripe_price_id" | "subscription_status"
+      | "baa_signer_name" | "baa_signer_title" | "baa_signer_email"
+      | "baa_signed_at" | "baa_countersigned_at" | "baa_document_path" | "baa_template_version">>;
 
 export function createInstitutionalAccount(account: CreateInstitutionalAccountInput): number {
   const result = getDb().prepare(`INSERT INTO institutional_accounts
@@ -595,6 +618,79 @@ export function listInstitutionalAccounts(): InstitutionalAccountRow[] {
 
 export function updateBaaStatus(id: number, status: string) {
   getDb().prepare("UPDATE institutional_accounts SET baa_status = ?, baa_requested_at = CASE WHEN ? = 'pending' THEN datetime('now') ELSE baa_requested_at END WHERE id = ?").run(status, status, id);
+}
+
+/**
+ * Customer-side BAA submission: the institutional admin uploaded their
+ * signed PDF. Records signer metadata and the file path on the Render
+ * disk, sets status='pending'. Awaiting Dōsys countersign before
+ * status flips to 'active'.
+ */
+export interface BaaSubmissionInput {
+  signer_name: string;
+  signer_title: string;
+  signer_email: string;
+  document_path: string;
+  template_version: string;
+}
+
+export function recordBaaSubmission(id: number, input: BaaSubmissionInput): void {
+  getDb()
+    .prepare(
+      `UPDATE institutional_accounts SET
+        baa_status = 'pending',
+        baa_requested_at = datetime('now'),
+        baa_signed_at = datetime('now'),
+        baa_signer_name = ?,
+        baa_signer_title = ?,
+        baa_signer_email = ?,
+        baa_document_path = ?,
+        baa_template_version = ?
+       WHERE id = ?`,
+    )
+    .run(
+      input.signer_name,
+      input.signer_title,
+      input.signer_email,
+      input.document_path,
+      input.template_version,
+      id,
+    );
+}
+
+/**
+ * Superadmin countersign: Dōsys (Mario) marks the BAA fully executed.
+ * Sets status='active' and stamps countersign timestamp. Optionally
+ * replaces the document_path with the countersigned PDF.
+ */
+export function recordBaaCountersign(id: number, countersignedDocumentPath?: string): void {
+  if (countersignedDocumentPath) {
+    getDb()
+      .prepare(
+        `UPDATE institutional_accounts SET
+          baa_status = 'active',
+          baa_countersigned_at = datetime('now'),
+          baa_document_path = ?
+         WHERE id = ?`,
+      )
+      .run(countersignedDocumentPath, id);
+  } else {
+    getDb()
+      .prepare(
+        `UPDATE institutional_accounts SET
+          baa_status = 'active',
+          baa_countersigned_at = datetime('now')
+         WHERE id = ?`,
+      )
+      .run(id);
+  }
+}
+
+/** List all institutions with BAA in 'pending' state — fuels the superadmin queue. */
+export function listPendingBaaInstitutions(): InstitutionalAccountRow[] {
+  return getDb()
+    .prepare("SELECT * FROM institutional_accounts WHERE baa_status = 'pending' ORDER BY baa_signed_at ASC")
+    .all() as InstitutionalAccountRow[];
 }
 
 export function getInstitutionUsers(institutionalAccountId: number): UserRow[] {
