@@ -115,8 +115,16 @@ export function runExistingRegimenEngine(
     }
   }
 
+  // Plot the level marker on the SAME absolute time axis the curve uses.
+  // `curvePoints` places dose k at t = k*tau (dose 1 at t=0, dose 2 at t=tau, …),
+  // so a level drawn 7.47h after dose 4 must be plotted at (4-1)*tau + 7.47,
+  // not at 7.47. The fitter still consumes time_since_last_dose_hours via its
+  // own modulo-tau wrapping, so the math is unchanged — this shift is purely
+  // for chart-marker placement.
+  const doseIndexForMarker = Math.max(1, doses_given ?? 1);
+  const doseShiftHours = (doseIndexForMarker - 1) * tau;
   const measured_levels = levels.map((l) => ({
-    time_hours: l.time_since_last_dose_hours,
+    time_hours: doseShiftHours + l.time_since_last_dose_hours,
     concentration: l.value_mcg_ml,
   }));
 

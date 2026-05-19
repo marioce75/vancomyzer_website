@@ -508,6 +508,61 @@ function testCase24(): void {
   }
 }
 
+function testCase25(): void {
+  // Chart-marker placement: a level drawn 7.47h after dose 4 (q8h) must be
+  // plotted at (4-1)*8 + 7.47 = 31.47h on the curve's absolute time axis,
+  // not at 7.47h. This locks in the fix for the chart/fitter time-frame
+  // mismatch that placed the marker on the wrong interval.
+  const tau = 8;
+  const dosesGiven = 4;
+  const timeSinceLast = 7.47;
+  const expectedMarkerHours = (dosesGiven - 1) * tau + timeSinceLast;
+
+  const result = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1000, interval_hours: tau, infusion_duration_hours: 1.5, doses_given: dosesGiven },
+    levels: [{ value_mcg_ml: 7.5, collection_time: "2026-05-18T09:28:00", time_since_last_dose_hours: timeSinceLast }],
+  });
+  assert(!("ok" in result && result.ok === false), "Case 25: expected success");
+  const r = result as { measured_levels: { time_hours: number; concentration: number }[]; curve: { time_hours: number }[] };
+  assert(r.measured_levels.length === 1, "Case 25: one measured level expected");
+  const m = r.measured_levels[0];
+  assert(
+    Math.abs(m.time_hours - expectedMarkerHours) < 1e-6,
+    `Case 25: marker x must be ${expectedMarkerHours}h (dose 4 + 7.47), got ${m.time_hours}h — the chart/fitter time-frame regression has returned`,
+  );
+  // Sanity: the curve must extend past the marker, otherwise the marker is invisible
+  const curveMaxHours = r.curve[r.curve.length - 1].time_hours;
+  assert(curveMaxHours >= expectedMarkerHours, `Case 25: curve must extend past marker (curve ends at ${curveMaxHours}h, marker at ${expectedMarkerHours}h)`);
+
+  // Pulse-dose (doses_given=1) must NOT shift — shift = 0 → marker at time_since_last
+  const pulseResult = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1500, interval_hours: 24, infusion_duration_hours: 1.5, doses_given: 1, target_auc24: 450 },
+    levels: [{ value_mcg_ml: 18, collection_time: "2026-05-18T09:00:00", time_since_last_dose_hours: 4 }],
+  });
+  assert(!("ok" in pulseResult && pulseResult.ok === false), "Case 25 pulse: expected success");
+  const pr = pulseResult as { measured_levels: { time_hours: number }[] };
+  assert(
+    Math.abs(pr.measured_levels[0].time_hours - 4) < 1e-6,
+    `Case 25 pulse: single-dose marker must stay at 4h (no shift), got ${pr.measured_levels[0].time_hours}h`,
+  );
+
+  // Steady-state (doses_given=6, q12h): shift = 5*12 = 60h
+  const ssResult = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1, doses_given: 6 },
+    levels: [{ value_mcg_ml: 14, collection_time: "2026-05-18T09:00:00", time_since_last_dose_hours: 3 }],
+  });
+  assert(!("ok" in ssResult && ssResult.ok === false), "Case 25 SS: expected success");
+  const sr = ssResult as { measured_levels: { time_hours: number }[] };
+  const expectedSs = 5 * 12 + 3;
+  assert(
+    Math.abs(sr.measured_levels[0].time_hours - expectedSs) < 1e-6,
+    `Case 25 SS: 6-dose q12h marker must be at ${expectedSs}h, got ${sr.measured_levels[0].time_hours}h`,
+  );
+}
+
 export function runExistingRegimenTests(): void {
   testCase1();
   testCase2();
@@ -533,9 +588,10 @@ export function runExistingRegimenTests(): void {
   testCase22();
   testCase23();
   testCase24();
+  testCase25();
 }
 
 if (typeof process !== "undefined" && process.argv[1]?.includes("existingRegimen.integration.test")) {
   runExistingRegimenTests();
-  console.log("All 24 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, and late-lab-draw tolerance with non-SS multi-dose accumulation.");
+  console.log("All 25 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, late-lab-draw tolerance with non-SS multi-dose accumulation, and chart-marker placement on the correct absolute-time interval.");
 }
