@@ -207,7 +207,6 @@ export default function CalculatorWorkspace() {
 
   const [bedbound, setBedbound] = useState(false);
   const [bedboundDoseData, setBedboundDoseData] = useState<BedboundDoseData | null>(null);
-  const [copySuccess, setCopySuccess] = useState(false);
 
   const [lastInputChangedAt, setLastInputChangedAt] = useState<number | null>(null);
   const [lastCalculatedAt, setLastCalculatedAt] = useState<number | null>(null);
@@ -605,10 +604,7 @@ export default function CalculatorWorkspace() {
   const handleCopyNote = useCallback(() => {
     const note = activeOption?.clinical_note ?? visibleResult?.documentation_preview?.clinical_note;
     if (!note) return;
-    navigator.clipboard.writeText(note).then(() => {
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    }).catch(() => {/* clipboard not available */});
+    navigator.clipboard.writeText(note).catch(() => {/* clipboard not available */});
   }, [activeOption, visibleResult]);
 
   const handleExportPDF = useCallback(() => {
