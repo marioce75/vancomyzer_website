@@ -376,12 +376,17 @@ function Limitations() {
           attempt to validate scenarios outside its derivation cohort.
         </li>
         <li>
-          <strong>Cases we attempted but could not verify:</strong> Colin 2019
-          renal-impairment subset (paywalled covariate Table); Rybak/ASHP 2020
-          Appendix A worked example (paywalled at AJHP); Pai 2014 MIPD case
-          (paywalled, abstract is methodological); Drennan 2024 trough-only
-          Bayesian (no such paper exists in PubMed). These are documented openly
-          here rather than fabricated.
+          <strong>Cases we attempted but could not verify, or dropped after
+          attempting:</strong> Colin 2019 renal-impairment subset (paywalled
+          covariate Table); Rybak/ASHP 2020 Appendix A worked example (paywalled
+          at AJHP); Pai 2014 MIPD case (paywalled, abstract is methodological);
+          Drennan 2024 trough-only Bayesian (no such paper exists in PubMed);
+          Neely 2014 cohort trough (the test was circular — our Bayesian fitter
+          trivially matched its own input observation, and the framing
+          conflicted with Vancomyzer&apos;s AUC-targeted positioning even though
+          Neely&apos;s own paper argued AUC over trough). These are documented
+          openly here rather than fabricated, and new AUC-focused cases are
+          being curated for the next release.
         </li>
         <li>
           A &quot;within tolerance&quot; result does not mean the recommendation
