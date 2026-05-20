@@ -381,12 +381,18 @@ function Limitations() {
           covariate Table); Rybak/ASHP 2020 Appendix A worked example (paywalled
           at AJHP); Pai 2014 MIPD case (paywalled, abstract is methodological);
           Drennan 2024 trough-only Bayesian (no such paper exists in PubMed);
-          Neely 2014 cohort trough (the test was circular — our Bayesian fitter
-          trivially matched its own input observation, and the framing
-          conflicted with Vancomyzer&apos;s AUC-targeted positioning even though
-          Neely&apos;s own paper argued AUC over trough). These are documented
-          openly here rather than fabricated, and new AUC-focused cases are
-          being curated for the next release.
+          Neely 2014 cohort trough (test was circular — our Bayesian fitter
+          trivially matched its own input observation, and the framing conflicted
+          with Vancomyzer&apos;s AUC-targeted positioning even though Neely&apos;s
+          own paper argued AUC over trough); Patanwala 2022 multi-platform ICU
+          comparison (cohort-mean format doesn&apos;t fit the per-patient test
+          schema — deferred until we add a &quot;reference band&quot; card type);
+          Shingde 2020 single-sample Bayesian (the candidate&apos;s
+          &quot;published AUC&quot; was analytically derived rather than extracted
+          from the paper, which would have made the test circular). Turner 2018
+          multi-platform comparison is paywalled at Wiley but is the highest-value
+          future card if full text becomes accessible. These dropouts are
+          documented openly here rather than swept under the rug.
         </li>
         <li>
           A &quot;within tolerance&quot; result does not mean the recommendation

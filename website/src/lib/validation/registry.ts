@@ -15,23 +15,22 @@
 import type { PublishedCase } from "./types";
 import { COLIN_2019_TYPICAL_ADULT } from "./cases/colin-2019-typical-adult";
 import { SMIT_2020_MORBIDLY_OBESE } from "./cases/smit-2020-morbidly-obese";
+import { ADANE_2015_EXTREME_OBESITY } from "./cases/adane-2015-extreme-obesity";
+import { CARRENO_2017_SPARSE_BAYESIAN_OBESE } from "./cases/carreno-2017-sparse-bayesian-obese";
 
 // Cases are wired in as the curation lands. Order matters — appears in
 // this order on /transparent-dosing/cases. Group by source for scannability.
 // Each case file co-locates the citation, patient inputs, published values,
 // and tolerance so a reviewer can verify in isolation.
-//
-// v2: Neely 2014 was dropped because (a) the test was circular — our Bayesian
-// fitter trivially matched its own input observation — and (b) it sent a
-// "trough-validation" message that conflicts with Vancomyzer's AUC-targeted
-// positioning. New cases will favor AUC-focused validation papers and
-// multi-platform Bayesian comparison studies (DoseMeRx, PrecisePK, InsightRx)
-// where we can position Vancomyzer alongside named commercial tools with
-// public delta numbers.
 
 export const CASES: PublishedCase[] = [
+  // Implementation-correctness anchor — exact prior reproduction
   COLIN_2019_TYPICAL_ADULT,
+  // Obesity model: simulation-typical (Smit derivation) and real-measured (Adane cohort)
   SMIT_2020_MORBIDLY_OBESE,
+  ADANE_2015_EXTREME_OBESITY,
+  // Sparse-sampling Bayesian fit — tests the fitter, not just the prior
+  CARRENO_2017_SPARSE_BAYESIAN_OBESE,
 ];
 
 export function getCaseById(id: string): PublishedCase | undefined {
