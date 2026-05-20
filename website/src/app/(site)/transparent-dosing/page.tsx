@@ -270,18 +270,37 @@ export default function TransparentDosingPage() {
             Bayesian magic. Anyone with a graduate-level pharmacometrics course can audit the engine.
             That is the point.
           </p>
-          <Link
-            href="/transparent-dosing/equations"
-            className="mt-6 inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
-            style={{
-              background: "#0f172a",
-              color: "#00c9b1",
-              border: "1px solid #1e293b",
-              letterSpacing: "0.08em",
-            }}
-          >
-            ▶ Full derivations &amp; equations
-          </Link>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/transparent-dosing/equations"
+              className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
+              style={{
+                background: "#0f172a",
+                color: "#00c9b1",
+                border: "1px solid #1e293b",
+                letterSpacing: "0.08em",
+              }}
+            >
+              ▶ Full derivations &amp; equations
+            </Link>
+            <Link
+              href="/transparent-dosing/cases"
+              className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
+              style={{
+                background: "#0f172a",
+                color: "#00c9b1",
+                border: "1px solid #1e293b",
+                letterSpacing: "0.08em",
+              }}
+            >
+              ▶ Literature reproducibility
+            </Link>
+          </div>
+          <p className="mt-3 text-xs" style={{ color: "#64748b" }}>
+            Literature Reproducibility is a public scoreboard: every published vancomycin case
+            we test our calculator against, with the live delta between our output and the
+            published value. If our engine drifts, the build fails before it ships.
+          </p>
         </div>
       </section>
 

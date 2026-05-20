@@ -291,8 +291,53 @@ export default function CalculatorWorkspace() {
 
   // Pre-fill patient state from URL query params (overrides session restore)
   const didPreFillRef = useRef(false);
+  // Literature Reproducibility case loaded via ?case=<id>; banner stays
+  // visible until the user resets or dismisses.
+  const [loadedCase, setLoadedCase] = useState<{ id: string; reference: string } | null>(null);
   useEffect(() => {
     if (didPreFillRef.current) return;
+
+    // (1) Literature Reproducibility case deep-link — takes precedence over scalar params
+    const caseId = searchParams.get("case");
+    if (caseId) {
+      // Lazy import keeps the case registry out of the calculator's initial bundle.
+      void import("@/lib/validation/registry").then(({ getCaseById }) => {
+        const c = getCaseById(caseId);
+        if (!c) return;
+        didPreFillRef.current = true;
+        setPatient((prev) => ({
+          ...prev,
+          age: c.patient.age_years,
+          weight_kg: c.patient.weight_kg,
+          serum_creatinine_mg_dl: c.patient.serum_creatinine_mg_dl,
+        }));
+        if (c.workflow_type === "empiric") {
+          applyViewMode("empiric");
+        } else if (c.regimen) {
+          const targetView: WorkspaceViewMode = c.levels.length >= 2 ? "two_levels" : "one_level";
+          applyViewMode(targetView);
+          setRegimen({
+            dose_mg: c.regimen.dose_mg,
+            interval_hours: c.regimen.interval_hours,
+            infusion_duration_hours: c.regimen.infusion_duration_hours,
+            doses_given: c.regimen.doses_given,
+          });
+          if (c.levels.length > 0) {
+            setLevels(
+              c.levels.map((l) => ({
+                value_mcg_ml: l.value_mcg_ml,
+                collection_time: "",
+                time_since_last_dose_hours: l.time_since_last_dose_hours,
+              })),
+            );
+          }
+        }
+        setLoadedCase({ id: c.id, reference: c.source.specific_reference });
+      });
+      return;
+    }
+
+    // (2) Scalar pre-fill — existing behavior
     const age = searchParams.get("age");
     const weight = searchParams.get("weight_kg");
     const scr = searchParams.get("serum_creatinine_mg_dl");
@@ -305,6 +350,7 @@ export default function CalculatorWorkspace() {
         setPatient(prev => ({ ...prev, age: parsedAge, weight_kg: parsedWeight, serum_creatinine_mg_dl: parsedScr }));
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- applyViewMode is intentionally not a dep; we want this to run once
   }, [searchParams]);
 
   const buildRequest = useCallback((): CalculateRequest => {
@@ -1283,6 +1329,40 @@ export default function CalculatorWorkspace() {
   return (
     <div className="relative flex h-screen flex-col overflow-hidden xl:overflow-hidden" style={{ background: "transparent", color: "var(--color-primary)" }}>
       <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} userName={user?.username} userRole={user?.role} onLogout={logout} />
+      {loadedCase && (
+        <div
+          role="status"
+          style={{
+            padding: "8px 16px",
+            background: "#eff6ff",
+            borderBottom: "1px solid #bfdbfe",
+            color: "#1e3a8a",
+            fontSize: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <span>
+            📚 Loaded from literature case: <strong>{loadedCase.reference}</strong>. Edit inputs freely — the case stays linked until you reset.
+          </span>
+          <a
+            href={`/transparent-dosing/cases#${loadedCase.id}`}
+            style={{ marginLeft: "auto", color: "#1e3a8a", textDecoration: "underline", fontWeight: 600 }}
+          >
+            View case page →
+          </a>
+          <button
+            type="button"
+            onClick={() => setLoadedCase(null)}
+            aria-label="Dismiss case banner"
+            style={{ background: "transparent", border: "none", color: "#1e3a8a", cursor: "pointer", fontSize: 16, padding: "0 4px" }}
+          >
+            ×
+          </button>
+        </div>
+      )}
       <div className="flex-1 overflow-auto xl:overflow-hidden h-full">
         <CalculatorLayout left={leftColumn} right={rightColumn} />
       </div>
