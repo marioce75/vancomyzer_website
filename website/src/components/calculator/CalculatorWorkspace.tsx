@@ -305,13 +305,23 @@ export default function CalculatorWorkspace() {
         const c = getCaseById(caseId);
         if (!c) return;
         didPreFillRef.current = true;
+        // Set ALL patient fields so the calculator can run immediately.
+        // RRT is forced to "no" because every published case in the registry
+        // assumes normal renal handling — none involve dialysis or CRRT.
         setPatient((prev) => ({
           ...prev,
           age: c.patient.age_years,
           weight_kg: c.patient.weight_kg,
           serum_creatinine_mg_dl: c.patient.serum_creatinine_mg_dl,
+          sex: c.patient.sex === "M" ? "male" : c.patient.sex === "F" ? "female" : prev.sex,
+          height_cm: c.patient.height_cm ?? prev.height_cm,
         }));
-        if (c.workflow_type === "empiric") {
+        setRrt(false);
+        // Mode selection:
+        //   - empiric / prior_at_regimen → empiric mode (engine picks regimen;
+        //     PK Parameters panel shows the prior's CL which is the matching point)
+        //   - existing with levels → existing-regimen mode at the appropriate level count
+        if (c.workflow_type === "empiric" || c.workflow_type === "prior_at_regimen") {
           applyViewMode("empiric");
         } else if (c.regimen) {
           const targetView: WorkspaceViewMode = c.levels.length >= 2 ? "two_levels" : "one_level";

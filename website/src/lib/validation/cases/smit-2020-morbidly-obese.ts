@@ -55,19 +55,25 @@ export const SMIT_2020_MORBIDLY_OBESE: PublishedCase = {
   published: {
     auc24_mg_h_l: 574,
     peak_mcg_ml: null,
-    trough_mcg_ml: 10.0,
+    // Smit's "10 mcg/mL" came from the prose statement "troughs of 5.7–14.6
+    // correspond to the target exposure" — that's a range midpoint reflecting
+    // population variability, not a point prediction at this specific regimen
+    // and patient. Comparing our point-predicted trough against it would be
+    // misleading on a credibility page, so we deliberately omit trough from
+    // this card and compare AUC₂₄ only, which IS a defensible point match.
+    trough_mcg_ml: null,
     clearance_l_h: 7.93,
     v1_l: null,
     source_kind: "population_simulation",
     extraction_method:
-      "CL evaluated from the published Smit 2020 covariate equation: 5.72 × (130/70)^0.535 ≈ 7.93 L/h. AUC₂₄ derived as TDD/CL = 4550/7.93. Trough midpoint of the published 5.7–14.6 mcg/mL target range.",
+      "CL evaluated from the published Smit 2020 covariate equation: 5.72 × (130/70)^0.535 ≈ 7.93 L/h. AUC₂₄ derived as TDD/CL = 4550/7.93. Trough was intentionally omitted from comparison because the paper reports only a range midpoint, not a regimen-specific prediction.",
     tolerance_rationale:
       "Wide tolerance (35% AUC) is required because the Vancomyzer Obesity Model composes Smit 2020 with Zhang 2024 refinements and Janmahasatian FFM scaling — it is intentionally NOT pure Smit. The realized delta against pure Smit is about -25% (our composite produces a higher CL and lower AUC at 130 kg) and this case exists to make that principled drift visible and bounded, not to claim point reproduction. Catastrophic drift (>35%) would indicate the composite has broken; modest drift (10–30%) is the by-design behavior.",
   },
   tolerance: {
     auc24_pct: 35,
     peak_pct: 25,
-    trough_pct: 95,
+    trough_pct: 25,
   },
   notes_for_page:
     "Visible by design: our Vancomyzer Obesity Model composes Smit 2020 with Zhang 2024 + Janmahasatian FFM, so it produces a higher CL (~25% AUC lower) than pure Smit at 130 kg/normal renal function. We publish that drift here transparently. The wide tolerance bounds catastrophic regression; the modest realized delta IS the documented design.",
