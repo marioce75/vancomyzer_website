@@ -199,16 +199,14 @@ export default function DoseRecommendationCard({
   onUndoLoadingDose,
   empiricDosingBlocked,
 }: DoseRecommendationCardProps) {
-  // SAFETY-CRITICAL: if the engine refused empiric dosing, render the pulse-
-  // dose safety state and DO NOT fall through to the standard regimen card.
-  if (empiricDosingBlocked) {
-    return <EmpiricDosingBlockedCard data={empiricDosingBlocked} />;
-  }
   // Show options that are in-range or below-target only — never show above-target options
   const options = frequency_options?.filter(
     (o) => o.dose_mg >= 500 && o.auc24 <= 600
   ) ?? [];
 
+  // All hooks must be called unconditionally on every render (Rules of Hooks).
+  // The empiricDosingBlocked / no-recommendation early returns happen AFTER
+  // hook setup so they don't change hook call ordering across renders.
   const [activeIdx, setActiveIdx] = useState<number>(() => {
     if (!recommended_dose || !recommended_interval_hours) return 0;
     const recDose = Number.parseFloat(recommended_dose);
@@ -217,6 +215,12 @@ export default function DoseRecommendationCard({
     );
     return idx >= 0 ? idx : 0;
   });
+
+  // SAFETY-CRITICAL: if the engine refused empiric dosing, render the pulse-
+  // dose safety state and DO NOT fall through to the standard regimen card.
+  if (empiricDosingBlocked) {
+    return <EmpiricDosingBlockedCard data={empiricDosingBlocked} />;
+  }
 
   if (!recommended_dose || !recommended_interval_hours) return null;
 
