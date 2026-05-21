@@ -508,6 +508,45 @@ function testCase24(): void {
   }
 }
 
+function testCase28_aucCapEnforcedInRecommendation(): void {
+  // Regression: the AUC cap (650 mg·h/L, Aljefri 2019) was previously not
+  // checked in the candidate filter — only peak and trough. A regimen could
+  // pass the peak/trough caps and still produce AUC₂₄ in the 700-800 range
+  // (clearly elevated AKI risk). This test pins the AUC-cap enforcement:
+  // a patient on a too-aggressive regimen with measured levels confirming
+  // elevated exposure must NOT receive a recommendation whose simulated
+  // AUC₂₄ exceeds the cap.
+  // Collection times must be consistent with the reported time-since-last-dose
+  // values per the validator's TIMING_TOLERANCE_HOURS check: same dose at
+  // 06:00 → level1 at 08:00 (2h post) and level2 at 13:30 (7.5h post).
+  const result = runExistingRegimenPipeline({
+    patient: { age: 60, weight_kg: 80, serum_creatinine_mg_dl: 1.8 },
+    regimen: { dose_mg: 1500, interval_hours: 8, infusion_duration_hours: 1.5, doses_given: 5 },
+    levels: [
+      { value_mcg_ml: 38, collection_time: "2026-03-15T08:00:00Z", time_since_last_dose_hours: 2 },
+      { value_mcg_ml: 22, collection_time: "2026-03-15T13:30:00Z", time_since_last_dose_hours: 7.5 },
+    ],
+  });
+  assert(!("ok" in result && result.ok === false), "Case 28: pipeline must accept the input");
+  const r = result as {
+    recommended_dose: string;
+    recommended_interval_hours: number;
+    pk_parameters?: { CL: number; V1: number; Q: number; V2: number };
+    adjustment_dosing_blocked?: unknown;
+  };
+  if (r.adjustment_dosing_blocked != null) return; // refusal IS a valid safe response
+  const recDose = Number.parseFloat(r.recommended_dose);
+  const tdd = recDose * (24 / r.recommended_interval_hours);
+  const cl = r.pk_parameters!.CL;
+  const auc24 = tdd / cl;
+  assert(
+    auc24 <= 650,
+    `Case 28 safety: recommended regimen produces AUC₂₄ ${auc24.toFixed(0)} mg·h/L > 650 cap. ` +
+    `Recommendation: ${recDose} mg q${r.recommended_interval_hours}h with CL ${cl.toFixed(2)} L/h. ` +
+    `The AUC-cap regression is back.`,
+  );
+}
+
 function testCase27_severeAkiAdjustmentRefusesUnsafeRegimen(): void {
   // Safety regression: severe AKI patient on too-aggressive q6h with a single
   // high trough used to get a recommendation of 250 mg q6h, which the
@@ -642,9 +681,10 @@ export function runExistingRegimenTests(): void {
   testCase25();
   testCase26_samCyclePeakTroughAcceptedWhenWallDeltaExceedsHalfInterval();
   testCase27_severeAkiAdjustmentRefusesUnsafeRegimen();
+  testCase28_aucCapEnforcedInRecommendation();
 }
 
 if (typeof process !== "undefined" && process.argv[1]?.includes("existingRegimen.integration.test")) {
   runExistingRegimenTests();
-  console.log("All 27 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, late-lab-draw tolerance with non-SS multi-dose accumulation, chart-marker placement on the correct absolute-time interval, same-cycle peak+trough cycle-offset acceptance, and severe-AKI adjustment-refusal peak-cap safety guard.");
+  console.log("All 28 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, late-lab-draw tolerance with non-SS multi-dose accumulation, chart-marker placement on the correct absolute-time interval, same-cycle peak+trough cycle-offset acceptance, severe-AKI adjustment-refusal peak-cap safety guard, and AUC-cap enforcement in adjustment recommendations.");
 }

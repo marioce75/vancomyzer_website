@@ -114,8 +114,19 @@ function getMaxTdd(scr: number): number {
   return 4500;                    // normal renal function — guideline max
 }
 
+// Safety caps — sourced from the 2020 ASHP/IDSA/PIDS/SIDP guideline supporting
+// evidence base. See buildAdjustmentRecommendation.ts SAFETY CONTRACT block
+// for full citations; values must stay in sync between the two files.
+//
+//   MAX_PEAK_MCG_ML  = 80   — historical Geraci 1958 ototoxicity reference;
+//                              2020 guideline does NOT publish a peak ceiling
+//   MAX_TROUGH_MCG_ML = 20  — tightened from 25 to van Hal 2013 (PMID 23165462)
+//                              adult-AKI threshold; pediatric (deferred) is 15
+//   MAX_AUC24_MG_H_L = 650 — Aljefri 2019 (DOI 10.1093/cid/ciz051) unified
+//                              AKI cutpoint; 2020 guideline target tops at 600
 const MAX_PEAK_MCG_ML = 80;
-const MAX_TROUGH_MCG_ML = 25;
+const MAX_TROUGH_MCG_ML = 20;
+const MAX_AUC24_MG_H_L = 650;
 
 // CrCl estimation for ARC detection (Cockcroft-Gault)
 function estimateCrCl(age: number, weight_kg: number, scr: number, sex: "male" | "female" | ""): number {
@@ -149,7 +160,7 @@ function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, s
         interval_hours,
         infusion_duration_hours: infDuration,
       });
-      if (exposure.peak > MAX_PEAK_MCG_ML || exposure.trough > MAX_TROUGH_MCG_ML) continue;
+      if (exposure.peak > MAX_PEAK_MCG_ML || exposure.trough > MAX_TROUGH_MCG_ML || exposure.auc24 > MAX_AUC24_MG_H_L) continue;
       candidates.push({
         dose_mg,
         interval_hours,
@@ -292,12 +303,12 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
 
   // ─── SAFETY REFUSAL PATH ──────────────────────────────────────────
   // The empiric search returned no candidate that simultaneously meets
-  // the TDD cap, peak cap (80 mcg/mL), and trough cap (25 mcg/mL). For
-  // any patient where the steady-state PK math says no fixed-interval
-  // regimen at q6/q8/q12/q24 with dose ≥ 500 mg is safe (typically
-  // severe renal impairment, CL < ~0.5 L/h, t½ > 50 h), we MUST NOT
-  // silently emit a guessed regimen. Refuse the empiric workflow and
-  // direct the clinician to pulse-dose-then-level.
+  // the TDD cap, peak cap (80 mcg/mL), trough cap (20 mcg/mL), AND
+  // AUC₂₄ cap (650 mg·h/L). For any patient where the steady-state PK
+  // math says no fixed-interval regimen at q6/q8/q12/q24 with dose
+  // ≥ 500 mg is safe (typically severe renal impairment, CL < ~0.5 L/h,
+  // t½ > 50 h), we MUST NOT silently emit a guessed regimen. Refuse
+  // the empiric workflow and direct the clinician to pulse-then-level.
   if (choice == null) {
     return buildEmpiricRefusalResult({
       patient,
@@ -487,6 +498,8 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
 }
 
 /**
+ * @safety-checked-via: self (refusal IS the safety response)
+ *
  * Build the InitialRegimenResult emitted when the empiric search returned no
  * safe candidate. The recommendation is a single pulse dose followed by a
  * measured level — the same workflow that vancomycin dosing protocols specify
@@ -514,8 +527,8 @@ function buildEmpiricRefusalResult(args: {
     `Empiric fixed-interval dosing is not safe for this patient. ` +
     `Estimated clearance is ${prior.CL.toFixed(2)} L/h (${modelLabel} prior with SCr ${prior.scr} mg/dL, ` +
     `age ${patient.age}, weight ${patient.weight_kg} kg) — every regimen in the q6/q8/q12/q24 search ` +
-    `space at the 500 mg minimum dose would exceed the AUC₂₄ ceiling of 600 mg·h/L or the trough ` +
-    `cap of 25 mcg/mL. ` +
+    `space at the 500 mg minimum dose would exceed the AUC₂₄ ceiling of ${MAX_AUC24_MG_H_L} mg·h/L ` +
+    `or the trough cap of ${MAX_TROUGH_MCG_ML} mcg/mL. ` +
     `Recommended action: give a single pulse dose of ${pulseMg} mg (${loadingDose.basis}) infused over ` +
     `${Math.max(1, Math.ceil((pulseMg / 10) / 60 * 4) / 4)} hours, then draw a vancomycin level and ` +
     `switch to the 1-Level workflow for level-guided maintenance redosing.`;
@@ -525,7 +538,7 @@ function buildEmpiricRefusalResult(args: {
   const assumptions = [
     `${modelLabel} two-compartment population prior used for clearance estimation.`,
     "Empiric search constrained to q6/q8/q12/q24 intervals with dose ≥ 500 mg per institutional safety floor.",
-    "No regimen in this search space simultaneously satisfies the AUC₂₄ ≤ 600 mg·h/L ceiling, trough ≤ 25 mcg/mL cap, and TDD safety cap for this patient.",
+    `No regimen in this search space simultaneously satisfies the AUC₂₄ ≤ ${MAX_AUC24_MG_H_L} mg·h/L ceiling, trough ≤ ${MAX_TROUGH_MCG_ML} mcg/mL cap, peak ≤ ${MAX_PEAK_MCG_ML} mcg/mL cap, and TDD safety cap for this patient.`,
     "Pulse-dose-then-level is the standard workflow when fixed-interval empiric dosing is unsafe.",
   ];
 
@@ -545,7 +558,7 @@ function buildEmpiricRefusalResult(args: {
   const clinical_note = [
     "Vancomycin: empiric fixed-interval dosing refused by calculator.",
     `Estimated CL ${prior.CL.toFixed(2)} L/h (${modelLabel} prior; SCr ${prior.scr} mg/dL, age ${patient.age}, weight ${patient.weight_kg} kg).`,
-    "No regimen in the q6/q8/q12/q24 search space at the 500 mg dose floor passes the AUC₂₄ ≤ 600 mg·h/L and trough ≤ 25 mcg/mL safety filters.",
+    `No regimen in the q6/q8/q12/q24 search space at the 500 mg dose floor passes the AUC₂₄ ≤ ${MAX_AUC24_MG_H_L} mg·h/L, trough ≤ ${MAX_TROUGH_MCG_ML} mcg/mL, and peak ≤ ${MAX_PEAK_MCG_ML} mcg/mL safety filters.`,
     `Recommended action: pulse dose ${pulseMg} mg × 1 (${loadingDose.basis}), then draw a vancomycin level and use the 1-Level workflow for level-guided redose timing.`,
     "** EMPIRIC FIXED-INTERVAL DOSING NOT RECOMMENDED — USE PULSE-THEN-LEVEL WORKFLOW **",
   ].join("\n");

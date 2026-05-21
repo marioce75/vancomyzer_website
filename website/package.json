@@ -7,11 +7,12 @@
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p ${PORT:-10000}",
     "lint": "next lint",
-    "test": "npm run test:pk && npm run test:hmac && npm run test:baa && npm run test:cases",
+    "test": "npm run test:pk && npm run test:hmac && npm run test:baa && npm run test:cases && npm run test:safety-pattern",
     "test:pk": "tsx src/lib/pk/__tests__/existingRegimen.integration.test.ts && tsx src/lib/pk/__tests__/initialRegimen.integration.test.ts",
     "test:hmac": "tsx src/lib/pilotApplication/__tests__/hmac.fixture.test.ts",
     "test:baa": "tsx src/lib/baa/__tests__/baa.test.ts",
-    "test:cases": "tsx scripts/verify-cases.ts"
+    "test:cases": "tsx scripts/verify-cases.ts",
+    "test:safety-pattern": "bash scripts/check-safety-pattern.sh"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
