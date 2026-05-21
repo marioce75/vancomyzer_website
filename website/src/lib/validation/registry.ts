@@ -14,6 +14,7 @@
 
 import type { PublishedCase } from "./types";
 import { COLIN_2019_TYPICAL_ADULT } from "./cases/colin-2019-typical-adult";
+import { COLIN_2019_ELDERLY_MILD_CKD } from "./cases/colin-2019-elderly-mild-ckd";
 import { SMIT_2020_MORBIDLY_OBESE } from "./cases/smit-2020-morbidly-obese";
 import { ADANE_2015_EXTREME_OBESITY } from "./cases/adane-2015-extreme-obesity";
 import { CARRENO_2017_SPARSE_BAYESIAN_OBESE } from "./cases/carreno-2017-sparse-bayesian-obese";
@@ -24,8 +25,10 @@ import { CARRENO_2017_SPARSE_BAYESIAN_OBESE } from "./cases/carreno-2017-sparse-
 // and tolerance so a reviewer can verify in isolation.
 
 export const CASES: PublishedCase[] = [
-  // Implementation-correctness anchor — exact prior reproduction
+  // Implementation-correctness anchor — exact prior reproduction (typical adult)
   COLIN_2019_TYPICAL_ADULT,
+  // FDecline + FSCR covariate composition (elderly + mild renal impairment)
+  COLIN_2019_ELDERLY_MILD_CKD,
   // Obesity model: simulation-typical (Smit derivation) and real-measured (Adane cohort)
   SMIT_2020_MORBIDLY_OBESE,
   ADANE_2015_EXTREME_OBESITY,

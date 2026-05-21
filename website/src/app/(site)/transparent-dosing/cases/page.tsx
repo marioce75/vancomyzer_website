@@ -376,23 +376,34 @@ function Limitations() {
           attempt to validate scenarios outside its derivation cohort.
         </li>
         <li>
-          <strong>Cases we attempted but could not verify, or dropped after
-          attempting:</strong> Colin 2019 renal-impairment subset (paywalled
-          covariate Table); Rybak/ASHP 2020 Appendix A worked example (paywalled
-          at AJHP); Pai 2014 MIPD case (paywalled, abstract is methodological);
-          Drennan 2024 trough-only Bayesian (no such paper exists in PubMed);
-          Neely 2014 cohort trough (test was circular — our Bayesian fitter
-          trivially matched its own input observation, and the framing conflicted
-          with Vancomyzer&apos;s AUC-targeted positioning even though Neely&apos;s
-          own paper argued AUC over trough); Patanwala 2022 multi-platform ICU
-          comparison (cohort-mean format doesn&apos;t fit the per-patient test
-          schema — deferred until we add a &quot;reference band&quot; card type);
-          Shingde 2020 single-sample Bayesian (the candidate&apos;s
-          &quot;published AUC&quot; was analytically derived rather than extracted
-          from the paper, which would have made the test circular). Turner 2018
-          multi-platform comparison is paywalled at Wiley but is the highest-value
-          future card if full text becomes accessible. These dropouts are
-          documented openly here rather than swept under the rug.
+          <strong>Cases we attempted but could not extract, or dropped after
+          attempting (now with full text in hand for several):</strong>
+          {" "}Rybak/ASHP 2020 (read full text — the executive summary contains
+          narrative recommendations only, not a per-patient worked example to
+          reproduce; verbatim cap citations now in code comments instead);
+          {" "}Pai 2014 (read full text — Table 1 reports aggregate AUC ratios
+          across n=47 sparse-Bayesian validation cohort but no per-patient
+          demographics + AUC, so we cite Pai 2014 as the methodology source for
+          our Carreno sparse-Bayesian case rather than its own card);
+          {" "}Patanwala 2022 multi-platform ICU comparison (read full text —
+          publishes cohort-mean AUC per platform (Goti 469, Colin 562, Thomson
+          517 across 188 ICU adults) but no per-patient data; the cohort-mean
+          format doesn&apos;t fit the per-patient test schema — deferred until
+          we add a &quot;reference band&quot; card type);
+          {" "}Turner 2018 (read full text — Tables 1-3 are aggregate medians
+          + IQRs across 19 ICU patients per platform, no per-patient breakdown;
+          deferred for the same reference-band card type as Patanwala);
+          {" "}Drennan 2024 trough-only Bayesian (no such paper exists in
+          PubMed);
+          {" "}Neely 2014 cohort trough (test was circular — our Bayesian
+          fitter trivially matched its own input observation, and the framing
+          conflicted with Vancomyzer&apos;s AUC-targeted positioning even
+          though Neely&apos;s own paper argued AUC over trough);
+          {" "}Shingde 2020 single-sample Bayesian (the candidate&apos;s
+          &quot;published AUC&quot; was analytically derived rather than
+          extracted from the paper, which would have made the test circular).
+          These dropouts are documented openly here rather than swept under
+          the rug.
         </li>
         <li>
           A &quot;within tolerance&quot; result does not mean the recommendation

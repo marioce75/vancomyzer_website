@@ -49,33 +49,37 @@ const INTERVAL_OPTIONS_H = [6, 8, 12, 18, 24, 36, 48];
 // should sit; pre-AUC literature heritage.
 const MAX_TDD_MG_PER_DAY = 4500;
 
-// Peak ceiling — historical ototoxicity reference from Geraci 1958 (irreversible
-// ototoxicity at peak 80–100 mg/L from impure "Mississippi mud" product). The 2020
-// ASHP/IDSA guideline does NOT publish a peak ceiling — peaks above 40 mg/L are
-// pharmacologically expected during AUC-guided dosing. Kept as a soft historical
-// safety reference; primary safety is the AUC₂₄ cap below.
-// Refs: Geraci 1958 (impure-product era); Forouzesh 2009 review (pure-product re-eval).
+// Peak ceiling — historical Geraci 1958 ototoxicity reference (irreversible
+// ototoxicity at peak 80–100 mg/L from impure "Mississippi mud" product).
+// Verified via reading the full Rybak 2020 AJHP executive summary: the 2020
+// guideline does NOT publish a numeric peak ceiling. Peaks above 40 mg/L are
+// pharmacologically expected during AUC-guided dosing. Kept as a soft
+// historical safety reference; primary safety chokepoint is the AUC₂₄ cap.
+// Refs: Geraci 1958; Forouzesh 2009 review.
 const MAX_PEAK_MCG_ML = 80;
 
-// Trough cap — tightened from 25 → 20 mcg/mL. Adult evidence: AKI risk is
-// clearly elevated above trough 20 mcg/mL (van Hal SJ et al. CID 2013, meta-
-// analysis. PMID 23165462). The 2020 guideline retracts the 2009 15–20 mcg/mL
-// trough TARGET due to AKI signal but does not republish a numeric ceiling for
-// adults — 20 is the most-cited threshold in the supporting evidence base.
-// Soft warn threshold below at 15 (AKI signal onset).
+// Trough cap — tightened from 25 → 20 mcg/mL. Rybak 2020 (AJHP 77:838) verbatim:
+// "the risk of AKI increases as a function of the trough concentration,
+// especially when maintained above 15 to 20 mg/L." Adult AKI evidence:
+// van Hal SJ et al. CID 2013, meta-analysis (PMID 23165462) — AKI clearly
+// elevated above 20 mcg/mL trough.
+// Pediatric ceiling (15 mcg/mL per Rybak Rec 21) deferred — Vancomyzer is
+// adult-only; TODO: add population-aware caps when pediatric mode lands.
 const MAX_TROUGH_MCG_ML = 20;
 
-// Trough warn threshold — Aljefri DM et al. CID 2019, meta-analysis showing
-// AKI risk rises significantly above trough 15 mcg/mL. DOI:10.1093/cid/ciz051.
-// Used by frequency-options ranking to penalize but not block recommendations
-// in the 15–20 mcg/mL range.
+// Trough warn threshold — Rybak 2020 (AJHP 77:837) verbatim references the
+// Lodise dataset: "median trough concentration and daily AUC values associated
+// with AKI were 15.7 mg/L and 625 mg·h/L, as compared with values of 8.7 mg/L
+// and 423 mg·h/L in subjects without AKI." Used by frequency-options ranking
+// to penalize but not block recommendations in the 15–20 mcg/mL range.
 const WARN_TROUGH_MCG_ML = 15;
 
-// AUC₂₄ ceiling — Aljefri DM et al. CID 2019 unified AKI cutpoint ≈ 650 mg·h/L
-// across the evidence base the 2020 ASHP/IDSA guideline rests on (OR for AKI
-// 0.36 below this threshold). DOI:10.1093/cid/ciz051. The 2020 guideline does
-// not publish a numeric adult AUC ceiling but its target band tops at 600.
-// Hard-block above this; warn at 600 (upper bound of target band).
+// AUC₂₄ ceiling — Aljefri DM et al. CID 2019, unified AKI cutpoint
+// (DOI:10.1093/cid/ciz051). Corroborated verbatim in Rybak 2020 (AJHP 77:838):
+// "Most patients who developed AKI had AUC values between 600 and 800 mg·h/L,
+// compared with 400 to 600 mg·h/L in those without AKI (P = 0.014)" [Suzuki et al].
+// The 2020 guideline target tops at AUC₂₄ 600. Hard-block above 650;
+// warn at 600 (upper bound of target band).
 const MAX_AUC24_MG_H_L = 650;
 const WARN_AUC24_MG_H_L = 600;
 
