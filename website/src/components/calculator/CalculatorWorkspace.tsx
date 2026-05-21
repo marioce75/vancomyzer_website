@@ -333,10 +333,20 @@ export default function CalculatorWorkspace() {
             doses_given: c.regimen.doses_given,
           });
           if (c.levels.length > 0) {
+            // Synthesize ISO collection_time strings from time_since_last_dose_hours
+            // so the 2-level validator (which requires collection_time and cross-
+            // checks wall-clock delta against reported delta) doesn't reject the
+            // pre-filled case. Anchor is an arbitrary epoch; the validator only
+            // cares about deltas between collection times, not absolute values.
+            // Assumes all levels share the same most-recent-dose (the common
+            // peak+trough case Carreno 2017 documents).
+            const anchorMs = Date.UTC(2026, 0, 1, 0, 0, 0);
             setLevels(
               c.levels.map((l) => ({
                 value_mcg_ml: l.value_mcg_ml,
-                collection_time: "",
+                collection_time: new Date(
+                  anchorMs + Math.round(l.time_since_last_dose_hours * 3_600_000),
+                ).toISOString(),
                 time_since_last_dose_hours: l.time_since_last_dose_hours,
               })),
             );

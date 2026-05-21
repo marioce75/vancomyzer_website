@@ -200,9 +200,9 @@ export function validateExistingRegimenRequest(
 
         const observedDelta = t2 - t1; // hours between collection times
 
-        // Levels may be from different dose cycles (e.g. peak from dose N, trough from dose N+1).
-        // Normalize the observed delta to be within ±interval to find the within-cycle offset.
-        const normalizedDelta = observedDelta % interval_hours;
+        // Levels may be from different dose cycles (e.g. peak from dose N, trough
+        // from dose N+1). The "cycleOffset" is the number of complete dosing
+        // intervals between the most-recent-dose of level i and that of level j.
         const reportedDelta =
           levels[j].time_since_last_dose_hours - levels[i].time_since_last_dose_hours;
 
@@ -213,9 +213,14 @@ export function validateExistingRegimenRequest(
           continue;
         }
 
-        // Check that reported time_since_last_dose_hours is consistent with collection timestamps
-        // accounting for the fact that levels may come from different dose cycles
-        const cycleOffset = Math.round(observedDelta / interval_hours) * interval_hours;
+        // Cycle offset uses FLOOR, not round. Previously used Math.round, which
+        // for same-cycle peak+trough drawn >interval/2 apart (e.g., peak @ 2h
+        // and trough @ 11.5h in a q12h interval — the standard workflow) would
+        // round 0.79 → 1, claim the levels crossed into the next dose cycle,
+        // and reject the consistent timestamps with "Collection time is
+        // inconsistent with reported time post-dose." Floor correctly counts
+        // complete intervals between source doses.
+        const cycleOffset = Math.floor(observedDelta / interval_hours) * interval_hours;
         const expectedReportedDelta = observedDelta - cycleOffset;
         if (Math.abs(expectedReportedDelta - reportedDelta) > TIMING_TOLERANCE_HOURS + 0.5) {
           field_errors[`levels[${j}].collection_time`] =

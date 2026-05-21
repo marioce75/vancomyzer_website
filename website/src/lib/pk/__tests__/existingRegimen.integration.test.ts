@@ -508,6 +508,30 @@ function testCase24(): void {
   }
 }
 
+function testCase26_samCyclePeakTroughAcceptedWhenWallDeltaExceedsHalfInterval(): void {
+  // Regression: peak + trough drawn IN THE SAME DOSING CYCLE on q12h with a
+  // wall-clock delta of 9.5 hours used to be falsely rejected because the
+  // validator's Math.round(9.5/12) = 1 claimed the second level had crossed
+  // into the next dose cycle. That's the entire standard peak+trough workflow
+  // — every real clinician hitting this case would get a false rejection.
+  // The fix (Math.round → Math.floor) preserves cross-cycle handling but
+  // correctly accepts same-cycle deltas >interval/2.
+  const result = runExistingRegimenPipeline({
+    patient: defaultPatient,
+    regimen: { dose_mg: 1500, interval_hours: 12, infusion_duration_hours: 1.5, doses_given: 5 },
+    levels: [
+      { value_mcg_ml: 30, collection_time: "2026-03-15T08:00:00Z", time_since_last_dose_hours: 2 },
+      { value_mcg_ml: 12, collection_time: "2026-03-15T17:30:00Z", time_since_last_dose_hours: 11.5 },
+    ],
+  });
+  assert(
+    !("ok" in result && result.ok === false),
+    `Case 26: same-cycle peak (2h) + trough (11.5h) on q12h must be accepted. ` +
+    `Validator bug (Math.round of 9.5/12) historically false-rejected this — the standard ` +
+    `peak+trough workflow. Got: ${JSON.stringify(result)}`,
+  );
+}
+
 function testCase25(): void {
   // Chart-marker placement: a level drawn 7.47h after dose 4 (q8h) must be
   // plotted at (4-1)*8 + 7.47 = 31.47h on the curve's absolute time axis,
@@ -589,9 +613,10 @@ export function runExistingRegimenTests(): void {
   testCase23();
   testCase24();
   testCase25();
+  testCase26_samCyclePeakTroughAcceptedWhenWallDeltaExceedsHalfInterval();
 }
 
 if (typeof process !== "undefined" && process.argv[1]?.includes("existingRegimen.integration.test")) {
   runExistingRegimenTests();
-  console.log("All 25 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, late-lab-draw tolerance with non-SS multi-dose accumulation, and chart-marker placement on the correct absolute-time interval.");
+  console.log("All 26 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, late-lab-draw tolerance with non-SS multi-dose accumulation, chart-marker placement on the correct absolute-time interval, and same-cycle peak+trough cycle-offset acceptance.");
 }
