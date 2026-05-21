@@ -90,10 +90,17 @@ export function runCase(c: PublishedCase): CaseResult {
     // trusted pre-curated test fixtures where we control all inputs.
     // The engine itself is the pure computation; bypassing the validator
     // is the right move for a build-time regression test.
+    // Pass height + sex so the obesity-model branch in buildPriorParameters
+    // can activate for BMI ≥ 40 cases (matching the calculator UI behavior,
+    // which always has these fields populated). Previously dropped them and
+    // the case page silently ran the Colin prior even when the calculator
+    // was running the Vancomyzer Obesity Model on the same patient.
     const patient = normalizePatient({
       age: c.patient.age_years,
       weight_kg: c.patient.weight_kg,
       serum_creatinine_mg_dl: c.patient.serum_creatinine_mg_dl,
+      height_cm: c.patient.height_cm ?? 0,
+      sex: c.patient.sex === "M" ? "male" : c.patient.sex === "F" ? "female" : "",
     });
     const regimen = normalizeRegimen({
       dose_mg: c.regimen.dose_mg,
