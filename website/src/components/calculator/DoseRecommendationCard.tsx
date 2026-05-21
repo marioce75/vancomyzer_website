@@ -24,6 +24,13 @@ interface DoseRecommendationCardProps {
   isPulseDose?: boolean;
   loadingDoseMg?: number | null;
   onUndoLoadingDose?: (() => void);
+  /** When set, replaces the standard dose card with a pulse-dose safety state. */
+  empiricDosingBlocked?: {
+    reason: string;
+    recommended_pulse_dose_mg: number;
+    safety_message: string;
+    estimated_cl_l_h: number;
+  } | null;
 }
 
 const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" };
@@ -190,7 +197,13 @@ export default function DoseRecommendationCard({
   isPulseDose,
   loadingDoseMg,
   onUndoLoadingDose,
+  empiricDosingBlocked,
 }: DoseRecommendationCardProps) {
+  // SAFETY-CRITICAL: if the engine refused empiric dosing, render the pulse-
+  // dose safety state and DO NOT fall through to the standard regimen card.
+  if (empiricDosingBlocked) {
+    return <EmpiricDosingBlockedCard data={empiricDosingBlocked} />;
+  }
   // Show options that are in-range or below-target only — never show above-target options
   const options = frequency_options?.filter(
     (o) => o.dose_mg >= 500 && o.auc24 <= 600
@@ -423,6 +436,60 @@ export default function DoseRecommendationCard({
           <p style={{ margin: "4px 0 0 0" }}>Draw first level 1.5–6h post-infusion end (dose 1 acceptable) or peak + trough near dose 3–4 for highest AUC accuracy — target AUC₂₄ 400–600 mg·h/L within 48h per ASHP/IDSA 2020.</p>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Pulse-dose safety state — shown when the engine refused empiric fixed-
+ * interval dosing because no candidate in its search grid was safe (typically
+ * severe renal impairment, CL < ~0.5 L/h). Replaces the standard dose card.
+ */
+function EmpiricDosingBlockedCard({
+  data,
+}: {
+  data: NonNullable<DoseRecommendationCardProps["empiricDosingBlocked"]>;
+}) {
+  return (
+    <div
+      role="alert"
+      className="border-l-4 p-4"
+      style={{
+        background: "#fff1f2",
+        borderColor: "#dc2626",
+        borderLeftColor: "#dc2626",
+      }}
+    >
+      <div className="mb-2 flex items-baseline gap-2">
+        <span className="text-base font-bold uppercase tracking-wider" style={{ color: "#991b1b" }}>
+          ⚠ Empiric dosing refused
+        </span>
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#991b1b" }}>
+          Pulse-then-level required
+        </span>
+      </div>
+      <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#7f1d1d" }}>
+        {data.safety_message}
+      </p>
+      <div
+        className="mb-3 grid gap-2 border p-3 text-[13px]"
+        style={{ background: "#ffffff", borderColor: "#fca5a5", color: "#7f1d1d" }}
+      >
+        <div className="font-bold uppercase tracking-wider text-xs">Recommended pulse dose</div>
+        <div className="text-xl font-bold" style={FONT}>
+          {data.recommended_pulse_dose_mg.toLocaleString()} mg <span className="text-sm font-normal">× 1 (single dose)</span>
+        </div>
+        <div className="text-xs">
+          Estimated CL: <strong>{data.estimated_cl_l_h.toFixed(2)} L/h</strong>. Draw a vancomycin level
+          after the pulse dose and switch to the <strong>1-Level</strong> tab above to compute
+          level-guided redose timing.
+        </div>
+      </div>
+      <p className="text-[11px]" style={{ color: "#7f1d1d" }}>
+        This is decision-support output only. The pulse-dose value is a weight-based estimate
+        (15–20 mg/kg, capped at 3000 mg); confirm against institutional protocol and
+        patient-specific factors before administration.
+      </p>
     </div>
   );
 }

@@ -65,15 +65,40 @@ export interface InitialRegimenResult {
     pk_model_name?: "colin_2019" | "vancomyzer_obesity";
     ffm_kg?: number;
   };
+  /**
+   * Set when no safe fixed-interval regimen exists in the search space — i.e.
+   * estimated clearance is so low that every candidate at q6/q8/q12/q24 with
+   * dose ≥ 500 mg would exceed the AUC ceiling or trough cap. The UI MUST render
+   * the pulse-dose safety state in place of the standard regimen card; the
+   * recommended_dose / recommended_interval_hours / auc24 / peak / trough fields
+   * remain populated with sentinel-safe values (0) so downstream consumers don't
+   * crash, but they are not clinically meaningful and must not be displayed.
+   *
+   * This is the engine's explicit safety refusal — fixing the prior bug where a
+   * silent 2000mg q8h fallback emitted catastrophically wrong regimens for
+   * patients with severe renal impairment.
+   */
+  empiric_dosing_blocked?: {
+    reason: string;
+    recommended_pulse_dose_mg: number;
+    safety_message: string;
+    estimated_cl_l_h: number;
+  };
 }
 
 const TARGET_AUC24_LOW = 400;
 const TARGET_AUC24_HIGH = 600;
 const TARGET_AUC24_MID = 500;
 
-// Dose grid capped at 2000 mg per IDSA/ASHP 2020 guideline (15–20 mg/kg, institutional cap 2000 mg)
-const DOSE_OPTIONS_MG = [250, 500, 750, 1000, 1250, 1500, 1750, 2000];
-// Q6h added for high-clearance patients who need more frequent dosing
+// Dose grid: minimum 500 mg (clinical floor — sub-500 mg empiric dosing belongs
+// in the level-guided pulse-dose workflow, not fixed-interval). Capped at 2000 mg
+// per IDSA/ASHP 2020 guideline (15–20 mg/kg, institutional cap 2000 mg).
+const DOSE_OPTIONS_MG = [500, 750, 1000, 1250, 1500, 1750, 2000];
+// Q6h added for high-clearance patients who need more frequent dosing.
+// Intervals beyond q24h are intentionally NOT in the grid — when the search
+// returns no safe candidate at q6/q8/q12/q24, the engine falls through to a
+// pulse-dose recommendation (single dose + level-guided redose) rather than
+// silently emitting an unsafe regimen. See empiricDosingBlocked path below.
 const INTERVAL_OPTIONS_H = [6, 8, 12, 24];
 const DEFAULT_INFUSION_HOURS = 1;
 
@@ -147,23 +172,17 @@ function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, s
     return dailyDoseA - dailyDoseB;
   });
 
-  const best = ranked.length > 0 ? ranked[0] : {
-    // Fallback: pick highest feasible dose at shortest interval
-    dose_mg: 2000,
-    interval_hours: 8,
-    auc24: simulateCandidateExposure(CL, V1, Q, V2, {
-      dose_mg: 2000, interval_hours: 8, infusion_duration_hours: 2,
-    }).auc24,
-    peak: simulateCandidateExposure(CL, V1, Q, V2, {
-      dose_mg: 2000, interval_hours: 8, infusion_duration_hours: 2,
-    }).peak,
-    trough: simulateCandidateExposure(CL, V1, Q, V2, {
-      dose_mg: 2000, interval_hours: 8, infusion_duration_hours: 2,
-    }).trough,
-    inRange: false,
-  };
+  // If the search produced no candidate, return null and let the caller
+  // route to the pulse-dose safety path. The previous behavior here
+  // silently emitted 2000 mg q8h regardless of patient — for severe AKI
+  // with CL ~0.2 L/h that produced AUC₂₄ ≈ 30,000 and a trough ≈ 1240
+  // mcg/mL, a fatal regimen. The empty-search outcome is the engine's
+  // correct signal that fixed-interval empiric dosing is not safe.
+  if (ranked.length === 0) {
+    return { best: null, candidates };
+  }
 
-  return { best, candidates };
+  return { best: ranked[0], candidates };
 }
 
 interface FrequencyOptionContext {
@@ -269,8 +288,25 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
   );
 
   const { best: choice, candidates } = chooseInitialCandidate(prior.CL, prior.V1, prior.Q, prior.V2, prior.scr);
-  const safeInfusion = computeSafeInfusionDurationHours(choice.dose_mg);
   const loadingDose = buildEmpiricLoadingDose({ actual_body_weight_kg: patient.weight_kg });
+
+  // ─── SAFETY REFUSAL PATH ──────────────────────────────────────────
+  // The empiric search returned no candidate that simultaneously meets
+  // the TDD cap, peak cap (80 mcg/mL), and trough cap (25 mcg/mL). For
+  // any patient where the steady-state PK math says no fixed-interval
+  // regimen at q6/q8/q12/q24 with dose ≥ 500 mg is safe (typically
+  // severe renal impairment, CL < ~0.5 L/h, t½ > 50 h), we MUST NOT
+  // silently emit a guessed regimen. Refuse the empiric workflow and
+  // direct the clinician to pulse-dose-then-level.
+  if (choice == null) {
+    return buildEmpiricRefusalResult({
+      patient,
+      prior,
+      loadingDose,
+    });
+  }
+
+  const safeInfusion = computeSafeInfusionDurationHours(choice.dose_mg);
   const curve = curvePoints(
     {
       CL: prior.CL,
@@ -446,6 +482,139 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
       weight_kg: patient.weight_kg,
       pk_model_name: prior.model_name,
       ffm_kg: prior.ffm_kg,
+    },
+  };
+}
+
+/**
+ * Build the InitialRegimenResult emitted when the empiric search returned no
+ * safe candidate. The recommendation is a single pulse dose followed by a
+ * measured level — the same workflow that vancomycin dosing protocols specify
+ * for severe renal impairment without dialysis.
+ *
+ * Sentinel-safe values are populated for the standard fields (recommended_dose,
+ * recommended_interval_hours, auc24, peak, trough) so downstream consumers that
+ * don't yet handle empiric_dosing_blocked don't crash. The UI MUST gate on
+ * empiric_dosing_blocked being present and render the pulse-dose safety state
+ * instead of those sentinel values.
+ */
+function buildEmpiricRefusalResult(args: {
+  patient: Patient;
+  prior: { CL: number; V1: number; Q: number; V2: number; scr: number; model_name: "colin_2019" | "vancomyzer_obesity"; ffm_kg?: number };
+  loadingDose: { suggested_dose_mg: number; basis: string };
+}): InitialRegimenResult {
+  const { patient, prior, loadingDose } = args;
+  const modelLabel = prior.model_name === "vancomyzer_obesity"
+    ? "Vancomyzer Obesity Model (Smit 2020 + Zhang 2023)"
+    : "Colin 2019";
+  const crcl = estimateCrCl(patient.age, patient.weight_kg, patient.serum_creatinine_mg_dl, patient.sex || "male");
+  const pulseMg = loadingDose.suggested_dose_mg;
+
+  const safety_message =
+    `Empiric fixed-interval dosing is not safe for this patient. ` +
+    `Estimated clearance is ${prior.CL.toFixed(2)} L/h (${modelLabel} prior with SCr ${prior.scr} mg/dL, ` +
+    `age ${patient.age}, weight ${patient.weight_kg} kg) — every regimen in the q6/q8/q12/q24 search ` +
+    `space at the 500 mg minimum dose would exceed the AUC₂₄ ceiling of 600 mg·h/L or the trough ` +
+    `cap of 25 mcg/mL. ` +
+    `Recommended action: give a single pulse dose of ${pulseMg} mg (${loadingDose.basis}) infused over ` +
+    `${Math.max(1, Math.ceil((pulseMg / 10) / 60 * 4) / 4)} hours, then draw a vancomycin level and ` +
+    `switch to the 1-Level workflow for level-guided maintenance redosing.`;
+
+  const interpretation_summary = safety_message;
+
+  const assumptions = [
+    `${modelLabel} two-compartment population prior used for clearance estimation.`,
+    "Empiric search constrained to q6/q8/q12/q24 intervals with dose ≥ 500 mg per institutional safety floor.",
+    "No regimen in this search space simultaneously satisfies the AUC₂₄ ≤ 600 mg·h/L ceiling, trough ≤ 25 mcg/mL cap, and TDD safety cap for this patient.",
+    "Pulse-dose-then-level is the standard workflow when fixed-interval empiric dosing is unsafe.",
+  ];
+
+  const limitations = [
+    "Empiric workflow is refused for this patient — the prior estimates severe renal impairment with prolonged elimination half-life.",
+    "No fixed-interval regimen is emitted because the engine cannot identify a candidate within the AUC and trough safety windows.",
+    "Pulse-dose value shown is a weight-based estimate (15–20 mg/kg, capped at 3000 mg); confirm dosing against institutional protocol and patient-specific factors before administration.",
+    "After the pulse dose, draw a level (typically at 24–48 h depending on estimated half-life) and use the 1-Level workflow to compute level-guided redose timing.",
+  ];
+
+  const quick_summary = [
+    `Empiric dosing refused — estimated CL ${prior.CL.toFixed(2)} L/h.`,
+    `Recommended: pulse dose ${pulseMg} mg × 1, then draw level + switch to 1-Level workflow.`,
+    `SCr ${prior.scr} mg/dL; ${modelLabel} prior.`,
+  ].join("\n");
+
+  const clinical_note = [
+    "Vancomycin: empiric fixed-interval dosing refused by calculator.",
+    `Estimated CL ${prior.CL.toFixed(2)} L/h (${modelLabel} prior; SCr ${prior.scr} mg/dL, age ${patient.age}, weight ${patient.weight_kg} kg).`,
+    "No regimen in the q6/q8/q12/q24 search space at the 500 mg dose floor passes the AUC₂₄ ≤ 600 mg·h/L and trough ≤ 25 mcg/mL safety filters.",
+    `Recommended action: pulse dose ${pulseMg} mg × 1 (${loadingDose.basis}), then draw a vancomycin level and use the 1-Level workflow for level-guided redose timing.`,
+    "** EMPIRIC FIXED-INTERVAL DOSING NOT RECOMMENDED — USE PULSE-THEN-LEVEL WORKFLOW **",
+  ].join("\n");
+
+  // "caution" is the highest-severity level in the ReviewStatus enum; the
+  // banner_title makes the refusal explicit.
+  const review_status = {
+    level: "caution" as const,
+    workflow_fit: "single_level" as const,
+    banner_title: "Empiric dosing refused — pulse-then-level required",
+    banner_body:
+      "The estimated PK profile makes fixed-interval empiric dosing unsafe. Give a single pulse dose, draw a level, and use the 1-Level workflow to compute level-guided redose timing.",
+    next_actions: [
+      `Give ${pulseMg} mg pulse dose × 1 (${loadingDose.basis}).`,
+      "Draw a vancomycin level (timing per estimated half-life).",
+      "Switch to the 1-Level workflow and enter the measured level to compute level-guided redose timing.",
+    ],
+  };
+
+  return {
+    recommendation_type: "initial_regimen",
+    auc24: 0,
+    peak: 0,
+    trough: 0,
+    auc_range_status: "below_target",
+    recommended_dose: "—",
+    recommended_interval_hours: 0,
+    recommended_infusion_duration_hours: 0,
+    interpretation_summary,
+    assumptions,
+    limitations,
+    curve: [],
+    measured_levels: [],
+    frequency_options: [],
+    calculation_details: {
+      method: "Empiric search returned no safe candidate; pulse-then-level workflow recommended",
+      evidence_strength: "population prior only — empiric refusal",
+      data_quality_summary: "No fixed-interval regimen is emitted; the recommendation is a single pulse dose followed by a measured level.",
+      review_status,
+      key_inputs: [
+        `SCr ${prior.scr} mg/dL (${modelLabel} renal covariate)`,
+        `Weight ${patient.weight_kg} kg`,
+        `Estimated CL ${prior.CL.toFixed(2)} L/h`,
+        ...(crcl > 0 ? [`Estimated CrCl ${Math.round(crcl)} mL/min`] : []),
+      ],
+      caution_flags: [
+        "Empiric fixed-interval dosing refused — pulse-then-level workflow required.",
+        "Severe renal impairment estimated by the population prior.",
+        "Confirm pulse-dose value against institutional protocol before administration.",
+      ],
+    },
+    documentation_preview: { quick_summary, clinical_note },
+    pk_parameters: {
+      CL: prior.CL,
+      V1: prior.V1,
+      Q: prior.Q,
+      V2: prior.V2,
+      used_posterior_refinement: false,
+      scr: prior.scr,
+      age: patient.age,
+      weight_kg: patient.weight_kg,
+      pk_model_name: prior.model_name,
+      ffm_kg: prior.ffm_kg,
+    },
+    empiric_dosing_blocked: {
+      reason: `No safe fixed-interval regimen at the q6/q8/q12/q24 × ≥500 mg search grid. Estimated CL ${prior.CL.toFixed(2)} L/h.`,
+      recommended_pulse_dose_mg: pulseMg,
+      safety_message,
+      estimated_cl_l_h: Math.round(prior.CL * 100) / 100,
     },
   };
 }

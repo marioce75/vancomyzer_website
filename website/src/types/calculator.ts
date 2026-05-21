@@ -143,6 +143,18 @@ export interface CalculateResponse {
     pk_model_name?: "colin_2019" | "vancomyzer_obesity";
     ffm_kg?: number;
   };
+  /**
+   * Set when the empiric search returns no safe fixed-interval regimen (severe
+   * renal impairment, very low clearance). The UI MUST render the pulse-dose
+   * safety state instead of the standard recommended_dose/auc/peak/trough
+   * fields, which will contain sentinel zeros in this case.
+   */
+  empiric_dosing_blocked?: {
+    reason: string;
+    recommended_pulse_dose_mg: number;
+    safety_message: string;
+    estimated_cl_l_h: number;
+  };
 }
 
 export interface CalculateErrorResponse {

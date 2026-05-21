@@ -170,6 +170,114 @@ function testGeriatricObesityNotOverdosed(): void {
   );
 }
 
+function testSevereRenalImpairmentRefusesEmpiricDosing(): void {
+  // Class I safety regression: the reported real-patient case that
+  // exposed the bug. 85y/F/79kg/SCr 4.53 used to produce a fatal
+  // recommendation of 2000 mg q8h (AUC₂₄ ~30,000, trough ~1240 mcg/mL)
+  // via a silent hardcoded fallback. The engine must REFUSE empiric
+  // dosing for this patient and emit empiric_dosing_blocked instead.
+  const result = computeInitialRegimen({
+    age: 85,
+    weight_kg: 79,
+    height_cm: 150,
+    sex: "female",
+    serum_creatinine_mg_dl: 4.53,
+  });
+
+  assert(
+    result.empiric_dosing_blocked != null,
+    "Severe AKI safety: empiric_dosing_blocked must be set for 85y/F/79kg/SCr 4.53. The engine emitting a fixed-interval regimen here would be a return of the catastrophic 2000mg q8h fallback bug.",
+  );
+  assert(
+    result.recommended_interval_hours === 0,
+    `Severe AKI safety: recommended_interval_hours must be 0 (sentinel) for the refusal case, got ${result.recommended_interval_hours}.`,
+  );
+  assert(
+    result.auc24 === 0 && result.peak === 0 && result.trough === 0,
+    `Severe AKI safety: AUC/peak/trough must be sentinel zeros for the refusal case (got auc24=${result.auc24}, peak=${result.peak}, trough=${result.trough}).`,
+  );
+  const blocked = result.empiric_dosing_blocked!;
+  assert(
+    blocked.recommended_pulse_dose_mg > 0 && blocked.recommended_pulse_dose_mg <= 3000,
+    `Severe AKI safety: pulse dose must be positive and ≤ 3000 mg cap (got ${blocked.recommended_pulse_dose_mg}).`,
+  );
+  assert(
+    blocked.estimated_cl_l_h < 1.0,
+    `Severe AKI safety: estimated CL for this patient should be well under 1 L/h (got ${blocked.estimated_cl_l_h}). If CL is higher, the underlying prior changed and the safety guard may not trigger as expected.`,
+  );
+  assert(
+    blocked.safety_message.includes("pulse"),
+    "Severe AKI safety: safety message must direct the user to pulse-dose-then-level workflow.",
+  );
+}
+
+function testSevereCkdRefusesEmpiricDosing(): void {
+  // Additional regression: 65y/M with SCr 5.0 — different demographics,
+  // same underlying severe-renal-impairment scenario. Engine must refuse.
+  const result = computeInitialRegimen({
+    age: 65,
+    weight_kg: 70,
+    height_cm: 175,
+    sex: "male",
+    serum_creatinine_mg_dl: 5.0,
+  });
+  assert(
+    result.empiric_dosing_blocked != null,
+    "65y/M/70kg/SCr 5.0 must trigger empiric refusal — severe renal impairment should never emit a fixed-interval regimen.",
+  );
+}
+
+function testNormalRenalFunctionStillRecommendsRegimen(): void {
+  // Inverse guard: the safety path must NOT trigger for normal-renal-
+  // function patients, who should receive a normal regimen recommendation.
+  const result = computeInitialRegimen({
+    age: 50,
+    weight_kg: 70,
+    height_cm: 175,
+    sex: "male",
+    serum_creatinine_mg_dl: 1.0,
+  });
+  assert(
+    result.empiric_dosing_blocked == null,
+    "Normal renal function (SCr 1.0) must NOT trigger empiric refusal — a fixed-interval regimen should be emitted.",
+  );
+  const doseMg = parseInt(result.recommended_dose.replace(/\D/g, ""), 10);
+  assert(
+    Number.isFinite(doseMg) && doseMg >= 500 && doseMg <= 2000,
+    `Normal renal function: recommended dose must be between 500–2000 mg (got ${result.recommended_dose}).`,
+  );
+  assert(
+    result.recommended_interval_hours > 0,
+    `Normal renal function: recommended interval must be > 0 (got ${result.recommended_interval_hours}).`,
+  );
+}
+
+function testDoseGridFloorRaisedTo500(): void {
+  // Mario's clinical-floor decision: 500 mg minimum dose for empiric
+  // workflow. Verify no recommendation ever emits below 500 mg.
+  const scenarios = [
+    { age: 30, weight_kg: 60, height_cm: 165, sex: "female" as const, serum_creatinine_mg_dl: 0.8 },
+    { age: 45, weight_kg: 70, height_cm: 175, sex: "male" as const, serum_creatinine_mg_dl: 1.0 },
+    { age: 70, weight_kg: 80, height_cm: 170, sex: "male" as const, serum_creatinine_mg_dl: 1.5 },
+    { age: 75, weight_kg: 65, height_cm: 160, sex: "female" as const, serum_creatinine_mg_dl: 2.0 },
+  ];
+  for (const p of scenarios) {
+    const result = computeInitialRegimen(p);
+    if (result.empiric_dosing_blocked != null) continue;
+    const doseMg = parseInt(result.recommended_dose.replace(/\D/g, ""), 10);
+    assert(
+      doseMg >= 500,
+      `Dose floor regression: patient ${JSON.stringify(p)} got recommended dose ${doseMg} mg, below the 500 mg floor.`,
+    );
+    for (const opt of result.frequency_options) {
+      assert(
+        opt.dose_mg >= 500,
+        `Dose floor regression: patient ${JSON.stringify(p)} got frequency option ${opt.dose_mg} mg q${opt.interval_hours}h, below the 500 mg floor.`,
+      );
+    }
+  }
+}
+
 export function runInitialRegimenIntegrationTests(): void {
   testProducesNonZeroExposure();
   testScrAffectsClearanceAndExposure();
@@ -177,9 +285,13 @@ export function runInitialRegimenIntegrationTests(): void {
   testLoadingDoseGuidanceIsPresentAndBounded();
   testLowBodyWeightLoadingDoseIsNotArtificiallyFloored();
   testGeriatricObesityNotOverdosed();
+  testSevereRenalImpairmentRefusesEmpiricDosing();
+  testSevereCkdRefusesEmpiricDosing();
+  testNormalRenalFunctionStillRecommendsRegimen();
+  testDoseGridFloorRaisedTo500();
 }
 
 if (typeof process !== "undefined" && process.argv[1]?.includes("initialRegimen.integration.test")) {
   runInitialRegimenIntegrationTests();
-  console.log("Initial regimen integration tests passed, including bounded empiric loading-dose guidance checks, low-body-weight optional loading-dose behavior, and geriatric-obesity FDecline guardrail.");
+  console.log("Initial regimen integration tests passed, including bounded empiric loading-dose guidance checks, low-body-weight optional loading-dose behavior, geriatric-obesity FDecline guardrail, severe-renal-impairment empiric-refusal safety guards, and 500mg dose-floor enforcement.");
 }
