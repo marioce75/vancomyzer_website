@@ -456,6 +456,7 @@ export default function CalculatorWorkspace() {
         documentation_preview: data.documentation_preview,
         pk_parameters: data.pk_parameters,
         empiric_dosing_blocked: data.empiric_dosing_blocked,
+        adjustment_dosing_blocked: data.adjustment_dosing_blocked,
       });
       setLastCalculatedAt(Date.now());
       setSelectedFrequencyOption(null);
@@ -1043,6 +1044,7 @@ export default function CalculatorWorkspace() {
                       loadingDoseMg={regimen.doses_given === 1 ? regimen.dose_mg : null}
                       onUndoLoadingDose={preLoadingDoseState.current ? handleUndoLoadingDose : undefined}
                       empiricDosingBlocked={visibleResult.empiric_dosing_blocked}
+                      adjustmentDosingBlocked={visibleResult.adjustment_dosing_blocked}
                     />
                     <TeachingNote label="Why this dose?">
                       The engine searches dose × interval combinations on the bounded grid (250–2000 mg, q6h–q48h)

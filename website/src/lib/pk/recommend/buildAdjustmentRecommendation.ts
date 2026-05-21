@@ -293,6 +293,44 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
     }
   }
 
+  // ─── POST-RECOMMENDATION SAFETY CHECK ──────────────────────────────
+  // Every code path above CAN emit a recommendation whose predicted
+  // peak/trough exceeds the institutional safety caps — especially
+  // conservativeSameIntervalDose, which scales by AUC ratio but doesn't
+  // simulate the actual exposure. For severe renal impairment + short
+  // current interval, the floor dose (250 or 500 mg) at the user's
+  // current interval can still produce peaks of 150+ mcg/mL.
+  //
+  // Verify the recommendation before returning it. If unsafe, refuse
+  // with adjustment_dosing_blocked rather than silently shipping a
+  // dangerous regimen. This mirrors the empiric_dosing_blocked pattern
+  // in initialRegimen.ts.
+  if (hasPK) {
+    const recDoseCheck = Number.parseFloat(base.recommended_dose);
+    const recIntervalCheck = base.recommended_interval_hours;
+    const recInfusionCheck = base.recommended_infusion_duration_hours ?? infusion_hours;
+    if (Number.isFinite(recDoseCheck) && recDoseCheck > 0 && recIntervalCheck > 0) {
+      const recExposure = simulateCandidateExposure(CL!, V1!, Q!, V2!, {
+        dose_mg: recDoseCheck,
+        interval_hours: recIntervalCheck,
+        infusion_duration_hours: Math.min(recInfusionCheck, recIntervalCheck),
+      });
+      if (recExposure.peak > MAX_PEAK_MCG_ML || recExposure.trough > MAX_TROUGH_MCG_ML) {
+        // The recommendation engine could not find a safe regimen in its
+        // search space. Refuse and direct the clinician to hold dosing
+        // and re-check the level.
+        base = buildAdjustmentRefusal({
+          CL: CL!,
+          recommendedDoseCheck: recDoseCheck,
+          recommendedInterval: recIntervalCheck,
+          predictedPeak: recExposure.peak,
+          predictedTrough: recExposure.trough,
+          predictedAuc24: recExposure.auc24,
+        });
+      }
+    }
+  }
+
   // Attach frequency options from the full candidate grid
   const recDose = Number.parseFloat(base.recommended_dose);
   base.frequency_options = collectFrequencyOptions(
@@ -303,4 +341,46 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
   );
 
   return base;
+}
+
+/**
+ * Build the AdjustmentRecommendation emitted when the recommendation
+ * engine cannot find a regimen whose predicted peak/trough fall within
+ * the institutional safety caps. Mirrors initialRegimen.ts's empiric
+ * refusal pattern: sentinel-safe values for the standard fields plus an
+ * adjustment_dosing_blocked field that the UI uses to render the safety
+ * state.
+ */
+function buildAdjustmentRefusal(args: {
+  CL: number;
+  recommendedDoseCheck: number;
+  recommendedInterval: number;
+  predictedPeak: number;
+  predictedTrough: number;
+  predictedAuc24: number;
+}): AdjustmentRecommendation {
+  const { CL, recommendedDoseCheck, recommendedInterval, predictedPeak, predictedTrough, predictedAuc24 } = args;
+  const safetyMessage =
+    `No safe maintenance regimen exists in the search space for this patient. ` +
+    `Estimated clearance is ${CL.toFixed(2)} L/h — at the calculator's minimum dose ` +
+    `(${recommendedDoseCheck} mg q${recommendedInterval}h, the lowest feasible at the ` +
+    `current interval) the predicted steady-state peak would be ` +
+    `${predictedPeak.toFixed(0)} mcg/mL and trough ${predictedTrough.toFixed(0)} mcg/mL ` +
+    `(AUC₂₄ ${predictedAuc24.toFixed(0)} mg·h/L), all above the institutional safety caps. ` +
+    `Recommended action: hold maintenance dosing, recheck a vancomycin level when ` +
+    `the trough falls below 15–20 mcg/mL, then redose using the 1-Level workflow ` +
+    `for level-guided pulse dosing.`;
+
+  return {
+    recommended_dose: "—",
+    recommended_interval_hours: 0,
+    recommended_infusion_duration_hours: 0,
+    frequency_options: [],
+    adjustment_dosing_blocked: {
+      reason: `No regimen in the search grid satisfies peak ≤ ${MAX_PEAK_MCG_ML} mcg/mL and trough ≤ ${MAX_TROUGH_MCG_ML} mcg/mL at estimated CL ${CL.toFixed(2)} L/h.`,
+      recommended_action: `Hold maintenance dosing; recheck level when trough < 15–20 mcg/mL; redose via 1-Level workflow.`,
+      safety_message: safetyMessage,
+      estimated_cl_l_h: Math.round(CL * 100) / 100,
+    },
+  };
 }

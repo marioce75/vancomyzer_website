@@ -155,6 +155,18 @@ export interface CalculateResponse {
     safety_message: string;
     estimated_cl_l_h: number;
   };
+  /**
+   * Set when the existing-regimen ADJUSTMENT engine cannot find any
+   * regimen in its search space whose predicted peak/trough fall within
+   * the institutional safety caps. The UI MUST render the safety state
+   * in place of the standard recommendation card.
+   */
+  adjustment_dosing_blocked?: {
+    reason: string;
+    recommended_action: string;
+    safety_message: string;
+    estimated_cl_l_h: number;
+  };
 }
 
 export interface CalculateErrorResponse {

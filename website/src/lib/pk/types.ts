@@ -117,6 +117,22 @@ export interface AdjustmentRecommendation {
     quick_summary: string;
     clinical_note: string;
   };
+  /**
+   * Set when no safe adjustment regimen exists — i.e. the engine cannot
+   * find any dose/interval combination in its search space whose predicted
+   * peak ≤ 80 mcg/mL and trough ≤ 25 mcg/mL. Typically severe renal
+   * impairment + sparse data where the current regimen is already supra-
+   * therapeutic. The UI MUST render the pulse-dose safety state in place
+   * of the standard regimen card; recommended_dose / interval / etc.
+   * remain populated with sentinel-safe values so downstream consumers
+   * don't crash.
+   */
+  adjustment_dosing_blocked?: {
+    reason: string;
+    recommended_action: string;
+    safety_message: string;
+    estimated_cl_l_h: number;
+  };
 }
 
 export interface ExplanationInput {

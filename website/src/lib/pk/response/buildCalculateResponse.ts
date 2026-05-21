@@ -150,5 +150,6 @@ export function buildCalculateResponse(
     documentation_preview: explain.documentation_preview,
     curve_engine_recommended: engineOutput.curve_engine_recommended,
     fit_diagnostic: engineOutput.fit_diagnostic,
+    adjustment_dosing_blocked: recommendation.adjustment_dosing_blocked,
   };
 }

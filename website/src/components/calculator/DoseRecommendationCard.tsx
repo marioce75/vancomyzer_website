@@ -31,6 +31,13 @@ interface DoseRecommendationCardProps {
     safety_message: string;
     estimated_cl_l_h: number;
   } | null;
+  /** When set, replaces the standard dose card with a hold-and-recheck safety state. */
+  adjustmentDosingBlocked?: {
+    reason: string;
+    recommended_action: string;
+    safety_message: string;
+    estimated_cl_l_h: number;
+  } | null;
 }
 
 const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" };
@@ -198,6 +205,7 @@ export default function DoseRecommendationCard({
   loadingDoseMg,
   onUndoLoadingDose,
   empiricDosingBlocked,
+  adjustmentDosingBlocked,
 }: DoseRecommendationCardProps) {
   // Show options that are in-range or below-target only — never show above-target options
   const options = frequency_options?.filter(
@@ -216,10 +224,18 @@ export default function DoseRecommendationCard({
     return idx >= 0 ? idx : 0;
   });
 
-  // SAFETY-CRITICAL: if the engine refused empiric dosing, render the pulse-
-  // dose safety state and DO NOT fall through to the standard regimen card.
+  // SAFETY-CRITICAL: if the engine refused dosing for safety reasons,
+  // render the safety state and DO NOT fall through to the standard
+  // regimen card. Two refusal modes:
+  //   - empiric_dosing_blocked: no safe fixed-interval regimen exists
+  //     for the patient (severe AKI, etc.) → pulse-then-level workflow
+  //   - adjustment_dosing_blocked: existing patient on too-aggressive
+  //     regimen, no safe adjustment exists → hold + recheck level
   if (empiricDosingBlocked) {
     return <EmpiricDosingBlockedCard data={empiricDosingBlocked} />;
+  }
+  if (adjustmentDosingBlocked) {
+    return <AdjustmentDosingBlockedCard data={adjustmentDosingBlocked} />;
   }
 
   if (!recommended_dose || !recommended_interval_hours) return null;
@@ -493,6 +509,62 @@ function EmpiricDosingBlockedCard({
         This is decision-support output only. The pulse-dose value is a weight-based estimate
         (15–20 mg/kg, capped at 3000 mg); confirm against institutional protocol and
         patient-specific factors before administration.
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Hold-and-recheck safety state — shown when the adjustment engine
+ * cannot find any regimen in its search space whose predicted peak/
+ * trough stay within institutional caps. Typically severe renal
+ * impairment + sparse data where the patient's current regimen is
+ * already supra-therapeutic and no acceptable dose-down or interval-
+ * extension exists in the search grid.
+ */
+function AdjustmentDosingBlockedCard({
+  data,
+}: {
+  data: NonNullable<DoseRecommendationCardProps["adjustmentDosingBlocked"]>;
+}) {
+  return (
+    <div
+      role="alert"
+      className="border-l-4 p-4"
+      style={{
+        background: "#fff1f2",
+        borderColor: "#dc2626",
+        borderLeftColor: "#dc2626",
+      }}
+    >
+      <div className="mb-2 flex items-baseline gap-2">
+        <span className="text-base font-bold uppercase tracking-wider" style={{ color: "#991b1b" }}>
+          ⚠ No safe adjustment exists
+        </span>
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#991b1b" }}>
+          Hold &amp; recheck
+        </span>
+      </div>
+      <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#7f1d1d" }}>
+        {data.safety_message}
+      </p>
+      <div
+        className="mb-3 grid gap-2 border p-3 text-[13px]"
+        style={{ background: "#ffffff", borderColor: "#fca5a5", color: "#7f1d1d" }}
+      >
+        <div className="font-bold uppercase tracking-wider text-xs">Recommended action</div>
+        <div className="text-[13px] font-semibold" style={FONT}>
+          {data.recommended_action}
+        </div>
+        <div className="text-xs">
+          Estimated CL: <strong>{data.estimated_cl_l_h.toFixed(2)} L/h</strong>.
+        </div>
+      </div>
+      <p className="text-[11px]" style={{ color: "#7f1d1d" }}>
+        This is decision-support output only. Holding maintenance dosing is the
+        engine&apos;s safety position when no acceptable dose-down or interval-extension
+        exists in its search grid; clinical context (infection severity, hemodynamics,
+        institutional protocol) remains the clinician&apos;s judgment.
       </p>
     </div>
   );

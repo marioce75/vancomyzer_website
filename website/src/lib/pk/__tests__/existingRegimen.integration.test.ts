@@ -508,6 +508,33 @@ function testCase24(): void {
   }
 }
 
+function testCase27_severeAkiAdjustmentRefusesUnsafeRegimen(): void {
+  // Safety regression: severe AKI patient on too-aggressive q6h with a single
+  // high trough used to get a recommendation of 250 mg q6h, which the
+  // engine itself simulates as peak 171 mcg/mL, trough 166 mcg/mL, AUC₂₄
+  // 4047 mg·h/L — all far over the institutional caps (peak 80, trough 25,
+  // AUC 600). The post-recommendation safety wrapper now catches this and
+  // emits adjustment_dosing_blocked instead of silently shipping the unsafe
+  // regimen.
+  const result = runExistingRegimenPipeline({
+    patient: { age: 78, weight_kg: 70, serum_creatinine_mg_dl: 5.0 },
+    regimen: { dose_mg: 1000, interval_hours: 6, infusion_duration_hours: 1, doses_given: 4 },
+    levels: [{ value_mcg_ml: 50, collection_time: "", time_since_last_dose_hours: 5 }],
+  });
+  assert(!("ok" in result && result.ok === false), "Case 27: pipeline must accept the input — only the recommendation should be refused");
+  const r = result as { adjustment_dosing_blocked?: { safety_message: string }; recommended_dose: string };
+  assert(
+    r.adjustment_dosing_blocked != null,
+    `Case 27 safety: adjustment_dosing_blocked MUST be set when no safe regimen exists. ` +
+    `Without this guard, the engine recommends 250 mg q6h producing peak 171, trough 166 — ` +
+    `a clinically dangerous return of the silent-fallback safety bug. Got recommendation: ${r.recommended_dose}.`,
+  );
+  assert(
+    r.recommended_dose === "—",
+    `Case 27 safety: recommended_dose must be sentinel "—" when adjustment is blocked, got "${r.recommended_dose}".`,
+  );
+}
+
 function testCase26_samCyclePeakTroughAcceptedWhenWallDeltaExceedsHalfInterval(): void {
   // Regression: peak + trough drawn IN THE SAME DOSING CYCLE on q12h with a
   // wall-clock delta of 9.5 hours used to be falsely rejected because the
@@ -614,9 +641,10 @@ export function runExistingRegimenTests(): void {
   testCase24();
   testCase25();
   testCase26_samCyclePeakTroughAcceptedWhenWallDeltaExceedsHalfInterval();
+  testCase27_severeAkiAdjustmentRefusesUnsafeRegimen();
 }
 
 if (typeof process !== "undefined" && process.argv[1]?.includes("existingRegimen.integration.test")) {
   runExistingRegimenTests();
-  console.log("All 26 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, late-lab-draw tolerance with non-SS multi-dose accumulation, chart-marker placement on the correct absolute-time interval, and same-cycle peak+trough cycle-offset acceptance.");
+  console.log("All 27 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, late-lab-draw tolerance with non-SS multi-dose accumulation, chart-marker placement on the correct absolute-time interval, same-cycle peak+trough cycle-offset acceptance, and severe-AKI adjustment-refusal peak-cap safety guard.");
 }
