@@ -21,8 +21,12 @@
  *                          what most popPK papers actually publish (very few publish individual
  *                          patient-level cases with full demographics + dose + AUC).
  *  - "existing"          → runExistingRegimenPipeline (full Bayesian fit using measured levels)
+ *  - "reference_band"    → NO engine call. Card renders a published multi-platform comparison
+ *                          (e.g., Patanwala 2022 cohort-mean AUC per popPK model) as
+ *                          industry-context evidence. Our engine is not in the test loop for
+ *                          these cards; they exist to show platform-choice variance.
  */
-export type WorkflowType = "empiric" | "prior_at_regimen" | "existing";
+export type WorkflowType = "empiric" | "prior_at_regimen" | "existing" | "reference_band";
 
 export type SourceKind =
   | "population_simulation"
@@ -113,6 +117,39 @@ export interface PublishedCase {
   /** Sentence(s) shown on the case card explaining context + caveats. */
   notes_for_page: string;
   workflow_type: WorkflowType;
+  /**
+   * Populated when workflow_type === "reference_band". Carries the per-
+   * platform published values for a multi-platform comparison study (e.g.,
+   * Patanwala 2022's three popPK priors over 188 ICU adults). When set, the
+   * runner skips the engine call and the card renders the comparison band
+   * directly. The patient / regimen / published / tolerance fields above are
+   * required by the schema but ignored by the runner for these cases — use
+   * sentinel/placeholder values in the case file.
+   */
+  reference_band?: ReferenceBand;
+}
+
+export interface ReferencePlatform {
+  /** Display name shown on the bar, e.g. "Goti (via Tucuxi)" or "PrecisePK". */
+  name: string;
+  mean_auc24_mg_h_l: number;
+  /** Optional standard deviation, shown as a whisker on the bar. */
+  sd_auc24_mg_h_l?: number;
+  /** Optional caveat — e.g. "uses the prior Vancomyzer is built on" so the
+   *  reader knows which row to compare against. */
+  notes?: string;
+  /** True if this is the platform Vancomyzer's prior is built on (highlighted
+   *  visually). */
+  is_vancomyzer_prior?: boolean;
+}
+
+export interface ReferenceBand {
+  /** One-paragraph cohort description shown above the bar chart. */
+  cohort_description: string;
+  /** Per-platform published values. Sorted ascending by mean on the card. */
+  platforms: ReferencePlatform[];
+  /** Position statement — how Vancomyzer relates to this band. */
+  our_position: string;
 }
 
 /** Result of running one case through the live engine and comparing to published. */
@@ -133,4 +170,9 @@ export interface CaseResult {
   within_tolerance: boolean;
   /** If false, lists which metrics drifted. */
   failures: string[];
+  /** True for reference_band cases that have no engine output to verify —
+   *  the card renders the published band as industry context, not as a
+   *  reproducibility test. These cases are excluded from the summary
+   *  scorecard's delta math but still counted in the total. */
+  is_reference_band?: boolean;
 }

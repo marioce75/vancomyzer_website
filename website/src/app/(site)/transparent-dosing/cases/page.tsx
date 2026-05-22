@@ -18,7 +18,7 @@
 import Link from "next/link";
 import { CASES } from "@/lib/validation/registry";
 import { runAllCases, summarize } from "@/lib/validation/runCase";
-import type { PublishedCase, CaseResult } from "@/lib/validation/types";
+import type { PublishedCase, CaseResult, ReferenceBand } from "@/lib/validation/types";
 
 export const metadata = {
   title: "Literature Reproducibility — Vancomyzer",
@@ -123,10 +123,15 @@ function SummaryScorecard({ summary }: { summary: ReturnType<typeof summarize> }
             Summary
           </div>
           <div style={{ fontSize: 22, fontWeight: 700, color: allPassing ? "#047857" : "#92400e", marginTop: 4 }}>
-            {summary.passing} / {summary.total} cases within tolerance
+            {summary.passing} / {summary.passing + summary.failing} engine tests within tolerance
             {summary.failing > 0 && (
               <span style={{ fontSize: 14, fontWeight: 600, marginLeft: 10, color: "#92400e" }}>
                 · {summary.failing} drifted
+              </span>
+            )}
+            {summary.reference_band_count > 0 && (
+              <span style={{ fontSize: 14, fontWeight: 500, marginLeft: 10, color: "#3730a3" }}>
+                · {summary.reference_band_count} reference band{summary.reference_band_count === 1 ? "" : "s"}
               </span>
             )}
           </div>
@@ -143,6 +148,12 @@ function SummaryScorecard({ summary }: { summary: ReturnType<typeof summarize> }
 }
 
 function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseResult }) {
+  // Reference-band cards render a published multi-platform comparison rather
+  // than an engine-vs-published delta. Branch early — they have a different
+  // shape and a different visual treatment (industry-context, not pass/fail).
+  if (caseDef.reference_band) {
+    return <ReferenceBandCard caseDef={caseDef} band={caseDef.reference_band} />;
+  }
   const pass = result.within_tolerance;
   return (
     <article
@@ -225,6 +236,181 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
         </Link>
       </footer>
     </article>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Reference-band card — published multi-platform AUC comparison.
+// Renders the per-platform means as horizontal bars with optional SD
+// whiskers, highlighting the platform Vancomyzer's prior is built on.
+// No engine call, no pass/fail — this is industry-context evidence.
+// ─────────────────────────────────────────────────────────────────────
+
+function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: ReferenceBand }) {
+  // Compute the chart's x-axis range. Pad ±10% beyond the min/max of
+  // (mean ± SD) across all platforms so the whiskers don't clip.
+  const lows = band.platforms.map((p) => p.mean_auc24_mg_h_l - (p.sd_auc24_mg_h_l ?? 0));
+  const highs = band.platforms.map((p) => p.mean_auc24_mg_h_l + (p.sd_auc24_mg_h_l ?? 0));
+  const rawMin = Math.min(...lows);
+  const rawMax = Math.max(...highs);
+  const span = rawMax - rawMin;
+  const xMin = Math.max(0, Math.floor((rawMin - span * 0.1) / 100) * 100);
+  const xMax = Math.ceil((rawMax + span * 0.1) / 100) * 100;
+  const xRange = xMax - xMin;
+
+  return (
+    <article
+      id={caseDef.id}
+      style={{
+        padding: "16px 20px",
+        background: "var(--color-card)",
+        border: "1px solid var(--color-border)",
+        borderLeft: "4px solid #6366f1",
+        borderRadius: 6,
+      }}
+    >
+      <header style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline", marginBottom: 6 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--color-primary)", margin: 0 }}>
+          {caseDef.source.specific_reference}
+        </h2>
+        <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#eef2ff", color: "#3730a3", border: "1px solid #c7d2fe", borderRadius: 4 }}>
+          ◇ Reference band
+        </span>
+      </header>
+      <p style={{ fontSize: 12, color: "var(--color-secondary)", margin: "0 0 6px 0" }}>
+        <strong>What it shows:</strong> {caseDef.what_it_tests}
+      </p>
+      <p style={{ fontSize: 12, color: "var(--color-dim)", margin: "0 0 10px 0", lineHeight: 1.55 }}>
+        {caseDef.notes_for_page}
+      </p>
+
+      <div style={{ fontSize: 11, color: "var(--color-dim)", lineHeight: 1.55, padding: "8px 10px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 4, marginBottom: 12 }}>
+        <strong style={{ color: "var(--color-primary)" }}>Cohort:</strong> {band.cohort_description}
+      </div>
+
+      {/* Horizontal bar chart — one row per platform */}
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-dim)", marginBottom: 8, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+          Cohort-mean AUC₂₄ (mg·h/L) per popPK model
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "200px 1fr 110px", gap: 8, alignItems: "center", fontSize: 12 }}>
+          {band.platforms.map((p) => {
+            const meanLeftPct = ((p.mean_auc24_mg_h_l - xMin) / xRange) * 100;
+            const barWidthPct = ((p.mean_auc24_mg_h_l - xMin) / xRange) * 100;
+            const whiskerLow = p.sd_auc24_mg_h_l != null ? Math.max(0, ((p.mean_auc24_mg_h_l - p.sd_auc24_mg_h_l - xMin) / xRange) * 100) : null;
+            const whiskerHigh = p.sd_auc24_mg_h_l != null ? Math.min(100, ((p.mean_auc24_mg_h_l + p.sd_auc24_mg_h_l - xMin) / xRange) * 100) : null;
+            const isOurs = p.is_vancomyzer_prior === true;
+            return (
+              <PlatformRow
+                key={p.name}
+                name={p.name}
+                notes={p.notes}
+                mean={p.mean_auc24_mg_h_l}
+                sd={p.sd_auc24_mg_h_l}
+                meanLeftPct={meanLeftPct}
+                barWidthPct={barWidthPct}
+                whiskerLowPct={whiskerLow}
+                whiskerHighPct={whiskerHigh}
+                isOurs={isOurs}
+              />
+            );
+          })}
+        </div>
+        {/* Axis ticks */}
+        <div style={{ display: "grid", gridTemplateColumns: "200px 1fr 110px", gap: 8, marginTop: 4, fontSize: 10, color: "var(--color-dim)" }}>
+          <div></div>
+          <div style={{ position: "relative", height: 14 }}>
+            <span style={{ position: "absolute", left: "0%", transform: "translateX(-50%)" }}>{xMin}</span>
+            <span style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>{Math.round((xMin + xMax) / 2)}</span>
+            <span style={{ position: "absolute", left: "100%", transform: "translateX(-100%)" }}>{xMax}</span>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <div style={{ fontSize: 12, color: "var(--color-secondary)", padding: "10px 12px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 4, marginBottom: 10, lineHeight: 1.55 }}>
+        <strong style={{ color: "var(--color-primary)" }}>Where Vancomyzer sits:</strong> {band.our_position}
+      </div>
+
+      <footer style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+        <a
+          href={caseDef.source.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: 11, color: "var(--color-primary)", textDecoration: "underline" }}
+        >
+          {caseDef.source.citation} ↗
+        </a>
+        <span style={{ fontSize: 11, color: "var(--color-dim)" }}>
+          DOI: {caseDef.source.doi}
+        </span>
+      </footer>
+    </article>
+  );
+}
+
+function PlatformRow({
+  name, notes, mean, sd, meanLeftPct, barWidthPct, whiskerLowPct, whiskerHighPct, isOurs,
+}: {
+  name: string;
+  notes?: string;
+  mean: number;
+  sd?: number;
+  meanLeftPct: number;
+  barWidthPct: number;
+  whiskerLowPct: number | null;
+  whiskerHighPct: number | null;
+  isOurs: boolean;
+}) {
+  void meanLeftPct; // unused — bar grows from 0
+  const barColor = isOurs ? "#6366f1" : "#94a3b8";
+  return (
+    <>
+      <div style={{ color: isOurs ? "var(--color-primary)" : "var(--color-secondary)", fontWeight: isOurs ? 600 : 400, lineHeight: 1.3 }}>
+        {name}
+        {notes && (
+          <div style={{ fontSize: 10, color: isOurs ? "#3730a3" : "var(--color-dim)", fontWeight: 500, marginTop: 1 }}>
+            {notes}
+          </div>
+        )}
+      </div>
+      <div style={{ position: "relative", height: 24, background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 3 }}>
+        {/* Bar from left to mean */}
+        <div
+          style={{
+            position: "absolute",
+            top: 4,
+            left: 0,
+            height: 16,
+            width: `${barWidthPct}%`,
+            background: barColor,
+            borderRadius: 2,
+          }}
+        />
+        {/* SD whisker */}
+        {whiskerLowPct != null && whiskerHighPct != null && (
+          <>
+            <div
+              style={{
+                position: "absolute",
+                top: 11,
+                left: `${whiskerLowPct}%`,
+                width: `${whiskerHighPct - whiskerLowPct}%`,
+                height: 2,
+                background: "#0f172a",
+                opacity: 0.5,
+              }}
+            />
+            <div style={{ position: "absolute", top: 6, left: `${whiskerLowPct}%`, width: 1, height: 12, background: "#0f172a", opacity: 0.5 }} />
+            <div style={{ position: "absolute", top: 6, left: `${whiskerHighPct}%`, width: 1, height: 12, background: "#0f172a", opacity: 0.5 }} />
+          </>
+        )}
+      </div>
+      <div style={{ fontSize: 12, color: isOurs ? "var(--color-primary)" : "var(--color-secondary)", fontWeight: isOurs ? 700 : 500, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
+        {mean.toFixed(0)}
+        {sd != null && <span style={{ color: "var(--color-dim)", fontWeight: 400 }}> ± {sd.toFixed(0)}</span>}
+      </div>
+    </>
   );
 }
 

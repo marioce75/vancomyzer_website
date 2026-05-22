@@ -18,6 +18,7 @@ import { COLIN_2019_ELDERLY_MILD_CKD } from "./cases/colin-2019-elderly-mild-ckd
 import { SMIT_2020_MORBIDLY_OBESE } from "./cases/smit-2020-morbidly-obese";
 import { ADANE_2015_EXTREME_OBESITY } from "./cases/adane-2015-extreme-obesity";
 import { CARRENO_2017_SPARSE_BAYESIAN_OBESE } from "./cases/carreno-2017-sparse-bayesian-obese";
+import { PATANWALA_2022_MULTI_PLATFORM } from "./cases/patanwala-2022-multi-platform";
 
 // Cases are wired in as the curation lands. Order matters — appears in
 // this order on /transparent-dosing/cases. Group by source for scannability.
@@ -34,6 +35,8 @@ export const CASES: PublishedCase[] = [
   ADANE_2015_EXTREME_OBESITY,
   // Sparse-sampling Bayesian fit — tests the fitter, not just the prior
   CARRENO_2017_SPARSE_BAYESIAN_OBESE,
+  // Industry-context reference band — multi-platform AUC variance
+  PATANWALA_2022_MULTI_PLATFORM,
 ];
 
 export function getCaseById(id: string): PublishedCase | undefined {

@@ -29,6 +29,20 @@ function withinTolerance(delta: number | null, tolerance: number): boolean {
 }
 
 export function runCase(c: PublishedCase): CaseResult {
+  // Reference-band cases don't call the engine — they exist purely to render
+  // a published multi-platform comparison as industry-context evidence.
+  // Return a sentinel result that the page and summary skip past.
+  if (c.workflow_type === "reference_band") {
+    return {
+      case_id: c.id,
+      predicted: { auc24: null, peak: null, trough: null, clearance_l_h: null, v1_l: null },
+      deltas: { auc24_pct: null, peak_pct: null, trough_pct: null },
+      within_tolerance: true,
+      failures: [],
+      is_reference_band: true,
+    };
+  }
+
   let predicted: CaseResult["predicted"];
 
   if (c.workflow_type === "empiric") {
@@ -158,15 +172,25 @@ export function runAllCases(cases: PublishedCase[]): CaseResult[] {
 
 /** Aggregate stats for the page summary scorecard. */
 export interface CaseSummary {
+  /** Total number of cards on the page, including reference-band industry-context cards. */
   total: number;
+  /** Tests that ran the engine and stayed within tolerance. */
   passing: number;
+  /** Tests that ran the engine and drifted beyond tolerance. */
   failing: number;
+  /** Reference-band cards (no engine call, no pass/fail). Counted in `total`
+   *  but excluded from passing/failing and delta math. */
+  reference_band_count: number;
   median_abs_auc_pct: number | null;
   max_abs_auc_pct: number | null;
 }
 
 export function summarize(results: CaseResult[]): CaseSummary {
-  const aucAbs = results
+  // Engine-run results only — reference-band cards have no delta to compute.
+  const engineResults = results.filter((r) => !r.is_reference_band);
+  const referenceBandCount = results.length - engineResults.length;
+
+  const aucAbs = engineResults
     .map((r) => r.deltas.auc24_pct)
     .filter((d): d is number => d != null)
     .map((d) => Math.abs(d))
@@ -181,8 +205,9 @@ export function summarize(results: CaseResult[]): CaseSummary {
 
   return {
     total: results.length,
-    passing: results.filter((r) => r.within_tolerance).length,
-    failing: results.filter((r) => !r.within_tolerance).length,
+    passing: engineResults.filter((r) => r.within_tolerance).length,
+    failing: engineResults.filter((r) => !r.within_tolerance).length,
+    reference_band_count: referenceBandCount,
     median_abs_auc_pct: median,
     max_abs_auc_pct: aucAbs.length === 0 ? null : aucAbs[aucAbs.length - 1],
   };
