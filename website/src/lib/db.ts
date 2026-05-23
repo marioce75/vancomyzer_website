@@ -410,6 +410,160 @@ export function listAllUsers(): UserRow[] {
 }
 
 // ---------------------------------------------------------------------------
+// User Management dashboard — server-side filter + pagination
+// ---------------------------------------------------------------------------
+
+export interface UserListFilter {
+  search?: string;                  // matches full_name | email | username | institution
+  status?: string;                  // active | pending | disabled
+  subscription_tier?: string;       // free | individual_pro | department | hospital
+  country_code?: string;            // ISO 3166-1 alpha-2
+  institution_type?: string;        // enum from userCategorization.ts
+  institutional_account_id?: number;
+  mfa_enabled?: boolean;            // false → MFA off
+  locked?: boolean;                 // true → locked_until > now
+  inactive_days?: number;           // last_login older than N days
+  sort?: "created_desc" | "created_asc" | "last_login_desc" | "name_asc" | "email_asc";
+  page?: number;                    // 1-indexed
+  page_size?: number;               // default 50, max 200
+}
+
+export interface PaginatedUsers {
+  users: UserRow[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+function buildUserWhere(filter: UserListFilter): { sql: string; params: (string | number)[] } {
+  const clauses: string[] = [];
+  const params: (string | number)[] = [];
+
+  if (filter.search && filter.search.trim()) {
+    const q = `%${filter.search.trim()}%`;
+    clauses.push("(full_name LIKE ? OR email LIKE ? OR username LIKE ? OR institution LIKE ?)");
+    params.push(q, q, q, q);
+  }
+  if (filter.status) {
+    clauses.push("status = ?");
+    params.push(filter.status);
+  }
+  if (filter.subscription_tier) {
+    clauses.push("subscription_tier = ?");
+    params.push(filter.subscription_tier);
+  }
+  if (filter.country_code) {
+    clauses.push("country_code = ?");
+    params.push(filter.country_code);
+  }
+  if (filter.institution_type) {
+    clauses.push("institution_type = ?");
+    params.push(filter.institution_type);
+  }
+  if (filter.institutional_account_id != null) {
+    clauses.push("institutional_account_id = ?");
+    params.push(filter.institutional_account_id);
+  }
+  if (filter.mfa_enabled === false) {
+    clauses.push("(mfa_enabled IS NULL OR mfa_enabled = 0)");
+  } else if (filter.mfa_enabled === true) {
+    clauses.push("mfa_enabled = 1");
+  }
+  if (filter.locked === true) {
+    clauses.push("locked_until IS NOT NULL AND locked_until > datetime('now')");
+  }
+  if (filter.inactive_days != null && filter.inactive_days > 0) {
+    clauses.push(`(last_login IS NULL OR last_login < datetime('now', '-${filter.inactive_days} days'))`);
+  }
+
+  const sql = clauses.length > 0 ? " WHERE " + clauses.join(" AND ") : "";
+  return { sql, params };
+}
+
+export function listUsersPaginated(filter: UserListFilter): PaginatedUsers {
+  const where = buildUserWhere(filter);
+  const orderBy =
+    filter.sort === "created_asc" ? "created_at ASC" :
+    filter.sort === "last_login_desc" ? "last_login DESC NULLS LAST" :
+    filter.sort === "name_asc" ? "full_name COLLATE NOCASE ASC" :
+    filter.sort === "email_asc" ? "email COLLATE NOCASE ASC" :
+    "created_at DESC";
+
+  const page = Math.max(1, filter.page ?? 1);
+  const pageSize = Math.min(200, Math.max(1, filter.page_size ?? 50));
+  const offset = (page - 1) * pageSize;
+
+  const db = getDb();
+  const total = (db.prepare(`SELECT COUNT(*) as cnt FROM users${where.sql}`).get(...where.params) as { cnt: number }).cnt;
+  const users = db
+    .prepare(`SELECT * FROM users${where.sql} ORDER BY ${orderBy} LIMIT ? OFFSET ?`)
+    .all(...where.params, pageSize, offset) as UserRow[];
+
+  return {
+    users,
+    total,
+    page,
+    page_size: pageSize,
+    total_pages: Math.max(1, Math.ceil(total / pageSize)),
+  };
+}
+
+export interface UserSegmentCounts {
+  total: number;
+  by_status: Array<{ key: string; count: number }>;
+  by_tier: Array<{ key: string; count: number }>;
+  by_country: Array<{ key: string; count: number }>;
+  by_institution_type: Array<{ key: string; count: number }>;
+  top_institutional_accounts: Array<{ id: number; institution_name: string; count: number }>;
+  health: {
+    inactive_90d: number;
+    mfa_off: number;
+    locked: number;
+    profile_incomplete: number;
+  };
+  growth: {
+    new_24h: number;
+    new_7d: number;
+    new_30d: number;
+  };
+}
+
+export function getUserSegmentCounts(): UserSegmentCounts {
+  const db = getDb();
+  const groupRows = (sql: string): Array<{ key: string; count: number }> =>
+    (db.prepare(sql).all() as Array<{ key: string | null; count: number }>)
+      .map((r) => ({ key: r.key ?? "unknown", count: r.count }));
+
+  return {
+    total: (db.prepare("SELECT COUNT(*) as cnt FROM users").get() as { cnt: number }).cnt,
+    by_status: groupRows("SELECT status as key, COUNT(*) as count FROM users GROUP BY status ORDER BY count DESC"),
+    by_tier: groupRows("SELECT subscription_tier as key, COUNT(*) as count FROM users GROUP BY subscription_tier ORDER BY count DESC"),
+    by_country: groupRows("SELECT country_code as key, COUNT(*) as count FROM users WHERE country_code IS NOT NULL GROUP BY country_code ORDER BY count DESC LIMIT 20"),
+    by_institution_type: groupRows("SELECT institution_type as key, COUNT(*) as count FROM users WHERE institution_type IS NOT NULL GROUP BY institution_type ORDER BY count DESC"),
+    top_institutional_accounts: (db.prepare(`
+      SELECT ia.id, ia.institution_name, COUNT(u.id) as count
+      FROM institutional_accounts ia
+      LEFT JOIN users u ON u.institutional_account_id = ia.id
+      GROUP BY ia.id, ia.institution_name
+      ORDER BY count DESC
+      LIMIT 10
+    `).all() as Array<{ id: number; institution_name: string; count: number }>),
+    health: {
+      inactive_90d: (db.prepare("SELECT COUNT(*) as cnt FROM users WHERE last_login IS NULL OR last_login < datetime('now', '-90 days')").get() as { cnt: number }).cnt,
+      mfa_off: (db.prepare("SELECT COUNT(*) as cnt FROM users WHERE mfa_enabled IS NULL OR mfa_enabled = 0").get() as { cnt: number }).cnt,
+      locked: (db.prepare("SELECT COUNT(*) as cnt FROM users WHERE locked_until IS NOT NULL AND locked_until > datetime('now')").get() as { cnt: number }).cnt,
+      profile_incomplete: (db.prepare("SELECT COUNT(*) as cnt FROM users WHERE country_code IS NULL OR institution_type IS NULL OR practice_setting IS NULL").get() as { cnt: number }).cnt,
+    },
+    growth: {
+      new_24h: (db.prepare("SELECT COUNT(*) as cnt FROM users WHERE created_at >= datetime('now', '-1 day')").get() as { cnt: number }).cnt,
+      new_7d: (db.prepare("SELECT COUNT(*) as cnt FROM users WHERE created_at >= datetime('now', '-7 days')").get() as { cnt: number }).cnt,
+      new_30d: (db.prepare("SELECT COUNT(*) as cnt FROM users WHERE created_at >= datetime('now', '-30 days')").get() as { cnt: number }).cnt,
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Account Lockout (SOC 2 A2)
 // ---------------------------------------------------------------------------
 
