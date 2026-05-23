@@ -1,7 +1,33 @@
+/**
+ * POST /api/auth/register
+ *
+ * Self-serve account creation. As of v2026.05:
+ *
+ *   - ALL tiers auto-approve. No admin approval gate. The combination of
+ *     the disclaimer / terms / HCP-confirmation / age-confirmation
+ *     click-throughs + the magic-link email round-trip + (for paid)
+ *     Stripe's own KYC is sufficient gating. Manual approval added
+ *     friction without adding safety.
+ *
+ *   - Three categorization fields are REQUIRED: country_code,
+ *     institution_type, practice_setting. These power the User Management
+ *     dashboard's segment/filter sidebar. Validated against the enums in
+ *     src/lib/userCategorization.ts.
+ *
+ *   - Two emails fire on success:
+ *       1. Admin notification (Mario) — quantification + visibility
+ *       2. User welcome — confirms account is active, links to sign in
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import db, { findUserByUsername, findUserByEmail } from "@/lib/db";
-import { sendRegistrationNotification } from "@/lib/email";
+import { sendRegistrationNotification, sendWelcomeEmail } from "@/lib/email";
+import {
+  isValidCountryCode,
+  isValidInstitutionType,
+  isValidPracticeSetting,
+} from "@/lib/userCategorization";
 
 export async function POST(request: NextRequest) {
   let body: {
@@ -11,6 +37,9 @@ export async function POST(request: NextRequest) {
     full_name?: string;
     credentials?: string;
     institution?: string;
+    country_code?: string;
+    institution_type?: string;
+    practice_setting?: string;
     agreed_disclaimer?: boolean;
     agreed_terms?: boolean;
     confirmed_hcp?: boolean;
@@ -23,7 +52,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON." }, { status: 400 });
   }
 
-  const { username, email, password, full_name, credentials, institution } = body;
+  const {
+    username, email, password, full_name, credentials, institution,
+    country_code, institution_type, practice_setting,
+  } = body;
 
   // Validation
   const errors: string[] = [];
@@ -38,6 +70,9 @@ export async function POST(request: NextRequest) {
   if (!body.agreed_disclaimer || !body.agreed_terms || !body.confirmed_hcp || !body.confirmed_age) {
     errors.push("All legal agreements must be accepted.");
   }
+  if (!isValidCountryCode(country_code)) errors.push("Country selection required.");
+  if (!isValidInstitutionType(institution_type)) errors.push("Institution type selection required.");
+  if (!isValidPracticeSetting(practice_setting)) errors.push("Practice setting selection required.");
 
   if (errors.length > 0) {
     return NextResponse.json({ error: errors.join(" ") }, { status: 400 });
@@ -57,12 +92,18 @@ export async function POST(request: NextRequest) {
   // Get client IP
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip") ?? "unknown";
 
-  // Insert user
+  // Insert user — status='active', approved_at=now(), approved_by='AUTO_REGISTRATION'
   const stmt = db.prepare(`
-    INSERT INTO users (username, email, password_hash, full_name, credentials, institution,
-                       agreed_disclaimer, agreed_terms, confirmed_hcp, confirmed_age,
-                       disclaimer_version, terms_version, agreement_timestamp, agreement_ip, status)
-    VALUES (?, ?, ?, ?, ?, ?, 1, 1, 1, 1, 'March 2026', 'March 2026', datetime('now'), ?, 'pending')
+    INSERT INTO users (
+      username, email, password_hash, full_name, credentials, institution,
+      country_code, institution_type, practice_setting,
+      agreed_disclaimer, agreed_terms, confirmed_hcp, confirmed_age,
+      disclaimer_version, terms_version, agreement_timestamp, agreement_ip,
+      status, approved_at, approved_by
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 1, 1,
+            'March 2026', 'March 2026', datetime('now'), ?,
+            'active', datetime('now'), 'AUTO_REGISTRATION')
   `);
 
   try {
@@ -73,6 +114,9 @@ export async function POST(request: NextRequest) {
       full_name!.trim(),
       credentials!.trim(),
       (institution ?? "").trim() || null,
+      country_code!,
+      institution_type!,
+      practice_setting!,
       ip,
     );
   } catch (err) {
@@ -80,18 +124,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Registration failed." }, { status: 500 });
   }
 
-  // Log registration + notify admin (must await to prevent serverless early exit)
-  console.log(`[REGISTER] New registration: ${username} (${email}) — pending approval`);
-  await sendRegistrationNotification({
-    full_name: full_name!.trim(),
-    credentials: credentials!.trim(),
-    institution: (institution ?? "").trim() || null,
-    email: email!.trim().toLowerCase(),
-    username: username!.trim(),
-  });
+  console.log(`[REGISTER] New auto-approved registration: ${username} (${email}) · ${country_code} · ${institution_type}`);
+
+  // Fire both emails — admin notification + user welcome. Done in parallel.
+  await Promise.allSettled([
+    sendRegistrationNotification({
+      full_name: full_name!.trim(),
+      credentials: credentials!.trim(),
+      institution: (institution ?? "").trim() || null,
+      email: email!.trim().toLowerCase(),
+      username: username!.trim(),
+    }),
+    sendWelcomeEmail({
+      full_name: full_name!.trim(),
+      email: email!.trim().toLowerCase(),
+      username: username!.trim(),
+    }),
+  ]);
 
   return NextResponse.json({
     ok: true,
-    message: "Your account is pending review. You will be notified when approved.",
+    message: "Your account is active. Check your email for the sign-in link.",
   });
 }

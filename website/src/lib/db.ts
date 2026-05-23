@@ -78,6 +78,18 @@ function getDb(): Database.Database {
   try { _db.exec("CREATE INDEX IF NOT EXISTS idx_users_stripe_customer ON users(stripe_customer_id)"); } catch { /* exists */ }
   try { _db.exec("CREATE INDEX IF NOT EXISTS idx_users_stripe_subscription ON users(stripe_subscription_id)"); } catch { /* exists */ }
 
+  // Structured user categorization (added v2026.05) — collected at registration
+  // for users dashboard segments/filters. Required for new signups; backfilled
+  // for existing users via a next-login "complete your profile" prompt.
+  //   country_code:      ISO 3166-1 alpha-2 (e.g. "US"), "OTHER" for long tail
+  //   institution_type:  enum from src/lib/userCategorization.ts
+  //   practice_setting:  enum from src/lib/userCategorization.ts
+  try { _db.exec("ALTER TABLE users ADD COLUMN country_code TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN institution_type TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN practice_setting TEXT"); } catch { /* exists */ }
+  try { _db.exec("CREATE INDEX IF NOT EXISTS idx_users_country ON users(country_code)"); } catch { /* exists */ }
+  try { _db.exec("CREATE INDEX IF NOT EXISTS idx_users_institution_type ON users(institution_type)"); } catch { /* exists */ }
+
   // Calculation history columns (Phase 6) — extend calculation_log
   // case_id: optional clinician-supplied tracking string (NO PHI; sanitized at write time)
   // tier_at_time: tier the user was on when the calc ran (audit trail)
@@ -286,6 +298,10 @@ export interface UserRow {
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   stripe_price_id: string | null;
+  // Structured categorization (collected at registration; backfilled on next login)
+  country_code: string | null;
+  institution_type: string | null;
+  practice_setting: string | null;
 }
 
 export function findUserByLogin(usernameOrEmail: string): UserRow | undefined {
@@ -345,6 +361,22 @@ export function updatePassword(id: number, passwordHash: string) {
 
 export function approveUser(id: number, approvedBy: string) {
   getDb().prepare("UPDATE users SET status = 'active', approved_at = datetime('now'), approved_by = ? WHERE id = ?").run(approvedBy, id);
+}
+
+/**
+ * Set the structured categorization fields for an existing user (the
+ * "complete your profile" prompt backfills these on next login for users
+ * who signed up before these fields were required).
+ */
+export function setUserCategorization(
+  id: number,
+  fields: { country_code: string; institution_type: string; practice_setting: string },
+): void {
+  getDb()
+    .prepare(
+      `UPDATE users SET country_code = ?, institution_type = ?, practice_setting = ? WHERE id = ?`,
+    )
+    .run(fields.country_code, fields.institution_type, fields.practice_setting, id);
 }
 
 export function disableUser(id: number) {

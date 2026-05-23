@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { COUNTRIES, INSTITUTION_TYPES, PRACTICE_SETTINGS } from "@/lib/userCategorization";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -15,6 +16,9 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [credentials, setCredentials] = useState("");
   const [institution, setInstitution] = useState("");
+  const [countryCode, setCountryCode] = useState("");
+  const [institutionType, setInstitutionType] = useState("");
+  const [practiceSetting, setPracticeSetting] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -57,6 +61,9 @@ export default function RegisterPage() {
       setError("Password must contain uppercase, lowercase, and number."); return;
     }
     if (!/^[a-zA-Z0-9_]+$/.test(username)) { setError("Username: letters, numbers, underscores only."); return; }
+    if (!countryCode) { setError("Country selection required."); return; }
+    if (!institutionType) { setError("Institution type selection required."); return; }
+    if (!practiceSetting) { setError("Practice setting selection required."); return; }
     setStep(2);
   };
 
@@ -68,6 +75,9 @@ export default function RegisterPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         full_name: fullName, credentials, institution, email, username, password,
+        country_code: countryCode,
+        institution_type: institutionType,
+        practice_setting: practiceSetting,
         agreed_disclaimer: agreedDisclaimer, agreed_terms: agreedTerms,
         confirmed_hcp: confirmedHcp, confirmed_age: confirmedAge,
       }),
@@ -92,12 +102,16 @@ export default function RegisterPage() {
       <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ maxWidth: 420, padding: 32, background: "#ffffff", border: "1px solid #cbd5e0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", borderRadius: 8, textAlign: "center" }}>
           <div style={{ fontSize: 40, marginBottom: 16 }}>✓</div>
-          <h1 style={{ fontSize: 18, fontWeight: 700, color: "#047857" }}>Registration Submitted</h1>
+          <h1 style={{ fontSize: 18, fontWeight: 700, color: "#047857" }}>Account active — welcome to Vancomyzer</h1>
           <p style={{ fontSize: 13, color: "#4a5568", marginTop: 12, lineHeight: 1.6 }}>
-            Your account is pending review. You will be notified at <strong>{email}</strong> when approved.
+            A welcome email is on its way to <strong>{email}</strong>. You can sign in right now and start using the calculator.
           </p>
-          <Link href="/login" style={{ display: "inline-block", marginTop: 20, fontSize: 13, color: "#1e4d8c", fontWeight: 600 }}>
-            Return to Sign In
+          <Link href="/login" style={{
+            display: "inline-block", marginTop: 20, padding: "10px 20px",
+            background: "#1e4d8c", color: "#fff", fontSize: 13, fontWeight: 600,
+            textDecoration: "none", borderRadius: 4,
+          }}>
+            Sign in now →
           </Link>
         </div>
       </div>
@@ -141,6 +155,33 @@ export default function RegisterPage() {
             <div style={{ marginBottom: 12 }}>
               <label style={labelStyle}>Institution / Hospital <span style={{ color: "#a0aec0", fontWeight: 400 }}>(optional)</span></label>
               <input type="text" value={institution} onChange={e => setInstitution(e.target.value)} placeholder="City Hospital" style={inputStyle} />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={labelStyle}>Country *</label>
+              <select value={countryCode} onChange={e => setCountryCode(e.target.value)} required style={inputStyle}>
+                <option value="">— Select country —</option>
+                {COUNTRIES.map(c => (
+                  <option key={c.code} value={c.code}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={labelStyle}>Institution type *</label>
+              <select value={institutionType} onChange={e => setInstitutionType(e.target.value)} required style={inputStyle}>
+                <option value="">— Select institution type —</option>
+                {INSTITUTION_TYPES.map(t => (
+                  <option key={t.code} value={t.code}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={labelStyle}>Practice setting *</label>
+              <select value={practiceSetting} onChange={e => setPracticeSetting(e.target.value)} required style={inputStyle}>
+                <option value="">— Select practice setting —</option>
+                {PRACTICE_SETTINGS.map(s => (
+                  <option key={s.code} value={s.code}>{s.name}</option>
+                ))}
+              </select>
             </div>
             <div style={{ marginBottom: 12 }}>
               <label style={labelStyle}>Email *</label>

@@ -61,7 +61,71 @@ export async function sendRegistrationNotification(user: {
 }
 
 /**
+ * Welcome a newly-registered user. Sent automatically on signup as part of
+ * the auto-approval flow (v2026.05) — replaces the previous "wait for admin
+ * approval" gating. Pairs with the admin notification email so both Mario
+ * and the user know the account is live.
+ */
+export async function sendWelcomeEmail(user: {
+  full_name: string;
+  email: string;
+  username: string;
+}) {
+  if (!process.env.SMTP_USER) {
+    console.log("[EMAIL] Skipped welcome email — SMTP not configured:", user.username);
+    return;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: user.email,
+      subject: "Welcome to Vancomyzer™ — your account is active",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 520px;">
+          <h2 style="color: #047857; margin-bottom: 4px;">Welcome to Vancomyzer™ ✓</h2>
+          <p style="font-size: 14px; color: #2d3748;">
+            Hello ${user.full_name},
+          </p>
+          <p style="font-size: 14px; color: #2d3748; line-height: 1.55;">
+            Your Vancomyzer™ account (<strong>${user.username}</strong>) is active and ready to use.
+            No approval step required.
+          </p>
+          <p style="margin-top: 16px;">
+            <a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/login"
+               style="display: inline-block; padding: 11px 24px; background: #1e4d8c; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 4px;">
+              Sign In to Vancomyzer
+            </a>
+          </p>
+          <div style="margin-top: 24px; padding: 14px; background: #f7fafc; border-left: 3px solid #1e4d8c; font-size: 12px; color: #4a5568; line-height: 1.55;">
+            <strong style="color: #1a3a5c;">Reminder:</strong> Vancomyzer™ is non-device clinical
+            decision support under 21st Century Cures Act §3060, intended for licensed healthcare
+            professionals only. Every recommendation must be independently reviewed by a clinician
+            prior to patient administration. Not a substitute for clinical judgment, institutional
+            protocols, or therapeutic drug monitoring.
+          </div>
+          <p style="margin-top: 24px; font-size: 11px; color: #4a5568; line-height: 1.55;">
+            Useful next steps:
+          </p>
+          <ul style="font-size: 11px; color: #4a5568; padding-left: 20px; line-height: 1.55;">
+            <li><a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/transparent-dosing" style="color: #1e4d8c;">Read how the engine works</a> (Transparent Dosing manifesto)</li>
+            <li><a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/transparent-dosing/cases" style="color: #1e4d8c;">See our Literature Reproducibility tests</a></li>
+            <li><a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/calculator" style="color: #1e4d8c;">Run your first calculation</a></li>
+          </ul>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
+        </div>
+      `,
+    });
+    console.log(`[EMAIL] Welcome email sent to ${user.email}`);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send welcome email:", err);
+  }
+}
+
+/**
  * Notify user that their account has been approved.
+ * (Legacy — auto-approval is now the default; this remains for any
+ * remaining manual-approval edge cases.)
  */
 export async function sendApprovalNotification(user: {
   full_name: string;
