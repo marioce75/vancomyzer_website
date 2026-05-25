@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useInstitutionalSettings } from "@/contexts/InstitutionalSettingsContext";
 import Link from "next/link";
 import ReferralCard from "@/components/ReferralCard";
+import DiscountStatusCard from "@/components/DiscountStatusCard";
 
 interface SettingField {
   key: string;
@@ -111,6 +112,8 @@ export default function InstitutionalSettingsPage() {
         Clinical defaults for {institution || "your institution"}. Changes apply to all users at this institution.
       </p>
 
+      {/* Student / resident discount — auto-verified school emails OR manual application */}
+      <DiscountStatusCard />
       {/* Referral program — earn 1 month free Pro per Pro conversion */}
       <ReferralCard />
       {!user.institution && (

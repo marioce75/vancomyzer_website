@@ -21,6 +21,7 @@ import { authOptions } from "@/lib/authOptions";
 import {
   findUserByLogin,
   setStripeCustomerId,
+  userHasActiveDiscount,
 } from "@/lib/db";
 import { getStripe } from "@/lib/stripe";
 
@@ -76,6 +77,17 @@ export async function POST(req: Request) {
     setStripeCustomerId(dbUser.id, customerId);
   }
 
+  // Auto-apply student/resident coupon if the user has a verified discount on file
+  const activeDiscount = userHasActiveDiscount(dbUser.id);
+  const discountCouponId = activeDiscount
+    ? (activeDiscount.discount_type === "student"
+        ? process.env.STRIPE_COUPON_STUDENT_ID
+        : process.env.STRIPE_COUPON_RESIDENT_ID)
+    : undefined;
+  // Stripe forbids combining `discounts` with `allow_promotion_codes`, so when
+  // we auto-apply a coupon we drop the promo-code box.
+  const applyAutoDiscount = Boolean(discountCouponId);
+
   const checkout = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
@@ -84,13 +96,16 @@ export async function POST(req: Request) {
       trial_period_days: TRIAL_DAYS,
       metadata: {
         user_id: String(dbUser.id),
+        ...(activeDiscount ? { discount_type: activeDiscount.discount_type } : {}),
       },
     },
+    ...(applyAutoDiscount
+      ? { discounts: [{ coupon: discountCouponId as string }] }
+      : { allow_promotion_codes: true }),
     // Card required upfront; Stripe charges after the trial.
     payment_method_collection: "always",
     success_url: `${baseUrl}/settings/billing?checkout=success`,
     cancel_url: `${baseUrl}/settings/billing?checkout=cancelled`,
-    allow_promotion_codes: true,
     automatic_tax: { enabled: false },
     billing_address_collection: "auto",
   });

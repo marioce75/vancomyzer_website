@@ -114,6 +114,28 @@ function getDb(): Database.Database {
     CREATE INDEX IF NOT EXISTS idx_referrals_converted ON referrals(converted_at);
   `);
 
+  // Student / resident discount program (added v2026.05). Auto-verifies on
+  // detected school-email domains; manual form + admin approval for residents
+  // and students whose email doesn't match the pattern. When verified, the
+  // billing checkout endpoint passes the configured Stripe coupon ID so the
+  // discount appears as a line item in the hosted checkout session.
+  _db.exec(`
+    CREATE TABLE IF NOT EXISTS user_discounts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL UNIQUE,
+      discount_type TEXT NOT NULL CHECK(discount_type IN ('student', 'resident')),
+      status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('auto_verified', 'pending', 'approved', 'denied')),
+      application_data TEXT,
+      verified_at TEXT,
+      verified_by TEXT,
+      denied_reason TEXT,
+      expires_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_user_discounts_status ON user_discounts(status);
+  `);
+
   // Calculation history columns (Phase 6) — extend calculation_log
   // case_id: optional clinician-supplied tracking string (NO PHI; sanitized at write time)
   // tier_at_time: tier the user was on when the calc ran (audit trail)
@@ -534,6 +556,120 @@ export interface ReferralStats {
   pending_count: number;
   credits_applied: number;
   credits_total_cents: number;
+}
+
+// ---------------------------------------------------------------------------
+// Student / resident discount program
+// ---------------------------------------------------------------------------
+
+export interface UserDiscountRow {
+  id: number;
+  user_id: number;
+  discount_type: "student" | "resident";
+  status: "auto_verified" | "pending" | "approved" | "denied";
+  application_data: string | null; // JSON-encoded application details
+  verified_at: string | null;
+  verified_by: string | null;
+  denied_reason: string | null;
+  expires_at: string | null;
+  created_at: string;
+}
+
+export function getUserDiscount(userId: number): UserDiscountRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM user_discounts WHERE user_id = ?")
+    .get(userId) as UserDiscountRow | undefined;
+}
+
+export function getDiscountById(id: number): UserDiscountRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM user_discounts WHERE id = ?")
+    .get(id) as UserDiscountRow | undefined;
+}
+
+/** Create an auto-verified student discount (school-email detection at registration). */
+export function createAutoVerifiedStudentDiscount(userId: number): void {
+  try {
+    getDb()
+      .prepare(
+        `INSERT INTO user_discounts (user_id, discount_type, status, verified_at, verified_by)
+         VALUES (?, 'student', 'auto_verified', datetime('now'), 'AUTO_EMAIL_DETECT')`,
+      )
+      .run(userId);
+  } catch {
+    /* user already has a discount row — no-op */
+  }
+}
+
+export interface DiscountApplicationInput {
+  discount_type: "student" | "resident";
+  program_name: string;
+  institution_name: string;
+  supervisor_name: string;
+  supervisor_email: string;
+  expected_completion: string; // free-text, e.g. "June 2027"
+  notes?: string;
+}
+
+/** Submit a manual application for a discount; status starts at 'pending'. */
+export function submitDiscountApplication(userId: number, input: DiscountApplicationInput): UserDiscountRow {
+  const db = getDb();
+  // Replace any prior denied/expired application with the new one
+  db.prepare("DELETE FROM user_discounts WHERE user_id = ? AND status = 'denied'").run(userId);
+  db.prepare(
+    `INSERT INTO user_discounts (user_id, discount_type, status, application_data)
+     VALUES (?, ?, 'pending', ?)`,
+  ).run(userId, input.discount_type, JSON.stringify(input));
+  return getUserDiscount(userId)!;
+}
+
+export function approveDiscountApplication(id: number, verifiedBy: string, expiresAt?: string): void {
+  if (expiresAt) {
+    getDb()
+      .prepare(
+        `UPDATE user_discounts SET status = 'approved', verified_at = datetime('now'),
+         verified_by = ?, expires_at = ?, denied_reason = NULL WHERE id = ?`,
+      )
+      .run(verifiedBy, expiresAt, id);
+  } else {
+    getDb()
+      .prepare(
+        `UPDATE user_discounts SET status = 'approved', verified_at = datetime('now'),
+         verified_by = ?, denied_reason = NULL WHERE id = ?`,
+      )
+      .run(verifiedBy, id);
+  }
+}
+
+export function denyDiscountApplication(id: number, verifiedBy: string, reason: string): void {
+  getDb()
+    .prepare(
+      `UPDATE user_discounts SET status = 'denied', verified_at = datetime('now'),
+       verified_by = ?, denied_reason = ? WHERE id = ?`,
+    )
+    .run(verifiedBy, reason, id);
+}
+
+export function listPendingDiscountApplications(): Array<UserDiscountRow & { username: string; email: string; full_name: string }> {
+  return getDb()
+    .prepare(
+      `SELECT ud.*, u.username, u.email, u.full_name
+       FROM user_discounts ud
+       JOIN users u ON u.id = ud.user_id
+       WHERE ud.status = 'pending'
+       ORDER BY ud.created_at ASC`,
+    )
+    .all() as Array<UserDiscountRow & { username: string; email: string; full_name: string }>;
+}
+
+/** True when the user is eligible for a discount at checkout (auto-verified
+ *  OR approved AND not expired). */
+export function userHasActiveDiscount(userId: number): UserDiscountRow | null {
+  const d = getUserDiscount(userId);
+  if (!d) return null;
+  if (d.status !== "auto_verified" && d.status !== "approved") return null;
+  if (d.expires_at && new Date(d.expires_at) < new Date()) return null;
+  return d;
 }
 
 export function getReferralStats(userId: number): ReferralStats {

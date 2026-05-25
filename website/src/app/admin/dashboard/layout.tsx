@@ -11,6 +11,7 @@ const navItems = [
   { label: "Calculations", href: "/admin/dashboard/calculations", icon: "🧪" },
   { label: "Pilot Applications", href: "/admin/dashboard/pilot-applications", icon: "🏥" },
   { label: "BAA Queue", href: "/admin/dashboard/baa", icon: "📝" },
+  { label: "Discounts", href: "/admin/dashboard/discounts", icon: "🎓" },
   { label: "Research", href: "/admin/dashboard/research", icon: "🔬" },
   { label: "Security", href: "/admin/dashboard/security", icon: "🔒" },
   { label: "Market Intel", href: "/admin/dashboard/market-intelligence", icon: "📡" },

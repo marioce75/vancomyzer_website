@@ -61,6 +61,83 @@ export async function sendRegistrationNotification(user: {
 }
 
 /**
+ * Notify a user of the outcome of their student/resident discount application.
+ * Approved → copy explains the discount auto-applies at Pro checkout.
+ * Denied   → copy gives the reason and invites re-application.
+ */
+export async function sendDiscountDecisionEmail(args: {
+  to_email: string;
+  to_name: string;
+  approved: boolean;
+  discount_type: "student" | "resident";
+  denied_reason?: string;
+}) {
+  if (!process.env.SMTP_USER) {
+    console.log("[EMAIL] Skipped discount-decision email — SMTP not configured.", args.to_email);
+    return;
+  }
+  try {
+    const typeLabel = args.discount_type === "student" ? "student" : "resident";
+    const subject = args.approved
+      ? `Your Vancomyzer ${typeLabel} discount is approved`
+      : `Your Vancomyzer ${typeLabel} discount application — additional info needed`;
+
+    const body = args.approved
+      ? `
+        <div style="font-family: Arial, sans-serif; max-width: 520px;">
+          <h2 style="color: #047857; margin-bottom: 4px;">${typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1)} discount approved ✓</h2>
+          <p style="font-size: 14px; color: #2d3748;">Hello ${args.to_name},</p>
+          <p style="font-size: 14px; color: #2d3748; line-height: 1.55;">
+            Your Vancomyzer ${typeLabel} discount has been approved. The discount will be applied automatically the next time you start a Pro subscription — you'll see the reduced price at checkout.
+          </p>
+          <p style="margin-top: 16px;">
+            <a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/upgrade"
+               style="display: inline-block; padding: 10px 22px; background: #1e4d8c; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 4px;">
+              Start your Pro trial
+            </a>
+          </p>
+          <p style="margin-top: 16px; font-size: 12px; color: #4a5568; line-height: 1.55;">
+            The discount remains active for as long as you're in training. If your training status changes, please let us know at <a href="mailto:contact@dosys.health" style="color: #1e4d8c;">contact@dosys.health</a>.
+          </p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys Health LLC</p>
+        </div>
+      `
+      : `
+        <div style="font-family: Arial, sans-serif; max-width: 520px;">
+          <h2 style="color: #92400e; margin-bottom: 4px;">${typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1)} discount — additional info needed</h2>
+          <p style="font-size: 14px; color: #2d3748;">Hello ${args.to_name},</p>
+          <p style="font-size: 14px; color: #2d3748; line-height: 1.55;">
+            We weren't able to verify your ${typeLabel} discount application as submitted. Reason:
+          </p>
+          <div style="margin: 14px 0; padding: 12px 14px; background: #fffbeb; border-left: 3px solid #f59e0b; font-size: 13px; color: #78350f;">
+            ${args.denied_reason ?? "Application did not meet verification criteria."}
+          </div>
+          <p style="font-size: 14px; color: #2d3748; line-height: 1.55;">
+            You're welcome to re-apply with additional details at any time. If you have questions, email <a href="mailto:contact@dosys.health" style="color: #1e4d8c;">contact@dosys.health</a>.
+          </p>
+          <p style="margin-top: 16px;">
+            <a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/settings"
+               style="display: inline-block; padding: 10px 22px; background: #1e4d8c; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 4px;">
+              Re-apply on Settings
+            </a>
+          </p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys Health LLC</p>
+        </div>
+      `;
+
+    await transporter.sendMail({
+      from: FROM,
+      to: args.to_email,
+      subject,
+      html: body,
+    });
+    console.log(`[EMAIL] Discount-decision (${args.approved ? "approved" : "denied"}) email sent to ${args.to_email}`);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send discount-decision email:", err);
+  }
+}
+
+/**
  * Notify a user that one of their referrals has converted to a paid
  * subscription — and that they've earned a 1-month credit (or it's
  * deferred to their first paid subscription if they're still on Free).

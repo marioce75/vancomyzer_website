@@ -21,13 +21,14 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import db, { findUserByUsername, findUserByEmail, createReferral } from "@/lib/db";
+import db, { findUserByUsername, findUserByEmail, createReferral, createAutoVerifiedStudentDiscount } from "@/lib/db";
 import { sendRegistrationNotification, sendWelcomeEmail } from "@/lib/email";
 import {
   isValidCountryCode,
   isValidInstitutionType,
   isValidPracticeSetting,
 } from "@/lib/userCategorization";
+import { detectStudentEmail } from "@/lib/discountEmail";
 
 export async function POST(request: NextRequest) {
   let body: {
@@ -135,6 +136,14 @@ export async function POST(request: NextRequest) {
     if (referral) {
       console.log(`[REGISTER] Referral recorded: referrer ${referral.referrer_user_id} → new user ${newUserId} via code ${refCode}`);
     }
+  }
+
+  // Auto-detect student discount eligibility from email domain (.edu,
+  // .ac.uk, etc.). Generous heuristic; residents and missed students
+  // use the manual application form on /settings.
+  if (detectStudentEmail(email!) === "student") {
+    createAutoVerifiedStudentDiscount(newUserId);
+    console.log(`[REGISTER] Student discount auto-verified for ${email} (school-email pattern)`);
   }
 
   console.log(`[REGISTER] New auto-approved registration: ${username} (${email}) · ${country_code} · ${institution_type}`);
