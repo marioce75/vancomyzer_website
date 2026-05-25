@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstitutionalSettings } from "@/contexts/InstitutionalSettingsContext";
 import Link from "next/link";
+import ReferralCard from "@/components/ReferralCard";
 
 interface SettingField {
   key: string;
@@ -106,9 +107,12 @@ export default function InstitutionalSettingsPage() {
       <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}>
         Institutional Settings
       </h1>
-      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 8 }}>
+      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 16 }}>
         Clinical defaults for {institution || "your institution"}. Changes apply to all users at this institution.
       </p>
+
+      {/* Referral program — earn 1 month free Pro per Pro conversion */}
+      <ReferralCard />
       {!user.institution && (
         <div style={{ padding: "10px 14px", marginBottom: 20, background: "#fffbeb", border: "1px solid #fcd34d", color: "#92400e", fontSize: 13 }}>
           No institution set in your profile. Settings will be saved as personal defaults. To share settings across your team, add your institution name during registration.

@@ -90,6 +90,30 @@ function getDb(): Database.Database {
   try { _db.exec("CREATE INDEX IF NOT EXISTS idx_users_country ON users(country_code)"); } catch { /* exists */ }
   try { _db.exec("CREATE INDEX IF NOT EXISTS idx_users_institution_type ON users(institution_type)"); } catch { /* exists */ }
 
+  // Referral program (added v2026.05). Each user gets an 8-char base36 code
+  // they share via /register?ref=<code>. When a referred user starts a paid
+  // subscription, the Stripe webhook fires a credit equal to one month of
+  // their plan to the referrer's customer balance (next invoice deduction).
+  try { _db.exec("ALTER TABLE users ADD COLUMN referral_code TEXT"); } catch { /* exists */ }
+  try { _db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_referral_code ON users(referral_code) WHERE referral_code IS NOT NULL"); } catch { /* exists */ }
+  _db.exec(`
+    CREATE TABLE IF NOT EXISTS referrals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      referrer_user_id INTEGER NOT NULL,
+      referred_user_id INTEGER NOT NULL UNIQUE,
+      referred_at TEXT NOT NULL DEFAULT (datetime('now')),
+      converted_at TEXT,
+      credit_applied_at TEXT,
+      stripe_credit_amount_cents INTEGER,
+      stripe_balance_transaction_id TEXT,
+      FOREIGN KEY (referrer_user_id) REFERENCES users(id),
+      FOREIGN KEY (referred_user_id) REFERENCES users(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_referrals_referrer ON referrals(referrer_user_id);
+    CREATE INDEX IF NOT EXISTS idx_referrals_referred ON referrals(referred_user_id);
+    CREATE INDEX IF NOT EXISTS idx_referrals_converted ON referrals(converted_at);
+  `);
+
   // Calculation history columns (Phase 6) — extend calculation_log
   // case_id: optional clinician-supplied tracking string (NO PHI; sanitized at write time)
   // tier_at_time: tier the user was on when the calc ran (audit trail)
@@ -302,6 +326,8 @@ export interface UserRow {
   country_code: string | null;
   institution_type: string | null;
   practice_setting: string | null;
+  // Referral program — lazy-generated 8-char base36 code on first need
+  referral_code: string | null;
 }
 
 export function findUserByLogin(usernameOrEmail: string): UserRow | undefined {
@@ -385,6 +411,157 @@ export function disableUser(id: number) {
 
 export function reactivateUser(id: number) {
   getDb().prepare("UPDATE users SET status = 'active' WHERE id = ?").run(id);
+}
+
+// ---------------------------------------------------------------------------
+// Referral program
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a random 8-character base36 referral code. Collisions are
+ * extremely unlikely (36^8 ≈ 2.8 trillion) but we retry on the off chance.
+ */
+function generateReferralCode(): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let out = "";
+  for (let i = 0; i < 8; i++) {
+    out += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return out;
+}
+
+/**
+ * Return the user's referral code, generating + persisting it on first call.
+ * Safe to call repeatedly — returns the same code after the first call.
+ */
+export function getOrCreateReferralCode(userId: number): string {
+  const db = getDb();
+  const existing = db.prepare("SELECT referral_code FROM users WHERE id = ?").get(userId) as { referral_code: string | null } | undefined;
+  if (existing?.referral_code) return existing.referral_code;
+
+  // Generate + persist with retry on collision
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const code = generateReferralCode();
+    try {
+      db.prepare("UPDATE users SET referral_code = ? WHERE id = ?").run(code, userId);
+      // Verify we got the value (uniqueness will reject duplicates)
+      const verify = db.prepare("SELECT referral_code FROM users WHERE id = ?").get(userId) as { referral_code: string };
+      return verify.referral_code;
+    } catch {
+      // Collision — retry
+    }
+  }
+  throw new Error("Unable to generate unique referral code after 10 attempts");
+}
+
+export function findUserByReferralCode(code: string): UserRow | undefined {
+  return getDb()
+    .prepare("SELECT * FROM users WHERE referral_code = ?")
+    .get(code.toUpperCase()) as UserRow | undefined;
+}
+
+export interface ReferralRow {
+  id: number;
+  referrer_user_id: number;
+  referred_user_id: number;
+  referred_at: string;
+  converted_at: string | null;
+  credit_applied_at: string | null;
+  stripe_credit_amount_cents: number | null;
+  stripe_balance_transaction_id: string | null;
+}
+
+/**
+ * Record a new referral linking the referrer (by code) to a freshly-registered
+ * referred user. Self-referrals (same user) and duplicate referrals are
+ * silently no-op'd rather than thrown — they shouldn't crash registration.
+ */
+export function createReferral(referrerCode: string, referredUserId: number): ReferralRow | null {
+  const db = getDb();
+  const referrer = findUserByReferralCode(referrerCode);
+  if (!referrer) return null;
+  if (referrer.id === referredUserId) return null; // self-referral guard
+  try {
+    db.prepare(
+      "INSERT INTO referrals (referrer_user_id, referred_user_id) VALUES (?, ?)",
+    ).run(referrer.id, referredUserId);
+    return db
+      .prepare("SELECT * FROM referrals WHERE referred_user_id = ?")
+      .get(referredUserId) as ReferralRow;
+  } catch {
+    return null; // unique constraint — already referred
+  }
+}
+
+/**
+ * Find the unconverted referral (if any) for a given referred user. Used by
+ * the Stripe webhook when that user starts a paid subscription.
+ */
+export function findUnconvertedReferralForReferred(referredUserId: number): ReferralRow | null {
+  const row = getDb()
+    .prepare(
+      "SELECT * FROM referrals WHERE referred_user_id = ? AND converted_at IS NULL",
+    )
+    .get(referredUserId) as ReferralRow | undefined;
+  return row ?? null;
+}
+
+export function markReferralConverted(referralId: number): void {
+  getDb()
+    .prepare("UPDATE referrals SET converted_at = datetime('now') WHERE id = ? AND converted_at IS NULL")
+    .run(referralId);
+}
+
+export function markReferralCreditApplied(
+  referralId: number,
+  amountCents: number,
+  stripeBalanceTransactionId: string,
+): void {
+  getDb()
+    .prepare(
+      `UPDATE referrals SET
+        credit_applied_at = datetime('now'),
+        stripe_credit_amount_cents = ?,
+        stripe_balance_transaction_id = ?
+       WHERE id = ?`,
+    )
+    .run(amountCents, stripeBalanceTransactionId, referralId);
+}
+
+export interface ReferralStats {
+  total_referred: number;
+  converted_count: number;
+  pending_count: number;
+  credits_applied: number;
+  credits_total_cents: number;
+}
+
+export function getReferralStats(userId: number): ReferralStats {
+  const db = getDb();
+  const row = db
+    .prepare(
+      `SELECT
+        COUNT(*) as total_referred,
+        SUM(CASE WHEN converted_at IS NOT NULL THEN 1 ELSE 0 END) as converted_count,
+        SUM(CASE WHEN converted_at IS NULL THEN 1 ELSE 0 END) as pending_count,
+        SUM(CASE WHEN credit_applied_at IS NOT NULL THEN 1 ELSE 0 END) as credits_applied,
+        COALESCE(SUM(stripe_credit_amount_cents), 0) as credits_total_cents
+       FROM referrals WHERE referrer_user_id = ?`,
+    )
+    .get(userId) as {
+      total_referred: number | null;
+      converted_count: number | null;
+      pending_count: number | null;
+      credits_applied: number | null;
+      credits_total_cents: number | null;
+    };
+  return {
+    total_referred: row.total_referred ?? 0,
+    converted_count: row.converted_count ?? 0,
+    pending_count: row.pending_count ?? 0,
+    credits_applied: row.credits_applied ?? 0,
+    credits_total_cents: row.credits_total_cents ?? 0,
+  };
 }
 
 /** Hard-delete a user. Use with care — irreversible. */

@@ -21,7 +21,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import db, { findUserByUsername, findUserByEmail } from "@/lib/db";
+import db, { findUserByUsername, findUserByEmail, createReferral } from "@/lib/db";
 import { sendRegistrationNotification, sendWelcomeEmail } from "@/lib/email";
 import {
   isValidCountryCode,
@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
     country_code?: string;
     institution_type?: string;
     practice_setting?: string;
+    referral_code?: string;        // optional ?ref=<code> from invite link
     agreed_disclaimer?: boolean;
     agreed_terms?: boolean;
     confirmed_hcp?: boolean;
@@ -106,8 +107,9 @@ export async function POST(request: NextRequest) {
             'active', datetime('now'), 'AUTO_REGISTRATION')
   `);
 
+  let newUserId: number;
   try {
-    stmt.run(
+    const result = stmt.run(
       username!.trim(),
       email!.trim().toLowerCase(),
       password_hash,
@@ -119,9 +121,20 @@ export async function POST(request: NextRequest) {
       practice_setting!,
       ip,
     );
+    newUserId = Number(result.lastInsertRowid);
   } catch (err) {
     console.error("[REGISTER]", err);
     return NextResponse.json({ error: "Registration failed." }, { status: 500 });
+  }
+
+  // Record referral if the user signed up via /register?ref=<code>. Silent
+  // no-op on self-referral, unknown code, or duplicate (already referred).
+  const refCode = body.referral_code?.trim().toUpperCase();
+  if (refCode) {
+    const referral = createReferral(refCode, newUserId);
+    if (referral) {
+      console.log(`[REGISTER] Referral recorded: referrer ${referral.referrer_user_id} → new user ${newUserId} via code ${refCode}`);
+    }
   }
 
   console.log(`[REGISTER] New auto-approved registration: ${username} (${email}) · ${country_code} · ${institution_type}`);

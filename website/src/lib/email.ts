@@ -61,6 +61,65 @@ export async function sendRegistrationNotification(user: {
 }
 
 /**
+ * Notify a user that one of their referrals has converted to a paid
+ * subscription — and that they've earned a 1-month credit (or it's
+ * deferred to their first paid subscription if they're still on Free).
+ *
+ * Fires from the Stripe webhook when subscription becomes active for a
+ * referred user, after the credit is applied via customer balance.
+ */
+export async function sendReferralConvertedEmail(args: {
+  referrer_full_name: string;
+  referrer_email: string;
+  referred_email: string;
+  credit_amount_usd: string;
+  deferred: boolean;
+}) {
+  if (!process.env.SMTP_USER) {
+    console.log("[EMAIL] Skipped referral-converted — SMTP not configured.", args.referrer_email);
+    return;
+  }
+  try {
+    const subject = args.deferred
+      ? `You earned a Vancomyzer credit — applied when you next subscribe`
+      : `Your Vancomyzer referral converted — $${args.credit_amount_usd} credit applied`;
+    const bodyIntro = args.deferred
+      ? `${args.referred_email} just subscribed to Vancomyzer Pro thanks to your referral. You've earned a $${args.credit_amount_usd} credit — we'll apply it automatically the next time you start a paid subscription.`
+      : `${args.referred_email} just subscribed to Vancomyzer Pro thanks to your referral. We've applied a $${args.credit_amount_usd} credit to your account — it'll come off your next invoice automatically.`;
+    await transporter.sendMail({
+      from: FROM,
+      to: args.referrer_email,
+      subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 520px;">
+          <h2 style="color: #047857; margin-bottom: 4px;">A referral converted ✓</h2>
+          <p style="font-size: 14px; color: #2d3748;">
+            Hello ${args.referrer_full_name},
+          </p>
+          <p style="font-size: 14px; color: #2d3748; line-height: 1.55;">
+            ${bodyIntro}
+          </p>
+          <div style="margin-top: 16px; padding: 14px; background: #ecfdf5; border-left: 3px solid #047857; font-size: 13px; color: #065f46;">
+            Thanks for sharing Vancomyzer with your colleagues. Keep going —
+            each Pro conversion earns you another month.
+          </div>
+          <p style="margin-top: 16px;">
+            <a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/settings"
+               style="display: inline-block; padding: 9px 18px; background: #1e4d8c; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 13px; border-radius: 4px;">
+              See your referrals
+            </a>
+          </p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys Health LLC</p>
+        </div>
+      `,
+    });
+    console.log(`[EMAIL] Referral-converted email sent to ${args.referrer_email} (deferred=${args.deferred})`);
+  } catch (err) {
+    console.error("[EMAIL] Failed to send referral-converted email:", err);
+  }
+}
+
+/**
  * Welcome a newly-registered user. Sent automatically on signup as part of
  * the auto-approval flow (v2026.05) — replaces the previous "wait for admin
  * approval" gating. Pairs with the admin notification email so both Mario

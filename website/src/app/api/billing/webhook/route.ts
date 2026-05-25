@@ -34,6 +34,7 @@ import {
   findUserByStripeSubscriptionId,
   findUserByLogin,
   findUserByEmail,
+  findUserById,
   findInstitutionByStripeCustomerId,
   findInstitutionByStripeSubscriptionId,
   createInstitutionalAccount,
@@ -44,8 +45,11 @@ import {
   setUserTier,
   recountSeats,
   logSecurityEvent,
+  findUnconvertedReferralForReferred,
+  markReferralConverted,
+  markReferralCreditApplied,
 } from "@/lib/db";
-import { sendDepartmentWelcomeEmail } from "@/lib/email";
+import { sendDepartmentWelcomeEmail, sendReferralConvertedEmail } from "@/lib/email";
 import { issueMagicLinkToken } from "@/lib/magicLink";
 
 // Stripe's signed payload must be read as the raw body — Next.js gives
@@ -106,6 +110,88 @@ async function handleSubscriptionEvent(sub: Stripe.Subscription) {
     }),
     severity: "info",
   });
+
+  // Referral conversion: if this user was referred and just became active
+  // (i.e., transitioned from trial to paid), fire a 1-month credit to the
+  // referrer's Stripe customer balance and notify them by email. Idempotent
+  // via converted_at IS NULL guard in findUnconvertedReferralForReferred.
+  if (status === "active") {
+    await fireReferralCreditIfApplicable(user).catch((err) => {
+      console.error(`[referral] Credit issuance failed for user ${user.id}:`, err);
+    });
+  }
+}
+
+// Single month of Individual Pro at the current public price. Hardcoded
+// because the referrer's plan may be free, in which case we still owe them
+// one month of Pro value as a credit usable when they upgrade.
+const REFERRAL_CREDIT_CENTS = 999;
+
+async function fireReferralCreditIfApplicable(referredUser: { id: number; email: string }) {
+  const referral = findUnconvertedReferralForReferred(referredUser.id);
+  if (!referral) return;
+
+  const referrer = findUserById(referral.referrer_user_id);
+  if (!referrer) {
+    console.warn(`[referral] Referrer ${referral.referrer_user_id} not found for referral ${referral.id}`);
+    return;
+  }
+
+  // Mark converted regardless of whether we can immediately issue the credit
+  // (e.g., referrer has no Stripe customer yet). Stats still reflect the
+  // conversion; the unapplied credit gets logged for manual reconciliation.
+  markReferralConverted(referral.id);
+
+  if (!referrer.stripe_customer_id) {
+    console.log(
+      `[referral] Referral ${referral.id} converted but referrer ${referrer.id} (${referrer.email}) has no Stripe customer; credit will be applied when they next subscribe.`,
+    );
+    // Still email the referrer — they earned the credit even if it's deferred
+    await sendReferralConvertedEmail({
+      referrer_full_name: referrer.full_name,
+      referrer_email: referrer.email,
+      referred_email: referredUser.email,
+      credit_amount_usd: (REFERRAL_CREDIT_CENTS / 100).toFixed(2),
+      deferred: true,
+    }).catch(() => {/* email already self-logs */});
+    return;
+  }
+
+  try {
+    const stripe = getStripe();
+    const tx = await stripe.customers.createBalanceTransaction(referrer.stripe_customer_id, {
+      amount: -REFERRAL_CREDIT_CENTS, // negative = credit to customer
+      currency: "usd",
+      description: `Vancomyzer referral credit (1 month) — referred ${referredUser.email}`,
+    });
+    markReferralCreditApplied(referral.id, REFERRAL_CREDIT_CENTS, tx.id);
+    console.log(
+      `[referral] Credit $${(REFERRAL_CREDIT_CENTS / 100).toFixed(2)} applied to referrer ${referrer.id} (${referrer.email}) for referral ${referral.id}`,
+    );
+
+    await sendReferralConvertedEmail({
+      referrer_full_name: referrer.full_name,
+      referrer_email: referrer.email,
+      referred_email: referredUser.email,
+      credit_amount_usd: (REFERRAL_CREDIT_CENTS / 100).toFixed(2),
+      deferred: false,
+    }).catch(() => {/* email already self-logs */});
+
+    logSecurityEvent({
+      user_id: referrer.id,
+      username: referrer.username,
+      action: "REFERRAL_CREDIT_APPLIED",
+      details: JSON.stringify({
+        referral_id: referral.id,
+        referred_user_id: referredUser.id,
+        credit_cents: REFERRAL_CREDIT_CENTS,
+        stripe_balance_transaction_id: tx.id,
+      }),
+      severity: "info",
+    });
+  } catch (err) {
+    console.error(`[referral] Stripe credit failed for referral ${referral.id}:`, err);
+  }
 }
 
 /**

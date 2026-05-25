@@ -1,16 +1,36 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState, useRef, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { COUNTRIES, INSTITUTION_TYPES, PRACTICE_SETTINGS } from "@/lib/userCategorization";
 
+// useSearchParams() must be wrapped in <Suspense> for Next.js 14 static
+// prerendering — without it, the build fails on /register. The wrapper
+// keeps the page client-rendered with a graceful loading fallback.
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#a0aec0" }}>Loading…</div>}>
+      <RegisterPageInner />
+    </Suspense>
+  );
+}
+
+function RegisterPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState(1);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // Referral code from /register?ref=<code>. Stored separately so it
+  // persists across the multi-step form and survives validation errors.
+  const [referralCode, setReferralCode] = useState("");
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) setReferralCode(ref.trim().toUpperCase());
+  }, [searchParams]);
 
   // Step 1 fields
   const [fullName, setFullName] = useState("");
@@ -78,6 +98,7 @@ export default function RegisterPage() {
         country_code: countryCode,
         institution_type: institutionType,
         practice_setting: practiceSetting,
+        referral_code: referralCode || undefined,
         agreed_disclaimer: agreedDisclaimer, agreed_terms: agreedTerms,
         confirmed_hcp: confirmedHcp, confirmed_age: confirmedAge,
       }),
@@ -139,6 +160,17 @@ export default function RegisterPage() {
         {error && (
           <div style={{ padding: "10px 14px", marginBottom: 16, background: "#fff5f5", border: "1px solid #fca5a5", color: "#991b1b", fontSize: 13, borderRadius: 4 }}>
             {error}
+          </div>
+        )}
+
+        {referralCode && (
+          <div style={{
+            padding: "10px 14px", marginBottom: 16,
+            background: "#ecfdf5", border: "1px solid #6ee7b7",
+            color: "#047857", fontSize: 12, borderRadius: 4,
+            lineHeight: 1.55,
+          }}>
+            🎁 <strong>Referred by a colleague.</strong> When you subscribe to Pro, your referrer earns 1 month free — and you get full Pro access via the 14-day trial.
           </div>
         )}
 
