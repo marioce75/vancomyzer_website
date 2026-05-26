@@ -36,7 +36,7 @@ const DEFAULT_COPY: Partial<Record<FeatureId, { title: string; description: stri
   "export.pdf": {
     title: "PDF export is a Pro feature",
     description:
-      "Export branded, watermark-free PDFs of your calculations for the medical record. Available on Individual Pro and higher.",
+      "Export branded clinical-note PDFs of your calculations for the medical record. Available on Individual Pro and higher.",
   },
   "export.note.copy": {
     title: "Clinical note export is a Pro feature",
@@ -44,9 +44,9 @@ const DEFAULT_COPY: Partial<Record<FeatureId, { title: string; description: stri
       "Copy a clinician-ready note to your clipboard for paste into the EHR. Available on Individual Pro and higher.",
   },
   "export.note.unwatermarked": {
-    title: "Watermark-free exports are a Pro feature",
+    title: "Clinical-note export is a Pro feature",
     description:
-      "Pro removes the Free-tier watermark from exported PDFs and notes — clean for chart inclusion.",
+      "Pro unlocks branded PDF and note export for the medical record — Free tier is calculator-only.",
   },
   "history.calculation": {
     title: "Calculation history is a Pro feature",

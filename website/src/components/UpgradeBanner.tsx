@@ -58,7 +58,7 @@ export default function UpgradeBanner() {
     >
       <div style={{ flex: 1, minWidth: 240 }}>
         <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#115e59", lineHeight: 1.4 }}>
-          Remove the export watermark &amp; save calculation history.
+          Export clinical notes for the chart &amp; save calculation history.
         </p>
         <p style={{ margin: "2px 0 0", fontSize: 11, color: "#0f766e", lineHeight: 1.4 }}>
           Vancomyzer&trade; Individual Pro · 14-day free trial · $9.99/mo billed annually.

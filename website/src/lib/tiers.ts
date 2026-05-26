@@ -75,7 +75,6 @@ export const TIERS: Record<TierId, TierConfig> = {
       "Vancomyzer Obesity Model (auto-activated BMI ≥ 40)",
       "All safety guardrails active",
       "DOI-linked inline references on every result",
-      "Watermarked clinical-note export",
       "Community support",
     ],
     cta: { label: "Start Free", href: "/register" },
@@ -89,7 +88,7 @@ export const TIERS: Record<TierId, TierConfig> = {
     features: [
       "Everything in Free",
       "Unlimited calculations",
-      "Clinical note export with NO watermark",
+      "Clinical note & PDF export for the medical record",
       "Calculation history (≥ 90 days, de-identified)",
       "Custom institution name on exported notes",
       "Email support (info@dosys.health)",
@@ -155,7 +154,8 @@ const TIER_RANK: Record<TierId, number> = {
 
 const FEATURE_MIN_TIER: Record<FeatureId, TierId> = {
   // Free
-  // (no feature gates at free — calculator + watermarked export are unconditional)
+  // (no feature gates at free — Bayesian calculator is unconditional; export
+  // and history are Pro-gated below)
 
   // Individual Pro
   "export.pdf": "individual_pro",
