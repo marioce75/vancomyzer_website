@@ -295,11 +295,25 @@ export default function TransparentDosingPage() {
             >
               ▶ Literature reproducibility
             </Link>
+            <Link
+              href="/transparent-dosing/predictive-performance"
+              className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
+              style={{
+                background: "#0f172a",
+                color: "#00c9b1",
+                border: "1px solid #1e293b",
+                letterSpacing: "0.08em",
+              }}
+            >
+              ▶ Predictive performance
+            </Link>
           </div>
           <p className="mt-3 text-xs" style={{ color: "#64748b" }}>
             Literature Reproducibility is a public scoreboard: every published vancomycin case
             we test our calculator against, with the live delta between our output and the
-            published value. If our engine drifts, the build fails before it ships.
+            published value. Predictive Performance is the Sheiner–Beal stress test: synthetic
+            ICU patients drawn from a different published model than our prior, with rBias and
+            rRMSE benchmarked against Bai et al. 2025.
           </p>
         </div>
       </section>
