@@ -1,0 +1,225 @@
+{
+  "n": 200,
+  "summary": {
+    "CL": {
+      "median_abs": 0.81,
+      "mean_signed": 0.97,
+      "p90_abs": 3.48,
+      "p95_abs": 5.65,
+      "max_abs": 18.1
+    },
+    "V1": {
+      "median_abs": 0.85,
+      "mean_signed": 0.62,
+      "p90_abs": 2.23,
+      "p95_abs": 3.0,
+      "max_abs": 32.76
+    },
+    "Q": {
+      "median_abs": 0.66,
+      "mean_signed": -0.01,
+      "p90_abs": 1.76,
+      "p95_abs": 2.93,
+      "max_abs": 21.34
+    },
+    "V2": {
+      "median_abs": 0.23,
+      "mean_signed": 0.36,
+      "p90_abs": 1.58,
+      "p95_abs": 3.83,
+      "max_abs": 13.77
+    }
+  },
+  "accuracy_vs_truth": {
+    "CL": {
+      "prior": 31.7,
+      "vz": 10.2,
+      "tucuxi": 10.3
+    },
+    "V1": {
+      "prior": 28.9,
+      "vz": 26.0,
+      "tucuxi": 26.3
+    },
+    "Q": {
+      "prior": 53.2,
+      "vz": 53.0,
+      "tucuxi": 52.6
+    },
+    "V2": {
+      "prior": 26.2,
+      "vz": 25.4,
+      "tucuxi": 25.2
+    }
+  },
+  "outliers": {
+    "CL": [
+      {
+        "id": "p196",
+        "crcl": 177,
+        "delta_pct": 18.1,
+        "vz": 4.04,
+        "tucuxi": 3.37,
+        "d_CL": 18.1
+      },
+      {
+        "id": "p100",
+        "crcl": 42.2,
+        "delta_pct": 14.7,
+        "vz": 0.84,
+        "tucuxi": 0.73,
+        "d_CL": 14.7
+      },
+      {
+        "id": "p111",
+        "crcl": 70.7,
+        "delta_pct": 8.3,
+        "vz": 1.67,
+        "tucuxi": 1.54,
+        "d_CL": 8.3
+      },
+      {
+        "id": "p96",
+        "crcl": 130.4,
+        "delta_pct": 8.0,
+        "vz": 3.68,
+        "tucuxi": 3.4,
+        "d_CL": 8.0
+      },
+      {
+        "id": "p166",
+        "crcl": 80,
+        "delta_pct": 7.1,
+        "vz": 2.75,
+        "tucuxi": 2.56,
+        "d_CL": 7.1
+      }
+    ],
+    "V1": [
+      {
+        "id": "p196",
+        "crcl": 177,
+        "delta_pct": 32.8,
+        "vz": 33.46,
+        "tucuxi": 24.04,
+        "d_CL": 18.1
+      },
+      {
+        "id": "p87",
+        "crcl": 83.8,
+        "delta_pct": 11.6,
+        "vz": 18.41,
+        "tucuxi": 16.39,
+        "d_CL": 3.9
+      },
+      {
+        "id": "p166",
+        "crcl": 80,
+        "delta_pct": 7.4,
+        "vz": 28.77,
+        "tucuxi": 26.73,
+        "d_CL": 7.1
+      },
+      {
+        "id": "p24",
+        "crcl": 57.4,
+        "delta_pct": 5.5,
+        "vz": 20.74,
+        "tucuxi": 19.64,
+        "d_CL": 3.7
+      },
+      {
+        "id": "p148",
+        "crcl": 55.3,
+        "delta_pct": 5.2,
+        "vz": 28.61,
+        "tucuxi": 27.16,
+        "d_CL": 4.1
+      }
+    ],
+    "Q": [
+      {
+        "id": "p196",
+        "crcl": 177,
+        "delta_pct": -21.3,
+        "vz": 1.48,
+        "tucuxi": 1.83,
+        "d_CL": 18.1
+      },
+      {
+        "id": "p117",
+        "crcl": 165.2,
+        "delta_pct": 7.3,
+        "vz": 3.39,
+        "tucuxi": 3.15,
+        "d_CL": 6.3
+      },
+      {
+        "id": "p87",
+        "crcl": 83.8,
+        "delta_pct": -7.3,
+        "vz": 1.41,
+        "tucuxi": 1.52,
+        "d_CL": 3.9
+      },
+      {
+        "id": "p166",
+        "crcl": 80,
+        "delta_pct": 5.5,
+        "vz": 2.41,
+        "tucuxi": 2.28,
+        "d_CL": 7.1
+      },
+      {
+        "id": "p95",
+        "crcl": 164.4,
+        "delta_pct": 4.1,
+        "vz": 3.56,
+        "tucuxi": 3.41,
+        "d_CL": 3.6
+      }
+    ],
+    "V2": [
+      {
+        "id": "p148",
+        "crcl": 55.3,
+        "delta_pct": 13.8,
+        "vz": 28.49,
+        "tucuxi": 24.82,
+        "d_CL": 4.1
+      },
+      {
+        "id": "p100",
+        "crcl": 42.2,
+        "delta_pct": 13.5,
+        "vz": 27.27,
+        "tucuxi": 23.83,
+        "d_CL": 14.7
+      },
+      {
+        "id": "p70",
+        "crcl": 52.2,
+        "delta_pct": 10.7,
+        "vz": 29.83,
+        "tucuxi": 26.81,
+        "d_CL": 5.7
+      },
+      {
+        "id": "p24",
+        "crcl": 57.4,
+        "delta_pct": 9.4,
+        "vz": 20.96,
+        "tucuxi": 19.06,
+        "d_CL": 3.7
+      },
+      {
+        "id": "p152",
+        "crcl": 80.2,
+        "delta_pct": 7.3,
+        "vz": 42.26,
+        "tucuxi": 39.3,
+        "d_CL": 3.1
+      }
+    ]
+  }
+}

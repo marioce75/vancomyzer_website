@@ -307,13 +307,27 @@ export default function TransparentDosingPage() {
             >
               ▶ Predictive performance
             </Link>
+            <Link
+              href="/transparent-dosing/engine-crosscheck"
+              className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
+              style={{
+                background: "#0f172a",
+                color: "#00c9b1",
+                border: "1px solid #1e293b",
+                letterSpacing: "0.08em",
+              }}
+            >
+              ▶ Engine cross-check
+            </Link>
           </div>
           <p className="mt-3 text-xs" style={{ color: "#64748b" }}>
             Literature Reproducibility is a public scoreboard: every published vancomycin case
             we test our calculator against, with the live delta between our output and the
             published value. Predictive Performance is the Sheiner–Beal stress test: synthetic
             ICU patients drawn from a different published model than our prior, with rBias and
-            rRMSE benchmarked against Bai et al. 2025.
+            rRMSE benchmarked against Bai et al. 2025. Engine Cross-Check pits our Bayesian
+            engine against Tucuxi — an independent open-source C++ dosing engine — and shows
+            the two agree on posterior PK parameters to under 1% (median, n=200).
           </p>
         </div>
       </section>
