@@ -956,6 +956,32 @@ export default function CalculatorWorkspace() {
         </div>
       )}
 
+      {/* Next-level sampling recommendation — persistent in empiric mode. Closes
+          the loop on the marketing claim that the calculator tells you when to
+          draw a level, and nudges users from prior-only → Bayesian-fit dosing. */}
+      {viewMode === "empiric" && visibleResult && (
+        <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 flex gap-3">
+          <span className="text-base shrink-0">🎯</span>
+          <div className="flex-1">
+            <p className="text-xs font-semibold text-teal-900">Next-Level Sampling Recommendation</p>
+            <p className="mt-1 text-xs text-teal-900 leading-5">
+              This dose is computed from the <strong>population prior only</strong> — no measured level was used. Draw a vancomycin level and re-run for an individualized Bayesian fit.
+            </p>
+            <ul className="mt-1 text-xs text-teal-900 leading-5 list-disc pl-4 space-y-0.5">
+              <li><strong>Earliest meaningful:</strong> 1.5–6h after dose 1 post-infusion end (sparse single-level workflow).</li>
+              <li><strong>Highest AUC accuracy:</strong> peak + trough near dose 3–4 at steady state (per ASHP/IDSA 2020).</li>
+            </ul>
+            <button
+              type="button"
+              onClick={() => applyViewMode("one_level")}
+              className="mt-2 inline-block rounded border border-teal-700 bg-white px-3 py-1 text-xs font-semibold text-teal-900 hover:bg-teal-100 transition-colors"
+            >
+              Switch to 1-Level workflow →
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Age >65 advisory — non-blocking, shown whenever age is entered */}
       {patient.age > 65 && !rrt && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex gap-3">
