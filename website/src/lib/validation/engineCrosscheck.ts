@@ -65,8 +65,8 @@ export const PARAM_LABEL: Record<string, string> = {
 export const CROSSCHECK_META = {
   seed: 42,
   date: "2026-05-30",
-  comparator: "Tucuxi (tucucli)",
+  comparator: "Tucuxi",
   comparatorRepo: "github.com/sotalya/tucuxi-core",
   comparatorCommit: "d36cc10 (2026-05-28)",
-  structuralModel: "linear.2comp.macro, IV infusion",
+  structuralModel: "two-compartment, IV infusion",
 } as const;

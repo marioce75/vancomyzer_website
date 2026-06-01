@@ -41,8 +41,8 @@ export default function CasesPage() {
       <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 720 }}>
         Every Vancomyzer release runs through a library of published vancomycin cases.
         If our calculator drifts from the cited literature beyond a pre-declared tolerance,
-        the build fails before it ships. The result is on this page — auditable, deterministic,
-        and refreshed on every deploy.
+        the release is halted before it goes live. The result is on this page — auditable,
+        reproducible, and refreshed with every release.
       </p>
 
       {CASES.length === 0 ? <EmptyState /> : <Body cases={CASES} results={results} summary={summary} />}

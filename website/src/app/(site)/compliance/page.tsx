@@ -19,7 +19,7 @@ const documents = [
   {
     title: "Change Management Policy",
     filename: "vancomyzer-change-management-policy.pdf",
-    description: "Software release process, code review, testing, and deployment controls.",
+    description: "Documented software development, review, testing, and release controls.",
   },
   {
     title: "Business Continuity Plan",

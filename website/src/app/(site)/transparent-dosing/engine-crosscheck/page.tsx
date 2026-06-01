@@ -27,9 +27,9 @@ import {
 export const metadata = {
   title: "Independent Engine Cross-Check — Vancomyzer",
   description:
-    "Vancomyzer's Bayesian engine cross-checked against Tucuxi, an independent " +
-    "open-source C++ MIPD engine. Given identical priors and data, the two " +
-    "engines agree on posterior PK parameters to under 1% (median, n=200).",
+    "Vancomyzer's Bayesian dosing engine cross-checked against Tucuxi, a separate " +
+    "independently-built dosing program. Given identical starting estimates and data, " +
+    "the two agree on individualized PK estimates to under 1% (median, n=200).",
 };
 
 export default function EngineCrosscheckPage() {
@@ -41,14 +41,14 @@ export default function EngineCrosscheckPage() {
         Independent Engine Cross-Check
       </h1>
       <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 760 }}>
-        A second, independently-written pharmacokinetic engine should reach the
+        A second, independently-developed pharmacokinetic engine should reach the
         same answer ours does. We checked: given identical priors and identical
-        measured levels, does Vancomyzer&rsquo;s TypeScript Bayesian engine reach
-        the same posterior PK parameters as <strong>Tucuxi</strong> — an
-        open-source C++ model-informed precision dosing engine from a different
-        team, in a different language? Across {CROSSCHECK.n} synthetic patients,
-        the two engines agree to <strong>under 1% (median)</strong> on every
-        parameter.
+        measured levels, does Vancomyzer&rsquo;s Bayesian engine reach the same
+        posterior PK parameters as <strong>Tucuxi</strong> — a separate,
+        independently-built model-informed precision dosing program developed by a
+        different academic team (the REDS institute at HEIG-VD, Switzerland)? Across
+        {" "}{CROSSCHECK.n} simulated patients, the two engines agree to{" "}
+        <strong>under 1% (median)</strong> on every parameter.
       </p>
 
       <SnapshotCaveat />
@@ -86,14 +86,14 @@ function SnapshotCaveat() {
       lineHeight: 1.55,
       marginBottom: 24,
     }}>
-      <strong>This is a fixed snapshot, not a live computation.</strong> The
+      <strong>These results are a fixed snapshot.</strong> The
       sister <Link href="/transparent-dosing/predictive-performance" style={{ color: "#2563eb", fontWeight: 600 }}>Predictive
-      Performance</Link> page recomputes on every deploy. This one can&rsquo;t:
-      it requires a locally-compiled build of the Tucuxi C++ engine, which
-      isn&rsquo;t in our repo or on the server. The figures below are the verbatim
-      output of a single run (seed {CROSSCHECK_META.seed}, {CROSSCHECK.n} patients,
-      {" "}{CROSSCHECK_META.date}) and the page renders directly from that run&rsquo;s
-      saved data file — nothing is retyped.
+      Performance</Link> analysis re-runs automatically and updates itself. This
+      comparison cannot: running the Tucuxi program requires installing it
+      separately, so it is not part of our live website. The figures below are the
+      exact results of a single comparison run ({CROSSCHECK.n} patients,
+      {" "}{CROSSCHECK_META.date}), shown here directly from that run&rsquo;s saved
+      results — none of the numbers are re-entered by hand.
     </div>
   );
 }
@@ -250,29 +250,27 @@ function MethodologyCard() {
           realistic assay noise.
         </li>
         <li>
-          Compute Vancomyzer&rsquo;s per-patient Colin-2019 prior, then run our
-          Bayesian engine on the two levels → posterior {`{`}CL, V₁, Q, V₂{`}`}.
+          Compute Vancomyzer&rsquo;s per-patient Colin-2019 starting estimate (prior),
+          then run our Bayesian engine on the two levels to obtain the individualized
+          estimates for clearance and volumes (CL, V₁, Q, V₂).
         </li>
         <li>
-          Build a Tucuxi drug-model file ({CROSSCHECK_META.structuralModel}) with
-          the <strong>same prior injected</strong> as fixed values and matched
-          variability + residual-error terms, plus a query carrying the
-          <strong> same dose history and the same two levels</strong>. Run
-          {" "}<code>tucucli</code> a-posteriori → Tucuxi&rsquo;s posterior.
+          Set up the Tucuxi program with the same vancomycin model
+          ({CROSSCHECK_META.structuralModel}), the <strong>same starting estimate</strong>,
+          and matched variability and assay-error settings, then give it the
+          <strong> same dosing history and the same two levels</strong>, and run its
+          Bayesian fit.
         </li>
         <li>
-          Compare the two posteriors per parameter. An analyzer asserts every one
-          of the {CROSSCHECK.n} patients is accounted for and refuses to summarize
-          if any run is dropped.
+          Compare the two programs&rsquo; individualized estimates, parameter by
+          parameter. The comparison confirms every one of the {CROSSCHECK.n} patients
+          is accounted for, and reports nothing unless all are present.
         </li>
       </ol>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 14, marginBottom: 0, lineHeight: 1.55 }}>
-        Comparator: {CROSSCHECK_META.comparator} ·{" "}
-        <a href={`https://${CROSSCHECK_META.comparatorRepo}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-primary)" }}>
-          {CROSSCHECK_META.comparatorRepo} ↗
-        </a>{" "}
-        · commit {CROSSCHECK_META.comparatorCommit} · AGPL-3.0. Tucuxi is developed
-        by the REDS institute at HEIG-VD (Yann Thoma).
+        Comparator: {CROSSCHECK_META.comparator} — a free, openly-available dosing
+        program. Tucuxi is developed by the REDS institute at HEIG-VD, Switzerland
+        (Prof. Yann Thoma), and is described in a peer-reviewed publication.
       </p>
     </section>
   );
@@ -281,20 +279,20 @@ function MethodologyCard() {
 function ScopeCard() {
   const limits = [
     {
-      label: "Validates the engine, not our Colin transcription",
-      body: "No canonical Colin-2019 vancomycin model file is published in Tucuxi's open repositories (it ships only with their desktop app). We authored the model file used here. So this confirms two independent engines converge given the same model encoding — it does not independently confirm our Colin equations. Those are checked separately on the Literature Reproducibility page.",
+      label: "This compares the two programs' calculations, not the Colin model itself",
+      body: "The published Colin-2019 vancomycin model is not openly available in a form Tucuxi can load (it comes only with Tucuxi's own desktop application). So we entered the Colin model into Tucuxi ourselves. This comparison therefore confirms that two independently-built programs reach the same answer from the same model — it is not a separate confirmation of the Colin equations. Those are checked on the Literature Reproducibility page.",
     },
     {
-      label: "The prior is injected, not re-derived",
-      body: "Both engines start from a byte-identical prior (Vancomyzer's, baked into the Tucuxi file). That's the point — it isolates the engine (optimizer + structural model + likelihood) as the only variable.",
+      label: "Both programs start from the same estimate",
+      body: "Tucuxi was given Vancomyzer's exact starting estimate for each patient. That is deliberate: it isolates the dose calculation itself as the only thing being compared.",
     },
     {
-      label: "Synthetic data",
-      body: "Patients and levels are Monte-Carlo simulated. No patient data is involved. Real-world behavior is addressed separately by the Predictive Performance stress test.",
+      label: "Simulated patients",
+      body: "The patients and their vancomycin levels are computer-generated, not real. No patient data is involved. Real-world performance is addressed separately by the Predictive Performance analysis.",
     },
     {
-      label: "Two-sample design",
-      body: "A peak + trough constrains clearance well but not the inter-compartmental/peripheral-volume terms. The agreement on CL/V₁ is the load-bearing result; Q/V₂ agreement reflects both engines staying near the shared prior.",
+      label: "Two-level sampling",
+      body: "A peak plus a trough pins down clearance well, but does not fully pin down the distribution-volume terms. The agreement on clearance and central volume is the key result; agreement on the other two reflects both programs staying near the shared starting estimate.",
     },
   ];
   return (
@@ -309,12 +307,12 @@ function ScopeCard() {
         ))}
       </ul>
       <p style={{ fontSize: 13, color: "var(--color-secondary)", marginTop: 14, marginBottom: 0, lineHeight: 1.6 }}>
-        <strong>What this establishes:</strong> an independent open-source C++
-        Bayesian dosing engine, given identical priors and data, reproduces
-        Vancomyzer&rsquo;s posterior clearance and volume estimates to within ~1%
-        (median, n={CROSSCHECK.n}) and matches its accuracy against a known truth
-        to within 0.4 points. Vancomyzer&rsquo;s optimizer and two-compartment math
-        are corroborated by an independent implementation.
+        <strong>What this establishes:</strong> a separate, independently-built
+        Bayesian dosing program, given identical starting estimates and data,
+        reproduces Vancomyzer&rsquo;s individualized clearance and volume estimates to
+        within ~1% (median, n={CROSSCHECK.n}) and matches its accuracy against a known
+        answer to within 0.4 points. Vancomyzer&rsquo;s calculations are corroborated by
+        an independent program.
       </p>
     </section>
   );

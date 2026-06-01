@@ -177,7 +177,7 @@ export default function TransparentDosingPage() {
             What we believe
           </h2>
           <p className="mt-3 text-sm" style={{ color: "#64748b" }}>
-            Six commitments that shape every line of code in the engine.
+            Six commitments that shape every calculation the engine makes.
           </p>
           <div className="mt-12 space-y-12">
             {PRINCIPLES.map((p) => (
@@ -209,9 +209,9 @@ export default function TransparentDosingPage() {
             The math, exposed.
           </h2>
           <p className="mt-3 max-w-2xl text-base leading-relaxed" style={{ color: "#334155" }}>
-            Here&rsquo;s the actual Colin 2019 clearance equation Vancomyzer evaluates for your patient,
-            verbatim from the engine source. It is the same equation a black-box tool would compute
-            internally. The difference is whether you ever get to see it.
+            Here&rsquo;s the actual Colin 2019 clearance equation Vancomyzer uses for your patient.
+            It is the same equation a black-box tool would compute internally. The difference is
+            whether you ever get to see it.
           </p>
 
           <pre
@@ -223,30 +223,31 @@ export default function TransparentDosingPage() {
               lineHeight: 1.7,
             }}
           >
-            <span style={{ color: "#94a3b8" }}>{"// Adult clearance — Colin 2019, two-compartment, weight + maturation + age decline + SCr"}</span>
+            <span style={{ color: "#94a3b8" }}>{"Vancomycin clearance (CL) — Colin 2019, two-compartment model"}</span>
             {"\n"}
-            <span style={{ color: "#94a3b8" }}>{"// Source: Clin Pharmacokinet. 2019;58(6):767-780. Eqs 6-13, Table 3."}</span>
+            <span style={{ color: "#94a3b8" }}>{"Source: Clin Pharmacokinet. 2019;58(6):767-780, Table 3"}</span>
             {"\n\n"}
-            <span style={{ color: "#00c9b1" }}>const</span>
-            {" CL = THETA_CL\n  * "}
-            <span style={{ color: "#fbbf24" }}>Math.pow</span>
-            {"(weight_kg / 70, 0.75)  "}
-            <span style={{ color: "#94a3b8" }}>{"// allometric size scaling"}</span>
-            {"\n  * "}
-            <span style={{ color: "#fbbf24" }}>FMat</span>
-            {"(PMA_weeks)            "}
-            <span style={{ color: "#94a3b8" }}>{"// sigmoidal maturation (≈1.0 for adults)"}</span>
-            {"\n  * "}
-            <span style={{ color: "#fbbf24" }}>FDecline</span>
-            {"(PMA_years)          "}
-            <span style={{ color: "#94a3b8" }}>{"// 50% reduction at age 61.6 years"}</span>
-            {"\n  * "}
-            <span style={{ color: "#fbbf24" }}>Math.exp</span>
-            {"(-THETA_SCR * (scr_mgdl - SCRstd));"}
+            <span style={{ color: "#00c9b1" }}>CL</span>
+            {" = θ·CL  ×  (weight / 70)"}
+            <span style={{ color: "#fbbf24" }}>{"^0.75"}</span>
+            {"        "}
+            <span style={{ color: "#94a3b8" }}>{"← size (weight) scaling"}</span>
+            {"\n           ×  "}
+            <span style={{ color: "#fbbf24" }}>F·maturation</span>
+            {"             "}
+            <span style={{ color: "#94a3b8" }}>{"← ≈ 1.0 in adults"}</span>
+            {"\n           ×  "}
+            <span style={{ color: "#fbbf24" }}>F·age-decline</span>
+            {"            "}
+            <span style={{ color: "#94a3b8" }}>{"← 50% lower by age 61.6 yr"}</span>
+            {"\n           ×  "}
+            <span style={{ color: "#fbbf24" }}>F·creatinine</span>
+            {"             "}
+            <span style={{ color: "#94a3b8" }}>{"← serum creatinine effect"}</span>
           </pre>
 
           <p className="mt-8 max-w-2xl text-base leading-relaxed" style={{ color: "#334155" }}>
-            And the Bayesian posterior, in three lines:
+            And the Bayesian step, in plain terms:
           </p>
 
           <pre
@@ -258,17 +259,20 @@ export default function TransparentDosingPage() {
               lineHeight: 1.7,
             }}
           >
-            <span style={{ color: "#94a3b8" }}>{"// Posterior ∝ likelihood(observed levels | params) × prior(params)"}</span>
+            <span style={{ color: "#94a3b8" }}>{"Individualized estimate  =  the population starting estimate,"}</span>
             {"\n"}
-            <span style={{ color: "#94a3b8" }}>{"// MAP estimate via multi-start Nelder-Mead in log-space"}</span>
+            <span style={{ color: "#94a3b8" }}>{"                            adjusted to best fit your patient's"}</span>
             {"\n"}
-            <span style={{ color: "#94a3b8" }}>{"// Bounded — a single outlier observation cannot override the population prior"}</span>
+            <span style={{ color: "#94a3b8" }}>{"                            measured vancomycin levels."}</span>
+            {"\n\n"}
+            <span style={{ color: "#94a3b8" }}>{"It is bounded: one unusual level cannot override the"}</span>
+            {"\n"}
+            <span style={{ color: "#94a3b8" }}>{"population data — it only nudges the estimate."}</span>
           </pre>
 
           <p className="mt-6 max-w-2xl text-sm leading-relaxed" style={{ color: "#64748b" }}>
-            That&rsquo;s the entire trick. There is no proprietary algorithm. There is no closed-source
-            Bayesian magic. Anyone with a graduate-level pharmacometrics course can audit the engine.
-            That is the point.
+            That&rsquo;s the entire approach. There is no proprietary black box and no hidden model.
+            Any clinician trained in pharmacokinetics can review exactly how it works. That is the point.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
@@ -325,9 +329,9 @@ export default function TransparentDosingPage() {
             we test our calculator against, with the live delta between our output and the
             published value. Predictive Performance is the Sheiner–Beal stress test: synthetic
             ICU patients drawn from a different published model than our prior, with rBias and
-            rRMSE benchmarked against Bai et al. 2025. Engine Cross-Check pits our Bayesian
-            engine against Tucuxi — an independent open-source C++ dosing engine — and shows
-            the two agree on posterior PK parameters to under 1% (median, n=200).
+            rRMSE benchmarked against Bai et al. 2025. Engine Cross-Check compares our Bayesian
+            engine against Tucuxi — a separate, independently-built dosing program — and shows
+            the two agree on individualized PK estimates to under 1% (median, n=200).
           </p>
         </div>
       </section>
