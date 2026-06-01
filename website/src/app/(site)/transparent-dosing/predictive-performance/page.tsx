@@ -202,7 +202,7 @@ function MethodologyCard() {
         <li>
           Generate <strong>n = {N}</strong> synthetic ICU patients with demographics matched to
           Bai 2025 Table 2 (age 61.71 ± 14.78, 63.1% male, weight ~65 kg, SCr ~0.66 mg/dL).
-          Seeded PRNG (seed = <strong>{SEED}</strong>) so the cohort is identical every run.
+          The patient set is fixed and reproducible, so the cohort is identical every time the analysis runs.
         </li>
         <li>
           For each patient, sample <strong>&ldquo;true&rdquo; PK parameters from the Goti 2018 model</strong>{" "}
@@ -234,12 +234,12 @@ function MethodologyCard() {
           patient&rsquo;s Goti truth at that same timepoint.
         </li>
         <li>
-          Aggregate predicted–vs–observed pairs across the cohort. Compute Sheiner–Beal
-          rBias (accuracy) and rRMSE (precision) per the formulas at top of <code>metrics.ts</code>.
+          Aggregate predicted–vs–observed pairs across the cohort. Compute the Sheiner–Beal
+          relative bias (accuracy) and relative root-mean-squared error (precision).
         </li>
       </ol>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 14, marginBottom: 0 }}>
-        Run it yourself: <code>npm run test:predictive</code> in the repo. Same seed, same numbers.
+        The analysis is fully reproducible: the same fixed patient set produces the same results every time.
       </p>
     </section>
   );

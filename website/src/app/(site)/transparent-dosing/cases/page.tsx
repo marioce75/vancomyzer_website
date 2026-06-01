@@ -599,9 +599,9 @@ function Limitations() {
         <li>
           When a case shows drift beyond its tolerance, we display it anyway with
           an amber badge and explanation. The page is intended to surface honest
-          engine behavior, not to be a curated success story. The build itself
-          hard-fails on undocumented drift, which is why this page is up to date
-          on every deploy.
+          engine behavior, not to be a curated success story. A release is
+          automatically halted on undocumented drift, which is why this page is
+          always up to date.
         </li>
       </ul>
     </section>

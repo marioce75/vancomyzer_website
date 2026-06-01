@@ -151,7 +151,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               ...FONT,
             }}
           >
-            TERMINAL SETTINGS
+            CLINICAL SETTINGS
           </h2>
           <button
             type="button"
