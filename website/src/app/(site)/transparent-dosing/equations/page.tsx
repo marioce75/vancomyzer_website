@@ -292,10 +292,12 @@ IIV (used as prior log-SDs in MAP):
             7. MAP-Bayesian posterior fitting
           </h2>
           <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#334155" }}>
-            Given measured levels, Vancomyzer fits the patient&rsquo;s individual PK by minimizing a Bayesian
-            objective: the sum of negative-log-likelihood of the observations under a normal assay-error
-            model and a log-normal prior penalty on each PK parameter. The minimization runs in log-space
-            with multi-start Nelder-Mead so single-level outlier cases don&rsquo;t get stuck in local minima.
+            Given measured levels, Vancomyzer fits the patient&rsquo;s individual PK using maximum a
+            posteriori (MAP) Bayesian estimation. It balances two things: how well the estimate fits the
+            patient&rsquo;s measured concentrations (under a normal assay-error model), against how far it
+            strays from the population priors (a log-normal prior on each PK parameter). The fit is
+            repeated from several starting points so an unusual single level cannot drag the estimate to
+            an implausible value.
           </p>
 
           <pre

@@ -24,7 +24,7 @@ export const metadata = {
   title: "Literature Reproducibility — Vancomyzer",
   description:
     "Every Vancomyzer release is tested against published vancomycin cases. " +
-    "If our calculator drifts from the literature, the build fails before it ships.",
+    "If our calculator drifts from the literature, the release is halted before it goes live.",
 };
 
 export default function CasesPage() {
