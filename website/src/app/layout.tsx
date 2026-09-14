@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./Providers";
 import RegulatoryFooter from "@/components/RegulatoryFooter";
+import Analytics from "@/components/Analytics";
 
 import type { Viewport } from "next";
 
@@ -45,6 +46,8 @@ export default function RootLayout({
           <div className="flex-1">{children}</div>
           <RegulatoryFooter />
         </Providers>
+        {/* Cookie-free usage analytics; renders nothing unless a provider is configured. */}
+        <Analytics />
       </body>
     </html>
   );

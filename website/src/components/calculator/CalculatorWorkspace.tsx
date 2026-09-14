@@ -47,6 +47,7 @@ import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFeature } from "@/hooks/useFeature";
 import { printReport, type ReportData } from "@/lib/generateReport";
+import { track } from "@/lib/analytics";
 const defaultPatient: CalculateRequestPatient = { age: 0, weight_kg: 0, height_cm: 0, sex: "", serum_creatinine_mg_dl: 0 };
 const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0 };
 const defaultLevel = { value_mcg_ml: 0, collection_time: "", time_since_last_dose_hours: 0 };
@@ -240,7 +241,20 @@ export default function CalculatorWorkspace() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const { settings, playSound } = useMatrixSettings();
-  const { user, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
+
+  // Workflow label for the "Calculation Run" analytics event. Read through a
+  // ref (like caseIdRef above) so handleCalculate's identity does not change
+  // with the view mode — a new identity would re-fire the empiric
+  // auto-recalc effect and send an extra request.
+  const viewModeRef = useRef<WorkspaceViewMode>(viewMode);
+  useEffect(() => { viewModeRef.current = viewMode; }, [viewMode]);
+
+  // When an anonymous visitor hits the calculation rate limit (HTTP 429), the
+  // debounced empiric auto-recalc must stop firing until the limit lifts —
+  // otherwise every keystroke keeps sending requests into the limiter. Set
+  // from the Retry-After header; explicit Calculate clicks are not blocked.
+  const rateLimitedUntilRef = useRef<number>(0);
 
   // ── Restore from sessionStorage on mount (client-only) ──
   const didRestoreRef = useRef(false);
@@ -404,6 +418,8 @@ export default function CalculatorWorkspace() {
 
   const handleCalculate = useCallback(async (opts?: { intent?: "auto" | "explicit" }) => {
     const intent = opts?.intent ?? "explicit";
+    // Captured at submit time so switching modes mid-request can't mislabel the analytics event.
+    const workflowMode = viewModeRef.current;
     playSound("calculate");
     setError(null);
     setLoading(true);
@@ -419,13 +435,28 @@ export default function CalculatorWorkspace() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
+        if (res.status === 429) {
+          // Pause auto-recalc for the server's Retry-After window (default 60 s
+          // if the header is missing or unreadable).
+          const retryAfterSec = Number(res.headers.get("retry-after"));
+          const waitSec = Number.isFinite(retryAfterSec) && retryAfterSec > 0 ? retryAfterSec : 60;
+          rateLimitedUntilRef.current = Date.now() + waitSec * 1000;
+        }
         const fieldErrorDetails = data.field_errors && typeof data.field_errors === "object"
           ? Object.entries(data.field_errors as Record<string, string>).map(([field, message]) => `${field}: ${message}`)
           : [];
         setResult(null);
         setError({
+          // error_type may also be "rate_limited" (HTTP 429 for anonymous
+          // visitors); it is only a label here — the visitor sees `message`.
           error_type: (data.error_type as CalculateErrorResponse["error_type"]) ?? "calculation_error",
-          message: typeof data.message === "string" ? data.message : "Calculation request failed.",
+          // A 429 normally carries a plain-language `message`; the 429 fallback
+          // only covers a limiter response that arrives without a JSON body.
+          message: typeof data.message === "string"
+            ? data.message
+            : res.status === 429
+              ? "Too many calculations in a short time. Please wait a minute, then try again."
+              : "Calculation request failed.",
           field_errors: data.field_errors,
           details: [...(Array.isArray(data.details) ? data.details : []), ...fieldErrorDetails],
           limitations: data.limitations,
@@ -462,6 +493,14 @@ export default function CalculatorWorkspace() {
       setSelectedFrequencyOption(null);
       setError(null);
       playSound("success");
+
+      // Usage analytics — only calculations the clinician explicitly started
+      // (Calculate button, Cmd/Ctrl+Enter, loading-dose simulation), never the
+      // debounced empiric auto-recalc (intent "auto"). The only prop is the
+      // workflow label; no patient inputs or results are ever sent.
+      if (intent === "explicit") {
+        track("Calculation Run", { mode: workflowMode });
+      }
 
       // ── PK Validation audit log ──
       if (Array.isArray(data.curve) && data.curve.length > 1) {
@@ -544,6 +583,9 @@ export default function CalculatorWorkspace() {
   useEffect(() => {
     const hasPatientCore = patient.age > 0 && patient.weight_kg > 0 && patient.serum_creatinine_mg_dl > 0;
     if (!hasPatientCore || mode !== "initial_regimen" || rrt === null || rrt === true) return;
+    // Rate-limited: stay quiet until the window passes. The visitor can still
+    // press Calculate, and the next field change after the window re-arms this.
+    if (Date.now() < rateLimitedUntilRef.current) return;
     const timer = window.setTimeout(() => {
       void handleCalculate({ intent: "auto" });
     }, 700);
@@ -862,14 +904,18 @@ export default function CalculatorWorkspace() {
         <div className="border-t px-4 py-2" style={{ borderTopColor: "var(--color-border)" }}>
           <p style={{ fontSize: 10, lineHeight: 1.6, color: "var(--color-dim)", fontFamily: "inherit", margin: 0 }}>
             Vancomyzer&trade; is non-device clinical decision support under 21st Century Cures Act §3060, intended for licensed healthcare professionals only. Every recommendation must be independently verified by a clinician prior to patient administration. Not FDA-cleared as a medical device, and not a substitute for clinical judgment, institutional protocols, or therapeutic drug monitoring.{" "}
-            <span
-              style={{ color: "var(--color-primary)", cursor: "pointer", textDecoration: "none" }}
+            {/* A real button so the full disclaimer is reachable by keyboard and screen readers. */}
+            <button
+              type="button"
               onClick={() => setDisclaimerOpen(true)}
+              style={{ color: "var(--color-primary)", cursor: "pointer", textDecoration: "none", background: "transparent", border: "none", padding: 0, font: "inherit" }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; }}
+              onFocus={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; }}
+              onBlur={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; }}
             >
               [See Full Disclaimer]
-            </span>
+            </button>
           </p>
         </div>
         {/* Footer links + copyright */}
@@ -1378,7 +1424,9 @@ export default function CalculatorWorkspace() {
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden xl:overflow-hidden" style={{ background: "transparent", color: "var(--color-primary)" }}>
-      <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} userName={user?.username} userRole={user?.role} onLogout={logout} />
+      {/* LOGOUT only when someone is signed in; open-access visitors get a
+          SIGN IN link in the same slot once the session check has settled. */}
+      <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} userName={user?.username} userRole={user?.role} onLogout={user ? logout : undefined} showSignIn={!authLoading && !user} />
       {loadedCase && (
         <div
           role="status"

@@ -1,5 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { OPEN_ACCESS } from "@/lib/openAccess";
+
+/**
+ * Identity headers forwarded to route handlers. Incoming copies are always
+ * stripped before forwarding, so a client cannot forge them. Route handlers
+ * should still derive identity from getServerSession() — these headers are
+ * only trustworthy when this middleware actually ran for the request.
+ */
+const IDENTITY_HEADER_PREFIX = "x-user-";
+
+/**
+ * Header values must be byte strings. A free-text value such as a display
+ * name with Vietnamese or CJK characters makes Headers.set throw, which would
+ * fail the whole request; omit that one header instead.
+ */
+function setIdentityHeader(headers: Headers, name: string, value: string): void {
+  try {
+    headers.set(name, value);
+  } catch {
+    /* not representable as a header value — leave it unset */
+  }
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -18,15 +40,25 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/calculator", request.url));
   }
 
-  // Protected pages — require session
-  const protectedPages = ["/", "/calculator", "/admin", "/research", "/mfa-verify"];
+  // Protected pages — require session.
+  // "/" is the public landing page and is never protected (it is also no
+  // longer in the matcher). "/calculator" requires a session only when open
+  // access is off (NEXT_PUBLIC_OPEN_ACCESS=false — see lib/openAccess.ts).
+  const protectedPages = [
+    ...(OPEN_ACCESS ? [] : ["/calculator"]),
+    "/admin",
+    "/research",
+    "/mfa-verify",
+  ];
   const needsPageAuth = protectedPages.some(p => pathname === p || pathname.startsWith(p + "/"));
 
   // Protected APIs — require session.
   // Note: /api/billing/webhook is INTENTIONALLY excluded — Stripe calls
   // it without a user session, signature verification gates it instead.
+  // /api/calculate follows the same open-access switch as /calculator;
+  // anonymous calculate traffic is rate limited inside the route handler.
   const protectedAPIs = [
-    "/api/calculate",
+    ...(OPEN_ACCESS ? [] : ["/api/calculate"]),
     "/api/audit",
     "/api/admin",
     "/api/research",
@@ -62,22 +94,36 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Pass user info in headers for downstream API routes
+  // Forward verified identity to route handlers as REQUEST headers.
+  //
+  // SECURITY: headers set on `NextResponse.next().headers` are RESPONSE
+  // headers — they go to the browser and never reach route handlers — while
+  // any x-user-* header the client sends DOES reach them. So: copy the
+  // incoming request headers, strip every client-supplied x-user-*, add the
+  // verified values only when a valid session token exists, and pass the
+  // sanitized set downstream with NextResponse.next({ request: { headers } }).
+  // Next 14.2 applies that via x-middleware-override-headers, which replaces
+  // the downstream request headers wholesale (so deletions here take effect).
+  // Identity is deliberately NOT echoed in response headers.
+  const requestHeaders = new Headers(request.headers);
+  // Collect names first — deleting while iterating a Headers object skips entries.
+  for (const name of Array.from(requestHeaders.keys())) {
+    if (name.startsWith(IDENTITY_HEADER_PREFIX)) requestHeaders.delete(name);
+  }
   if (token) {
-    const response = NextResponse.next();
-    response.headers.set("x-user-email", (token.email as string) ?? "");
-    response.headers.set("x-user-name", (token.name as string) ?? "");
-    response.headers.set("x-user-id", String(token.id ?? ""));
-    response.headers.set("x-user-username", (token.username as string) ?? "");
-    return response;
+    setIdentityHeader(requestHeaders, "x-user-email", (token.email as string) ?? "");
+    setIdentityHeader(requestHeaders, "x-user-name", (token.name as string) ?? "");
+    setIdentityHeader(requestHeaders, "x-user-id", String(token.id ?? ""));
+    setIdentityHeader(requestHeaders, "x-user-username", (token.username as string) ?? "");
   }
 
-  return NextResponse.next();
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
+  // "/" is intentionally not matched: it is the public landing page and
+  // needs no session check or identity forwarding.
   matcher: [
-    "/",
     "/calculator/:path*",
     "/admin/:path*",
     "/login",

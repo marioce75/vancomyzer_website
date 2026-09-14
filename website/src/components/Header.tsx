@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { href: "/transparent-dosing", label: "Transparency" },
@@ -11,8 +12,18 @@ const navItems = [
   { href: "/contact", label: "Contact" },
 ];
 
+// Primary "Calculator" action. Tailwind arbitrary classes rather than an
+// inline style so no hover JS is needed; teal-700 keeps white text above
+// 4.5:1 contrast on the light header.
+const CALCULATOR_BUTTON_CLASS =
+  "items-center justify-center rounded-md bg-[#0f766e] font-semibold text-white whitespace-nowrap transition hover:bg-[#115e59] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f766e]";
+
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, loading } = useAuth();
+  // Offer "Sign in" only once the session check has finished and found
+  // nobody, so signed-in clinicians never see it flash on first paint.
+  const showSignIn = !loading && !user;
 
   return (
     <header
@@ -34,8 +45,10 @@ export default function Header() {
               VANCOMYZER<sup className="text-[7px] sm:text-[8px] font-semibold ml-0.5 align-super" style={{ color: "var(--color-secondary)" }}>{"™"}</sup>
             </span>
           </Link>
+          {/* Badge moved from lg to xl so the added Sign in + Calculator
+              actions fit on one row at 1024px without wrapping. */}
           <span
-            className="hidden px-2.5 py-1 text-[11px] font-medium lg:inline-flex"
+            className="hidden px-2.5 py-1 text-[11px] font-medium xl:inline-flex"
             style={{
               border: "1px solid var(--color-primary-a40)",
               background: "var(--color-primary-a05)",
@@ -47,9 +60,11 @@ export default function Header() {
           </span>
         </div>
 
-        <div className="flex items-center gap-4 md:gap-6">
-          {/* Desktop nav */}
-          <ul className="hidden items-center gap-4 lg:gap-6 md:flex">
+        <div className="flex items-center gap-3 lg:gap-6">
+          {/* Desktop nav — breakpoint raised from md to lg: with the two new
+              actions the full row overflows between 768px and 1023px, so
+              tablets use the menu instead. */}
+          <ul className="hidden items-center gap-6 lg:flex">
             {navItems.map(({ href, label }) => (
               <li key={href}>
                 <Link href={href} className="text-sm font-medium transition" style={{ color: "var(--color-secondary)" }}>
@@ -59,13 +74,30 @@ export default function Header() {
             ))}
           </ul>
 
-          {/* Mobile hamburger */}
+          {showSignIn && (
+            <Link
+              href="/login"
+              className="hidden whitespace-nowrap text-sm font-medium transition lg:inline"
+              style={{ color: "var(--color-secondary)" }}
+            >
+              Sign in
+            </Link>
+          )}
+
+          {/* Primary action — in the bar from 640px up; phones get it at the
+              top of the menu (the bar has no room beside the brand at 320px). */}
+          <Link href="/calculator" className={`hidden px-4 py-2 text-sm sm:inline-flex ${CALCULATOR_BUTTON_CLASS}`}>
+            Calculator
+          </Link>
+
+          {/* Mobile / tablet hamburger */}
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 -mr-2"
+            className="lg:hidden p-2 -mr-2"
             style={{ color: "var(--color-secondary)" }}
             aria-label="Toggle menu"
+            aria-controls="site-mobile-menu"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               {mobileOpen ? (
@@ -78,9 +110,16 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* Mobile dropdown menu */}
+      {/* Mobile / tablet dropdown menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t px-4 py-3 space-y-1" style={{ borderTopColor: "var(--color-border)", background: "var(--color-bg)" }}>
+        <div id="site-mobile-menu" className="lg:hidden border-t px-4 py-3 space-y-1" style={{ borderTopColor: "var(--color-border)", background: "var(--color-bg)" }}>
+          <Link
+            href="/calculator"
+            onClick={() => setMobileOpen(false)}
+            className={`mb-2 flex w-full px-3 py-2.5 text-sm ${CALCULATOR_BUTTON_CLASS}`}
+          >
+            Open Calculator
+          </Link>
           {navItems.map(({ href, label }) => (
             <Link
               key={href}
@@ -92,6 +131,16 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          {showSignIn && (
+            <Link
+              href="/login"
+              onClick={() => setMobileOpen(false)}
+              className="block py-2.5 px-3 text-sm font-semibold rounded transition"
+              style={{ color: "var(--color-primary)", borderTop: "1px solid var(--color-border)" }}
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       )}
     </header>

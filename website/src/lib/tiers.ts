@@ -11,6 +11,8 @@
  * commitment under 21st Century Cures Act §3060.
  */
 
+import { OPEN_ACCESS, OPEN_ACCESS_FEATURES } from "./openAccess";
+
 export type TierId = "free" | "individual_pro" | "department" | "hospital";
 
 export type FeatureId =
@@ -211,6 +213,13 @@ export function isPaidTier(tier: TierId | string): boolean {
 }
 
 export function hasFeature(tier: TierId | string, feature: FeatureId): boolean {
+  // Open-access launch mode (lib/openAccess.ts): calculator features that
+  // work without an account are unlocked for everyone, whatever the tier
+  // (anonymous visitors arrive here as "free"). All other features fall
+  // through to the tier rules below. No runtime import cycle: openAccess.ts
+  // imports FeatureId from this file with `import type`, which is erased.
+  if (OPEN_ACCESS && OPEN_ACCESS_FEATURES.has(feature)) return true;
+
   const userRank = TIER_RANK[normalizeTier(tier)];
   const requiredRank = TIER_RANK[FEATURE_MIN_TIER[feature]];
   return userRank >= requiredRank;

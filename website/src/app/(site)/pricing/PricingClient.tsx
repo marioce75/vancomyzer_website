@@ -9,8 +9,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { OPEN_ACCESS } from "@/lib/openAccess";
+import { track } from "@/lib/analytics";
 
 type BillingCycle = "annual" | "monthly";
+
+/** A normal link/button CTA, or (open-access launch only) a plain, non-clickable label. */
+type TierCta =
+  | { label: string; href: string; external?: boolean }
+  | { label: string; nonInteractive: true };
 
 interface TierCard {
   name: string;
@@ -23,7 +30,7 @@ interface TierCard {
     monthly?: { amount: string; suffix: string };
   };
   features: string[];
-  cta: { label: string; href: string; external?: boolean };
+  cta: TierCta;
   ctaSubLabel?: string;
   badge?: string;
 }
@@ -103,11 +110,53 @@ const TIERS: TierCard[] = [
   },
 ];
 
+/**
+ * Open-access launch period (see lib/openAccess.ts): calculator features are
+ * free for everyone without an account, so only the self-serve Free and
+ * Individual Pro calls to action change. Department and Hospital are left
+ * untouched — team administration, audit logs, BAA and EMR integration are
+ * still offered. With NEXT_PUBLIC_OPEN_ACCESS=false this is exactly TIERS,
+ * so the page renders as it did before the launch period.
+ */
+const DISPLAY_TIERS: TierCard[] = OPEN_ACCESS
+  ? TIERS.map((tier) => {
+      if (tier.name === "Free") {
+        return { ...tier, cta: { label: "Open Calculator", href: "/calculator" } };
+      }
+      if (tier.name === "Individual Pro") {
+        return {
+          ...tier,
+          cta: { label: "Free during launch", nonInteractive: true },
+          // Replaces "card required upfront" — calculation history still needs
+          // an account, so the label is scoped to calculator features.
+          ctaSubLabel: "calculator features · no account needed",
+        };
+      }
+      return tier;
+    })
+  : TIERS;
+
 export default function PricingClient() {
   const [cycle, setCycle] = useState<BillingCycle>("annual");
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-16">
+      {/* Open-access launch banner — not rendered when OPEN_ACCESS is false. */}
+      {OPEN_ACCESS && (
+        <div
+          className="mx-auto mb-10 max-w-3xl rounded-lg border px-5 py-4 text-center"
+          style={{ borderColor: "#0d9488", background: "rgba(13,148,136,0.08)" }}
+        >
+          <p className="text-base font-semibold" style={{ color: "#0f766e" }}>
+            Vancomyzer is free for all clinicians during our launch period — no account needed.
+          </p>
+          <p className="mt-1 text-sm" style={{ color: "var(--color-secondary)" }}>
+            Department and Hospital plans remain available for team administration, audit logs,
+            Business Associate Agreements and EMR integration.
+          </p>
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: "var(--color-primary)" }}>
@@ -157,7 +206,7 @@ export default function PricingClient() {
 
       {/* Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {TIERS.map((tier) => {
+        {DISPLAY_TIERS.map((tier) => {
           const isFeatured = tier.badge === "Most Popular";
           const cyclePrice = cycle === "monthly" && tier.price.monthly ? tier.price.monthly : tier.price.annual;
           return (
@@ -247,6 +296,31 @@ export default function PricingClient() {
                 };
                 const btnClass = "block rounded-md px-4 py-2.5 text-center text-sm font-semibold transition";
 
+                // Open-access launch only: a plain label, deliberately not a link
+                // or button (dashed border so it doesn't read as clickable).
+                if ("nonInteractive" in tier.cta) {
+                  return (
+                    <span
+                      className={btnClass}
+                      style={{
+                        background: "rgba(13,148,136,0.08)",
+                        color: "#0f766e",
+                        border: "1px dashed #0d9488",
+                        cursor: "default",
+                      }}
+                    >
+                      {tier.cta.label}
+                    </span>
+                  );
+                }
+
+                // Only the open-access Free card links to the calculator; record
+                // that click like the landing page's Open Calculator button.
+                const trackOpenCalculator =
+                  tier.cta.href === "/calculator"
+                    ? () => track("Open Calculator", { source: "pricing" })
+                    : undefined;
+
                 return tier.cta.external ? (
                   <a
                     href={tier.cta.href}
@@ -266,6 +340,7 @@ export default function PricingClient() {
                     style={baseStyle}
                     onMouseEnter={onEnter}
                     onMouseLeave={onLeave}
+                    onClick={trackOpenCalculator}
                   >
                     {tier.cta.label}
                   </Link>

@@ -15,7 +15,7 @@ const FONT: React.CSSProperties = { fontFamily: "'Share Tech Mono', monospace" }
  * exact original text (including ™ and any case) is rendered inside the
  * anchor so the legal copy reads identically.
  */
-function linkifyDosys(text: string): React.ReactNode {
+export function linkifyDosys(text: string): React.ReactNode {
   // Cover both casings of the brand mark used in the legal copy:
   //   "Dōsys™" (mixed case) and "DŌSYS™" (all caps in the liability section).
   const re = /(D[Ōō](?:SYS|sys)™)/g;
@@ -41,7 +41,22 @@ function linkifyDosys(text: string): React.ReactNode {
   return parts.map((p, i) => <Fragment key={i}>{p}</Fragment>);
 }
 
-const SECTIONS = [
+/** Copyright line shown beneath the disclaimer text. */
+export const DISCLAIMER_COPYRIGHT = "© 2026 Dōsys™. All Rights Reserved.";
+
+/** One heading + body block of the legal disclaimer. */
+export interface DisclaimerSection {
+  heading: string;
+  body: string;
+}
+
+/**
+ * The full legal disclaimer — single source of truth. Rendered by this
+ * informational modal and by the blocking DisclaimerGate shown before the
+ * calculator. If any wording here changes, bump DISCLAIMER_VERSION in
+ * src/lib/disclaimer.ts so every visitor accepts the new terms.
+ */
+export const SECTIONS: readonly DisclaimerSection[] = [
   {
     heading: "INTENDED USE",
     body: `D\u014Dsys\u2122 provides Vancomyzer\u2122 \u2014 a Vancomycin Dosage Calculator using Bayesian modeling and pharmacokinetics \u2014 to support the care of patients with bacterial infections. Vancomyzer is offered to licensed healthcare professionals across multiple tiers: a free tier with the full Bayesian engine for individual clinicians, and paid Individual Pro and Hospital tiers that add features such as clinical-note export, calculation history, EMR integration, audit logging, and Business Associate Agreements. The pharmacokinetic models, equations, and clinical safety guardrails are identical across all tiers.
@@ -205,7 +220,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
               ...FONT,
             }}
           >
-            {"\u00A9"} 2026 D{"\u014D"}sys{"\u2122"}. All Rights Reserved.
+            {DISCLAIMER_COPYRIGHT}
           </p>
         </div>
       </div>

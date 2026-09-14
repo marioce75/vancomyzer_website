@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 export const CTA_LINKS = {
-  exploreWorkflow: { href: "/", label: "Open the calculator" },
+  exploreWorkflow: { href: "/calculator", label: "Open the calculator" },
   sampleCase: { href: "/calculator?age=58&weight_kg=82&serum_creatinine_mg_dl=1.4", label: "Review a sample case" },
   documentationSummary: { href: "/transparent-dosing", label: "Review references & methods" },
   trustEvidence: { href: "/transparent-dosing", label: "Explore references & methods" },

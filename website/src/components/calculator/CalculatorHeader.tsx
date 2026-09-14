@@ -10,9 +10,15 @@ interface CalculatorHeaderProps {
   userName?: string | null;
   userRole?: string | null;
   onLogout?: () => void;
+  /**
+   * Show a SIGN IN link in the slot LOGOUT normally occupies. The workspace
+   * sets this only after the session check has finished and nobody is
+   * signed in (open-access visitors), so it never flashes for account holders.
+   */
+  showSignIn?: boolean;
 }
 
-export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen, userName, userRole, onLogout }: CalculatorHeaderProps) {
+export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen, userName, userRole, onLogout, showSignIn }: CalculatorHeaderProps) {
   const logoSrc = "/logo-signal.svg";
   return (
     <header
@@ -253,6 +259,30 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               LOGOUT
             </button>
           )}
+          {!onLogout && showSignIn && (
+            <Link
+              href="/login"
+              className="ml-1 px-2 py-1 text-[11px] font-semibold transition"
+              style={{
+                color: "var(--color-secondary)",
+                border: "1px solid var(--color-border)",
+                background: "transparent",
+                textDecoration: "none",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary)";
+                (e.currentTarget as HTMLElement).style.color = "#ffffff";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
+              }}
+            >
+              SIGN IN
+            </Link>
+          )}
         </div>
 
         {/* ── Mobile actions (visible when nav is hidden) ─── */}
@@ -273,6 +303,15 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             >
               LOGOUT
             </button>
+          )}
+          {!onLogout && showSignIn && (
+            <Link
+              href="/login"
+              className="px-2 py-1.5 text-[10px] font-semibold"
+              style={{ color: "var(--color-secondary)", border: "1px solid var(--color-border)", background: "transparent", textDecoration: "none" }}
+            >
+              SIGN IN
+            </Link>
           )}
         </div>
 

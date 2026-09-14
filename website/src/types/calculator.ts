@@ -170,7 +170,9 @@ export interface CalculateResponse {
 }
 
 export interface CalculateErrorResponse {
-  error_type: "validation_error" | "calculation_error" | "insufficient_data";
+  // "rate_limited" is returned with HTTP 429 to anonymous callers of
+  // POST /api/calculate (see src/lib/rateLimit.ts); the visitor sees `message`.
+  error_type: "validation_error" | "calculation_error" | "insufficient_data" | "rate_limited";
   message: string;
   field_errors?: Record<string, string>;
   details?: string[];

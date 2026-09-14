@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import { computeInitialRegimen } from "@/lib/initialRegimen";
 import { runExistingRegimenPipeline } from "@/lib/pk/runExistingRegimenPipeline";
 import { logCalculation } from "@/lib/auditLog";
 import { logCalculationEntry, getUserTier, findUserByLogin, logSecurityEvent } from "@/lib/db";
 import { hasFeature } from "@/lib/tiers";
 import { validateCaseId } from "@/lib/calculationHistory";
+import { authOptions } from "@/lib/authOptions";
+import { checkRateLimit, getCalculateRateLimitConfig, getClientIp } from "@/lib/rateLimit";
 
 type Mode = "initial_regimen" | "existing_regimen";
 
@@ -151,7 +154,32 @@ function extractPKParams(result: Record<string, unknown>): { CL: number; V1: num
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
-  const userEmail = request.headers.get("x-user-email") ?? "anonymous";
+
+  // Identity comes from the verified session, never from request headers:
+  // a client can send any x-user-* header it likes, and middleware is not
+  // guaranteed to have run. Same pattern as lib/featureGate.ts.
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email ?? "anonymous";
+  const isAnonymous = !session?.user?.email;
+
+  // Anonymous abuse guard — open-access mode lets requests through without a
+  // session. Checked before the body is read so rejected requests stay cheap.
+  // Limits are generous on purpose (see lib/rateLimit.ts): the calculator
+  // recalculates automatically during data entry and many clinicians can
+  // share one hospital network address. Signed-in users are not limited.
+  if (isAnonymous) {
+    const { max, windowMs } = getCalculateRateLimitConfig();
+    const limit = checkRateLimit(`calculate:${getClientIp(request.headers)}`, max, windowMs);
+    if (!limit.allowed) {
+      return NextResponse.json(
+        {
+          error_type: "rate_limited",
+          message: "Too many calculations from your network in a short time. Please wait a few minutes and try again.",
+        },
+        { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } },
+      );
+    }
+  }
 
   let body: unknown;
   try {

@@ -5,9 +5,10 @@
  * (PDF print, future image exports, etc.) can apply consistent
  * Free-tier branding without duplicating the styling rules.
  *
- * Behavior:
+ * Behavior (decided by hasFeature(tier, "export.note.unwatermarked")):
  *   - Free tier: tiled diagonal SVG overlay + footer upgrade banner
  *   - Individual Pro / Department / Hospital: nothing
+ *   - Open-access launch mode on (lib/openAccess.ts): nothing, for every tier
  *
  * Watermark must NOT obscure clinical data — opacity stays low,
  * pointer-events disabled, and a low z-index relative to error/UI
@@ -16,7 +17,7 @@
  * fully readable through the watermark.
  */
 
-import { isPaidTier } from "./tiers";
+import { hasFeature } from "./tiers";
 
 export interface WatermarkOutput {
   /** Inline CSS to splice into the document <style> block. */
@@ -33,9 +34,17 @@ const EMPTY: WatermarkOutput = {
   bannerHtml: "",
 };
 
-/** Return Free-tier watermark markup, or empty strings for paid tiers. */
+/**
+ * Return Free-tier watermark markup, or empty strings when the tier (or
+ * open-access launch mode) grants unwatermarked export.
+ */
 export function buildExportWatermark(tier: string): WatermarkOutput {
-  if (isPaidTier(tier)) return EMPTY;
+  // Decided through the feature gate rather than isPaidTier so open-access
+  // mode (lib/openAccess.ts) removes the watermark and upgrade banner for
+  // everyone. With open access off this matches the old isPaidTier check
+  // exactly: export.note.unwatermarked requires individual_pro, the lowest
+  // paid tier.
+  if (hasFeature(tier, "export.note.unwatermarked")) return EMPTY;
 
   // Tiled SVG pattern — 520x180 tile rotated -30°. Repeats over the
   // entire viewport so a printed page never has un-watermarked sections.

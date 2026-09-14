@@ -3,6 +3,7 @@
 import { useEffect, useCallback, useState } from "react";
 import Link from "next/link";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -39,6 +40,9 @@ const TOGGLES = [
 
 export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const { settings, updateSetting, resetToDefaults, mounted } = useMatrixSettings();
+  // /api/bug-report still requires a session. Visitors who are not signed in
+  // get a short sign-in / contact note instead of a form that would fail.
+  const { user } = useAuth();
 
   /* Bug-report form state */
   const [bugDescription, setBugDescription] = useState("");
@@ -188,15 +192,21 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 28 }}>
 
           {/* ── 1. ACCOUNT ────────────────────────────────────── */}
+          {/* Every account page requires sign-in, so visitors who are not
+              signed in get a single sign-in link instead of four links that
+              would each bounce them to the login page. */}
           <section>
             <SectionLabel>ACCOUNT</SectionLabel>
             <div className="flex flex-col gap-1.5" style={{ marginTop: 10 }}>
-              {[
-                { href: "/settings", label: "Institutional Settings" },
-                { href: "/settings/billing", label: "Billing & Subscription" },
-                { href: "/settings/history", label: "Calculation History" },
-                { href: "/team", label: "Team Management" },
-              ].map(({ href, label }) => (
+              {(user
+                ? [
+                    { href: "/settings", label: "Institutional Settings" },
+                    { href: "/settings/billing", label: "Billing & Subscription" },
+                    { href: "/settings/history", label: "Calculation History" },
+                    { href: "/team", label: "Team Management" },
+                  ]
+                : [{ href: "/login", label: "Sign in to your account" }]
+              ).map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
@@ -418,6 +428,8 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           {/* ── 6. REPORT A BUG ─────────────────────────────── */}
           <section>
             <SectionLabel>REPORT A BUG</SectionLabel>
+            {user ? (
+            <>
             <p style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 6, lineHeight: 1.5, ...FONT }}>
               Describe what happened. Your name, email, current page, and browser are attached automatically so the team can reply.
             </p>
@@ -481,6 +493,20 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 }}
               >
                 {bugMessage}
+              </p>
+            )}
+            </>
+            ) : (
+              <p style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 6, lineHeight: 1.6, ...FONT }}>
+                Reports sent from here include your account details so our team can reply. Please{" "}
+                <Link href="/login" onClick={onClose} style={{ color: "var(--color-primary)", textDecoration: "underline" }}>
+                  sign in
+                </Link>{" "}
+                first, or reach us any time through the{" "}
+                <Link href="/contact" onClick={onClose} style={{ color: "var(--color-primary)", textDecoration: "underline" }}>
+                  Contact page
+                </Link>
+                .
               </p>
             )}
           </section>
