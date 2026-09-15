@@ -176,7 +176,13 @@ function conservativeSameIntervalDose(
 ): AdjustmentRecommendation {
   const recommended_dose_mg = Math.min(2000, roundDoseMg(Math.max(250, (currentDoseMg * TARGET_AUC24_MID) / Math.max(auc24, 1))));
   const tdd = (recommended_dose_mg * 24) / currentIntervalHours;
-  const dose_mg = tdd > MAX_TDD_MG_PER_DAY ? roundDoseMg((MAX_TDD_MG_PER_DAY * currentIntervalHours) / 24) : recommended_dose_mg;
+  // Floor, never round, when clamping to the daily-dose ceiling: roundDoseMg()
+  // rounds to the NEAREST 250 mg and can push the result back up through the
+  // cap (q6h: 4500 × 6/24 = 1125 → 1250 mg → 5000 mg/day, over the 4500 limit).
+  // The grid-search paths already reject candidates above the cap; this path
+  // must agree with them.
+  const cappedDoseMg = Math.max(250, Math.floor((MAX_TDD_MG_PER_DAY * currentIntervalHours) / 24 / 250) * 250);
+  const dose_mg = tdd > MAX_TDD_MG_PER_DAY ? cappedDoseMg : recommended_dose_mg;
   return finalizeRecommendation(Math.max(250, dose_mg), currentIntervalHours, requestedInfusionHours, safety);
 }
 

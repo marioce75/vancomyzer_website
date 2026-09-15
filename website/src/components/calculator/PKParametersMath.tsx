@@ -29,48 +29,83 @@ interface ParamRow {
   substitute: (p: PKParams) => string;
 }
 
+/**
+ * Colin 2019 Table 3 estimates and covariate factors.
+ *
+ * These MIRROR src/lib/pk/posterior/buildPriorParameters.ts, which is the
+ * engine's source of truth. The equations and the substituted values shown to
+ * the clinician must reproduce the number the engine actually computed \u2014 if
+ * this block and the engine ever diverge, the panel is lying about the math.
+ */
+const COLIN = {
+  THETA_CL: 5.31,
+  THETA_V1: 42.9,
+  THETA_V2: 41.7,
+  THETA_Q: 3.22,
+  PMA50_WK: 46.4,
+  GAMMA1: 2.89,
+  AGE50_YR: 61.6,
+  GAMMA2: 2.24,
+  THETA_SCR: 0.649,
+  MIN_SCR: 0.4,
+} as const;
+
+function colinFactors(age: number, scr: number): { FMat: number; FDecline: number; FSCR: number } {
+  const PMA_yr = Math.max(18, age) + 40 / 52;
+  const PMA_wk = PMA_yr * 52;
+  const FMat = PMA_wk ** COLIN.GAMMA1 / (PMA_wk ** COLIN.GAMMA1 + COLIN.PMA50_WK ** COLIN.GAMMA1);
+  const FDecline = 1 / (1 + (PMA_yr / COLIN.AGE50_YR) ** COLIN.GAMMA2);
+  const SCRstd = Math.exp(-1.228 + Math.log10(PMA_yr) * 0.672 + 6.27 * Math.exp(-3.11 * PMA_yr));
+  const FSCR = Math.exp(-COLIN.THETA_SCR * (Math.max(COLIN.MIN_SCR, scr) - SCRstd));
+  return { FMat, FDecline, FSCR };
+}
+
+/**
+ * The obesity model applies its age-decline factor to RAW age, not to the
+ * post-menstrual age the Colin path uses (obesityModel.ts → obesityFDecline).
+ * Using the Colin variant here leaves the printed arithmetic ~1.4% off the
+ * engine's clearance, so the two must stay separate.
+ */
+function obesityFDecline(age: number): number {
+  if (age <= 0) return 1.0;
+  return 1 / (1 + (age / COLIN.AGE50_YR) ** COLIN.GAMMA2);
+}
+
+const f3 = (n: number): string => n.toFixed(3);
+
 function buildColinRows(): ParamRow[] {
   return [
     {
       key: "CL",
       label: "CL",
       unit: "L/h",
-      equation: "CL = 4.49 \u00d7 (1 - 0.00554 \u00d7 (Age - 35)) \u00d7 (SCr / 0.9)^-0.223 \u00d7 (WT / 70)^0.806",
+      equation: "CL = 5.31 \u00d7 (WT / 70)^0.75 \u00d7 FMat \u00d7 FDecline \u00d7 FSCR",
       substitute: (p) => {
-        const age = p.age ?? "?";
-        const wt = p.weight_kg ?? "?";
-        return `4.49 \u00d7 (1 - 0.00554 \u00d7 (${age} - 35)) \u00d7 (${p.scr} / 0.9)\u207b\u00b2\u00b2\u00b3 \u00d7 (${wt} / 70)\u2070\u00b7\u2078\u2070\u2076`;
+        const wt = p.weight_kg ?? 70;
+        const { FMat, FDecline, FSCR } = colinFactors(p.age ?? 18, p.scr);
+        return `5.31 \u00d7 (${wt} / 70)\u2070\u00b7\u2077\u2075 \u00d7 ${f3(FMat)} \u00d7 ${f3(FDecline)} \u00d7 ${f3(FSCR)}`;
       },
     },
     {
       key: "V1",
       label: "V1",
       unit: "L",
-      equation: "V1 = 40.6 \u00d7 (WT / 70)^1.00",
-      substitute: (p) => {
-        const wt = p.weight_kg ?? "?";
-        return `40.6 \u00d7 (${wt} / 70)\u00b9\u00b7\u2070\u2070`;
-      },
+      equation: "V1 = 42.9 \u00d7 (WT / 70)",
+      substitute: (p) => `42.9 \u00d7 (${p.weight_kg ?? 70} / 70)`,
     },
     {
       key: "Q",
       label: "Q",
       unit: "L/h",
-      equation: "Q = 3.87 \u00d7 (WT / 70)^0.806",
-      substitute: (p) => {
-        const wt = p.weight_kg ?? "?";
-        return `3.87 \u00d7 (${wt} / 70)\u2070\u00b7\u2078\u2070\u2076`;
-      },
+      equation: "Q = 3.22 \u00d7 (WT / 70)^0.75",
+      substitute: (p) => `3.22 \u00d7 (${p.weight_kg ?? 70} / 70)\u2070\u00b7\u2077\u2075`,
     },
     {
       key: "V2",
       label: "V2",
       unit: "L",
-      equation: "V2 = 37.6 \u00d7 (WT / 70)^1.00",
-      substitute: (p) => {
-        const wt = p.weight_kg ?? "?";
-        return `37.6 \u00d7 (${wt} / 70)\u00b9\u00b7\u2070\u2070`;
-      },
+      equation: "V2 = 41.7 \u00d7 (WT / 70)",
+      substitute: (p) => `41.7 \u00d7 (${p.weight_kg ?? 70} / 70)`,
     },
   ];
 }
@@ -81,10 +116,12 @@ function buildObesityRows(): ParamRow[] {
       key: "CL",
       label: "CL",
       unit: "L/h",
-      equation: "CL = 0.0571 \u00d7 CrCl + 0.0158 \u00d7 TBW",
+      // FDecline is applied by the engine (buildObesityPriors) and must be shown,
+      // otherwise the printed arithmetic cannot reproduce the CL beside it.
+      equation: "CL = (0.0571 \u00d7 CrCl + 0.0158 \u00d7 TBW) \u00d7 FDecline(age)",
       substitute: (p) => {
         const wt = p.weight_kg ?? "?";
-        return `0.0571 \u00d7 CrCl + 0.0158 \u00d7 ${wt}`;
+        return `(0.0571 \u00d7 CrCl + 0.0158 \u00d7 ${wt}) \u00d7 ${f3(obesityFDecline(p.age ?? 18))}`;
       },
     },
     {
@@ -137,7 +174,7 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
   const PARAM_ROWS = isObesity ? buildObesityRows() : buildColinRows();
 
   const modelHeaderLabel = isObesity
-    ? "Vancomyzer Obesity Model \u2014 Smit 2020 + Zhang 2023"
+    ? "Vancomyzer Obesity Model \u2014 derived from Smit 2020 + Zhang 2024"
     : "Colin 2019";
 
   return (

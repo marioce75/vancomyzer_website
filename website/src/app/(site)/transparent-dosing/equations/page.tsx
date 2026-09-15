@@ -236,8 +236,18 @@ two-compartment steady-state superposition formula
             cohorts (Smit 2020 + Zhang 2024). Volumes scale to Fat-Free Mass (vancomycin is hydrophilic;
             it doesn&rsquo;t distribute into adipose), while clearance retains a TBW component because renal
             elimination scales with total body weight. Colin 2019&rsquo;s age-decline factor is composed on
-            top — a small but defensible bridge of the geriatric-obesity gap that the source cohorts
-            under-represented.
+            top, to bridge the geriatric-obesity gap that the source cohorts under-represented.
+          </p>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#334155" }}>
+            <strong>This clearance equation is a Vancomyzer composition, not a verbatim published
+            equation.</strong> Smit 2020&rsquo;s own final model is CL = 5.72 × (TBW/70)<sup>0.535</sup>,
+            which contains no creatinine-clearance term and no age term. Our form reproduces that
+            published clearance closely in middle-aged adults (about 7.9 L/h at 130 kg, within 1%),
+            but because age enters twice — once through Cockcroft-Gault and again through the
+            age-decline factor — it falls progressively further below the published Smit value with
+            advancing age (roughly half, at the same body size, by age 70). That is deliberate
+            conservatism in a population where renal function is often overestimated, and it is the
+            reason this model is named as ours rather than presented as Smit&rsquo;s.
           </p>
 
           <pre

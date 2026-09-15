@@ -14,6 +14,9 @@ export function normalizePatient(raw: RawPatient): NormalizedPatient {
   const height_cm = Math.max(0, Math.min(250, Number(raw.height_cm) || 0));
   const sexRaw = String(raw.sex ?? "").toLowerCase();
   const sex = (sexRaw === "male" || sexRaw === "female") ? sexRaw : "" as const;
-  const serum_creatinine_mg_dl = Math.max(0.1, Number(raw.serum_creatinine_mg_dl) ?? 1);
+  // `||` not `??`: Number(undefined) and Number("abc") are NaN, which `??` does
+  // not replace (it only catches null/undefined), so the fallback was dead and
+  // a missing SCr propagated NaN through every downstream dose calculation.
+  const serum_creatinine_mg_dl = Math.max(0.1, Number(raw.serum_creatinine_mg_dl) || 1);
   return { age, weight_kg, height_cm, sex, serum_creatinine_mg_dl };
 }

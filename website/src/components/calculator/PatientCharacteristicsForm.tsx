@@ -202,9 +202,17 @@ export default function PatientCharacteristicsForm({
           <>
             <div className="flex items-center gap-2 text-xs" style={{ color: isObese ? "#92400e" : "var(--color-secondary)" }}>
               <span style={{ fontWeight: 600 }}>BMI: {bmi.toFixed(1)} kg/m²</span>
-              {isObese && (
+              {/* The engine only switches to the obesity model when sex is known
+                  (buildPriorParameters requires height AND sex), so the badge must
+                  require it too — otherwise it claims a model that is not running. */}
+              {isObese && (sex === "male" || sex === "female") && (
                 <span style={{ padding: "1px 6px", background: "#fffbeb", border: "1px solid #fcd34d", color: "#92400e", fontWeight: 600, fontSize: 10 }}>
                   OBESITY MODEL ACTIVE
+                </span>
+              )}
+              {isObese && sex !== "male" && sex !== "female" && (
+                <span style={{ padding: "1px 6px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: 600, fontSize: 10 }}>
+                  ENTER SEX TO USE THE OBESITY MODEL
                 </span>
               )}
             </div>

@@ -75,7 +75,10 @@ export function buildDocumentationPreview(input: ExplanationInput): {
     `Recommendation: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1} h.`,
     changeSummary,
     ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
-    `SCr: ${scr} mg/dL (direct Colin 2019 covariate — no Cockcroft-Gault). Explicit adult prior model: Colin 2019 two-compartment; ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`,
+    // Must name the prior that actually ran — this line goes into the chart.
+    engineOutput.model_name === "vancomyzer_obesity"
+      ? `SCr: ${scr} mg/dL (used via Cockcroft-Gault CrCl on total body weight). Explicit adult prior model: Vancomyzer Obesity Model, two-compartment, volumes scaled to fat-free mass (BMI ≥ 40); ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`
+      : `SCr: ${scr} mg/dL (direct Colin 2019 covariate — no Cockcroft-Gault). Explicit adult prior model: Colin 2019 two-compartment; ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`,
     `Posterior fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"} (${posterior_fit?.fit_quality_reason ?? "no measured levels available"}). Uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Sparse levels do not justify overconfident patient-specific precision.`,
   ].join("\n");
 
