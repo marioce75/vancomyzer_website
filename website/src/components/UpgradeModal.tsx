@@ -36,7 +36,7 @@ const DEFAULT_COPY: Partial<Record<FeatureId, { title: string; description: stri
   "export.pdf": {
     title: "PDF export is a Pro feature",
     description:
-      "Export branded clinical-note PDFs of your calculations for the medical record. Available on Individual Pro and higher.",
+      "Export clinical-note PDFs of your calculations for the medical record. Available on Individual Pro and higher.",
   },
   "export.note.copy": {
     title: "Clinical note export is a Pro feature",
@@ -46,7 +46,7 @@ const DEFAULT_COPY: Partial<Record<FeatureId, { title: string; description: stri
   "export.note.unwatermarked": {
     title: "Clinical-note export is a Pro feature",
     description:
-      "Pro unlocks branded PDF and note export for the medical record — Free tier is calculator-only.",
+      "Pro unlocks PDF and note export for the medical record — Free tier is calculator-only.",
   },
   "history.calculation": {
     title: "Calculation history is a Pro feature",
@@ -93,10 +93,12 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
   const headline = title ?? copy.title;
   const body = description ?? copy.description;
 
-  // Department / Hospital CTAs go to dosys.health/contact (sales).
-  // Individual Pro CTA goes to /settings/billing (self-serve checkout).
-  const isSelfServe = upgradeTier.id === "individual_pro";
-  const primaryHref = isSelfServe ? "/settings/billing" : upgradeTier.cta.href;
+  // Individual Pro and Department are self-serve (trial checkout).
+  // Hospital CTA goes to dosys.health/contact (sales).
+  const isSelfServe = upgradeTier.id === "individual_pro" || upgradeTier.id === "department";
+  const primaryHref = isSelfServe
+    ? upgradeTier.id === "individual_pro" ? "/settings/billing" : "/upgrade/department"
+    : upgradeTier.cta.href;
   const primaryLabel = isSelfServe ? "Start 14-day trial" : upgradeTier.cta.label;
   const primaryExternal = !isSelfServe;
 

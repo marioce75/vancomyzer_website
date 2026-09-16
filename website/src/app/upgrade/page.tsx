@@ -3,21 +3,20 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { TrialStatusResult } from '@/lib/trial/trialService'
+import { COLIN_2019 } from '@/lib/pk/modelRegistry'
 
 const GREEN = '#00d4aa'
 const NAVY  = '#1C3A52'
 const SLATE = '#3D5A73'
 
 const FEATURES = [
-  { label: 'Unlimited AUC-guided calculations', free: true, pro: true },
+  { label: 'AUC-guided calculations', free: true, pro: true },
   { label: 'Bayesian single & two-level estimation', free: true, pro: true },
-  { label: 'Obesity PK model (BMI ≥40, FFM-based)', free: true, pro: true },
+  { label: `${COLIN_2019.shortName} PK model (every adult, every BMI)`, free: true, pro: true },
   { label: 'Pilot summary report PDF', free: true, pro: true },
-  { label: 'Full case history export (CSV)', free: false, pro: true },
-  { label: 'Persistent patient list', free: false, pro: true },
-  { label: 'Multi-user institutional access', free: false, pro: true },
-  { label: 'Research mode + NONMEM export', free: false, pro: true },
-  { label: 'Priority clinical support', free: false, pro: true },
+  { label: 'Calculation history (90-day retention)', free: false, pro: true },
+  { label: 'PDF export and clinical-note copy (free for everyone during launch)', free: false, pro: true },
+  { label: 'Email support', free: false, pro: true },
 ]
 
 export default function UpgradePage() {
@@ -82,14 +81,14 @@ export default function UpgradePage() {
           <div style={{ fontSize: 12, fontWeight: 700, color: NAVY, letterSpacing: '0.08em', marginBottom: 12 }}>YOUR PILOT IN NUMBERS</div>
           <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' as const }}>
             {[
-              { label: 'Cases', value: stats.totalCases },
-              { label: 'AUC Attainment', value: stats.aucTargetAttainmentRate != null ? `${stats.aucTargetAttainmentRate.toFixed(0)}%` : '—' },
-              { label: 'Obesity Model', value: stats.obesityModelActivations },
-              { label: 'ICU Cases', value: stats.icuCases },
+              { label: 'Cases', value: stats.totalCases, sub: null as string | null },
+              { label: 'AUC Attainment', value: stats.aucTargetAttainmentRate != null ? `${stats.aucTargetAttainmentRate.toFixed(0)}%` : '—', sub: null as string | null },
+              { label: 'Custom obesity model (retired)', value: stats.obesityModelActivations, sub: 'uses before 15 Sep 2026' as string | null },
+              { label: 'ICU Cases', value: stats.icuCases, sub: null as string | null },
             ].map(s => (
               <div key={s.label}>
                 <div style={{ fontSize: 22, fontWeight: 700, color: GREEN, fontFamily: 'monospace' }}>{s.value}</div>
-                <div style={{ fontSize: 11, color: SLATE, marginTop: 2 }}>{s.label}</div>
+                <div style={{ fontSize: 11, color: SLATE, marginTop: 2 }}>{s.label}</div>{s.sub && <div style={{ fontSize: 9, color: SLATE, opacity: 0.7, marginTop: 1 }}>{s.sub}</div>}
               </div>
             ))}
           </div>
@@ -115,10 +114,10 @@ export default function UpgradePage() {
                   color: plan === p ? NAVY : SLATE,
                 }}
               >
-                {p === 'annual' ? '$149 / year' : '$19 / month'}
+                {p === 'annual' ? '$9.99 / month' : '$19.99 / month'}
                 {p === 'annual' && (
                   <span style={{ display: 'block', fontSize: 10, fontWeight: 400, marginTop: 2 }}>
-                    saves ~35%
+                    billed annually · saves ~50%
                   </span>
                 )}
               </button>
@@ -139,7 +138,7 @@ export default function UpgradePage() {
                 letterSpacing: '0.04em',
               }}
             >
-              {loading ? 'Redirecting to Checkout…' : `Subscribe ${plan === 'annual' ? '— $149/yr' : '— $19/mo'}`}
+              {loading ? 'Redirecting to Checkout…' : `Subscribe ${plan === 'annual' ? '— $9.99/mo billed annually' : '— $19.99/mo'}`}
             </button>
             <div style={{ fontSize: 11, color: SLATE, marginTop: 8 }}>
               Secure checkout via Stripe · Cancel anytime

@@ -1,16 +1,19 @@
 "use client";
 
 /**
- * Pricing presentation page — mirrored verbatim from dosys.health/pricing
- * (Free, Individual Pro, Department / Hospital). Decoupled from lib/tiers.ts
- * so the gate-source-of-truth can keep four internal tier IDs while users
- * see a single Department / Hospital card identical to the marketing site.
+ * Pricing presentation page (Free, Individual Pro, Department, Hospital).
+ * Decoupled from lib/tiers.ts, which stays the feature-gate source of truth.
+ * Keep the plan facts here, in lib/tiers.ts and on dosys.health/pricing in
+ * step. Since the 15 Sep 2026 review: the core calculator is free
+ * permanently, and features that do not exist yet are labelled
+ * "not yet available" rather than listed as included.
  */
 
 import { useState } from "react";
 import Link from "next/link";
 import { OPEN_ACCESS } from "@/lib/openAccess";
 import { track } from "@/lib/analytics";
+import { COLIN_2019 } from "@/lib/pk/modelRegistry";
 
 type BillingCycle = "annual" | "monthly";
 
@@ -40,14 +43,14 @@ const TIERS: TierCard[] = [
     name: "Free",
     audience: "Students, individual clinicians",
     price: {
-      annual: { amount: "$0", suffix: "forever" },
+      annual: { amount: "$0", suffix: "core calculator · free permanently" },
     },
     features: [
       "Full AUC calculator",
-      "Colin 2019 PK model",
+      `${COLIN_2019.shortName} PK model for all adults`,
       "Empiric, 1-level, 2-level workflows",
       "DOI-linked references",
-      "Community support",
+      "In-app bug reporting (free account)",
     ],
     cta: { label: "Start Free", href: "/register" },
   },
@@ -60,13 +63,14 @@ const TIERS: TierCard[] = [
     },
     features: [
       "Everything in Free",
-      "Unlimited calculations",
-      "Clinical note export",
-      "Calculation history",
+      "PDF export",
+      "Clinical-note copy",
+      "“Why this result” interpretation",
+      "Calculation history (90-day retention)",
       "Email support",
     ],
     cta: { label: "Start 14-Day Trial", href: "/settings/billing" },
-    ctaSubLabel: "card required upfront · cancel anytime",
+    ctaSubLabel: "card required at signup · cancel anytime",
     badge: "Most Popular",
   },
   {
@@ -74,62 +78,65 @@ const TIERS: TierCard[] = [
     audience: "Hospital pharmacy departments — self-serve",
     scope: "5–20 seats · 14-day free trial",
     price: {
-      annual: { amount: "$500 / $1,000", suffix: "/mo · ≤10 seats or 11–20 seats" },
+      annual: { amount: "$500 / $1,000", suffix: "/month · up to 10 seats or 11–20 seats" },
     },
     features: [
       "Everything in Individual Pro",
       "Up to 10 seats — $500/month",
       "11–20 seats — $1,000/month",
-      "Admin panel with user management & audit logs",
-      "Shared calculation history across the team",
-      "Priority email support (24-hour SLA)",
+      "Admin panel with user management & roles",
+      "Institution-scoped audit log (90-day retention)",
+      "Priority email support (service terms by contract)",
       "Onboarding assistance",
     ],
     cta: { label: "Start 14-Day Trial", href: "/upgrade/department" },
-    ctaSubLabel: "card required upfront · cancel anytime",
+    ctaSubLabel: "card required at signup · cancel anytime",
   },
   {
     name: "Hospital",
-    audience: "Health systems with EMR + BAA requirements",
+    audience: "Health systems",
     scope: "Scoped to your institution",
     price: {
-      annual: { amount: "Custom", suffix: "" },
+      annual: { amount: "Custom quote", suffix: "" },
     },
     features: [
       "Everything in Department",
-      "Unlimited user seats",
-      "EMR integration (HL7 / FHIR — Epic, Cerner, others)",
-      "Custom hospital branding on outputs",
-      "SLA & uptime guarantee",
-      "SOC 2 compliance documentation",
-      "Business Associate Agreement (BAA)",
-      "Dedicated account manager & onboarding",
-      "Priority support",
+      "Seat count set by contract",
+      "Service terms by contract",
+      "Business Associate Agreement (available after legal review — not yet available)",
+      "SOC 2 Type I in progress (target Q4 2026)",
+      "EMR/EHR integration via SMART on FHIR (in development — not yet available)",
+      "Custom branding on outputs (in development — not yet available)",
     ],
     cta: { label: "Contact Sales", href: "https://dosys.health/contact", external: true },
   },
 ];
 
 /**
- * Open-access launch period (see lib/openAccess.ts): calculator features are
- * free for everyone without an account, so only the self-serve Free and
- * Individual Pro calls to action change. Department and Hospital are left
- * untouched — team administration, audit logs, BAA and EMR integration are
- * still offered. With NEXT_PUBLIC_OPEN_ACCESS=false this is exactly TIERS,
+ * Open-access launch period (see lib/openAccess.ts): on top of the core
+ * calculator (free permanently), PDF export, clinical-note copy and "why this
+ * result" interpretation are free for everyone without an account. Only the
+ * self-serve Free and Individual Pro calls to action change; calculation
+ * history still needs Individual Pro, and the Department and Hospital cards
+ * are unchanged. With NEXT_PUBLIC_OPEN_ACCESS=false this is exactly TIERS,
  * so the page renders as it did before the launch period.
  */
 const DISPLAY_TIERS: TierCard[] = OPEN_ACCESS
   ? TIERS.map((tier) => {
       if (tier.name === "Free") {
-        return { ...tier, cta: { label: "Open Calculator", href: "/calculator" } };
+        return {
+          ...tier,
+          cta: { label: "Open Calculator", href: "/calculator" },
+          ctaSubLabel: "no account needed during the launch period",
+        };
       }
       if (tier.name === "Individual Pro") {
         return {
           ...tier,
           cta: { label: "Free during launch", nonInteractive: true },
-          // Replaces "card required upfront" — calculation history still needs
-          // an account, so the label is scoped to calculator features.
-          ctaSubLabel: "calculator features · no account needed",
+          // Replaces "card required at signup". Only these three features are
+          // open during launch; calculation history still needs Individual Pro.
+          ctaSubLabel: "PDF export, note copy & interpretation · no account needed",
         };
       }
       return tier;
@@ -148,11 +155,13 @@ export default function PricingClient() {
           style={{ borderColor: "#0d9488", background: "rgba(13,148,136,0.08)" }}
         >
           <p className="text-base font-semibold" style={{ color: "#0f766e" }}>
-            Vancomyzer is free for all clinicians during our launch period — no account needed.
+            The core Vancomyzer calculator is free, permanently.
           </p>
           <p className="mt-1 text-sm" style={{ color: "var(--color-secondary)" }}>
-            Department and Hospital plans remain available for team administration, audit logs,
-            Business Associate Agreements and EMR integration.
+            During the launch period, PDF export, clinical-note copy and &ldquo;why this result&rdquo;
+            interpretation are also free for everyone, with no account needed. After the launch period
+            they return to Individual Pro. Calculation history requires Individual Pro; team administration
+            and audit logs require a Department plan.
           </p>
         </div>
       )}
@@ -163,7 +172,7 @@ export default function PricingClient() {
           Transparent Pricing for Transparent Math
         </h1>
         <p className="mt-3 text-base" style={{ color: "var(--color-secondary)" }}>
-          From individual pharmacists to health systems — Vancomyzer&trade; scales with your needs.
+          Plans for individual clinicians, pharmacy departments and health systems.
         </p>
       </div>
 
@@ -200,7 +209,7 @@ export default function PricingClient() {
           className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
           style={{ background: "rgba(13,148,136,0.12)", color: "#0d9488" }}
         >
-          Save up to 50%
+          Save 50% with annual billing
         </span>
       </div>
 

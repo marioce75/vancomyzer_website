@@ -54,7 +54,7 @@ export default function PilotDashboardPage() {
   const statCards = [
     { label: 'Total Cases', value: stats.totalCases, sub: 'patients dosed' },
     { label: 'AUC Target Attainment', value: stats.aucTargetAttainmentRate != null ? `${stats.aucTargetAttainmentRate.toFixed(0)}%` : '—', sub: 'of cases with outcomes' },
-    { label: 'Obesity Model', value: stats.obesityModelActivations, sub: 'BMI ≥40 activations' },
+    { label: 'Custom obesity model (retired)', value: stats.obesityModelActivations, sub: 'uses before 15 Sep 2026' },
     { label: 'ICU Patients', value: stats.icuCases, sub: 'critical care cases' },
   ]
 
@@ -144,7 +144,7 @@ export default function PilotDashboardPage() {
             <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}>
               Use Vancomyzer as your primary dosing support tool. Your case data is accumulating.
               At day 75, a personalized summary report will be generated showing your AUC attainment rate,
-              obesity model activations, and key clinical insights — a document you can share with your
+              case volume and key insights from your logged cases — a document you can share with your
               pharmacy director to make the case for an institutional subscription.
             </p>
           </>
@@ -212,7 +212,7 @@ export default function PilotDashboardPage() {
               cursor: 'pointer', textDecoration: 'none',
             }}
           >
-            Subscribe — $19/mo or $149/yr
+            Subscribe — $9.99/mo billed annually · $19.99/mo
           </a>
         )}
       </div>
@@ -223,12 +223,10 @@ export default function PilotDashboardPage() {
           <div style={{ fontSize: 13, fontWeight: 600, color: NAVY, marginBottom: 12 }}>What is included after the pilot</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 32px' }}>
             {([
-              ['Full case history export (CSV)', true],
-              ['Multi-user institutional access', false],
+              ['Calculation history (90-day retention)', true],
               ['Pilot summary report PDF', true],
-              ['Persistent patient list', false],
-              ['Priority clinical support', false],
-              ['Research mode + NONMEM export', false],
+              ['PDF export and clinical-note copy', true],
+              ['Email support', true],
             ] as [string, boolean][]).map(([feature, included]) => (
               <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: SLATE }}>
                 <span style={{ color: included ? GREEN : '#94a3b8', fontWeight: 700 }}>{included ? '✓' : '→'}</span>

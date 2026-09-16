@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       status, approved_at, approved_by
     )
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 1, 1,
-            'March 2026', 'March 2026', datetime('now'), ?,
+            'September 2026', 'March 2026', datetime('now'), ?,
             'active', datetime('now'), 'AUTO_REGISTRATION')
   `);
 

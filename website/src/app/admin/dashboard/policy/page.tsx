@@ -36,7 +36,7 @@ export default function PolicyPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}>Policy Management</h1>
-      <p className="text-sm text-gray-500 mb-6">SOC 2 Type II policy library and compliance controls</p>
+      <p className="text-sm text-gray-500 mb-6">Security policy library and compliance controls (SOC 2 Type I in progress, target Q4 2026)</p>
 
       {/* Policies table */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-8">

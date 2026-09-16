@@ -97,7 +97,7 @@ export default function ContactPage() {
         Reach the team behind Vancomyzer™
       </h1>
       <p className="mt-4 text-gray-600 leading-7">
-        Built by an ICU pharmacist. Backed by evidence. Available to every hospital.
+        Built by an ICU pharmacist. Transparent about its evidence. Available to every hospital.
       </p>
       <p className="text-gray-600">
         Choose the right channel for your inquiry below.

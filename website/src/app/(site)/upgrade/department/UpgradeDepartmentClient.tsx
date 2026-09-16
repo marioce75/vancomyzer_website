@@ -72,7 +72,7 @@ export default function UpgradeDepartmentClient() {
           Set up Vancomyzer for your team
         </h1>
         <p className="mt-3 text-base" style={{ color: "var(--color-secondary)" }}>
-          14-day free trial · no charge until trial ends · cancel anytime
+          14-day free trial · card required at signup · not charged until the trial ends · cancel anytime
         </p>
       </div>
 
@@ -142,10 +142,10 @@ export default function UpgradeDepartmentClient() {
         <ul className="space-y-2 text-sm" style={{ color: "var(--color-foreground)" }}>
           {[
             "Everything in Individual Pro",
-            "Unlimited user seats with shared workspace",
+            "Up to 20 user seats with shared workspace",
             "Admin panel: user management, roles, audit logs",
             "Calculation history across the whole team",
-            "Priority email support (24-hour SLA)",
+            "Priority email support (service terms by contract)",
             "Onboarding assistance",
           ].map((feature) => (
             <li key={feature} className="flex items-start gap-2">
@@ -190,8 +190,8 @@ export default function UpgradeDepartmentClient() {
 
         <p className="text-xs" style={{ color: "var(--color-dim)" }}>
           By starting the trial you become the institution admin. You can invite teammates immediately,
-          and assign admin to another user any time from the admin panel. Card is captured upfront;
-          Stripe authorizes but does not charge until the trial ends.
+          and assign admin to another user any time from the admin panel. Your card is saved at signup
+          and not charged until the trial ends.
         </p>
       </form>
     </main>

@@ -234,11 +234,12 @@ export async function sendWelcomeEmail(user: {
             </a>
           </p>
           <div style="margin-top: 24px; padding: 14px; background: #f7fafc; border-left: 3px solid #1e4d8c; font-size: 12px; color: #4a5568; line-height: 1.55;">
-            <strong style="color: #1a3a5c;">Reminder:</strong> Vancomyzer™ is non-device clinical
-            decision support under 21st Century Cures Act §3060, intended for licensed healthcare
-            professionals only. Every recommendation must be independently reviewed by a clinician
-            prior to patient administration. Not a substitute for clinical judgment, institutional
-            protocols, or therapeutic drug monitoring.
+            <strong style="color: #1a3a5c;">Reminder:</strong> Vancomyzer™ is not FDA-cleared or
+            approved. It is designed to meet the non-device clinical decision support criteria of
+            FD&amp;C Act §520(o)(1)(E), and is intended for licensed healthcare professionals only.
+            Every recommendation must be independently reviewed by a clinician prior to patient
+            administration. Not a substitute for clinical judgment, institutional protocols, or
+            therapeutic drug monitoring.
           </div>
           <p style="margin-top: 24px; font-size: 11px; color: #4a5568; line-height: 1.55;">
             Useful next steps:

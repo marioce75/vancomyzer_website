@@ -1,7 +1,12 @@
 /**
- * Regulatory disclaimer strip — required on every screen of the app
- * per 21st Century Cures Act §3060 non-device CDS posture and our
- * dosys.health public commitments. Do not remove without legal review.
+ * Regulatory disclaimer strip — rendered on every screen of the app.
+ *
+ * Uses the approved short-form regulatory wording (review remediation,
+ * 15 Sep 2026). Vancomyzer is DESIGNED to meet the non-device CDS criteria
+ * of FD&C Act §520(o)(1)(E); the FDA has made no determination, so never
+ * say it "is" or is "classified as" non-device CDS. The long form lives on
+ * /disclaimer, /register and the landing page. Do not remove without legal
+ * review.
  */
 export default function RegulatoryFooter() {
   return (
@@ -20,8 +25,9 @@ export default function RegulatoryFooter() {
       }}
     >
       Vancomyzer&trade; is a clinical decision-support tool for qualified healthcare
-      professionals only. Not FDA-cleared as a medical device. Classified as
-      non-device CDS under the 21st Century Cures Act, Section 3060.
+      professionals only. Not FDA-cleared or approved. Designed to meet the non-device
+      clinical decision support criteria of FD&amp;C Act §520(o)(1)(E); not reviewed by
+      the FDA.
     </div>
   );
 }

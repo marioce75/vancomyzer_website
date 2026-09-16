@@ -5,7 +5,7 @@ export default function DisclaimerPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <h1 className="text-3xl font-bold tracking-tight text-slate-900">Medical Disclaimer</h1>
-      <p className="mt-2 text-sm text-slate-500">Last updated: March 2026</p>
+      <p className="mt-2 text-sm text-slate-500">Last updated: September 2026</p>
 
       <CanonicalDocCallout docName="Medical Disclaimer" href={LEGAL_LINKS.disclaimer} />
 
@@ -28,14 +28,17 @@ export default function DisclaimerPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Scope of Use</h2>
           <p>
-            The calculator is scoped to <strong>adult intermittent-infusion vancomycin</strong> as described on this site. It is not validated for pediatric use, continuous infusion, or conditions outside the stated assumptions. Outputs should not be used in clinical situations outside this explicit scope without independent clinical assessment.
+            The calculator is scoped to <strong>adult intermittent-infusion vancomycin</strong> as described on this site. Vancomyzer™ has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. It is not designed for pediatric patients, patients receiving dialysis or other renal replacement therapy, continuous-infusion vancomycin, or conditions outside the stated assumptions. Outputs should not be used in clinical situations outside this explicit scope without independent clinical assessment.
           </p>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Non-Device Clinical Decision Support</h2>
+          <h2 className="text-lg font-semibold text-slate-900 mb-2">Regulatory Status</h2>
           <p>
-            Vancomyzer™ is classified as non-device clinical decision support software consistent with FDA CDS guidance. It is <strong>not FDA-cleared or FDA-approved as a medical device</strong>. It has not been clinically validated in prospective outcomes studies, and no claim is made that its use improves patient outcomes relative to other dosing methods.
+            Vancomyzer™ is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has <strong>not been cleared, approved or otherwise reviewed by the FDA</strong>. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation.
+          </p>
+          <p className="mt-3">
+            It has not been evaluated in prospective clinical outcome studies, and no claim is made that its use improves patient outcomes relative to other dosing methods.
           </p>
         </section>
 

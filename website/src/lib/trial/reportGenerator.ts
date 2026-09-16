@@ -2,6 +2,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 import { findUserById } from '@/lib/db'
+import { COLIN_2019, VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED } from '@/lib/pk/modelRegistry'
 import type { TrialStatusResult } from './trialService'
 
 const hex = (h: string) => {
@@ -57,7 +58,7 @@ export async function generatePilotReport(
   const statBoxes = [
     { label: 'Patients Dosed', value: stats.totalCases.toString(), sub: 'total cases logged' },
     { label: 'AUC Target Attainment', value: stats.aucTargetAttainmentRate != null ? `${stats.aucTargetAttainmentRate.toFixed(0)}%` : 'N/A', sub: 'of cases with outcome data' },
-    { label: 'Obesity Model', value: stats.obesityModelActivations.toString(), sub: 'auto-activations (BMI ≥40)' },
+    { label: 'Obesity Model', value: stats.obesityModelActivations.toString(), sub: 'historical use, now retired' },
     { label: 'ICU Patients', value: stats.icuCases.toString(), sub: 'critical care cases' },
   ]
 
@@ -90,7 +91,7 @@ export async function generatePilotReport(
   }
 
   if (stats.obesityModelActivations > 0) {
-    insights.push(`The Vancomyzer™ Obesity Model (FFM-based, BMI ≥40) was automatically activated ${stats.obesityModelActivations} time${stats.obesityModelActivations !== 1 ? 's' : ''} — providing pharmacologically appropriate dosing for patients in whom total body weight-based models have known systematic bias.`)
+    insights.push(`The ${VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.shortName} was used in ${stats.obesityModelActivations} case${stats.obesityModelActivations !== 1 ? 's' : ''} logged during this pilot. That model was retired from dosing on ${VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.retiredOn} — this is a historical count only. Every adult now uses the ${COLIN_2019.shortName} model, at any body size.`)
   }
 
   if (stats.twoLevelCases > 0) {
@@ -98,7 +99,7 @@ export async function generatePilotReport(
   }
 
   if (stats.icuCases > 0) {
-    insights.push(`${stats.icuCases} ICU patients were dosed, a population at elevated risk of vancomycin-associated nephrotoxicity where AUC-guided dosing has the greatest demonstrated clinical impact.`)
+    insights.push(`${stats.icuCases} ICU patients were dosed. ICU patients are at elevated risk of vancomycin-associated nephrotoxicity, a population the 2020 consensus guideline highlights for AUC-guided monitoring.`)
   }
 
   if (insights.length === 0) {
@@ -132,9 +133,9 @@ export async function generatePilotReport(
   y -= 18
 
   const context = [
-    'The 2020 ASHP/IDSA/PIDS/SIDP consensus guidelines mandate AUC24-guided vancomycin monitoring with Bayesian software as the preferred method, targeting AUC24/MIC of 400–600 mg·h/L.',
-    'Trough-based monitoring is associated with AKI rates as high as 19%. AUC-guided dosing reduces nephrotoxicity risk — particularly relevant for ICU and high-comorbidity populations.',
-    'Vancomyzer™ is the only transparent, open-source Bayesian dosing platform displaying all PK equations with DOI-linked citations at the point of care.',
+    'The 2020 ASHP/IDSA/PIDS/SIDP consensus guideline recommends AUC-guided monitoring, preferably with Bayesian estimation, and targets an AUC24/MIC of 400–600 mg·h/L for serious MRSA infections (assuming an MIC of 1 mg/L).',
+    'The same guideline cites evidence that AUC-guided dosing is associated with less nephrotoxicity than trough-guided dosing — particularly relevant for ICU and high-comorbidity populations.',
+    'Vancomyzer™ shows the model, assumptions and evidence behind each estimate, including PK equations with DOI-linked citations, at the point of care.',
   ]
 
   context.forEach(text => {
@@ -160,8 +161,8 @@ export async function generatePilotReport(
   page.drawRectangle({ x: 0, y: y - 72, width: 4, height: 72, color: GREEN })
 
   page.drawText('Ready to Continue?', { x: 20, y: y - 18, size: 13, font: fontBold, color: NAVY })
-  page.drawText('Subscribe to Vancomyzer™ to retain your full case history, unlock multi-user access,', { x: 20, y: y - 34, size: 9, font: fontReg, color: SLATE })
-  page.drawText('and continue AUC-guided dosing with no interruption to your clinical workflow.', { x: 20, y: y - 46, size: 9, font: fontReg, color: SLATE })
+  page.drawText('Subscribe to Vancomyzer™ Pro to keep your calculation history after the pilot ends.', { x: 20, y: y - 34, size: 9, font: fontReg, color: SLATE })
+  page.drawText('The core calculator remains free for individual clinicians.', { x: 20, y: y - 46, size: 9, font: fontReg, color: SLATE })
   page.drawText('Visit vancomyzer.com/upgrade to get started.', { x: 20, y: y - 60, size: 9, font: fontBold, color: GREEN })
 
   page.drawLine({ start: { x: 40, y: 36 }, end: { x: 572, y: 36 }, thickness: 0.5, color: hex('#C8DDD8') })

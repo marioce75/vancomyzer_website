@@ -32,7 +32,7 @@ export default function AboutPage() {
           Product philosophy
         </h2>
         <ul className="mt-4 space-y-2 text-gray-600">
-          <li>Transparency over black-box presentation</li>
+          <li>Transparency in how every estimate is produced</li>
           <li>Interpretability over vague sophistication claims</li>
           <li>Clinician oversight over algorithmic authority</li>
           <li>Documentation clarity for communication</li>

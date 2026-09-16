@@ -3,6 +3,11 @@ import Link from "next/link";
 import OpenCalculatorButton from "@/components/landing/OpenCalculatorButton";
 import AucCurveIllustration from "@/components/landing/AucCurveIllustration";
 import { OPEN_ACCESS } from "@/lib/openAccess";
+import {
+  COLIN_2019,
+  COLIN_2021_OBESE_EVALUATION,
+  HIGH_BMI_THRESHOLD_KG_M2,
+} from "@/lib/pk/modelRegistry";
 
 /**
  * Public landing page at "/".
@@ -19,14 +24,17 @@ import { OPEN_ACCESS } from "@/lib/openAccess";
  *
  * Copy rules: plain clinical language; no invented statistics, testimonials
  * or outcome claims; cited facts only (published sources already referenced
- * on /transparent-dosing). The launch-period line follows OPEN_ACCESS so the
- * page stays truthful when the switch is turned off.
+ * on /transparent-dosing). Model names and citations come from
+ * @/lib/pk/modelRegistry. Validation, regulatory and pricing wording follows
+ * the approved wording bank from the 15 Sep 2026 review remediation. The
+ * launch-period line follows OPEN_ACCESS so the page stays truthful when the
+ * switch is turned off.
  */
 
 export const metadata: Metadata = {
   title: "Vancomycin AUC Dosing Calculator — Free Bayesian Dosing Support | Vancomyzer™",
   description:
-    "Free Bayesian, AUC-guided vancomycin dosing calculator for pharmacists, physicians and other clinicians. Empiric dosing from patient characteristics, refinement with one or two measured levels, the Colin 2019 population model, a dedicated obesity model, and AUC24 targets aligned with the 2020 ASHP/IDSA/PIDS/SIDP consensus guideline.",
+    `Free Bayesian, AUC-guided vancomycin dosing calculator for pharmacists, physicians and other clinicians. Empiric dosing from patient characteristics, refinement with one or two measured levels, the ${COLIN_2019.shortName} population model for all adults with a high-BMI advisory, and AUC24 targets aligned with the 2020 ASHP/IDSA/PIDS/SIDP consensus guideline.`,
   openGraph: {
     title: "Vancomyzer™ — Free Bayesian Vancomycin AUC Dosing Calculator",
     description:
@@ -43,15 +51,18 @@ export const metadata: Metadata = {
   },
 };
 
+// Pricing facts: the core calculator is free, permanently. During the launch
+// period PDF export, note copy and interpretation are also free with no
+// account; afterwards they return to Individual Pro.
 const LAUNCH_LINE = OPEN_ACCESS
-  ? "Free for all clinicians during our launch period — no account needed."
-  : "Free for individual clinicians — create an account or sign in to get started.";
+  ? "The core calculator is free, permanently. During our launch period, PDF export, note copy and result interpretation are free too — no account needed."
+  : "The core calculator is free for individual clinicians, permanently — create a free account or sign in to get started.";
 
 const CAPABILITIES: { title: string; body: string; source?: string }[] = [
   {
     title: "AUC₂₄-guided targets",
     body:
-      "Suggested regimens aim for an AUC₂₄ of 400–600 mg·h/L, the target range recommended for serious MRSA infections by the 2020 ASHP/IDSA/PIDS/SIDP vancomycin consensus guideline.",
+      "Suggested regimens aim for an AUC₂₄ of 400–600 mg·h/L, the target range recommended for serious MRSA infections (assuming an MIC of 1 mg/L) by the 2020 ASHP/IDSA/PIDS/SIDP vancomycin consensus guideline.",
     source: "Rybak MJ et al. Am J Health Syst Pharm. 2020;77(11):835-864.",
   },
   {
@@ -65,16 +76,16 @@ const CAPABILITIES: { title: string; body: string; source?: string }[] = [
       "Enter one or two measured vancomycin levels and the estimate is individualized to your patient with Bayesian methods. The adjustment is bounded, so one unusual level cannot override the population data.",
   },
   {
-    title: "Colin 2019 pooled population model",
+    title: `${COLIN_2019.shortName} pooled population model`,
     body:
-      "The default adult model is a published, peer-reviewed analysis that pools 14 vancomycin studies — not a proprietary model you cannot inspect.",
-    source: "Colin PJ et al. Clin Pharmacokinet. 2019;58(6):767-780.",
+      "A published, peer-reviewed analysis that pools 14 vancomycin studies. Vancomyzer shows the model, assumptions and evidence behind each estimate.",
+    source: COLIN_2019.citation,
   },
   {
-    title: "Dedicated obesity model",
+    title: "One model for all adults, with a high-BMI advisory",
     body:
-      "For adults with a BMI of 40 kg/m² or higher, a separate model based on fat-free mass is used when height and sex are entered.",
-    source: "Smit C et al. Br J Clin Pharmacol. 2020;86(2):303-317.",
+      `${COLIN_2019.shortName} is used for every adult, at any body size; there is no separate obesity model. At a BMI of ${HIGH_BMI_THRESHOLD_KG_M2} kg/m² or higher, an advisory notes that published evaluation at that size is limited, and fat-free mass and alternative creatinine-clearance estimates are shown for context only. They do not change the calculation.`,
+    source: COLIN_2021_OBESE_EVALUATION.citation,
   },
   {
     title: "Built-in safety checks",
@@ -97,17 +108,17 @@ const EVIDENCE_LINKS = [
   {
     href: "/transparent-dosing/cases",
     title: "Literature Reproducibility",
-    body: "Published vancomycin cases run through the calculator and compared with the published results.",
+    body: "Published vancomycin cases run through the calculator. Same-model Colin 2019 reproductions are pass/fail; cases from other published models are shown for context only.",
   },
   {
     href: "/transparent-dosing/predictive-performance",
     title: "Predictive Performance",
-    body: "How closely predictions hold up on simulated patients drawn from a different published model.",
+    body: "A developer-run synthetic analysis (not real patients): predictions compared with simulated ICU patients generated from a different published model.",
   },
   {
     href: "/transparent-dosing/engine-crosscheck",
-    title: "Independent Engine Cross-Check",
-    body: "Our individualized estimates compared with Tucuxi, a separate, independently built dosing program.",
+    title: "Engine Cross-Check",
+    body: "A developer-run synthetic analysis (not real patients): our individualized estimates compared with Tucuxi, a separately built dosing program given the same priors.",
   },
   {
     href: "/faq",
@@ -295,9 +306,10 @@ export default function LandingPage() {
               Review the evidence before you rely on it.
             </h2>
             <p className="mt-3 text-base leading-relaxed" style={{ color: "#334155" }}>
-              Every model, equation and published source is documented. The calculator is checked
-              against published vancomycin cases, against simulated patients, and against a separately
-              built dosing program — and those results are public.
+              Every model, equation and published source is documented. Vancomyzer has not yet been
+              validated in real patients. Its equations are checked against published values and
+              synthetic test cases; external validation with patient data is planned. The results of
+              those developer-run checks are public.
             </p>
           </div>
 
@@ -382,7 +394,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Regulatory statement — wording kept consistent with RegulatoryFooter and DisclaimerModal. */}
+        {/* Regulatory statement — approved long-form wording (15 Sep 2026); RegulatoryFooter carries the short form. */}
         <div
           className="mx-auto mt-12 max-w-6xl rounded-lg border p-6"
           style={{ borderColor: "#cbd5e1", background: "#f8fafc" }}
@@ -391,13 +403,13 @@ export default function LandingPage() {
             Regulatory status
           </span>
           <p className="mt-2 text-sm leading-relaxed" style={{ color: "#334155" }}>
-            Vancomyzer&trade; is a clinical decision-support tool for qualified healthcare
-            professionals. It has not been cleared or approved by the U.S. Food and Drug Administration
-            as a medical device, and is provided as non-device clinical decision support under the 21st
-            Century Cures Act, Section 3060. It is intended to support, not replace, clinical judgment:
-            every recommendation must be independently reviewed by a qualified clinician against the
-            patient&rsquo;s clinical status, institutional protocols and therapeutic drug monitoring
-            before any change to therapy.
+            Vancomyzer&trade; is designed to meet the criteria for non-device clinical decision support
+            in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060
+            of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by
+            the FDA. It is intended for licensed healthcare professionals, who must independently review
+            the basis for each recommendation. It supports, and does not replace, clinical judgment:
+            review every recommendation against the patient&rsquo;s clinical status, institutional
+            protocols and therapeutic drug monitoring before any change to therapy.
           </p>
           <Link
             href="/disclaimer"

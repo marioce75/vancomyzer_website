@@ -133,11 +133,11 @@ ${topPosts.filter(p => p.upvote_count >= 200).map(p => `- [${p.upvote_count}↑]
 
 ## Context about Vancomyzer™
 - Free Bayesian vancomycin AUC calculator, web-based, no app install needed
-- Colin 2019 two-compartment PK model + obesity model (FFM-based, BMI≥40)
+- Colin 2019 two-compartment PK model for all adults, with a high-BMI advisory (the custom obesity model was retired 15 Sep 2026)
 - AUC-guided dosing per ASHP/IDSA 2020 guidelines
 - Currently pre-revenue, building toward FDA 510(k) submission
 - Target: community hospitals without existing TDM software
-- Key differentiator: transparency (all equations visible), speed (bedside use), cost (free vs $25-50K/year)
+- Key differentiator: transparency (all equations visible), speed (bedside use), cost (core calculator free; commercial platforms do not publish list prices, so do not assume a figure)
 - SMART on FHIR scaffold built for EHR integration
 
 Produce your analysis as the JSON structure specified in your system prompt. Focus on insights that are specific and actionable, not generic market observations.`;

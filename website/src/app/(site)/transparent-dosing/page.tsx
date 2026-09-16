@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { OPEN_ACCESS } from "@/lib/openAccess";
+import {
+  COLIN_2019,
+  PUBLISHED_OBESITY_COMPARATORS,
+  VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED,
+} from "@/lib/pk/modelRegistry";
 
 export const metadata: Metadata = {
   title: "Transparent Dosing — Vancomyzer™",
   description:
-    "Vancomycin dosing should not be a black box. Vancomyzer is a transparent Bayesian dosing calculator built on the same Colin 2019 pooled prior the commercial tools use — with the math, the priors, and the confidence band in the open.",
+    "Vancomyzer is a transparent Bayesian vancomycin dosing calculator: the model, the priors and an illustrative uncertainty band are shown in the open, with every equation documented and cited.",
   openGraph: {
     title: "Transparent Vancomycin Dosing — Vancomyzer™",
     description:
-      "Every equation, every prior, every confidence interval is in the open. Free for clinicians.",
+      "Every equation and every prior is documented in the open, with an illustrative uncertainty band on the concentration-time graph. Free for clinicians.",
     type: "website",
     url: "https://vancomyzer.com/transparent-dosing",
     siteName: "Vancomyzer™",
@@ -26,25 +32,25 @@ const PRINCIPLES = [
     n: "01",
     title: "Show the math.",
     body:
-      "Every equation, every prior, every fit decision is visible in the UI. No clinical decision-support tool that hides its reasoning belongs in a pharmacy workflow. We render the Colin 2019 covariate equations next to your patient's computed CL. We show the residual on every Bayesian fit. Turn on Teaching Mode and you get plain-language PK explanations inline with each result.",
+      `Every equation, every prior, every fit decision is visible in the UI. Vancomyzer shows its reasoning, not just its result. We render the ${COLIN_2019.shortName} covariate equations next to your patient's computed CL. We show the residual on every Bayesian fit. Turn on Teaching Mode and you get plain-language PK explanations inline with each result.`,
   },
   {
     n: "02",
     title: "Honest uncertainty.",
     body:
-      "When the data can't constrain the answer, the UI says so — with an explicit confidence band on the concentration-time graph, not a confident-looking line. The band widens when no level is fit, narrows when two coherent levels are in. We'd rather be visibly humble than invisibly wrong.",
+      "When the data can't constrain the answer, the UI says so — with an illustrative uncertainty band around the predicted concentration-time curve, not a statistical confidence, credible or prediction interval, and not a falsely confident single line. The band widens when no level is fit, narrows when two coherent levels are in. We'd rather be visibly humble than invisibly wrong.",
   },
   {
     n: "03",
     title: "The prior is published, peer-reviewed, and pooled from 14 studies.",
     body:
-      "Not four. Not five. Not proprietary. Colin PJ et al, Clinical Pharmacokinetics 58:767–780, 2019: a pooled population PK analysis across 14 published vancomycin studies, n=2,554 patients, 8,303 measured concentrations, neonates through elderly. CC BY-NC. The same prior the commercial vendors quietly build on — we just tell you.",
+      `${COLIN_2019.citation} ${COLIN_2019.sourcePopulation} Vancomyzer shows the model, assumptions and evidence behind each estimate.`,
   },
   {
     n: "04",
     title: "Free for the people who need it most.",
     body:
-      "Pharmacy students, residents, individual clinicians: the full calculator is free, forever. Hospital tier exists for institutions that need EMR integration, audit logs, custom branding, and a Business Associate Agreement — not for the math itself. Basic dosing safety isn't gated behind a $50,000 contract.",
+      "Pharmacy students, residents, individual clinicians: the full calculator is free, permanently. Institutional plans add workflow features for hospitals and health systems — team audit logs are live today; EMR/EHR integration, SSO, custom branding and a Business Associate Agreement are not yet available. None of it changes the math clinicians rely on.",
   },
   {
     n: "05",
@@ -56,42 +62,42 @@ const PRINCIPLES = [
     n: "06",
     title: "Open methodology.",
     body:
-      "The math you see in the FAQ is the math in the engine. Every model, every parameter, every safety guardrail is documented with its primary citation. The pediatric clamp, dialysis exclusion, and continuous-infusion exclusion are explicit because they haven't been validated, not because we're saving features for an upgrade tier.",
+      "The Colin 2019 equations and parameter values shown throughout this site are generated from the same model registry the calculation engine uses. Every model, every parameter, every safety guardrail is documented with its primary citation. The pediatric clamp, dialysis exclusion, and continuous-infusion exclusion are explicit because Vancomyzer is not designed for those populations, not because we're saving features for an upgrade tier.",
   },
 ];
 
 const ANTI_PROMISES = [
-  "We will not claim FDA clearance we don't have. Vancomyzer is non-device clinical decision support under 21st Century Cures Act §3060, scoped accordingly. The disclaimer on every page is real, not legal noise.",
+  "We will not claim FDA clearance we don't have. Vancomyzer™ is not FDA-cleared or approved; it is designed to meet the non-device clinical decision support criteria of FD&C Act §520(o)(1)(E). The disclaimer on every page is real, not legal noise.",
   "We will not fit your patient on a single outlier level by quietly loosening the prior. The fit is bounded; the residual is shown; the advisory tells you when to draw another level.",
   "We will not pretend the calculator works for pediatrics, dialysis, continuous infusion, or extreme renal failure until those subpopulations have been validated and shipped with their own safety rails.",
-  "We will not gate basic AUC-guided dosing behind a hospital contract. The free tier is the same engine as Hospital tier — only EMR integration, BAA, custom branding, and audit logs are paid features.",
+  "We will not gate basic AUC-guided dosing behind a hospital contract. Every plan uses the same calculation engine; paid plans add workflow features such as PDF export, notes, calculation history and team audit logs.",
   "We will not replace clinician judgment. Every recommendation comes with the math, the residuals, and the assumptions so a pharmacist can override it with full context.",
 ];
 
 const SOURCES = [
   {
-    label: "Colin PJ et al. — Vancomycin Pharmacokinetics Throughout Life: Pooled Population Analysis (14 studies, n=2,554)",
-    citation: "Clin Pharmacokinet. 2019;58(6):767-780.",
-    doi: "10.1007/s40262-018-0727-5",
-    note: "Default adult prior. CC BY-NC.",
+    label: COLIN_2019.displayName,
+    citation: COLIN_2019.citation,
+    doi: COLIN_2019.doi,
+    note: "Default adult prior, used for every adult at any body size. CC BY-NC.",
   },
   {
-    label: "Smit C et al. — Vancomycin pharmacokinetics in morbid obesity",
-    citation: "Br J Clin Pharmacol. 2020;86(2):303-317.",
-    doi: "10.1111/bcp.14144",
-    note: "Obesity-model CL formula (BMI ≥ 40).",
+    label: `${PUBLISHED_OBESITY_COMPARATORS[0].shortName} — published obesity vancomycin model (not implemented)`,
+    citation: PUBLISHED_OBESITY_COMPARATORS[0].citation,
+    doi: PUBLISHED_OBESITY_COMPARATORS[0].doi,
+    note: `Reviewed for comparison. ${PUBLISHED_OBESITY_COMPARATORS[0].population}`,
   },
   {
-    label: "Zhang T et al. — External validation of the obesity vancomycin model",
-    citation: "Clin Pharmacokinet. 2024;63:79-91.",
-    doi: "10.1007/s40262-023-01324-5",
-    note: "Independent validation cohort.",
+    label: `${PUBLISHED_OBESITY_COMPARATORS[1].shortName} — published obesity vancomycin model (not implemented)`,
+    citation: PUBLISHED_OBESITY_COMPARATORS[1].citation,
+    doi: PUBLISHED_OBESITY_COMPARATORS[1].doi,
+    note: `Reviewed for comparison. ${PUBLISHED_OBESITY_COMPARATORS[1].population}`,
   },
   {
     label: "Janmahasatian S et al. — Quantification of lean bodyweight (FFM equations)",
     citation: "Clin Pharmacokinet. 2005;44(10):1051-1065.",
     doi: "10.2165/00003088-200544100-00004",
-    note: "V₁ and V₂ scaling in obesity branch.",
+    note: `Used by Vancomyzer's custom obesity model, retired from dosing on ${VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.retiredOn}. Historical reference only.`,
   },
   {
     label: "Rybak MJ et al. — Therapeutic monitoring of vancomycin (ASHP/IDSA/PIDS/SIDP 2020)",
@@ -117,16 +123,16 @@ export default function TransparentDosingPage() {
             className="text-4xl font-extrabold leading-tight tracking-tight sm:text-6xl"
             style={{ color: "#ffffff" }}
           >
-            Vancomycin dosing should not be a black box.
+            Show the model. Show the evidence. Show the uncertainty.
           </h1>
           <p className="mt-6 max-w-3xl text-lg leading-relaxed sm:text-xl" style={{ color: "#cbd5e1" }}>
             Vancomyzer&trade; is a transparent Bayesian dosing calculator for clinical pharmacists.
-            Every equation, every prior, every confidence interval is in the open — because the math
-            behind your dose decisions should be auditable, not just trusted.
+            Every equation and every prior is in the open, with an illustrative uncertainty band
+            — because the math behind your dose decisions should be auditable, not just trusted.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Link
-              href="/register"
+              href={OPEN_ACCESS ? "/calculator" : "/register"}
               className="cta-primary inline-block rounded-md px-6 py-3 text-center text-sm font-bold uppercase tracking-wider transition"
               style={{ background: "#00c9b1", color: "#0f172a", letterSpacing: "0.08em" }}
             >
@@ -147,24 +153,26 @@ export default function TransparentDosingPage() {
       <section className="px-6 py-20">
         <div className="mx-auto max-w-3xl">
           <h2 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "#0f172a" }}>
-            The state of vancomycin dosing tools is strange.
+            Not every vancomycin dosing tool shows its work.
           </h2>
           <div className="mt-6 space-y-5 text-base leading-relaxed sm:text-lg" style={{ color: "#334155" }}>
             <p>
-              The two commercial leaders charge $25,000–$50,000 per hospital per year. They produce a
-              confident dose recommendation. They will not show you the prior they used, the math they
-              ran, the residual on the fit, or the source of their derivation cohort. If you ask, you
-              get a sales-deck version of <em>&ldquo;trust us — we work with 1,000+ hospitals.&rdquo;</em>
+              Some tools produce a confident dose recommendation without showing the prior they
+              used, the math they ran, the residual on the fit, or the evidence behind the model
+              — so a clinician has no way to check the reasoning before it reaches a patient.
             </p>
             <p>
-              That&rsquo;s not clinical decision support. That&rsquo;s a vendor with a calculator behind a paywall.
+              Commercial platforms offer capabilities such as EHR integration, population-specific
+              models and implementation support; compare options against your own institution&rsquo;s
+              needs. Vancomyzer takes a transparency-first approach to the same problem: it shows
+              the model, the assumptions and the evidence behind each estimate.
             </p>
             <p>
-              We built Vancomyzer differently. The math is in the open. The prior is the same Colin 2019
-              pooled model the commercial tools quietly use — and we say so out loud. The confidence band
-              shows you exactly how much the engine actually knows about your patient. The Bayesian fit
-              is explained inline, in plain language, when you turn on Teaching Mode. And it&rsquo;s free for
-              individual clinicians, forever.
+              The math is in the open. The {COLIN_2019.shortName} prior is documented with its
+              primary citation. An illustrative uncertainty band shows how much the fit can and
+              cannot say about your patient. The Bayesian fit is explained inline, in plain
+              language, when you turn on Teaching Mode. And the calculator is free for individual
+              clinicians, permanently.
             </p>
           </div>
         </div>
@@ -209,9 +217,8 @@ export default function TransparentDosingPage() {
             The math, exposed.
           </h2>
           <p className="mt-3 max-w-2xl text-base leading-relaxed" style={{ color: "#334155" }}>
-            Here&rsquo;s the actual Colin 2019 clearance equation Vancomyzer uses for your patient.
-            It is the same equation a black-box tool would compute internally. The difference is
-            whether you ever get to see it.
+            Here&rsquo;s the actual {COLIN_2019.shortName} clearance equation Vancomyzer uses for
+            your patient, shown here rather than computed out of view.
           </p>
 
           <pre
@@ -271,7 +278,7 @@ export default function TransparentDosingPage() {
           </pre>
 
           <p className="mt-6 max-w-2xl text-sm leading-relaxed" style={{ color: "#64748b" }}>
-            That&rsquo;s the entire approach. There is no proprietary black box and no hidden model.
+            That&rsquo;s the entire approach. Nothing is hidden and nothing is withheld.
             Any clinician trained in pharmacokinetics can review exactly how it works. That is the point.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -325,13 +332,13 @@ export default function TransparentDosingPage() {
             </Link>
           </div>
           <p className="mt-3 text-xs" style={{ color: "#64748b" }}>
-            Literature Reproducibility is a public scoreboard: every published vancomycin case
-            we test our calculator against, with the live delta between our output and the
-            published value. Predictive Performance is the Sheiner–Beal stress test: synthetic
-            ICU patients drawn from a different published model than our prior, with rBias and
-            rRMSE benchmarked against Bai et al. 2025. Engine Cross-Check compares our Bayesian
-            engine against Tucuxi — a separate, independently-built dosing program — and shows
-            the two agree on individualized PK estimates to under 1% (median, n=200).
+            Literature Reproducibility lists the published vancomycin cases we run through the
+            calculator: the Colin 2019 cases are pass/fail reproductions of the same model, and
+            cases built on other published models are shown for context only, not as pass/fail tests. Predictive Performance and Engine Cross-Check are developer-run
+            synthetic analyses, not real-patient validation. Predictive Performance compares
+            Vancomyzer against 200 synthetic ICU patients generated from a different published
+            model. Engine Cross-Check compares Vancomyzer against Tucuxi, a separately built
+            dosing program, when both are given the same priors.
           </p>
         </div>
       </section>
@@ -348,11 +355,10 @@ export default function TransparentDosingPage() {
             The argument is correct as stated. It is also not what Vancomyzer does.
           </p>
           <p className="mt-4 max-w-2xl text-base leading-relaxed" style={{ color: "#334155" }}>
-            Our default adult prior is Colin 2019, which is itself a <strong>pooled population PK
-            analysis across 14 published studies</strong>, ~2,554 patients, ~8,303 vancomycin concentrations,
-            spanning neonates through elderly. It was published explicitly to be the &ldquo;single coherent
-            prior across populations&rdquo; reference for vancomycin dosing tools — and it&rsquo;s the same
-            published model the commercial tools build on.
+            Our default adult prior is {COLIN_2019.shortName}, itself a <strong>pooled population PK
+            analysis of data from 14 studies</strong> (2,554 individuals), spanning neonates
+            through elderly adults. Vancomyzer shows the model, assumptions and evidence behind each
+            estimate.
           </p>
 
           <div className="mt-10 space-y-5">
@@ -384,10 +390,14 @@ export default function TransparentDosingPage() {
             ))}
           </div>
 
-          <p className="mt-10 max-w-2xl text-sm italic" style={{ color: "#64748b" }}>
-            &ldquo;We use a proprietary Bayesian model trained on data from our 1,000+ hospital partners.&rdquo;
-            <br />
-            — every commercial vendor&rsquo;s marketing page, paraphrased.
+          <p className="mt-10 max-w-2xl text-sm leading-relaxed" style={{ color: "#64748b" }}>
+            Smit 2020 and Zhang 2024 are shown above for comparison; Vancomyzer does not implement
+            either one. Vancomyzer&rsquo;s own custom obesity model was retired from dosing on{" "}
+            {VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.retiredOn} — its coefficients did not appear in
+            either published paper, it was never externally validated, and it produced a step change
+            in estimates at BMI 40. The {COLIN_2019.shortName} model is now used for every adult, at
+            any body size; published evaluation of {COLIN_2019.shortName} at BMI 40 or more is
+            limited (Colin 2021: 15 of 49 obese adults).
           </p>
         </div>
       </section>
@@ -426,12 +436,13 @@ export default function TransparentDosingPage() {
             Open the calculator.
           </h2>
           <p className="mt-4 text-lg leading-relaxed" style={{ color: "#cbd5e1" }}>
-            Free for individual clinicians. No credit card. The full Bayesian engine, the Colin 2019
-            prior, the obesity model, the confidence band — all of it.
+            Free for individual clinicians, permanently. No credit card. The full calculator, the{" "}
+            {COLIN_2019.shortName} model, an illustrative uncertainty band — all of it, shown in the
+            open.
           </p>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4">
             <Link
-              href="/register"
+              href={OPEN_ACCESS ? "/calculator" : "/register"}
               className="cta-primary inline-block rounded-md px-8 py-3 text-sm font-bold uppercase tracking-wider transition"
               style={{ background: "#00c9b1", color: "#0f172a", letterSpacing: "0.08em" }}
             >
@@ -446,9 +457,10 @@ export default function TransparentDosingPage() {
             </Link>
           </div>
           <p className="mt-10 text-xs" style={{ color: "#64748b" }}>
-            Vancomyzer&trade; is a clinical decision-support tool for licensed healthcare professionals.
-            Not FDA-cleared as a medical device. Classified as non-device CDS under the 21st Century
-            Cures Act §3060. Engineered by{" "}
+            Vancomyzer&trade; is a clinical decision-support tool for qualified healthcare
+            professionals only. Not FDA-cleared or approved. Designed to meet the non-device
+            clinical decision support criteria of FD&amp;C Act §520(o)(1)(E); not reviewed by
+            the FDA. Engineered by{" "}
             <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" style={{ color: "#00c9b1" }}>
               Dōsys&trade;
             </a>

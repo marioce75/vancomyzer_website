@@ -5,13 +5,14 @@
  * if-checks) when adding tiers, features, or pricing. Every gate, banner,
  * upgrade-prompt, and admin view should read from here.
  *
- * NEVER use this file to gate clinical safety features (Obesity Model,
+ * NEVER use this file to gate clinical safety features (high-BMI advisory,
  * RRT block, age >65 advisory, infusion-rate enforcement, AUC target
  * range, equation transparency). Those are non-tier-gated by regulatory
  * commitment under 21st Century Cures Act §3060.
  */
 
 import { OPEN_ACCESS, OPEN_ACCESS_FEATURES } from "./openAccess";
+import { COLIN_2019 } from "./pk/modelRegistry";
 
 export type TierId = "free" | "individual_pro" | "department" | "hospital";
 
@@ -69,12 +70,11 @@ export const TIERS: Record<TierId, TierConfig> = {
   free: {
     id: "free",
     name: "Free",
-    priceLabel: "$0 forever",
+    priceLabel: "$0 · free permanently",
     audience: "Students, individual clinicians",
     features: [
       "Full AUC calculator (Empiric, 1-level, 2-level)",
-      "Colin 2019 two-compartment PK model",
-      "Vancomyzer Obesity Model (auto-activated BMI ≥ 40)",
+      `${COLIN_2019.shortName} two-compartment PK model (every adult, every BMI)`,
       "All safety guardrails active",
       "DOI-linked inline references on every result",
       "Community support",
@@ -89,9 +89,8 @@ export const TIERS: Record<TierId, TierConfig> = {
     audience: "Pharmacists, physicians, NPs, PAs",
     features: [
       "Everything in Free",
-      "Unlimited calculations",
       "Clinical note & PDF export for the medical record",
-      "Calculation history (≥ 90 days, de-identified)",
+      "Calculation history (90-day retention, de-identified)",
       "Custom institution name on exported notes",
       "Email support (info@dosys.health)",
     ],
@@ -101,41 +100,37 @@ export const TIERS: Record<TierId, TierConfig> = {
   department: {
     id: "department",
     name: "Department",
-    priceLabel: "$500–$2,000/month",
+    priceLabel: "$500/month (up to 10 seats) · $1,000/month (11–20 seats)",
     audience: "Hospital pharmacy departments (5–20 users)",
     features: [
       "Everything in Individual Pro",
       "5–20 user seats with shared workspace",
       "Admin panel & user management",
-      "Audit logs (de-identified case IDs)",
-      "Priority email support (24-hour SLA)",
+      "Institution-scoped audit logs (90-day retention)",
+      "Priority email support (service terms by contract)",
       "Onboarding assistance",
     ],
-    cta: {
-      label: "Contact Sales",
-      href: `${CONTACT_URL}?type=department`,
-      external: true,
-    },
+    cta: { label: "Start 14-Day Trial", href: "/upgrade/department" },
     paid: true,
   },
   hospital: {
     id: "hospital",
     name: "Hospital",
     priceLabel: "Contact for pricing",
-    audience: "Health systems + EMR integration",
+    audience: "Health systems",
     features: [
       "Everything in Department",
-      "EMR integration (HL7/FHIR — Epic, Cerner)",
-      "Custom branding on outputs",
-      "SLA & uptime guarantee",
-      "SOC 2 compliance documentation",
-      "Business Associate Agreement (BAA)",
-      "SSO / SAML",
-      "Dedicated account manager",
+      "EMR/EHR integration (in development — not yet available)",
+      "Custom branding on outputs (in development — not yet available)",
+      "Uptime & support: service terms by contract",
+      "SOC 2 Type I in progress (target Q4 2026)",
+      "Business Associate Agreement (available after legal review — not yet available)",
+      "SSO / SAML (in development — not yet available)",
+      "Account management: service terms by contract",
       "White-glove onboarding",
     ],
     cta: {
-      label: "Request Proposal",
+      label: "Contact Sales",
       href: `${CONTACT_URL}?type=hospital`,
       external: true,
     },

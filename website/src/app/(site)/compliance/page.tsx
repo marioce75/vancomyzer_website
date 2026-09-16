@@ -8,22 +8,18 @@ import { useEffect } from "react";
 const documents = [
   {
     title: "Information Security Policy",
-    filename: "vancomyzer-information-security-policy.pdf",
     description: "Organizational security controls, encryption standards, and data handling procedures.",
   },
   {
     title: "Access Control Policy",
-    filename: "vancomyzer-access-control-policy.pdf",
     description: "Authentication, authorization, role-based access, and session management.",
   },
   {
     title: "Change Management Policy",
-    filename: "vancomyzer-change-management-policy.pdf",
     description: "Documented software development, review, testing, and release controls.",
   },
   {
     title: "Business Continuity Plan",
-    filename: "vancomyzer-business-continuity-plan.pdf",
     description: "Disaster recovery, backup procedures, and incident response protocols.",
   },
 ];
@@ -64,13 +60,15 @@ export default function CompliancePage() {
         SOC 2 Compliance Documentation
       </h1>
       <p className="mt-2 text-sm" style={{ color: "var(--color-secondary)" }}>
-        Available to Hospital plan subscribers.
+        Available to Hospital plan subscribers. Vancomyzer&rsquo;s SOC 2 Type I audit is in
+        progress, with a target completion of Q4 2026. The policy documents below are in
+        preparation and are not yet available for download.
       </p>
 
       <div className="mt-8 space-y-4">
         {documents.map((doc) => (
           <div
-            key={doc.filename}
+            key={doc.title}
             className="flex items-start justify-between gap-4 rounded-lg border p-5"
             style={{
               borderColor: "var(--color-border)",
@@ -91,18 +89,16 @@ export default function CompliancePage() {
                 {doc.description}
               </p>
             </div>
-            <a
-              href={`/compliance/${doc.filename}`}
-              download
-              className="shrink-0 rounded px-3 py-1.5 text-xs font-semibold transition"
+            <span
+              className="shrink-0 rounded px-3 py-1.5 text-xs font-semibold"
               style={{
-                border: "1px solid #0d9488",
-                color: "#0d9488",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-secondary)",
                 background: "transparent",
               }}
             >
-              Download PDF
-            </a>
+              Documentation in preparation
+            </span>
           </div>
         ))}
       </div>
@@ -122,13 +118,7 @@ export default function CompliancePage() {
             <dt className="font-medium" style={{ color: "var(--color-foreground)" }}>
               Application Version:
             </dt>
-            <dd>1.0.0</dd>
-          </div>
-          <div className="flex gap-2">
-            <dt className="font-medium" style={{ color: "var(--color-foreground)" }}>
-              Last Security Review:
-            </dt>
-            <dd>March 2026</dd>
+            <dd>0.1.0</dd>
           </div>
           <div className="flex gap-2">
             <dt className="font-medium" style={{ color: "var(--color-foreground)" }}>
@@ -137,6 +127,26 @@ export default function CompliancePage() {
             <dd>Q4 2026</dd>
           </div>
         </dl>
+      </div>
+
+      <div
+        className="mt-6 rounded-lg border p-5"
+        style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}
+      >
+        <h2
+          className="text-sm font-semibold"
+          style={{ color: "var(--color-foreground)" }}
+        >
+          Security controls in place today
+        </h2>
+        <ul className="mt-3 space-y-1.5 text-xs leading-relaxed" style={{ color: "var(--color-secondary)" }}>
+          <li>HTTPS is enforced for all traffic in transit.</li>
+          <li>Administrator accounts can enable TOTP multi-factor authentication; once enabled, it is required to access admin pages.</li>
+          <li>Calculations and administrative actions are audit-logged.</li>
+        </ul>
+        <p className="mt-3 text-xs leading-relaxed" style={{ color: "var(--color-secondary)" }}>
+          Business Associate Agreement: available after legal review — not yet available.
+        </p>
       </div>
     </main>
   );

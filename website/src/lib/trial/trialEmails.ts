@@ -32,8 +32,8 @@ export async function sendPhase2Email(user: { email: string; name: string }) {
       <p>Hi ${user.name},</p>
       <p>You are now in <strong>Phase 2</strong> of your 90-day Vancomyzer™ pilot — the active use phase.</p>
       <p>Every patient you run through the calculator is being logged. At day 75, a personalized
-      summary report will be generated showing your AUC attainment rate, obesity model activations,
-      and key clinical outcomes — a document you can share with your pharmacy director.</p>
+      summary report will be generated showing your AUC attainment rate and case volume — a document
+      you can share with your pharmacy director.</p>
       <p>Keep using Vancomyzer™ as your primary dosing support tool.</p>
       <p>— The Dosys Health LLC Team<br>mario@dosys.health</p>
     `
@@ -47,7 +47,7 @@ export async function sendReportReadyEmail(user: { email: string; name: string }
     `
       <p>Hi ${user.name},</p>
       <p>You have reached day 75 of your Vancomyzer™ pilot. <strong>Your personalized summary report is ready to generate.</strong></p>
-      <p>The report documents your AUC target attainment rate, obesity model activations, and case volume —
+      <p>The report documents your AUC target attainment rate and case volume —
       everything you need to make the case for an institutional subscription to your pharmacy director.</p>
       <p><a href="https://vancomyzer.com/dashboard/pilot" style="color:#00d4aa;font-weight:bold;">
         Generate my report →
@@ -65,10 +65,10 @@ export async function sendTrialExpiringEmail(user: { email: string; name: string
     `
       <p>Hi ${user.name},</p>
       <p>Your Vancomyzer™ free pilot ends in <strong>${daysLeft} days</strong>.</p>
-      <p>Subscribe now to retain your full case history, unlock multi-user access, and continue
-      AUC-guided dosing without interruption.</p>
+      <p>Subscribe now to keep your calculation history after the pilot ends. The core calculator
+      remains free.</p>
       <p><a href="https://vancomyzer.com/upgrade" style="color:#00d4aa;font-weight:bold;">
-        Subscribe — $19/mo or $149/yr →
+        Subscribe — $9.99/mo billed annually or $19.99/mo →
       </a></p>
       <p>— The Dosys Health LLC Team</p>
     `

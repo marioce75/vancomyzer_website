@@ -264,9 +264,9 @@ function RegisterPageInner() {
                 <p><strong>Not Medical Advice</strong></p>
                 <p>Vancomyzer™ provides clinical decision-support information for clinician review only. Nothing on this site constitutes medical advice, a prescription, a diagnosis, or a treatment recommendation. All dosing outputs are model-based review aids generated from pharmacokinetic calculations. They must be independently reviewed and validated by a licensed clinician before any clinical application.</p>
                 <p><strong>Regulatory Status</strong></p>
-                <p>Vancomyzer™ has not been cleared or approved by the U.S. Food and Drug Administration as a medical device. It is provided as non-device clinical decision support software under Section 520(o)(1)(E) of the Federal Food, Drug and Cosmetic Act as amended by the 21st Century Cures Act.</p>
+                <p>Vancomyzer™ is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation.</p>
                 <p><strong>Scope</strong></p>
-                <p>This tool is scoped to adult intermittent intravenous vancomycin only. It is not validated for pediatric use, continuous infusion, renal replacement therapy, or conditions outside the stated assumptions.</p>
+                <p>This tool is scoped to adult intermittent intravenous vancomycin only. Vancomyzer™ has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. It is not designed for pediatric patients, continuous infusion, renal replacement therapy, or conditions outside the stated assumptions.</p>
                 <p><strong>Limitation of Liability</strong></p>
                 <p>THIS TOOL IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT SHALL THE DEVELOPERS BE LIABLE FOR ANY DAMAGES ARISING OUT OF THE USE OF THIS TOOL.</p>
                 <p style={{ marginTop: 12, padding: 8, background: "#e2e8f0", textAlign: "center", fontWeight: 600, fontSize: 10, color: "#4a5568" }}>
@@ -321,7 +321,7 @@ function RegisterPageInner() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
               {[
-                { checked: agreedDisclaimer, set: setAgreedDisclaimer, label: "I have read and agree to the Vancomyzer™ Medical Disclaimer (March 2026)" },
+                { checked: agreedDisclaimer, set: setAgreedDisclaimer, label: "I have read and agree to the Vancomyzer™ Medical Disclaimer (September 2026)" },
                 { checked: agreedTerms, set: setAgreedTerms, label: "I have read and agree to the Terms of Use (March 2026)" },
                 { checked: confirmedHcp, set: setConfirmedHcp, label: "I confirm I am a licensed healthcare professional" },
                 { checked: confirmedAge, set: setConfirmedAge, label: "I confirm I am 18 years of age or older" },
