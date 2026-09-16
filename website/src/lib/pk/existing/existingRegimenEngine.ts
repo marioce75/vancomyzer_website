@@ -6,6 +6,7 @@ import { runPosteriorEngine } from "../posterior/posteriorEngine";
 import { computeExposure, curvePoints, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
 import { computeSafeInfusionDurationHours } from "../recommend/infusionSafety";
 import type { ExistingRegimenEngineInput, ExistingRegimenEngineOutput } from "../types";
+import { modelShortName } from "../modelRegistry";
 
 export function runExistingRegimenEngine(
   input: ExistingRegimenEngineInput
@@ -134,9 +135,7 @@ export function runExistingRegimenEngine(
       ? `Non-steady-state analysis based on ${doses_given} dose${doses_given === 1 ? "" : "s"}.`
       : "Steady-state assumed (≥5 doses).";
 
-  const priorMsg = model_name === "vancomyzer_obesity"
-    ? "Vancomyzer Obesity Model (Smit 2020 + Zhang 2023) two-compartment adult population prior"
-    : "Colin 2019 two-compartment adult population prior";
+  const priorMsg = `${modelShortName(model_name)} two-compartment adult population prior`;
 
   const data_quality_note = used_posterior_refinement
     ? `Bounded MAP posterior update from measured level(s) using the ${priorMsg}. Fit quality: ${posterior_fit.fit_quality} (${posterior_fit.fit_quality_reason}). ${steadyStateNote}`

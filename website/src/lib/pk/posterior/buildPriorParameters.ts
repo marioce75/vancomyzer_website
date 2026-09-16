@@ -36,20 +36,27 @@
  * Note: STDY10 (haematological malignancy ×1.294) and STDY13 (heel prick) 
  * covariates are not included here as they are not clinically relevant 
  * for standard adult TDM dosing contexts.
+ *
+ * Colin 2019 is used for EVERY adult, at every body size. The former custom
+ * BMI ≥ 40 obesity branch was retired from dosing on 2026-09-15 (see
+ * modelRegistry.ts, VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED, for the reasons).
+ * Parameter values come from the model registry so the equations shown to
+ * clinicians and the numbers used here cannot drift apart.
  */
 
 import type { NormalizedPatient, NormalizedRegimen } from "../types";
+import { COLIN_2019, COLIN_2019_PARAMETERS, type PkModelId } from "../modelRegistry";
 
-// ── Table 3 parameter estimates ──────────────────────────────────────────────
-const THETA_CL   = 5.31;   // maximum CL (L/h per 70 kg)
-const THETA_V1   = 42.9;   // central volume (L per 70 kg)
-const THETA_V2   = 41.7;   // peripheral volume (L per 70 kg)
-const THETA_Q    = 3.22;   // intercompartmental clearance (L/h per 70 kg)
-const PMA50_WK   = 46.4;   // PMA at 50% maturation (weeks)
-const GAMMA1     = 2.89;   // maturation Hill exponent
-const AGE50_YR   = 61.6;   // age at 50% decline (years)
-const GAMMA2     = 2.24;   // decline Hill exponent
-const THETA_SCR  = 0.649;  // SCr effect on CL (mg/dL scale)
+// ── Table 3 parameter estimates (from the model registry) ────────────────────
+const THETA_CL   = COLIN_2019_PARAMETERS.thetaCL;            // maximum CL (L/h per 70 kg)
+const THETA_V1   = COLIN_2019_PARAMETERS.thetaV1;            // central volume (L per 70 kg)
+const THETA_V2   = COLIN_2019_PARAMETERS.thetaV2;            // peripheral volume (L per 70 kg)
+const THETA_Q    = COLIN_2019_PARAMETERS.thetaQ;             // intercompartmental clearance (L/h per 70 kg)
+const PMA50_WK   = COLIN_2019_PARAMETERS.pma50Weeks;         // PMA at 50% maturation (weeks)
+const GAMMA1     = COLIN_2019_PARAMETERS.hillMaturation;     // maturation Hill exponent
+const AGE50_YR   = COLIN_2019_PARAMETERS.age50DeclineYears;  // PMA (years) at 50% decline
+const GAMMA2     = COLIN_2019_PARAMETERS.hillDecline;        // decline Hill exponent
+const THETA_SCR  = COLIN_2019_PARAMETERS.thetaSCr;           // SCr effect on CL (per mg/dL)
 
 // Numeric floors
 const MIN_WT_KG  = 30;
@@ -57,15 +64,15 @@ const MIN_SCR    = 0.4;    // prevents division issues; floored SCr
 
 export const ADULT_VANCOMYCIN_PRIOR_MODEL = {
   id: "colin-2019-two-compartment",
-  label: "Colin 2019 — two-compartment adult population PK prior",
-  structuralModel: "Two-compartment intermittent IV infusion",
+  label: `${COLIN_2019.shortName} — two-compartment adult population PK prior`,
+  structuralModel: COLIN_2019.structure,
   covariates: "Weight (allometric 0.75), PMA-based maturation + age-decline sigmoid, SCr (direct, mg/dL)",
   clearance: {
-    equation: "CL = 5.31 × (WT/70)^0.75 × FMat × FDecline × exp(-0.649×(SCr−SCRstd))",
-    age_decline: "FDecline = 1/(1+(PMA_yr/61.6)^2.24) — 50% CL reduction at age 61.6 years",
-    scr_note: "SCr used directly (mg/dL) as published covariate. Cockcroft-Gault NOT used.",
-    reference_patient: "35yr, 70kg, SCr 0.83 mg/dL → CL 4.10 L/h ✓",
-    source: "Colin PJ et al. Clin Pharmacokinet. 2019;58(6):767–780. Eqs 6–13, Table 3.",
+    equation: COLIN_2019.equations.CL,
+    age_decline: COLIN_2019.equations.FDecline,
+    scr_note: COLIN_2019.renalCovariate,
+    reference_patient: `${COLIN_2019.referenceCheck.input} → CL ${COLIN_2019.referenceCheck.expectedCL_L_h.toFixed(2)} L/h`,
+    source: `${COLIN_2019.citation} Eqs 6–13, Table 3.`,
   },
 } as const;
 
@@ -75,9 +82,10 @@ export interface PriorParameters {
   Q:  number;
   V2: number;
   scr: number;
-  model_name: "colin_2019" | "vancomyzer_obesity";
-  ffm_kg?: number;       // Fat-Free Mass — only set when obesity model is active
-  omega_CL?: number;     // IIV overrides for Bayesian MAP (obesity model uses Smit 2020 values)
+  /** Always "colin_2019" for new calculations; the union keeps historical ids typed. */
+  model_name: PkModelId;
+  ffm_kg?: number;       // Fat-Free Mass — not set: no dosing path scales volumes to FFM
+  omega_CL?: number;     // Optional IIV overrides for the MAP fit (none are currently set)
   omega_V1?: number;
   omega_Q?: number;
   omega_V2?: number;
@@ -116,32 +124,10 @@ export function buildPriorParameters(
   const age = Math.max(18, patient.age);
 
   // ---------------------------------------------------------------------------
-  // Obesity Model Branch — activates when BMI ≥ 40 AND height/sex are provided
-  // Uses FFM-based Vd (Smit 2020 + Zhang 2023) instead of TBW-based Colin 2019
-  // ---------------------------------------------------------------------------
-  if (patient.height_cm > 0 && (patient.sex === "male" || patient.sex === "female")) {
-    const { calculateBMI, selectPKModel, buildObesityPriors, calculateFFM, OBESITY_OMEGA } = require("../obesityModel");
-    const bmi = calculateBMI(wt, patient.height_cm);
-    if (bmi >= 40) {
-      const model = selectPKModel(bmi);
-      if (model === "vancomyzer_obesity") {
-        const priors = buildObesityPriors(age, wt, patient.height_cm, scr, patient.sex);
-        const ffm = calculateFFM(wt, patient.height_cm, patient.sex);
-        return {
-          CL: priors.CL, V1: priors.V1, Q: priors.Q, V2: priors.V2, scr,
-          model_name: "vancomyzer_obesity" as const,
-          ffm_kg: ffm,
-          omega_CL: OBESITY_OMEGA.CL,
-          omega_V1: OBESITY_OMEGA.V1,
-          omega_Q: OBESITY_OMEGA.Q,
-          omega_V2: OBESITY_OMEGA.V2,
-        };
-      }
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Colin 2019 Model — default for non-obese patients (unchanged)
+  // Colin 2019 — the only dosing model, for every adult at every body size.
+  // There is deliberately no BMI-based model switch (the retired custom obesity
+  // branch produced a step change at BMI 40). BMI ≥ 40 gets an advisory
+  // (modelRegistry.highBmiAdvisory), never a different model.
   // ---------------------------------------------------------------------------
 
   // Adults: PMA = age_years + 40 weeks gestation (standard assumption)

@@ -1,4 +1,5 @@
 import type { ExplanationInput } from "../types";
+import { modelShortName, renalCovariateDescription } from "../modelRegistry";
 
 export function buildAssumptions(input: ExplanationInput): string[] {
   const usedRefinement = input.engineOutput.used_posterior_refinement === true;
@@ -11,16 +12,11 @@ export function buildAssumptions(input: ExplanationInput): string[] {
   const dosesGiven = input.engineOutput.doses_given;
   const isNonSteadyState = dosesGiven !== undefined && dosesGiven < 5;
   // Which prior actually ran. Stating the wrong one here is a factual error in
-  // text the clinician may paste into the record, so both branches are explicit.
-  const isObesityModel = input.engineOutput.model_name === "vancomyzer_obesity";
+  // text the clinician may paste into the record, so the wording comes from the
+  // model registry for whichever model id the engine reports.
+  const renalCovariateAssumption = renalCovariateDescription(input.engineOutput.model_name);
 
-  const renalCovariateAssumption = isObesityModel
-    ? "Vancomycin clearance is estimated from Cockcroft-Gault creatinine clearance (calculated on total body weight) plus a total-body-weight term, then multiplied by an age-decline factor: CL = (0.0571 × CrCl + 0.0158 × TBW) × FDecline(age)."
-    : "Serum creatinine (SCr) is used directly as the renal covariate in the Colin 2019 model — Cockcroft-Gault CrCl estimation is NOT used. The SCr effect on clearance is FSCR = exp(−0.649 × (SCr − SCRstd)), where SCRstd is the age-standardised reference creatinine.";
-
-  const priorModelAssumption = isObesityModel
-    ? "Two-compartment adult prior model explicit in code: Vancomyzer Obesity Model (volumes scale to fat-free mass), used because BMI ≥ 40 with height and sex provided."
-    : "Two-compartment adult prior model explicit in code: Colin 2019 population prior.";
+  const priorModelAssumption = `Two-compartment adult prior model explicit in code: ${modelShortName(input.engineOutput.model_name)} population prior.`;
 
   return [
     renalCovariateAssumption,

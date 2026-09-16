@@ -11,6 +11,7 @@ import { buildLimitations } from "./explain/buildLimitations";
 import { buildDocumentationPreview } from "./explain/buildDocumentationPreview";
 import { buildCalculateResponse } from "./response/buildCalculateResponse";
 import type { NormalizedPatient, ExplanationInput } from "./types";
+import { highBmiAdvisory } from "./modelRegistry";
 
 export interface ExistingRegimenPipelineInput {
   patient: {
@@ -91,6 +92,9 @@ export function runExistingRegimenPipeline(
     limitations: buildLimitations(explanationInput),
     documentation_preview: buildDocumentationPreview(explanationInput),
   };
+  // High body size gets an advisory, never a different model (modelRegistry.ts).
+  const bmiAdvisory = highBmiAdvisory(patient);
+  if (bmiAdvisory) explain.limitations.unshift(bmiAdvisory);
 
   const response = buildCalculateResponse(
     "existing_regimen",

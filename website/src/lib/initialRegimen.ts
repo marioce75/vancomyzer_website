@@ -9,6 +9,7 @@ import { simulateCandidateExposure } from "./pk/recommend/simulateCandidateExpos
 import { computeSafeInfusionDurationHours } from "./pk/recommend/infusionSafety";
 import { curvePoints } from "./pk/steadyStateTwoCompartment";
 import { buildInitialRegimenReviewStatus } from "./pk/response/buildReviewStatus";
+import { highBmiAdvisory, modelShortName, renalCovariateDescription } from "./pk/modelRegistry";
 import type { CalculationDetails, FrequencyOption } from "@/types/calculator";
 
 interface Patient {
@@ -218,7 +219,6 @@ function buildOptionInterpretation(
     `Initial regimen option: ${opt.dose_mg} mg every ${opt.interval_hours} hours infused over ${infDurationHours} hours. ` +
     `Prior-based first-pass estimate: AUC24 ${opt.auc24} mg\u00b7h/L; peak ${opt.peak} mcg/mL; trough ${opt.trough} mcg/mL. ` +
     `SCr ${ctx.scr} mg/dL (${ctx.modelLabel} renal covariate).` +
-    (ctx.ffm_kg ? ` FFM ${ctx.ffm_kg.toFixed(1)} kg (Janmahasatian 2005) \u2014 V1 and V2 scaled to FFM.` : "") +
     ctx.arcNote + belowNote +
     ` If immediate severe-infection coverage is clinically necessary under local practice, a clinician may optionally consider an empiric loading-dose estimate around ${ctx.loadingDoseMg} mg (${ctx.loadingDoseBasis}) before maintenance dosing. ` +
     `No measured levels; re-evaluate after levels are available. Intended to support review, not replace clinician judgment.`
@@ -360,9 +360,7 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
     };
   }
 
-  const modelLabel = prior.model_name === "vancomyzer_obesity"
-    ? "Vancomyzer Obesity Model (Smit 2020 + Zhang 2023)"
-    : "Colin 2019";
+  const modelLabel = modelShortName(prior.model_name);
 
   const arcNote = arc_advisory
     ? ` WARNING: Augmented renal clearance detected (CrCl ${arc_advisory.crcl_ml_min} mL/min). Target AUC may not be achievable with standard intermittent dosing — consider continuous infusion.`
@@ -386,16 +384,16 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
     `Initial regimen suggestion: ${recommended_dose} every ${choice.interval_hours} hours infused over ${safeInfusion.infusion_duration_hours} hours. ` +
     `Prior-based first-pass estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
     `SCr ${prior.scr} mg/dL (${modelLabel} renal covariate).` +
-    (prior.ffm_kg ? ` FFM ${prior.ffm_kg.toFixed(1)} kg (Janmahasatian 2005) \u2014 V1 and V2 scaled to FFM.` : "") +
     arcNote + belowTargetNote +
     ` If immediate severe-infection coverage is clinically necessary under local practice, a clinician may optionally consider an empiric loading-dose estimate around ${loadingDose.suggested_dose_mg} mg (${loadingDose.basis}) before maintenance dosing. ` +
     `${safeInfusion.safety_note ? `${safeInfusion.safety_note} ` : ""}` +
     `No measured levels; re-evaluate after levels are available. Intended to support review, not replace clinician judgment.`;
 
+  // High body size gets an advisory, never a different model (modelRegistry.ts).
+  const bmiAdvisory = highBmiAdvisory(patient);
+
   const assumptions = [
-    prior.model_name === "vancomyzer_obesity"
-      ? "Obesity model (Smit 2020 + Zhang 2023): V1 and V2 scaled to FFM (Janmahasatian 2005). CL uses TBW-based CrCl (Cockcroft-Gault)."
-      : "Serum creatinine (SCr) is used directly as the renal covariate in the Colin 2019 model \u2014 Cockcroft-Gault CrCl estimation is NOT used. CL scales with (0.83/SCr)^0.80 per the Colin 2019 published equations.",
+    renalCovariateDescription(prior.model_name),
     `Adult prior model explicit in code: ${modelLabel} two-compartment population prior.`,
     "Initial regimen chosen from practical dose/interval candidates using the shared two-compartment steady-state PK model.",
     "AUC24 = (dose \u00d7 24/\u03c4) / CL at steady state \u2014 standard linear PK relationship.",
@@ -405,6 +403,7 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
   ];
 
   const limitations = [
+    ...(bmiAdvisory ? [bmiAdvisory] : []),
     "First-pass adult prior estimate only; no measured levels are available to individualize PK.",
     "Outputs are model-based prior predictions and should not be interpreted as patient-specific certainty.",
     ...(auc_range_status === "below_target"
@@ -444,6 +443,7 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
       ? ["AUC24 is BELOW the target range of 400\u2013600 mg\u00b7h/L \u2014 clinical review required."]
       : []),
     ...(arc_advisory ? ["Augmented renal clearance detected \u2014 standard intermittent dosing may be inadequate."] : []),
+    ...(bmiAdvisory ? ["High body size: evidence for the Colin 2019 model at BMI 40 or more is limited \u2014 obtain early levels."] : []),
     "Review assumptions, scope exclusions, and local protocol before acting.",
   ];
 
@@ -517,9 +517,7 @@ function buildEmpiricRefusalResult(args: {
   loadingDose: { suggested_dose_mg: number; basis: string };
 }): InitialRegimenResult {
   const { patient, prior, loadingDose } = args;
-  const modelLabel = prior.model_name === "vancomyzer_obesity"
-    ? "Vancomyzer Obesity Model (Smit 2020 + Zhang 2023)"
-    : "Colin 2019";
+  const modelLabel = modelShortName(prior.model_name);
   const crcl = estimateCrCl(patient.age, patient.weight_kg, patient.serum_creatinine_mg_dl, patient.sex || "male");
   const pulseMg = loadingDose.suggested_dose_mg;
 

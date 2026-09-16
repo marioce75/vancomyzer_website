@@ -8,6 +8,7 @@ import { hasFeature } from "@/lib/tiers";
 import { validateCaseId } from "@/lib/calculationHistory";
 import { authOptions } from "@/lib/authOptions";
 import { checkRateLimit, getCalculateRateLimitConfig, getClientIp } from "@/lib/rateLimit";
+import { computeBmi, HIGH_BMI_THRESHOLD_KG_M2 } from "@/lib/pk/modelRegistry";
 
 type Mode = "initial_regimen" | "existing_regimen";
 
@@ -40,7 +41,8 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
     const p = o.patient as Record<string, unknown>;
     if (typeof p.age !== "number" || Number.isNaN(p.age) || p.age < 18 || p.age > 120) field_errors["patient.age"] = "Adult calculator requires age 18-120.";
     if (typeof p.weight_kg !== "number" || Number.isNaN(p.weight_kg) || p.weight_kg < 30 || p.weight_kg > 400) field_errors["patient.weight_kg"] = "Weight must be 30-400 kg.";
-    // height_cm and sex are optional — needed for obesity model (BMI ≥ 40)
+    // height_cm and sex are optional — used only for the high-BMI advisory and the
+    // informational CrCl comparison; they never switch the PK model.
     if (p.height_cm !== undefined && p.height_cm !== 0 && (typeof p.height_cm !== "number" || p.height_cm < 100 || p.height_cm > 250)) field_errors["patient.height_cm"] = "Height must be 100-250 cm.";
     if (p.sex !== undefined && p.sex !== "" && p.sex !== "male" && p.sex !== "female") field_errors["patient.sex"] = "Sex must be 'male' or 'female'.";
     if (typeof p.serum_creatinine_mg_dl !== "number" || Number.isNaN(p.serum_creatinine_mg_dl) || p.serum_creatinine_mg_dl < 0.1 || p.serum_creatinine_mg_dl > 10) field_errors["patient.serum_creatinine_mg_dl"] = "Scr must be 0.1-10 mg/dL. For SCr >10, consult nephrology — PK model reliability is limited.";
@@ -256,7 +258,7 @@ export async function POST(request: NextRequest) {
     // (Pro+, no patient identifiers, includes optional case_id).
     // Auto-recalc never persists; only explicit user action does.
     if (intent === "explicit") {
-      persistCalculation(userEmail, "empiric", result, caseId);
+      persistCalculation(userEmail, "empiric", result, caseId, patient);
     }
 
     return NextResponse.json(result);
@@ -337,7 +339,7 @@ export async function POST(request: NextRequest) {
   // Calculation history — gated on history.calculation feature.
   // Auto-recalc never persists; only explicit user action does.
   if (intent === "explicit") {
-    persistCalculation(userEmail, "existing", resultObj, caseId);
+    persistCalculation(userEmail, "existing", resultObj, caseId, validated.data.patient as Record<string, unknown>);
   }
 
   return NextResponse.json(result);
@@ -358,6 +360,7 @@ function persistCalculation(
   workflowType: string,
   result: Record<string, unknown>,
   caseId: string | null,
+  patientInput?: { weight_kg?: unknown; height_cm?: unknown },
 ) {
   try {
     if (userEmail === "anonymous") return;
@@ -375,7 +378,8 @@ function persistCalculation(
       workflow_type: workflowType,
       pk_model: (pk?.pk_model_name as string) ?? "colin_2019",
       obesity_model_active: pk?.pk_model_name === "vancomyzer_obesity" ? 1 : 0,
-      bmi_above_40: pk?.pk_model_name === "vancomyzer_obesity" ? 1 : 0,
+      // From measured BMI — the retired obesity model id no longer tracks body size.
+      bmi_above_40: (computeBmi(Number(patientInput?.weight_kg), Number(patientInput?.height_cm)) ?? 0) >= HIGH_BMI_THRESHOLD_KG_M2 ? 1 : 0,
       dose_mg: Number.isFinite(dose) ? dose : null,
       interval_hours: (result.recommended_interval_hours as number) ?? null,
       auc24: typeof auc24 === "number" ? auc24 : null,

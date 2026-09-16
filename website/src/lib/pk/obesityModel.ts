@@ -1,25 +1,26 @@
 /**
- * Vancomyzer Obesity Model — FFM-Based PK for BMI ≥ 40 kg/m²
+ * Body-size utilities — BMI, fat-free mass and Cockcroft-Gault variants.
  *
- * This module provides:
- * 1. BMI calculation
- * 2. Fat-Free Mass (FFM) calculation (Janmahasatian 2005)
- * 3. Obesity-specific population PK parameters (derived from Smit 2020 + Zhang 2023)
- * 4. Model selection logic
+ * INFORMATIONAL ONLY. Nothing in this file feeds a dosing calculation.
+ * Vancomyzer doses every adult with the Colin 2019 model (see
+ * pk/modelRegistry.ts). The custom BMI ≥ 40 "obesity model" that used these
+ * helpers to build clearance and FFM-scaled volumes was retired from dosing on
+ * 2026-09-15; its equations and the reasons for retirement are recorded in
+ * modelRegistry.ts (VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED).
+ *
+ * Remaining uses: the obesity advisory panel (CrCl on TBW / AdjBW / FFM for
+ * clinician context), research-mode enrichment, and research SCr records.
  *
  * References:
  * - Janmahasatian S et al. Clin Pharmacokinet. 2005;44(10):1051-65. DOI: 10.2165/00003088-200544100-00004
- * - Smit C et al. Br J Clin Pharmacol. 2020;86(2):303-317. DOI: 10.1111/bcp.14144
- * - Zhang T et al. Clin Pharmacokinet. 2024;63:79-91. DOI: 10.1007/s40262-023-01324-5
- *
- * IMPORTANT: This model does NOT replace Colin 2019 for non-obese patients.
- * It activates ONLY when BMI ≥ 40 kg/m².
+ * - Cockcroft DW, Gault MH. Nephron. 1976;16(1):31-41.
  */
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
+/** BMI at which the advisory panel is shown. Not a model switch. */
 export const BMI_OBESITY_THRESHOLD = 40;
 
 // ---------------------------------------------------------------------------
@@ -58,7 +59,7 @@ export function calculateFFM(weight_kg: number, height_cm: number, sex: "male" |
 }
 
 // ---------------------------------------------------------------------------
-// Cockcroft-Gault CrCl (using TBW — standard for obesity dosing)
+// Cockcroft-Gault CrCl on total body weight (informational / research only)
 // ---------------------------------------------------------------------------
 
 export function calculateCrCl(
@@ -72,94 +73,14 @@ export function calculateCrCl(
   return sex === "female" ? base * 0.85 : base;
 }
 
-// ---------------------------------------------------------------------------
-// Obesity Model PK Parameters
-// ---------------------------------------------------------------------------
-
-export interface ObesityPKPriors {
-  CL: number;
-  V1: number;
-  Q: number;
-  V2: number;
-  /** Age-decline factor applied to CL. 1.0 for very young adults; approaches
-   *  zero as age increases past ~80. Exposed so the UI can show the
-   *  pre/post-decline CL values for clinical transparency. */
-  fdecline_factor: number;
-  /** CL before FDecline was applied — useful for the multi-method comparison
-   *  display when the clinician wants to see the underlying Smit/Zhang
-   *  formula output. */
-  CL_before_fdecline: number;
-}
-
-/**
- * Colin 2019's age-decline function — applied here to bridge the obesity-model
- * literature gap. Smit 2020 and Zhang 2024 derived their CL formula on cohorts
- * that under-represented geriatric obese patients, so applying their formula
- * without an age-decline factor over-predicts CL in elderly obese patients.
- * FDecline is a separate physiological covariate independent of body habitus
- * (geriatric renal decline beyond what SCr alone captures, especially in
- * sarcopenic obesity) and can be safely composed with the Smit/Zhang CL
- * scaling. Sigmoid form approaches 1.0 for younger adults and ~0.4 at age 70.
- *
- *   FDecline = 1 / (1 + (age / 61.6)^2.24)
- *
- * Source: Colin PJ et al. Clin Pharmacokinet. 2019;58(6):767-780. Eq 12.
- */
-function obesityFDecline(age: number): number {
-  if (age <= 0) return 1.0;
-  return 1 / (1 + Math.pow(age / 61.6, 2.24));
-}
-
-/**
- * Calculate population PK priors for the Vancomyzer Obesity Model.
- *
- * CL = (0.0571 × CrCl + 0.0158 × TBW) × FDecline(age)
- *      [Smit/Zhang body-scaling × Colin 2019 age-decline]
- * V1 = 0.287 × FFM                       [FFM — adipose excluded]
- * Q  = 1.23 L/h                           [fixed intercompartmental clearance]
- * V2 = 0.89 × FFM                        [FFM — adipose excluded]
- *
- * Derived from:
- * - Smit C et al. Br J Clin Pharmacol. 2020;86(2):303-317. DOI: 10.1111/bcp.14144
- * - Zhang T et al. Clin Pharmacokinet. 2024;63:79-91. DOI: 10.1007/s40262-023-01324-5
- * - Colin PJ et al. Clin Pharmacokinet. 2019;58(6):767-780. DOI: 10.1007/s40262-018-0727-5
- *   (age-decline composition)
- */
-export function buildObesityPriors(
-  age: number,
-  weight_kg: number,
-  height_cm: number,
-  scr_mg_dl: number,
-  sex: "male" | "female"
-): ObesityPKPriors {
-  const ffm = calculateFFM(weight_kg, height_cm, sex);
-  const crcl = calculateCrCl(age, weight_kg, scr_mg_dl, sex);
-
-  const baseCL = 0.0571 * crcl + 0.0158 * weight_kg;
-  const fdecline = obesityFDecline(age);
-  const CL = Math.max(0.5, baseCL * fdecline);
-  const V1 = Math.max(5, 0.287 * ffm);
-  const Q  = 1.23;
-  const V2 = Math.max(5, 0.89 * ffm);
-
-  return {
-    CL,
-    V1,
-    Q,
-    V2,
-    fdecline_factor: fdecline,
-    CL_before_fdecline: Math.max(0.5, baseCL),
-  };
-}
-
 /**
  * Multi-method CrCl comparison for the obesity advisory panel.
  *
  * In obese geriatric patients the three Cockcroft-Gault variants can disagree
- * by 2-3× (e.g., 70F 127kg SCr 1.65: CG-TBW=64, CG-AdjBW=43, CG-FFM=29). Our
- * obesity-model CL uses CG-TBW (Smit/Zhang convention) but clinicians need to
- * see all three to judge whether the post-FDecline CL is appropriate or
- * whether a manual override is warranted.
+ * by 2-3× (e.g., 70F 127kg SCr 1.65: CG-TBW=64, CG-AdjBW=43, CG-FFM=29).
+ * Shown so clinicians can see how uncertain body-size-based renal estimates
+ * are. None of these values enters the Colin 2019 calculation, which uses
+ * serum creatinine directly.
  *
  * AdjBW = IBW + 0.4 × (TBW − IBW) — standard obese-adjustment used in clinical
  * practice. IBW (Devine 1974, lb→kg): 50 kg (M) or 45.5 kg (F) baseline + 2.3 kg
@@ -202,53 +123,3 @@ export function buildCrClBreakdown(
     ffm_kg: ffm,
   };
 }
-
-// ---------------------------------------------------------------------------
-// IIV (Inter-Individual Variability) — omega values for Bayesian priors
-// Used as prior log-SDs in the MAP estimation
-// ---------------------------------------------------------------------------
-
-export const OBESITY_OMEGA = {
-  CL: 0.29,  // 29% IIV on CL (Smit 2020 Table 2)
-  V1: 0.32,  // 32% IIV on V1
-  Q:  0.50,  // Fixed — same as Colin 2019 (not estimated in Smit 2020)
-  V2: 0.28,  // 28% IIV on V2
-};
-
-// ---------------------------------------------------------------------------
-// Model Selection
-// ---------------------------------------------------------------------------
-
-export type PKModelName = "colin_2019" | "vancomyzer_obesity";
-
-export function selectPKModel(bmi: number): PKModelName {
-  if (bmi >= BMI_OBESITY_THRESHOLD) {
-    return "vancomyzer_obesity";
-  }
-  return "colin_2019";
-}
-
-// ---------------------------------------------------------------------------
-// Model Metadata (for display)
-// ---------------------------------------------------------------------------
-
-export const OBESITY_MODEL_META = {
-  name: "Vancomyzer Obesity Model",
-  label: "Vancomyzer Obesity Model — derived from Smit 2020 + Zhang 2023",
-  shortLabel: "Obesity Model (BMI ≥ 40)",
-  population: "Adults with BMI ≥ 40 kg/m²",
-  references: [
-    {
-      citation: "Smit C et al. Br J Clin Pharmacol. 2020;86(2):303-317.",
-      doi: "10.1111/bcp.14144",
-    },
-    {
-      citation: "Zhang T et al. Clin Pharmacokinet. 2024;63:79-91.",
-      doi: "10.1007/s40262-023-01324-5",
-    },
-    {
-      citation: "Janmahasatian S et al. Clin Pharmacokinet. 2005;44(10):1051-65. [FFM equations]",
-      doi: "10.2165/00003088-200544100-00004",
-    },
-  ],
-};

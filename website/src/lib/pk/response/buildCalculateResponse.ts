@@ -1,5 +1,6 @@
 import type { ExistingRegimenEngineOutput, AdjustmentRecommendation, ExplanationInput, NormalizedPatient } from "../types";
 import { buildExistingRegimenReviewStatus } from "./buildReviewStatus";
+import { modelShortName } from "../modelRegistry";
 import { buildDocumentationPreview } from "../explain/buildDocumentationPreview";
 import { buildInterpretationSummary } from "../explain/buildInterpretationSummary";
 import { curvePoints, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
@@ -133,7 +134,7 @@ export function buildCalculateResponse(
             : "Multi-level workflow fit with explicit chronology; review still depends on coherent same-interval timing.",
       review_status,
       key_inputs: [
-        `SCr ${engineOutput.scr} mg/dL (${engineOutput.model_name === "vancomyzer_obesity" ? "Obesity Model" : "Colin 2019"} renal covariate)`,
+        `SCr ${engineOutput.scr} mg/dL (${modelShortName(engineOutput.model_name)} renal covariate)`,
         `${engineOutput.level_count} measured level${engineOutput.level_count === 1 ? "" : "s"}`,
         `Current regimen ${engineOutput.current_regimen_dose_mg} mg q${engineOutput.current_regimen_interval_hours}h`,
       ],

@@ -1,4 +1,5 @@
 import type { ExplanationInput } from "../types";
+import { COLIN_2019, modelShortName } from "../modelRegistry";
 
 function buildRecommendationDelta(input: ExplanationInput): string {
   const { engineOutput, recommendation } = input;
@@ -66,7 +67,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
     changeSummary,
     ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
     ...(recommendation.infusion_duration_adjusted_for_safety && recommendation.infusion_safety_note ? [recommendation.infusion_safety_note] : []),
-    `SCr: ${scr} mg/dL (Colin 2019 renal covariate). Fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Assumptions and limitations apply.`,
+    `SCr: ${scr} mg/dL (${modelShortName(engineOutput.model_name)} renal covariate). Fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Assumptions and limitations apply.`,
   ].join("\n");
 
   const clinical_note = [
@@ -76,9 +77,9 @@ export function buildDocumentationPreview(input: ExplanationInput): {
     changeSummary,
     ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
     // Must name the prior that actually ran — this line goes into the chart.
-    engineOutput.model_name === "vancomyzer_obesity"
-      ? `SCr: ${scr} mg/dL (used via Cockcroft-Gault CrCl on total body weight). Explicit adult prior model: Vancomyzer Obesity Model, two-compartment, volumes scaled to fat-free mass (BMI ≥ 40); ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`
-      : `SCr: ${scr} mg/dL (direct Colin 2019 covariate — no Cockcroft-Gault). Explicit adult prior model: Colin 2019 two-compartment; ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`,
+    engineOutput.model_name === COLIN_2019.id
+      ? `SCr: ${scr} mg/dL (direct ${COLIN_2019.shortName} covariate — no Cockcroft-Gault). Explicit adult prior model: ${COLIN_2019.shortName} two-compartment; ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`
+      : `SCr: ${scr} mg/dL. Explicit adult prior model: ${modelShortName(engineOutput.model_name)}; ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`,
     `Posterior fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"} (${posterior_fit?.fit_quality_reason ?? "no measured levels available"}). Uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Sparse levels do not justify overconfident patient-specific precision.`,
   ].join("\n");
 
