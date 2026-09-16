@@ -1,6 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import {
+  COLIN_2019,
+  COLIN_2021_OBESE_EVALUATION,
+  HIGH_BMI_THRESHOLD_KG_M2,
+  PUBLISHED_OBESITY_COMPARATORS,
+  VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED,
+} from "@/lib/pk/modelRegistry";
 
 /* ── FAQ Data ──────────────────────────────────────────────────── */
 
@@ -15,158 +22,239 @@ interface FaqItem {
   refs: FaqRef[];
 }
 
+/* ── Model registry helpers ─────────────────────────────────────
+ * Model names, citations, equations and model status are read from
+ * src/lib/pk/modelRegistry.ts so this page cannot drift from the engine. */
+
+const COLIN = COLIN_2019;
+const RETIRED = VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED;
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** "2026-09-15" → "15 Sep 2026" */
+function formatIsoDate(iso: string): string {
+  const [year, month, day] = iso.split("-").map(Number);
+  return `${day} ${MONTHS[month - 1]} ${year}`;
+}
+
+function comparator(id: (typeof PUBLISHED_OBESITY_COMPARATORS)[number]["id"]) {
+  const model = PUBLISHED_OBESITY_COMPARATORS.find((m) => m.id === id);
+  if (!model) throw new Error(`Model registry has no published comparator "${id}"`);
+  return model;
+}
+
+function pubmedUrl(citation: string): string {
+  const pmid = citation.match(/PMID:\s*(\d+)/)?.[1];
+  return pmid
+    ? `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`
+    : `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(citation)}`;
+}
+
+const doiUrl = (doi: string) => `https://doi.org/${doi}`;
+const bullets = (items: readonly string[]) => items.map((item) => `• ${item}`).join("\n");
+
+const RETIRED_ON = formatIsoDate(RETIRED.retiredOn);
+const BMI_40 = `BMI ≥ ${HIGH_BMI_THRESHOLD_KG_M2} kg/m²`;
+const SMIT = comparator("smit_2020");
+const ZHANG = comparator("zhang_2024");
+const COMPARATOR_NAMES = PUBLISHED_OBESITY_COMPARATORS.map((m) => m.shortName).join(" and ");
+const COLIN_2021_NOTE = `Colin 2021: ${COLIN_2021_OBESE_EVALUATION.summary}`;
+const VALIDATION_STATUS =
+  "Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned.";
+
+/* ── References ────────────────────────────────────────────────── */
+
+const REF_COLIN_2019: FaqRef = { label: COLIN.citation, url: doiUrl(COLIN.doi) };
+const REF_COLIN_2021: FaqRef = {
+  label: COLIN_2021_OBESE_EVALUATION.citation,
+  url: pubmedUrl(COLIN_2021_OBESE_EVALUATION.citation),
+};
+const REF_OBESITY_COMPARATORS: FaqRef[] = PUBLISHED_OBESITY_COMPARATORS.map((m) => ({
+  label: `${m.citation} [${m.status}]`,
+  url: doiUrl(m.doi),
+}));
+const REF_COCKCROFT_GAULT: FaqRef = {
+  label: "Cockcroft DW, Gault MH. Prediction of creatinine clearance from serum creatinine. Nephron. 1976;16(1):31-41.",
+  url: "https://pubmed.ncbi.nlm.nih.gov/1244564/",
+};
+const REF_NKF_CG: FaqRef = {
+  label: "National Kidney Foundation. Cockcroft-Gault formula.",
+  url: "https://www.kidney.org/professionals/gfr_calculatorCoc",
+};
+const REF_RYBAK_2020: FaqRef = {
+  label: "Rybak MJ, et al. Therapeutic monitoring of vancomycin for serious MRSA infections: a revised consensus guideline (ASHP/IDSA/PIDS/SIDP). Am J Health Syst Pharm. 2020;77(11):835-864.",
+  url: "https://pubmed.ncbi.nlm.nih.gov/32191793/",
+};
+const REF_JANMAHASATIAN_2005: FaqRef = {
+  label: "Janmahasatian S, et al. Quantification of lean bodyweight. Clin Pharmacokinet. 2005;44(10):1051-1065.",
+  url: "https://doi.org/10.2165/00003088-200544100-00004",
+};
+const REF_BUKHARI_2024: FaqRef = {
+  label: "Bukhari R, et al. Comparing actual and rounded serum creatinine concentration for assessing the accuracy of vancomycin dosing in elderly patients. Healthcare (Basel). 2024;12(11):1144.",
+  url: "https://doi.org/10.3390/healthcare12111144",
+};
+
 const FAQ_ITEMS: FaqItem[] = [
   {
-    question: "Where does Vancomyzer\u2019s pharmacokinetic data come from?",
+    question: "Where does Vancomyzer’s pharmacokinetic data come from?",
     answer: [
-      "Vancomyzer\u2019s default adult prior is the Colin 2019 two-compartment population PK model, which itself is a pooled analysis of 14 published vancomycin studies covering patients from neonates through the elderly. Covariates: postmenstrual age, weight, and serum creatinine. The full source-study table is in Table 1 of the paper (open-access, CC BY-NC).",
-      "For patients with BMI \u2265 40, Vancomyzer switches to an obesity model derived from Smit 2020 (morbid-obesity vancomycin PK) and Zhang 2024 (external validation), with Fat-Free Mass calculated from the Janmahasatian 2005 equations.",
-      "All four references are linked below \u2014 nothing in the calculator is built on undisclosed or proprietary data.",
+      `Vancomyzer uses one population pharmacokinetic model for every adult: the ${COLIN.displayName}. Its inputs are age, total body weight and serum creatinine.`,
+      `Source data: ${COLIN.sourcePopulation}`,
+      `Scope in Vancomyzer: ${COLIN.vancomyzerScope}`,
+      `There is no separate obesity model. A custom Vancomyzer obesity model used for ${BMI_40} was retired from dosing on ${RETIRED_ON}. ${COMPARATOR_NAMES} are published obesity models that were reviewed for comparison; neither is implemented.`,
+      "Equations, parameter values and Vancomyzer’s own settings (such as the Bayesian prior widths) are published on the Equations & derivations page.",
     ],
-    refs: [
-      { label: "Colin PJ et al. Vancomycin Pharmacokinetics Throughout Life \u2014 Pooled Population Analysis (14 studies). Clin Pharmacokinet. 2019;58(6):767-780.", url: "https://doi.org/10.1007/s40262-018-0727-5" },
-      { label: "Smit C et al. Vancomycin PK in morbid obesity. Br J Clin Pharmacol. 2020;86(2):303-317.", url: "https://doi.org/10.1111/bcp.14144" },
-      { label: "Zhang T et al. External validation of the obesity vancomycin model. Clin Pharmacokinet. 2024;63:79-91.", url: "https://doi.org/10.1007/s40262-023-01324-5" },
-      { label: "Janmahasatian S et al. Quantification of lean bodyweight (FFM equations). Clin Pharmacokinet. 2005;44(10):1051-1065.", url: "https://doi.org/10.2165/00003088-200544100-00004" },
-    ],
+    refs: [REF_COLIN_2019],
   },
   {
-    question: "Why doesn\u2019t the Colin 2019 model use Cockcroft-Gault?",
+    question: "Why doesn’t Vancomyzer use Cockcroft-Gault to estimate vancomycin clearance?",
     answer: [
-      "Cockcroft-Gault estimates kidney function from age, weight, sex, and serum creatinine \u2014 then feeds that estimate into a separate vancomycin equation. It introduces two layers of estimation before you even get a PK prediction. For non-obese patients (BMI < 40), Vancomyzer uses the Colin 2019 model, which takes serum creatinine directly as a covariate \u2014 no intermediate CrCl calculation required.",
-      "For patients with BMI \u2265 40, Vancomyzer activates a separate obesity model (Smit 2020 + Zhang 2023) that does use Cockcroft-Gault CrCl for clearance estimation. This is clinically appropriate because vancomycin clearance in obesity scales with total body weight via renal elimination, and CG with TBW is the established method in the obesity PK literature. The key difference: the obesity model uses CG intentionally for CL only, while volumes of distribution are scaled to Fat-Free Mass (FFM) \u2014 not total body weight.",
+      `Because ${COLIN.shortName} was built with serum creatinine itself as the renal covariate. SCr enters clearance directly:`,
+      { formula: COLIN.equations.FSCR },
+      "SCRstd is an age-standardised reference creatinine. Substituting a Cockcroft-Gault CrCl would mean running a different model from the one that was published and evaluated.",
+      "This is a property of the model, not evidence that one renal estimate is better for every patient. Cockcroft-Gault remains widely used for drug dosing, and all creatinine-based estimates share the same weakness when muscle mass is low (see “What about muscle mass?”).",
+      `The retired custom obesity model (${BMI_40}, until ${RETIRED_ON}) did use Cockcroft-Gault CrCl for clearance. That model is no longer used for dosing.`,
     ],
-    refs: [
-      {
-        label: "Cockcroft DW, Gault MH. Prediction of creatinine clearance from serum creatinine. Nephron. 1976;16(1):31-41.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/1244564/",
-      },
-      {
-        label: "Smit C et al. Vancomycin PK in morbid obesity. Br J Clin Pharmacol. 2020;86(2):303-317.",
-        url: "https://doi.org/10.1111/bcp.14144",
-      },
-    ],
+    refs: [REF_COLIN_2019, REF_COCKCROFT_GAULT],
   },
   {
-    question: "Why is Cockcroft-Gault considered outdated for vancomycin dosing?",
+    question: "What are the limitations of Cockcroft-Gault for vancomycin dosing?",
     answer: [
-      "It was developed in 1976 on 249 male patients to estimate creatinine clearance \u2014 not to predict vancomycin pharmacokinetics. It systematically underperforms in elderly patients, low muscle mass, obesity, and critical illness. The National Kidney Foundation no longer recommends it for clinical use because it was not expressed using standardized creatinine values \u2014 the assay used in its derivation was likely 10\u201320% higher than current methods, meaning CG-based calculations lead to higher drug dosing recommendations than originally intended.",
+      "Cockcroft-Gault was published in 1976 to estimate creatinine clearance in adult men (derivation data from 249 patients). It was not developed to predict vancomycin pharmacokinetics.",
+      "Like other creatinine-based estimates, it can mislead when muscle mass is low (older, sarcopenic or bedbound patients), when renal function is changing, and in critical illness. In obesity, the result depends heavily on which body weight is entered. It was also derived before creatinine assays were standardised (see the next question).",
+      "For assessing chronic kidney disease, KDIGO and the National Kidney Foundation favour eGFR equations such as CKD-EPI. That guidance is about CKD assessment: Cockcroft-Gault remains widely used for drug dosing.",
     ],
-    refs: [
-      {
-        label: "Rybak MJ et al. Therapeutic monitoring of vancomycin for serious MRSA infections. ASHP/IDSA/SIDP 2020 Revised Consensus Guidelines.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/32191793/",
-      },
-      {
-        label: "National Kidney Foundation \u2014 Cockcroft-Gault Formula.",
-        url: "https://www.kidney.org/professionals/gfr_calculatorCoc",
-      },
-    ],
+    refs: [REF_COCKCROFT_GAULT, REF_NKF_CG],
   },
   {
-    question: "How serum creatinine is measured matters \u2014 and it has changed",
+    question: "How serum creatinine is measured matters — and it has changed",
     answer: [
-      "Creatinine has been measured two ways in clinical labs:",
-      "The old way \u2014 Jaffe method (picric acid reaction, since 1886): A colorimetric reaction that measures creatinine but is non-specific. Glucose, bilirubin, acetoacetate, and certain drugs like cephalosporins all interfere and falsely elevate the result. At low creatinine concentrations \u2014 below 1.0 mg/dL \u2014 the Jaffe method reads approximately 7% higher than the enzymatic method, exceeding the acceptable bias threshold. This matters most in elderly, cachectic, and low-muscle-mass patients \u2014 exactly the populations most likely to receive vancomycin.",
-      "The current standard \u2014 Enzymatic method (IDMS-traceable): Modern labs use an enzymatic assay traceable to isotope dilution mass spectrometry (IDMS), the international gold standard. The enzymatic method is more specific \u2014 glucose, acetoacetate, and cephalosporins do not interfere \u2014 giving it better accuracy especially at lower creatinine concentrations.",
-      "Why this gap matters for dosing: Cockcroft-Gault was derived using Jaffe-measured creatinine. When you plug an enzymatic creatinine value into it \u2014 which is what modern labs report \u2014 you are using a number the equation was never calibrated for. Converting enzymatic SCr values back into Jaffe-equivalent values has been shown to significantly improve the performance of the Cockcroft-Gault equation for predicting vancomycin concentrations. That conversion step is rarely done at the bedside, creating a systematic mismatch baked silently into every Cockcroft-Gault-based vancomycin calculation in a modern hospital.",
+      "Clinical laboratories measure creatinine with two main methods:",
+      "Jaffe (alkaline picrate) method, first described in 1886: a colorimetric reaction that is less specific. Glucose, bilirubin, acetoacetate and some cephalosporins can interfere. In one single-analyser method comparison (Küme et al.; 230 serum samples), Jaffe results were higher than enzymatic results, especially at low creatinine concentrations.",
+      "Enzymatic method: more specific, with fewer interferences, and it performed better at low creatinine concentrations in that comparison. Many laboratories now use enzymatic assays calibrated to isotope dilution mass spectrometry (IDMS) reference methods.",
+      "How much the method matters varies. In an outpatient comparison (Schmidt 2015; 529 paired results), 5.5% of eGFR results fell on different sides of a clinical decision limit depending on the method, and the authors judged the risk from assay bias to be much smaller than the risk from biological variation.",
+      `Why it matters for dosing: Cockcroft-Gault was derived before creatinine measurement was standardised, and renal-function equations are not interchangeable. In a population PK study of 78 elderly patients (Glatard 2015), vancomycin models built on different renal-function equations gave different parameter and AUC estimates, and using an equation other than the one a model was built with could significantly alter predictive performance. Vancomyzer uses the ${COLIN.shortName} serum-creatinine covariate as published rather than substituting another renal estimate.`,
     ],
     refs: [
-      { label: "Jaffe assay vs enzymatic bias", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6816857/" },
-      { label: "Clinical risk of Jaffe vs enzymatic misclassification", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4657986/" },
-      { label: "Impact on vancomycin dosing", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4432143/" },
+      { label: "Küme T, et al. Evaluation and comparison of Abbott Jaffe and enzymatic creatinine methods: could the old method meet the new requirements? J Clin Lab Anal. 2018;32(1):e22168.", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6816857/" },
+      { label: "Schmidt RL, et al. A risk assessment of the Jaffe vs enzymatic method for creatinine measurement in an outpatient population. PLoS One. 2015;10(11):e0143205.", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4657986/" },
+      { label: "Glatard A, et al. Influence of renal function estimation on pharmacokinetic modeling of vancomycin in elderly patients. Antimicrob Agents Chemother. 2015;59(6):2986-2994.", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4432143/" },
     ],
   },
   {
     question: "What about muscle mass?",
     answer: [
-      "Serum creatinine is a byproduct of muscle metabolism \u2014 so it reflects muscle mass as much as kidney function. A frail 80-year-old with a creatinine of 0.8 mg/dL may have severely reduced kidney function masked by low muscle mass. Cockcroft-Gault partially adjusts for this using age and a sex factor, but it was not built for patients with sarcopenia, critical illness, or extreme body compositions.",
-      "Colin 2019 uses serum creatinine directly as a continuous covariate within a Bayesian framework \u2014 not to estimate CrCl, but to inform the model\u2019s prediction of individual PK parameters. Combined with age and weight, the model accounts for muscle mass effects implicitly through the posterior update when a measured vancomycin level is entered. A bedbound geriatric patient\u2019s low creatinine and low weight together shift the posterior estimate in a way Cockcroft-Gault cannot replicate.",
+      `Serum creatinine comes from muscle, so it reflects muscle mass as well as kidney function. In older, sarcopenic or bedbound patients, a low SCr can overstate renal function whichever equation is used: Cockcroft-Gault, CKD-EPI or the ${COLIN.shortName} SCr covariate. No creatinine-based equation corrects for this in an individual patient.`,
+      `${COLIN.shortName} includes age (through an age-standardised reference creatinine and an age-decline factor on clearance), but that describes the average effect of age, not an individual patient’s muscle mass. When the renal estimate is doubtful, measured vancomycin levels entered into the Bayesian fit let the estimate move away from the population prediction.`,
+      "Vancomyzer uses the SCr you enter and does not round low values up (the model input has a lower bound of 0.4 mg/dL). In a single-centre retrospective study of 245 patients aged 65 and older (Bukhari 2024), dosing with SCr rounded up to 1 mg/dL was less accurate than dosing with the actual SCr.",
+      "The calculator shows an enhanced-monitoring advisory for patients older than 65 and, when the bedbound workflow is selected, a warning when SCr is below 0.7 mg/dL. Review any renal estimate you consider unreliable, and obtain levels early.",
     ],
-    refs: [
-      {
-        label: "Colin PJ et al. Vancomycin Pharmacokinetics Throughout Life. Clin Pharmacokinet. 2019;58(6):767-780.",
-        url: "https://doi.org/10.1007/s40262-018-0727-5",
-      },
-    ],
+    refs: [REF_COLIN_2019, REF_BUKHARI_2024],
   },
   {
-    question: "What does Colin 2019 use instead of Cockcroft-Gault?",
+    question: `What does ${COLIN.shortName} use instead of Cockcroft-Gault?`,
     answer: [
-      "Colin 2019 uses age, weight, and serum creatinine directly as covariates in a two-compartment Bayesian model \u2014 no intermediate CrCl calculation. It was built from pooled data across 14 studies and multiple patient populations from neonates to elderly, making it one of the most broadly validated vancomycin PK models published. The model includes a specific age-decline function (FDecline) that captures the natural reduction in vancomycin clearance after peak adulthood \u2014 something Cockcroft-Gault approximates crudely through age alone.",
+      "Age, total body weight and serum creatinine, as direct covariates in a two-compartment model, with no intermediate CrCl calculation. FDecline describes the fall in clearance with age; FSCR describes the effect of serum creatinine relative to an age-standardised reference:",
+      { formula: [COLIN.equations.CL, COLIN.equations.FDecline, COLIN.equations.FSCR].join("\n") },
+      `Source data: ${COLIN.sourcePopulation}`,
+      `Covariates in the published final model that Vancomyzer does not apply:\n${bullets(COLIN.omittedCovariates)}`,
+      "Full equations, parameter values and a typical-adult reference check are on the Equations & derivations page.",
     ],
-    refs: [
-      {
-        label: "Colin PJ et al. Clin Pharmacokinet. 2019.",
-        url: "https://doi.org/10.1007/s40262-018-0727-5",
-      },
-    ],
+    refs: [REF_COLIN_2019],
   },
   {
-    question: "What about IBW \u2014 why does traditional dosing require it and why does Vancomyzer not?",
+    question: "What about IBW — why does traditional dosing require it and why does Vancomyzer not?",
     answer: [
-      "In traditional vancomycin dosing, determining the right dose requires answering a question that has no single correct answer: which body weight do you use?",
-      "Three options exist in clinical practice, each requiring its own calculation:",
-      "Total body weight (TBW): The patient\u2019s actual weight. Simple \u2014 but in obese patients, dosing on TBW can produce dangerously supratherapeutic levels. In one study of patients receiving TBW-based vancomycin dosing, 48% of patients with a BMI \u226535 were supratherapeutic on their first trough level.",
-      "Ideal body weight (IBW) \u2014 Devine formula: The weight a patient \u201cshould\u201d be based on height and sex.",
+      "In traditional vancomycin dosing, determining the dose requires answering a question that has no single correct answer: which body weight do you use?",
+      "Three options are used in clinical practice, each requiring its own calculation:",
+      "Total body weight (TBW): the patient’s actual weight. Simple, but TBW-based dosing can produce supratherapeutic levels in obese patients. In one retrospective study of 171 adults dosed on actual body weight, 48% of patients with BMI ≥ 35 had a supratherapeutic first trough (above 20 mg/L), compared with 12% at BMI 20–24.9.",
+      "Ideal body weight (IBW), Devine formula: the weight a patient “should” be, based on height and sex.",
       { formula: "Males:   50 kg + 2.3 kg per inch over 60 inches\nFemales: 45.5 kg + 2.3 kg per inch over 60 inches" },
-      "This requires height \u2014 a variable Cockcroft-Gault does not even include \u2014 adding yet another manual calculation step. And IBW alone can underestimate dose requirements in obese patients.",
-      "Adjusted body weight (AdjBW): IBW + 0.4 \u00d7 (TBW \u2212 IBW). Used when TBW exceeds IBW by more than 30%. Standard clinical dosing guidelines apply this formula when actual body weight is more than 30% above IBW.",
-      "The problem: This weight selection step \u2014 TBW vs IBW vs AdjBW \u2014 is debated, inconsistently applied between institutions, requires height that may not be reliably documented, and adds a third manual calculation on top of the CG estimate already in progress. The 2020 ASHP/IDSA guidelines moved toward recommending TBW for empiric dosing precisely because the IBW debate had no clear resolution.",
-      "How Vancomyzer handles body size: For non-obese patients (BMI < 40), the Colin 2019 model takes actual body weight directly as a covariate \u2014 no IBW, no AdjBW, no height required. The Bayesian model handles body size effects through its mathematical structure. When a measured level is entered, the posterior update further refines the individual PK estimate regardless of body composition.",
-      "For patients with BMI \u2265 40, Vancomyzer activates an obesity-specific model that uses a more physiologically appropriate metric: Fat-Free Mass (FFM). FFM is calculated from height, weight, and sex using the Janmahasatian 2005 equations. Volumes of distribution are scaled to FFM because vancomycin is hydrophilic and distributes poorly into adipose tissue. This is more precise than IBW/AdjBW approximations \u2014 it uses a validated pharmacometric equation rather than a height-based rule of thumb.",
+      "This requires height, which Cockcroft-Gault does not use, and IBW alone can underestimate dose requirements in obese patients.",
+      "Adjusted body weight (AdjBW): IBW + 0.4 × (TBW − IBW). Some institutional protocols use it when actual body weight exceeds IBW by more than 30%.",
+      "The practical problem: which weight to use varies between institutions, depends on a reliably documented height, and adds a manual step on top of the CrCl estimate. For obese adults, the 2020 ASHP/IDSA/PIDS/SIDP guideline suggests loading doses of 20–25 mg/kg actual body weight (maximum 3,000 mg), maintenance doses usually no higher than 4,500 mg/day, and early monitoring of levels.",
+      `How Vancomyzer handles body size: ${COLIN.shortName} uses total body weight directly for every adult at every BMI (CL and Q scale with (weight/70)^0.75; V1 and V2 with weight/70). No IBW, AdjBW or height is needed for the calculation, and no other model takes over at any BMI. Measured levels, when entered, individualise the estimate through the Bayesian fit.`,
+      `Height is still worth entering so BMI can be assessed. At ${BMI_40}, an advisory notes that published evaluation of ${COLIN.shortName} at that body size is limited and recommends early vancomycin levels; fat-free mass and alternative creatinine-clearance estimates are shown for information only and do not change the calculation.`,
     ],
     refs: [
-      { label: "IBW Devine formula: Devine BJ. Drug Intell Clin Pharm. 1974;8:650-655", url: "https://pubmed.ncbi.nlm.nih.gov/1244564/" },
-      { label: "AdjBW and obesity dosing guidelines: UC Davis Adult IV Vancomycin Dosing Guidelines.", url: "https://health.ucdavis.edu/media-resources/antibiotic-stewardship/documents/pdfs/guidelines/vanc_dosing.pdf" },
-      { label: "Supratherapeutic levels with TBW dosing in obesity", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3764551/" },
-      { label: "Janmahasatian S et al. Quantification of lean bodyweight. Clin Pharmacokinet. 2005;44(10):1051-1065.", url: "https://doi.org/10.2165/00003088-200544100-00004" },
+      { label: "Pai MP, Paloucek FP. The origin of the “ideal” body weight equations (Devine formula). Ann Pharmacother. 2000;34(9):1066-1069.", url: "https://doi.org/10.1345/aph.19381" },
+      { label: "UC Davis Health. Adult IV vancomycin dosing guidelines (example institutional protocol).", url: "https://health.ucdavis.edu/media-resources/antibiotic-stewardship/documents/pdfs/guidelines/vanc_dosing.pdf" },
+      { label: "Actual body weight dosing of vancomycin in obese patients (retrospective study, 171 adults).", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3764551/" },
+      REF_RYBAK_2020,
+      REF_JANMAHASATIAN_2005,
     ],
   },
   {
-    question: "How accurate is Colin 2019 compared to older methods?",
+    question: `How has ${COLIN.shortName} performed in independent evaluations?`,
     answer: [
-      "Independent evaluations consistently rank it among the top performers:",
-      "\u2022 Outperformed 6 of 7 literature models in a McGill University Health Centre validation\n\u2022 Second best in a Belgian multicenter study of 169 patients and 923 TDM samples\n\u2022 Identified as one of two best-transferable models in a head-to-head comparison of 7 vancomycin PopPK models\n\u2022 Validated across ICU, general ward, and outpatient settings in multiple countries\n\u2022 For patients with BMI \u2265 40, Vancomyzer supplements Colin 2019 with an FFM-based obesity model (Smit 2020 + Zhang 2023) that scales V\u2081 and V\u2082 to fat-free mass for more accurate volume estimation in morbid obesity",
+      `${VALIDATION_STATUS} The studies below evaluated the published ${COLIN.shortName} model, not Vancomyzer’s implementation of it.`,
+      bullets([
+        `Heus 2022 (three Belgian hospitals; 169 non-ICU general-ward patients on continuous-infusion vancomycin; 923 samples): ${COLIN.shortName} had the second-best predictive performance of 23 published models, after the Okada model. Vancomyzer models intermittent infusion, not continuous infusion.`,
+        `Aljutayli 2022 (McGill University Health Centre; single-centre retrospective data from 116 adults): transferability diagnostics suggested ${COLIN.shortName} and a model by Yamamoto et al. were the two of seven literature models best suited to the local data. The authors note that these diagnostics were not strong predictors of predictive performance.`,
+        COLIN_2021_NOTE,
+        `Patanwala 2022 (188 critically ill adults; 466 AUC estimates): ${COLIN.shortName}, Goti 2018 and Thomson 2009 placed the AUC in the same category (below, within or above 400–600 mg·h/L) for 48% of estimates, so model choice can change dosing decisions in the ICU.`,
+      ]),
+      "Results depend on the population, infusion method and sampling design, and none of these studies establishes accuracy for every patient. Use measured levels to individualise dosing.",
     ],
     refs: [
-      { label: "Belgian multicenter validation", url: "https://pubmed.ncbi.nlm.nih.gov/35341931/" },
-      { label: "McGill head-to-head comparison", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9010252/" },
-      { label: "Obesity validation", url: "https://pubmed.ncbi.nlm.nih.gov/33278242/" },
-      { label: "Discrepancies between Bayesian models in ICU", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9767744/" },
+      { label: "Heus A, et al. Model-informed precision dosing of vancomycin via continuous infusion: a clinical fit-for-purpose evaluation of published PK models. Int J Antimicrob Agents. 2022;59(5):106579.", url: "https://pubmed.ncbi.nlm.nih.gov/35341931/" },
+      { label: "Aljutayli A, et al. Pharmacokinetic equations versus Bayesian guided vancomycin monitoring: pharmacokinetic model and model-informed precision dosing trial simulations. Clin Transl Sci. 2022;15(4):942-953.", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9010252/" },
+      REF_COLIN_2021,
+      { label: "Patanwala AE, et al. Discrepancies between Bayesian vancomycin models can affect clinical decisions in the critically ill. Crit Care Res Pract. 2022;2022:7011376.", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9767744/" },
+    ],
+  },
+  {
+    question: "Has Vancomyzer itself been validated in patients?",
+    answer: [
+      VALIDATION_STATUS,
+      "Evidence to date is developer-run: reproduction of published literature cases, synthetic simulation, and a synthetic cross-check against Tucuxi. These checks test whether the equations are implemented as intended; they do not show how accurately Vancomyzer predicts levels in real patients.",
+      "The shaded band around the predicted curve on the concentration–time graph is a fixed ± percentage of the predicted concentration (wider when fit uncertainty is rated higher). It is not a statistical confidence or credible interval.",
+      "Vancomyzer™ is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation.",
+    ],
+    refs: [
+      { label: "Literature reproducibility cases", url: "/transparent-dosing/cases" },
+      { label: "Engine cross-check vs Tucuxi (developer-run, synthetic)", url: "/transparent-dosing/engine-crosscheck" },
+      { label: "Medical disclaimer", url: "/disclaimer" },
     ],
   },
   {
     question: "Does Vancomyzer calculate CrCl anywhere?",
     answer: [
-      "For non-obese patients (BMI < 40): No. The Colin 2019 model takes age, weight, and SCr directly as covariates \u2014 no CrCl, no IBW, no AdjBW. This removes multiple sources of estimation error and keeps the input set minimal.",
-      "For patients with BMI \u2265 40: Yes. The obesity model uses Cockcroft-Gault with total body weight to estimate CrCl for the clearance equation (CL = 0.0571 \u00d7 CrCl + 0.0158 \u00d7 TBW). This is standard practice in the obesity PK literature \u2014 renal elimination of vancomycin scales with total body weight, and CG-TBW is the established estimator in this population. The CrCl value is shown in the clinical advisory panel when the obesity model activates.",
-      "Volumes of distribution in the obesity model are NOT based on CrCl or TBW \u2014 they use Fat-Free Mass (FFM) from the Janmahasatian 2005 equations, because vancomycin distributes into lean tissue, not adipose.",
+      `Not for the dosing calculation. ${COLIN.renalCovariate}`,
+      `Cockcroft-Gault estimates appear only in advisories: one can flag possible augmented renal clearance, and at ${BMI_40} fat-free mass and alternative creatinine-clearance estimates are shown for information only. None of these changes the clearance estimate.`,
+      `Until ${RETIRED_ON}, the retired custom obesity model used Cockcroft-Gault CrCl on total body weight for clearance at ${BMI_40}. It is no longer used for dosing.`,
     ],
-    refs: [
-      {
-        label: "Colin PJ et al. Clin Pharmacokinet. 2019.",
-        url: "https://doi.org/10.1007/s40262-018-0727-5",
-      },
-      {
-        label: "Smit C et al. Br J Clin Pharmacol. 2020;86(2):303-317.",
-        url: "https://doi.org/10.1111/bcp.14144",
-      },
-    ],
+    refs: [REF_COLIN_2019, REF_COCKCROFT_GAULT],
   },
   {
-    question: "What is Fat-Free Mass (FFM) and why does the obesity model use it?",
+    question: "What is fat-free mass (FFM), and does Vancomyzer use it?",
     answer: [
-      "Fat-Free Mass is the portion of body weight that is not adipose tissue \u2014 it includes muscle, bone, organs, and water. FFM is calculated using the Janmahasatian 2005 equations, which require weight, height, and sex:",
-      { formula: "FFM (male)   = (9270 \u00d7 TBW) / (6680 + 216 \u00d7 BMI)\nFFM (female) = (9270 \u00d7 TBW) / (8780 + 244 \u00d7 BMI)" },
-      "Vancomycin is a hydrophilic glycopeptide \u2014 it distributes into plasma and interstitial fluid but poorly penetrates adipose tissue. In patients with BMI \u2265 40, total body weight dramatically overestimates the volume available for drug distribution. Scaling V\u2081 and V\u2082 to FFM instead of TBW produces more accurate volume estimates and prevents overdosing.",
-      "The Vancomyzer obesity model (derived from Smit 2020 and Zhang 2023) uses FFM for volumes of distribution while retaining TBW-based CrCl for clearance \u2014 reflecting the physiological reality that drug distribution is lean-tissue-limited but renal elimination scales with total body mass.",
+      "Fat-free mass is the part of body weight that is not adipose tissue: muscle, bone, organs and water. The Janmahasatian 2005 equations estimate it from weight, height and sex:",
+      { formula: "FFM (male)   = (9270 × TBW) / (6680 + 216 × BMI)\nFFM (female) = (9270 × TBW) / (8780 + 244 × BMI)" },
+      `Vancomyzer does not use FFM in its calculation. ${COLIN.shortName} scales clearance and volumes with total body weight at every BMI. At ${BMI_40}, FFM is shown for information only.`,
+      "The retired custom obesity model scaled V1 and V2 to FFM. Vancomycin is hydrophilic, but how best to scale its dosing in obesity is still debated, and published obesity models take different approaches (see “Which published obesity models were reviewed, and are they used?”).",
     ],
-    refs: [
-      { label: "Janmahasatian S et al. Quantification of lean bodyweight. Clin Pharmacokinet. 2005;44(10):1051-1065.", url: "https://doi.org/10.2165/00003088-200544100-00004" },
-      { label: "Smit C et al. Br J Clin Pharmacol. 2020;86(2):303-317.", url: "https://doi.org/10.1111/bcp.14144" },
-      { label: "Zhang T et al. Clin Pharmacokinet. 2024;63:79-91.", url: "https://doi.org/10.1007/s40262-023-01324-5" },
+    refs: [REF_JANMAHASATIAN_2005, REF_COLIN_2021],
+  },
+  {
+    question: "Why was the Vancomyzer custom obesity model retired?",
+    answer: [
+      `${RETIRED.displayName}. Former scope: ${RETIRED.formerScope} All adults are now calculated with ${COLIN.shortName}.`,
+      `Why it was retired:\n${bullets(RETIRED.whyRetired)}`,
+      `At ${BMI_40}, the calculator now shows an advisory recommending early vancomycin levels, because published evaluation of ${COLIN.shortName} at that body size is limited. ${COLIN_2021_NOTE}`,
+      `The former equations are kept on the Equations & derivations page so that calculations made before ${RETIRED_ON} remain interpretable.`,
     ],
+    refs: [REF_COLIN_2021, ...REF_OBESITY_COMPARATORS],
+  },
+  {
+    question: "Which published obesity models were reviewed, and are they used?",
+    answer: [
+      `${COMPARATOR_NAMES} were reviewed for comparison. Neither is implemented in Vancomyzer.`,
+      ...PUBLISHED_OBESITY_COMPARATORS.map((m) => `${m.shortName} (${m.status}): ${m.clearance}.\nPopulation: ${m.population}`),
+      `The ${SMIT.shortName} authors caution against using their model in renal impairment or critical illness, and it showed large a-priori bias in the Colin 2021 evaluation in obese adults. ${ZHANG.shortName} found that CKD-EPI eGFR described clearance better than Cockcroft-Gault in their data.`,
+      `Vancomyzer uses ${COLIN.shortName} for all adults, with a high-BMI advisory that recommends early levels (see “Why was the Vancomyzer custom obesity model retired?”).`,
+    ],
+    refs: [...REF_OBESITY_COMPARATORS, REF_COLIN_2021],
   },
 ];
 
