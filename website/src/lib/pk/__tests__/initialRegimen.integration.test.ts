@@ -136,13 +136,15 @@ function testLowBodyWeightLoadingDoseIsNotArtificiallyFloored(): void {
 
 function testGeriatricObesityNotOverdosed(): void {
   // Real-patient regression: 70F, 127.27 kg, 165 cm, SCr 1.65.
-  // BMI 46.7 — obesity model active. Patient is also geriatric with mild
-  // renal impairment. The original obesity model (no age decline) used
-  // CG-TBW CrCl 63.7 → CL 5.65 L/h → recommended TDD ≈ 2,500 mg/day
-  // (e.g., 1500 mg q12h). Mario's clinical instinct flagged that as too
-  // aggressive. After applying Colin 2019 FDecline to the obesity-model CL,
-  // the recommended TDD must stay at or below 1,000 mg/day for this
-  // patient — the clinically defensible upper bound for this profile.
+  // BMI 46.7 — Colin 2019 still runs: it is the only dosing model at every
+  // BMI, and BMI ≥ 40 adds an advisory, not a different model (the custom
+  // BMI ≥ 40 obesity branch was retired from dosing on 2026-09-15). Patient
+  // is also geriatric with mild renal impairment. The retired branch derived
+  // CL from Cockcroft-Gault CrCl on total body weight and once recommended
+  // 1500 mg q12h for this patient; Mario's clinical instinct flagged that as
+  // too aggressive. Colin 2019 scales CL by (WT/70)^0.75 and applies its own
+  // age decline (FDecline) and SCr covariate, and the recommended TDD must
+  // stay at or below 1,500 mg/day for this patient.
   const result = computeInitialRegimen({
     age: 70,
     weight_kg: 127.27,
@@ -157,16 +159,16 @@ function testGeriatricObesityNotOverdosed(): void {
     "Geriatric obesity regression: recommendation must be numeric and positive",
   );
   const tdd = doseMg * (24 / interval);
-  // Threshold = 1500 mg/day. Math with strict Colin 2019 FDecline at age 70
-  // (factor 0.429) gives required TDD ≈ 1211 mg/day for the engine's AUC
-  // target midpoint of 500; the bounded dose grid picks 1250 q24h. This is
-  // a 2.4× reduction from the pre-FDecline obesity-model recommendation
-  // (3000 mg/day = 1500 q12h). Going below 1000 mg/day for this patient
-  // would require biasing the AUC target toward the low end of 400-600,
-  // a separate clinical decision.
+  // Threshold = 1500 mg/day. Colin 2019 for this patient (PMA 70.8 y →
+  // FDecline 0.423; SCr 1.65; 127.27 kg) gives CL ≈ 2.33 L/h, so the
+  // engine's AUC target midpoint of 500 needs TDD ≈ 1,160 mg/day; the
+  // bounded dose grid picks 1250 mg q24h (AUC24 ≈ 537). The retired
+  // branch's 1500 mg q12h was 3000 mg/day. Going below 1000 mg/day for this
+  // patient would require biasing the AUC target toward the low end of
+  // 400-600, a separate clinical decision.
   assert(
     tdd <= 1500,
-    `Geriatric obesity regression: total daily dose must stay ≤ 1500 mg/day (got ${tdd} mg/day = ${doseMg} mg q${interval}h). Indicates FDecline regressed or obesity-model CL is over-predicting.`,
+    `Geriatric obesity regression: total daily dose must stay ≤ 1500 mg/day (got ${tdd} mg/day = ${doseMg} mg q${interval}h). Indicates the Colin 2019 age decline (FDecline) or SCr covariate regressed, or a model other than Colin 2019 is running.`,
   );
 }
 
