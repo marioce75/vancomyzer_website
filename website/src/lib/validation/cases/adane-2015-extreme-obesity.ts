@@ -1,41 +1,42 @@
 /**
- * Adane 2015 — extreme obesity, real measured AUC.
+ * Adane 2015: cross-model reference (cohort statistic from a different model).
  *
- * 31 BMI ≥40 adults with suspected/confirmed Staph aureus infection,
- * dosed to clinical practice (median 4 g/day), sampled at steady state
- * with measured 24-h urine creatinine clearance. The cohort median
- * AUC₂₄ was 583 mg·h/L (IQR 514–726). This is one of the few
- * vancomycin papers that publishes a real measured AUC (not a
- * population-typical simulation), making it a much stronger
- * reproducibility test than purely simulation-derived cases.
+ * Adane ED, et al. Pharmacotherapy. 2015;35(2):127-139 (abstract): 31 adults
+ * with BMI ≥ 40 receiving vancomycin for suspected or confirmed
+ * Staphylococcus aureus infection; peak, midpoint and trough concentrations
+ * at steady state; one-compartment NONMEM model. Median weight 147.9 kg,
+ * BMI 49.5 kg/m², Cockcroft-Gault ClCr 124.8 mL/min/1.73 m² (as reported);
+ * median dose 4000 mg/day; median AUC₂₄ 582.9 mg·h/L (IQR 513.8–726.2);
+ * population mean V 0.51 L/kg and CL 6.54 L/h.
  *
- * We use the cohort-median patient as the test point. Real per-patient
- * demographics are in the paper's Table 1, behind paywall. The
- * demographics chosen (50y/F/147.9kg/SCr 0.9/173cm) approximate the
- * cohort's published medians (BMI 49.5, ClCr 124.8 mL/min via 24-h
- * urine — note: Cockcroft-Gault on these inputs gives ~175 mL/min,
- * which differs from the paper's measured ClCr because C-G overestimates
- * in obesity; that's exactly why measured ClCr was used in the paper).
+ * The card shows those cohort values next to the engine's Colin 2019 values
+ * for one approximated cohort-median patient. Different model — difference
+ * shown for context, not a pass/fail test.
  *
- * Source: Adane ED et al. Pharmacotherapy. 2015;35(2):127-139.
+ * Inputs: weight is the published median; height 173 cm gives BMI 49.4.
+ * Age 50 years, SCr 0.9 mg/dL and female sex are approximations chosen by
+ * Vancomyzer. They have not been verified against the paper's Table 1.
+ *
+ * Infusion: 2000 mg over 3.5 h keeps the rate at or below 10 mg/min. It does
+ * not change steady-state AUC₂₄.
  */
 
+import { COLIN_2019 } from "@/lib/pk/modelRegistry";
 import type { PublishedCase } from "../types";
 
 export const ADANE_2015_EXTREME_OBESITY: PublishedCase = {
   id: "adane-2015-extreme-obesity",
   what_it_tests:
-    "Real-patient cohort obesity test: cohort-median AUC₂₄ of 583 mg·h/L (IQR 514–726) from 31 prospectively sampled BMI ≥40 adults. Our Vancomyzer Obesity Model should land inside the published IQR.",
+    `The published cohort median AUC₂₄ (583 mg·h/L, IQR 514–726) and population clearance (6.54 L/h, one-compartment model) in 31 adults with BMI ≥ 40, next to the engine's ${COLIN_2019.shortName} values for one approximated cohort-median patient at 2000 mg every 12 h.`,
   source: {
     citation:
       "Adane ED, Herald M, Koura F. Pharmacokinetics of Vancomycin in Extremely Obese Patients with Suspected or Confirmed Staphylococcus aureus Infections. Pharmacotherapy. 2015;35(2):127-139",
     doi: "10.1002/phar.1531",
     url: "https://doi.org/10.1002/phar.1531",
-    specific_reference:
-      "Results — n=31 BMI ≥40 adults; median TBW 147.9 kg, BMI 49.5; measured 24-h urine ClCr 124.8 mL/min/1.73m²; median dose 4000 mg/day; measured cohort-median AUC₂₄ 582.9 mg·h/L (IQR 513.8–726.2); NONMEM popPK CL 6.54 L/h, V 0.51 L/kg",
+    specific_reference: "Adane 2015 abstract — cohort median AUC₂₄ and population clearance, BMI ≥ 40 (different model)",
     verified: true,
     verification_note:
-      "All numbers verified verbatim from the PMID 25644478 abstract. Prospective cohort with steady-state sampling and 24-h urine ClCr — this is a real measured AUC, not a simulation.",
+      "Cohort values checked against the PubMed abstract (PMID 25644478): n = 31, median weight 147.9 kg, BMI 49.5 kg/m², Cockcroft-Gault ClCr 124.8 mL/min/1.73 m², median dose 4000 mg/day, median AUC₂₄ 582.9 mg·h/L (IQR 513.8–726.2), population mean V 0.51 L/kg and CL 6.54 L/h. The abstract also states that 24-hour urine creatinine clearance was collected. Patient-level values (Table 1) were not checked.",
   },
   patient: {
     age_years: 50,
@@ -44,34 +45,32 @@ export const ADANE_2015_EXTREME_OBESITY: PublishedCase = {
     sex: "F",
     height_cm: 173,
     indication: "Suspected or confirmed Staphylococcus aureus infection",
+    inputs_status: "approximated",
     notes:
-      "Cohort-median patient — age and SCr are approximations of the paper's reported medians; the published cohort had a 24-h urine measured ClCr of 124.8 mL/min/1.73m² that Cockcroft-Gault would overestimate at this weight (exactly why the paper used measured ClCr). Real per-patient demographics are in the paper's Table 1.",
+      "Weight (147.9 kg) is the published cohort median; height 173 cm gives BMI 49.4 (published median 49.5). Age 50 years, SCr 0.9 mg/dL and female sex are approximations chosen by Vancomyzer and have not been verified against the paper.",
   },
   regimen: {
     dose_mg: 2000,
     interval_hours: 12,
-    infusion_duration_hours: 1.5,
+    infusion_duration_hours: 3.5,
     doses_given: 6,
   },
   levels: [],
   published: {
     auc24_mg_h_l: 582.9,
+    auc24_range: { low: 513.8, high: 726.2, description: "interquartile range" },
     peak_mcg_ml: null,
     trough_mcg_ml: null,
     clearance_l_h: 6.54,
     v1_l: null,
-    source_kind: "individual_observed",
+    source_kind: "cohort_summary",
     extraction_method:
-      "Cohort-median AUC₂₄ (582.9 mg·h/L) and population PK parameters (V = 0.51 L/kg → ~75 L; CL = 6.54 L/h) read verbatim from the PMID 25644478 abstract. AUC is the measured/NONMEM-derived value at the cohort median, not an analytic TDD/CL.",
-    tolerance_rationale:
-      "±25% AUC. The Vancomyzer Obesity Model is a composite (Smit + Zhang 2024 + Janmahasatian FFM); Adane is a pure one-compartment NONMEM fit with TBW on V and ClCr on CL. The published IQR (513.8–726.2 mg·h/L) corresponds to roughly ±22% around 583, so a 25% tolerance bounds the published cohort variability while still flagging catastrophic engine drift.",
+      "Median AUC₂₄ 582.9 mg·h/L (IQR 513.8–726.2) at a median dose of 4000 mg/day, and population mean CL 6.54 L/h from a one-compartment model, read from the abstract. These summarize the cohort; they are not values for this card's inputs.",
+    tolerance_rationale: "Not applicable: cross-model reference (cohort statistic, different model), no pass/fail.",
   },
-  tolerance: {
-    auc24_pct: 25,
-    peak_pct: 30,
-    trough_pct: 30,
-  },
+  comparison_kind: "cross_model_reference",
+  tolerance: null,
   notes_for_page:
-    "Real prospective cohort: 31 BMI ≥40 adults sampled at steady state with measured 24-h urine ClCr. Median AUC₂₄ 583 mg·h/L (published IQR 514–726). Our obesity-model branch should land inside the published IQR for a cohort-median patient at 2 g q12h.",
+    "Adane 2015 measured three steady-state concentrations per patient in 31 adults with BMI ≥ 40 at one hospital and fitted a one-compartment model. The published AUC and CL summarize that cohort, while the engine value is for one approximated patient, so they are not expected to match and the difference is not a test of accuracy.",
   workflow_type: "prior_at_regimen",
 };

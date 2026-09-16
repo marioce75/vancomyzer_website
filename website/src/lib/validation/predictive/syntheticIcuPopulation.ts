@@ -1,7 +1,9 @@
 /**
- * Synthetic ICU patient generator — demographics matched to the
- * inclusion cohort of Bai et al. 2025 (the predictive-performance
- * paper that motivates this whole validation harness).
+ * Synthetic ICU patient generator for the developer-run synthetic analysis
+ * (not real patients). Demographic distributions are calibrated to summary
+ * statistics reported for the real ICU cohort of Bai et al. 2025. The
+ * synthetic patients are not those patients, and results from this
+ * generator are not comparable with that study.
  *
  * Source for the target distributions:
  *   Bai G, Qi H, Huang Y, et al. "Predictive Performance of Bayesian
@@ -15,19 +17,26 @@
  *     SCr          median 58    IQR 46–77      μmol/L  (=0.66 mg/dL median)
  *     BMI          median 24.0  IQR 21.44–26.32
  *
- * Excluded by Bai (and therefore by us): RRT, ECMO, HD, ages <18.
+ * What is and is not simulated:
+ *   - Adults only (age clamped to 18–95 years).
+ *   - No dialysis, CRRT or ECMO (the truth model's non-dialysis branch is
+ *     used for everyone).
+ *   - Augmented renal clearance is NOT excluded. Cockcroft–Gault CrCl is
+ *     floored at 5 and capped at 200 mL/min, so values above 200 are set
+ *     to 200 rather than removed.
  *
  * Implementation notes:
  *   - Age is sampled normal, clamped to [18, 95].
  *   - Weight is sampled log-normal calibrated so the 50/25/75
  *     percentiles roughly match the target IQR. Same for SCr.
- *   - Height is sampled normal (per CDC adult tables, low BSV).
- *   - CrCl is then derived via Cockcroft–Gault — same path most
- *     Bayesian engines use, so the "truth" sampling and the
- *     downstream prior consume the same CrCl number.
- *   - We do NOT enforce a BMI floor: underweight and obese patients
- *     are realistic ICU presentations and the harness should be
- *     stressed across that range.
+ *   - Height is sampled normal by sex (175 ± 7 cm male, 162 ± 7 cm
+ *     female; developer-chosen values).
+ *   - CrCl is derived via Cockcroft–Gault (total body weight) and is
+ *     used only by the truth model. Vancomyzer's Colin 2019 prior uses
+ *     serum creatinine directly, not CrCl.
+ *   - No BMI limits are applied, but weight is limited to 35–160 kg and
+ *     the weight distribution is centred on 65 kg, so few patients have a
+ *     BMI of 40 or more (2 of 200 with seed 42).
  *
  * Strictly synthetic — no PHI, no real patient data, no IRB needed.
  */
@@ -40,17 +49,19 @@ export interface SyntheticPatient {
   weight_kg: number;
   height_cm: number;
   scr_mg_dl: number;
-  /** Cockcroft–Gault, capped at [5, 200] mL/min. */
+  /** Cockcroft–Gault, limited to [CRCL_FLOOR_ML_MIN, CRCL_CAP_ML_MIN] mL/min. */
   crcl_ml_min: number;
 }
 
-/** Cockcroft–Gault CrCl (mL/min). Mirrors the path most Bayesian
- *  engines use for the prior — including PrecisePK/Goti. */
+export const CRCL_FLOOR_ML_MIN = 5;
+export const CRCL_CAP_ML_MIN = 200;
+
+/** Cockcroft–Gault CrCl (mL/min), total body weight, used by the truth model only. */
 function cockcroftGault(p: { age_yr: number; weight_kg: number; sex: "male" | "female"; scr_mg_dl: number }): number {
   const numerator = (140 - p.age_yr) * p.weight_kg;
   const denominator = 72 * p.scr_mg_dl;
   const crcl = (numerator / denominator) * (p.sex === "female" ? 0.85 : 1.0);
-  return Math.max(5, Math.min(200, crcl));
+  return Math.max(CRCL_FLOOR_ML_MIN, Math.min(CRCL_CAP_ML_MIN, crcl));
 }
 
 function clamp(v: number, lo: number, hi: number): number {

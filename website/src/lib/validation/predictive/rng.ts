@@ -5,13 +5,13 @@
  * pharmacometric sampling at n=200–1000 patient scale. NOT cryptographic.
  *
  * Seeded explicitly so that:
- *   (a) `npm test` produces the same rBias/rRMSE every run
- *   (b) the disclosed seed on the public page is reproducible by
- *       any third party who downloads this repo.
+ *   (a) `npm test` produces the same metrics every run
+ *   (b) the seed disclosed on the public page reproduces the page's
+ *       numbers for anyone with this repository.
  *
- * If anyone changes the seed without updating the public page, the
- * test:predictive script will print a banner pointing them at the page
- * copy so the disclosure stays honest.
+ * The page and scripts/verify-predictive-performance.ts both use
+ * PREDICTIVE_DEFAULT_SEED and PREDICTIVE_DEFAULT_N from ./runValidation,
+ * so they cannot disagree about the seed or cohort size.
  */
 
 export interface Rng {

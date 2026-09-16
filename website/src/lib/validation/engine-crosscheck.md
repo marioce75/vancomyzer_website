@@ -1,15 +1,28 @@
 # Engine Cross-Check — Vancomyzer vs Tucuxi (Part A)
 
-**Status:** Internal engineering-validation record. NOT linked from public nav.
-**Date:** 2026-05-30
+**Status:** Engineering record behind the public Engine Cross-Check page
+(`/transparent-dosing/engine-crosscheck`, linked from the Transparent Dosing
+hub). Developer-run synthetic analysis (not real patients).
+**Run date:** 2026-05-30, with the Vancomyzer engine as of that date (before the
+2026-09-15 retirement of the custom obesity model).
 **Author:** Vancomyzer team (Dōsys Health LLC)
 **Cohort:** n = 200 synthetic ICU patients, seed 42, 0 dropped.
 
-> Companion to the public Predictive Performance page
-> (`/transparent-dosing/predictive-performance`, "Stage 1" / Part B). Part B
-> (synthetic Sheiner–Beal stress test) is shipped and public. Part A (this
-> doc) is an independent-engine cross-check, kept internal pending a decision
-> on public framing.
+> Companion to the Predictive Performance page
+> (`/transparent-dosing/predictive-performance`, Part B), which is also a
+> developer-run synthetic analysis. Real-patient performance has not been
+> evaluated.
+
+> **Revision 2026-09-16 (external review remediation).** The recorded results
+> (report.json and the tables in §5) are unchanged. Interpretation was
+> corrected: (1) "statistically interchangeable" and "corroboration" claims
+> removed, since no equivalence margins were prespecified and both engines were
+> given the same priors and a model file written by Vancomyzer; (2) the claim
+> that tail disagreements are confined to augmented renal clearance was wrong
+> and is replaced in §5.3; (3) the regenerated seed-42 cohort shows 2 patients
+> with BMI ≥ 40 (p87, p196) for whom the engine used the since-retired custom
+> obesity model on the run date; (4) the residual-error description in §4 is
+> flagged as inconsistent with the committed generator.
 
 ---
 
@@ -18,9 +31,11 @@
 Given **identical priors and identical data**, does Vancomyzer's TypeScript
 Bayesian engine (posterior MAP over a two-compartment model) reach the **same
 posterior PK parameters** as an *independently implemented* engine? Agreement
-is evidence the engine — optimizer + structural model + likelihood — is
-implemented correctly. This is orthogonal to Literature Reproducibility (AUC vs
-published cases) and to Part B (accuracy vs a synthetic truth).
+shows the engine (optimizer + structural model + likelihood) behaves
+consistently with an independently written engine for this model encoding. It
+is not proof of correctness, it does not check the Colin 2019 equations, and it
+says nothing about clinical accuracy. This is separate from Literature
+Reproducibility (published values) and Part B (accuracy vs a synthetic truth).
 
 Comparator: **Tucuxi** (`tucucli`), the open-source MIPD engine from
 REDS/HEIG-VD (Yann Thoma), `github.com/sotalya/tucuxi-core`, AGPL-3.0, C++17.
@@ -30,20 +45,22 @@ Independent language, independent numerical implementation, peer-reviewed.
 
 ## 2. Honest scope & caveats (read first)
 
-1. **This validates the ENGINE, not our Colin transcription.** No canonical
+1. **This checks the fitting ENGINE, not our Colin transcription.** No canonical
    Colin-2019 vancomycin drug file exists in any public Tucuxi repo (verified by
    clean clone: `sotalya/tucuxi-drugs` ships only imatinib; `tucuxi-core` ships
    only synthetic test models + a C++ vancomycin unit test, not a loadable
    `.tdd`). The clinical Colin file ships only with the closed GUI app. **We
-   authored the `.tdd` used here.** So this confirms that two independent engines
-   fed the same model encoding converge to the same posterior — it does NOT
-   independently confirm our Colin equations.
+   authored the `.tdd` used here.** So this shows whether two independently
+   written engines fed the same model encoding reach similar posteriors — it
+   does NOT independently confirm our Colin equations or clinical accuracy.
 
 2. **The prior is injected, not derived by Tucuxi.** For each patient we compute
-   Vancomyzer's per-patient Colin prior in our own code and bake those four
+   Vancomyzer's per-patient prior in our own code (Colin 2019, or on the run date
+   the since-retired custom obesity model for BMI ≥ 40) and bake those four
    numbers (CL, V1, Q, V2) into the patient's Tucuxi `.tdd` as fixed
-   `standardValue`s (no covariate equations). Both engines therefore start from a
-   byte-identical prior; any posterior difference is attributable to the engine.
+   `standardValue`s (no covariate equations). Both engines therefore start from the
+   same prior values; posterior differences reflect the engines plus any
+   differences in variability or error-model settings (see §4 notes).
 
 3. **Synthetic data.** Patients + levels are Monte-Carlo simulated (same seed-42
    cohort as Part B), truth drawn from the Goti-2018 model. No PHI.
@@ -104,16 +121,28 @@ asserts `parsed + dropped == n` and refuses to summarize on any drop.
 
 - **Cohort:** n = 200 synthetic ICU patients, seed 42 (same generator as Part B,
   `src/lib/validation/predictive/syntheticIcuPopulation.ts`).
-- **Truth:** Goti-2018 individual params (`goti2018.ts`) → simulate steady-state
-  peak (t = 3.0 h) + trough (t = 11.5 h) in a 12 h interval, dose 15 mg/kg q12h
-  (rounded 250 mg), 90-min infusion, + combined residual error (0.15 prop +
+- **Truth:** Goti 2018-based individual params (`goti2018.ts`; weight scaling and
+  variability are developer choices) → simulate steady-state peak (t = 3.0 h) +
+  trough (t = 11.5 h) in a 12 h interval, dose 15 mg/kg q12h (rounded 250 mg),
+  90-min infusion, + combined residual error (recorded here as 0.15 prop +
   1.0 mg/L additive).
+  *Note (2026-09-16):* the committed generator (`goti2018.ts`, unchanged since
+  2026-05-29) uses 0.20 proportional + 1.0 mg/L additive. 0.15 is the
+  proportional term of Vancomyzer's fitting likelihood
+  (`fitPosteriorParameters.ts`: SD = max(1.0, 0.15 × concentration)). The
+  one-off harness scripts were not saved, so which truth residual error this
+  run used cannot be confirmed from the repository.
 - **Vancomyzer:** `runPosteriorEngine` → prior + posterior {CL,V1,Q,V2}.
 - **Tucuxi:** per-patient `.tdd` with Vancomyzer's prior baked as fixed
   `standardValue`s; bsv `exponential` stdDev = Vancomyzer's log-prior SDs
   (CL 0.35, V1 0.25, Q 0.5, V2 0.5); error model `mixed`
   (sigma[0]=1.0 additive, sigma[1]=0.15 proportional). Same dose history + same
   two levels in the `.tqf`. Parse posterior {CL,V1,Q,V2}.
+  *Note (2026-09-16):* these settings approximate, but may not match in form,
+  Vancomyzer's likelihood (SD = max(1.0, 0.15 × concentration)). For patients
+  with BMI ≥ 40 the engine on the run date used the since-retired custom obesity
+  model with different prior SDs (CL 0.29, V1 0.32, Q 0.50, V2 0.28); whether the
+  Tucuxi files for those patients used matching SDs was not recorded.
 - **Design note:** injecting the prior via query *covariates* (Design B) failed —
   Tucuxi's importer rejects covariate `<unit>l</unit>`. Baking the prior into
   the `.tdd` as fixed values (Design C) is cleaner and sidesteps it.
@@ -134,10 +163,11 @@ asserts `parsed + dropped == n` and refuses to summarize on any drop.
 Δ = relative difference vs the mean of the two engines. Apriori requests echo
 the injected prior exactly, confirming the extraction pipeline is sound.
 
-All four parameters agree to **<1% median**. Mean signed offset is negligible on
-every parameter (largest is CL +0.97%; Q is essentially zero at −0.01%). Tails
-(p90 ≤ 3.5%) are tight; individual maxima (12–33%) come from a handful of
-augmented-renal-clearance patients — see §5.3.
+Observed agreement: median |Δ| 0.23–0.85% across the four parameters; p95
+2.93–5.65%; maxima 13.77–32.76%. Mean signed offsets range from −0.01% (Q) to
++0.97% (CL). No equivalence margins were prespecified, so this describes observed
+agreement only. The maxima are not confined to augmented renal clearance — see
+§5.3.
 
 ### 5.2 Accuracy vs the known Goti truth (median abs %)
 
@@ -148,61 +178,68 @@ augmented-renal-clearance patients — see §5.3.
 | Q  | 53.2 | 53.0 | 52.6 |
 | V2 | 26.2 | 25.4 | 25.2 |
 
-The two engines are **statistically interchangeable** — within 0.1–0.4
-percentage points of each other on every parameter.
+The two engines' median errors are within 0.1–0.4 percentage points of each
+other on every parameter. No equivalence margins were prespecified; this is
+observed agreement, not a test of interchangeability.
 
 **Important honest nuance:** only **CL** is materially improved by the fit
 (31.7 → ~10.2). V1 improves modestly (28.9 → ~26), and **Q and V2 are barely
 moved** (53 → ~53; 26.2 → ~25.3). A peak + trough at steady state mainly
 constrains clearance; it does not constrain the inter-compartmental and
 peripheral-volume parameters, so both engines correctly leave Q/V2 near the
-prior. This is a property of the two-sample sampling design, **not** an engine
-defect — and the fact that the two independent engines behave *identically* on
-the under-constrained parameters is itself strong corroboration.
+prior. This is a property of the two-sample sampling design. Similar behaviour
+is expected when two engines fit the same model and prior to the same data.
 
-### 5.3 Where the tail disagreement lives
+### 5.3 Where the tail disagreement lives (corrected 2026-09-16)
 
-The p95/max outliers cluster at **CrCl extremes** (augmented renal clearance and
-low clearance), verbatim from report.json:
+Top five recorded outliers per parameter, verbatim from report.json (id, CrCl
+mL/min, Δ):
 
-| Param | worst cases (id, CrCl, Δ) |
+| Param | worst cases |
 |---|---|
-| CL | p196 (CrCl 177.0, +18.1%), p100 (CrCl 42.2, +14.7%), p111 (70.7, +8.3%) |
-| V1 | p196 (CrCl 177.0, +32.8%), p87 (83.8, +11.6%), p166 (80.0, +7.4%) |
+| CL | p196 (177, +18.1%), p100 (42.2, +14.7%), p111 (70.7, +8.3%), p96 (130.4, +8.0%), p166 (80, +7.1%) |
+| V1 | p196 (177, +32.8%), p87 (83.8, +11.6%), p166 (80, +7.4%), p24 (57.4, +5.5%), p148 (55.3, +5.2%) |
+| Q  | p196 (177, −21.3%), p117 (165.2, +7.3%), p87 (83.8, −7.3%), p166 (80, +5.5%), p95 (164.4, +4.1%) |
+| V2 | p148 (55.3, +13.8%), p100 (42.2, +13.5%), p70 (52.2, +10.7%), p24 (57.4, +9.4%), p152 (80.2, +7.3%) |
 
-The single largest divergence on every parameter is the same patient, **p196**
-(CrCl 177 — augmented renal clearance). At high clearance the steady-state
-trough falls toward assay noise, the two levels under-constrain the fit, and the
-two MAP optimizers settle at slightly different points along a shallow CL–V1
-likelihood ridge. This is expected for sparse-data Bayesian estimation and
-affects only the distribution tail; the median stays <1%.
+The disagreements are **not** confined to augmented renal clearance: of the 20
+listed entries, 6 (patients p196, p96, p117, p95) have CrCl above 130 mL/min;
+the rest range from 42 to 84 mL/min, and no V2 outlier is above 130.
+
+p196 is the largest outlier for CL, V1 and Q. Regenerating the seed-42 cohort
+from the committed generator reproduces the CrCl of all 12 outlier ids above
+(ids are zero-based indices). In that cohort exactly 2 of 200 patients have
+BMI ≥ 40 with height and sex present: **p87** (BMI 41.0) and **p196** (BMI 42.2).
+On the run date the engine used the since-retired custom obesity model for both
+(confirmed by running the pre-retirement engine on their inputs), with a small
+central volume and different prior SDs. Both are prominent outliers. This may
+explain part of their disagreement, but it has not been confirmed, and the other
+outliers are unexplained. Individual disagreements should be investigated; a
+re-run with the current engine and saved per-patient inputs is needed.
 
 ---
 
 ## 6. Conclusion
 
-Given identical priors and identical data, an independently-implemented C++ MIPD
-engine (Tucuxi) and Vancomyzer's TypeScript engine produce posterior PK
-parameters that agree to **<1% (median) on all four parameters** and are
-**within 0.4 pts of each other in accuracy against a known synthetic truth**.
-The two engines agree with each other better than either agrees with truth —
-the signature of two valid, independent implementations. Tail divergence
-(p90 ≤ 3.5%) is confined to augmented-renal-clearance patients where the
-two-sample design under-constrains the fit. Both engines improve clearance
-estimation dramatically (≈32% → ≈10% error) and both correctly leave the
-under-constrained parameters (Q, V2) near the prior.
+Given the same priors, a model file written by Vancomyzer and the same synthetic
+data, Tucuxi (C++) and Vancomyzer's TypeScript engine produced posterior
+estimates with median absolute differences of 0.23–0.85% (p95 2.93–5.65%,
+maxima 13.77–32.76%), and median errors against the synthetic truth within
+0.1–0.4 percentage points of each other. No equivalence margins were
+prespecified. Both engines reduced the median CL error from 31.7% (prior) to
+about 10%; Q and V2 stayed near the prior, as expected with two steady-state
+levels. The largest individual disagreements span a wide range of renal
+function and have not been explained (§5.3).
 
-**Defensible internal claim:** *An independent open-source C++ Bayesian dosing
-engine (Tucuxi, HEIG-VD), given identical priors and data, reproduces
-Vancomyzer's posterior clearance and volume estimates to within ~1% (median,
-n=200) and matches Vancomyzer's accuracy against a known truth to within
-0.4 percentage points on all four PK parameters. Vancomyzer's MAP optimizer and
-two-compartment structural math are corroborated by an independent
-implementation.*
+**What can be said:** *In a developer-run synthetic analysis (not real
+patients), Tucuxi and Vancomyzer, given the same priors, model file and data,
+produced similar posterior estimates for most of 200 synthetic patients (median
+absolute CL difference 0.81%, p95 5.65%, maximum 18.1%).*
 
-**Not claimed:** independent validation of our Colin *transcription* (out of
-scope — we authored the `.tdd`; prior injected; data synthetic); or that the
-fit constrains Q/V2 (it does not, by sampling design).
+**Not claimed:** that the Colin 2019 equations are correct (we authored the
+`.tdd`; prior injected); that the engines are interchangeable (no equivalence
+margins); that the fit constrains Q/V2 (it does not, by sampling design); or
+anything about accuracy in real patients.
 
 **Correction to an earlier draft.** Two interim errors, both caught and fixed
 before anything was pushed:
@@ -236,3 +273,6 @@ ephemeral) and were not committed. To rebuild:
    `tucucli`, parse the posterior, compare per-parameter.
 4. Analyzer MUST assert `parsed + dropped == n` and refuse to summarize on any
    drop (see §3 gotcha). Record each patient's Goti truth to reproduce §5.2.
+5. Save the per-patient inputs (demographics, prior values and SDs, levels),
+   the generated `.tdd`/`.tqf` files, the truth residual error used and the
+   engine commit, so individual disagreements can be investigated.

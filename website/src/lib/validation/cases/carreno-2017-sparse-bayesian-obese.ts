@@ -1,41 +1,41 @@
 /**
- * Carreno 2017 — sparse-sampling Bayesian AUC recovery in obese adults.
+ * Carreno 2017: cross-model reference (cohort result from other models).
  *
- * 12 obese adult patients (median age 61, BMI 45, ClCr 86 mL/min)
- * with full-data AUC₂₄ across four popPK priors ranging 437–489 mg·h/L.
- * The paper's finding: peak + trough Bayesian fits (AUC_PT) gave the
- * best approximation to the full-sampling "truth"; trough-only and
- * midpoint+trough variants tended to overestimate.
+ * Carreno JJ, et al. Antimicrob Agents Chemother. 2017;61(5):e02478-16
+ * (abstract): 12 obese adults (median age 61 years, median creatinine
+ * clearance 86 mL/min, median BMI 45 kg/m²), five concentrations per patient,
+ * four population models used as Bayesian priors in ADAPT V. Full-data
+ * AUC₂₄ estimates ranged from 437 to 489 mg·h/L across the four analyses.
+ * Peak-and-trough estimates approximated the full-data AUC best; trough-only
+ * and midpoint-and-trough estimates tended to overestimate it.
  *
- * We test our Bayesian fitter against the same workflow: a cohort-
- * typical 130 kg adult with one peak (post-distribution) and one
- * trough, expecting our posterior AUC₂₄ to land in the paper's
- * published 437–489 mg·h/L band.
+ * This card runs the engine's Colin 2019 Bayesian fit on two ILLUSTRATIVE
+ * levels for an ILLUSTRATIVE patient and shows the result next to that
+ * published range. Different model — difference shown for context, not a
+ * pass/fail test. Per-patient data were not available, so the patient
+ * values, regimen and levels below were chosen by Vancomyzer and are not
+ * from the paper. The range midpoint (463) is derived for display.
  *
- * Real per-patient data is paywalled — we use a cohort-typical
- * patient and representative levels consistent with the paper's
- * dosing range (15 mg/kg q12h in a 130 kg adult, with troughs
- * targeted to 10–20 mcg/mL and a corresponding post-distribution peak).
- *
- * Source: Carreno JJ et al. Antimicrob Agents Chemother. 2017;61(5):e02478-16.
+ * Infusion: 1250 mg over 2.5 h keeps the rate at or below 10 mg/min; the
+ * first level is drawn 1 h after the end of the infusion.
  */
 
+import { COLIN_2019 } from "@/lib/pk/modelRegistry";
 import type { PublishedCase } from "../types";
 
 export const CARRENO_2017_SPARSE_BAYESIAN_OBESE: PublishedCase = {
   id: "carreno-2017-sparse-bayesian-obese",
   what_it_tests:
-    "Sparse-sampling Bayesian AUC₂₄ recovery in obesity: fed a peak + trough from a cohort-typical patient, our posterior AUC should land inside the paper's published 437–489 mg·h/L band that four popPK priors produced with full data.",
+    `The engine's ${COLIN_2019.shortName} Bayesian AUC₂₄ from two illustrative levels, next to the range of full-data AUC₂₄ estimates (437–489 mg·h/L) that Carreno 2017 reported across four other population models in 12 obese adults.`,
   source: {
     citation:
       "Carreno JJ, Lomaestro B, Tietjan J, Lodise TP. Pilot Study of a Bayesian Approach To Estimate Vancomycin Exposure in Obese Patients with Limited Pharmacokinetic Sampling. Antimicrob Agents Chemother. 2017;61(5):e02478-16",
     doi: "10.1128/AAC.02478-16",
     url: "https://doi.org/10.1128/AAC.02478-16",
-    specific_reference:
-      "Results — n=12 adult obese patients (median age 61, BMI 45, ClCr 86 mL/min). Full-data AUC₂₄ across 4 priors: 437–489 mg·h/L. Peak + trough (AUC_PT) approximated the full-data AUC best; midpoint+trough (AUC_MT) and trough-only (AUC_T) tended to overestimate.",
+    specific_reference: "Carreno 2017 abstract — full-data AUC₂₄ range across four population models, obese adults (different models)",
     verified: true,
     verification_note:
-      "Cohort demographics and full-data AUC₂₄ band (437–489) verified verbatim from the PMID 28289024 abstract. Per-patient AUC values are in the paper's tables, behind paywall — we use the cohort-typical patient with representative levels as the test point.",
+      "Checked against the PubMed abstract (PMID 28289024): n = 12, median age 61 years, median creatinine clearance 86 mL/min (the abstract does not state the method), median BMI 45 kg/m², full-data AUC₂₄ estimates 437–489 mg·h/L across four models. Per-patient data were not available.",
   },
   patient: {
     age_years: 61,
@@ -43,47 +43,37 @@ export const CARRENO_2017_SPARSE_BAYESIAN_OBESE: PublishedCase = {
     serum_creatinine_mg_dl: 1.0,
     sex: "M",
     height_cm: 170,
-    indication: "Suspected or confirmed Gram-positive infection (obese cohort)",
+    indication: "Suspected or confirmed Gram-positive infection (illustrative)",
+    inputs_status: "illustrative",
     notes:
-      "Cohort-typical patient at the paper's median demographics (age 61, BMI 45, ClCr ~86 mL/min by Cockcroft-Gault). Real per-patient data is paywalled.",
+      "Illustrative values chosen by Vancomyzer, not from the paper. Age 61 years and BMI 45 match the published cohort medians; weight, height, sex and SCr do not come from the paper. Cockcroft-Gault with total body weight gives about 143 mL/min for these inputs, not the published median of 86 mL/min.",
   },
-  // Regimen chosen so the engine's obesity-model CL (≈5.4 L/h for this
-  // patient profile) lands the predicted AUC₂₄ in the paper's published
-  // 437–489 mg·h/L band. At TDD = 2500 mg/day (1250 mg q12h), our prior
-  // gives AUC ≈ 463 — the band midpoint. A higher TDD like 1500 q12h
-  // would push our engine to ~555 (outside the band by design) and was
-  // creating user-visible inconsistency: clicking "Run in calculator"
-  // from the case card would always trigger the recommendation engine
-  // to suggest 1250 q12h instead of the input regimen, making the case
-  // delta appear to "shift" when the user loaded it.
   regimen: {
     dose_mg: 1250,
     interval_hours: 12,
-    infusion_duration_hours: 1.5,
+    infusion_duration_hours: 2.5,
     doses_given: 5,
   },
+  // Illustrative levels chosen by Vancomyzer (not from the paper).
   levels: [
-    { value_mcg_ml: 25, time_since_last_dose_hours: 2.0 },
+    { value_mcg_ml: 25, time_since_last_dose_hours: 3.5 },
     { value_mcg_ml: 10, time_since_last_dose_hours: 11.5 },
   ],
   published: {
     auc24_mg_h_l: 463,
+    auc24_range: { low: 437, high: 489, description: "range of full-data estimates across four population models; 463 is the midpoint, derived for display" },
     peak_mcg_ml: null,
     trough_mcg_ml: null,
     clearance_l_h: null,
     v1_l: null,
-    source_kind: "individual_predicted_bayesian",
+    source_kind: "cohort_summary",
     extraction_method:
-      "Midpoint of the published full-data AUC₂₄ band (437–489 mg·h/L) across the paper's 4 popPK priors. Peak (30 mcg/mL @ 2h) and trough (12 mcg/mL @ 11.5h) are representative of the cohort's dosing-to-level profile: 15 mg/kg q12h in a 130 kg adult, trough targeted to the 10–20 mcg/mL therapeutic window.",
-    tolerance_rationale:
-      "±20% AUC. The paper's own full-data AUC varies by ~12% just across the four priors (437 → 489). Add Bayesian fit noise from sparse sampling (~10% per the paper's reported AUC_PT performance) and ±20% bounds the expected drift band.",
+      "Range of full-data AUC₂₄ estimates (437–489 mg·h/L) read from the abstract; midpoint 463 derived by Vancomyzer. The levels on this card (25 mg/L 3.5 h after the start of the dose, 1 h after the end of a 2.5 h infusion; 10 mg/L at 11.5 h) are illustrative and were chosen by Vancomyzer.",
+    tolerance_rationale: "Not applicable: cross-model reference (cohort result from other models, illustrative inputs), no pass/fail.",
   },
-  tolerance: {
-    auc24_pct: 20,
-    peak_pct: 25,
-    trough_pct: 30,
-  },
+  comparison_kind: "cross_model_reference",
+  tolerance: null,
   notes_for_page:
-    "Carreno 2017 showed peak + trough Bayesian fits recover the full-sampling AUC₂₄ in obese adults to within ~10%. Our engine fed the same two-point profile should land in the 437–489 mg·h/L band the paper published across four popPK priors.",
+    "Carreno 2017 found that Bayesian estimates from a peak and a trough approximated the full-data AUC better than trough-only or midpoint-and-trough estimates. The published range is a cohort result for real patients and other models, while this card's patient values and levels are illustrative, so the difference is context only.",
   workflow_type: "existing",
 };

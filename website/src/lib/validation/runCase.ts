@@ -1,12 +1,21 @@
 /**
- * Run a single PublishedCase through the Vancomyzer engine and compute
- * the delta against the published values. Deterministic — same case +
- * same engine code always produces the same result, which is what
- * makes this usable as a build-time regression test.
+ * Run a single PublishedCase through the Vancomyzer engine and compute the
+ * difference from the published values. Deterministic: the same case and
+ * the same engine code always give the same result, so the same-model
+ * reproductions can run as a regression test in `npm test`.
  *
- * Branches by workflow_type:
- *   - "empiric"  → computeInitialRegimen (no levels, no regimen input)
- *   - "existing" → runExistingRegimenPipeline (regimen + optional levels)
+ * Engine invocation by workflow_type:
+ *   - "empiric"          → computeInitialRegimen (no levels, no regimen input)
+ *   - "prior_at_regimen" → buildPriorParameters + computeExposure
+ *   - "existing"         → runExistingRegimenEngine (regimen + levels)
+ *   - "reference_band"   → no engine call
+ *
+ * Status by comparison_kind:
+ *   - "same_model_reproduction" → "pass" only if at least one published
+ *     metric is present and every published metric is within tolerance;
+ *     otherwise "fail". A reproduction with nothing to compare never passes.
+ *   - "cross_model_reference" and "reference_band" → "not_tested". They are
+ *     excluded from pass/fail counts and from the summary statistics.
  */
 
 import { computeInitialRegimen } from "../initialRegimen";
@@ -18,33 +27,35 @@ import { normalizeRegimen } from "../pk/normalize/normalizeRegimen";
 import { normalizeLevels } from "../pk/normalize/normalizeLevels";
 import type { CaseResult, PublishedCase } from "./types";
 
+/** Maximum infusion rate (mg/min) accepted for a case regimen. */
+export const MAX_CASE_INFUSION_RATE_MG_PER_MIN = 10;
+
 function pctDelta(predicted: number | null, published: number | null): number | null {
   if (predicted == null || published == null || published === 0) return null;
   return ((predicted - published) / published) * 100;
 }
 
-function withinTolerance(delta: number | null, tolerance: number): boolean {
-  if (delta == null) return true; // no published value → can't fail
-  return Math.abs(delta) <= tolerance;
+function assertCaseIsConsistent(c: PublishedCase): void {
+  const isBandWorkflow = c.workflow_type === "reference_band";
+  const isBandKind = c.comparison_kind === "reference_band";
+  if (isBandWorkflow !== isBandKind) {
+    throw new Error(`Case ${c.id}: workflow_type "reference_band" and comparison_kind "reference_band" must be used together`);
+  }
+  if (c.comparison_kind === "same_model_reproduction" && c.tolerance == null) {
+    throw new Error(`Case ${c.id}: a same-model reproduction must declare a tolerance`);
+  }
+  if (c.comparison_kind !== "same_model_reproduction" && c.tolerance != null) {
+    throw new Error(`Case ${c.id}: only same-model reproductions may declare a tolerance`);
+  }
+  if (c.regimen) {
+    const rate = c.regimen.dose_mg / (c.regimen.infusion_duration_hours * 60);
+    if (rate > MAX_CASE_INFUSION_RATE_MG_PER_MIN + 1e-9) {
+      throw new Error(`Case ${c.id}: infusion rate ${rate.toFixed(1)} mg/min exceeds ${MAX_CASE_INFUSION_RATE_MG_PER_MIN} mg/min`);
+    }
+  }
 }
 
-export function runCase(c: PublishedCase): CaseResult {
-  // Reference-band cases don't call the engine — they exist purely to render
-  // a published multi-platform comparison as industry-context evidence.
-  // Return a sentinel result that the page and summary skip past.
-  if (c.workflow_type === "reference_band") {
-    return {
-      case_id: c.id,
-      predicted: { auc24: null, peak: null, trough: null, clearance_l_h: null, v1_l: null },
-      deltas: { auc24_pct: null, peak_pct: null, trough_pct: null },
-      within_tolerance: true,
-      failures: [],
-      is_reference_band: true,
-    };
-  }
-
-  let predicted: CaseResult["predicted"];
-
+function runEngine(c: PublishedCase): CaseResult["predicted"] {
   if (c.workflow_type === "empiric") {
     const result = computeInitialRegimen({
       age: c.patient.age_years,
@@ -53,14 +64,16 @@ export function runCase(c: PublishedCase): CaseResult {
       sex: c.patient.sex === "M" ? "male" : "female",
       height_cm: c.patient.height_cm ?? 0,
     });
-    predicted = {
+    return {
       auc24: result.auc24,
       peak: result.peak,
       trough: result.trough,
       clearance_l_h: result.pk_parameters.CL,
       v1_l: result.pk_parameters.V1,
     };
-  } else if (c.workflow_type === "prior_at_regimen") {
+  }
+
+  if (c.workflow_type === "prior_at_regimen") {
     if (!c.regimen) {
       throw new Error(`Case ${c.id}: prior_at_regimen workflow requires a regimen`);
     }
@@ -86,81 +99,110 @@ export function runCase(c: PublishedCase): CaseResult {
       tau: c.regimen.interval_hours,
       T_inf: Math.min(c.regimen.infusion_duration_hours, c.regimen.interval_hours),
     });
-    predicted = {
+    return {
       auc24: exposure.auc24,
       peak: exposure.peak,
       trough: exposure.trough,
       clearance_l_h: prior.CL,
       v1_l: prior.V1,
     };
-  } else {
-    if (!c.regimen) {
-      throw new Error(`Case ${c.id}: existing workflow requires a regimen`);
-    }
-    // Call the engine directly rather than runExistingRegimenPipeline.
-    // The pipeline's validator is designed to protect the user-facing API
-    // from inconsistent inputs and has quirks (e.g. it rejects 2-level
-    // wall-clock deltas > interval/2 as "cross-cycle") that are wrong for
-    // trusted pre-curated test fixtures where we control all inputs.
-    // The engine itself is the pure computation; bypassing the validator
-    // is the right move for a build-time regression test.
-    // Pass height + sex so the obesity-model branch in buildPriorParameters
-    // can activate for BMI ≥ 40 cases (matching the calculator UI behavior,
-    // which always has these fields populated). Previously dropped them and
-    // the case page silently ran the Colin prior even when the calculator
-    // was running the Vancomyzer Obesity Model on the same patient.
-    const patient = normalizePatient({
-      age: c.patient.age_years,
-      weight_kg: c.patient.weight_kg,
-      serum_creatinine_mg_dl: c.patient.serum_creatinine_mg_dl,
-      height_cm: c.patient.height_cm ?? 0,
-      sex: c.patient.sex === "M" ? "male" : c.patient.sex === "F" ? "female" : "",
-    });
-    const regimen = normalizeRegimen({
-      dose_mg: c.regimen.dose_mg,
-      interval_hours: c.regimen.interval_hours,
-      infusion_duration_hours: c.regimen.infusion_duration_hours,
-      doses_given: c.regimen.doses_given,
-    });
-    const levels = normalizeLevels(
-      c.levels.map((l) => ({
-        value_mcg_ml: l.value_mcg_ml,
-        collection_time: "",
-        time_since_last_dose_hours: l.time_since_last_dose_hours,
-      })),
-    );
-    const r = runExistingRegimenEngine({ patient, regimen, levels });
-    predicted = {
-      auc24: r.auc24,
-      peak: r.peak,
-      trough: r.trough,
-      clearance_l_h: r.CL,
-      v1_l: r.V1,
+  }
+
+  if (!c.regimen) {
+    throw new Error(`Case ${c.id}: existing workflow requires a regimen`);
+  }
+  // Call the engine directly rather than runExistingRegimenPipeline. The
+  // pipeline's validator protects the user-facing API from inconsistent
+  // inputs (e.g. it rejects 2-level wall-clock deltas > interval/2 as
+  // "cross-cycle"), which does not apply to curated fixtures where every
+  // input is controlled. Height and sex are passed as the calculator passes
+  // them; since 15 Sep 2026 they do not change the model (Colin 2019 is used
+  // at every BMI).
+  const patient = normalizePatient({
+    age: c.patient.age_years,
+    weight_kg: c.patient.weight_kg,
+    serum_creatinine_mg_dl: c.patient.serum_creatinine_mg_dl,
+    height_cm: c.patient.height_cm ?? 0,
+    sex: c.patient.sex === "M" ? "male" : c.patient.sex === "F" ? "female" : "",
+  });
+  const regimen = normalizeRegimen({
+    dose_mg: c.regimen.dose_mg,
+    interval_hours: c.regimen.interval_hours,
+    infusion_duration_hours: c.regimen.infusion_duration_hours,
+    doses_given: c.regimen.doses_given,
+  });
+  const levels = normalizeLevels(
+    c.levels.map((l) => ({
+      value_mcg_ml: l.value_mcg_ml,
+      collection_time: "",
+      time_since_last_dose_hours: l.time_since_last_dose_hours,
+    })),
+  );
+  const r = runExistingRegimenEngine({ patient, regimen, levels });
+  return {
+    auc24: r.auc24,
+    peak: r.peak,
+    trough: r.trough,
+    clearance_l_h: r.CL,
+    v1_l: r.V1,
+  };
+}
+
+export function runCase(c: PublishedCase): CaseResult {
+  assertCaseIsConsistent(c);
+
+  if (c.comparison_kind === "reference_band") {
+    return {
+      case_id: c.id,
+      comparison_kind: c.comparison_kind,
+      predicted: { auc24: null, peak: null, trough: null, clearance_l_h: null, v1_l: null },
+      deltas: { auc24_pct: null, peak_pct: null, trough_pct: null, clearance_pct: null, v1_pct: null },
+      status: "not_tested",
+      failures: [],
     };
   }
 
+  const predicted = runEngine(c);
   const deltas = {
     auc24_pct: pctDelta(predicted.auc24, c.published.auc24_mg_h_l),
     peak_pct: pctDelta(predicted.peak, c.published.peak_mcg_ml),
     trough_pct: pctDelta(predicted.trough, c.published.trough_mcg_ml),
+    clearance_pct: pctDelta(predicted.clearance_l_h, c.published.clearance_l_h),
+    v1_pct: pctDelta(predicted.v1_l, c.published.v1_l),
   };
 
+  if (c.comparison_kind === "cross_model_reference") {
+    return { case_id: c.id, comparison_kind: c.comparison_kind, predicted, deltas, status: "not_tested", failures: [] };
+  }
+
+  // Same-model reproduction.
+  const tol = c.tolerance!;
+  const checks: { label: string; published: number | null; delta: number | null; tolerance: number }[] = [
+    { label: "AUC24", published: c.published.auc24_mg_h_l, delta: deltas.auc24_pct, tolerance: tol.auc24_pct },
+    { label: "Peak", published: c.published.peak_mcg_ml, delta: deltas.peak_pct, tolerance: tol.peak_pct },
+    { label: "Trough", published: c.published.trough_mcg_ml, delta: deltas.trough_pct, tolerance: tol.trough_pct },
+    { label: "CL", published: c.published.clearance_l_h, delta: deltas.clearance_pct, tolerance: tol.clearance_pct },
+    { label: "V1", published: c.published.v1_l, delta: deltas.v1_pct, tolerance: tol.v1_pct },
+  ];
+  const compared = checks.filter((k) => k.published != null);
   const failures: string[] = [];
-  if (!withinTolerance(deltas.auc24_pct, c.tolerance.auc24_pct)) {
-    failures.push(`AUC24 ${deltas.auc24_pct?.toFixed(1)}% > ±${c.tolerance.auc24_pct}%`);
+  if (compared.length === 0) {
+    failures.push("No published value to compare; a reproduction case cannot pass without one");
   }
-  if (!withinTolerance(deltas.peak_pct, c.tolerance.peak_pct)) {
-    failures.push(`Peak ${deltas.peak_pct?.toFixed(1)}% > ±${c.tolerance.peak_pct}%`);
-  }
-  if (!withinTolerance(deltas.trough_pct, c.tolerance.trough_pct)) {
-    failures.push(`Trough ${deltas.trough_pct?.toFixed(1)}% > ±${c.tolerance.trough_pct}%`);
+  for (const k of compared) {
+    if (k.delta == null || !Number.isFinite(k.delta)) {
+      failures.push(`${k.label}: engine produced no finite value to compare`);
+    } else if (Math.abs(k.delta) > k.tolerance) {
+      failures.push(`${k.label} ${k.delta.toFixed(2)}% outside ±${k.tolerance}%`);
+    }
   }
 
   return {
     case_id: c.id,
+    comparison_kind: c.comparison_kind,
     predicted,
     deltas,
-    within_tolerance: failures.length === 0,
+    status: failures.length === 0 ? "pass" : "fail",
     failures,
   };
 }
@@ -170,45 +212,50 @@ export function runAllCases(cases: PublishedCase[]): CaseResult[] {
   return cases.map(runCase);
 }
 
-/** Aggregate stats for the page summary scorecard. */
+/** Aggregate stats for the page summary and the CLI. */
 export interface CaseSummary {
-  /** Total number of cards on the page, including reference-band industry-context cards. */
+  /** All cards on the page. */
   total: number;
-  /** Tests that ran the engine and stayed within tolerance. */
+  /** Same-model reproductions (the only pass/fail tests). */
+  reproduction_count: number;
   passing: number;
-  /** Tests that ran the engine and drifted beyond tolerance. */
   failing: number;
-  /** Reference-band cards (no engine call, no pass/fail). Counted in `total`
-   *  but excluded from passing/failing and delta math. */
+  /** Cross-model references: engine value shown for context, not pass/fail. */
+  cross_model_reference_count: number;
+  /** Reference bands: no engine call. */
   reference_band_count: number;
+  /** Over same-model reproductions only. */
   median_abs_auc_pct: number | null;
   max_abs_auc_pct: number | null;
+  max_abs_clearance_pct: number | null;
+}
+
+function medianOf(sorted: number[]): number | null {
+  if (sorted.length === 0) return null;
+  const m = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1 ? sorted[m] : (sorted[m - 1] + sorted[m]) / 2;
 }
 
 export function summarize(results: CaseResult[]): CaseSummary {
-  // Engine-run results only — reference-band cards have no delta to compute.
-  const engineResults = results.filter((r) => !r.is_reference_band);
-  const referenceBandCount = results.length - engineResults.length;
-
-  const aucAbs = engineResults
-    .map((r) => r.deltas.auc24_pct)
-    .filter((d): d is number => d != null)
-    .map((d) => Math.abs(d))
-    .sort((a, b) => a - b);
-
-  const median =
-    aucAbs.length === 0
-      ? null
-      : aucAbs.length % 2 === 1
-        ? aucAbs[(aucAbs.length - 1) / 2]
-        : (aucAbs[aucAbs.length / 2 - 1] + aucAbs[aucAbs.length / 2]) / 2;
+  const reproductions = results.filter((r) => r.comparison_kind === "same_model_reproduction");
+  const absValues = (pick: (r: CaseResult) => number | null) =>
+    reproductions
+      .map(pick)
+      .filter((d): d is number => d != null)
+      .map((d) => Math.abs(d))
+      .sort((a, b) => a - b);
+  const aucAbs = absValues((r) => r.deltas.auc24_pct);
+  const clAbs = absValues((r) => r.deltas.clearance_pct);
 
   return {
     total: results.length,
-    passing: engineResults.filter((r) => r.within_tolerance).length,
-    failing: engineResults.filter((r) => !r.within_tolerance).length,
-    reference_band_count: referenceBandCount,
-    median_abs_auc_pct: median,
+    reproduction_count: reproductions.length,
+    passing: reproductions.filter((r) => r.status === "pass").length,
+    failing: reproductions.filter((r) => r.status === "fail").length,
+    cross_model_reference_count: results.filter((r) => r.comparison_kind === "cross_model_reference").length,
+    reference_band_count: results.filter((r) => r.comparison_kind === "reference_band").length,
+    median_abs_auc_pct: medianOf(aucAbs),
     max_abs_auc_pct: aucAbs.length === 0 ? null : aucAbs[aucAbs.length - 1],
+    max_abs_clearance_pct: clAbs.length === 0 ? null : clAbs[clAbs.length - 1],
   };
 }

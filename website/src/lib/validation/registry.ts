@@ -1,15 +1,17 @@
 /**
- * Central registry of Literature Reproducibility cases.
+ * Central registry of literature cases.
  *
  * Adding a case:
  *   1. Create src/lib/validation/cases/<id>.ts exporting a PublishedCase
- *   2. Import and append below
- *   3. Run `npm run test:cases` — case-runner will fail the build if our
- *      engine drifts from the published value beyond the case's tolerance
+ *   2. Set comparison_kind honestly: "same_model_reproduction" only when the
+ *      published value comes from the model the engine uses (Colin 2019);
+ *      otherwise "cross_model_reference" (context only, no pass/fail)
+ *   3. Import and append below
+ *   4. Run `npm run test:cases`. It fails `npm test` if a same-model
+ *      reproduction is outside its tolerance or has no published value.
  *
- * Removing a case requires a written justification in the PR — these
- * are public on /transparent-dosing/cases, and silent removal looks
- * like we're hiding a failure.
+ * Removing a case requires a written justification in the PR. The cases
+ * are public on /transparent-dosing/cases.
  */
 
 import type { PublishedCase } from "./types";
@@ -26,16 +28,14 @@ import { PATANWALA_2022_MULTI_PLATFORM } from "./cases/patanwala-2022-multi-plat
 // and tolerance so a reviewer can verify in isolation.
 
 export const CASES: PublishedCase[] = [
-  // Implementation-correctness anchor — exact prior reproduction (typical adult)
+  // Same-model reproductions (Colin 2019): pass/fail at 1%
   COLIN_2019_TYPICAL_ADULT,
-  // FDecline + FSCR covariate composition (elderly + mild renal impairment)
   COLIN_2019_ELDERLY_MILD_CKD,
-  // Obesity model: simulation-typical (Smit derivation) and real-measured (Adane cohort)
+  // Cross-model references: different published models or cohort statistics, context only
   SMIT_2020_MORBIDLY_OBESE,
   ADANE_2015_EXTREME_OBESITY,
-  // Sparse-sampling Bayesian fit — tests the fitter, not just the prior
   CARRENO_2017_SPARSE_BAYESIAN_OBESE,
-  // Industry-context reference band — multi-platform AUC variance
+  // Reference band: published multi-model comparison, no engine run
   PATANWALA_2022_MULTI_PLATFORM,
 ];
 

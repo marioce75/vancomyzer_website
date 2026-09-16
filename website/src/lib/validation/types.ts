@@ -1,56 +1,75 @@
 /**
- * Type definitions for the Literature Reproducibility case library.
+ * Type definitions for the literature case library.
  *
- * Each PublishedCase is a frozen-in-time test fixture pinning Vancomyzer's
- * engine output to a value cited in the peer-reviewed literature or a
- * society guideline. Cases run at build time (see scripts/verify-cases.ts)
- * and hard-fail the build if our output drifts beyond the case's tolerance.
+ * There are three kinds of case (see ComparisonKind):
+ *  - same-model reproductions pin the engine's output to a value published
+ *    for the model the engine uses (Colin 2019). They run in `npm test`
+ *    (scripts/verify-cases.ts) and fail the suite if the engine drifts
+ *    outside the case's tolerance or if no published value is present.
+ *  - cross-model references run the engine (Colin 2019) next to a value
+ *    from a DIFFERENT published model or a cohort statistic. The difference
+ *    is shown for context only. They never pass or fail and are excluded
+ *    from summary statistics.
+ *  - reference bands show a published multi-model comparison without
+ *    running the engine.
  *
- * Schema is deliberately strict: every numeric input must be a specific
- * number (no ranges), and every published value must have an extraction
- * method recorded so the attorney/clinician/reviewer can verify the data
- * against the cited source.
+ * Every published value must record how it was extracted so a reviewer
+ * can check it against the cited source.
  */
 
 /**
- * How the engine should be invoked for a case:
- *  - "empiric"           → computeInitialRegimen (engine picks the best regimen for the patient)
- *  - "prior_at_regimen"  → buildPriorParameters + computeExposure (prior-only prediction at a
- *                          stated regimen; no Bayesian update). Used to verify the prior's
- *                          CL/V output against a published population-typical AUC, which is
- *                          what most popPK papers actually publish (very few publish individual
- *                          patient-level cases with full demographics + dose + AUC).
- *  - "existing"          → runExistingRegimenPipeline (full Bayesian fit using measured levels)
- *  - "reference_band"    → NO engine call. Card renders a published multi-platform comparison
- *                          (e.g., Patanwala 2022 cohort-mean AUC per popPK model) as
- *                          industry-context evidence. Our engine is not in the test loop for
- *                          these cards; they exist to show platform-choice variance.
+ * How the engine is invoked for a case:
+ *  - "empiric"           → computeInitialRegimen (engine picks the regimen)
+ *  - "prior_at_regimen"  → buildPriorParameters + computeExposure (population prior at a stated
+ *                          regimen; no Bayesian update)
+ *  - "existing"          → runExistingRegimenEngine (Bayesian fit to the case's levels)
+ *  - "reference_band"    → no engine call; the card renders a published multi-model comparison
  */
 export type WorkflowType = "empiric" | "prior_at_regimen" | "existing" | "reference_band";
 
+/**
+ * What the case's comparison means:
+ *  - "same_model_reproduction": published value comes from the model the engine uses.
+ *    Pass/fail against `tolerance`; counted in the summary.
+ *  - "cross_model_reference": published value comes from a different model or a cohort
+ *    statistic. Engine value and difference are shown for context only; no pass/fail;
+ *    excluded from summary statistics. `tolerance` must be null.
+ *  - "reference_band": no engine call (workflow_type "reference_band"). `tolerance` must be null.
+ */
+export type ComparisonKind = "same_model_reproduction" | "cross_model_reference" | "reference_band";
+
 export type SourceKind =
+  /** Typical-individual value from a published model's equations or text. */
+  | "model_typical_value"
+  /** Cohort-level statistic (median, mean, range) from a published study. */
+  | "cohort_summary"
   | "population_simulation"
   | "individual_observed"
   | "individual_predicted_bayesian"
   | "guideline_worked_example";
 
+/**
+ * Where the case's patient inputs come from:
+ *  - "published": the inputs are the values stated in the source
+ *  - "approximated": some inputs match published values; others were chosen by Vancomyzer
+ *    to approximate the source and have not been verified against it (see patient.notes)
+ *  - "illustrative": the inputs were chosen by Vancomyzer for illustration and are not from the source
+ *  - "not_applicable": sentinel inputs on a reference-band card (no engine run)
+ */
+export type InputsStatus = "published" | "approximated" | "illustrative" | "not_applicable";
+
 export interface SourceCitation {
-  /** Vancouver-style citation, e.g. "Colin PJ et al. Clin Pharmacokinet. 2019;58(6):767-780" */
+  /** Vancouver-style citation. */
   citation: string;
-  /** DOI without the "doi:" prefix, e.g. "10.1007/s40262-018-0727-5" */
+  /** DOI without the "doi:" prefix. */
   doi: string;
-  /** Resolvable URL for the source (DOI or stable URL) */
+  /** Resolvable URL for the source (DOI or stable URL). */
   url: string;
-  /**
-   * Exact pointer into the source, e.g. "Figure 3, panel B" or
-   * "Appendix A, Patient Case 1". Required — clinicians click through
-   * to verify, and a vague "see paper" undercuts the credibility play.
-   */
+  /** Exact pointer into the source, e.g. "Abstract" or "Table 3, a posteriori rows". */
   specific_reference: string;
   /**
-   * True only if the curator personally verified the numbers against the
-   * source. False means the case is sourced from a secondary reference
-   * (e.g. cited in a review) and we couldn't access the primary.
+   * True only if the curator checked the numbers against the source.
+   * False means a secondary reference was used.
    */
   verified: boolean;
   verification_note: string;
@@ -65,13 +84,16 @@ export interface CasePatient {
   height_cm: number | null;
   /** Free-text clinical context, e.g. "MRSA bacteremia". */
   indication: string;
-  /** Caveats: "population median, not real patient" or "case 14 from cohort". */
+  /** Where the inputs come from. Shown on the card. */
+  inputs_status: InputsStatus;
+  /** Caveats about the inputs, shown on the card. */
   notes: string;
 }
 
 export interface CaseRegimen {
   dose_mg: number;
   interval_hours: number;
+  /** Must keep the infusion rate at or below 10 mg/min (duration ≥ dose/600 h). */
   infusion_duration_hours: number;
   doses_given: number;
 }
@@ -81,80 +103,96 @@ export interface CaseLevel {
   time_since_last_dose_hours: number;
 }
 
+export interface PublishedRange {
+  low: number;
+  high: number;
+  /** e.g. "interquartile range" or "range of full-data estimates across four models". */
+  description: string;
+}
+
 export interface PublishedValues {
   auc24_mg_h_l: number | null;
+  /** Optional published range around auc24_mg_h_l, shown on the card. */
+  auc24_range?: PublishedRange | null;
   peak_mcg_ml: number | null;
   trough_mcg_ml: number | null;
   clearance_l_h: number | null;
   v1_l: number | null;
   source_kind: SourceKind;
-  /** "Read directly from Table 3 row 2" | "Visual estimation from Figure 4" etc. */
+  /** "Read directly from Table 3 row 2" | "Evaluated from the published equation" etc. */
   extraction_method: string;
-  /** Justification for the chosen tolerance. */
+  /** Justification for the chosen tolerance, or why there is none. */
   tolerance_rationale: string;
 }
 
 export interface CaseTolerance {
-  /** Acceptable absolute percent error on AUC24 before the case is "drifted". */
+  /** Maximum absolute percent difference before a reproduction case fails. */
   auc24_pct: number;
   peak_pct: number;
   trough_pct: number;
+  clearance_pct: number;
+  v1_pct: number;
 }
 
 export interface PublishedCase {
-  /** kebab-case slug, e.g. "colin-2019-fig-3b". URL-safe, stable across builds. */
+  /** kebab-case slug, e.g. "colin-2019-typical-adult". URL-safe, stable across builds. */
   id: string;
-  /** One-sentence summary of what the case proves. */
+  /** One-sentence summary of what the case checks or shows. */
   what_it_tests: string;
   source: SourceCitation;
   patient: CasePatient;
-  /** Required for "existing", omitted for "empiric" (which has no input regimen). */
+  /** Required for "existing" and "prior_at_regimen"; null for "empiric" and "reference_band". */
   regimen: CaseRegimen | null;
-  /** Empty array if no measured concentrations (population sim / empiric). */
+  /** Empty array if there are no measured concentrations. */
   levels: CaseLevel[];
   published: PublishedValues;
-  tolerance: CaseTolerance;
-  /** Sentence(s) shown on the case card explaining context + caveats. */
+  comparison_kind: ComparisonKind;
+  /** Required for same-model reproductions; null for cross-model references and reference bands. */
+  tolerance: CaseTolerance | null;
+  /** Sentence(s) shown on the case card explaining context and caveats. */
   notes_for_page: string;
   workflow_type: WorkflowType;
   /**
-   * Populated when workflow_type === "reference_band". Carries the per-
-   * platform published values for a multi-platform comparison study (e.g.,
-   * Patanwala 2022's three popPK priors over 188 ICU adults). When set, the
-   * runner skips the engine call and the card renders the comparison band
-   * directly. The patient / regimen / published / tolerance fields above are
-   * required by the schema but ignored by the runner for these cases — use
-   * sentinel/placeholder values in the case file.
+   * Populated when workflow_type === "reference_band". Carries per-model
+   * published values for a multi-model comparison study. The runner skips
+   * the engine call; patient / regimen / published fields are sentinels.
    */
   reference_band?: ReferenceBand;
 }
 
 export interface ReferencePlatform {
-  /** Display name shown on the bar, e.g. "Goti (via Tucuxi)" or "PrecisePK". */
+  /** Display name shown on the bar, e.g. "Goti 2018 (via Tucuxi)". */
   name: string;
   mean_auc24_mg_h_l: number;
   /** Optional standard deviation, shown as a whisker on the bar. */
   sd_auc24_mg_h_l?: number;
-  /** Optional caveat — e.g. "uses the prior Vancomyzer is built on" so the
-   *  reader knows which row to compare against. */
+  /** Optional caveat shown under the name. */
   notes?: string;
-  /** True if this is the platform Vancomyzer's prior is built on (highlighted
-   *  visually). */
+  /** True if this row uses the model Vancomyzer uses for dosing (highlighted). */
   is_vancomyzer_prior?: boolean;
 }
 
 export interface ReferenceBand {
   /** One-paragraph cohort description shown above the bar chart. */
   cohort_description: string;
-  /** Per-platform published values. Sorted ascending by mean on the card. */
+  /** Per-model published values. */
   platforms: ReferencePlatform[];
-  /** Position statement — how Vancomyzer relates to this band. */
+  /** How Vancomyzer relates to this published comparison. */
   our_position: string;
 }
+
+export type CaseStatus =
+  /** Same-model reproduction within tolerance on every published metric. */
+  | "pass"
+  /** Same-model reproduction outside tolerance, or with nothing published to compare. */
+  | "fail"
+  /** Cross-model reference or reference band: not a pass/fail test. */
+  | "not_tested";
 
 /** Result of running one case through the live engine and comparing to published. */
 export interface CaseResult {
   case_id: string;
+  comparison_kind: ComparisonKind;
   predicted: {
     auc24: number | null;
     peak: number | null;
@@ -162,17 +200,15 @@ export interface CaseResult {
     clearance_l_h: number | null;
     v1_l: number | null;
   };
+  /** (engine − published) / published × 100, or null when either is missing. */
   deltas: {
     auc24_pct: number | null;
     peak_pct: number | null;
     trough_pct: number | null;
+    clearance_pct: number | null;
+    v1_pct: number | null;
   };
-  within_tolerance: boolean;
-  /** If false, lists which metrics drifted. */
+  status: CaseStatus;
+  /** For status "fail": which checks failed. Empty otherwise. */
   failures: string[];
-  /** True for reference_band cases that have no engine output to verify —
-   *  the card renders the published band as industry context, not as a
-   *  reproducibility test. These cases are excluded from the summary
-   *  scorecard's delta math but still counted in the total. */
-  is_reference_band?: boolean;
 }

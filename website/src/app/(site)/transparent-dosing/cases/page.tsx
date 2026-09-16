@@ -1,31 +1,39 @@
 /**
- * /transparent-dosing/cases — Literature Reproducibility page.
+ * /transparent-dosing/cases — Literature cases page.
  *
- * Lists every PublishedCase, runs each through the engine at render
- * time, and shows the delta between our prediction and the published
- * value. Cards are color-coded:
- *   - within tolerance → green check
- *   - drifted beyond tolerance → amber warning + transparent explanation
+ * Lists every PublishedCase, runs each through the engine when the page is
+ * built, and shows the result in one of three forms:
+ *   - same-model reproduction (Colin 2019): engine vs published value with a
+ *     pass/fail badge against the case's tolerance
+ *   - cross-model reference: engine (Colin 2019) next to a value from a
+ *     different published model or a cohort statistic; difference shown for
+ *     context, never pass/fail, excluded from the summary statistics
+ *   - reference band: published multi-model comparison, no engine run
  *
- * Build-time enforcement: scripts/verify-cases.ts (wired into `npm test
- * via test:cases`) hard-fails the build if ANY case drifts beyond its
- * declared tolerance — so this page can never silently regress in prod.
- *
- * Empty-state: if CASES is empty (pre-curation), shows a placeholder
- * explaining the page is under construction. Honest, not aspirational.
+ * The same cases run in `npm test` (scripts/verify-cases.ts); a same-model
+ * reproduction outside tolerance fails the suite.
  */
 
 import Link from "next/link";
 import { CASES } from "@/lib/validation/registry";
-import { runAllCases, summarize } from "@/lib/validation/runCase";
-import type { PublishedCase, CaseResult, ReferenceBand } from "@/lib/validation/types";
+import { runAllCases, summarize, type CaseSummary } from "@/lib/validation/runCase";
+import type { PublishedCase, CaseResult, ReferenceBand, ComparisonKind } from "@/lib/validation/types";
+import { COLIN_2019, VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED } from "@/lib/pk/modelRegistry";
 
 export const metadata = {
   title: "Literature Reproducibility — Vancomyzer",
   description:
-    "Every Vancomyzer release is tested against published vancomycin cases. " +
-    "If our calculator drifts from the literature, the release is halted before it goes live.",
+    "Vancomyzer's Colin 2019 equations checked against published values, plus published results from other models shown for context. " +
+    "These cases run in the automated test suite (npm test); a drift outside tolerance fails the suite.",
 };
+
+const CROSS_MODEL_WORDING = "Different model — difference shown for context, not a pass/fail test.";
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function formatIsoDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${d} ${MONTHS[m - 1]} ${y}`;
+}
 
 export default function CasesPage() {
   const results = runAllCases(CASES);
@@ -38,11 +46,15 @@ export default function CasesPage() {
       <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--color-primary)", marginBottom: 6, lineHeight: 1.2 }}>
         Literature Reproducibility
       </h1>
-      <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 720 }}>
-        Every Vancomyzer release runs through a library of published vancomycin cases.
-        If our calculator drifts from the cited literature beyond a pre-declared tolerance,
-        the release is halted before it goes live. The result is on this page — auditable,
-        reproducible, and refreshed with every release.
+      <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 12, maxWidth: 720 }}>
+        Published vancomycin values run through Vancomyzer&apos;s engine. Cases that use the same model
+        as the engine ({COLIN_2019.shortName}) are pass/fail checks of the implementation. Cases from other
+        published models or patient cohorts are shown for context only. These cases run in the automated
+        test suite (npm test); a drift outside tolerance fails the suite.
+      </p>
+      <p style={{ fontSize: 13, color: "var(--color-dim)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 720 }}>
+        Vancomyzer has not yet been validated in real patients. Its equations are checked against published
+        values and synthetic test cases; external validation with patient data is planned.
       </p>
 
       {CASES.length === 0 ? <EmptyState /> : <Body cases={CASES} results={results} summary={summary} />}
@@ -78,10 +90,9 @@ function EmptyState() {
         marginBottom: 28,
       }}
     >
-      <strong>Case library under curation.</strong> The first 8 published cases are being
-      verified against their primary sources. Each case will list the cited paper, the
-      patient inputs, the published prediction, and our calculator&apos;s live output —
-      with a delta in either direction shown transparently.
+      <strong>No cases are registered yet.</strong> Each case will list the cited paper, the patient
+      inputs, the published value and the engine&apos;s output, with the difference shown in either
+      direction.
     </div>
   );
 }
@@ -89,23 +100,53 @@ function EmptyState() {
 interface BodyProps {
   cases: PublishedCase[];
   results: CaseResult[];
-  summary: ReturnType<typeof summarize>;
+  summary: CaseSummary;
 }
+
+const GROUPS: { kind: ComparisonKind; title: string; intro: string }[] = [
+  {
+    kind: "same_model_reproduction",
+    title: `Same-model reproductions (${COLIN_2019.shortName}) · pass/fail`,
+    intro: `The published value comes from ${COLIN_2019.shortName}, the model the engine uses, so the engine should reproduce it within the stated tolerance.`,
+  },
+  {
+    kind: "cross_model_reference",
+    title: "Cross-model references · context only",
+    intro: `The published value comes from a different model or summarizes a patient cohort. The engine's ${COLIN_2019.shortName} value is shown next to it; these cards never pass or fail.`,
+  },
+  {
+    kind: "reference_band",
+    title: "Published reference band · no engine run",
+    intro: "Published results from a multi-model comparison, shown for context. Vancomyzer was not run on these patients.",
+  },
+];
 
 function Body({ cases, results, summary }: BodyProps) {
   return (
     <>
       <SummaryScorecard summary={summary} />
-      <div style={{ display: "grid", gap: 16, marginBottom: 28 }}>
-        {cases.map((c, i) => (
-          <CaseCard key={c.id} caseDef={c} result={results[i]} />
-        ))}
-      </div>
+      {GROUPS.map((g) => {
+        const indices = cases.map((c, i) => (c.comparison_kind === g.kind ? i : -1)).filter((i) => i >= 0);
+        if (indices.length === 0) return null;
+        return (
+          <section key={g.kind} style={{ marginBottom: 28 }}>
+            <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 4px" }}>
+              {g.title}
+            </h2>
+            <p style={{ fontSize: 12, color: "var(--color-dim)", margin: "0 0 12px", lineHeight: 1.55 }}>{g.intro}</p>
+            <div style={{ display: "grid", gap: 16 }}>
+              {indices.map((i) => (
+                <CaseCard key={cases[i].id} caseDef={cases[i]} result={results[i]} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </>
   );
 }
 
-function SummaryScorecard({ summary }: { summary: ReturnType<typeof summarize> }) {
+function SummaryScorecard({ summary }: { summary: CaseSummary }) {
   const allPassing = summary.failing === 0;
   return (
     <div
@@ -122,25 +163,25 @@ function SummaryScorecard({ summary }: { summary: ReturnType<typeof summarize> }
           <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-dim)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
             Summary
           </div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: allPassing ? "#047857" : "#92400e", marginTop: 4 }}>
-            {summary.passing} / {summary.passing + summary.failing} engine tests within tolerance
+          <div style={{ fontSize: 20, fontWeight: 700, color: allPassing ? "#047857" : "#92400e", marginTop: 4 }}>
+            {summary.passing} / {summary.reproduction_count} same-model reproductions within tolerance
             {summary.failing > 0 && (
               <span style={{ fontSize: 14, fontWeight: 600, marginLeft: 10, color: "#92400e" }}>
-                · {summary.failing} drifted
-              </span>
-            )}
-            {summary.reference_band_count > 0 && (
-              <span style={{ fontSize: 14, fontWeight: 500, marginLeft: 10, color: "#3730a3" }}>
-                · {summary.reference_band_count} reference band{summary.reference_band_count === 1 ? "" : "s"}
+                · {summary.failing} outside tolerance
               </span>
             )}
           </div>
+          <div style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 4 }}>
+            Not pass/fail: {summary.cross_model_reference_count} cross-model reference
+            {summary.cross_model_reference_count === 1 ? "" : "s"} and {summary.reference_band_count} reference band
+            {summary.reference_band_count === 1 ? "" : "s"}, excluded from these statistics.
+          </div>
         </div>
         <dl style={{ display: "grid", gridTemplateColumns: "auto auto", gap: "4px 16px", margin: 0, fontSize: 12, color: "var(--color-secondary)" }}>
-          <dt style={{ margin: 0 }}>Median |AUC₂₄ error|</dt>
-          <dd style={{ margin: 0, fontWeight: 600 }}>{summary.median_abs_auc_pct?.toFixed(1) ?? "—"}%</dd>
-          <dt style={{ margin: 0 }}>Max |AUC₂₄ error|</dt>
-          <dd style={{ margin: 0, fontWeight: 600 }}>{summary.max_abs_auc_pct?.toFixed(1) ?? "—"}%</dd>
+          <dt style={{ margin: 0 }}>Largest |AUC₂₄ difference|</dt>
+          <dd style={{ margin: 0, fontWeight: 600 }}>{summary.max_abs_auc_pct == null ? "—" : `${summary.max_abs_auc_pct.toFixed(2)}%`}</dd>
+          <dt style={{ margin: 0 }}>Largest |CL difference|</dt>
+          <dd style={{ margin: 0, fontWeight: 600 }}>{summary.max_abs_clearance_pct == null ? "—" : `${summary.max_abs_clearance_pct.toFixed(2)}%`}</dd>
         </dl>
       </div>
     </div>
@@ -148,32 +189,34 @@ function SummaryScorecard({ summary }: { summary: ReturnType<typeof summarize> }
 }
 
 function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseResult }) {
-  // Reference-band cards render a published multi-platform comparison rather
-  // than an engine-vs-published delta. Branch early — they have a different
-  // shape and a different visual treatment (industry-context, not pass/fail).
-  if (caseDef.reference_band) {
+  if (caseDef.comparison_kind === "reference_band" && caseDef.reference_band) {
     return <ReferenceBandCard caseDef={caseDef} band={caseDef.reference_band} />;
   }
-  const pass = result.within_tolerance;
+  const isReproduction = caseDef.comparison_kind === "same_model_reproduction";
+  const pass = result.status === "pass";
+  const borderColor = isReproduction ? (pass ? "#10b981" : "#f59e0b") : "#64748b";
   return (
     <article
       id={caseDef.id}
       style={{
         padding: "16px 20px",
         background: "var(--color-card)",
-        border: `1px solid ${pass ? "var(--color-border)" : "#fcd34d"}`,
-        borderLeft: `4px solid ${pass ? "#10b981" : "#f59e0b"}`,
+        border: `1px solid ${isReproduction && !pass ? "#fcd34d" : "var(--color-border)"}`,
+        borderLeft: `4px solid ${borderColor}`,
         borderRadius: 6,
       }}
     >
       <header style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline", marginBottom: 6 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--color-primary)", margin: 0 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--color-primary)", margin: 0 }}>
           {caseDef.source.specific_reference}
-        </h2>
-        <PassFailBadge pass={pass} failures={result.failures} />
+        </h3>
+        {isReproduction ? <PassFailBadge pass={pass} failures={result.failures} /> : <ContextBadge />}
       </header>
+      {!isReproduction && (
+        <p style={{ fontSize: 12, fontWeight: 600, color: "#334155", margin: "0 0 6px 0" }}>{CROSS_MODEL_WORDING}</p>
+      )}
       <p style={{ fontSize: 12, color: "var(--color-secondary)", margin: "0 0 6px 0" }}>
-        <strong>What it tests:</strong> {caseDef.what_it_tests}
+        <strong>{isReproduction ? "What it tests:" : "What it shows:"}</strong> {caseDef.what_it_tests}
       </p>
       <p style={{ fontSize: 12, color: "var(--color-dim)", margin: "0 0 12px 0", lineHeight: 1.55 }}>
         {caseDef.notes_for_page}
@@ -181,9 +224,9 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
 
       <PatientRegimenLine caseDef={caseDef} />
 
-      <DeltaTable caseDef={caseDef} result={result} />
+      {isReproduction ? <ReproductionTable caseDef={caseDef} result={result} /> : <CrossModelTable caseDef={caseDef} result={result} />}
 
-      {!pass && (
+      {isReproduction && !pass && (
         <div
           style={{
             marginTop: 10,
@@ -195,11 +238,12 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
             color: "#78350f",
           }}
         >
-          <strong>Drift exceeded tolerance:</strong> {result.failures.join("; ")}.
-          We show this case anyway so the page reflects honest engine behavior, not
-          a curated success story.
+          <strong>Outside tolerance:</strong> {result.failures.join("; ")}. This case is shown so the page
+          reflects the engine&apos;s current behavior; the discrepancy needs investigation.
         </div>
       )}
+
+      <SourceDetails caseDef={caseDef} />
 
       <footer style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <a
@@ -239,16 +283,28 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
   );
 }
 
+function SourceDetails({ caseDef }: { caseDef: PublishedCase }) {
+  return (
+    <details style={{ marginTop: 10, fontSize: 12, color: "var(--color-secondary)" }}>
+      <summary style={{ cursor: "pointer", color: "var(--color-dim)" }}>How the published value was obtained</summary>
+      <div style={{ marginTop: 6, lineHeight: 1.55 }}>
+        <p style={{ margin: "0 0 4px" }}><strong>Extraction:</strong> {caseDef.published.extraction_method}</p>
+        <p style={{ margin: "0 0 4px" }}><strong>Verification:</strong> {caseDef.source.verification_note}</p>
+        <p style={{ margin: 0 }}><strong>Tolerance:</strong> {caseDef.published.tolerance_rationale}</p>
+      </div>
+    </details>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────
-// Reference-band card — published multi-platform AUC comparison.
-// Renders the per-platform means as horizontal bars with optional SD
-// whiskers, highlighting the platform Vancomyzer's prior is built on.
-// No engine call, no pass/fail — this is industry-context evidence.
+// Reference-band card — published multi-model AUC comparison.
+// Renders the per-model means as horizontal bars with optional SD
+// whiskers, highlighting the model Vancomyzer uses for dosing.
+// No engine call, no pass/fail.
 // ─────────────────────────────────────────────────────────────────────
 
 function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: ReferenceBand }) {
-  // Compute the chart's x-axis range. Pad ±10% beyond the min/max of
-  // (mean ± SD) across all platforms so the whiskers don't clip.
+  // Pad ±10% beyond the min/max of (mean ± SD) so the whiskers don't clip.
   const lows = band.platforms.map((p) => p.mean_auc24_mg_h_l - (p.sd_auc24_mg_h_l ?? 0));
   const highs = band.platforms.map((p) => p.mean_auc24_mg_h_l + (p.sd_auc24_mg_h_l ?? 0));
   const rawMin = Math.min(...lows);
@@ -270,11 +326,11 @@ function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: Re
       }}
     >
       <header style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline", marginBottom: 6 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--color-primary)", margin: 0 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--color-primary)", margin: 0 }}>
           {caseDef.source.specific_reference}
-        </h2>
+        </h3>
         <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#eef2ff", color: "#3730a3", border: "1px solid #c7d2fe", borderRadius: 4 }}>
-          ◇ Reference band
+          ◇ Reference band · not pass/fail
         </span>
       </header>
       <p style={{ fontSize: 12, color: "var(--color-secondary)", margin: "0 0 6px 0" }}>
@@ -288,18 +344,15 @@ function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: Re
         <strong style={{ color: "var(--color-primary)" }}>Cohort:</strong> {band.cohort_description}
       </div>
 
-      {/* Horizontal bar chart — one row per platform */}
-      <div style={{ marginBottom: 12 }}>
+      <div style={{ marginBottom: 12, overflowX: "auto" }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-dim)", marginBottom: 8, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-          Cohort-mean AUC₂₄ (mg·h/L) per popPK model
+          Published cohort-mean AUC₂₄ (mg·h/L) per population model
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "200px 1fr 110px", gap: 8, alignItems: "center", fontSize: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(110px, 200px) minmax(80px, 1fr) 90px", gap: 8, alignItems: "center", fontSize: 12 }}>
           {band.platforms.map((p) => {
-            const meanLeftPct = ((p.mean_auc24_mg_h_l - xMin) / xRange) * 100;
             const barWidthPct = ((p.mean_auc24_mg_h_l - xMin) / xRange) * 100;
             const whiskerLow = p.sd_auc24_mg_h_l != null ? Math.max(0, ((p.mean_auc24_mg_h_l - p.sd_auc24_mg_h_l - xMin) / xRange) * 100) : null;
             const whiskerHigh = p.sd_auc24_mg_h_l != null ? Math.min(100, ((p.mean_auc24_mg_h_l + p.sd_auc24_mg_h_l - xMin) / xRange) * 100) : null;
-            const isOurs = p.is_vancomyzer_prior === true;
             return (
               <PlatformRow
                 key={p.name}
@@ -307,20 +360,18 @@ function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: Re
                 notes={p.notes}
                 mean={p.mean_auc24_mg_h_l}
                 sd={p.sd_auc24_mg_h_l}
-                meanLeftPct={meanLeftPct}
                 barWidthPct={barWidthPct}
                 whiskerLowPct={whiskerLow}
                 whiskerHighPct={whiskerHigh}
-                isOurs={isOurs}
+                highlight={p.is_vancomyzer_prior === true}
               />
             );
           })}
         </div>
-        {/* Axis ticks */}
-        <div style={{ display: "grid", gridTemplateColumns: "200px 1fr 110px", gap: 8, marginTop: 4, fontSize: 10, color: "var(--color-dim)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(110px, 200px) minmax(80px, 1fr) 90px", gap: 8, marginTop: 4, fontSize: 10, color: "var(--color-dim)" }}>
           <div></div>
           <div style={{ position: "relative", height: 14 }}>
-            <span style={{ position: "absolute", left: "0%", transform: "translateX(-50%)" }}>{xMin}</span>
+            <span style={{ position: "absolute", left: "0%" }}>{xMin}</span>
             <span style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>{Math.round((xMin + xMax) / 2)}</span>
             <span style={{ position: "absolute", left: "100%", transform: "translateX(-100%)" }}>{xMax}</span>
           </div>
@@ -329,7 +380,7 @@ function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: Re
       </div>
 
       <div style={{ fontSize: 12, color: "var(--color-secondary)", padding: "10px 12px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 4, marginBottom: 10, lineHeight: 1.55 }}>
-        <strong style={{ color: "var(--color-primary)" }}>Where Vancomyzer sits:</strong> {band.our_position}
+        <strong style={{ color: "var(--color-primary)" }}>How this relates to Vancomyzer:</strong> {band.our_position}
       </div>
 
       <footer style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
@@ -350,32 +401,29 @@ function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: Re
 }
 
 function PlatformRow({
-  name, notes, mean, sd, meanLeftPct, barWidthPct, whiskerLowPct, whiskerHighPct, isOurs,
+  name, notes, mean, sd, barWidthPct, whiskerLowPct, whiskerHighPct, highlight,
 }: {
   name: string;
   notes?: string;
   mean: number;
   sd?: number;
-  meanLeftPct: number;
   barWidthPct: number;
   whiskerLowPct: number | null;
   whiskerHighPct: number | null;
-  isOurs: boolean;
+  highlight: boolean;
 }) {
-  void meanLeftPct; // unused — bar grows from 0
-  const barColor = isOurs ? "#6366f1" : "#94a3b8";
+  const barColor = highlight ? "#6366f1" : "#94a3b8";
   return (
     <>
-      <div style={{ color: isOurs ? "var(--color-primary)" : "var(--color-secondary)", fontWeight: isOurs ? 600 : 400, lineHeight: 1.3 }}>
+      <div style={{ color: highlight ? "var(--color-primary)" : "var(--color-secondary)", fontWeight: highlight ? 600 : 400, lineHeight: 1.3 }}>
         {name}
         {notes && (
-          <div style={{ fontSize: 10, color: isOurs ? "#3730a3" : "var(--color-dim)", fontWeight: 500, marginTop: 1 }}>
+          <div style={{ fontSize: 10, color: highlight ? "#3730a3" : "var(--color-dim)", fontWeight: 500, marginTop: 1 }}>
             {notes}
           </div>
         )}
       </div>
       <div style={{ position: "relative", height: 24, background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 3 }}>
-        {/* Bar from left to mean */}
         <div
           style={{
             position: "absolute",
@@ -387,7 +435,6 @@ function PlatformRow({
             borderRadius: 2,
           }}
         />
-        {/* SD whisker */}
         {whiskerLowPct != null && whiskerHighPct != null && (
           <>
             <div
@@ -406,7 +453,7 @@ function PlatformRow({
           </>
         )}
       </div>
-      <div style={{ fontSize: 12, color: isOurs ? "var(--color-primary)" : "var(--color-secondary)", fontWeight: isOurs ? 700 : 500, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
+      <div style={{ fontSize: 12, color: highlight ? "var(--color-primary)" : "var(--color-secondary)", fontWeight: highlight ? 700 : 500, fontVariantNumeric: "tabular-nums", textAlign: "right" }}>
         {mean.toFixed(0)}
         {sd != null && <span style={{ color: "var(--color-dim)", fontWeight: 400 }}> ± {sd.toFixed(0)}</span>}
       </div>
@@ -427,75 +474,167 @@ function PassFailBadge({ pass, failures }: { pass: boolean; failures: string[] }
       title={failures.join("; ")}
       style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#fef3c7", color: "#92400e", border: "1px solid #fcd34d", borderRadius: 4 }}
     >
-      ⚠ Drifted
+      ⚠ Outside tolerance
     </span>
   );
 }
+
+function ContextBadge() {
+  return (
+    <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#f1f5f9", color: "#334155", border: "1px solid #cbd5e1", borderRadius: 4 }}>
+      Different model · context only
+    </span>
+  );
+}
+
+const INPUTS_LABEL: Record<PublishedCase["patient"]["inputs_status"], string> = {
+  published: "Inputs as published",
+  approximated: "Inputs partly approximated (not verified)",
+  illustrative: "Illustrative inputs (not from the source)",
+  not_applicable: "Not applicable",
+};
 
 function PatientRegimenLine({ caseDef }: { caseDef: PublishedCase }) {
   const p = caseDef.patient;
   const r = caseDef.regimen;
   return (
     <div style={{ fontSize: 12, color: "var(--color-secondary)", marginBottom: 10, lineHeight: 1.55 }}>
-      <strong style={{ color: "var(--color-primary)" }}>Patient:</strong>{" "}
-      {p.age_years}y {p.sex} · {p.weight_kg} kg · SCr {p.serum_creatinine_mg_dl} mg/dL
-      {p.height_cm && <> · {p.height_cm} cm</>}
-      {r && (
-        <>
-          <span style={{ margin: "0 8px", color: "var(--color-border)" }}>·</span>
-          <strong style={{ color: "var(--color-primary)" }}>Regimen:</strong>{" "}
-          {r.dose_mg} mg q{r.interval_hours}h × {r.doses_given} dose{r.doses_given === 1 ? "" : "s"}
-        </>
-      )}
-      {caseDef.levels.length > 0 && (
-        <>
-          <span style={{ margin: "0 8px", color: "var(--color-border)" }}>·</span>
-          <strong style={{ color: "var(--color-primary)" }}>Levels:</strong>{" "}
-          {caseDef.levels.map((l, i) => (
-            <span key={i}>
-              {i > 0 && ", "}
-              {l.value_mcg_ml} mcg/mL @ {l.time_since_last_dose_hours}h
-            </span>
-          ))}
-        </>
-      )}
+      <div>
+        <strong style={{ color: "var(--color-primary)" }}>Patient:</strong>{" "}
+        {p.age_years} y {p.sex} · {p.weight_kg} kg · SCr {p.serum_creatinine_mg_dl} mg/dL
+        {p.height_cm && <> · {p.height_cm} cm</>}
+        {r && (
+          <>
+            <span style={{ margin: "0 8px", color: "var(--color-border)" }}>·</span>
+            <strong style={{ color: "var(--color-primary)" }}>Regimen:</strong>{" "}
+            {r.dose_mg} mg every {r.interval_hours} h over {r.infusion_duration_hours} h
+          </>
+        )}
+        {caseDef.levels.length > 0 && (
+          <>
+            <span style={{ margin: "0 8px", color: "var(--color-border)" }}>·</span>
+            <strong style={{ color: "var(--color-primary)" }}>Levels (hours after the start of the dose):</strong>{" "}
+            {caseDef.levels.map((l, i) => (
+              <span key={i}>
+                {i > 0 && ", "}
+                {l.value_mcg_ml} mg/L at {l.time_since_last_dose_hours} h
+              </span>
+            ))}
+          </>
+        )}
+      </div>
+      <div style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 4 }}>
+        <strong>{INPUTS_LABEL[p.inputs_status]}.</strong> {p.notes}
+      </div>
     </div>
   );
 }
 
-function DeltaTable({ caseDef, result }: { caseDef: PublishedCase; result: CaseResult }) {
-  const rows: { label: string; published: number | null; predicted: number | null; pct: number | null; tol: number }[] = [
-    { label: "AUC₂₄ (mg·h/L)", published: caseDef.published.auc24_mg_h_l, predicted: result.predicted.auc24, pct: result.deltas.auc24_pct, tol: caseDef.tolerance.auc24_pct },
-    { label: "Peak (mcg/mL)", published: caseDef.published.peak_mcg_ml, predicted: result.predicted.peak, pct: result.deltas.peak_pct, tol: caseDef.tolerance.peak_pct },
-    { label: "Trough (mcg/mL)", published: caseDef.published.trough_mcg_ml, predicted: result.predicted.trough, pct: result.deltas.trough_pct, tol: caseDef.tolerance.trough_pct },
-  ].filter((r) => r.published != null);
+interface MetricRow {
+  label: string;
+  published: number | null;
+  publishedText?: string;
+  engine: number | null;
+  pct: number | null;
+  digits: number;
+  tol?: number;
+}
 
+function metricRows(caseDef: PublishedCase, result: CaseResult): MetricRow[] {
+  const pub = caseDef.published;
+  const tol = caseDef.tolerance;
+  const range = pub.auc24_range;
+  const rows: MetricRow[] = [
+    {
+      label: "AUC₂₄ (mg·h/L)",
+      published: pub.auc24_mg_h_l,
+      publishedText:
+        pub.auc24_mg_h_l != null && range
+          ? `${pub.auc24_mg_h_l.toFixed(1)} (${range.low}–${range.high})`
+          : undefined,
+      engine: result.predicted.auc24,
+      pct: result.deltas.auc24_pct,
+      digits: 1,
+      tol: tol?.auc24_pct,
+    },
+    { label: "CL (L/h)", published: pub.clearance_l_h, engine: result.predicted.clearance_l_h, pct: result.deltas.clearance_pct, digits: 2, tol: tol?.clearance_pct },
+    { label: "V₁ (L)", published: pub.v1_l, engine: result.predicted.v1_l, pct: result.deltas.v1_pct, digits: 1, tol: tol?.v1_pct },
+    { label: "Peak (mg/L)", published: pub.peak_mcg_ml, engine: result.predicted.peak, pct: result.deltas.peak_pct, digits: 1, tol: tol?.peak_pct },
+    { label: "Trough (mg/L)", published: pub.trough_mcg_ml, engine: result.predicted.trough, pct: result.deltas.trough_pct, digits: 1, tol: tol?.trough_pct },
+  ];
+  return rows.filter((r) => r.published != null);
+}
+
+function signedPct(v: number | null, digits: number): string {
+  if (v == null) return "—";
+  return `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(digits)}%`;
+}
+
+function ReproductionTable({ caseDef, result }: { caseDef: PublishedCase; result: CaseResult }) {
+  const rows = metricRows(caseDef, result);
   return (
-    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginTop: 4 }}>
-      <thead>
-        <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
-          <th style={thStyle}></th>
-          <th style={thStyle}>Published</th>
-          <th style={thStyle}>Vancomyzer</th>
-          <th style={thStyle}>Δ</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((r) => {
-          const ok = r.pct == null || Math.abs(r.pct) <= r.tol;
-          return (
+    <div style={{ overflowX: "auto" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginTop: 4 }}>
+        <thead>
+          <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
+            <th style={thStyle}></th>
+            <th style={thStyle}>Published</th>
+            <th style={thStyle}>Engine ({COLIN_2019.shortName})</th>
+            <th style={thStyle}>Difference</th>
+            <th style={thStyle}>Tolerance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => {
+            const ok = r.pct != null && r.tol != null && Math.abs(r.pct) <= r.tol;
+            return (
+              <tr key={r.label} style={{ borderBottom: "1px solid var(--color-border)" }}>
+                <td style={tdLabelStyle}>{r.label}</td>
+                <td style={tdNumStyle}>{r.publishedText ?? r.published?.toFixed(r.digits) ?? "—"}</td>
+                <td style={tdNumStyle}>{r.engine?.toFixed(r.digits) ?? "—"}</td>
+                <td style={{ ...tdNumStyle, color: ok ? "#047857" : "#b91c1c", fontWeight: 600 }}>
+                  {signedPct(r.pct, 2)} {ok ? "✓" : "⚠"}
+                </td>
+                <td style={tdNumStyle}>±{r.tol}%</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function CrossModelTable({ caseDef, result }: { caseDef: PublishedCase; result: CaseResult }) {
+  const rows = metricRows(caseDef, result);
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginTop: 4 }}>
+        <thead>
+          <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
+            <th style={thStyle}></th>
+            <th style={thStyle}>Published (different model or cohort)</th>
+            <th style={thStyle}>Engine ({COLIN_2019.shortName})</th>
+            <th style={thStyle}>Difference (context only)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
             <tr key={r.label} style={{ borderBottom: "1px solid var(--color-border)" }}>
               <td style={tdLabelStyle}>{r.label}</td>
-              <td style={tdNumStyle}>{r.published?.toFixed(1) ?? "—"}</td>
-              <td style={tdNumStyle}>{r.predicted?.toFixed(1) ?? "—"}</td>
-              <td style={{ ...tdNumStyle, color: ok ? "#047857" : "#b91c1c", fontWeight: 600 }}>
-                {r.pct == null ? "—" : `${r.pct > 0 ? "+" : ""}${r.pct.toFixed(1)}% ${ok ? "✓" : "⚠"}`}
-              </td>
+              <td style={tdNumStyle}>{r.publishedText ?? r.published?.toFixed(r.digits) ?? "—"}</td>
+              <td style={tdNumStyle}>{r.engine?.toFixed(r.digits) ?? "—"}</td>
+              <td style={{ ...tdNumStyle, color: "var(--color-secondary)" }}>{signedPct(r.pct, 1)}</td>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </tbody>
+      </table>
+      {caseDef.published.auc24_range && (
+        <p style={{ fontSize: 11, color: "var(--color-dim)", margin: "6px 0 0", lineHeight: 1.5 }}>
+          AUC₂₄ values in parentheses: {caseDef.published.auc24_range.description}.
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -512,6 +651,7 @@ const tdLabelStyle: React.CSSProperties = {
   padding: "6px 8px",
   textAlign: "left",
   color: "var(--color-secondary)",
+  whiteSpace: "nowrap",
 };
 const tdNumStyle: React.CSSProperties = {
   padding: "6px 8px",
@@ -532,76 +672,52 @@ function Limitations() {
       }}
     >
       <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", marginTop: 0, marginBottom: 10 }}>
-        Honest limitations
+        Limitations
       </h2>
       <ul style={{ fontSize: 12, color: "var(--color-secondary)", lineHeight: 1.65, marginLeft: 18, marginTop: 0, marginBottom: 0 }}>
         <li>
-          These are <strong>reproducibility tests against published model
-          parameters</strong>, not real-world clinical validation. Most popPK
-          papers don&apos;t publish per-patient individual cases with full
-          demographics + dose + AUC — they publish covariate equations and
-          population-typical predictions. So these cases test &quot;does our engine
-          reproduce the cited model&apos;s typical-individual output?&quot;, not
-          &quot;does our engine match a published real patient&apos;s observed AUC?&quot;.
+          These cases check the engine against published values; they are not clinical validation.
+          Vancomyzer has not yet been validated in real patients. Its equations are checked against
+          published values and synthetic test cases; external validation with patient data is planned.
         </li>
         <li>
-          Cases drawn from our derivation papers (Colin 2019) confirm
-          implementation correctness — by construction the typical-individual
-          output should match within a few percent.
+          Only the same-model reproductions ({COLIN_2019.shortName}) are pass/fail tests. They use
+          model-typical individuals rather than real patients, so they confirm that the equations are
+          implemented as published, not that doses are accurate for patients.
         </li>
         <li>
-          The Smit 2020 case is published with a <strong>by-design drift</strong>:
-          our Vancomyzer Obesity Model composes Smit + Zhang 2024 + Janmahasatian
-          FFM and produces a higher CL (~25% lower AUC) than pure Smit at 130 kg.
-          We show that drift transparently rather than tuning the test until it
-          looks clean.
+          Cross-model references compare the engine ({COLIN_2019.shortName}) with a different published
+          model or a cohort statistic. {CROSS_MODEL_WORDING} A difference does not show which model is more
+          accurate for a given patient. Some of these cards use approximated or illustrative inputs; each
+          card says which.
         </li>
         <li>
-          <strong>No pediatric, dialysis, or post-transplant cases</strong> in this
-          set. The platform&apos;s prior is an adult population model; we don&apos;t
-          attempt to validate scenarios outside its derivation cohort.
+          The former Vancomyzer custom obesity model was retired from dosing on{" "}
+          {formatIsoDate(VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.retiredOn)}.
         </li>
         <li>
-          <strong>Cases we attempted but could not extract, or dropped after
-          attempting (now with full text in hand for several):</strong>
-          {" "}Rybak/ASHP 2020 (read full text — the executive summary contains
-          narrative recommendations only, not a per-patient worked example to
-          reproduce; verbatim cap citations now in code comments instead);
-          {" "}Pai 2014 (read full text — Table 1 reports aggregate AUC ratios
-          across n=47 sparse-Bayesian validation cohort but no per-patient
-          demographics + AUC, so we cite Pai 2014 as the methodology source for
-          our Carreno sparse-Bayesian case rather than its own card);
-          {" "}Patanwala 2022 multi-platform ICU comparison (read full text —
-          publishes cohort-mean AUC per platform (Goti 469, Colin 562, Thomson
-          517 across 188 ICU adults) but no per-patient data; the cohort-mean
-          format doesn&apos;t fit the per-patient test schema — deferred until
-          we add a &quot;reference band&quot; card type);
-          {" "}Turner 2018 (read full text — Tables 1-3 are aggregate medians
-          + IQRs across 19 ICU patients per platform, no per-patient breakdown;
-          deferred for the same reference-band card type as Patanwala);
-          {" "}Drennan 2024 trough-only Bayesian (no such paper exists in
-          PubMed);
-          {" "}Neely 2014 cohort trough (test was circular — our Bayesian
-          fitter trivially matched its own input observation, and the framing
-          conflicted with Vancomyzer&apos;s AUC-targeted positioning even
-          though Neely&apos;s own paper argued AUC over trough);
-          {" "}Shingde 2020 single-sample Bayesian (the candidate&apos;s
-          &quot;published AUC&quot; was analytically derived rather than
-          extracted from the paper, which would have made the test circular).
-          These dropouts are documented openly here rather than swept under
-          the rug.
+          <strong>No pediatric, dialysis or post-transplant cases.</strong> These are outside
+          Vancomyzer&apos;s scope (adults not on renal replacement therapy).
         </li>
         <li>
-          A &quot;within tolerance&quot; result does not mean the recommendation
-          is correct for any individual patient. Every clinical recommendation
-          remains the responsibility of the licensed clinician at the bedside.
+          <strong>Sources considered but not added as cases:</strong>
+          {" "}Rybak/ASHP 2020 (narrative recommendations only, no worked patient example to reproduce);
+          {" "}Pai 2014 (aggregate results across the cohort, no per-patient demographics with AUC);
+          {" "}Turner 2018 (aggregate medians and interquartile ranges per program across 19 ICU patients;
+          not yet added as a reference band);
+          {" "}Neely 2014 cohort trough (the comparison was circular: the fitted level was the value being
+          compared);
+          {" "}Shingde 2020 single-sample Bayesian (the candidate &quot;published AUC&quot; was derived
+          rather than read from the paper, so the comparison would have been circular).
+          {" "}Patanwala 2022 is shown above as a reference band.
         </li>
         <li>
-          When a case shows drift beyond its tolerance, we display it anyway with
-          an amber badge and explanation. The page is intended to surface honest
-          engine behavior, not to be a curated success story. A release is
-          automatically halted on undocumented drift, which is why this page is
-          always up to date.
+          A &quot;within tolerance&quot; result does not mean a recommendation is correct for any
+          individual patient. Every clinical decision remains the responsibility of the treating clinician.
+        </li>
+        <li>
+          These cases run in the automated test suite (npm test); a drift outside tolerance fails the suite.
+          A case outside tolerance is still shown on this page, with an amber badge.
         </li>
       </ul>
     </section>

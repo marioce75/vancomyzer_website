@@ -1,56 +1,46 @@
 /**
- * Goti 2018 vancomycin population PK model — used as the GROUND-TRUTH
- * generator for the predictive-performance harness.
+ * Goti 2018-based truth model: the GROUND-TRUTH generator for the
+ * predictive-performance harness (developer-run synthetic analysis, not
+ * real patients).
  *
- * Source: Goti V, Chaturvedula A, Fossler MJ et al. "Hospitalized
- * Patients With and Without Hemodialysis Have Markedly Different
- * Vancomycin Pharmacokinetics: A Population Pharmacokinetic Model-Based
- * Analysis." Ther Drug Monit. 2018;40(2):212–221.
+ * Source of the typical values: Goti V, Chaturvedula A, Fossler MJ, et al.
+ * Hospitalized patients with and without hemodialysis have markedly
+ * different vancomycin pharmacokinetics: a population pharmacokinetic
+ * model-based analysis. Ther Drug Monit. 2018;40(2):212–221.
  * DOI: 10.1097/FTD.0000000000000490
  *
- * Why Goti as the truth generator:
- *   1. Largest published popPK derivation set (n=1812) outside of Colin
- *   2. US ICU/hospitalized population — different prior distribution
- *      from Colin 2019's pooled multi-source cohort (n=2554)
- *   3. Independent peer-reviewed implementation in PrecisePK — and was
- *      the worst-performing prior in Bai et al 2025 (rRMSE up to 68.59%
- *      a priori), so it stresses a Colin-prior fitter realistically
- *   4. CrCl as the dominant covariate (not the SCr-only path Colin uses)
- *      — guarantees the prior–truth mismatch is structural, not just
- *      parametric noise
+ * Why a different model from Vancomyzer's prior: the truth model should not
+ * be Colin 2019, or the fit would start from the true typical values. Goti
+ * 2018 is a two-compartment model built from routine hospital monitoring
+ * data, with creatinine clearance (not serum creatinine) on clearance, so
+ * the prior and the truth differ in structure as well as in values.
  *
- * Structural form (non-hemodialysis branch; HD patients are out of
- * scope for Vancomyzer):
+ * What is Goti 2018 and what is a developer choice. The Goti 2018 abstract
+ * (and Bai et al. 2025, Table 1) list creatinine clearance and dialysis
+ * status as covariates on clearance and dialysis status on central volume.
+ * No body-weight covariate is listed. The allometric weight terms below were
+ * ADDED by the developer, and the variability and residual-error values are
+ * developer choices, not Goti 2018 estimates. The typical values and the
+ * CrCl relationship are as transcribed by the developer and have not been
+ * re-checked against the full text in this revision.
  *
- *     CL (L/h) = θCL × (CrCl_mL_min / 120)^0.8 × (WT_kg / 70)^0.75
- *     V1 (L)   = θV1 × (WT_kg / 70)
- *     Q  (L/h) = θQ  × (WT_kg / 70)^0.75
- *     V2 (L)   = θV2 × (WT_kg / 70)
+ *     CL (L/h) = θCL × (CrCl_mL_min / 120)^0.8 × (WT_kg / 70)^0.75   (weight term added)
+ *     V1 (L)   = θV1 × (WT_kg / 70)                                  (weight term added)
+ *     Q  (L/h) = θQ  × (WT_kg / 70)^0.75                             (weight term added)
+ *     V2 (L)   = θV2 × (WT_kg / 70)                                  (weight term added)
  *
- *     θCL = 4.5, θV1 = 58.4, θQ = 6.5, θV2 = 38.4
+ *     θCL = 4.5, θV1 = 58.4, θQ = 6.5, θV2 = 38.4 (non-dialysis branch)
  *
- * Allometric exponents (0.75 for clearances, 1.0 for volumes) follow
- * standard pharmacometric practice and match the Goti structural form
- * as transcribed in third-party reviews (DoseMeRx model documentation,
- * Uster 2021 systematic evaluation).
+ * Between-subject variability (log-normal), developer-chosen:
  *
- * Between-subject variability (exponential model, log-normal random
- * effects): omega values are set to literature-typical adult vancomycin
- * BSV ranges since the raw OMEGA matrix isn't openly published. These
- * are documented on the public page so reviewers can sanity-check them.
+ *     omega_CL = 0.40, omega_V1 = 0.30, omega_Q = 0.50, omega_V2 = 0.40
  *
- *     omega_CL = 0.40   (40% CV)
- *     omega_V1 = 0.30   (30% CV)
- *     omega_Q  = 0.50   (50% CV)
- *     omega_V2 = 0.40   (40% CV)
+ * Residual error (combined proportional + additive), developer-chosen:
+ *     prop_err = 0.20 (20% CV), add_err = 1.0 mg/L SD
  *
- * Residual error (combined proportional + additive):
- *     prop_err = 0.20   (20% CV)
- *     add_err  = 1.0    (1.0 mg/L SD)
- *
- * @safety-checked-via not-clinical — this module never emits a dose. It
- * only generates synthetic ground-truth concentrations for off-line
- * validation. No production code path imports from this file.
+ * @safety-checked-via not-clinical: this module never emits a dose. It only
+ * generates synthetic concentrations for offline validation. No production
+ * code path imports from this file.
  */
 
 import type { Rng } from "./rng";
@@ -108,7 +98,7 @@ export function gotiIndividualParameters(cov: GotiCovariates, rng: Rng): PkParam
   };
 }
 
-/** Add Goti-style combined proportional + additive residual error to a concentration. */
+/** Add the developer-chosen combined proportional + additive residual error to a concentration (floored at 0.1 mg/L). */
 export function addResidualError(conc_true: number, rng: Rng): number {
   const prop_noise = conc_true * GOTI_2018_RESIDUAL.proportional * rng.normal();
   const add_noise  = GOTI_2018_RESIDUAL.additive_mg_l * rng.normal();
