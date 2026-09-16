@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { CalculationDetails, CalculatorMode } from "@/types/calculator";
+import { COLIN_2019, modelShortName } from "@/lib/pk/modelRegistry";
 
 interface CalculationMethodPanelProps {
   mode: CalculatorMode;
@@ -8,6 +9,8 @@ interface CalculationMethodPanelProps {
   details?: CalculationDetails | null;
   assumptions?: string[];
   infusionDurationAdjustedForSafety?: boolean;
+  /** Model id from the result's pk_parameters. Omitted before a calculation: Colin 2019, the only dosing model. */
+  pkModelName?: string | null;
 }
 
 function modeLabel(mode: CalculatorMode, levelCount: number) {
@@ -21,6 +24,7 @@ export default function CalculationMethodPanel({
   details,
   assumptions = [],
   infusionDurationAdjustedForSafety = false,
+  pkModelName,
 }: CalculationMethodPanelProps) {
   return (
     <div className="rounded-[18px] border border-slate-200 bg-slate-50 p-4">
@@ -33,7 +37,7 @@ export default function CalculationMethodPanel({
         </div>
         <div className="flex justify-between gap-4 rounded-xl border border-slate-200 bg-white px-3 py-2">
           <span className="font-medium text-slate-500">Model</span>
-          <span>Adult Intermittent IV</span>
+          <span>{modelShortName(pkModelName)} &middot; Adult Intermittent IV</span>
         </div>
         <div className="flex justify-between gap-4 rounded-xl border border-slate-200 bg-white px-3 py-2">
           <span className="font-medium text-slate-500">Safety Bounds</span>
@@ -66,8 +70,8 @@ export default function CalculationMethodPanel({
             <strong className="mb-1 block text-slate-800">References</strong>
             <ul className="space-y-1.5">
               <li>
-                Colin PJ et al. <em>Vancomycin pharmacokinetics throughout life.</em> Clin Pharmacokinet. 2019;58(6):767–780.{" "}
-                <a href="https://doi.org/10.1007/s40262-018-0727-5" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">DOI ↗</a>
+                {COLIN_2019.citation}{" "}
+                <a href={`https://doi.org/${COLIN_2019.doi}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">DOI ↗</a>
               </li>
               <li>
                 Rybak MJ et al. <em>Therapeutic monitoring of vancomycin.</em> AJHP. 2020;77(11):835–864.{" "}

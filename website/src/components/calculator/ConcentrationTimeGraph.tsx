@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { CalculationDetails } from "@/types/calculator";
+import { modelShortName } from "@/lib/pk/modelRegistry";
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -15,21 +16,21 @@ interface ConcentrationTimeGraphProps {
   measured_levels?: CurvePoint[] | null;
   calculationDetails?: CalculationDetails | null;
   pk_model_name?: "colin_2019" | "vancomyzer_obesity";
-  /** Posterior fit uncertainty — drives the width of the shaded confidence
-   *  band drawn around the predicted curve. Honest visualization of how much
-   *  the engine can claim to know about THIS patient given the data. */
+  /** Posterior fit uncertainty label — selects the width of the shaded
+   *  illustrative band drawn around the predicted curve. The band is a fixed
+   *  ± percentage, not a statistical confidence or prediction interval. */
   uncertainty_label?: "population_only" | "low" | "moderate" | "high" | "very_high";
 }
 
 /**
- * Approximate ±band width as a fraction of the predicted concentration.
+ * Illustrative ± band width as a fraction of the predicted concentration.
  *
- * This is a v0 visualization — we propagate the qualitative uncertainty label
- * (the fitter already produces) into a band width rather than computing a true
- * Bayesian credible interval from the posterior covariance. The chosen factors
- * are conservative-by-default (population_only widest, low narrowest), framed
- * around clinical assay imprecision (~15% even for a perfect model) and the
- * IIV in the published priors.
+ * NOT a statistical interval. Each qualitative uncertainty label maps to a
+ * fixed ± percentage multiplier; nothing is computed from the posterior
+ * covariance, and the band has no stated coverage. The factors were chosen
+ * with clinical assay imprecision (~15% even for a perfect model) and the IIV
+ * in the published priors in mind. Order, narrowest to widest: low 10%,
+ * moderate 18%, high 28%, population_only 35%, very_high 40%.
  */
 function uncertaintyBandFactor(label: ConcentrationTimeGraphProps["uncertainty_label"]): number {
   switch (label) {
@@ -46,9 +47,18 @@ function uncertaintyBandFactor(label: ConcentrationTimeGraphProps["uncertainty_l
 
 const FONT = "'Share Tech Mono', 'Courier New', monospace";
 const PAD = { top: 24, right: 60, bottom: 42, left: 56 };
-const TARGET_LOW = 10;
-const TARGET_HIGH = 20;
+/** Trough reference lines (mg/L). A reference only; the dosing target is AUC24 400–600 mg·h/L. */
+const TROUGH_REF_LOW = 10;
+const TROUGH_REF_HIGH = 20;
+/** Assumed MIC (mg/L) for the reference line; not patient-specific. */
 const MIC = 1.0;
+
+/* ── Canvas label helper ─────────────────────────────────────── */
+
+/** First label that fits in maxWidth at the context's current font; otherwise the last (shortest). */
+function fitCanvasLabel(ctx: CanvasRenderingContext2D, labels: string[], maxWidth: number): string {
+  return labels.find((label) => ctx.measureText(label).width <= maxWidth) ?? labels[labels.length - 1];
+}
 
 /* ── Color helpers — read CSS vars at draw time ──────────────── */
 
@@ -64,7 +74,7 @@ function calcDomains(curve: CurvePoint[], measured: CurvePoint[], zoom: number) 
   // Zoom is the hard cap — clips or extends the x axis to exactly the selected window
   const xMax = zoom;
   const visible = all.filter((p) => p.time_hours <= zoom);
-  const yMax = Math.max(40, ...visible.map((p) => p.concentration), TARGET_HIGH + 5);
+  const yMax = Math.max(40, ...visible.map((p) => p.concentration), TROUGH_REF_HIGH + 5);
   return { xMin: 0, xMax, yMin: 0, yMax: Math.ceil(yMax / 5) * 5 };
 }
 
@@ -202,17 +212,25 @@ function drawGraph(
     ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gw, y); ctx.stroke();
   }
 
-  // ─── Target range band ───
-  const yTargetTop = toY(TARGET_HIGH);
-  const yTargetBot = toY(TARGET_LOW);
+  // ─── Trough reference band (10–20 mg/L). Not the dosing target: the engine doses to AUC24 400–600. ───
+  const yTargetTop = toY(TROUGH_REF_HIGH);
+  const yTargetBot = toY(TROUGH_REF_LOW);
   ctx.fillStyle = aucFill;
   ctx.fillRect(PAD.left, yTargetTop, gw, yTargetBot - yTargetTop);
   ctx.font = `9px ${FONT}`;
   ctx.fillStyle = dim;
   ctx.textAlign = "right";
-  ctx.fillText("TARGET RANGE", PAD.left + gw - 4, yTargetTop + 12);
+  ctx.fillText(
+    fitCanvasLabel(ctx, [
+      "TROUGH REF 10–20 mg/L · NOT THE DOSING TARGET (AUC 400–600)",
+      "TROUGH REF 10–20 · NOT DOSING TARGET",
+      "TROUGH REF 10–20",
+    ], gw - 8),
+    PAD.left + gw - 4,
+    yTargetTop + 12,
+  );
 
-  // ─── MIC line ───
+  // ─── MIC line (fixed at an assumed MIC of 1 mg/L; not a patient-specific value) ───
   const yMic = toY(MIC);
   ctx.setLineDash([4, 3]);
   ctx.strokeStyle = "rgba(255,100,100,0.4)";
@@ -222,14 +240,14 @@ function drawGraph(
   ctx.font = `9px ${FONT}`;
   ctx.fillStyle = "rgba(255,100,100,0.6)";
   ctx.textAlign = "right";
-  ctx.fillText("MIC 1.0", PAD.left + gw - 4, yMic - 3);
+  ctx.fillText("MIC 1 mg/L (assumed)", PAD.left + gw - 4, yMic - 3);
 
   // ─── Trough reference lines ───
   ctx.setLineDash([5, 3]);
   ctx.strokeStyle = secondary;
   ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(PAD.left, toY(TARGET_HIGH)); ctx.lineTo(PAD.left + gw, toY(TARGET_HIGH)); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(PAD.left, toY(TARGET_LOW)); ctx.lineTo(PAD.left + gw, toY(TARGET_LOW)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(PAD.left, toY(TROUGH_REF_HIGH)); ctx.lineTo(PAD.left + gw, toY(TROUGH_REF_HIGH)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(PAD.left, toY(TROUGH_REF_LOW)); ctx.lineTo(PAD.left + gw, toY(TROUGH_REF_LOW)); ctx.stroke();
   ctx.setLineDash([]);
 
   // ─── Axes ───
@@ -293,10 +311,10 @@ function drawGraph(
   ctx.rect(PAD.left, PAD.top, gw, gh);
   ctx.clip();
 
-  // ─── Confidence band (translucent shaded region around predicted curve) ───
-  // Width is derived from the posterior fit's uncertainty_label so the visual
-  // honestly reflects how much the engine can claim to know about THIS patient.
-  // No level fitted = widest; multiple coherent levels = narrowest.
+  // ─── Illustrative band (translucent shaded region around predicted curve) ───
+  // Width is a fixed ± percentage chosen from the uncertainty label (see
+  // uncertaintyBandFactor). It is not a statistical confidence or prediction
+  // interval.
   if (bandFactor > 0 && curve.length > 1) {
     const drawLen = Math.floor(curve.length * animProgress);
     if (drawLen > 1) {
@@ -582,10 +600,7 @@ export default function ConcentrationTimeGraph({
 
   const handleMouseLeave = useCallback(() => setMouse(null), []);
 
-  const modelLabel = calculationDetails?.method
-    ? (pk_model_name === "vancomyzer_obesity" ? "Vancomyzer Obesity Model" : "Colin 2019")
-    : "";
-  const modelSubLabel = pk_model_name === "vancomyzer_obesity" ? "Smit 2020 + Zhang 2023" : "";
+  const modelLabel = calculationDetails?.method ? modelShortName(pk_model_name) : "";
   const evidenceLabel = calculationDetails?.evidence_strength ?? "";
 
   return (
@@ -604,12 +619,6 @@ export default function ConcentrationTimeGraph({
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{modelLabel}</span>
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>Two-Compartment</span>
-            {modelSubLabel && (
-              <>
-                <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
-                <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{modelSubLabel}</span>
-              </>
-            )}
           </>
         )}
         {evidenceLabel && (
@@ -673,14 +682,14 @@ export default function ConcentrationTimeGraph({
           <span
             className="flex items-center gap-1 text-[8px]"
             style={{ color: getCSSColor("--color-dim", "#009933") }}
-            title={`±${(bandFactor * 100).toFixed(0)}% band — ${uncertainty_label?.replace(/_/g, " ") ?? "uncertainty"} fit`}
+            title={`Illustrative ±${(bandFactor * 100).toFixed(0)}% range for a "${uncertainty_label?.replace(/_/g, " ") ?? "unspecified"}" uncertainty label. A fixed percentage around the predicted curve, not a statistical confidence or prediction interval.`}
           >
             <span className="inline-block w-3 h-3" style={{ background: "rgba(30, 77, 140, 0.10)", border: "1px solid rgba(30, 77, 140, 0.25)" }} />
-            Confidence band (±{(bandFactor * 100).toFixed(0)}%, {uncertainty_label?.replace(/_/g, " ") ?? "—"})
+            Illustrative ±{(bandFactor * 100).toFixed(0)}% range (not a statistical confidence or prediction interval)
           </span>
         )}
         <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-          <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44") }} /> Trough ref (10–20)
+          <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44") }} /> Trough reference 10–20 mg/L (not the dosing target; target is AUC₂₄ 400–600)
         </span>
         <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span className="inline-block w-3 h-3" style={{ background: "var(--color-primary-a08)", border: "1px solid var(--color-primary-a20)" }} /> AUC₂₄

@@ -19,7 +19,7 @@ import CalculatorLayout from "@/components/calculator/CalculatorLayout";
 import PatientCharacteristicsForm from "@/components/calculator/PatientCharacteristicsForm";
 import CalculationMethodPanel from "@/components/calculator/CalculationMethodPanel";
 import RegimenForm from "@/components/calculator/RegimenForm";
-import LevelEntryTable from "@/components/calculator/LevelEntryTable";
+import LevelEntryTable, { manualHoursCollectionTime } from "@/components/calculator/LevelEntryTable";
 import CalculatorActionBar from "@/components/calculator/CalculatorActionBar";
 import PrimaryMetricsCard from "@/components/calculator/PrimaryMetricsCard";
 import DoseRecommendationCard from "@/components/calculator/DoseRecommendationCard";
@@ -48,11 +48,61 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFeature } from "@/hooks/useFeature";
 import { printReport, type ReportData } from "@/lib/generateReport";
 import { track } from "@/lib/analytics";
+import { parseClinicalNumber } from "@/lib/parseClinicalNumber";
+import { COLIN_2019, modelDisplayName } from "@/lib/pk/modelRegistry";
 const defaultPatient: CalculateRequestPatient = { age: 0, weight_kg: 0, height_cm: 0, sex: "", serum_creatinine_mg_dl: 0 };
 const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0 };
 const defaultLevel = { value_mcg_ml: 0, collection_time: "", time_since_last_dose_hours: 0 };
 
 type WorkspaceViewMode = "empiric" | "one_level" | "two_levels";
+
+type BandUncertaintyLabel = "population_only" | "low" | "moderate" | "high" | "very_high";
+
+/** Narrowest to widest, matching the fixed band widths in ConcentrationTimeGraph (10, 18, 28, 35, 40%). */
+const BAND_WIDTH_ORDER: readonly BandUncertaintyLabel[] = ["low", "moderate", "high", "population_only", "very_high"];
+
+function widerBandLabel(a: BandUncertaintyLabel, b: BandUncertaintyLabel): BandUncertaintyLabel {
+  return BAND_WIDTH_ORDER.indexOf(a) >= BAND_WIDTH_ORDER.indexOf(b) ? a : b;
+}
+
+function isBandUncertaintyLabel(value: unknown): value is BandUncertaintyLabel {
+  return typeof value === "string" && (BAND_WIDTH_ORDER as readonly string[]).includes(value);
+}
+
+/**
+ * Uncertainty label for the illustrative band on the concentration-time graph.
+ * Presentation only; the band is never narrower than the engine's own
+ * posterior_fit.uncertainty_label.
+ *
+ * - If the response carries posterior_fit, its uncertainty_label is used and
+ *   widened for a weak or prior-only fit.
+ * - The current response does not include posterior_fit, so the label is
+ *   otherwise reconstructed from fields that encode it (buildCalculateResponse):
+ *   no posterior refinement → population_only; "multiple coherent levels"
+ *   (fit_quality and uncertainty both "moderate") → moderate; any other fitted
+ *   result → high. The engine never labels a fit "low", so the number of levels
+ *   alone never narrows the band.
+ * - Fit-quality warnings keep the band at "high" or wider.
+ */
+function deriveBandUncertaintyLabel(result: CalculateResponse): BandUncertaintyLabel {
+  const posteriorFit = (result as unknown as { posterior_fit?: { uncertainty_label?: unknown; fit_quality?: unknown } }).posterior_fit;
+  let label: BandUncertaintyLabel;
+  if (posteriorFit && isBandUncertaintyLabel(posteriorFit.uncertainty_label)) {
+    label = posteriorFit.uncertainty_label;
+    if (posteriorFit.fit_quality === "weak") label = widerBandLabel(label, "high");
+    if (posteriorFit.fit_quality === "prior_only" || posteriorFit.fit_quality === "not_applicable") {
+      label = widerBandLabel(label, "population_only");
+    }
+  } else if (!result.pk_parameters?.used_posterior_refinement) {
+    label = "population_only";
+  } else if (result.calculation_details?.evidence_strength === "multiple coherent levels") {
+    label = "moderate";
+  } else {
+    label = "high";
+  }
+  if ((result.fit_quality_warnings?.length ?? 0) > 0) label = widerBandLabel(label, "high");
+  return label;
+}
 
 function TypewriterLoop({ text, interval = 5000 }: { text: string; interval?: number }) {
   const [displayed, setDisplayed] = useState("");
@@ -354,13 +404,12 @@ export default function CalculatorWorkspace() {
             // cares about deltas between collection times, not absolute values.
             // Assumes all levels share the same most-recent-dose (the common
             // peak+trough case Carreno 2017 documents).
-            const anchorMs = Date.UTC(2026, 0, 1, 0, 0, 0);
             setLevels(
               c.levels.map((l) => ({
                 value_mcg_ml: l.value_mcg_ml,
-                collection_time: new Date(
-                  anchorMs + Math.round(l.time_since_last_dose_hours * 3_600_000),
-                ).toISOString(),
+                // Same synthetic reference as manual-hours entry, so the level
+                // table reopens these rows in manual-hours mode.
+                collection_time: manualHoursCollectionTime(l.time_since_last_dose_hours),
                 time_since_last_dose_hours: l.time_since_last_dose_hours,
               })),
             );
@@ -376,10 +425,10 @@ export default function CalculatorWorkspace() {
     const weight = searchParams.get("weight_kg");
     const scr = searchParams.get("serum_creatinine_mg_dl");
     if (age && weight && scr) {
-      const parsedAge = Number(age);
-      const parsedWeight = Number(weight);
-      const parsedScr = Number(scr);
-      if (parsedAge > 0 && parsedWeight > 0 && parsedScr > 0) {
+      const parsedAge = parseClinicalNumber(age);
+      const parsedWeight = parseClinicalNumber(weight);
+      const parsedScr = parseClinicalNumber(scr);
+      if (parsedAge !== null && parsedWeight !== null && parsedScr !== null && parsedAge > 0 && parsedWeight > 0 && parsedScr > 0) {
         didPreFillRef.current = true;
         setPatient(prev => ({ ...prev, age: parsedAge, weight_kg: parsedWeight, serum_creatinine_mg_dl: parsedScr }));
       }
@@ -392,8 +441,12 @@ export default function CalculatorWorkspace() {
     const caseIdField = canSaveHistory && trimmedCaseId.length > 0 ? { case_id: trimmedCaseId } : {};
     const base = { mode, patient: { ...patient }, ...caseIdField };
     if (mode === "initial_regimen") return base;
-    // Filter out empty/zero levels (loading dose simulation has no measured levels)
-    const validLevels = levels.filter(l => l.value_mcg_ml > 0);
+    // Drop only completely untouched rows (loading-dose simulation has no measured
+    // levels). A row with a time but an unreadable/zero value is sent as-is so the
+    // server rejects it visibly instead of silently fitting one level fewer.
+    const validLevels = levels.filter(
+      (l) => l.value_mcg_ml !== 0 || l.time_since_last_dose_hours !== 0 || (l.collection_time ?? "").trim() !== "",
+    );
     return { ...base, regimen, levels: validLevels };
   }, [mode, patient, regimen, levels, canSaveHistory]);
 
@@ -534,7 +587,7 @@ export default function CalculatorWorkspace() {
           `AUC24 (trapezoid):  ${trapAuc.toFixed(1)} mg·h/L\n` +
           `Δ: ${aucDelta.toFixed(1)} mg·h/L${aucMatch ? " — within tolerance" : " — EXCEEDS tolerance"}\n` +
           `Match: ${aucMatch ? "✓ PASS" : "✗ FAIL"}\n\n` +
-          `Model: Colin 2019 Two-Compartment\n` +
+          `Model: ${modelDisplayName(data.pk_parameters?.pk_model_name)}\n` +
           `τ: ${data.recommended_interval_hours ?? "?"}h\n` +
           `Infusion: ${data.recommended_infusion_duration_hours ?? "?"}h`
         );
@@ -738,6 +791,7 @@ export default function CalculatorWorkspace() {
         V2: visibleResult.pk_parameters.V2,
         used_posterior_refinement: visibleResult.pk_parameters.used_posterior_refinement,
       } : undefined,
+      pk_model_name: visibleResult.pk_parameters?.pk_model_name,
       interpretation_summary: opt?.interpretation_summary ?? visibleResult.interpretation_summary,
       assumptions: visibleResult.assumptions,
       limitations: visibleResult.limitations,
@@ -885,7 +939,7 @@ export default function CalculatorWorkspace() {
             onToggle={(id) => setActiveSection(activeSection === id ? "" : id)}
           />
           <SectionPanel id="settings" activeSection={activeSection}>
-            <CalculationMethodPanel mode={mode} levelCount={levels.length} details={visibleResult?.calculation_details} assumptions={visibleResult?.assumptions} infusionDurationAdjustedForSafety={visibleResult?.infusion_duration_adjusted_for_safety} />
+            <CalculationMethodPanel mode={mode} levelCount={levels.length} details={visibleResult?.calculation_details} assumptions={visibleResult?.assumptions} infusionDurationAdjustedForSafety={visibleResult?.infusion_duration_adjusted_for_safety} pkModelName={visibleResult?.pk_parameters?.pk_model_name} />
           </SectionPanel>
         </div>
       </div>
@@ -903,7 +957,7 @@ export default function CalculatorWorkspace() {
         {/* Inline disclaimer — always visible */}
         <div className="border-t px-4 py-2" style={{ borderTopColor: "var(--color-border)" }}>
           <p style={{ fontSize: 10, lineHeight: 1.6, color: "var(--color-dim)", fontFamily: "inherit", margin: 0 }}>
-            Vancomyzer&trade; is non-device clinical decision support under 21st Century Cures Act §3060, intended for licensed healthcare professionals only. Every recommendation must be independently verified by a clinician prior to patient administration. Not FDA-cleared as a medical device, and not a substitute for clinical judgment, institutional protocols, or therapeutic drug monitoring.{" "}
+            Vancomyzer&trade; is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation. Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. It is not a substitute for clinical judgment, institutional protocols, or therapeutic drug monitoring.{" "}
             {/* A real button so the full disclaimer is reachable by keyboard and screen readers. */}
             <button
               type="button"
@@ -1035,13 +1089,13 @@ export default function CalculatorWorkspace() {
           <div>
             <p className="text-xs font-semibold text-amber-900">Age &gt;65 — Enhanced Monitoring Advisory</p>
             <p className="mt-0.5 text-xs text-amber-800 leading-5">
-              The Colin 2019 model includes an age-decline function (FDecline), but renal function in older adults may decline faster than SCr reflects — especially in patients with low muscle mass. Consider:
+              The {COLIN_2019.shortName} model includes an age-decline function (FDecline), but renal function in older adults may decline faster than SCr reflects — especially in patients with low muscle mass. Consider:
             </p>
             <ul className="mt-1 text-xs text-amber-800 leading-5 list-disc pl-4 space-y-0.5">
               <li>More frequent vancomycin level monitoring (every 24–48h rather than 72h)</li>
               <li>Daily SCr to detect early renal deterioration</li>
-              <li>If SCr appears low relative to clinical status, consider cystatin C or SCr floor</li>
-              <li>External validation data suggest Colin 2019 performs best in adults 18–64; level-based Bayesian refinement is especially important for patients &gt;65</li>
+              <li>If SCr appears low relative to clinical status, rely on early measured levels rather than rounding SCr up (routine rounding to 1 mg/dL reduced dose-prediction accuracy in older adults; Bukhari 2024)</li>
+              <li>Measured levels with Bayesian refinement, rather than population estimates alone, to individualize dosing in patients &gt;65</li>
             </ul>
           </div>
         </div>
@@ -1119,8 +1173,22 @@ export default function CalculatorWorkspace() {
                       adjustmentDosingBlocked={visibleResult.adjustment_dosing_blocked}
                     />
                     <TeachingNote label="Why this dose?">
-                      The engine searches dose × interval combinations on the bounded grid (250–2000 mg, q6h–q48h)
-                      and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target.
+                      {visibleResult.recommendation_type === "existing_regimen" ? (
+                        <>
+                          When the level data support an individualized fit, the engine evaluates doses of 250–2000 mg at
+                          q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄
+                          exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the
+                          midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor
+                          fit) it instead scales the current dose toward that midpoint at the current interval, within the same
+                          safety limits.
+                        </>
+                      ) : (
+                        <>
+                          The engine evaluates doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted
+                          peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄
+                          lands closest to the midpoint of the 400–600 target.
+                        </>
+                      )}{" "}
                       Peak and trough are forward-predicted from the patient&rsquo;s posterior PK (or population prior if no
                       level is fit) using the two-compartment model. The recommendation always favors options that stay
                       within target rather than ones that hit midpoint exactly outside the window.
@@ -1169,7 +1237,7 @@ export default function CalculatorWorkspace() {
                         organs) and a peripheral one (less-perfused tissues). The four PK parameters describe this:
                       </p>
                       <ul style={{ marginTop: 6, paddingLeft: 18, listStyle: "disc" }}>
-                        <li><strong>CL</strong> — clearance (L/h). How fast the body eliminates the drug. Falls with renal impairment and with age (Colin 2019 FDecline).</li>
+                        <li><strong>CL</strong> — clearance (L/h). How fast the body eliminates the drug. Falls with renal impairment and with age ({COLIN_2019.shortName} FDecline).</li>
                         <li><strong>V₁</strong> — central volume (L). Initial dilution space at the end of infusion; drives peak concentration.</li>
                         <li><strong>Q</strong> — intercompartmental clearance (L/h). Speed of redistribution between central and peripheral.</li>
                         <li><strong>V₂</strong> — peripheral volume (L). Where the drug temporarily &ldquo;hides&rdquo;; it slowly returns to central as the central level falls.</li>
@@ -1229,18 +1297,7 @@ export default function CalculatorWorkspace() {
                     measured_levels={visibleResult.measured_levels}
                     calculationDetails={visibleResult.calculation_details}
                     pk_model_name={visibleResult.pk_parameters?.pk_model_name}
-                    uncertainty_label={(() => {
-                      // Derive band width from what's exposed on the response.
-                      // No posterior refinement → widest band (prior-only).
-                      // Posterior + 1 level → moderate band; 2+ levels → narrow.
-                      // Evidence-strength hints (e.g., "high uncertainty") tighten it.
-                      if (!visibleResult.pk_parameters?.used_posterior_refinement) return "population_only";
-                      const evidence = visibleResult.calculation_details?.evidence_strength ?? "";
-                      if (evidence.includes("high uncertainty")) return "high";
-                      const levelCount = visibleResult.measured_levels?.length ?? 0;
-                      if (levelCount >= 2) return "low";
-                      return "moderate";
-                    })()}
+                    uncertainty_label={deriveBandUncertaintyLabel(visibleResult)}
                   />
                 </div>
               </section>
@@ -1273,11 +1330,12 @@ export default function CalculatorWorkspace() {
                 <TeachingNote label="How does Bayesian feedback work?">
                   <p style={{ marginTop: 0 }}>
                     The engine starts with a population prior — what we&rsquo;d expect for an &ldquo;average&rdquo;
-                    patient with this age, weight, and SCr (Colin 2019, pooled from 14 studies).
-                    When you enter a measured level, MAP-Bayesian estimation shifts the patient&rsquo;s individual
+                    patient with this age, weight, and SCr, from the {COLIN_2019.shortName} model. Model source:{" "}
+                    {COLIN_2019.sourcePopulation}
+                    {" "}When you enter a measured level, MAP-Bayesian estimation shifts the patient&rsquo;s individual
                     PK parameters toward values that better explain the measurement, while a log-normal
-                    prior penalty keeps the shift bounded — a single observation can&rsquo;t override what
-                    decades of pop-PK data say is physiologically plausible.
+                    prior penalty keeps the shift bounded — a single observation cannot move the estimates far
+                    from what the population model considers plausible.
                   </p>
                   <p style={{ marginTop: 6 }}>
                     With one level the fit is bounded by the prior; with two or more well-timed levels

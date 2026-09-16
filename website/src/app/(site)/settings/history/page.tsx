@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFeature } from "@/hooks/useFeature";
+import { modelShortName } from "@/lib/pk/modelRegistry";
 
 interface HistoryRow {
   id: number;
@@ -259,7 +260,8 @@ export default function HistoryPage() {
                         {row.case_id ?? <span style={{ color: "var(--color-dim)" }}>—</span>}
                       </td>
                       <td style={{ padding: "10px 12px", color: "var(--color-secondary)", whiteSpace: "nowrap" }}>
-                        {row.pk_model === "vancomyzer_obesity" ? "Obesity" : "Colin 2019"}
+                        {/* Historical rows may carry the retired custom obesity model; the registry labels it "(retired)". */}
+                        {modelShortName(row.pk_model)}
                       </td>
                       <td style={{ padding: "10px 12px", color: "var(--color-primary)", fontWeight: 600 }}>
                         {row.dose_mg != null ? `${row.dose_mg} mg` : "—"}

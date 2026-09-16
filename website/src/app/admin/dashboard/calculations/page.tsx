@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { COLIN_2019, VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED, modelShortName } from "@/lib/pk/modelRegistry";
 
 interface Row {
   id: number;
@@ -139,8 +140,8 @@ export default function AdminCalculationsPage() {
             className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded text-slate-900 bg-white"
           >
             <option value="">All</option>
-            <option value="colin_2019">Colin 2019</option>
-            <option value="vancomyzer_obesity">Obesity model</option>
+            <option value={COLIN_2019.id}>{COLIN_2019.shortName}</option>
+            <option value={VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.id}>{VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.shortName}</option>
           </select>
         </div>
         <div className="flex items-end">
@@ -185,7 +186,7 @@ export default function AdminCalculationsPage() {
                     {row.case_id ?? <span className="text-slate-400">—</span>}
                   </td>
                   <td className="px-3 py-2 text-slate-700">
-                    {row.pk_model === "vancomyzer_obesity" ? "Obesity" : "Colin 2019"}
+                    {modelShortName(row.pk_model)}
                   </td>
                   <td className="px-3 py-2 text-slate-900 font-medium whitespace-nowrap">
                     {row.dose_mg != null ? `${row.dose_mg} mg` : "—"}

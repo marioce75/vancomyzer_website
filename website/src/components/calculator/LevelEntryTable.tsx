@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { CalculateRequestLevel } from "@/types/calculator";
+import ClinicalNumberInput from "./ClinicalNumberInput";
 import DatePartInput from "./DatePartInput";
 
 interface LevelEntryTableProps {
@@ -52,6 +53,35 @@ function calcHours(
   return Math.round((diffMs / 3600000) * 100) / 100;
 }
 
+/**
+ * Manual-hours mode has no wall-clock times, but the server reads
+ * collection_time with Date.parse and compares the gap between two levels'
+ * collection times with the difference in their hours after dose. Sending the
+ * typed hours ("2.5") as collection_time parsed as a calendar date (Feb 5,
+ * 2001) or failed ("7.47"), so valid entries were rejected.
+ *
+ * Each level therefore gets a synthetic ISO timestamp: this fixed reference
+ * dose time plus its hours after dose. The gap between two levels then equals
+ * the difference in their entered hours, and time_since_last_dose_hours is sent
+ * exactly as entered. The reference date is arbitrary and never shown.
+ */
+const MANUAL_HOURS_REFERENCE_DOSE_MS = Date.UTC(2000, 0, 1, 0, 0, 0);
+/** Synthetic timestamps fall within this window after the reference. */
+const MANUAL_HOURS_WINDOW_MS = 31 * 24 * 3_600_000;
+
+export function manualHoursCollectionTime(hours: number): string {
+  if (!Number.isFinite(hours) || hours <= 0) return "";
+  return new Date(MANUAL_HOURS_REFERENCE_DOSE_MS + Math.round(hours * 3_600_000)).toISOString();
+}
+
+function isManualHoursCollectionTime(collectionTime: string | undefined): boolean {
+  if (!collectionTime) return false;
+  const ms = Date.parse(collectionTime);
+  return Number.isFinite(ms)
+    && ms >= MANUAL_HOURS_REFERENCE_DOSE_MS
+    && ms < MANUAL_HOURS_REFERENCE_DOSE_MS + MANUAL_HOURS_WINDOW_MS;
+}
+
 // ── Shared styles ─────────────────────────────────────────────
 
 const inputClass = (hasError: boolean) =>
@@ -99,8 +129,13 @@ export default function LevelEntryTable({
     doseTimeErr: "",
   })));
 
-  const [useDateTime, setUseDateTime] = useState<boolean[]>(levels.map(() => true));
+  // Levels that already carry a synthetic manual-hours timestamp (e.g. after the
+  // section panel remounts) reopen in manual-hours mode.
+  const [useDateTime, setUseDateTime] = useState<boolean[]>(() =>
+    levels.map((l) => !isManualHoursCollectionTime(l.collection_time)),
+  );
   const [levelWarnings, setLevelWarnings] = useState<string[]>(levels.map(() => ""));
+  const [parseErrors, setParseErrors] = useState<Record<string, string>>({});
 
   // Restore level date/time from collection_time on mount (handles section panel remounts)
   useEffect(() => {
@@ -109,6 +144,7 @@ export default function LevelEntryTable({
       const level = levels[i];
       if (dt.levelTime) return dt; // already has time — skip
       if (!level?.collection_time) return dt;
+      if (isManualHoursCollectionTime(level.collection_time)) return dt; // synthetic, not a real draw time
       const ms = Date.parse(level.collection_time);
       if (isNaN(ms)) return dt;
       const d = new Date(ms);
@@ -181,10 +217,21 @@ export default function LevelEntryTable({
 
   const toggleMode = (index: number) => {
     const next = [...useDateTime];
-    next[index] = !next[index];
+    next[index] = !(next[index] ?? true);
     setUseDateTime(next);
+    setParseErrors((prev) => ({ ...prev, [`hours-${index}`]: "" }));
     if (!next[index]) {
       update(index, { time_since_last_dose_hours: 0, collection_time: "" });
+    } else {
+      // Back to date & time: drop the synthetic manual-hours timestamp and use
+      // whatever the date and time fields currently give.
+      const cur = dateTimes[index];
+      const levelDt = cur ? buildDateTime(cur.levelDate, cur.levelTime) : null;
+      const hours = cur ? calcHours(cur.doseDate, cur.doseTime, cur.levelDate, cur.levelTime) : null;
+      update(index, {
+        time_since_last_dose_hours: hours !== null && hours >= 0 ? hours : 0,
+        collection_time: levelDt ? levelDt.toISOString() : "",
+      });
     }
   };
 
@@ -225,24 +272,22 @@ export default function LevelEntryTable({
             <div>
               <Label>Vancomycin level concentration (mcg/mL)</Label>
               <div className="flex">
-                <input
-                  type="number"
-                  min={0}
-                  step={0.1}
-                  value={level.value_mcg_ml || ""}
-                  onChange={(e) => {
-                    update(i, { value_mcg_ml: e.target.value ? Number(e.target.value) : 0 });
+                <ClinicalNumberInput
+                  inputMode="decimal"
+                  value={level.value_mcg_ml}
+                  onValueChange={(concentration) => {
+                    update(i, { value_mcg_ml: concentration });
                     setLevelWarnings((prev) => { const n = [...prev]; n[i] = ""; return n; });
                   }}
-                  onBlur={(e) => {
-                    const v = e.target.value ? Number(e.target.value) : 0;
+                  onBlurValue={(v, _raw, parseError) => {
+                    setParseErrors((prev) => ({ ...prev, [`value-${i}`]: parseError ?? "" }));
                     setLevelWarnings((prev) => {
                       const n = [...prev];
-                      n[i] = v > 40 ? `Level ${v} mcg/mL is unusually high — please confirm this value is correct.` : "";
+                      n[i] = v !== null && v > 40 ? `Level ${v} mcg/mL is unusually high — please confirm this value is correct.` : "";
                       return n;
                     });
                   }}
-                  className={`${inputClass(Boolean(valueError))} rounded-r-none`}
+                  className={(invalidText) => `${inputClass(Boolean(valueError || invalidText))} rounded-r-none`}
                   placeholder="e.g. 18.5"
                 />
                 <span className="flex items-center px-3 text-xs rounded-r h-[40px] shrink-0" style={{background: 'rgba(255,255,255,0.04)', border: '1px solid var(--navy-border-strong)', borderLeft: 'none', color: 'var(--text-muted)'}}>
@@ -251,7 +296,10 @@ export default function LevelEntryTable({
               </div>
               {/* Validation errors only shown after a failed Calculate attempt (set via fieldErrors prop) */}
               {valueError && <p className="text-xs text-red-600 mt-1">{valueError}</p>}
-              {!valueError && levelWarnings[i] && (
+              {!valueError && parseErrors[`value-${i}`] && (
+                <p className="text-xs text-red-600 mt-1">{parseErrors[`value-${i}`]}</p>
+              )}
+              {!valueError && !parseErrors[`value-${i}`] && levelWarnings[i] && (
                 <p className="text-xs text-amber-700 mt-1 font-medium">⚠ {levelWarnings[i]}</p>
               )}
             </div>
@@ -375,16 +423,17 @@ export default function LevelEntryTable({
               <div>
                 <Label>Time drawn (hours after dose start)</Label>
                 <div className="flex">
-                  <input
-                    type="number"
-                    min={0}
-                    step={0.5}
-                    value={level.time_since_last_dose_hours || ""}
-                    onChange={(e) => update(i, {
-                      time_since_last_dose_hours: e.target.value ? Number(e.target.value) : 0,
-                      collection_time: e.target.value ? String(Number(e.target.value)) : "",
+                  <ClinicalNumberInput
+                    inputMode="decimal"
+                    value={level.time_since_last_dose_hours}
+                    onValueChange={(hours) => update(i, {
+                      time_since_last_dose_hours: hours,
+                      collection_time: manualHoursCollectionTime(hours),
                     })}
-                    className={`${inputClass(Boolean(timeError))} rounded-r-none`}
+                    onBlurValue={(_v, _raw, parseError) => {
+                      setParseErrors((prev) => ({ ...prev, [`hours-${i}`]: parseError ?? "" }));
+                    }}
+                    className={(invalidText) => `${inputClass(Boolean(timeError || collectionError || invalidText))} rounded-r-none`}
                     placeholder="e.g. 2.5"
                   />
                   <span className="flex items-center px-3 text-xs rounded-r h-[40px] shrink-0" style={{background: 'rgba(255,255,255,0.04)', border: '1px solid var(--navy-border-strong)', borderLeft: 'none', color: 'var(--text-muted)'}}>
@@ -392,6 +441,9 @@ export default function LevelEntryTable({
                   </span>
                 </div>
                 {(timeError || collectionError) && <p className="text-xs text-red-600 mt-1">{collectionError || timeError}</p>}
+                {!timeError && !collectionError && parseErrors[`hours-${i}`] && (
+                  <p className="text-xs text-red-600 mt-1">{parseErrors[`hours-${i}`]}</p>
+                )}
               </div>
             )}
           </div>

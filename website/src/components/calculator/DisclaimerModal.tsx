@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useCallback } from "react";
+import { COLIN_2019 } from "@/lib/pk/modelRegistry";
 
 interface DisclaimerModalProps {
   open: boolean;
@@ -59,7 +60,7 @@ export interface DisclaimerSection {
 export const SECTIONS: readonly DisclaimerSection[] = [
   {
     heading: "INTENDED USE",
-    body: `D\u014Dsys\u2122 provides Vancomyzer\u2122 \u2014 a Vancomycin Dosage Calculator using Bayesian modeling and pharmacokinetics \u2014 to support the care of patients with bacterial infections. Vancomyzer is offered to licensed healthcare professionals across multiple tiers: a free tier with the full Bayesian engine for individual clinicians, and paid Individual Pro and Hospital tiers that add features such as clinical-note export, calculation history, EMR integration, audit logging, and Business Associate Agreements. The pharmacokinetic models, equations, and clinical safety guardrails are identical across all tiers.
+    body: `D\u014Dsys\u2122 provides Vancomyzer\u2122 \u2014 a Vancomycin Dosage Calculator using Bayesian modeling and pharmacokinetics \u2014 to support the care of patients with bacterial infections. Vancomyzer is intended for licensed healthcare professionals. The core calculator is free permanently. Paid plans (Individual Pro, Department and Hospital) add account features such as calculation history, team administration and audit logs; during the launch period, PDF export, clinical-note copy and result interpretation are free for everyone. The pharmacokinetic model, equations, and clinical safety guardrails are identical across all plans.
 
 D\u014Dsys\u2122 makes no representations or warranties regarding the accuracy, quality, completeness, timeliness, appropriateness, or suitability of this tool. D\u014Dsys\u2122 assumes no obligation to update the tool or advise on further developments concerning vancomycin dosage. Medical information changes rapidly. YOU AS THE USER (\u201CUSER\u201D) ACKNOWLEDGE THAT THE TOOL IS PROVIDED ON AN \u201CAS IS\u201D BASIS AND THAT ANY USE OF OR RELIANCE ON THE TOOL SHALL BE AT YOUR SOLE RISK.`,
   },
@@ -69,11 +70,11 @@ D\u014Dsys\u2122 makes no representations or warranties regarding the accuracy, 
   },
   {
     heading: "REGULATORY STATUS",
-    body: `Vancomyzer\u2122 has not been cleared or approved by the U.S. Food and Drug Administration as a medical device. It is provided as non-device clinical decision support software under Section 520(o)(1)(E) of the Federal Food, Drug and Cosmetic Act as amended by the 21st Century Cures Act.`,
+    body: `Vancomyzer\u2122 is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation.`,
   },
   {
     heading: "SCOPE",
-    body: `This tool is scoped to adult intermittent intravenous vancomycin only. It is not validated for pediatric use, continuous infusion, renal replacement therapy, or conditions outside the stated assumptions.`,
+    body: `This tool is scoped to adult intermittent intravenous vancomycin only. It is not designed for pediatric patients, continuous infusion, renal replacement therapy, or conditions outside the stated assumptions. Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned.`,
   },
   {
     heading: "COPYRIGHT LICENSE",
@@ -89,7 +90,7 @@ D\u014Dsys\u2122 makes no representations or warranties regarding the accuracy, 
   },
   {
     heading: "PHARMACOKINETIC MODEL",
-    body: `All calculations use the Colin 2019 two-compartment population pharmacokinetic model. Colin PJ et al. Clin Pharmacokinet. 2019;58(6):767-780. DOI: 10.1007/s40262-018-0727-5. Mathematical equations are in the public domain and used with attribution.`,
+    body: `All dosing calculations use the ${COLIN_2019.displayName}, for every adult at every body size. ${COLIN_2019.citation} DOI: ${COLIN_2019.doi}. Fat-free mass and alternative creatinine-clearance estimates are shown for information only and do not change the calculation. Published equations are used with attribution.`,
   },
 ];
 

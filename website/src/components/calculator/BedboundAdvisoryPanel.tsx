@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react"; // useRef kept for todayRef
+import ClinicalNumberInput from "./ClinicalNumberInput";
 import DatePartInput from "./DatePartInput";
 
 export interface BedboundDoseData {
@@ -66,6 +67,7 @@ export default function BedboundAdvisoryPanel({
   const [adminDate, setAdminDate] = useState<string>(today);
   const [adminTime, setAdminTime] = useState<string>("");
   const [adminTimeErr, setAdminTimeErr] = useState<string>("");
+  const [parseErrors, setParseErrors] = useState<{ dose?: string; infusion?: string }>({});
 
   // Fire callback whenever form values change
   useEffect(() => {
@@ -108,8 +110,11 @@ export default function BedboundAdvisoryPanel({
         <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5">
           <p className="text-xs font-semibold text-red-800">⚠ SCr {scrMgDl} mg/dL — Low Muscle Mass Warning</p>
           <p className="mt-1 text-xs text-red-700 leading-5">
-            Low SCr in bedbound patients likely reflects reduced muscle mass, not preserved renal function.
-            Consider applying an SCr floor of 0.7–1.0 mg/dL or ordering <strong>cystatin C</strong> before dosing.
+            Low SCr in bedbound patients may reflect reduced muscle mass rather than preserved renal function, so
+            the estimate may overstate clearance. Routinely rounding SCr up to a fixed value is not recommended: rounding
+            to 1 mg/dL reduced dose-prediction accuracy in a retrospective study of older adults (Bukhari 2024). Obtain an
+            early vancomycin level to individualize dosing. Cystatin C or a measured creatinine clearance can inform your
+            clinical assessment but cannot be entered into the Colin 2019 model.
           </p>
         </div>
       )}
@@ -136,29 +141,30 @@ export default function BedboundAdvisoryPanel({
           {/* Dose given */}
           <div>
             <Label>Dose given (mg)</Label>
-            <input
-              type="number"
-              min={0}
-              step={250}
+            <ClinicalNumberInput
+              inputMode="decimal"
+              rejectThousandsGrouping
               placeholder="e.g. 1000"
-              value={doseGiven || ""}
-              onChange={(e) => setDoseGiven(e.target.value ? Number(e.target.value) : 0)}
-              className={inputCls(false)}
+              value={doseGiven}
+              onValueChange={setDoseGiven}
+              onBlurValue={(_v, _raw, parseError) => setParseErrors((prev) => ({ ...prev, dose: parseError ?? undefined }))}
+              className={(invalidText) => inputCls(invalidText)}
             />
+            {parseErrors.dose && <p className="mt-1 text-[11px] text-red-600">{parseErrors.dose}</p>}
           </div>
 
           {/* Infusion duration */}
           <div>
             <Label>Infusion duration (h)</Label>
-            <input
-              type="number"
-              min={0}
-              step={0.25}
+            <ClinicalNumberInput
+              inputMode="decimal"
               placeholder="e.g. 1.5"
-              value={infusionHours || ""}
-              onChange={(e) => setInfusionHours(e.target.value ? Number(e.target.value) : 0)}
-              className={inputCls(false)}
+              value={infusionHours}
+              onValueChange={setInfusionHours}
+              onBlurValue={(_v, _raw, parseError) => setParseErrors((prev) => ({ ...prev, infusion: parseError ?? undefined }))}
+              className={(invalidText) => inputCls(invalidText)}
             />
+            {parseErrors.infusion && <p className="mt-1 text-[11px] text-red-600">{parseErrors.infusion}</p>}
           </div>
         </div>
 

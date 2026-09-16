@@ -1,7 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { CalculateRequestPatient } from "@/types/calculator";
+import { COLIN_2019, computeBmi, HIGH_BMI_THRESHOLD_KG_M2, highBmiAdvisory } from "@/lib/pk/modelRegistry";
 import BedboundAdvisoryPanel, { BedboundDoseData } from "./BedboundAdvisoryPanel";
+import ClinicalNumberInput from "./ClinicalNumberInput";
 import ObesityAdvisoryPanel from "./ObesityAdvisoryPanel";
+
+/** BMI outside this range almost always means weight or height was entered in the wrong units. */
+const PLAUSIBLE_BMI_MIN = 12;
+const PLAUSIBLE_BMI_MAX = 80;
 
 interface PatientCharacteristicsFormProps {
   value: CalculateRequestPatient;
@@ -50,20 +56,8 @@ export default function PatientCharacteristicsForm({
   onBedboundChange,
   onBedboundLoadingDoseChange,
 }: PatientCharacteristicsFormProps) {
-  const [scrRaw, setScrRaw] = useState<string>(
-    value.serum_creatinine_mg_dl ? String(value.serum_creatinine_mg_dl) : ""
-  );
   const [blurErrors, setBlurErrors] = useState<Record<string, string>>({});
   const [blurWarnings, setBlurWarnings] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    const displayed = parseFloat(scrRaw);
-    if (value.serum_creatinine_mg_dl === 0) {
-      setScrRaw("");
-    } else if (isNaN(displayed) || displayed !== value.serum_creatinine_mg_dl) {
-      setScrRaw(String(value.serum_creatinine_mg_dl));
-    }
-  }, [value.serum_creatinine_mg_dl]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = (key: keyof CalculateRequestPatient, val: string | number) => {
     onChange({ ...value, [key]: val });
@@ -73,39 +67,35 @@ export default function PatientCharacteristicsForm({
     <div className="space-y-4">
       <FormRow>
         <InputGroup label="Age (years)">
-          <input
-            type="number"
-            min={0}
+          <ClinicalNumberInput
             inputMode="numeric"
-            value={value.age || ""}
-            onChange={(e) => update("age", e.target.value ? Number(e.target.value) : 0)}
-            onBlur={() => {
-              const v = value.age;
-              const err = v > 0 && v < 18 ? "Age must be ≥ 18 years"
+            value={value.age}
+            onValueChange={(n) => update("age", n)}
+            onBlurValue={(v, _raw, parseError) => {
+              const err = v === null ? (parseError ?? "")
+                        : v > 0 && v < 18 ? "Age must be ≥ 18 years"
                         : v > 110 ? "Age > 110 — please verify"
                         : "";
               setBlurErrors((prev) => ({ ...prev, age: err }));
             }}
-            className={inputClass(Boolean(fieldErrors["patient.age"] || blurErrors.age))}
+            className={(invalidText) => inputClass(Boolean(fieldErrors["patient.age"] || blurErrors.age || invalidText))}
             placeholder="e.g. 65"
           />
           {(blurErrors.age) && <p className="mt-1 text-xs text-red-600">{blurErrors.age}</p>}
         </InputGroup>
         <InputGroup label="Weight (kg)">
-          <input
-            type="number"
-            min={0}
+          <ClinicalNumberInput
             inputMode="decimal"
-            value={value.weight_kg || ""}
-            onChange={(e) => update("weight_kg", e.target.value ? Number(e.target.value) : 0)}
-            onBlur={() => {
-              const v = value.weight_kg;
-              const err = v > 0 && v < 30 ? "Weight must be ≥ 30 kg"
+            value={value.weight_kg}
+            onValueChange={(n) => update("weight_kg", n)}
+            onBlurValue={(v, _raw, parseError) => {
+              const err = v === null ? (parseError ?? "")
+                        : v > 0 && v < 30 ? "Weight must be ≥ 30 kg"
                         : v > 300 ? "Weight > 300 kg — please verify"
                         : "";
               setBlurErrors((prev) => ({ ...prev, weight: err }));
             }}
-            className={inputClass(Boolean(fieldErrors["patient.weight_kg"] || blurErrors.weight))}
+            className={(invalidText) => inputClass(Boolean(fieldErrors["patient.weight_kg"] || blurErrors.weight || invalidText))}
             placeholder="e.g. 75.5"
           />
           {blurErrors.weight && <p className="mt-1 text-xs text-red-600">{blurErrors.weight}</p>}
@@ -113,33 +103,21 @@ export default function PatientCharacteristicsForm({
       </FormRow>
       <FormRow>
         <InputGroup label="Serum Creatinine (mg/dL)">
-          <input
-            type="text"
+          {/* Parsed with parseClinicalNumber: "1,2" is 1.2, never 1. Unparseable
+              text leaves the value empty and marks the field invalid. */}
+          <ClinicalNumberInput
             inputMode="decimal"
-            value={scrRaw}
-            onChange={(e) => {
-              const raw = e.target.value;
-              setScrRaw(raw);
-              if (raw === "" || raw === "0") {
-                update("serum_creatinine_mg_dl", 0);
-              } else {
-                const parsed = parseFloat(raw);
-                if (!isNaN(parsed) && parsed >= 0) {
-                  update("serum_creatinine_mg_dl", parsed);
-                }
-              }
-            }}
-            onBlur={() => {
-              const parsed = parseFloat(scrRaw);
-              if (isNaN(parsed) || parsed < 0) {
-                setScrRaw("");
-                update("serum_creatinine_mg_dl", 0);
-                setBlurErrors((prev) => ({ ...prev, scr: "" }));
+            rejectThousandsGrouping
+            value={value.serum_creatinine_mg_dl}
+            onValueChange={(n) => update("serum_creatinine_mg_dl", n)}
+            onBlurValue={(parsed, _raw, parseError) => {
+              if (parsed === null || parsed < 0) {
+                const err = parsed === null ? (parseError ?? "") : "SCr cannot be negative.";
+                setBlurErrors((prev) => ({ ...prev, scr: err }));
                 setBlurWarnings((prev) => ({ ...prev, scr: "" }));
               } else {
-                setScrRaw(String(parsed));
                 if (parsed > 15) {
-                  setBlurErrors((prev) => ({ ...prev, scr: "SCr > 15 mg/dL — please verify this value." }));
+                  setBlurErrors((prev) => ({ ...prev, scr: "SCr > 15 mg/dL — please verify this value. If it was reported in µmol/L, divide by 88.4." }));
                   setBlurWarnings((prev) => ({ ...prev, scr: "" }));
                 } else if (parsed < 0.4) {
                   setBlurErrors((prev) => ({ ...prev, scr: "" }));
@@ -150,26 +128,30 @@ export default function PatientCharacteristicsForm({
                 }
               }
             }}
-            className={inputClass(Boolean(fieldErrors["patient.serum_creatinine_mg_dl"] || blurErrors.scr))}
+            className={(invalidText) => inputClass(Boolean(fieldErrors["patient.serum_creatinine_mg_dl"] || blurErrors.scr || invalidText))}
             placeholder="e.g. 1.1"
           />
+          <p className="mt-1 text-[11px] text-slate-500">mg/dL (µmol/L ÷ 88.4)</p>
           {blurErrors.scr && <p className="mt-1 text-xs text-red-600">{blurErrors.scr}</p>}
           {!blurErrors.scr && blurWarnings.scr && <p className="mt-1 text-xs text-amber-700">⚠ {blurWarnings.scr}</p>}
         </InputGroup>
       </FormRow>
 
-      {/* Height + Sex — optional, enables obesity model when BMI ≥ 40 */}
+      {/* Height + Sex — optional. Neither changes the model: height gives BMI (high-BMI
+          advisory and unit check); sex is used only for the informational FFM/CrCl comparison. */}
       <FormRow>
         <InputGroup label="Height (cm)">
-          <input
-            type="number"
-            min={0}
-            inputMode="numeric"
-            value={value.height_cm || ""}
-            onChange={(e) => update("height_cm", e.target.value ? Number(e.target.value) : 0)}
-            className={inputClass(Boolean(fieldErrors["patient.height_cm"]))}
+          <ClinicalNumberInput
+            inputMode="decimal"
+            value={value.height_cm}
+            onValueChange={(n) => update("height_cm", n)}
+            onBlurValue={(_v, _raw, parseError) => {
+              setBlurErrors((prev) => ({ ...prev, height: parseError ?? "" }));
+            }}
+            className={(invalidText) => inputClass(Boolean(fieldErrors["patient.height_cm"] || blurErrors.height || invalidText))}
             placeholder="e.g. 170"
           />
+          {blurErrors.height && <p className="mt-1 text-xs text-red-600">{blurErrors.height}</p>}
         </InputGroup>
         <InputGroup label="Sex">
           <select
@@ -184,42 +166,25 @@ export default function PatientCharacteristicsForm({
         </InputGroup>
       </FormRow>
 
-      {/* BMI display + obesity advisory */}
+      {/* BMI, unit check and high-BMI advisory. Information only: there is no
+          model switch at any BMI (Colin 2019 is used for every adult). */}
       {value.weight_kg > 0 && value.height_cm > 0 && (() => {
-        const h = value.height_cm / 100;
-        const bmi = value.weight_kg / (h * h);
-        if (!isFinite(bmi) || bmi <= 0) return null;
-        const isObese = bmi >= 40;
-        const sex = value.sex as "male" | "female" | "";
-        // Compute FFM inline for display (Janmahasatian 2005)
-        let ffm = 0;
-        if (isObese && (sex === "male" || sex === "female")) {
-          ffm = sex === "male"
-            ? (9270 * value.weight_kg) / (6680 + 216 * bmi)
-            : (9270 * value.weight_kg) / (8780 + 244 * bmi);
-        }
+        const bmi = computeBmi(value.weight_kg, value.height_cm);
+        if (bmi === null || !isFinite(bmi) || bmi <= 0) return null;
+        const isHighBmi = bmi >= HIGH_BMI_THRESHOLD_KG_M2;
+        const unitsImplausible = bmi > PLAUSIBLE_BMI_MAX || bmi < PLAUSIBLE_BMI_MIN;
+        const sex = value.sex === "male" || value.sex === "female" ? value.sex : null;
         return (
           <>
-            <div className="flex items-center gap-2 text-xs" style={{ color: isObese ? "#92400e" : "var(--color-secondary)" }}>
+            <div className="flex items-center gap-2 text-xs" style={{ color: isHighBmi ? "#92400e" : "var(--color-secondary)" }}>
               <span style={{ fontWeight: 600 }}>BMI: {bmi.toFixed(1)} kg/m²</span>
-              {/* The engine only switches to the obesity model when sex is known
-                  (buildPriorParameters requires height AND sex), so the badge must
-                  require it too — otherwise it claims a model that is not running. */}
-              {isObese && (sex === "male" || sex === "female") && (
-                <span style={{ padding: "1px 6px", background: "#fffbeb", border: "1px solid #fcd34d", color: "#92400e", fontWeight: 600, fontSize: 10 }}>
-                  OBESITY MODEL ACTIVE
-                </span>
-              )}
-              {isObese && sex !== "male" && sex !== "female" && (
-                <span style={{ padding: "1px 6px", background: "#f1f5f9", border: "1px solid #cbd5e1", color: "#475569", fontWeight: 600, fontSize: 10 }}>
-                  ENTER SEX TO USE THE OBESITY MODEL
-                </span>
-              )}
             </div>
-            {isObese && (sex === "male" || sex === "female") && ffm > 0 && (
+            {unitsImplausible && (
+              <p className="text-xs text-amber-700 font-medium" role="status">⚠ Check units — weight in kg, height in cm</p>
+            )}
+            {isHighBmi && (
               <ObesityAdvisoryPanel
                 bmi={bmi}
-                ffm_kg={ffm}
                 sex={sex}
                 age={value.age}
                 weight_kg={value.weight_kg}
@@ -229,6 +194,11 @@ export default function PatientCharacteristicsForm({
             )}
           </>
         );
+      })()}
+      {value.weight_kg > 0 && !(value.height_cm > 0) && (() => {
+        // No height: BMI cannot be assessed. The registry flags this for heavier patients.
+        const advisory = highBmiAdvisory({ weight_kg: value.weight_kg, height_cm: null });
+        return advisory ? <p className="text-xs text-amber-700">⚠ {advisory}</p> : null;
       })()}
 
       {/* Renal Replacement Therapy guard */}
@@ -263,7 +233,7 @@ export default function PatientCharacteristicsForm({
           <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
             <p className="text-xs font-semibold text-red-800">⚠ Calculator blocked</p>
             <p className="mt-0.5 text-xs text-red-700 leading-5">
-              The Colin 2019 model is not validated for patients on renal replacement therapy (CRRT, HD, PD). Use a specialist RRT-specific dosing protocol or consult pharmacy.
+              The {COLIN_2019.shortName} model is not validated for patients on renal replacement therapy (CRRT, HD, PD). Use a specialist RRT-specific dosing protocol or consult pharmacy.
             </p>
           </div>
         )}
