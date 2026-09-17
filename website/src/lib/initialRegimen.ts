@@ -10,6 +10,7 @@ import { computeSafeInfusionDurationHours } from "./pk/recommend/infusionSafety"
 import { curvePoints } from "./pk/steadyStateTwoCompartment";
 import { buildInitialRegimenReviewStatus } from "./pk/response/buildReviewStatus";
 import { highBmiAdvisory, modelShortName, renalCovariateDescription } from "./pk/modelRegistry";
+import { DEFAULT_DOSE_POLICY, type DosePolicy } from "./pk/dosePolicy";
 import {
   ARC_THRESHOLD_ML_MIN_1_73,
   crclOnTotalBodyWeight,
@@ -120,12 +121,25 @@ const DEFAULT_INFUSION_HOURS = 1;
 // (Loading dose max of 3000 mg is separate — see buildEmpiricLoadingDose.ts)
 const MAX_SINGLE_DOSE_MG = 2000;
 
-// Max TDD safety cap per ASHP/IDSA 2020 guidelines: 4500 mg/day hard ceiling
-function getMaxTdd(scr: number): number {
-  if (scr >= 3.5) return 1000;   // severely impaired
-  if (scr >= 2.0) return 2000;   // moderately impaired
-  if (scr >= 1.3) return 3000;   // mildly impaired
-  return 4500;                    // normal renal function — guideline max
+/**
+ * Per-dose ceiling in mg/kg. The 2020 ASHP/IDSA/PIDS/SIDP maintenance band is
+ * 15-20 mg/kg per dose; 25 leaves headroom for rounding to the dose grid
+ * without admitting amounts no guideline supports. The absolute 2000 mg cap
+ * alone did not bound this: a 45 kg adult could be offered 2000 mg q24h, which
+ * is 44 mg/kg in a single dose.
+ */
+const MAX_DOSE_MG_PER_KG = 25;
+
+// Max TDD safety cap per ASHP/IDSA 2020 guidelines: 4500 mg/day hard ceiling.
+// An institution may configure a lower ceiling at /settings; it can never raise
+// one (dosePolicyFromSettings clamps), so this takes the smaller of the two.
+function getMaxTdd(scr: number, policy: DosePolicy): number {
+  const tier =
+    scr >= 3.5 ? 1000 :          // severely impaired
+    scr >= 2.0 ? 2000 :          // moderately impaired
+    scr >= 1.3 ? 3000 :          // mildly impaired
+    4500;                        // normal renal function — guideline max
+  return Math.min(tier, policy.maxDailyDoseMg);
 }
 
 // Safety caps — sourced from the 2020 ASHP/IDSA/PIDS/SIDP guideline supporting
@@ -142,7 +156,7 @@ const MAX_PEAK_MCG_ML = 80;
 const MAX_TROUGH_MCG_ML = 20;
 const MAX_AUC24_MG_H_L = 650;
 
-function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, scr: number) {
+function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, scr: number, weight_kg: number, policy: DosePolicy) {
   const candidates: {
     dose_mg: number;
     interval_hours: number;
@@ -152,13 +166,15 @@ function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, s
     inRange: boolean;
   }[] = [];
 
-  const maxTdd = getMaxTdd(scr);
+  const maxTdd = getMaxTdd(scr, policy);
 
   for (const interval_hours of INTERVAL_OPTIONS_H) {
     for (const dose_mg of DOSE_OPTIONS_MG) {
-      if (dose_mg > MAX_SINGLE_DOSE_MG) continue;
+      if (dose_mg > Math.min(MAX_SINGLE_DOSE_MG, policy.maxSingleDoseMg)) continue;
       const tdd = (dose_mg * 24) / interval_hours;
       if (tdd > maxTdd) continue;
+      // Bound the amount given at once, not just the daily total.
+      if (weight_kg > 0 && dose_mg / weight_kg > MAX_DOSE_MG_PER_KG) continue;
       const infDuration = computeSafeInfusionDurationHours(dose_mg).infusion_duration_hours;
       // Infusion must not exceed 2/3 of the dosing interval
       if (infDuration > interval_hours * 0.67) continue;
@@ -183,7 +199,17 @@ function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, s
   const ranked = (inRangeCandidates.length > 0 ? inRangeCandidates : candidates).sort((a, b) => {
     const aucDelta = Math.abs(a.auc24 - TARGET_AUC24_MID) - Math.abs(b.auc24 - TARGET_AUC24_MID);
     if (aucDelta !== 0) return aucDelta;
-    // Prefer longer intervals (less burden) when AUC is comparable
+    // On an exact AUC tie, prefer the conventional interval rather than the
+    // longest. Equal predicted exposure does not make 2000 mg q24h equivalent
+    // to 1000 mg q12h — the guideline band is stated per dose, and the old
+    // "longest interval wins" rule made q24h the default for 560 of 720
+    // realistic normal-renal adults, with a per-dose amount above 25 mg/kg in
+    // 152 of them. Ties are exact and common because AUC24 depends only on the
+    // daily dose, so this tie-break decides a large share of empiric output.
+    const CONVENTIONAL_INTERVAL_H = 12;
+    const aFromConventional = Math.abs(a.interval_hours - CONVENTIONAL_INTERVAL_H);
+    const bFromConventional = Math.abs(b.interval_hours - CONVENTIONAL_INTERVAL_H);
+    if (aFromConventional !== bFromConventional) return aFromConventional - bFromConventional;
     if (a.interval_hours !== b.interval_hours) return b.interval_hours - a.interval_hours;
     const dailyDoseA = (a.dose_mg * 24) / a.interval_hours;
     const dailyDoseB = (b.dose_mg * 24) / b.interval_hours;
@@ -337,7 +363,10 @@ function assertInitialRegimenInputs(patient: Patient): void {
   }
 }
 
-export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
+export function computeInitialRegimen(
+  patient: Patient,
+  policy: DosePolicy = DEFAULT_DOSE_POLICY,
+): InitialRegimenResult {
   assertInitialRegimenInputs(patient);
   const prior = buildPriorParameters(
     {
@@ -354,8 +383,8 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
     }
   );
 
-  const { best: choice, candidates } = chooseInitialCandidate(prior.CL, prior.V1, prior.Q, prior.V2, prior.scr);
-  const loadingDose = buildEmpiricLoadingDose({ actual_body_weight_kg: patient.weight_kg });
+  const { best: choice, candidates } = chooseInitialCandidate(prior.CL, prior.V1, prior.Q, prior.V2, prior.scr, patient.weight_kg, policy);
+  const loadingDose = buildEmpiricLoadingDose({ actual_body_weight_kg: patient.weight_kg, policy });
 
   // ─── SAFETY REFUSAL PATH ──────────────────────────────────────────
   // The empiric search returned no candidate that simultaneously meets
@@ -434,7 +463,8 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
         `urinary creatinine clearance before acting on this. ` +
         `If confirmed, standard intermittent dosing may not achieve target AUC24 of 400\u2013600 mg\u00b7h/L; ` +
         `required TDD \u2248 ${Math.round(required_tdd).toLocaleString()} mg/day. ` +
-        `Consider continuous IV infusion (~${ci_rate} mg/h with loading dose) or consult Infectious Diseases/nephrology. ` +
+        `Continuous infusion is outside this calculator's scope \u2014 it is neither modelled nor dosed here, so manage it ` +
+        `per local protocol with Infectious Diseases or nephrology input rather than from these numbers. ` +
         `Obtain two vancomycin levels early (2\u20134h and 6\u20138h post-dose) to confirm individual PK.`,
     };
   }

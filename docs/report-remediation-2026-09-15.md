@@ -151,28 +151,72 @@ expanded and its own Show Math toggle sits directly above it — and the workspa
 line. The right column is its own scroll region (`CalculatorLayout.tsx:19`), so these reductions are
 what decide whether the first screen holds everything.
 
-### Still open in the engine (not fixed here)
-- `normalizePatient` turns missing weight into 70 kg and missing SCr into 1.0; SCr 0.1–0.39 is
-  floored to 0.4 and notes print 0.4. (The 300 kg ceiling is fixed; the defaults are not.)
-- Mixing manual-hours and date/time levels still gives misleading rejections.
-- ARC advisory suggests a continuous-infusion rate although continuous infusion is out of scope.
+### Dosing changes — approved by Mario and implemented 16 Sep 2026
 
-### Needs clinical sign-off before it can be fixed (each changes emitted doses)
-Reproduced by execution in the 15–16 Sep engine audit, deliberately left alone:
-- **Colin prior CL collapses at high SCr.** At SCr 6.0 the prior gives CL 0.106 L/h and the MAP
-  fit is dragged to 0.493 against a true 0.7, so the engine halves a dose that was correct.
-  Flooring the prior also moves the empiric refusal boundary.
-- **Posterior CL is not renally bounded.** One mis-drawn 1.0 mcg/mL trough raises CL to 4.09× the
-  patient's own CrCl and ships 4500 mg/day to a patient with CrCl 39.
-- **Steady state is a fixed count of 5 doses.** Entering 4 vs 5 doses changes the daily dose by
-  33% on identical PK; it should key on the patient's own terminal half-life.
-- **The sparse path refuses when a safe regimen exists** (750 mg q8h, AUC 492) because its
-  heuristic candidate failed the hard cap first.
-- **The empiric tie-break prefers the longest interval**, offering a 45 kg adult 2000 mg q24h
-  (44 mg/kg) over 1000 mg q12h at identical predicted AUC.
-- **Institutional dose ceilings are ignored** — /settings values are validated, saved, never read.
-- Fixed Q, uncapped Cockcroft–Gault, the SCr 0.4 floor, and an unbounded curve horizon at very
-  low clearance (a 6.18-year, 11.6 MB curve for one request).
+Every item that previously sat under "needs clinical sign-off" was approved and is now done.
+Each was measured before and after against a fixed cohort (see the measurement below).
+
+- **Colin prior CL collapse at high SCr — fixed downstream, not in the prior.** Flooring the prior
+  was tried first and reverted: it moved 1944 of 10800 grid points away from an independent Colin
+  2019 re-implementation (worst 5.64× at SCr 6) and broke the promise the Transparency and
+  equations pages make. The published prior stays faithful; the **posterior** clearance is now
+  bounded at a physiological non-renal floor (0.4 L/h per 70 kg, allometric) and the result says
+  so. Bounding runs only when a fit succeeded — the prior-only path is never floored.
+- **Posterior clearance is renally bounded.** A fit above 2× the patient's Cockcroft-Gault
+  clearance is capped and flagged (Cucci 2023: vancomycin CL runs 0.6–0.8× CrCl; the highest
+  genuine ARC ratio measured was 1.15×). Measured: a single implausible 1.0 mcg/mL trough took
+  CL from 10.012 to 5.667 L/h and the recommendation from 1500 mg q8h to 1000 mg q8h — 4500 down
+  to 3000 mg/day.
+- **Steady state keys on the patient's own terminal half-life**, not a dose count
+  (`isSteadyStateRegimen`). The dose count is kept as a necessary condition, so the predicate can
+  only ever become more conservative. `validateExistingRegimenRequest` deliberately keeps only the
+  count half — it runs before any PK is fitted and has no half-life available.
+- **Sparse path no longer refuses when a safe regimen exists.** The heuristic now returns null
+  rather than a refusal when its single candidate fails the caps, so the caller falls through to
+  conservative scaling. Measured: a 38 y / 62 kg patient on 2000 mg q6h with a trough of 55 went
+  from "no safe maintenance regimen exists" to 1000 mg q12h at a predicted AUC24 of 454.
+  It deliberately does **not** fall through to the full grid — that grid ranks on steady-state
+  exposure and ignores drug already on board, which would dose a patient sitting at a trough of 50.
+- **Empiric tie-break prefers the conventional interval** and a per-dose ceiling of 25 mg/kg now
+  bounds the amount given at once, not just the daily total.
+- **Institutional dose ceilings are read.** /settings values reach both engines as a plain
+  `DosePolicy`. Settings may only **tighten** a ceiling, never raise one. Measured: with 500 mg /
+  1000 mg/day configured, both paths emit 500 mg q12h at 1000 mg/day and every frequency option
+  respects it; a file asking for 3000/6000 is clamped back to 2000/4500.
+- **Loading dose carries its own infusion duration** — 3000 mg now states 5 h (10.0 mg/min)
+  instead of sitting above the maintenance dose's 1.25 h, which read as 40 mg/min.
+- **Curve horizon and point count are capped** (336 h, 2000 points), ending the 6.18-year,
+  11.6 MB response at very low clearance. Display only; no dose changes.
+- **`normalizePatient` no longer invents values** — a missing weight or SCr is NaN and the
+  validator rejects it by name, instead of silently dosing a 70 kg / SCr 1.0 patient.
+- **Mixing manual-hours and date/time levels** is detected and named, instead of surfacing as
+  "collection times span more than 3 dosing intervals".
+- **The ARC advisory no longer recommends continuous infusion**, which is out of scope here.
+- Dead duplicate `creatinineClearance.ts` deleted (a second, disagreeing Cockcroft-Gault that
+  nothing imported). The research module's adjusted body weight is no longer null at BMI ≥ 40.
+- **Fixed Q is moot** — 1.23 survives only as the retired model's documentation string in
+  `modelRegistry.ts`; no live path uses it. The SCr 0.4 floor is removed (Winter 2012 found
+  rounding a low creatinine up made prediction worse).
+
+### Measured dose impact
+
+Identical cohort run at `525b44f` and after, then diffed: 64 empiric patients (age 30–85, 50–140 kg,
+SCr 0.6–4.0) and 7 adjustment scenarios.
+
+- **20 of 64 empiric rows changed, and in every one the total daily dose and the AUC24 are
+  identical.** Only the interval and the per-dose amount moved — 2000 mg q24h became 1000 mg q12h,
+  1500 mg q24h became 750 mg q12h. No patient's exposure changed.
+- Per-dose amounts above 25 mg/kg fell from 7 rows to 2, and both remaining rows sit at exactly
+  25.0 mg/kg (the ceiling is inclusive).
+- 3 adjustment scenarios changed: the sparse refusal became a safe on-target regimen; the
+  severe-AKI case still refuses (correctly) with its clearance floored 0.150 → 0.400 and an
+  advisory; the implausible-level case was capped as described above.
+
+### Still open in the engine (not fixed here)
+- `loading_dose_enabled: false` is not wired. Honouring it means conditioning every prose surface
+  that mentions a loading dose, not just suppressing the number.
+- Configurable AUC targets are deliberately not wired: they would change every "in range"
+  statement and target-band citation in the output text. The 400–600 band stays guideline-fixed.
 
 ## Open decisions (Mario / counsel)
 

@@ -1,4 +1,5 @@
 import type { NormalizedPatient, NormalizedRegimen, NormalizedLevel } from "../types";
+import { isManualHoursCollectionTime } from "@/lib/manualHoursTimestamp";
 
 const TIMING_TOLERANCE_HOURS = 0.25;
 const MIN_POST_INFUSION_LEVEL_HOURS = 0.5;
@@ -115,7 +116,14 @@ export function validateExistingRegimenRequest(
 
   const interval_hours = regimen.interval_hours;
   const isPulseDose = regimen.doses_given === 1;
-  // Non-SS path matches the engine's threshold (existingRegimenEngine: doses_given < 5).
+  // The engine decides steady state from the patient's own terminal half-life
+  // (isSteadyStateRegimen). This validator runs BEFORE any PK is fitted, so it
+  // has no half-life available and deliberately keeps only the dose-count half
+  // of that predicate — the necessary condition. The engine's test is strictly
+  // stricter, so a regimen accepted as steady state here can still be treated
+  // as pre-steady-state downstream; the reverse cannot happen, which is the
+  // safe direction. Do not "fix" this to match without threading PK in.
+  //
   // For non-SS, the multi-dose accumulation math does not require time ≤ interval —
   // a level drawn after the interval is just an extended trough.
   const isNonSteadyState = regimen.doses_given !== undefined && regimen.doses_given < 5;
@@ -191,6 +199,22 @@ export function validateExistingRegimenRequest(
         field_errors[`levels[${i}].collection_time`] = "Must be a valid datetime when provided.";
       }
     });
+
+    // Levels entered as "hours after the dose" carry a synthetic timestamp off a
+    // fixed reference date; levels entered as a date and time carry a real one.
+    // Mixing the two puts the pair ~26 years apart, which used to surface as
+    // "Collection times span more than 3 dosing intervals — please verify dates
+    // are correct." That sends the clinician hunting for a wrong date when the
+    // actual problem is that two rows were filled in using different modes.
+    const syntheticIdx = levels.findIndex((l) => isManualHoursCollectionTime(l.collection_time));
+    const realIdx = levels.findIndex(
+      (l) => l.collection_time.trim() !== "" && !isManualHoursCollectionTime(l.collection_time),
+    );
+    if (syntheticIdx >= 0 && realIdx >= 0) {
+      field_errors[`levels[${Math.max(syntheticIdx, realIdx)}].collection_time`] =
+        "Levels were entered in two different ways — some as hours after the dose, some as a date and time. " +
+        "The time between levels cannot be compared across the two. Enter every level the same way.";
+    }
 
     for (let i = 0; i < levels.length - 1; i++) {
       for (let j = i + 1; j < levels.length; j++) {

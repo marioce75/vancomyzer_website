@@ -22,6 +22,19 @@ export interface CurvePoint {
   concentration: number;
 }
 
+/**
+ * Ceilings on the plotted curve. The horizon used to come from the terminal
+ * half-life with no bound: at CL 0.0047 L/h (85 y, SCr 10) that asked for 2,253
+ * doses, and one request produced two 108,193-point curves spanning 6.18 years
+ * in an 11.6 MB response — which the chart then redrew every animation frame.
+ *
+ * 336 h (14 days) already exceeds the widest zoom the chart offers (168 h), and
+ * capping the point count keeps the payload flat regardless of PK parameters.
+ * Neither affects a dose: these bound what is drawn, not what is computed.
+ */
+const MAX_CURVE_HORIZON_HOURS = 336;
+const MAX_CURVE_POINTS = 2000;
+
 function computeConstants({ CL, V1, Q, V2 }: TwoCompartmentParameters) {
   const k10 = CL / V1;
   const k12 = Q / V1;
@@ -115,6 +128,50 @@ export function concentrationAtTime(input: SteadyStateInput & { t: number }): nu
   return term(alpha, A) + term(beta, B);
 }
 
+/**
+ * Terminal (beta-phase) half-life in hours. This is the patient's own
+ * accumulation timescale, derived from the smaller eigenvalue of the
+ * two-compartment system.
+ */
+export function terminalHalfLifeHours(params: TwoCompartmentParameters): number {
+  const { beta } = computeConstants(params);
+  if (!(beta > 0) || !Number.isFinite(beta)) return Infinity;
+  return Math.LN2 / beta;
+}
+
+/**
+ * Is the regimen at steady state?
+ *
+ * A fixed count of 5 doses is not a steady-state criterion — it ignores how
+ * fast the patient actually clears the drug. A 65 y/90 kg/SCr 1.5 patient has a
+ * posterior terminal half-life of 35.4 h, so at 5 doses of q12h (60 h) they are
+ * 1.7 half-lives in, at roughly 71% of steady state, while the engine asserted
+ * "steady state assumed" and reported the projected steady-state trough as if
+ * measured. Entering 4 versus 5 doses moved the daily dose by 33% on identical
+ * PK purely because of that switch.
+ *
+ * Both conditions must hold: at least STEADY_STATE_MIN_DOSES doses AND enough
+ * elapsed time to cover STEADY_STATE_HALF_LIVES terminal half-lives (~94% of
+ * steady state at 4). The dose count is kept as a necessary condition so that
+ * nothing previously treated as pre-steady-state is promoted by this change —
+ * the predicate can only ever become more conservative.
+ */
+export const STEADY_STATE_MIN_DOSES = 5;
+export const STEADY_STATE_HALF_LIVES = 4;
+
+export function isSteadyStateRegimen(
+  doses_given: number | undefined,
+  tau: number,
+  params: TwoCompartmentParameters,
+): boolean {
+  if (doses_given === undefined) return true; // caller gave no dose history
+  if (doses_given < STEADY_STATE_MIN_DOSES) return false;
+  if (!(tau > 0)) return false;
+  const halfLife = terminalHalfLifeHours(params);
+  if (!Number.isFinite(halfLife)) return false;
+  return doses_given * tau >= STEADY_STATE_HALF_LIVES * halfLife;
+}
+
 export function computeExposure(input: SteadyStateInput): ExposureResult {
   const { dose_mg, tau, T_inf, CL } = input;
   const auc24 = (dose_mg / CL) * (24 / tau);
@@ -141,14 +198,17 @@ export function curvePoints(input: SteadyStateInput, step_hours: number = 0.5): 
   const { tau } = input;
   const { beta } = computeConstants(input);
 
-  // Determine number of doses needed to show near-steady-state (≥5 half-lives)
+  // Determine number of doses needed to show near-steady-state (≥5 half-lives),
+  // then bound it — see MAX_CURVE_HORIZON_HOURS.
   const halfLifeBeta = 0.693 / beta;
-  const n_doses = Math.max(10, Math.ceil((5 * halfLifeBeta) / tau) + 2);
+  const idealDoses = Math.max(10, Math.ceil((5 * halfLifeBeta) / tau) + 2);
+  const n_doses = Math.min(idealDoses, Math.max(1, Math.ceil(MAX_CURVE_HORIZON_HOURS / tau)));
   const total_time = n_doses * tau;
+  const step = Math.max(step_hours, total_time / MAX_CURVE_POINTS);
 
   // Build time points: uniform grid + key pharmacokinetic landmarks (end of each infusion, start of each dose)
   const times = new Set<number>();
-  for (let t = 0; t <= total_time + 1e-9; t += step_hours) {
+  for (let t = 0; t <= total_time + 1e-9; t += step) {
     times.add(Math.round(t * 1000) / 1000);
   }
   for (let k = 0; k < n_doses; k++) {
@@ -212,8 +272,13 @@ export function loadingDoseCurvePoints(
 
   // First maintenance dose starts after the loading dose interval
   const firstMaintTime = maintTau;
-  // Ensure enough doses to visibly approach steady state (≥5 half-lives, min 10 maintenance doses)
-  const n_maint = Math.max(10, Math.ceil((5 * halfLifeBeta) / maintTau) + 2);
+  // Ensure enough doses to visibly approach steady state (≥5 half-lives, min 10
+  // maintenance doses), bounded by MAX_CURVE_HORIZON_HOURS.
+  const idealMaint = Math.max(10, Math.ceil((5 * halfLifeBeta) / maintTau) + 2);
+  const n_maint = Math.min(
+    idealMaint,
+    Math.max(1, Math.ceil(Math.max(0, MAX_CURVE_HORIZON_HOURS - firstMaintTime) / maintTau)),
+  );
   const total_time = firstMaintTime + n_maint * maintTau;
 
   // Build dose schedule: [{ time, dose_mg, T_inf }]
@@ -229,9 +294,10 @@ export function loadingDoseCurvePoints(
     });
   }
 
-  // Build time grid
+  // Build time grid, with the point count bounded the same way.
+  const step = Math.max(step_hours, total_time / MAX_CURVE_POINTS);
   const times = new Set<number>();
-  for (let t = 0; t <= total_time + 1e-9; t += step_hours) {
+  for (let t = 0; t <= total_time + 1e-9; t += step) {
     times.add(Math.round(t * 1000) / 1000);
   }
   for (const d of doseSchedule) {

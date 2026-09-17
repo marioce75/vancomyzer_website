@@ -34,6 +34,7 @@ import type { ExistingRegimenEngineOutput, AdjustmentRecommendation, FrequencyOp
 import { simulateCandidateExposure } from "./simulateCandidateExposure";
 import { computeSafeInfusionDurationHours } from "./infusionSafety";
 import { curvePoints, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
+import { DEFAULT_DOSE_POLICY, type DosePolicy } from "../dosePolicy";
 
 // AUC₂₄ target band — Rybak MJ et al. AJHP 2020;77(11):835-864.
 // DOI:10.1093/ajhp/zxaa036. Mirror: CID 2020;71(6):1361-1364, DOI:10.1093/cid/ciaa303.
@@ -187,16 +188,18 @@ function conservativeSameIntervalDose(
   auc24: number,
   requestedInfusionHours: number | null | undefined,
   safety: { CL: number; V1: number; Q: number; V2: number },
+  maxTddMgPerDay: number = MAX_TDD_MG_PER_DAY,
+  maxSingleDoseMg: number = 2000,
 ): AdjustmentRecommendation {
-  const recommended_dose_mg = Math.min(2000, roundDoseMg(Math.max(250, (currentDoseMg * TARGET_AUC24_MID) / Math.max(auc24, 1))));
+  const recommended_dose_mg = Math.min(maxSingleDoseMg, roundDoseMg(Math.max(250, (currentDoseMg * TARGET_AUC24_MID) / Math.max(auc24, 1))));
   const tdd = (recommended_dose_mg * 24) / currentIntervalHours;
   // Floor, never round, when clamping to the daily-dose ceiling: roundDoseMg()
   // rounds to the NEAREST 250 mg and can push the result back up through the
   // cap (q6h: 4500 × 6/24 = 1125 → 1250 mg → 5000 mg/day, over the 4500 limit).
   // The grid-search paths already reject candidates above the cap; this path
   // must agree with them.
-  const cappedDoseMg = Math.max(250, Math.floor((MAX_TDD_MG_PER_DAY * currentIntervalHours) / 24 / 250) * 250);
-  const dose_mg = tdd > MAX_TDD_MG_PER_DAY ? cappedDoseMg : recommended_dose_mg;
+  const cappedDoseMg = Math.max(250, Math.floor((maxTddMgPerDay * currentIntervalHours) / 24 / 250) * 250);
+  const dose_mg = tdd > maxTddMgPerDay ? cappedDoseMg : recommended_dose_mg;
   return finalizeRecommendation(Math.max(250, dose_mg), currentIntervalHours, requestedInfusionHours, safety);
 }
 
@@ -207,7 +210,10 @@ function conservativeSameIntervalDose(
  * Pre-filters candidates by peak/trough/AUC caps before passing to
  * finalizeRecommendation (the safety chokepoint).
  */
-function boundedSparseHighExposureRecommendation(output: ExistingRegimenEngineOutput): AdjustmentRecommendation | null {
+function boundedSparseHighExposureRecommendation(
+  output: ExistingRegimenEngineOutput,
+  maxTddMgPerDay: number = MAX_TDD_MG_PER_DAY,
+): AdjustmentRecommendation | null {
   const { CL, V1, Q, V2, auc24, current_regimen_dose_mg, current_regimen_interval_hours, current_regimen_infusion_hours } = output;
   if (CL == null || V1 == null || Q == null || V2 == null || CL <= 0 || V1 <= 0 || Q <= 0 || V2 <= 0) return null;
 
@@ -229,7 +235,13 @@ function boundedSparseHighExposureRecommendation(output: ExistingRegimenEngineOu
       heuristicExposure.trough <= MAX_TROUGH_MCG_ML &&
       heuristicExposure.auc24 <= Math.max(TARGET_AUC24_HIGH + 50, auc24 * 0.8)
     ) {
-      return finalizeRecommendation(heuristicDose, nextLongerInterval, infusion_hours, safety);
+      const proposed = finalizeRecommendation(heuristicDose, nextLongerInterval, infusion_hours, safety);
+      // A refusal here means THIS one heuristic candidate failed the hard caps,
+      // not that the patient cannot be dosed. Returning the refusal made the
+      // caller's `??` treat it as a final answer and end the search. Fall
+      // through instead — first to the local grid below, then to the caller's
+      // conservative scaling.
+      if (proposed.adjustment_dosing_blocked == null) return proposed;
     }
   }
 
@@ -241,7 +253,7 @@ function boundedSparseHighExposureRecommendation(output: ExistingRegimenEngineOu
   for (const interval_hours of intervalOptions) {
     for (const dose_mg of doseOptions) {
       const dailyDose = (dose_mg * 24) / interval_hours;
-      if (dailyDose > MAX_TDD_MG_PER_DAY) continue;
+      if (dailyDose > maxTddMgPerDay) continue;
       const exp = simulateCandidateExposure(CL, V1, Q, V2, {
         dose_mg,
         interval_hours,
@@ -271,7 +283,10 @@ function boundedSparseHighExposureRecommendation(output: ExistingRegimenEngineOu
   });
 
   if (ranked.length === 0) return null;
-  return finalizeRecommendation(ranked[0].dose_mg, ranked[0].interval_hours, infusion_hours, safety);
+  const best = finalizeRecommendation(ranked[0].dose_mg, ranked[0].interval_hours, infusion_hours, safety);
+  // Same reasoning as above: a refusal is "this candidate failed", not "no
+  // regimen exists". Let the caller decide.
+  return best.adjustment_dosing_blocked == null ? best : null;
 }
 
 function collectFrequencyOptions(
@@ -279,14 +294,17 @@ function collectFrequencyOptions(
   infusion_hours: number,
   recommended: { dose_mg: number; interval_hours: number },
   targetAucMid: number = TARGET_AUC24_MID,
-  loadingDose?: { dose_mg: number; T_inf: number }
+  loadingDose?: { dose_mg: number; T_inf: number },
+  maxTddMgPerDay: number = MAX_TDD_MG_PER_DAY,
+  maxSingleDoseMg: number = 2000,
 ): FrequencyOption[] {
   const allCandidates: { dose_mg: number; interval_hours: number; auc24: number; peak: number; trough: number; inRange: boolean }[] = [];
 
   for (const interval_hours of INTERVAL_OPTIONS_H) {
     for (const dose_mg of DOSE_OPTIONS_MG) {
+      if (dose_mg > maxSingleDoseMg) continue;
       const dailyDose = (dose_mg * 24) / interval_hours;
-      if (dailyDose > MAX_TDD_MG_PER_DAY) continue;
+      if (dailyDose > maxTddMgPerDay) continue;
       const exp = simulateCandidateExposure(CL, V1, Q, V2, {
         dose_mg,
         interval_hours,
@@ -349,7 +367,15 @@ function collectFrequencyOptions(
   return options;
 }
 
-export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutput): AdjustmentRecommendation {
+export function buildAdjustmentRecommendation(
+  output: ExistingRegimenEngineOutput,
+  policy: DosePolicy = DEFAULT_DOSE_POLICY,
+): AdjustmentRecommendation {
+  // Institutional ceilings can only tighten the guideline caps, never raise
+  // them (dosePolicyFromSettings clamps), so these are always the lower of the
+  // two. With no configured settings they are exactly the previous literals.
+  const maxTddMgPerDay = Math.min(MAX_TDD_MG_PER_DAY, policy.maxDailyDoseMg);
+  const maxSingleDoseMg = Math.min(2000, policy.maxSingleDoseMg);
   const { auc24, current_regimen_dose_mg, current_regimen_interval_hours, CL, V1, Q, V2, current_regimen_infusion_hours, posterior_fit, level_count, doses_given, target_auc24 } = output;
   const infusion_hours = current_regimen_infusion_hours ?? 1;
   const isPulseDose = doses_given === 1;
@@ -388,37 +414,36 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
 
   let base: AdjustmentRecommendation;
 
-  if (!isPulseDose && weakEvidenceRecommendation) {
-    if (isClearlySupraTherapeuticSparseCase(output)) {
-      base = boundedSparseHighExposureRecommendation(output) ?? conservativeSameIntervalDose(current_regimen_dose_mg, current_regimen_interval_hours, auc24, current_regimen_infusion_hours, safety);
-    } else {
-      base = conservativeSameIntervalDose(current_regimen_dose_mg, current_regimen_interval_hours, auc24, current_regimen_infusion_hours, safety);
+  // The full dose x interval grid, screened against the safety caps. Built once,
+  // up front, so BOTH the sparse/weak-evidence path and the normal path can see
+  // it — previously only the normal path did.
+  const candidates: CandidateScore[] = [];
+  for (const interval_hours of INTERVAL_OPTIONS_H) {
+    for (const dose_mg of DOSE_OPTIONS_MG) {
+      if (dose_mg > maxSingleDoseMg) continue;
+      const dailyDose = (dose_mg * 24) / interval_hours;
+      if (dailyDose > maxTddMgPerDay) continue;
+      const exp = simulateCandidateExposure(CL, V1, Q, V2, {
+        dose_mg,
+        interval_hours,
+        infusion_duration_hours: Math.min(infusion_hours, interval_hours),
+      });
+      if (exp.peak > MAX_PEAK_MCG_ML || exp.trough > MAX_TROUGH_MCG_ML || exp.auc24 > MAX_AUC24_MG_H_L) continue;
+      candidates.push({
+        dose_mg,
+        interval_hours,
+        auc24: exp.auc24,
+        peak: exp.peak,
+        trough: exp.trough,
+        sameInterval: interval_hours === current_regimen_interval_hours,
+        intervalDistance: Math.abs(interval_hours - current_regimen_interval_hours),
+        dailyDose,
+      });
     }
-  } else {
-    const candidates: CandidateScore[] = [];
-    for (const interval_hours of INTERVAL_OPTIONS_H) {
-      for (const dose_mg of DOSE_OPTIONS_MG) {
-        const dailyDose = (dose_mg * 24) / interval_hours;
-        if (dailyDose > MAX_TDD_MG_PER_DAY) continue;
-        const exp = simulateCandidateExposure(CL, V1, Q, V2, {
-          dose_mg,
-          interval_hours,
-          infusion_duration_hours: Math.min(infusion_hours, interval_hours),
-        });
-        if (exp.peak > MAX_PEAK_MCG_ML || exp.trough > MAX_TROUGH_MCG_ML || exp.auc24 > MAX_AUC24_MG_H_L) continue;
-        candidates.push({
-          dose_mg,
-          interval_hours,
-          auc24: exp.auc24,
-          peak: exp.peak,
-          trough: exp.trough,
-          sameInterval: interval_hours === current_regimen_interval_hours,
-          intervalDistance: Math.abs(interval_hours - current_regimen_interval_hours),
-          dailyDose,
-        });
-      }
-    }
+  }
 
+  /** Best regimen from the screened grid, or null when the grid is empty. */
+  const gridRecommendation = (): AdjustmentRecommendation | null => {
     const inRangeCandidates = candidates.filter((candidate) => candidate.auc24 >= TARGET_AUC24_LOW && candidate.auc24 <= TARGET_AUC24_HIGH);
     if (inRangeCandidates.length > 0) {
       inRangeCandidates.sort((a, b) => {
@@ -433,8 +458,9 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
         }
         return a.dailyDose - b.dailyDose;
       });
-      base = finalizeRecommendation(inRangeCandidates[0].dose_mg, inRangeCandidates[0].interval_hours, infusion_hours, safety);
-    } else if (candidates.length > 0) {
+      return finalizeRecommendation(inRangeCandidates[0].dose_mg, inRangeCandidates[0].interval_hours, infusion_hours, safety);
+    }
+    if (candidates.length > 0) {
       candidates.sort((a, b) => {
         const aPenalty = Math.abs(a.auc24 - targetAucMid);
         const bPenalty = Math.abs(b.auc24 - targetAucMid);
@@ -450,12 +476,37 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
         }
         return a.dailyDose - b.dailyDose;
       });
-      base = finalizeRecommendation(candidates[0].dose_mg, candidates[0].interval_hours, infusion_hours, safety);
-    } else if (auc24 > 0) {
-      base = conservativeSameIntervalDose(current_regimen_dose_mg, current_regimen_interval_hours, auc24, current_regimen_infusion_hours, safety);
-    } else {
-      base = finalizeRecommendation(current_regimen_dose_mg, current_regimen_interval_hours, current_regimen_infusion_hours, safety);
+      return finalizeRecommendation(candidates[0].dose_mg, candidates[0].interval_hours, infusion_hours, safety);
     }
+    return null;
+  };
+
+  const lastResort = (): AdjustmentRecommendation =>
+    auc24 > 0
+      ? conservativeSameIntervalDose(current_regimen_dose_mg, current_regimen_interval_hours, auc24, current_regimen_infusion_hours, safety, maxTddMgPerDay, maxSingleDoseMg)
+      : finalizeRecommendation(current_regimen_dose_mg, current_regimen_interval_hours, current_regimen_infusion_hours, safety);
+
+  if (!isPulseDose && weakEvidenceRecommendation) {
+    const sparse = isClearlySupraTherapeuticSparseCase(output)
+      ? boundedSparseHighExposureRecommendation(output, maxTddMgPerDay)
+      : null;
+    // boundedSparseHighExposureRecommendation now returns null (not a refusal)
+    // when its own candidate fails the caps, so this falls through to
+    // conservative same-interval scaling — which is what rescues the case the
+    // audit found: a 38 y / 62 kg patient on 2000 mg q6h with a trough of 55
+    // was told "no safe maintenance regimen exists in the search space" when
+    // scaling the current dose lands on a safe on-target regimen.
+    //
+    // It deliberately does NOT fall through to the full dose x interval grid.
+    // That grid ranks candidates on their STEADY-STATE exposure, which ignores
+    // drug already on board: for a 78 y / SCr 5.0 patient sitting at a measured
+    // trough of 50 mcg/mL it happily finds a long-interval 250 mg regimen whose
+    // steady state is fine, while the patient must not be dosed at all until
+    // levels fall. When both the heuristic and the conservative scaling refuse,
+    // refusal is the answer (existingRegimen.integration.test.ts case 27).
+    base = sparse ?? conservativeSameIntervalDose(current_regimen_dose_mg, current_regimen_interval_hours, auc24, current_regimen_infusion_hours, safety, maxTddMgPerDay, maxSingleDoseMg);
+  } else {
+    base = gridRecommendation() ?? lastResort();
   }
 
   // ─── POST-RECOMMENDATION SAFETY CHECK (DEFENSE IN DEPTH) ──────────
@@ -505,7 +556,9 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
       CL, V1, Q, V2, infusion_hours,
       { dose_mg: Number.isFinite(recDose) ? recDose : current_regimen_dose_mg, interval_hours: base.recommended_interval_hours },
       targetAucMid,
-      isPulseDose ? { dose_mg: current_regimen_dose_mg, T_inf: Math.min(infusion_hours, current_regimen_interval_hours) } : undefined
+      isPulseDose ? { dose_mg: current_regimen_dose_mg, T_inf: Math.min(infusion_hours, current_regimen_interval_hours) } : undefined,
+      maxTddMgPerDay,
+      maxSingleDoseMg,
     );
   }
 

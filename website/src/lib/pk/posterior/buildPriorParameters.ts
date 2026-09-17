@@ -60,7 +60,26 @@ const THETA_SCR  = COLIN_2019_PARAMETERS.thetaSCr;           // SCr effect on CL
 
 // Numeric floors
 const MIN_WT_KG  = 30;
-const MIN_SCR    = 0.4;    // prevents division issues; floored SCr
+
+/**
+ * There is deliberately NO clearance floor in this file.
+ *
+ * Colin 2019's FSCR term is a bare exponential in serum creatinine with no
+ * lower bound, so at high SCr the prior clearance falls below anything
+ * physiological — at SCr 6.0 it returns 0.106 L/h for a 65 y / 80 kg adult
+ * whose true clearance is about 0.7 L/h. That is a real defect, but flooring it
+ * HERE would mean the engine no longer reproduces Colin 2019 as published: it
+ * moved 1944 of 10800 grid points away from an independent re-implementation
+ * (worst 5.64x at SCr 6) and would have broken the promise this site makes on
+ * its Transparency and equations pages. It is also the exact pattern the
+ * 15 Sep 2026 review criticised and that the custom obesity model was retired
+ * for — a house modification silently applied to a published model.
+ *
+ * The prior therefore stays faithful, and the collapse is handled downstream
+ * where it does harm: the posterior clearance is bounded at a physiological
+ * non-renal floor and an explicit extrapolation advisory is raised. See
+ * posteriorEngine.ts (MIN_NONRENAL_CL_L_H_PER_70KG).
+ */
 
 export const ADULT_VANCOMYCIN_PRIOR_MODEL = {
   id: "colin-2019-two-compartment",
@@ -120,7 +139,15 @@ export function buildPriorParameters(
   _regimen: NormalizedRegimen
 ): PriorParameters {
   const wt  = Math.max(MIN_WT_KG, patient.weight_kg);
-  const scr = Math.max(MIN_SCR, patient.serum_creatinine_mg_dl);
+  // Serum creatinine is used as entered. The previous 0.4 mg/dL floor was
+  // justified in-code as preventing "division issues", which is not true of
+  // Colin 2019 — SCr appears inside exp(-0.649 x (SCr - SCRstd)), which is
+  // finite at every value, and the API already bounds the input to 0.1-10 mg/dL.
+  // The floor understated clearance by up to 17.7% in exactly the augmented-
+  // clearance population it mattered for, and suppressed the ARC advisory by
+  // forcing the exposure back into range. Winter 2012 (n = 3678) likewise found
+  // that rounding a low creatinine up made dose prediction worse, not better.
+  const scr = patient.serum_creatinine_mg_dl;
   const age = Math.max(18, patient.age);
 
   // ---------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 import type { ExplanationInput } from "../types";
 import { modelShortName, renalCovariateDescription } from "../modelRegistry";
+import { isSteadyStateRegimen } from "../steadyStateTwoCompartment";
 
 export function buildAssumptions(input: ExplanationInput): string[] {
   const usedRefinement = input.engineOutput.used_posterior_refinement === true;
@@ -10,7 +11,12 @@ export function buildAssumptions(input: ExplanationInput): string[] {
 
   const isPulseDose = input.engineOutput.doses_given === 1;
   const dosesGiven = input.engineOutput.doses_given;
-  const isNonSteadyState = dosesGiven !== undefined && dosesGiven < 5;
+  // Same predicate the engine uses, so the prose and the numbers cannot
+  // disagree about whether this patient is at steady state.
+  const { CL, V1, Q, V2, current_regimen_interval_hours } = input.engineOutput;
+  const isNonSteadyState =
+    dosesGiven !== undefined &&
+    !isSteadyStateRegimen(dosesGiven, current_regimen_interval_hours, { CL, V1, Q, V2 });
   // Which prior actually ran. Stating the wrong one here is a factual error in
   // text the clinician may paste into the record, so the wording comes from the
   // model registry for whichever model id the engine reports.

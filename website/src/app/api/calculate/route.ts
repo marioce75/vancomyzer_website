@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { computeInitialRegimen, InitialRegimenInputError } from "@/lib/initialRegimen";
+import { getSettingsForUser } from "@/lib/institutionalSettings";
+import { dosePolicyFromSettings } from "@/lib/pk/dosePolicy";
 import { runExistingRegimenPipeline } from "@/lib/pk/runExistingRegimenPipeline";
 import { logCalculation } from "@/lib/auditLog";
 import { logCalculationEntry, getUserTier, findUserByLogin, logSecurityEvent } from "@/lib/db";
@@ -256,9 +258,18 @@ export async function POST(request: NextRequest) {
     // validateRequest above already bounds these, so this is defence in depth:
     // the engine now enforces its own scope, and a miss here must surface as a
     // 400 naming the field rather than a 500.
+    // Institutional dose ceilings, if this user's department configured any.
+    // /settings validated and persisted these and the engine then never read
+    // them, so a department that set a 500 mg single-dose limit still received
+    // 1500 mg recommendations. Anonymous and unaffiliated users get the
+    // guideline defaults, and a configured value can only tighten a ceiling,
+    // never raise one (dosePolicyFromSettings clamps).
+    const policyUser = userEmail !== "anonymous" ? findUserByLogin(userEmail) : undefined;
+    const dosePolicy = dosePolicyFromSettings(getSettingsForUser(policyUser?.institution ?? ""));
+
     let result: Record<string, unknown>;
     try {
-      result = computeInitialRegimen(patient) as unknown as Record<string, unknown>;
+      result = computeInitialRegimen(patient, dosePolicy) as unknown as Record<string, unknown>;
     } catch (error) {
       if (!(error instanceof InitialRegimenInputError)) throw error;
       logCalculation({
@@ -299,10 +310,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   }
 
+  // Same institutional ceilings as the empiric path above. Recomputed here
+  // because that block returns before reaching this point.
+  const existingPolicyUser = userEmail !== "anonymous" ? findUserByLogin(userEmail) : undefined;
   const result = runExistingRegimenPipeline({
     patient: validated.data.patient as Record<string, unknown>,
     regimen: validated.data.regimen as Record<string, unknown>,
     levels: (validated.data.levels as Array<Record<string, unknown>>) ?? [],
+    policy: dosePolicyFromSettings(getSettingsForUser(existingPolicyUser?.institution ?? "")),
   });
 
   if ("ok" in result && result.ok === false) {

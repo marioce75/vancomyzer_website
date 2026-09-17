@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { CalculateRequestLevel } from "@/types/calculator";
 import ClinicalNumberInput from "./ClinicalNumberInput";
 import DatePartInput from "./DatePartInput";
+import { isManualHoursCollectionTime, manualHoursCollectionTime } from "@/lib/manualHoursTimestamp";
 
 interface LevelEntryTableProps {
   levels: CalculateRequestLevel[];
@@ -65,22 +66,10 @@ function calcHours(
  * the difference in their entered hours, and time_since_last_dose_hours is sent
  * exactly as entered. The reference date is arbitrary and never shown.
  */
-const MANUAL_HOURS_REFERENCE_DOSE_MS = Date.UTC(2000, 0, 1, 0, 0, 0);
-/** Synthetic timestamps fall within this window after the reference. */
-const MANUAL_HOURS_WINDOW_MS = 31 * 24 * 3_600_000;
-
-export function manualHoursCollectionTime(hours: number): string {
-  if (!Number.isFinite(hours) || hours <= 0) return "";
-  return new Date(MANUAL_HOURS_REFERENCE_DOSE_MS + Math.round(hours * 3_600_000)).toISOString();
-}
-
-function isManualHoursCollectionTime(collectionTime: string | undefined): boolean {
-  if (!collectionTime) return false;
-  const ms = Date.parse(collectionTime);
-  return Number.isFinite(ms)
-    && ms >= MANUAL_HOURS_REFERENCE_DOSE_MS
-    && ms < MANUAL_HOURS_REFERENCE_DOSE_MS + MANUAL_HOURS_WINDOW_MS;
-}
+// Defined in @/lib/manualHoursTimestamp so the server-side validator can share
+// the same definition without importing this component. Re-exported here
+// because existing callers import it from this module.
+export { manualHoursCollectionTime };
 
 // ── Shared styles ─────────────────────────────────────────────
 

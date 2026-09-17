@@ -1028,6 +1028,15 @@ export default function CalculatorWorkspace() {
     </div>
   );
 
+  // Does anything actually occupy the advisory rail? When nothing does, the
+  // two-column grid would reserve ~38% of the workspace for an empty column.
+  const hasAdvisoryRail =
+    (hasStaleResult && !loading) ||
+    (visibleResult?.timing_warnings?.length ?? 0) > 0 ||
+    (visibleResult?.fit_quality_warnings?.length ?? 0) > 0 ||
+    (viewMode === "empiric" && visibleResult != null) ||
+    (patient.age > 65 && !rrt);
+
   const rightColumn = (
     <div className="flex flex-col h-full gap-3">
       {/* Single-line strip: the two-line header cost ~30px of the fold for no
@@ -1044,7 +1053,7 @@ export default function CalculatorWorkspace() {
           exposure metrics and the graph all land in the first screen. Below xl
           the grid collapses to one column and the original stacked order
           returns, so narrow displays are unchanged. */}
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,1fr)] gap-3 items-start">
+      <div className={`grid grid-cols-1 gap-3 items-start ${hasAdvisoryRail ? "xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,1fr)]" : "xl:grid-cols-1"}`}>
         <aside className="flex flex-col gap-3 min-w-0 xl:col-start-2 xl:row-start-1">
 
       {hasStaleResult && !loading && (

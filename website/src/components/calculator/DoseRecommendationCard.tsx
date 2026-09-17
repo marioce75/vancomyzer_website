@@ -427,8 +427,7 @@ export default function DoseRecommendationCard({
               <strong>If confirmed:</strong>
               <ul style={{ margin: "4px 0 0 16px", padding: 0, listStyleType: "disc" }}>
                 <li>Obtain two vancomycin levels early (2–4h and 6–8h post-dose) to confirm individual PK parameters before proceeding</li>
-                <li>Continuous IV infusion: ~{arc_advisory.continuous_infusion_rate_mg_h} mg/hour (administer loading dose first)</li>
-                <li>Consult Infectious Diseases and/or nephrology</li>
+                <li>Consult Infectious Diseases and/or nephrology. Continuous infusion is outside this calculator&rsquo;s scope — it is not modelled or dosed here, so manage it per local protocol rather than from these numbers</li>
               </ul>
             </div>
             <p style={{ margin: 0, fontSize: 10, fontStyle: "italic" }}>

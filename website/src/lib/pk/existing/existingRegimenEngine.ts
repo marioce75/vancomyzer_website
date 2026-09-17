@@ -3,7 +3,7 @@
  */
 
 import { runPosteriorEngine } from "../posterior/posteriorEngine";
-import { computeExposure, curvePoints, loadingDoseCurvePoints, singleDoseAuc } from "../steadyStateTwoCompartment";
+import { computeExposure, curvePoints, isSteadyStateRegimen, loadingDoseCurvePoints, singleDoseAuc } from "../steadyStateTwoCompartment";
 import { computeSafeInfusionDurationHours } from "../recommend/infusionSafety";
 import type { ExistingRegimenEngineInput, ExistingRegimenEngineOutput } from "../types";
 import { modelShortName } from "../modelRegistry";
@@ -26,12 +26,18 @@ export function runExistingRegimenEngine(
     prior_CL,
     prior_V1,
     per_level_residuals,
+    posterior_cl_bound,
   } = posteriorResult;
   const { dose_mg, interval_hours, infusion_duration_hours, doses_given, target_auc24 } = regimen;
   const tau = interval_hours;
   const T_inf = Math.min(Math.max(0, infusion_duration_hours), tau);
 
-  const isNonSteadyState = doses_given !== undefined && doses_given < 5;
+  // Steady state is decided by the patient's own accumulation timescale, not by
+  // a fixed dose count — see isSteadyStateRegimen. The dose count remains a
+  // necessary condition, so this can only classify MORE patients as
+  // pre-steady-state than before, never fewer.
+  const isNonSteadyState =
+    doses_given !== undefined && !isSteadyStateRegimen(doses_given, tau, { CL, V1, Q, V2 });
   const isPulseDose = doses_given === 1;
 
   const steadyStateExposure = computeExposure({ CL, V1, Q, V2, dose_mg, tau, T_inf });
@@ -83,6 +89,15 @@ export function runExistingRegimenEngine(
     );
   } else {
     curve = curvePoints({ CL, V1, Q, V2, dose_mg, tau, T_inf });
+    // For a pre-steady-state regimen the reported peak and trough are taken
+    // from the Nth dosing interval, so the plotted curve has to stop there too.
+    // Letting it run on to steady state made the graph disagree with the
+    // numbers printed beside it — the same panel-vs-graph split the
+    // loading-dose curve had, measured at +6.4% on the trough.
+    if (isNonSteadyState && doses_given !== undefined && doses_given > 0) {
+      const horizonHours = doses_given * tau;
+      curve = curve.filter((point) => point.time_hours <= horizonHours + 1e-9);
+    }
   }
 
   // For steady-state, use the SS AUC24 = TDD/CL
@@ -181,5 +196,6 @@ export function runExistingRegimenEngine(
     doses_given,
     target_auc24,
     fit_diagnostic,
+    posterior_cl_bound,
   };
 }

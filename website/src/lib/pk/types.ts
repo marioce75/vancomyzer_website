@@ -86,6 +86,12 @@ export interface ExistingRegimenEngineOutput {
   model_name: "colin_2019" | "vancomyzer_obesity";
   ffm_kg?: number;
   fit_diagnostic?: FitDiagnostic;
+  /**
+   * Set when the fitted clearance hit a physiological bound — either the
+   * non-renal floor or the clearance-vs-CrCl ceiling. Carried so the result can
+   * tell the clinician the estimate was adjusted and why.
+   */
+  posterior_cl_bound?: "floored_nonrenal" | "capped_renal";
 }
 
 export interface FrequencyOption {

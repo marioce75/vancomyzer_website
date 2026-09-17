@@ -11,6 +11,7 @@ import { buildDocumentationPreview } from "./explain/buildDocumentationPreview";
 import { buildCalculateResponse } from "./response/buildCalculateResponse";
 import type { NormalizedPatient, ExplanationInput } from "./types";
 import { highBmiAdvisory } from "./modelRegistry";
+import type { DosePolicy } from "./dosePolicy";
 
 export interface ExistingRegimenPipelineInput {
   patient: {
@@ -37,6 +38,12 @@ export interface ExistingRegimenPipelineInput {
   /** Not modelled — see hasAdministrationHistory. */
   administration_history?: unknown;
   dose_history?: unknown;
+  /**
+   * Institutional dose ceilings for this user's department. Absent means the
+   * guideline defaults; a configured value can only tighten a cap, never raise
+   * one (dosePolicyFromSettings).
+   */
+  policy?: DosePolicy;
   levels: Array<{
     value_mcg_ml?: unknown;
     collection_time?: unknown;
@@ -95,7 +102,7 @@ export function runExistingRegimenPipeline(
   const timing_warnings = validation.warnings ?? [];
 
   const engineOutput = runExistingRegimenEngine({ patient, regimen, levels });
-  const recommendation = buildAdjustmentRecommendation(engineOutput);
+  const recommendation = buildAdjustmentRecommendation(engineOutput, input.policy);
 
   // `engineOutput.curve` must stay the series the shipped auc24/peak/trough were
   // sampled from. A block here used to overwrite it, for doses_given === 1, with
@@ -160,15 +167,33 @@ export function runExistingRegimenPipeline(
   // substantially from anything the prior + level can constrain. Surface it
   // so the clinician knows not to over-interpret the recommendation.
   const FIT_QUALITY_THRESHOLD = 0.25;
+  const fitQualityWarnings: string[] = [];
   const diag = engineOutput.fit_diagnostic;
   if (diag && diag.max_relative_error > FIT_QUALITY_THRESHOLD) {
     const worst = diag.posterior_predicted_at_levels.reduce(
       (acc, r) => (r.relative_error > acc.relative_error ? r : acc),
       diag.posterior_predicted_at_levels[0],
     );
-    (response as Record<string, unknown>).fit_quality_warnings = [
+    fitQualityWarnings.push(
       `Posterior fit cannot fully explain the measured level (predicted ${worst.predicted.toFixed(1)} mcg/mL vs observed ${worst.observed.toFixed(1)} mcg/mL — ${(worst.relative_error * 100).toFixed(0)}% error). Patient PK appears to differ substantially from the population prior. Recommend a confirmatory level before adjusting the dose.`,
-    ];
+    );
+  }
+
+  // The fitted clearance hit a physiological bound. Say so — an adjusted
+  // estimate presented as if it were the raw fit is the failure this prevents.
+  if (engineOutput.posterior_cl_bound === "floored_nonrenal") {
+    fitQualityWarnings.push(
+      "Estimated clearance was raised to the lowest physiologically plausible non-renal value. At this serum creatinine the population model extrapolates below what an anuric adult still clears, so the prior cannot be trusted here — rely on measured levels, and repeat one before adjusting the dose.",
+    );
+  }
+  if (engineOutput.posterior_cl_bound === "capped_renal") {
+    fitQualityWarnings.push(
+      "Estimated clearance was capped: the fit implied a vancomycin clearance more than twice this patient's estimated creatinine clearance, which is not plausible for a renally cleared drug. Check that the level was drawn from the correct lumen, after the infusion finished, and correctly labelled — repeat it before escalating the dose.",
+    );
+  }
+
+  if (fitQualityWarnings.length > 0) {
+    (response as Record<string, unknown>).fit_quality_warnings = fitQualityWarnings;
   }
 
   return response;

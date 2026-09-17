@@ -44,7 +44,11 @@ export function enrichPatientFields(
   const bmi = calculateBMI(weight_kg, height_cm);
   const ffm = calculateFFM(weight_kg, height_cm, sex);
   const ibw = calculateIBW(height_cm, sex);
-  const adjbw = (bmi >= 30 && bmi < 40) ? calculateAdjBW(weight_kg, ibw) : null;
+  // Adjusted body weight matters most at BMI 40 and above, which the previous
+  // 30-40 window excluded — the field was stored as null for exactly the
+  // patients it describes best. Research dataset field only; no dosing path
+  // reads it.
+  const adjbw = bmi >= 30 ? calculateAdjBW(weight_kg, ibw) : null;
   const crcl = calculateCrCl(cappedAge, weight_kg, scr_baseline, sex);
 
   return {
