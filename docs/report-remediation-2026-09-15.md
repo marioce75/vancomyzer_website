@@ -87,9 +87,50 @@ pulse-dose results are provably unchanged.
   branch retired, 65 y / 130 kg / SCr 5.0 returns `blocked=YES, CL 0.2907, colin_2019` with and
   without a height. Verified by execution, not assumed.
 
+### Renal estimate and the ARC advisory — 16 Sep 2026
+
+Creatinine clearance never enters a dose (Colin 2019 takes serum creatinine directly), so this
+changes what the clinician is shown and when the advisory fires, not the dosing.
+
+**Displayed estimate** now selects the body weight by BMI stratum, per Winter 2012 (n = 3678):
+actual body weight when underweight, ideal body weight at normal weight, adjusted body weight
+(IBW + 0.4 × (TBW − IBW)) at BMI 25 or above. It falls back to actual body weight, and says so,
+when height or sex is missing. Measured: 25 y / 200 kg / SCr 0.7 goes from **456 to 291 mL/min**
+(−36%); a 60 y / 80 kg patient moves −7%; a 48 kg patient does not move. The label now names the
+weight used, states that the value is absolute rather than indexed to 1.73 m², and says the dose
+does not use it. No cap is applied — no primary evidence supports any specific ceiling.
+
+**ARC advisory** now tests the clearance indexed to body surface area (Du Bois) against
+130 mL/min/1.73 m² — the definition used by Udy 2013, Barletta 2017 and Cucci 2023 — instead of an
+absolute value against 150, which was both the wrong number and the wrong basis. The
+`auc_range_status === "below_target"` conjunction is gone: a patient with genuine augmented
+clearance whose regimen happens to land inside 400–600 still has augmented clearance, and
+previously got no warning. The trigger deliberately stays on **total** body weight: in ICU patients
+with measured ARC, Cockcroft-Gault accuracy was 70% on total body weight but 61% on adjusted and
+38% on lean, so every lean-weight substitution under-detects (Cucci 2023, Pharmacotherapy
+43:1131-8). Wording changed from "DETECTED" to "possible", naming a measured 8–24 h urinary
+creatinine clearance as the confirmatory test.
+
+Measured firing rate on the synthetic ICU-like cohort (n = 200, seed 42): **0% before, 23% after**,
+against published ARC prevalence of 57.7–67% in at-risk ICU cohorts — conservative, not excessive.
+It concentrates where the validated tools predict: 39% at age under 56 versus 6% over 75, and 43%
+at SCr below 0.7 versus 0% in every band at or above 0.7. The old rule never fired once in 200
+realistic patients.
+
+The panel's citation was corrected: it claimed the 2020 ASHP/IDSA/SIDP guideline as the source of
+the ARC threshold, but that guideline defines no adult ARC threshold.
+
+**Four starved safety surfaces fixed.** `CalculatorWorkspace` rebuilt the API response field by
+field and dropped `arc_advisory`, `auc_range_status`, `timing_warnings` and `fit_quality_warnings`,
+so the red ARC card, the below-target banner, the late-draw timing warnings and the poor-fit
+warning could never render. The text still reached clinicians through `interpretation_summary` and
+the clinical note, but every dedicated panel was dead code.
+
 ### Still open in the engine (not fixed here)
-- `CalculatorWorkspace` result-copy drops `fit_quality_warnings`, `timing_warnings`,
-  `arc_advisory`, `auc_range_status`; `posterior_fit` is still not returned in the API response.
+- `posterior_fit` is still not returned in the API response, so the graph's uncertainty band
+  cannot use the engine's own label. (The four dropped warning fields are fixed — see above.)
+- `auc_range_status` is still not produced on the existing-regimen path, so the below-target
+  banner fires only in the empiric workflow even now that the field reaches the UI.
 - `normalizePatient` turns missing weight into 70 kg and missing SCr into 1.0; SCr 0.1–0.39 is
   floored to 0.4 and notes print 0.4. (The 300 kg ceiling is fixed; the defaults are not.)
 - Mixing manual-hours and date/time levels still gives misleading rejections.

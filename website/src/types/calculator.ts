@@ -88,7 +88,14 @@ export type AucRangeStatus = "in_range" | "below_target" | "above_target";
 
 export interface ArcAdvisory {
   detected: boolean;
+  /** Cockcroft-Gault on total body weight, absolute mL/min. */
   crcl_ml_min?: number;
+  /**
+   * The same clearance indexed to 1.73 m2, which is the basis the ARC
+   * definition uses. Absent when height was not entered, so BSA could not be
+   * derived; the trigger then falls back to the absolute value.
+   */
+  crcl_indexed_ml_min_1_73?: number;
   cl_l_h?: number;
   required_tdd_mg?: number;
   continuous_infusion_rate_mg_h?: number;

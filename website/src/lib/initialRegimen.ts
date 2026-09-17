@@ -10,6 +10,12 @@ import { computeSafeInfusionDurationHours } from "./pk/recommend/infusionSafety"
 import { curvePoints } from "./pk/steadyStateTwoCompartment";
 import { buildInitialRegimenReviewStatus } from "./pk/response/buildReviewStatus";
 import { highBmiAdvisory, modelShortName, renalCovariateDescription } from "./pk/modelRegistry";
+import {
+  ARC_THRESHOLD_ML_MIN_1_73,
+  crclOnTotalBodyWeight,
+  displayedCrCl,
+  indexToBsa,
+} from "./pk/renalEstimate";
 import type { CalculationDetails, FrequencyOption } from "@/types/calculator";
 
 interface Patient {
@@ -22,9 +28,16 @@ interface Patient {
 
 export type AucRangeStatus = "in_range" | "below_target" | "above_target";
 
+/** Kept in sync by hand with the identical shape in src/types/calculator.ts. */
 export interface ArcAdvisory {
   detected: boolean;
+  /** Cockcroft-Gault on total body weight, absolute mL/min. */
   crcl_ml_min?: number;
+  /**
+   * The same clearance indexed to 1.73 m2, the basis the ARC definition uses.
+   * Absent when height was not entered, so BSA could not be derived.
+   */
+  crcl_indexed_ml_min_1_73?: number;
   cl_l_h?: number;
   required_tdd_mg?: number;
   continuous_infusion_rate_mg_h?: number;
@@ -128,13 +141,6 @@ function getMaxTdd(scr: number): number {
 const MAX_PEAK_MCG_ML = 80;
 const MAX_TROUGH_MCG_ML = 20;
 const MAX_AUC24_MG_H_L = 650;
-
-// CrCl estimation for ARC detection (Cockcroft-Gault)
-function estimateCrCl(age: number, weight_kg: number, scr: number, sex: "male" | "female" | ""): number {
-  if (age <= 0 || weight_kg <= 0 || scr <= 0) return 0;
-  const base = ((140 - age) * weight_kg) / (72 * scr);
-  return sex === "female" ? base * 0.85 : base;
-}
 
 function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, scr: number) {
   const candidates: {
@@ -387,24 +393,47 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
 
   const auc_range_status = getAucRangeStatus(auc24);
 
-  // ARC detection
-  const crcl = estimateCrCl(patient.age, patient.weight_kg, patient.serum_creatinine_mg_dl, patient.sex || "male");
+  // Displayed renal estimate and ARC detection use different body weights on
+  // purpose \u2014 see the header of renalEstimate.ts for the evidence.
+  const displayCrCl = displayedCrCl(patient);
   const required_tdd = TARGET_AUC24_MID * prior.CL;
-  const isArc = crcl > 150 && auc_range_status === "below_target";
+
+  // ARC is defined at 130 mL/min/1.73 m2 (Udy 2013, Barletta 2017, Cucci 2023),
+  // an INDEXED threshold. The previous test compared an absolute Cockcroft-Gault
+  // value against 150, so it was both the wrong number and the wrong basis, and
+  // it over-flagged patients with a large body surface area. When height is
+  // missing BSA cannot be derived, so the absolute value is compared instead \u2014
+  // the more sensitive direction, which is the safe one for detection.
+  //
+  // The `auc_range_status === "below_target"` conjunction was also removed: a
+  // patient with genuine augmented clearance whose regimen happens to land
+  // inside 400-600 still has augmented clearance, and previously received no
+  // warning at all.
+  const arcCrclTotalBw = crclOnTotalBodyWeight(patient);
+  const arcCrclIndexed = indexToBsa(arcCrclTotalBw, patient.weight_kg, patient.height_cm);
+  const arcBasis = arcCrclIndexed ?? arcCrclTotalBw;
+  const isArc = arcBasis >= ARC_THRESHOLD_ML_MIN_1_73;
 
   let arc_advisory: ArcAdvisory | undefined;
   if (isArc) {
     const ci_rate = Math.round(TARGET_AUC24_MID * prior.CL / 24 * 10) / 10;
+    const basisPhrase = arcCrclIndexed !== null
+      ? `${Math.round(arcCrclIndexed)} mL/min/1.73 m\u00b2`
+      : `${Math.round(arcCrclTotalBw)} mL/min absolute (height not entered, so it could not be indexed)`;
     arc_advisory = {
       detected: true,
-      crcl_ml_min: Math.round(crcl),
+      crcl_ml_min: Math.round(arcCrclTotalBw),
+      ...(arcCrclIndexed !== null ? { crcl_indexed_ml_min_1_73: Math.round(arcCrclIndexed) } : {}),
       cl_l_h: Math.round(prior.CL * 10) / 10,
       required_tdd_mg: Math.round(required_tdd),
       continuous_infusion_rate_mg_h: ci_rate,
       message:
-        `Augmented renal clearance detected (CrCl ${Math.round(crcl)} mL/min, CL ${prior.CL.toFixed(1)} L/h). ` +
-        `Standard intermittent dosing cannot achieve target AUC24 of 400\u2013600 mg\u00b7h/L. ` +
-        `Required TDD \u2248 ${Math.round(required_tdd).toLocaleString()} mg/day. ` +
+        `Possible augmented renal clearance: estimated ${basisPhrase} against a threshold of ` +
+        `${ARC_THRESHOLD_ML_MIN_1_73} mL/min/1.73 m\u00b2 (CL ${prior.CL.toFixed(1)} L/h). ` +
+        `Estimating equations detect augmented clearance poorly \u2014 confirm with a measured 8\u201324 hour ` +
+        `urinary creatinine clearance before acting on this. ` +
+        `If confirmed, standard intermittent dosing may not achieve target AUC24 of 400\u2013600 mg\u00b7h/L; ` +
+        `required TDD \u2248 ${Math.round(required_tdd).toLocaleString()} mg/day. ` +
         `Consider continuous IV infusion (~${ci_rate} mg/h with loading dose) or consult Infectious Diseases/nephrology. ` +
         `Obtain two vancomycin levels early (2\u20134h and 6\u20138h post-dose) to confirm individual PK.`,
     };
@@ -413,7 +442,7 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
   const modelLabel = modelShortName(prior.model_name);
 
   const arcNote = arc_advisory
-    ? ` WARNING: Augmented renal clearance detected (CrCl ${arc_advisory.crcl_ml_min} mL/min). Target AUC may not be achievable with standard intermittent dosing — consider continuous infusion.`
+    ? ` NOTE: Possible augmented renal clearance (${arc_advisory.crcl_indexed_ml_min_1_73 ?? arc_advisory.crcl_ml_min} mL/min${arc_advisory.crcl_indexed_ml_min_1_73 ? "/1.73 m²" : " absolute"}, threshold ${ARC_THRESHOLD_ML_MIN_1_73}). Confirm with a measured 8–24 h urinary creatinine clearance; if confirmed, target AUC may not be achievable with standard intermittent dosing.`
     : "";
 
   const freqCtx: FrequencyOptionContext = {
@@ -477,7 +506,7 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
     `Dose: ${recommended_dose}; Interval: every ${choice.interval_hours} hours; Infusion: ${safeInfusion.infusion_duration_hours} hours.`,
     `Prior-based estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL.`,
     ...(auc_range_status !== "in_range" ? [`** AUC24 ${auc_range_status === "below_target" ? "BELOW" : "ABOVE"} TARGET (400\u2013600 mg\u00b7h/L) **`] : []),
-    ...(arc_advisory ? [`** ARC DETECTED: CrCl ${arc_advisory.crcl_ml_min} mL/min. Consider continuous infusion ~${arc_advisory.continuous_infusion_rate_mg_h} mg/h. **`] : []),
+    ...(arc_advisory ? [`** POSSIBLE ARC: ${arc_advisory.crcl_indexed_ml_min_1_73 ?? arc_advisory.crcl_ml_min} mL/min${arc_advisory.crcl_indexed_ml_min_1_73 ? "/1.73 m²" : " absolute"} vs threshold ${ARC_THRESHOLD_ML_MIN_1_73}. Confirm with measured 8–24 h urinary CrCl before acting. **`] : []),
     ...(safeInfusion.safety_note ? [safeInfusion.safety_note] : []),
     `SCr: ${prior.scr} mg/dL (${modelLabel} renal covariate). Adult prior model: ${modelLabel} two-compartment population prior.`,
     `If rapid empiric attainment is clinically necessary under local practice, an optional actual-body-weight loading-dose estimate around ${loadingDose.suggested_dose_mg} mg may be considered (${loadingDose.basis}).`,
@@ -492,7 +521,7 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
     ...(auc_range_status === "below_target"
       ? ["AUC24 is BELOW the target range of 400\u2013600 mg\u00b7h/L \u2014 clinical review required."]
       : []),
-    ...(arc_advisory ? ["Augmented renal clearance detected \u2014 standard intermittent dosing may be inadequate."] : []),
+    ...(arc_advisory ? ["Possible augmented renal clearance \u2014 confirm with a measured urinary creatinine clearance; estimating equations detect it poorly."] : []),
     ...(bmiAdvisory ? ["High body size: evidence for the Colin 2019 model at BMI 40 or more is limited \u2014 obtain early levels."] : []),
     "Review assumptions, scope exclusions, and local protocol before acting.",
   ];
@@ -524,7 +553,7 @@ export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
         `SCr ${prior.scr} mg/dL (${modelLabel} renal covariate)`,
         `Weight ${patient.weight_kg} kg`,
         `Safety infusion duration ${safeInfusion.infusion_duration_hours} h`,
-        ...(crcl > 0 ? [`Estimated CrCl ${Math.round(crcl)} mL/min`] : []),
+        ...(displayCrCl ? [displayCrCl.label] : []),
       ],
       caution_flags,
     },
@@ -568,7 +597,7 @@ function buildEmpiricRefusalResult(args: {
 }): InitialRegimenResult {
   const { patient, prior, loadingDose } = args;
   const modelLabel = modelShortName(prior.model_name);
-  const crcl = estimateCrCl(patient.age, patient.weight_kg, patient.serum_creatinine_mg_dl, patient.sex || "male");
+  const displayCrCl = displayedCrCl(patient);
   const pulseMg = loadingDose.suggested_dose_mg;
 
   const safety_message =
@@ -650,7 +679,7 @@ function buildEmpiricRefusalResult(args: {
         `SCr ${prior.scr} mg/dL (${modelLabel} renal covariate)`,
         `Weight ${patient.weight_kg} kg`,
         `Estimated CL ${prior.CL.toFixed(2)} L/h`,
-        ...(crcl > 0 ? [`Estimated CrCl ${Math.round(crcl)} mL/min`] : []),
+        ...(displayCrCl ? [displayCrCl.label] : []),
       ],
       caution_flags: [
         "Empiric fixed-interval dosing refused — pulse-then-level workflow required.",

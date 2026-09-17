@@ -397,27 +397,37 @@ export default function DoseRecommendationCard({
       {arc_advisory?.detected && (
         <div className="rounded-lg border-2 px-4 py-3" style={{ borderColor: "#dc2626", background: "#fef2f2" }}>
           <p className="text-sm font-bold" style={{ color: "#991b1b", margin: 0 }}>
-            ⚠ AUGMENTED RENAL CLEARANCE DETECTED
+            ⚠ POSSIBLE AUGMENTED RENAL CLEARANCE
           </p>
           <div className="mt-2 space-y-1.5 text-xs" style={{ color: "#7f1d1d" }}>
             <div className="flex flex-wrap gap-x-4 gap-y-1">
-              <span><strong>CrCl:</strong> {arc_advisory.crcl_ml_min} mL/min</span>
+              {arc_advisory.crcl_indexed_ml_min_1_73 != null ? (
+                <span><strong>Estimated CrCl:</strong> {arc_advisory.crcl_indexed_ml_min_1_73} mL/min/1.73 m² (threshold 130)</span>
+              ) : (
+                <span><strong>Estimated CrCl:</strong> {arc_advisory.crcl_ml_min} mL/min absolute — height not entered, so it could not be indexed</span>
+              )}
               <span><strong>CL:</strong> {arc_advisory.cl_l_h} L/h</span>
               <span><strong>Required TDD:</strong> ~{arc_advisory.required_tdd_mg?.toLocaleString()} mg/day</span>
             </div>
             <p style={{ margin: 0, lineHeight: 1.6 }}>
-              Standard intermittent dosing cannot achieve target AUC₂₄ of 400–600 mg·h/L with this clearance.
+              Estimating equations detect augmented renal clearance poorly. Confirm with a measured 8–24 hour
+              urinary creatinine clearance before acting on this.
+              {auc_range_status === "below_target"
+                ? " The best available intermittent regimen for this patient is already below the 400–600 mg·h/L target."
+                : ""}
             </p>
             <div style={{ margin: 0, lineHeight: 1.6 }}>
-              <strong>Clinical options:</strong>
+              <strong>If confirmed:</strong>
               <ul style={{ margin: "4px 0 0 16px", padding: 0, listStyleType: "disc" }}>
+                <li>Obtain two vancomycin levels early (2–4h and 6–8h post-dose) to confirm individual PK parameters before proceeding</li>
                 <li>Continuous IV infusion: ~{arc_advisory.continuous_infusion_rate_mg_h} mg/hour (administer loading dose first)</li>
                 <li>Consult Infectious Diseases and/or nephrology</li>
-                <li>Obtain two vancomycin levels early (2–4h and 6–8h post-dose) to confirm individual PK parameters before proceeding</li>
               </ul>
             </div>
             <p style={{ margin: 0, fontSize: 10, fontStyle: "italic" }}>
-              Reference: ASHP/IDSA/SIDP 2020 Guidelines — Augmented Renal Clearance
+              Threshold and definition: Udy 2013 (Crit Care 17:R35); Barletta 2017 (J Trauma Acute Care Surg
+              82:665–71); Cucci 2023 (Pharmacotherapy 43:1131–8). The 2020 ASHP/IDSA/SIDP vancomycin guideline
+              does not define an adult ARC threshold.
             </p>
           </div>
         </div>

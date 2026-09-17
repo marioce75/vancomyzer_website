@@ -544,6 +544,16 @@ export default function CalculatorWorkspace() {
         pk_parameters: data.pk_parameters,
         empiric_dosing_blocked: data.empiric_dosing_blocked,
         adjustment_dosing_blocked: data.adjustment_dosing_blocked,
+        // These four are safety surfaces the engine computes and this whitelist
+        // used to drop, so the panels that render them could never fire: the
+        // red augmented-renal-clearance card, the below-target banner, the
+        // late-draw timing warnings and the poor-fit warning. The warning text
+        // still reached clinicians through interpretation_summary and the
+        // clinical note, but every dedicated panel was dead.
+        arc_advisory: data.arc_advisory,
+        auc_range_status: data.auc_range_status,
+        timing_warnings: Array.isArray(data.timing_warnings) ? data.timing_warnings : undefined,
+        fit_quality_warnings: Array.isArray(data.fit_quality_warnings) ? data.fit_quality_warnings : undefined,
       });
       setLastCalculatedAt(Date.now());
       setSelectedFrequencyOption(null);

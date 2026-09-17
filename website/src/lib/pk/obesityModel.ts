@@ -95,6 +95,30 @@ export interface CrClBreakdown {
   ffm_kg: number;
 }
 
+/**
+ * Ideal body weight, Devine 1974 (lb -> kg): 50 kg (M) or 45.5 kg (F) plus
+ * 2.3 kg per inch over 60 inches. Exported so the displayed creatinine-clearance
+ * estimate and this advisory panel share one definition.
+ *
+ * Note the provenance: the Devine formula "is not referenced to a particular
+ * data set, but was instead based on the empiric estimates of Devine's mentor"
+ * (Pai & Paloucek 2000, Ann Pharmacother 34:1066-9).
+ */
+export function idealBodyWeightKg(height_cm: number, sex: "male" | "female"): number {
+  const height_in = height_cm / 2.54;
+  const base = sex === "male" ? 50 : 45.5;
+  return Math.max(0, base + 2.3 * Math.max(0, height_in - 60));
+}
+
+/**
+ * Adjusted body weight = IBW + factor x (TBW - IBW). The 0.4 factor traces to
+ * Schwartz 1978 (J Infect Dis 138:499-505), a 13-patient aminoglycoside
+ * volume-of-distribution study — not a clearance study.
+ */
+export function adjustedBodyWeightKg(weight_kg: number, ibw_kg: number, factor = 0.4): number {
+  return weight_kg > ibw_kg ? ibw_kg + factor * (weight_kg - ibw_kg) : weight_kg;
+}
+
 export function buildCrClBreakdown(
   age: number,
   weight_kg: number,
@@ -103,10 +127,8 @@ export function buildCrClBreakdown(
   sex: "male" | "female",
 ): CrClBreakdown {
   const ffm = calculateFFM(weight_kg, height_cm, sex);
-  const height_in = height_cm / 2.54;
-  const ibw_base = sex === "male" ? 50 : 45.5;
-  const ibw_kg = Math.max(0, ibw_base + 2.3 * Math.max(0, height_in - 60));
-  const adjbw_kg = weight_kg > ibw_kg ? ibw_kg + 0.4 * (weight_kg - ibw_kg) : weight_kg;
+  const ibw_kg = idealBodyWeightKg(height_cm, sex);
+  const adjbw_kg = adjustedBodyWeightKg(weight_kg, ibw_kg);
 
   const cgFor = (w: number): number => {
     if (age <= 0 || w <= 0 || scr_mg_dl <= 0) return 0;
