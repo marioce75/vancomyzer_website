@@ -1,9 +1,21 @@
-import { concentrationAtTime } from "../steadyStateTwoCompartment";
+import {
+  concentrationAtTime,
+  singleDoseConcentration,
+  type TwoCompartmentParameters,
+} from "../steadyStateTwoCompartment";
 import type { PosteriorFitDiagnostics } from "../types";
 import type { NormalizedObservation } from "./normalizeObservations";
 
 const ASSAY_SD_FLOOR_MCG_ML = 1.0;
 const ASSAY_CV = 0.15;
+
+/**
+ * Doses after which the regimen is treated as steady state. Matches the
+ * threshold existingRegimenEngine and validateExistingRegimenRequest use, so
+ * the fit, the exposure summary and the validator cannot disagree about which
+ * regime a patient is in.
+ */
+const STEADY_STATE_DOSE_THRESHOLD = 5;
 
 const PRIOR_LOG_CL_SD = 0.35;
 const PRIOR_LOG_V1_SD = 0.25;
@@ -19,7 +31,15 @@ export interface FitPosteriorInput {
   tau: number;
   T_inf: number;
   observations: NormalizedObservation[];
-  // Optional omega overrides — used by obesity model (Smit 2020 IIV values)
+  /**
+   * Doses given so far. When present and below STEADY_STATE_DOSE_THRESHOLD the
+   * fit superposes exactly that many doses instead of the steady-state
+   * accumulation factor. Undefined means steady state.
+   */
+  doses_given?: number;
+  // Optional between-subject-variability overrides. No shipped model sets these
+  // since the custom obesity branch was retired on 15 Sep 2026; kept so a future
+  // model can widen or narrow the prior without changing this file.
   omega_CL?: number;
   omega_V1?: number;
   omega_Q?: number;
@@ -57,23 +77,59 @@ function observationSd(predicted: number, observed: number): number {
   return Math.max(ASSAY_SD_FLOOR_MCG_ML, ASSAY_CV * anchor);
 }
 
+/**
+ * Predicted concentration for one observed level.
+ *
+ * Steady state — the tau-accumulation form, which presumes an infinite train of
+ * preceding doses.
+ *
+ * Pre-steady-state — superposition of exactly the doses actually given:
+ *   C(t) = sum over k = 0..N-1 of singleDoseConcentration(t + k*tau)
+ * where t is the true time since the most recent dose. Using the steady-state
+ * form here asked the optimizer to explain a level that has only accumulated
+ * over N doses with a concentration built from infinitely many, and the only
+ * way to fit that is to inflate clearance — which underestimated AUC24 by 22%
+ * to 53% after dose 2 and drove dose increases in patients who were already
+ * accumulating. Reading the true elapsed time also means a level drawn past the
+ * interval is modelled as the extended trough it is rather than as an on-time
+ * one. This is the same superposition curvePoints() draws, so the fit and the
+ * plotted curve now share one definition of the concentration-time profile.
+ */
+function predictConcentration(
+  params: TwoCompartmentParameters,
+  input: FitPosteriorInput,
+  observation: NormalizedObservation,
+): number {
+  const { dose_mg, tau, T_inf, doses_given } = input;
+  const base = { ...params, dose_mg, tau, T_inf };
+
+  if (doses_given === undefined || doses_given >= STEADY_STATE_DOSE_THRESHOLD) {
+    return concentrationAtTime({ ...base, t: observation.time_in_interval });
+  }
+
+  let total = 0;
+  for (let k = 0; k < doses_given; k++) {
+    total += singleDoseConcentration(base, observation.time_hours + k * tau);
+  }
+  return total;
+}
+
 function objective(
   CL: number, V1: number, Q: number, V2: number,
   input: FitPosteriorInput
 ): number {
-  const { dose_mg, tau, T_inf, observations, priorCL, priorV1, priorQ, priorV2 } = input;
+  const { observations, priorCL, priorV1, priorQ, priorV2 } = input;
 
-  // Use omega overrides if provided (e.g., Smit 2020 IIV for obesity model)
+  // Use between-subject-variability overrides if a model provided them.
   const sdCL = input.omega_CL ?? PRIOR_LOG_CL_SD;
   const sdV1 = input.omega_V1 ?? PRIOR_LOG_V1_SD;
   const sdQ  = input.omega_Q  ?? PRIOR_LOG_Q_SD;
   const sdV2 = input.omega_V2 ?? PRIOR_LOG_V2_SD;
 
   let nll = 0;
-  for (const { time_in_interval, concentration } of observations) {
-    const predicted = concentrationAtTime({
-      CL, V1, Q, V2, dose_mg, tau, T_inf, t: time_in_interval
-    });
+  for (const observation of observations) {
+    const { concentration } = observation;
+    const predicted = predictConcentration({ CL, V1, Q, V2 }, input, observation);
     const sd = observationSd(predicted, concentration);
     const residual = concentration - predicted;
     nll += 0.5 * (residual / sd) ** 2 + Math.log(sd);
@@ -207,12 +263,14 @@ function summarizeDiagnostics(
   posteriorV2: number,
   success: boolean
 ): PosteriorFitDiagnostics {
-  const { priorCL, priorV1, dose_mg, tau, T_inf, observations } = input;
-  const residuals = observations.map(({ time_in_interval, concentration }) => {
-    const predicted = concentrationAtTime({
-      CL: posteriorCL, V1: posteriorV1, Q: posteriorQ, V2: posteriorV2,
-      dose_mg, tau, T_inf, t: time_in_interval
-    });
+  const { priorCL, priorV1, observations } = input;
+  const residuals = observations.map((observation) => {
+    const { concentration } = observation;
+    const predicted = predictConcentration(
+      { CL: posteriorCL, V1: posteriorV1, Q: posteriorQ, V2: posteriorV2 },
+      input,
+      observation,
+    );
     const absError = Math.abs(concentration - predicted);
     const relativeError = concentration > 0 ? absError / concentration : 0;
     return { predicted, concentration, absError, relativeError };
@@ -374,11 +432,13 @@ export function fitPosteriorParameters(
   // the recorded time-in-interval. Surfaced so the API route can log fit
   // quality and the UI can warn the clinician when no fit explains the data.
   const per_level_residuals: PerLevelResidual[] = normalizedInput.observations.map(
-    ({ time_in_interval, concentration }) => {
-      const predicted = concentrationAtTime({
-        CL: finalCL, V1: finalV1, Q: finalQ, V2: finalV2,
-        dose_mg, tau, T_inf: T_infClamped, t: time_in_interval,
-      });
+    (observation) => {
+      const { concentration } = observation;
+      const predicted = predictConcentration(
+        { CL: finalCL, V1: finalV1, Q: finalQ, V2: finalV2 },
+        normalizedInput,
+        observation,
+      );
       const relative_error = concentration > 0 ? Math.abs(predicted - concentration) / concentration : 0;
       return { observed: concentration, predicted, relative_error };
     },

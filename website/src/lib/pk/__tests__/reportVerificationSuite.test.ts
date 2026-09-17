@@ -69,9 +69,9 @@ interface CheckDefinition {
   ref: string;
   title: string;
   status: CheckStatus;
-  /** PENDING checks: the workstream that owns the fix. */
+  /** The workstream that owned the fix. */
   owner?: string;
-  /** PENDING checks: one line on why the check cannot pass yet. */
+  /** The defect this check was written for, kept as the record of what it guards. */
   reason?: string;
   run: (c: CheckContext) => void;
 }
@@ -1034,15 +1034,18 @@ const REQUIRED_CHECKS: CheckDefinition[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// PENDING checks: desired behavior for open engine issues. They run but never fail the suite.
+// Engine-session checks: the eight open engine issues handed over on 15 Sep 2026.
+// All were fixed on 16 Sep 2026 and promoted from PENDING to REQUIRED in the same
+// change, so they now fail the run if they regress. Each keeps `owner` and
+// `reason` as the record of the defect it guards against.
 // ---------------------------------------------------------------------------
 
-const PENDING_CHECKS: CheckDefinition[] = [
+const ENGINE_SESSION_CHECKS: CheckDefinition[] = [
   {
     id: "j2",
     ref: "§10 Decimal parsing (unit errors)",
     title: "Initial-regimen inputs are validated below the route: SCr 88.4 and age 17 rejected",
-    status: "PENDING",
+    status: "REQUIRED",
     owner: ENGINE_SESSION,
     reason:
       "Nothing importable validates initial_regimen inputs: only the non-exported validateRequest in src/app/api/calculate/route.ts rejects SCr > 10 mg/dL or age < 18.",
@@ -1075,7 +1078,7 @@ const PENDING_CHECKS: CheckDefinition[] = [
     id: "p1",
     ref: "§10 Non-steady-state fit",
     title: "doses_given = 2 trough simulated from known PK: posterior steady-state AUC24 within 15% of truth",
-    status: "PENDING",
+    status: "REQUIRED",
     owner: ENGINE_SESSION,
     reason:
       "Doses 2–4 are fitted with steady-state equations (normalizeObservations and fitPosteriorParameters apply the τ accumulation factor), which biases CL for pre-steady-state levels.",
@@ -1118,7 +1121,7 @@ const PENDING_CHECKS: CheckDefinition[] = [
     id: "p2",
     ref: "§10 Single-dose AUC window",
     title: "doses_given = 1: first-dose AUC24 is AUC0–24 of the dose given, distinct from the steady-state projection",
-    status: "PENDING",
+    status: "REQUIRED",
     owner: ENGINE_SESSION,
     reason:
       "existingRegimenEngine reports 'first-dose AUC24' as the area over 0–τ × 24/τ, which for τ ≠ 24 h is neither AUC0–24 nor the steady-state projection.",
@@ -1159,7 +1162,7 @@ const PENDING_CHECKS: CheckDefinition[] = [
     id: "p3",
     ref: "§10 Extreme weight",
     title: "350 kg in the existing-regimen path is rejected or used as entered, never computed as 300 kg",
-    status: "PENDING",
+    status: "REQUIRED",
     owner: ENGINE_SESSION,
     reason:
       "normalizePatient clamps weight to 20–300 kg before validateExistingRegimenRequest (which allows up to 400 kg), so 300–400 kg is silently computed as 300 kg.",
@@ -1190,7 +1193,7 @@ const PENDING_CHECKS: CheckDefinition[] = [
     id: "p4",
     ref: "§10 Late draw / missed dose",
     title: "Level 23.5 h after the last dose on q12h is rejected, or flagged and not fitted as an on-time trough",
-    status: "PENDING",
+    status: "REQUIRED",
     owner: ENGINE_SESSION,
     reason:
       "For doses_given 2–4 the validator only warns and normalizeObservations clamps the sample time to τ, so a late level is fitted as an on-time trough (the steady-state path rejects it).",
@@ -1224,7 +1227,7 @@ const PENDING_CHECKS: CheckDefinition[] = [
     id: "p5",
     ref: "§10 Administration history",
     title: "Loading dose then maintenance change gets an explicit unsupported/abstention message",
-    status: "PENDING",
+    status: "REQUIRED",
     owner: ENGINE_SESSION,
     reason:
       "The API has no administration-history input: loading doses, regimen changes, missed or held doses and actual infusion end times are silently ignored and a uniform regimen is assumed.",
@@ -1274,7 +1277,7 @@ const PENDING_CHECKS: CheckDefinition[] = [
     id: "p6",
     ref: "§10 Dialysis / RRT",
     title: "Dialysis/RRT status is part of the API input contract",
-    status: "PENDING",
+    status: "REQUIRED",
     owner: ENGINE_SESSION,
     reason:
       "Neither CalculateRequestPatient (src/types/calculator.ts) nor validateRequest (src/app/api/calculate/route.ts) has a dialysis/RRT field, although Colin 2019 scope excludes renal replacement therapy.",
@@ -1295,7 +1298,7 @@ const PENDING_CHECKS: CheckDefinition[] = [
     id: "p7",
     ref: "§10 Level-pair chronology",
     title: "Trough before dose N+1 then peak after dose N+1, entered in that order, is accepted",
-    status: "PENDING",
+    status: "REQUIRED",
     owner: ENGINE_SESSION,
     reason:
       "validateExistingRegimenRequest compares level pairs in entry order, so a later level with a shorter time since dose is read as inconsistent (the same pair entered peak-first is accepted).",
@@ -1313,7 +1316,7 @@ const PENDING_CHECKS: CheckDefinition[] = [
   },
 ];
 
-export const CHECKS: CheckDefinition[] = [...REQUIRED_CHECKS, ...PENDING_CHECKS];
+export const CHECKS: CheckDefinition[] = [...REQUIRED_CHECKS, ...ENGINE_SESSION_CHECKS];
 
 // ---------------------------------------------------------------------------
 // Runner

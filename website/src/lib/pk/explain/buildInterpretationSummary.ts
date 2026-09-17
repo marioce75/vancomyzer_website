@@ -49,6 +49,24 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
       : "Posterior-updated estimate"
     : "First-pass population estimate";
 
+  // A refusal must not also state a recommendation. When the safety layer blocks
+  // maintenance dosing, recommended_dose is the sentinel "—" and the interval is
+  // 0, so this used to read "Recommended adjustment: — every 0 h infused over 0 h"
+  // followed by a rationale claiming a SHORTER interval was being recommended —
+  // pointing the opposite way from the hold the safety card states, for a patient
+  // in severe AKI. Report the estimates, then the refusal, and stop.
+  const blocked = recommendation.adjustment_dosing_blocked;
+  if (blocked) {
+    return (
+      `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. ` +
+      `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
+      `Two-compartment model (SCr ${scr} mg/dL). ` +
+      `${blocked.safety_message} ${blocked.recommended_action} ` +
+      `Fit quality ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty ${posterior_fit?.uncertainty_label ?? "population_only"}. ` +
+      `${data_quality_note} Intended to support review, not replace clinician judgment.`
+    );
+  }
+
   const infusionDuration = recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1;
   const infusionSafetyNote = recommendation.infusion_duration_adjusted_for_safety && recommendation.infusion_safety_note
     ? ` ${recommendation.infusion_safety_note}`

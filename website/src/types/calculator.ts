@@ -11,6 +11,12 @@ export interface CalculateRequestPatient {
   height_cm: number;
   sex: "male" | "female" | "";
   serum_creatinine_mg_dl: number;
+  /**
+   * Dialysis or other renal replacement therapy. The Colin 2019 population
+   * excludes RRT, and this site states that recommendations are withheld for
+   * it, so the API refuses the calculation when this is true.
+   */
+  dialysis_or_rrt?: boolean;
 }
 
 export interface CalculateRequestRegimen {

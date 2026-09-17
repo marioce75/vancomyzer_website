@@ -282,7 +282,57 @@ function getAucRangeStatus(auc24: number): AucRangeStatus {
   return "below_target";
 }
 
+/**
+ * Thrown when computeInitialRegimen is handed inputs outside the adult
+ * intermittent-infusion scope. The API route checks these before calling, but
+ * nothing below the route did — so through any other caller an SCr entered in
+ * µmol/L (88.4) came back as a confident "severe renal impairment" refusal
+ * describing a unit error rather than a patient, and a 17-year-old came back
+ * with a full regimen computed from the age-18 prior.
+ */
+export class InitialRegimenInputError extends Error {
+  readonly error_type = "validation_error" as const;
+  readonly field_errors: Record<string, string>;
+
+  constructor(field_errors: Record<string, string>) {
+    super("Patient inputs are outside the adult intermittent-infusion scope of this calculator.");
+    this.name = "InitialRegimenInputError";
+    this.field_errors = field_errors;
+  }
+}
+
+/** Bounds mirror validateRequest in the API route and validateExistingRegimenRequest. */
+function assertInitialRegimenInputs(patient: Patient): void {
+  const field_errors: Record<string, string> = {};
+  const { age, weight_kg, serum_creatinine_mg_dl } = patient;
+  const height_cm = patient.height_cm ?? 0;
+
+  if (typeof age !== "number" || Number.isNaN(age) || age < 18 || age > 120) {
+    field_errors["patient.age"] = "Adult calculator requires age 18-120.";
+  }
+  if (typeof weight_kg !== "number" || Number.isNaN(weight_kg) || weight_kg < 30 || weight_kg > 400) {
+    field_errors["patient.weight_kg"] = "Weight must be 30-400 kg.";
+  }
+  if (
+    typeof serum_creatinine_mg_dl !== "number" ||
+    Number.isNaN(serum_creatinine_mg_dl) ||
+    serum_creatinine_mg_dl < 0.1 ||
+    serum_creatinine_mg_dl > 10
+  ) {
+    field_errors["patient.serum_creatinine_mg_dl"] =
+      "SCr must be 0.1-10 mg/dL. A value near 88 is micromol/L — divide by 88.4 to convert.";
+  }
+  if (height_cm !== 0 && (Number.isNaN(height_cm) || height_cm < 100 || height_cm > 250)) {
+    field_errors["patient.height_cm"] = "Height must be 100-250 cm.";
+  }
+
+  if (Object.keys(field_errors).length > 0) {
+    throw new InitialRegimenInputError(field_errors);
+  }
+}
+
 export function computeInitialRegimen(patient: Patient): InitialRegimenResult {
+  assertInitialRegimenInputs(patient);
   const prior = buildPriorParameters(
     {
       age: patient.age,

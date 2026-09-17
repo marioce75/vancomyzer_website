@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { computeInitialRegimen } from "@/lib/initialRegimen";
+import { computeInitialRegimen, InitialRegimenInputError } from "@/lib/initialRegimen";
 import { runExistingRegimenPipeline } from "@/lib/pk/runExistingRegimenPipeline";
 import { logCalculation } from "@/lib/auditLog";
 import { logCalculationEntry, getUserTier, findUserByLogin, logSecurityEvent } from "@/lib/db";
@@ -46,6 +46,17 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
     if (p.height_cm !== undefined && p.height_cm !== 0 && (typeof p.height_cm !== "number" || p.height_cm < 100 || p.height_cm > 250)) field_errors["patient.height_cm"] = "Height must be 100-250 cm.";
     if (p.sex !== undefined && p.sex !== "" && p.sex !== "male" && p.sex !== "female") field_errors["patient.sex"] = "Sex must be 'male' or 'female'.";
     if (typeof p.serum_creatinine_mg_dl !== "number" || Number.isNaN(p.serum_creatinine_mg_dl) || p.serum_creatinine_mg_dl < 0.1 || p.serum_creatinine_mg_dl > 10) field_errors["patient.serum_creatinine_mg_dl"] = "Scr must be 0.1-10 mg/dL. For SCr >10, consult nephrology — PK model reliability is limited.";
+    // Dialysis / renal replacement therapy is outside the Colin 2019 population
+    // and outside this calculator's stated scope. The workspace collected an RRT
+    // toggle but never sent it, so the API could not keep the withholding the
+    // site promises; it is part of the request contract now and refuses here.
+    const dialysisOrRrt = p.dialysis_or_rrt;
+    if (dialysisOrRrt !== undefined && typeof dialysisOrRrt !== "boolean") {
+      field_errors["patient.dialysis_or_rrt"] = "Must be true or false.";
+    } else if (dialysisOrRrt === true) {
+      field_errors["patient.dialysis_or_rrt"] =
+        "Vancomycin dosing during dialysis or other renal replacement therapy is outside this calculator's validated scope — the Colin 2019 population excludes RRT, so its clearance estimate does not describe a patient on dialysis. Dose per your institution's RRT protocol with nephrology input.";
+    }
   }
 
   if (resolvedMode === "existing_regimen") {
@@ -242,7 +253,31 @@ export async function POST(request: NextRequest) {
       sex: ((p.sex as string) === "male" || (p.sex as string) === "female" ? p.sex : "") as "male" | "female" | "",
       serum_creatinine_mg_dl: p.serum_creatinine_mg_dl as number,
     };
-    const result = computeInitialRegimen(patient) as unknown as Record<string, unknown>;
+    // validateRequest above already bounds these, so this is defence in depth:
+    // the engine now enforces its own scope, and a miss here must surface as a
+    // 400 naming the field rather than a 500.
+    let result: Record<string, unknown>;
+    try {
+      result = computeInitialRegimen(patient) as unknown as Record<string, unknown>;
+    } catch (error) {
+      if (!(error instanceof InitialRegimenInputError)) throw error;
+      logCalculation({
+        mode: "initial_regimen",
+        duration_ms: Date.now() - startTime,
+        status: "error",
+        user_email: userEmail,
+        inputs,
+        error: {
+          type: error.error_type,
+          message: error.message,
+          field_errors: error.field_errors,
+        },
+      });
+      return NextResponse.json(
+        { error_type: error.error_type, message: error.message, field_errors: error.field_errors },
+        { status: 400 },
+      );
+    }
 
     logCalculation({
       mode: "initial_regimen",

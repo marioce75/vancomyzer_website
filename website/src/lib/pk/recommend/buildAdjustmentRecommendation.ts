@@ -477,14 +477,23 @@ export function buildAdjustmentRecommendation(output: ExistingRegimenEngineOutpu
     }
   }
 
-  // Attach frequency options from the full candidate grid
-  const recDose = Number.parseFloat(base.recommended_dose);
-  base.frequency_options = collectFrequencyOptions(
-    CL, V1, Q, V2, infusion_hours,
-    { dose_mg: Number.isFinite(recDose) ? recDose : current_regimen_dose_mg, interval_hours: base.recommended_interval_hours },
-    targetAucMid,
-    isPulseDose ? { dose_mg: current_regimen_dose_mg, T_inf: Math.min(infusion_hours, current_regimen_interval_hours) } : undefined
-  );
+  // Attach frequency options from the full candidate grid.
+  //
+  // A refusal MUST NOT carry dose suggestions. buildAdjustmentRefusal sets
+  // frequency_options: [] deliberately, and overwriting it unconditionally here
+  // contradicted the safety state the dose card and the exported PDF render: a
+  // patient the engine had just refused to dose ("hold maintenance dosing,
+  // recheck when trough < 15") still shipped a three-option dose menu, each
+  // option enriched with its own generated clinical note.
+  if (base.adjustment_dosing_blocked == null) {
+    const recDose = Number.parseFloat(base.recommended_dose);
+    base.frequency_options = collectFrequencyOptions(
+      CL, V1, Q, V2, infusion_hours,
+      { dose_mg: Number.isFinite(recDose) ? recDose : current_regimen_dose_mg, interval_hours: base.recommended_interval_hours },
+      targetAucMid,
+      isPulseDose ? { dose_mg: current_regimen_dose_mg, T_inf: Math.min(infusion_hours, current_regimen_interval_hours) } : undefined
+    );
+  }
 
   return base;
 }

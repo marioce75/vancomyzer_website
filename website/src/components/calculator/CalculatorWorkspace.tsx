@@ -439,7 +439,10 @@ export default function CalculatorWorkspace() {
   const buildRequest = useCallback((): CalculateRequest => {
     const trimmedCaseId = caseIdRef.current.trim();
     const caseIdField = canSaveHistory && trimmedCaseId.length > 0 ? { case_id: trimmedCaseId } : {};
-    const base = { mode, patient: { ...patient }, ...caseIdField };
+    // The RRT toggle was collected and stored but never sent, so the API could
+    // not withhold a recommendation for dialysis / renal replacement therapy the
+    // way this site says it does. Send it as part of the patient contract.
+    const base = { mode, patient: { ...patient, dialysis_or_rrt: rrt === true }, ...caseIdField };
     if (mode === "initial_regimen") return base;
     // Drop only completely untouched rows (loading-dose simulation has no measured
     // levels). A row with a time but an unreadable/zero value is sent as-is so the
@@ -448,7 +451,7 @@ export default function CalculatorWorkspace() {
       (l) => l.value_mcg_ml !== 0 || l.time_since_last_dose_hours !== 0 || (l.collection_time ?? "").trim() !== "",
     );
     return { ...base, regimen, levels: validLevels };
-  }, [mode, patient, regimen, levels, canSaveHistory]);
+  }, [mode, patient, rrt, regimen, levels, canSaveHistory]);
 
   const applyViewMode = useCallback((next: WorkspaceViewMode) => {
     setViewMode(next);
@@ -1256,7 +1259,7 @@ export default function CalculatorWorkspace() {
                 {/* Pulse-dose curve toggle: lets the clinician compare the
                     profile of their entered regimen vs. the engine's auto-
                     recommended adjustment for this patient's posterior PK. */}
-                {visibleResult.curve_engine_recommended && !activeOption && (
+                {visibleResult.curve_engine_recommended && !activeOption && !visibleResult.adjustment_dosing_blocked && (
                   <div className="flex items-center justify-between gap-2 border-b px-3 py-2 text-xs"
                     style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
                     <span style={{ color: "var(--color-secondary)" }}>Showing curve for:</span>

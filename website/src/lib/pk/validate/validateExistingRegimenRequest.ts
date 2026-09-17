@@ -150,17 +150,17 @@ export function validateExistingRegimenRequest(
         if (isNonSteadyState) {
           if (overshoot <= tolerance) {
             warnings.push(
-              `Level for dose ${i + 1} drawn ${overshootStr} h after the dosing interval — interpreted as a late trough. Common nursing-handoff variability.`,
+              `Level ${i + 1} drawn ${overshootStr} h after the dosing interval — interpreted as a late trough. Common nursing-handoff variability.`,
             );
           } else {
             warnings.push(
-              `Level for dose ${i + 1} drawn ${overshootStr} h past the dosing interval. Treated as an extended trough; the posterior fit will rely heavily on the population prior. Verify the dose times if this is unexpected.`,
+              `Level ${i + 1} drawn ${overshootStr} h past the dosing interval. Treated as an extended trough; the posterior fit will rely heavily on the population prior. Verify the dose times if this is unexpected.`,
             );
           }
         } else if (overshoot <= tolerance) {
           // Steady-state, within tolerance — accept with advisory.
           warnings.push(
-            `Level for dose ${i + 1} drawn ${overshootStr} h after the dosing interval — interpreted as a late trough. Common nursing-handoff variability.`,
+            `Level ${i + 1} drawn ${overshootStr} h after the dosing interval — interpreted as a late trough. Common nursing-handoff variability.`,
           );
         } else {
           // Steady-state, beyond tolerance — keep the existing reject + recovery path.
@@ -213,16 +213,21 @@ export function validateExistingRegimenRequest(
           continue;
         }
 
-        // Cycle offset uses FLOOR, not round. Previously used Math.round, which
-        // for same-cycle peak+trough drawn >interval/2 apart (e.g., peak @ 2h
-        // and trough @ 11.5h in a q12h interval — the standard workflow) would
-        // round 0.79 → 1, claim the levels crossed into the next dose cycle,
-        // and reject the consistent timestamps with "Collection time is
-        // inconsistent with reported time post-dose." Floor correctly counts
-        // complete intervals between source doses.
-        const cycleOffset = Math.floor(observedDelta / interval_hours) * interval_hours;
-        const expectedReportedDelta = observedDelta - cycleOffset;
-        if (Math.abs(expectedReportedDelta - reportedDelta) > TIMING_TOLERANCE_HOURS + 0.5) {
+        // Two levels are often timed from different doses — the standard pair
+        // is a trough before dose N+1 and a peak after it. If their two source
+        // doses sit m complete intervals apart then
+        //   observedDelta = m*interval + (reported_j - reported_i)
+        // so (observedDelta - reportedDelta) / interval must be a whole number.
+        // Testing that directly accepts the trough-then-peak pair in entry
+        // order. Deriving the offset from observedDelta alone (floor, or the
+        // round before it) assumed level j was never timed from an earlier
+        // dose than level i, so it read the standard pair as inconsistent and
+        // rejected it — while the very same pair entered peak-first passed.
+        // Sign is not constrained: entry order should not decide validity.
+        const intervalsBetweenDoses = (observedDelta - reportedDelta) / interval_hours;
+        const wholeIntervals = Math.round(intervalsBetweenDoses);
+        const offByHours = Math.abs(intervalsBetweenDoses - wholeIntervals) * interval_hours;
+        if (offByHours > TIMING_TOLERANCE_HOURS + 0.5 || Math.abs(wholeIntervals) > 3) {
           field_errors[`levels[${j}].collection_time`] =
             "Collection time is inconsistent with reported time post-dose. Check that each level's dose time is the most recent dose before that level was drawn.";
         }

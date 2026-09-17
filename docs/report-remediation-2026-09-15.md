@@ -38,28 +38,81 @@ Branch: `report-remediation-2026-09-15` (base `389c3b1`). Model manifest: `2026-
 - Predictive (synthetic, n = 200): vs noisy observation bias +0.48 mg/L, rBias +8.17%, rRMSE 31.69%; vs noise-free truth rRMSE 15.95%.
 - Independent code review completed; its HIGH and MEDIUM findings are fixed on this branch.
 
-## Engine-session handoff (not fixed here)
+## Engine-session handoff — closed 16 Sep 2026
 
-PENDING checks in the report suite print "NOW PASSING" when fixed — promote them to REQUIRED then.
+All eight checks are fixed and were promoted from PENDING to REQUIRED in the same change.
+The report suite is **18/18 REQUIRED passing**, `tsc --noEmit` is clean, and the full `npm test`
+chain (PK integration, HMAC, BAA, cases, safety pattern, predictive, report suite) passes.
+`next build` and `next lint` also pass after the engine commit; lint reports 5 warnings, all of
+them in files this change does not touch (`Footer.tsx`, `ConcentrationTimeGraph.tsx`, `db.ts`)
+or at lines it does not touch (`CalculatorWorkspace.tsx:614`). The "3 pre-existing warnings"
+noted above undercounted.
 
-| Check | Measured on this branch |
-|---|---|
-| p1 Doses 2–4 fitted with steady-state equations | doses_given = 2: posterior AUC24 −34.9%, −52.5%, −21.6% vs truth. **Clinically important: underestimated exposure can drive dose increases.** |
-| p2 Single-dose AUC window | "first-dose AUC24" = AUC0–τ × 24/τ (q12h: 408 vs true AUC0–24 290) |
-| p3 Weight clamp | 350 kg accepted and computed as 300 kg in the existing-regimen path |
-| p4 Late draw / missed dose | level 23.5 h after a q12h dose fitted identically to an on-time trough |
-| p5 Administration history | loading dose then regimen change silently ignored |
-| p6 Dialysis/RRT | UI toggle only; not in the API contract, note, PDF or history |
-| p7 Level-pair chronology | trough before dose N+1 then peak after it is rejected |
-| j2 Initial-regimen input guard | below the route, SCr 88.4 and age 17 are computed (route rejects both) |
+| Check | Was | Now |
+|---|---|---|
+| p1 Doses 2–4 fitted with steady-state equations | posterior AUC24 −34.9% / −52.5% / −21.6% vs truth | **+0.3% / −12.4% / +6.3%** |
+| p2 Single-dose AUC window | 476 at q8h, 408 at q12h for the same 1500 mg dose and level | 290 at both — the true AUC0–24, interval-independent |
+| p3 Weight clamp | 350 kg computed as 300 kg | used as entered; ceiling raised to the 400 kg the API documents |
+| p4 Late draw / missed dose | fitted identically to an on-time trough | CL 2.83 vs 3.90 L/h, flagged |
+| p5 Administration history | silently ignored | explicit "administration history is not modelled" limitation |
+| p6 Dialysis/RRT | toggle collected, never sent | in `CalculateRequestPatient`, sent by the workspace, refused by the route |
+| p7 Level-pair chronology | standard trough→peak pair rejected | accepted in either entry order |
+| j2 Initial-regimen input guard | SCr 88.4 returned a "severe renal impairment" refusal | `InitialRegimenInputError`, surfaced by the route as a 400 naming the field |
 
-Also:
-- `CalculatorWorkspace` result-copy block drops `fit_quality_warnings`, `timing_warnings`, `arc_advisory`, `auc_range_status`; return `posterior_fit` in the API response so the band uses the engine label directly.
-- `normalizePatient` turns missing weight into 70 kg and missing SCr into 1.0; SCr 0.1–0.39 is floored to 0.4 and notes print 0.4.
-- Validator late-draw messages use the level index as the dose number; mixing manual-hours and date/time levels gives misleading rejections.
-- `runExistingRegimenPipeline` input type lacks `height_cm`/`sex` (the BMI advisory needs them).
-- Stale comments: `fitPosteriorParameters.ts:22,66`, `posteriorEngine.ts:76` (obesity-model omegas).
+p1 and p4 share one fix: `fitPosteriorParameters.predictConcentration` superposes exactly
+`doses_given` doses at the observation's true elapsed time — the same math `curvePoints` draws,
+so the fit and the plotted curve can no longer disagree. N = 1 collapses to single-dose, so
+pulse-dose results are provably unchanged.
+
+### Also fixed from the list above
+- Validator late-draw messages said "Level for dose N" for a level index — now "Level N".
+- `runExistingRegimenPipeline` input type accepts `height_cm`/`sex`.
+- Stale obesity-omega comments in `fitPosteriorParameters.ts` and `posteriorEngine.ts`.
+
+### Also fixed, from the engine session's own audit (not in the report)
+- **The chart contradicted the panel.** For a loading dose the curve was rebuilt on the
+  *recommended* regimen after peak/trough/AUC had been computed from the patient's own, so the
+  panel read trough 5.9 ("increase the dose") while the graph beside it never fell below ~17.9
+  ("hold or reduce"). Across 2025 simulated cases the two disagreed in 727, worst case 15.75
+  mcg/mL. Override deleted; measured after: curve at 24 h 17.56 against a reported trough 17.6.
+- **A refusal shipped a dose menu.** `frequency_options` was attached unconditionally, so a
+  patient the engine had just refused to dose still received three dose options, each with a
+  generated clinical note, reachable via Export PDF. Now empty when dosing is blocked.
+- **A refusal printed a recommendation.** The interpretation panel and the chart note read
+  "Recommended adjustment: — every 0 h" and "interval shortening from q6h to q0h" — pointing
+  opposite to the hold on the safety card, in the permanent record. Both now state the hold.
+- **A refusal still offered an "Engine recommendation" curve** chosen from an uncapped grid
+  (250 mg q24h: trough 55.1, AUC24 1371). Dropped when blocked, and gated in the UI.
+- `height-typo-flips-refusal`, rated critical against the old code, is **moot**: with the obesity
+  branch retired, 65 y / 130 kg / SCr 5.0 returns `blocked=YES, CL 0.2907, colin_2019` with and
+  without a height. Verified by execution, not assumed.
+
+### Still open in the engine (not fixed here)
+- `CalculatorWorkspace` result-copy drops `fit_quality_warnings`, `timing_warnings`,
+  `arc_advisory`, `auc_range_status`; `posterior_fit` is still not returned in the API response.
+- `normalizePatient` turns missing weight into 70 kg and missing SCr into 1.0; SCr 0.1–0.39 is
+  floored to 0.4 and notes print 0.4. (The 300 kg ceiling is fixed; the defaults are not.)
+- Mixing manual-hours and date/time levels still gives misleading rejections.
 - ARC advisory suggests a continuous-infusion rate although continuous infusion is out of scope.
+
+### Needs clinical sign-off before it can be fixed (each changes emitted doses)
+Reproduced by execution in the 15–16 Sep engine audit, deliberately left alone:
+- **Colin prior CL collapses at high SCr.** At SCr 6.0 the prior gives CL 0.106 L/h and the MAP
+  fit is dragged to 0.493 against a true 0.7, so the engine halves a dose that was correct.
+  Flooring the prior also moves the empiric refusal boundary.
+- **Posterior CL is not renally bounded.** One mis-drawn 1.0 mcg/mL trough raises CL to 4.09× the
+  patient's own CrCl and ships 4500 mg/day to a patient with CrCl 39.
+- **Steady state is a fixed count of 5 doses.** Entering 4 vs 5 doses changes the daily dose by
+  33% on identical PK; it should key on the patient's own terminal half-life.
+- **The sparse path refuses when a safe regimen exists** (750 mg q8h, AUC 492) because its
+  heuristic candidate failed the hard cap first.
+- **The empiric tie-break prefers the longest interval**, offering a 45 kg adult 2000 mg q24h
+  (44 mg/kg) over 1000 mg q12h at identical predicted AUC.
+- **No warning when an adjustment misses target**: 1500 mg q8h at AUC24 385 ships with no
+  below-target banner, and the card displays the *previous* regimen's exposure.
+- **Institutional dose ceilings are ignored** — /settings values are validated, saved, never read.
+- Fixed Q, uncapped Cockcroft–Gault, the SCr 0.4 floor, and an unbounded curve horizon at very
+  low clearance (a 6.18-year, 11.6 MB curve for one request).
 
 ## Open decisions (Mario / counsel)
 

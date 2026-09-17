@@ -15,6 +15,13 @@ export interface NormalizedObservation {
 export interface ObservationContext {
   tau: number;
   T_inf: number;
+  /**
+   * Doses actually given, when the regimen is still pre-steady-state. The
+   * fitter superposes exactly this many doses instead of assuming the infinite
+   * dose train the steady-state equations describe. Undefined when the caller
+   * gave no dose count (treated as steady state).
+   */
+  doses_given?: number;
 }
 
 function timeInInterval(t: number, tau: number): number {
@@ -51,11 +58,16 @@ export function normalizeObservations(
   const observations: NormalizedObservation[] = levels.map((l) => {
     const time_hours = Math.max(0, l.time_since_last_dose_hours);
     const concentration = Math.max(0, l.value_mcg_ml);
-    // For non-pulse-dose (SS or multi-dose accumulation) workflows: when the
-    // level was drawn slightly past the dosing interval (a "late trough" — the
+    // When the level was drawn past the dosing interval (a "late trough" — the
     // next dose hasn't been given yet), wrapping via modulo would put it at
     // the next cycle's peak time, which is the wrong physical interpretation.
-    // Clamp to tau instead so the SS posterior fitter sees it as the trough.
+    // Clamp to tau instead so the steady-state fitter sees it as the trough.
+    //
+    // This clamp only shapes `time_in_interval`, which is read by the
+    // steady-state prediction path. Pre-steady-state fits read `time_hours`
+    // below and superpose the doses actually given, so for those a late draw
+    // keeps its true elapsed time and is modelled as the extended trough it
+    // is (fitPosteriorParameters.predictConcentration).
     let time_in_interval: number;
     if (!isPulseDose && tau > 0 && time_hours > tau) {
       time_in_interval = tau;
@@ -66,6 +78,6 @@ export function normalizeObservations(
   });
   return {
     observations,
-    context: { tau: effectiveTau, T_inf },
+    context: { tau: effectiveTau, T_inf, doses_given: regimen.doses_given },
   };
 }

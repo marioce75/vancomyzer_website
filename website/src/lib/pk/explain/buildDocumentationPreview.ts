@@ -61,10 +61,22 @@ export function buildDocumentationPreview(input: ExplanationInput): {
     ? "Posterior-updated"
     : "First-pass population";
 
+  // A refusal must not also state a recommendation. Both lines below are pasted
+  // into the chart and exported in the PDF, where a blocked result printed
+  // "Recommendation: — every 0 h infused over 0 h" and "Change summary: interval
+  // shortening from q6h to q0h" — advice pointing the opposite way from the hold
+  // the safety card gives, in the permanent record.
+  const blocked = recommendation.adjustment_dosing_blocked;
+  const recommendationLines = blocked
+    ? [`Maintenance dosing held — ${blocked.safety_message}`, blocked.recommended_action]
+    : [
+        `Recommendation: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1} h`,
+        changeSummary,
+      ];
+
   const quick_summary = [
     `AUC24: ${auc24} mg·h/L; peak ${peak}; trough ${trough} mcg/mL (${estimateLabel})`,
-    `Recommendation: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1} h`,
-    changeSummary,
+    ...recommendationLines,
     ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
     ...(recommendation.infusion_duration_adjusted_for_safety && recommendation.infusion_safety_note ? [recommendation.infusion_safety_note] : []),
     `SCr: ${scr} mg/dL (${modelShortName(engineOutput.model_name)} renal covariate). Fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Assumptions and limitations apply.`,
@@ -73,8 +85,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
   const clinical_note = [
     `Vancomycin existing regimen evaluation (${estimateLabel} estimate).`,
     `AUC24: ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL.`,
-    `Recommendation: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1} h.`,
-    changeSummary,
+    ...recommendationLines,
     ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
     // Must name the prior that actually ran — this line goes into the chart.
     engineOutput.model_name === COLIN_2019.id

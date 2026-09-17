@@ -10,7 +10,11 @@ export interface RawPatient {
 
 export function normalizePatient(raw: RawPatient): NormalizedPatient {
   const age = Math.max(0, Math.min(120, Number(raw.age) || 0));
-  const weight_kg = Math.max(20, Math.min(300, Number(raw.weight_kg) || 70));
+  // Ceiling matches the range the API documents and validateExistingRegimenRequest
+  // enforces (30-400 kg). A 300 kg clamp here silently recomputed every patient
+  // from 300-400 kg at 300 kg — understating clearance by up to 25% and biasing
+  // toward underdosing — while the validator's own >400 kg rejection never ran.
+  const weight_kg = Math.max(20, Math.min(400, Number(raw.weight_kg) || 70));
   const height_cm = Math.max(0, Math.min(250, Number(raw.height_cm) || 0));
   const sexRaw = String(raw.sex ?? "").toLowerCase();
   const sex = (sexRaw === "male" || sexRaw === "female") ? sexRaw : "" as const;

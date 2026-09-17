@@ -47,7 +47,7 @@ function computeConstants({ CL, V1, Q, V2 }: TwoCompartmentParameters) {
  * Uses the two-compartment biexponential model.
  * t must be >= 0.
  */
-function singleDoseConcentration(input: SteadyStateInput, t: number): number {
+export function singleDoseConcentration(input: SteadyStateInput, t: number): number {
   if (t < 0) return 0;
   const { dose_mg, T_inf } = input;
   const R0 = dose_mg / T_inf;
@@ -66,6 +66,32 @@ function singleDoseConcentration(input: SteadyStateInput, t: number): number {
       B / beta  * (1 - Math.exp(-beta  * T_inf)) * Math.exp(-beta  * (t - T_inf))
     );
   }
+}
+
+/**
+ * Area under the concentration-time curve of a SINGLE dose over [from, to]
+ * hours, by trapezoid on a fine grid. Used for the loading-dose workflow, where
+ * the quantity the clinician is shown must be the exposure from the one dose
+ * actually given over a fixed 24 h window — independent of any dosing interval,
+ * since no second dose has been given to define one.
+ */
+export function singleDoseAuc(
+  input: SteadyStateInput,
+  from: number,
+  to: number,
+  step_hours: number = 0.02,
+): number {
+  if (!(to > from)) return 0;
+  const steps = Math.max(1, Math.ceil((to - from) / step_hours));
+  const dt = (to - from) / steps;
+  let area = 0;
+  let previous = singleDoseConcentration(input, from);
+  for (let i = 1; i <= steps; i++) {
+    const current = singleDoseConcentration(input, from + i * dt);
+    area += ((previous + current) / 2) * dt;
+    previous = current;
+  }
+  return area;
 }
 
 export function concentrationAtTime(input: SteadyStateInput & { t: number }): number {

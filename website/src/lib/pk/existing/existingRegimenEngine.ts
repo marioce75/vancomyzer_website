@@ -3,7 +3,7 @@
  */
 
 import { runPosteriorEngine } from "../posterior/posteriorEngine";
-import { computeExposure, curvePoints, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
+import { computeExposure, curvePoints, loadingDoseCurvePoints, singleDoseAuc } from "../steadyStateTwoCompartment";
 import { computeSafeInfusionDurationHours } from "../recommend/infusionSafety";
 import type { ExistingRegimenEngineInput, ExistingRegimenEngineOutput } from "../types";
 import { modelShortName } from "../modelRegistry";
@@ -102,17 +102,17 @@ export function runExistingRegimenEngine(
       }
     }
 
-    // For a loading dose (dose 1), compute actual AUC over first interval via trapezoidal rule
-    // SS AUC overestimates single-dose exposure because it includes accumulation
-    if (isPulseDose && doseCycle.length > 1) {
-      let trapAuc = 0;
-      for (let i = 1; i < doseCycle.length; i++) {
-        const dt = doseCycle[i].time_hours - doseCycle[i - 1].time_hours;
-        const avgC = (doseCycle[i].concentration + doseCycle[i - 1].concentration) / 2;
-        trapAuc += dt * avgC;
-      }
-      // Scale to 24h equivalent for clinical comparison with AUC₂₄ target
-      auc24 = trapAuc * (24 / tau);
+    // For a loading dose (dose 1), report the area under the first 24 hours of
+    // that single dose. This previously integrated the first interval and scaled
+    // by 24/tau, which made a number labelled "first-dose AUC24" depend on an
+    // interval at which no dose had yet been given: the same 1500 mg dose and
+    // the same measured level read 476 at q8h, 408 at q12h and 274 at q24h —
+    // straddling the 400-600 target boundary on a value the clinician could not
+    // trace to any input, because the interval control is hidden in pulse mode.
+    // AUC0-24 of one dose is interval-independent, which is what the label
+    // promises and what the 400-600 target is compared against.
+    if (isPulseDose) {
+      auc24 = singleDoseAuc({ CL, V1, Q, V2, dose_mg, tau, T_inf }, 0, 24);
     }
   }
 
@@ -130,7 +130,7 @@ export function runExistingRegimenEngine(
   }));
 
   const steadyStateNote = isPulseDose
-    ? "Loading dose simulation (single dose). AUC₂₄ is the first-dose extrapolation, not steady-state."
+    ? "Loading dose simulation (single dose). AUC₂₄ is the area under the first 24 hours of this one dose, not steady-state exposure."
     : isNonSteadyState
       ? `Non-steady-state analysis based on ${doses_given} dose${doses_given === 1 ? "" : "s"}.`
       : "Steady-state assumed (≥5 doses).";

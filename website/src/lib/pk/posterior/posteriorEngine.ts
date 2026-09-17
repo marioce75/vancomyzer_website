@@ -73,7 +73,9 @@ export function runPosteriorEngine(
     tau: context.tau,
     T_inf: context.T_inf,
     observations,
-    // Pass obesity omega overrides when applicable
+    doses_given: context.doses_given,
+    // Between-subject-variability overrides, when a model supplies them.
+    // Colin 2019 does not, so these are undefined for every shipped result.
     omega_CL: prior.omega_CL,
     omega_V1: prior.omega_V1,
     omega_Q: prior.omega_Q,
