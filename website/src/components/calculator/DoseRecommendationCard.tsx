@@ -21,6 +21,12 @@ interface DoseRecommendationCardProps {
   auc_range_status?: AucRangeStatus | null;
   arc_advisory?: ArcAdvisory | null;
   auc24?: number | null;
+  /**
+   * Predicted exposure of the regimen being recommended. On the existing-regimen
+   * path `auc24` is the CURRENT regimen's exposure, so the below-target banner
+   * must quote this instead or it states the wrong number.
+   */
+  predicted_auc24?: number | null;
   isPulseDose?: boolean;
   loadingDoseMg?: number | null;
   onUndoLoadingDose?: (() => void);
@@ -201,6 +207,7 @@ export default function DoseRecommendationCard({
   auc_range_status,
   arc_advisory,
   auc24: rawAuc24,
+  predicted_auc24,
   isPulseDose,
   loadingDoseMg,
   onUndoLoadingDose,
@@ -434,13 +441,13 @@ export default function DoseRecommendationCard({
       )}
 
       {/* Below-target warning (non-ARC) */}
-      {!arc_advisory?.detected && auc_range_status === "below_target" && rawAuc24 != null && (
+      {!arc_advisory?.detected && auc_range_status === "below_target" && (predicted_auc24 ?? rawAuc24) != null && (
         <div className="rounded-lg border px-4 py-3" style={{ borderColor: "#fca5a5", background: "#fff1f2" }}>
           <p className="text-sm font-bold" style={{ color: "#991b1b", margin: 0 }}>
             AUC₂₄ BELOW TARGET
           </p>
           <p className="mt-1 text-xs" style={{ color: "#7f1d1d", margin: 0 }}>
-            Best available regimen achieves AUC₂₄ of {rawAuc24} mg·h/L, which is below the target range of 400–600 mg·h/L. Clinical review is required — consider more frequent dosing, higher doses, or continuous infusion.
+            The recommended regimen is predicted to achieve AUC₂₄ of {predicted_auc24 ?? rawAuc24} mg·h/L, which is below the target range of 400–600 mg·h/L. Clinical review is required — consider more frequent dosing, higher doses, or continuous infusion.
           </p>
         </div>
       )}

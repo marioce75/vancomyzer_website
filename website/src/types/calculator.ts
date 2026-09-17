@@ -128,6 +128,25 @@ export interface CalculateResponse {
     posterior_predicted_at_levels: { observed: number; predicted: number; relative_error: number }[];
     max_relative_error: number;
   };
+  /**
+   * The engine's own posterior fit diagnostic. Returned so the graph's
+   * uncertainty band can use `uncertainty_label` directly instead of inferring
+   * a width from whatever else happens to be on the response.
+   */
+  posterior_fit?: {
+    observation_count: number;
+    fit_quality: string;
+    fit_quality_reason: string;
+    uncertainty_label: string;
+  };
+  /**
+   * Predicted steady-state exposure of the regimen being recommended, as
+   * distinct from `auc24`/`peak`/`trough`, which on the existing-regimen path
+   * describe the regimen the patient is already on.
+   */
+  predicted_auc24?: number;
+  predicted_peak?: number;
+  predicted_trough?: number;
   recommended_dose: string;
   recommended_interval_hours: number;
   recommended_infusion_duration_hours?: number;

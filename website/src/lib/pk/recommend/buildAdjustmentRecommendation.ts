@@ -150,6 +150,20 @@ function finalizeRecommendation(
     recommended_infusion_duration_hours: infusion.infusion_duration_hours,
     infusion_duration_adjusted_for_safety: infusion.adjusted_for_safety,
     infusion_safety_note: infusion.safety_note,
+    // Keep the exposure simulated just above for the safety caps rather than
+    // discarding it. Without it the adjustment path emitted a regimen and never
+    // said what exposure it expected, so nothing could warn when the emitted
+    // regimen missed the 400-600 target, and the dose card displayed the
+    // CURRENT regimen's AUC in its place.
+    predicted_auc24: Math.round(exposure.auc24 * 10) / 10,
+    predicted_peak: Math.round(exposure.peak * 10) / 10,
+    predicted_trough: Math.round(exposure.trough * 10) / 10,
+    auc_range_status:
+      exposure.auc24 < TARGET_AUC24_LOW
+        ? "below_target"
+        : exposure.auc24 > TARGET_AUC24_HIGH
+          ? "above_target"
+          : "in_range",
   };
 }
 

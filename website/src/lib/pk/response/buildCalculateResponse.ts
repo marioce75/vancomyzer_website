@@ -151,6 +151,19 @@ export function buildCalculateResponse(
     documentation_preview: explain.documentation_preview,
     curve_engine_recommended: engineOutput.curve_engine_recommended,
     fit_diagnostic: engineOutput.fit_diagnostic,
+    // The engine's own fit diagnostic, so the graph's uncertainty band can use
+    // uncertainty_label directly rather than reconstructing a width from other
+    // fields that happen to encode it.
+    posterior_fit: engineOutput.posterior_fit,
+    // Where the regimen this response actually recommends sits against the
+    // 400-600 band, plus the exposure it is predicted to produce. The empiric
+    // path has always reported these; the adjustment path reported neither, so
+    // a recommendation that missed target shipped with no banner and the card
+    // displayed the CURRENT regimen's exposure instead of the proposed one.
+    auc_range_status: recommendation.auc_range_status,
+    predicted_auc24: recommendation.predicted_auc24,
+    predicted_peak: recommendation.predicted_peak,
+    predicted_trough: recommendation.predicted_trough,
     adjustment_dosing_blocked: recommendation.adjustment_dosing_blocked,
   };
 }

@@ -126,11 +126,32 @@ so the red ARC card, the below-target banner, the late-draw timing warnings and 
 warning could never render. The text still reached clinicians through `interpretation_summary` and
 the clinical note, but every dedicated panel was dead code.
 
+### Adjustment-path exposure, fit diagnostic, and workspace layout — 16 Sep 2026
+
+**`posterior_fit` is now returned.** The graph's uncertainty band reads the engine's own
+`uncertainty_label` directly instead of reconstructing a width from whatever else the response
+happens to carry. The reconstruction stays as the fallback for a result restored from an older
+session snapshot.
+
+**The adjustment path now reports the exposure it recommends.** `finalizeRecommendation` already
+simulated peak, trough and AUC24 to run the safety caps and then threw them away, so an
+existing-regimen recommendation shipped without ever stating the exposure it expected: nothing
+could fire the below-target banner, and the dose card fell back to displaying the exposure of the
+regimen the patient was *already on*. The recommendation now carries `predicted_auc24`,
+`predicted_peak`, `predicted_trough` and `auc_range_status`, and the banner quotes the recommended
+regimen instead of the current one.
+
+**Workspace layout.** The analysis column is a two-column grid at `xl`: dose card, exposure
+metrics, concentration-time graph and signal strip in the main column, with the advisory stack in a
+parallel rail. The advisories previously ran full width *above* the results and pushed the
+concentration-time graph below the fold, so the clinician had to scroll to see the curve. Nothing is
+hidden or collapsed by the move, and below `xl` the grid returns to the original single-column
+order. Separately, the derivation panel in `PKParametersMath` now starts collapsed — it runs ~350px
+expanded and its own Show Math toggle sits directly above it — and the workspace header is a single
+line. The right column is its own scroll region (`CalculatorLayout.tsx:19`), so these reductions are
+what decide whether the first screen holds everything.
+
 ### Still open in the engine (not fixed here)
-- `posterior_fit` is still not returned in the API response, so the graph's uncertainty band
-  cannot use the engine's own label. (The four dropped warning fields are fixed — see above.)
-- `auc_range_status` is still not produced on the existing-regimen path, so the below-target
-  banner fires only in the empiric workflow even now that the field reaches the UI.
 - `normalizePatient` turns missing weight into 70 kg and missing SCr into 1.0; SCr 0.1–0.39 is
   floored to 0.4 and notes print 0.4. (The 300 kg ceiling is fixed; the defaults are not.)
 - Mixing manual-hours and date/time levels still gives misleading rejections.
@@ -149,8 +170,6 @@ Reproduced by execution in the 15–16 Sep engine audit, deliberately left alone
   heuristic candidate failed the hard cap first.
 - **The empiric tie-break prefers the longest interval**, offering a 45 kg adult 2000 mg q24h
   (44 mg/kg) over 1000 mg q12h at identical predicted AUC.
-- **No warning when an adjustment misses target**: 1500 mg q8h at AUC24 385 ships with no
-  below-target banner, and the card displays the *previous* regimen's exposure.
 - **Institutional dose ceilings are ignored** — /settings values are validated, saved, never read.
 - Fixed Q, uncapped Cockcroft–Gault, the SCr 0.4 floor, and an unbounded curve horizon at very
   low clearance (a 6.18-year, 11.6 MB curve for one request).

@@ -129,7 +129,10 @@ const PARAM_LABELS: { key: ParamKey; label: string; unit: string }[] = [
 const RETIRED = VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED;
 
 export default function PKParametersMath({ params }: PKParametersMathProps) {
-  const [showMath, setShowMath] = useState(true);
+  // Collapsed by default. Expanded, the derivation runs ~350px and pushed the
+  // concentration-time graph below the fold, so the clinician had to scroll to
+  // see the curve. Nothing is hidden: the Show Math toggle sits directly above.
+  const [showMath, setShowMath] = useState(false);
 
   useEffect(() => {
     try {

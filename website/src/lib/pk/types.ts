@@ -108,6 +108,20 @@ export interface AdjustmentRecommendation {
   recommended_infusion_duration_hours?: number;
   infusion_duration_adjusted_for_safety?: boolean;
   infusion_safety_note?: string;
+  /**
+   * Predicted steady-state exposure of the regimen this recommendation actually
+   * emits, and where it sits against the 400-600 target band.
+   *
+   * finalizeRecommendation already simulates these to run the safety caps and
+   * used to discard them, so the adjustment path shipped a regimen without ever
+   * stating the exposure it expected: nothing could warn when the emitted
+   * regimen missed target, and the dose card fell back to displaying the
+   * CURRENT regimen's AUC in its place.
+   */
+  predicted_auc24?: number;
+  predicted_peak?: number;
+  predicted_trough?: number;
+  auc_range_status?: "in_range" | "below_target" | "above_target";
   interpretation_summary?: string;
   assumptions?: string[];
   limitations?: string[];
