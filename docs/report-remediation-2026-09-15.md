@@ -17,6 +17,13 @@ Branch: `report-remediation-2026-09-15` (base `389c3b1`). Model manifest: `2026-
    $1,000/mo (11–20), card at signup; Hospital by quote.
 4. **Delivery:** commit and push this branch; no merge to `main`, no deploy.
 
+> **Correction, 16 Sep 2026.** Decision 4 no longer describes reality, and this document repeated
+> "`main` is still at `389c3b1`" without checking. `origin/main` is at **`b736b87`** — it already
+> contains the first seven commits of this branch (Colin 2019 for every adult, the retired obesity
+> model, the evidence-page rewrites, the public-claims changes). If the host redeploys from `main`,
+> that work is already in production. The four engine commits — `7d8a983`, `74c3c73`, `525b44f`,
+> `ce07967` — are **not** on `main`.
+
 ## What changed
 
 | Area | Change |
