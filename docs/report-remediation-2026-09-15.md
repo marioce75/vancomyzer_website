@@ -148,15 +148,22 @@ regimen the patient was *already on*. The recommendation now carries `predicted_
 `predicted_peak`, `predicted_trough` and `auc_range_status`, and the banner quotes the recommended
 regimen instead of the current one.
 
-**Workspace layout.** The analysis column is a two-column grid at `xl`: dose card, exposure
-metrics, concentration-time graph and signal strip in the main column, with the advisory stack in a
-parallel rail. The advisories previously ran full width *above* the results and pushed the
-concentration-time graph below the fold, so the clinician had to scroll to see the curve. Nothing is
-hidden or collapsed by the move, and below `xl` the grid returns to the original single-column
-order. Separately, the derivation panel in `PKParametersMath` now starts collapsed — it runs ~350px
-expanded and its own Show Math toggle sits directly above it — and the workspace header is a single
-line. The right column is its own scroll region (`CalculatorLayout.tsx:19`), so these reductions are
-what decide whether the first screen holds everything.
+**Workspace layout — attempted, then reverted.** The analysis column was reflowed into a two-column
+grid at `xl`, moving the advisory stack into a parallel rail so the concentration-time graph would
+land on the first screen. It broke the calculator. Row 1 is a `grid-cols-[1fr_auto]` whose `auto`
+track holds the PREDICTED PK panel, and that panel's Colin citation is one long unbroken line — so
+inside the narrower column the `auto` track claimed the full width and collapsed the `1fr` dose
+track to zero. The SUGGESTED DOSE card, the frequency options and everything below them stopped
+being visible.
+
+It typechecked, passed every test and built cleanly, which is exactly why no gate caught it: the
+failure is purely a rendered-width collapse, and it was shipped without anyone seeing it rendered.
+Reverted in `e14af36` and verified against `74c3c73` — the only remaining differences in that file
+are the `posterior_fit` comment and the four `setResult` fields, with no layout residue.
+
+The one change kept is that the derivation panel in `PKParametersMath` starts collapsed: a different
+file, not part of the breakage, and reversible from its own Show Math toggle. The graph therefore
+still sits below the fold. Fixing that properly needs a change someone can look at before it ships.
 
 ### Dosing changes — approved by Mario and implemented 16 Sep 2026
 
