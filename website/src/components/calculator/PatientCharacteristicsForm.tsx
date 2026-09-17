@@ -18,23 +18,28 @@ interface PatientCharacteristicsFormProps {
   bedbound: boolean;
   onBedboundChange: (val: boolean) => void;
   onBedboundLoadingDoseChange?: (data: BedboundDoseData | null) => void;
+  /**
+   * Engine-reported estimated CrCl (context only, parsed from the last fresh
+   * result's key_inputs). Shown beside SCr; never enters any calculation.
+   */
+  estimatedCrCl?: { value: number; note: string } | null;
 }
 
 const inputClass = (hasError: boolean) =>
-  `block w-full h-10 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 transition-colors ${
+  `block w-full h-9 px-2.5 border rounded-md text-sm focus:outline-none focus:ring-1 transition-colors ${
     hasError
       ? "border-red-500 ring-1 ring-red-500 bg-[rgba(239,68,68,0.06)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
       : "border-[var(--navy-border-strong)] bg-[rgba(255,255,255,0.05)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:ring-[var(--teal)] focus:border-[var(--teal)]"
   }`;
 
 const Label = ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) => (
-  <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-600 mb-1">
+  <label htmlFor={htmlFor} className="block text-xs font-semibold text-slate-600 mb-0.5">
     {children}
   </label>
 );
 
 const FormRow = ({ children }: { children: React.ReactNode }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+  <div className="grid grid-cols-2 gap-x-3 gap-y-2">
     {children}
   </div>
 );
@@ -55,6 +60,7 @@ export default function PatientCharacteristicsForm({
   bedbound,
   onBedboundChange,
   onBedboundLoadingDoseChange,
+  estimatedCrCl = null,
 }: PatientCharacteristicsFormProps) {
   const [blurErrors, setBlurErrors] = useState<Record<string, string>>({});
   const [blurWarnings, setBlurWarnings] = useState<Record<string, string>>({});
@@ -64,7 +70,7 @@ export default function PatientCharacteristicsForm({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2.5">
       <FormRow>
         <InputGroup label="Age (years)">
           <ClinicalNumberInput
@@ -83,6 +89,19 @@ export default function PatientCharacteristicsForm({
           />
           {(blurErrors.age) && <p className="mt-1 text-xs text-red-600">{blurErrors.age}</p>}
         </InputGroup>
+        <InputGroup label="Sex">
+          <select
+            value={value.sex || ""}
+            onChange={(e) => update("sex", e.target.value)}
+            className={inputClass(false)}
+          >
+            <option value="">— Select —</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </InputGroup>
+      </FormRow>
+      <FormRow>
         <InputGroup label="Weight (kg)">
           <ClinicalNumberInput
             inputMode="decimal"
@@ -100,7 +119,23 @@ export default function PatientCharacteristicsForm({
           />
           {blurErrors.weight && <p className="mt-1 text-xs text-red-600">{blurErrors.weight}</p>}
         </InputGroup>
+        <InputGroup label="Height (cm)">
+          <ClinicalNumberInput
+            inputMode="decimal"
+            value={value.height_cm}
+            onValueChange={(n) => update("height_cm", n)}
+            onBlurValue={(_v, _raw, parseError) => {
+              setBlurErrors((prev) => ({ ...prev, height: parseError ?? "" }));
+            }}
+            className={(invalidText) => inputClass(Boolean(fieldErrors["patient.height_cm"] || blurErrors.height || invalidText))}
+            placeholder="e.g. 170"
+          />
+          {blurErrors.height && <p className="mt-1 text-xs text-red-600">{blurErrors.height}</p>}
+        </InputGroup>
       </FormRow>
+
+      {/* Renal function */}
+      <p className="vz-kicker pt-1" style={{ borderTop: "1px solid var(--color-border)", paddingTop: 6 }}>Renal function</p>
       <FormRow>
         <InputGroup label="Serum Creatinine (mg/dL)">
           {/* Parsed with parseClinicalNumber: "1,2" is 1.2, never 1. Unparseable
@@ -131,40 +166,46 @@ export default function PatientCharacteristicsForm({
             className={(invalidText) => inputClass(Boolean(fieldErrors["patient.serum_creatinine_mg_dl"] || blurErrors.scr || invalidText))}
             placeholder="e.g. 1.1"
           />
-          <p className="mt-1 text-[11px] text-slate-500">mg/dL (µmol/L ÷ 88.4)</p>
+          <p className="mt-0.5 text-[10px] text-slate-500">µmol/L ÷ 88.4</p>
           {blurErrors.scr && <p className="mt-1 text-xs text-red-600">{blurErrors.scr}</p>}
           {!blurErrors.scr && blurWarnings.scr && <p className="mt-1 text-xs text-amber-700">⚠ {blurWarnings.scr}</p>}
         </InputGroup>
+        {/* Renal Replacement Therapy guard — required before the engine runs */}
+        <div>
+          <Label>Renal replacement therapy</Label>
+          <div className="vz-seg w-full" role="group" aria-label="Renal replacement therapy">
+            {([false, true] as const).map((val) => (
+              <button
+                key={String(val)}
+                type="button"
+                aria-pressed={rrt === val}
+                onClick={() => onRrtChange?.(val)}
+                className="flex-1"
+                style={rrt === val && val ? { background: "#b91c1c", color: "#fff" } : undefined}
+              >
+                {val ? "Yes" : "No"}
+              </button>
+            ))}
+          </div>
+        </div>
       </FormRow>
-
-      {/* Height + Sex — optional. Neither changes the model: height gives BMI (high-BMI
-          advisory and unit check); sex is used only for the informational FFM/CrCl comparison. */}
-      <FormRow>
-        <InputGroup label="Height (cm)">
-          <ClinicalNumberInput
-            inputMode="decimal"
-            value={value.height_cm}
-            onValueChange={(n) => update("height_cm", n)}
-            onBlurValue={(_v, _raw, parseError) => {
-              setBlurErrors((prev) => ({ ...prev, height: parseError ?? "" }));
-            }}
-            className={(invalidText) => inputClass(Boolean(fieldErrors["patient.height_cm"] || blurErrors.height || invalidText))}
-            placeholder="e.g. 170"
-          />
-          {blurErrors.height && <p className="mt-1 text-xs text-red-600">{blurErrors.height}</p>}
-        </InputGroup>
-        <InputGroup label="Sex">
-          <select
-            value={value.sex || ""}
-            onChange={(e) => update("sex", e.target.value)}
-            className={inputClass(false)}
-          >
-            <option value="">— Select —</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </InputGroup>
-      </FormRow>
+      <p className={`-mt-1 text-[10px] ${rrt === null ? "text-amber-700 font-semibold" : "text-slate-500"}`}>
+        {rrt === null ? "RRT (CRRT, HD or PD) — required before the calculator can run." : "CRRT, hemodialysis or peritoneal dialysis."}
+      </p>
+      {estimatedCrCl && (
+        <div className="-mt-1 flex flex-wrap items-baseline gap-x-2 text-xs" style={{ color: "var(--color-secondary)" }} role="status">
+          <span className="font-semibold">Est. CrCl {estimatedCrCl.value} mL/min</span>
+          <span className="text-[10px] text-slate-500">{estimatedCrCl.note} · context only; the dose is calculated from SCr</span>
+        </div>
+      )}
+      {rrt === true && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2" role="alert">
+          <p className="text-xs font-semibold text-red-800">⚠ Calculator blocked</p>
+          <p className="mt-0.5 text-xs text-red-700 leading-5">
+            The {COLIN_2019.shortName} model is not validated for patients on renal replacement therapy (CRRT, HD, PD). Use a specialist RRT-specific dosing protocol or consult pharmacy.
+          </p>
+        </div>
+      )}
 
       {/* BMI, unit check and high-BMI advisory. Information only: there is no
           model switch at any BMI (Colin 2019 is used for every adult). */}
@@ -201,57 +242,20 @@ export default function PatientCharacteristicsForm({
         return advisory ? <p className="text-xs text-amber-700">⚠ {advisory}</p> : null;
       })()}
 
-      {/* Renal Replacement Therapy guard */}
-      <div className={`rounded-xl border px-4 py-3 ${rrt === null ? "border-amber-300 bg-amber-50" : "border-slate-200 bg-slate-50"}`}>
-        <p className="text-sm font-medium text-slate-700 mb-1">
-          Renal Replacement Therapy (RRT)?
-          <span className="ml-1.5 text-xs font-normal text-amber-600">{rrt === null ? "— required" : ""}</span>
-        </p>
-        <p className="text-xs text-slate-500 mb-2">CRRT, hemodialysis, peritoneal dialysis</p>
-        <div className="flex gap-2">
-          {([false, true] as const).map((val) => (
-            <button
-              key={String(val)}
-              type="button"
-              onClick={() => onRrtChange?.(val)}
-              className={`flex-1 rounded-lg border py-2 text-sm font-semibold transition ${
-                rrt === val
-                  ? val
-                    ? "border-red-300 bg-red-600 text-white shadow-sm"
-                    : "border-emerald-300 bg-emerald-600 text-white shadow-sm"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-100"
-              }`}
-            >
-              {val ? "Yes" : "No"}
-            </button>
-          ))}
-        </div>
-        {rrt === null && (
-          <p className="mt-2 text-xs text-amber-700">Please select before the calculator can run.</p>
-        )}
-        {rrt === true && (
-          <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-            <p className="text-xs font-semibold text-red-800">⚠ Calculator blocked</p>
-            <p className="mt-0.5 text-xs text-red-700 leading-5">
-              The {COLIN_2019.shortName} model is not validated for patients on renal replacement therapy (CRRT, HD, PD). Use a specialist RRT-specific dosing protocol or consult pharmacy.
-            </p>
-          </div>
-        )}
-      </div>
-
       {/* Bedbound/Geriatric toggle */}
       <div>
         <button
           type="button"
           onClick={() => onBedboundChange(!bedbound)}
-          className={`w-full flex items-center justify-between rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${
+          aria-pressed={bedbound}
+          className={`w-full flex items-center justify-between rounded-md border px-3 py-1.5 text-xs font-semibold transition ${
             bedbound
               ? "border-amber-300 bg-amber-100 text-amber-900"
               : "border-slate-200 bg-white text-slate-600 hover:border-amber-200 hover:bg-amber-50"
           }`}
         >
           <span className="flex items-center gap-2">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="1" y="12" width="18" height="3" fill="var(--color-primary)"/>
               <rect x="1" y="5" width="2" height="10" fill="var(--color-primary)"/>
               <rect x="17" y="9" width="2" height="6" fill="var(--color-primary)"/>

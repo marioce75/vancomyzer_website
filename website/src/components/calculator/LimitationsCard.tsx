@@ -17,19 +17,19 @@ export default function LimitationsCard({
   const remaining = featuredLimitation ? list.slice(1) : list;
 
   return (
-    <section className="mt-6 rounded-lg border border-gray-200 bg-white p-4">
-      <h2 className="text-lg font-semibold text-gray-900">Limitations</h2>
-      <div className="mt-4">
+    <section className="mt-3 border-t pt-2" style={{ borderTopColor: "var(--color-border)" }}>
+      <h2 className="vz-kicker m-0 mb-1">Limitations</h2>
+      <div>
         {list.length > 0 ? (
           <>
             {featuredLimitation && (
-              <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 p-3">
-                <p className="text-sm font-medium text-amber-950">Review-critical limitation</p>
-                <p className="mt-1 text-sm text-amber-900">{featuredLimitation}</p>
+              <div className="mb-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5">
+                <p className="text-xs font-semibold text-amber-950">Review-critical limitation</p>
+                <p className="mt-0.5 text-xs text-amber-900">{featuredLimitation}</p>
               </div>
             )}
             {remaining.length > 0 && (
-              <ul className="list-disc space-y-1 pl-5 text-sm text-gray-700">
+              <ul className="list-disc space-y-1 pl-4 text-xs text-gray-700">
                 {remaining.map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
@@ -37,7 +37,7 @@ export default function LimitationsCard({
             )}
           </>
         ) : (
-          <p className="text-sm text-gray-500">
+          <p className="text-xs text-gray-500">
             Run a calculation to see limitations and caution notes.
           </p>
         )}

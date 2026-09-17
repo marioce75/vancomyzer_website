@@ -29,18 +29,19 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
         boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
       }}
     >
-      <div className="flex h-12 sm:h-14 lg:h-[68px] items-center justify-between gap-2 sm:gap-4 lg:gap-6 pl-2 pr-3 sm:pr-5 lg:pr-8">
+      <div className="flex h-12 items-center justify-between gap-2 sm:gap-4 pl-3 pr-3 sm:pr-4" style={{ height: "var(--vz-header-h, 48px)" }}>
 
         {/* ── Brand ──────────────────────────────────────── */}
-        <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0 group" style={{ textDecoration: "none" }}>
-          <div className="min-w-0 hidden sm:block">
+        <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0 group" style={{ textDecoration: "none" }} aria-label="Vancomyzer home">
+          <span className="sm:hidden font-bold vancomyzer-title" style={{ fontSize: 16, letterSpacing: "2px", color: "var(--color-primary)" }}>VZ</span>
+          <div className="min-w-0 hidden sm:flex items-baseline gap-3">
             <h1
-              className="font-bold whitespace-nowrap leading-tight transition-colors vancomyzer-title"
-              style={{ fontSize: "22px", letterSpacing: "4px", color: "var(--color-primary)", textShadow: "0 0 10px var(--color-glow)" }}
+              className="font-bold whitespace-nowrap leading-none transition-colors vancomyzer-title"
+              style={{ fontSize: "18px", letterSpacing: "3px", color: "var(--color-primary)", textShadow: "0 0 10px var(--color-glow)" }}
             >
               VANCOMYZER{"\u2122"}
             </h1>
-            <p className="font-medium leading-none mt-0.5 whitespace-nowrap hidden lg:block" style={{ fontSize: "12px", letterSpacing: "2px", color: "var(--color-secondary)" }}>
+            <p className="font-medium leading-none whitespace-nowrap hidden xl:block" style={{ fontSize: "10px", letterSpacing: "2px", color: "var(--color-secondary)" }}>
               BAYESIAN PK ·{" "}
               <span style={{ fontSize: "11px", letterSpacing: "3px", color: "var(--color-dim)" }}>
                 ENGINEERED BY{" "}
@@ -69,9 +70,9 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           </div>
         </Link>
 
-        {/* Clinical decision support badge — desktop only */}
+        {/* Clinical decision support badge — wide desktop only; the calculator gets the width */}
         <span
-          className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap shrink-0"
+          className="hidden 2xl:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap shrink-0"
           style={{
             border: "1px solid var(--color-primary-a40)",
             background: "var(--color-primary-a05)",
@@ -105,7 +106,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 role="tab"
                 aria-selected={viewMode === value}
                 onClick={() => onViewModeChange(value)}
-                className="px-2.5 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold transition-all"
+                className="px-2 sm:px-3.5 py-1 text-[11px] sm:text-[13px] font-semibold whitespace-nowrap transition-all"
                 style={
                   viewMode === value
                     ? {
@@ -129,10 +130,10 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
         </div>
 
         {/* ── Nav ───────────────────────────────────────── */}
-        <div className="hidden md:flex flex-1 items-center justify-end gap-2">
+        <div className="hidden lg:flex flex-1 items-center justify-end gap-2">
           <Link
             href="/"
-            className="px-3 py-1.5 text-sm font-medium transition"
+            className="px-2.5 py-1 text-[13px] font-medium transition"
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
@@ -149,7 +150,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           </Link>
           <Link
             href="/faq"
-            className="px-3 py-1.5 text-sm font-medium transition"
+            className="px-2.5 py-1 text-[13px] font-medium transition"
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
@@ -166,7 +167,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           </Link>
           <Link
             href="/transparent-dosing"
-            className="px-3 py-1.5 text-sm font-medium transition"
+            className="px-2.5 py-1 text-[13px] font-medium transition"
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
@@ -184,7 +185,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           {userRole === "admin" && (
             <Link
               href="/admin/dashboard"
-              className="px-3 py-1.5 text-sm font-medium transition"
+              className="px-2.5 py-1 text-[13px] font-medium transition"
               style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace", fontWeight: 700 }}
               onMouseEnter={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
@@ -204,7 +205,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             <button
               type="button"
               onClick={onSettingsOpen}
-              className="ml-1 p-2 transition"
+              className="ml-1 p-1.5 transition"
               style={{
                 color: "var(--color-secondary)",
                 border: "1px solid transparent",
@@ -285,8 +286,23 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           )}
         </div>
 
-        {/* ── Mobile actions (visible when nav is hidden) ─── */}
-        <div className="flex md:hidden items-center gap-1">
+        {/* ── Compact actions (below lg, where the nav is hidden) ─── */}
+        <div className="flex lg:hidden items-center gap-1">
+          {onSettingsOpen && (
+            <button
+              type="button"
+              onClick={onSettingsOpen}
+              className="p-1.5"
+              style={{ color: "var(--color-secondary)", border: "1px solid transparent", background: "transparent", cursor: "pointer" }}
+              aria-label="Clinical settings"
+              title="Clinical settings"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" aria-hidden="true">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+            </button>
+          )}
           {userRole === "admin" && (
             <Link
               href="/admin/dashboard"

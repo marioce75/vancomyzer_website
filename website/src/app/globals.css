@@ -804,3 +804,285 @@ body.theme-basic .manifesto-dark a.cta-outline {
   background-color: transparent !important;
   border-color: #cbd5e1 !important;
 }
+
+/* ── Calculator workstation (clinical cockpit) ──────────────────
+   Layout primitives for /calculator. The major workspace is a CSS
+   grid; component internals stay Flexbox. Breakpoints match Tailwind:
+   lg 1024px (rail + stacked workspace), xl 1280px (rail + graph +
+   side rail). Below lg the page is a single scrolling column.
+   ─────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Regulatory strip height on desktop (single line at ≥1024px). The
+     calculator subtracts it from the viewport so the app never overflows. */
+  --vz-footer-h: 33px;
+  --vz-header-h: 48px;
+  --vz-rail-w: clamp(296px, 24vw, 360px);
+  --vz-side-w: clamp(324px, 25vw, 400px);
+  --vz-gap: 8px;
+}
+
+.vz-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+@media (min-width: 1024px) {
+  .vz-app {
+    height: calc(100dvh - var(--vz-footer-h));
+    overflow: hidden;
+  }
+  /* Two lines at 1024–1279px, one line from 1280px (measured with Inter 11px). */
+  :root { --vz-footer-h: 49px; }
+  .vz-regulatory-footer {
+    height: var(--vz-footer-h);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+}
+@media (min-width: 1280px) {
+  :root { --vz-footer-h: 33px; }
+}
+
+/* Two-zone shell: input rail + workspace */
+.vz-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+@media (min-width: 1024px) {
+  .vz-shell {
+    display: grid;
+    grid-template-columns: var(--vz-rail-w) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    overflow: hidden;
+  }
+  .vz-rail {
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .vz-workspace {
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Workspace grid: band across the top, graph + side rail below */
+.vz-results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vz-gap);
+  min-height: 0;
+}
+@media (min-width: 1280px) {
+  .vz-results {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--vz-side-w);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      "band band"
+      "advisories advisories"
+      "graph side";
+    flex: 1 1 auto;
+  }
+  .vz-results > .vz-area-band { grid-area: band; }
+  .vz-results > .vz-area-advisories { grid-area: advisories; }
+  .vz-results > .vz-area-graph { grid-area: graph; min-height: 0; }
+  .vz-results > .vz-area-side { grid-area: side; min-height: 0; overflow-y: auto; }
+}
+@media (min-width: 1024px) {
+  .vz-results { flex: 1 1 auto; }
+}
+
+/* Panel chrome — one consistent surface instead of card soup */
+.vz-panel {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  min-width: 0;
+}
+.vz-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 10px;
+  min-height: 30px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-highlight);
+}
+.vz-panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+.vz-kicker {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-dim);
+}
+.vz-num { font-variant-numeric: tabular-nums; }
+
+/* Input rail sections */
+.vz-section { border-bottom: 1px solid var(--color-border); }
+.vz-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 12px;
+  background: var(--color-highlight);
+  border-bottom: 1px solid var(--color-border);
+}
+.vz-section-body { padding: 8px 12px 10px; }
+
+/* Compact clinical inputs */
+.vz-field label { font-size: 12px; font-weight: 600; color: var(--color-secondary); margin-bottom: 2px; display: block; }
+.vz-input {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 0 9px;
+  font-size: 14px;
+  border: 1px solid #a0aec0;
+  border-radius: 4px;
+  background: #fff;
+  color: #1a202c;
+  font-variant-numeric: tabular-nums;
+}
+.vz-input[aria-invalid="true"] { border-color: #dc2626 !important; box-shadow: 0 0 0 1px #dc2626 !important; }
+
+/* Segmented control */
+.vz-seg { display: inline-flex; border: 1px solid #c5cdd8; border-radius: 4px; overflow: hidden; }
+.vz-seg > button {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #fff;
+  color: #4a5568;
+  border: 0;
+  border-right: 1px solid #c5cdd8;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.vz-seg > button:last-child { border-right: 0; }
+.vz-seg > button[aria-pressed="true"] { background: #2b6cb0; color: #fff; }
+.vz-seg > button:hover:not([aria-pressed="true"]) { background: #edf2f7; }
+.vz-seg > button:focus-visible { outline: 2px solid #2b6cb0; outline-offset: -2px; }
+
+/* Advisory rows — severity by border + icon + label, never color alone */
+.vz-advisory {
+  display: block;
+  padding: 5px 10px;
+  border: 1px solid;
+  border-left-width: 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  min-width: 0;
+}
+.vz-advisory--info    { border-color: #90cdf4; border-left-color: #2b6cb0; background: #ebf8ff; color: #1e3a5f; }
+.vz-advisory--caution { border-color: #fcd34d; border-left-color: #d97706; background: #fffbeb; color: #78350f; }
+.vz-advisory--warning { border-color: #fca5a5; border-left-color: #dc2626; background: #fef2f2; color: #7f1d1d; }
+.vz-advisory--success { border-color: #6ee7b7; border-left-color: #059669; background: #ecfdf5; color: #064e3b; }
+.vz-advisory-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+}
+@media (max-width: 639px) {
+  .vz-advisory-row { grid-template-columns: auto minmax(0, 1fr); }
+  .vz-advisory-row > :nth-child(3) { grid-column: 2; }
+}
+.vz-advisory summary { cursor: pointer; list-style: none; }
+.vz-advisory summary::-webkit-details-marker { display: none; }
+
+/* Status chips */
+.vz-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 18px;
+}
+.vz-chip--ok      { background: #ecfdf5; border-color: #6ee7b7; color: #047857; }
+.vz-chip--caution { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+.vz-chip--warn    { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
+.vz-chip--neutral { background: #edf2f7; border-color: #cbd5e0; color: #4a5568; }
+
+/* Comparison table */
+.vz-table { width: 100%; border-collapse: collapse; font-size: 11.5px; table-layout: auto; }
+.vz-table th {
+  text-align: right;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-dim);
+  padding: 4px 5px;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+.vz-table th:first-child, .vz-table td:first-child { text-align: left; }
+.vz-table td { padding: 5px 4px; text-align: right; border-bottom: 1px solid var(--color-border); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vz-table td:first-child { white-space: normal; }
+.vz-table tr[role="radio"] { cursor: pointer; }
+.vz-table tr[role="radio"]:hover td { background: #edf2f7; }
+.vz-table tr[role="radio"][aria-checked="true"] td { background: #dbeafe; font-weight: 600; }
+.vz-table tr[role="radio"][aria-checked="true"] td:first-child { box-shadow: inset 3px 0 0 #2b6cb0; }
+.vz-table tr[role="radio"]:focus-visible { outline: 2px solid #2b6cb0; outline-offset: -2px; }
+
+/* Detail tabs */
+.vz-tabs { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 1px solid var(--color-border); background: var(--color-highlight); }
+.vz-tabs > button {
+  padding: 6px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-dim);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.vz-tabs > button[aria-selected="true"] { color: var(--color-primary); border-bottom-color: var(--color-primary); background: var(--color-card); }
+.vz-tabs > button:focus-visible { outline: 2px solid #2b6cb0; outline-offset: -2px; }
+
+/* Key/value list for PK & method details */
+.vz-kv { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; row-gap: 3px; font-size: 12px; }
+.vz-kv dt { color: var(--color-dim); font-weight: 600; white-space: nowrap; }
+.vz-kv dd { margin: 0; color: var(--color-secondary); min-width: 0; overflow-wrap: anywhere; }
+
+/* Result obscured while inputs are stale or the model is running */
+.vz-obscured { position: relative; }
+.vz-obscured > .vz-obscured-content { filter: blur(6px); opacity: 0.35; pointer-events: none; user-select: none; }
+.vz-obscured > .vz-obscured-overlay {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  z-index: 2; pointer-events: none;
+}
+
+/* Graph fills its panel on desktop */
+.vz-graph-fill { display: flex; flex-direction: column; min-height: 0; height: 100%; }
+.vz-graph-fill canvas { flex: 1 1 auto; min-height: 220px; height: auto !important; }

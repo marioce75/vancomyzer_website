@@ -55,7 +55,12 @@ for file in "${FILES_TO_CHECK[@]}"; do
     # Extract function name — look at the surrounding context, not just the
     # line with the return type (function name may be 10+ lines earlier in
     # a multi-line signature). Most recent `function NAME(` wins.
-    fnname=$(echo "$context" | grep -oE 'function [A-Za-z_][A-Za-z0-9_]*' | tail -1 | sed 's/^function //')
+    # Both `function NAME(` and `const NAME = (` (arrow) declarations count.
+    # `|| true` keeps an empty grep from aborting the script under
+    # `set -o pipefail` — that abort made the check exit 1 on a clean tree.
+    fnname=$(echo "$context" \
+      | grep -oE '(function [A-Za-z_][A-Za-z0-9_]*|const [A-Za-z_][A-Za-z0-9_]* *=)' \
+      | tail -1 | sed -E 's/^function //; s/^const //; s/ *=$//' || true)
 
     is_chokepoint=false
     for cp in "${CHOKEPOINTS[@]}"; do

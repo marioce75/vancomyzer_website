@@ -22,21 +22,16 @@ import RegimenForm from "@/components/calculator/RegimenForm";
 import LevelEntryTable, { manualHoursCollectionTime } from "@/components/calculator/LevelEntryTable";
 import CalculatorActionBar from "@/components/calculator/CalculatorActionBar";
 import PrimaryMetricsCard from "@/components/calculator/PrimaryMetricsCard";
-import DoseRecommendationCard from "@/components/calculator/DoseRecommendationCard";
+import DoseRecommendationCard, { LoadingDosePopover } from "@/components/calculator/DoseRecommendationCard";
 import TeachingNote from "@/components/calculator/TeachingNote";
-import ClinicalSignalStrip from "@/components/calculator/ClinicalSignalStrip";
+import Advisory from "@/components/calculator/Advisory";
+import InputSection from "@/components/calculator/InputSection";
+import RegimenComparisonTable from "@/components/calculator/RegimenComparisonTable";
+import ResultDetailTabs from "@/components/calculator/ResultDetailTabs";
 import InterpretationSummaryCard from "@/components/calculator/InterpretationSummaryCard";
-import AssumptionsCard from "@/components/calculator/AssumptionsCard";
 import LimitationsCard from "@/components/calculator/LimitationsCard";
 import ConcentrationTimeGraph from "@/components/calculator/ConcentrationTimeGraph";
-import ClinicalNotePreview from "@/components/calculator/ClinicalNotePreview";
-import CalculatorLoadingState from "@/components/calculator/CalculatorLoadingState";
 import CalculatorErrorState from "@/components/calculator/CalculatorErrorState";
-import CalculatorResultState from "@/components/calculator/CalculatorResultState";
-import ResultScopeBanner from "@/components/calculator/ResultScopeBanner";
-import CalculationDetailsCard from "@/components/calculator/CalculationDetailsCard";
-import DataFitReviewabilityPanel from "@/components/calculator/DataFitReviewabilityPanel";
-import RegimenSuggestionCard from "@/components/calculator/RegimenSuggestionCard";
 import SettingsPanel from "@/components/calculator/SettingsPanel";
 import DisclaimerModal from "@/components/calculator/DisclaimerModal";
 import PKParametersMath from "@/components/calculator/PKParametersMath";
@@ -49,7 +44,7 @@ import { useFeature } from "@/hooks/useFeature";
 import { printReport, type ReportData } from "@/lib/generateReport";
 import { track } from "@/lib/analytics";
 import { parseClinicalNumber } from "@/lib/parseClinicalNumber";
-import { COLIN_2019, modelDisplayName } from "@/lib/pk/modelRegistry";
+import { COLIN_2019, modelDisplayName, modelShortName } from "@/lib/pk/modelRegistry";
 const defaultPatient: CalculateRequestPatient = { age: 0, weight_kg: 0, height_cm: 0, sex: "", serum_creatinine_mg_dl: 0 };
 const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0 };
 const defaultLevel = { value_mcg_ml: 0, collection_time: "", time_since_last_dose_hours: 0 };
@@ -104,38 +99,6 @@ function deriveBandUncertaintyLabel(result: CalculateResponse): BandUncertaintyL
   return label;
 }
 
-function TypewriterLoop({ text, interval = 5000 }: { text: string; interval?: number }) {
-  const [displayed, setDisplayed] = useState("");
-  const [phase, setPhase] = useState<"typing" | "visible" | "erasing">("typing");
-  const idxRef = useRef(0);
-
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    if (phase === "typing") {
-      if (idxRef.current < text.length) {
-        timer = setTimeout(() => {
-          idxRef.current += 1;
-          setDisplayed(text.slice(0, idxRef.current));
-        }, 60);
-      } else {
-        timer = setTimeout(() => setPhase("erasing"), interval);
-      }
-    } else if (phase === "erasing") {
-      if (idxRef.current > 0) {
-        timer = setTimeout(() => {
-          idxRef.current -= 1;
-          setDisplayed(text.slice(0, idxRef.current));
-        }, 30);
-      } else {
-        timer = setTimeout(() => setPhase("typing"), 400);
-      }
-    }
-    return () => clearTimeout(timer);
-  }, [displayed, phase, text, interval]);
-
-  return <span className="mx-typewriter">{displayed}</span>;
-}
-
 function hasPatientCoreData(patient: typeof defaultPatient): boolean {
   return (
     patient.age > 0 &&
@@ -144,100 +107,25 @@ function hasPatientCoreData(patient: typeof defaultPatient): boolean {
   );
 }
 
-function SectionToggle({
-  id,
-  title,
-  subtitle,
-  completed,
-  activeSection,
-  onToggle,
-}: {
-  id: string;
-  title: string;
-  subtitle: string;
-  completed: boolean;
-  activeSection: string;
-  onToggle: (id: string) => void;
-}) {
-  const isActive = activeSection === id;
-
-  return (
-    <button
-      type="button"
-      className="mt-3 flex w-full items-center justify-between border px-4 py-3 text-left transition first:mt-0"
-      style={
-        isActive
-          ? { background: "var(--color-highlight)", borderColor: "var(--color-primary-a50)", borderLeft: "3px solid var(--color-primary)" }
-          : { background: "var(--color-card)", borderColor: "var(--color-border)" }
-      }
-      onClick={() => onToggle(id)}
-      aria-expanded={isActive}
-      aria-controls={`section-panel-${id}`}
-      onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "var(--color-highlight)"; }}
-      onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "var(--color-card)"; }}
-    >
-      <div className="flex items-start gap-3">
-        <span
-          className="mt-0.5 inline-flex h-6 w-6 items-center justify-center border text-[11px] font-semibold"
-          style={
-            completed
-              ? { border: "1px solid #6ee7b7", background: "#ecfdf5", color: "#047857", fontFamily: "'Share Tech Mono', monospace" }
-              : { border: "1px solid #fcd34d", background: "#fffbeb", color: "#92400e", fontFamily: "'Share Tech Mono', monospace" }
-          }
-        >
-          {completed ? "OK" : "IN"}
-        </span>
-        <span>
-          <span
-            className="block text-sm font-semibold"
-            style={{ color: isActive ? "var(--color-primary)" : "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
-          >
-            {title}
-          </span>
-          <span
-            className="mt-0.5 block text-xs"
-            style={{ color: isActive ? "var(--color-secondary)" : "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
-          >
-            {subtitle}
-          </span>
-        </span>
-      </div>
-      <span
-        className="text-xs font-semibold uppercase tracking-[0.18em]"
-        style={{
-          color: isActive ? "var(--color-primary)" : completed ? "var(--color-secondary)" : "var(--color-dim)",
-          fontFamily: "'Share Tech Mono', monospace",
-        }}
-      >
-        {completed ? "READY" : "OPEN"}
-      </span>
-    </button>
-  );
-}
-
-function SectionPanel({ id, activeSection, children }: { id: string; activeSection: string; children: ReactNode }) {
-  const isActive = activeSection === id;
-
-  return (
-    <div
-      id={`section-panel-${id}`}
-      className={`overflow-hidden transition-all ${
-        isActive ? "max-h-[2200px] px-4 pb-4 pt-3" : "max-h-0 px-4 pb-0 pt-0"
-      }`}
-      style={{ background: "var(--color-card)", borderLeft: "1px solid var(--color-border)", borderRight: "1px solid var(--color-border)", borderBottom: isActive ? "1px solid var(--color-border)" : "none" }}
-    >
-      {children}
-    </div>
-  );
-}
-
-
 function getModeScopedFieldErrors(mode: CalculatorMode, fieldErrors?: Record<string, string>): Record<string, string> {
   if (!fieldErrors) return {};
   if (mode === "initial_regimen") {
     return Object.fromEntries(Object.entries(fieldErrors).filter(([key]) => key.startsWith("patient.")));
   }
   return fieldErrors;
+}
+
+/** True when the viewport matches `query`; false during SSR and before mount. */
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const update = () => setMatches(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, [query]);
+  return matches;
 }
 
 const SESSION_KEY = "vancomyzer_calculator_state";
@@ -262,6 +150,10 @@ export default function CalculatorWorkspace() {
   const [lastInputChangedAt, setLastInputChangedAt] = useState<number | null>(null);
   const [lastCalculatedAt, setLastCalculatedAt] = useState<number | null>(null);
   const [selectedFrequencyOption, setSelectedFrequencyOption] = useState<FrequencyOption | null>(null);
+  // Existing-regimen path only: view the CURRENT regimen (as entered) instead
+  // of the engine's recommendation. The response's top-level auc24/peak/trough
+  // and curve describe the current regimen; frequency_options carry their own.
+  const [viewCurrentRegimen, setViewCurrentRegimen] = useState(false);
   // Pulse-dose only: lets the user flip the chart between their entered
   // regimen (default) and the engine's auto-recommended adjustment.
   const [showEngineRecommended, setShowEngineRecommended] = useState(false);
@@ -290,7 +182,10 @@ export default function CalculatorWorkspace() {
   const [activeSection, setActiveSection] = useState<string>("patient");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
-  const { settings, playSound } = useMatrixSettings();
+  const { playSound } = useMatrixSettings();
+  // Desktop cockpit (≥1280px): the graph fills its panel beside the side rail
+  // instead of using a fixed height.
+  const graphFill = useMediaQuery("(min-width: 1280px)");
   const { user, loading: authLoading, logout } = useAuth();
 
   // Workflow label for the "Calculation Run" analytics event. Read through a
@@ -565,6 +460,7 @@ export default function CalculatorWorkspace() {
       });
       setLastCalculatedAt(Date.now());
       setSelectedFrequencyOption(null);
+      setViewCurrentRegimen(false);
       setError(null);
       playSound("success");
 
@@ -677,6 +573,7 @@ export default function CalculatorWorkspace() {
     setMode("initial_regimen");
     setLastCalculatedAt(null);
     setSelectedFrequencyOption(null);
+    setViewCurrentRegimen(false);
     setRrt(null);
     setActiveSection("patient");
     setBedbound(false);
@@ -692,10 +589,41 @@ export default function CalculatorWorkspace() {
   // Single source of truth: the currently active frequency option.
   // selectedFrequencyOption → user clicked a tab; recommendedOption → backend primary recommendation.
   // Every output section must read from activeOption rather than visibleResult directly.
-  const recommendedOption = visibleResult?.recommendation_type === "existing_regimen"
-    ? (visibleResult.frequency_options?.find((o) => o.is_recommended) ?? null)
-    : null;
-  const activeOption = selectedFrequencyOption ?? recommendedOption;
+  // The engine's recommended candidate is the default selection on both paths
+  // (on the initial-regimen path its curve is the response's own curve at a
+  // finer time step, so the graph is unchanged).
+  const recommendedOption = visibleResult?.frequency_options?.find((o) => o.is_recommended) ?? null;
+  // Existing-regimen path: "current regimen" view is a synthetic option built
+  // from the response's top-level exposure and curve, which describe the
+  // regimen as entered. On the pulse-dose path the engine's top-level curve is
+  // the loading dose CONTINUED at the entered dose/interval (not a single-dose
+  // profile), and each candidate's curve is loading → that maintenance, so the
+  // same row semantics apply. Nothing is recomputed.
+  const currentRegimenOption: FrequencyOption | null =
+    viewCurrentRegimen && visibleResult?.recommendation_type === "existing_regimen"
+      ? {
+          dose_mg: regimen.dose_mg,
+          interval_hours: regimen.interval_hours,
+          infusion_duration_hours: regimen.infusion_duration_hours,
+          auc24: visibleResult.auc24,
+          peak: visibleResult.peak,
+          trough: visibleResult.trough,
+          is_recommended: false,
+          curve: visibleResult.curve,
+          interpretation_summary: visibleResult.interpretation_summary,
+          clinical_note: visibleResult.documentation_preview?.clinical_note,
+        }
+      : null;
+  const activeOption = currentRegimenOption ?? (selectedFrequencyOption ?? recommendedOption);
+  const activeIsCurrent = currentRegimenOption != null;
+  // Estimated CrCl is reported by the engine as context text in key_inputs; it
+  // is parsed for display on the renal row and never used in any calculation.
+  const estimatedCrCl = (() => {
+    const line = visibleResult?.calculation_details?.key_inputs?.find((k) => /Estimated CrCl/i.test(k));
+    const m = line?.match(/Estimated CrCl\s+([\d.]+)\s*mL\/min\s*\(([^)]*)\)/i);
+    return m ? { value: Number(m[1]), note: m[2].replace(/;.*$/, "") } : null;
+  })();
+
   const patientReady = hasPatientCoreData(patient) && rrt !== null;
   const isPulseDose = regimen.doses_given === 1;
   const regimenReady = regimen.dose_mg > 0 && regimen.infusion_duration_hours > 0 &&
@@ -711,6 +639,13 @@ export default function CalculatorWorkspace() {
   );
   const hideCalculate = bedbound && !bedboundLevelComplete;
 
+  // Layout continuity: while inputs are stale or the model is running, keep
+  // the last result mounted (obscured and non-interactive) instead of
+  // unmounting it, so the workspace never jumps during recalculation.
+  const displayResult = visibleResult ?? ((loading || hasStaleResult) ? result : null);
+  const resultObscured = displayResult != null && visibleResult == null;
+  const autoRecalcArmed = mode === "initial_regimen" && patientReady && rrt === false;
+
   const handleApplyRecommendedRegimen = useCallback(() => {
     if (!result?.recommended_dose || !result?.recommended_interval_hours) return;
     const dose = Number.parseFloat(result.recommended_dose);
@@ -725,9 +660,10 @@ export default function CalculatorWorkspace() {
     }));
   }, [result]);
 
-  const handleSelectFrequency = useCallback((option: FrequencyOption) => {
+  const handleSelectFrequency = useCallback((option: FrequencyOption | null) => {
     // Only update the visual display — do NOT touch regimen state, which would
-    // trigger stale-result detection and wipe the graph.
+    // trigger stale-result detection and wipe the graph. null = current regimen.
+    setViewCurrentRegimen(option == null);
     setSelectedFrequencyOption(option);
   }, []);
 
@@ -829,688 +765,668 @@ export default function CalculatorWorkspace() {
   }, [visibleResult, activeOption, patient, user?.subscriptionTier]);
 
   const leftColumn = (
-    <div className="flex flex-col h-full">
-      <div className="mx-shimmer-border border p-5" style={{ borderTop: "3px solid var(--color-primary)", borderLeft: "1px solid var(--color-border)", borderRight: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>CLINICAL DATA INTAKE</p>
-        <h2 className="mt-1.5 text-lg font-semibold tracking-tight" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
-          <TypewriterLoop text="Enter patient data to begin." interval={5000} />
-        </h2>
-        <p className="mt-1 text-sm leading-6" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
-          Complete each section. The Bayesian engine runs automatically once enough data is present.
-        </p>
-      </div>
-
-      <div className="flex flex-col flex-1 pb-24 pt-5">
-        {/* Patient Section */}
-        <div>
-          <SectionToggle
-            id="patient"
-            title="Patient Information"
-            subtitle="Adult demographics and renal function inputs"
-            completed={patientReady}
-            activeSection={activeSection}
-            onToggle={(id) => setActiveSection(activeSection === id ? "" : id)}
+    <div className="flex h-full flex-col">
+      <div className="flex-1">
+        <InputSection
+          id="patient"
+          title="Patient"
+          completed={patientReady}
+          focusSection={activeSection}
+        >
+          <PatientCharacteristicsForm
+            value={patient}
+            onChange={setPatient}
+            fieldErrors={fieldErrors}
+            rrt={rrt}
+            onRrtChange={(val) => {
+              setRrt(val);
+              if (val === true) {
+                // Immediately retract any existing recommendation
+                setResult(null);
+                setError(null);
+                setSelectedFrequencyOption(null);
+                setLastCalculatedAt(null);
+              }
+            }}
+            bedbound={bedbound}
+            onBedboundChange={(val) => {
+              setBedbound(val);
+              if (!val) setBedboundDoseData(null);
+            }}
+            onBedboundLoadingDoseChange={setBedboundDoseData}
+            estimatedCrCl={estimatedCrCl}
           />
-          <SectionPanel id="patient" activeSection={activeSection}>
-            <PatientCharacteristicsForm
-                value={patient}
-                onChange={setPatient}
-                fieldErrors={fieldErrors}
-                rrt={rrt}
-                onRrtChange={(val) => {
-                  setRrt(val);
-                  if (val === true) {
-                    // Immediately retract any existing recommendation
-                    setResult(null);
-                    setError(null);
-                    setSelectedFrequencyOption(null);
-                    setLastCalculatedAt(null);
-                  }
-                }}
-                bedbound={bedbound}
-                onBedboundChange={(val) => {
-                  setBedbound(val);
-                  if (!val) setBedboundDoseData(null);
-                }}
-                onBedboundLoadingDoseChange={setBedboundDoseData}
-              />
-          </SectionPanel>
-        </div>
+        </InputSection>
 
-        {/* Regimen Section — only shown in existing_regimen mode */}
+        {/* Regimen — only in existing_regimen mode */}
         {mode === "existing_regimen" && (
-          <div>
-            <SectionToggle
-              id="regimen"
-              title="Dosing History"
-              subtitle="Current maintenance regimen being evaluated"
-              completed={regimenReady}
-              activeSection={activeSection}
-              onToggle={(id) => setActiveSection(activeSection === id ? "" : id)}
-            />
-            <SectionPanel id="regimen" activeSection={activeSection}>
-              <div className="flex flex-col gap-4">
-                <RegimenForm value={regimen} onChange={setRegimen} fieldErrors={fieldErrors} />
+          <InputSection id="regimen" title="Dosing history" completed={regimenReady} focusSection={activeSection}>
+            <RegimenForm value={regimen} onChange={setRegimen} fieldErrors={fieldErrors} />
+          </InputSection>
+        )}
+
+        {/* Levels — only in existing_regimen mode */}
+        {mode === "existing_regimen" && (
+          <InputSection id="levels" title="Drug levels" completed={levelReady} focusSection={activeSection}>
+            {bedbound && (
+              <div className="mb-2">
+                {!bedboundLevelComplete ? (
+                  <Advisory severity="caution" title="Phase 1 complete — awaiting level" role="status">
+                    Loading dose recorded. Draw the vancomycin level per the timing in the Bedbound panel, then enter the concentration,
+                    date and time below. <strong>Calculate</strong> unlocks once the level is entered.
+                  </Advisory>
+                ) : (
+                  <Advisory severity="success" title="Phase 2 — level entered, ready to calculate" role="status">
+                    Press <strong>Calculate</strong> to run the Bayesian engine and receive a maintenance regimen recommendation.
+                  </Advisory>
+                )}
               </div>
-            </SectionPanel>
-          </div>
-        )}
-
-        {/* Levels Section (if applicable) */}
-        {mode === "existing_regimen" && (
-          <div>
-            <SectionToggle
-              id="levels"
-              title="Drug Levels"
-              subtitle="Measured concentrations used for posterior refinement"
-              completed={levelReady}
-              activeSection={activeSection}
-              onToggle={(id) => setActiveSection(activeSection === id ? "" : id)}
+            )}
+            <LevelEntryTable
+              levels={levels}
+              onChange={setLevels}
+              fieldErrors={fieldErrors}
+              intervalHours={regimen.interval_hours || undefined}
+              prefillDoseDate={bedboundDoseData?.adminDate}
+              prefillDoseTime={bedboundDoseData?.adminTime}
             />
-            <SectionPanel id="levels" activeSection={activeSection}>
-              {/* Bedbound two-phase banner */}
-              {bedbound && (
-                <div className="mb-3">
-                  {!bedboundLevelComplete ? (
-                    <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 flex items-start gap-3">
-                      <span className="mt-0.5 shrink-0 text-lg">⏳</span>
-                      <div>
-                        <p className="text-sm font-semibold text-amber-900">Phase 1 complete — awaiting level</p>
-                        <p className="mt-0.5 text-xs text-amber-800 leading-5">
-                          Loading dose has been recorded. Draw the vancomycin level per the timing in the Bedbound panel,
-                          then enter the concentration, date, and time below.
-                          The <strong>Calculate</strong> button will unlock once the level is entered.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 flex items-start gap-3">
-                      <span className="mt-0.5 shrink-0 text-lg">✓</span>
-                      <div>
-                        <p className="text-sm font-semibold text-emerald-900">Phase 2 — level entered, ready to calculate</p>
-                        <p className="mt-0.5 text-xs text-emerald-800 leading-5">
-                          Vancomycin level received. Press <strong>Calculate</strong> to run the Bayesian engine
-                          and receive a maintenance regimen recommendation.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-              <LevelEntryTable
-                  levels={levels}
-                  onChange={setLevels}
-                  fieldErrors={fieldErrors}
-                  intervalHours={regimen.interval_hours || undefined}
-                  prefillDoseDate={bedboundDoseData?.adminDate}
-                  prefillDoseTime={bedboundDoseData?.adminTime}
-                />
-            </SectionPanel>
-          </div>
+          </InputSection>
         )}
 
-        {/* Calculation Settings */}
-        <div>
-          <SectionToggle
-            id="settings"
-            title="Calculation Method"
-            subtitle="Workflow status, evidence grade, and safety framing"
-            completed={true}
-            activeSection={activeSection}
-            onToggle={(id) => setActiveSection(activeSection === id ? "" : id)}
-          />
-          <SectionPanel id="settings" activeSection={activeSection}>
-            <CalculationMethodPanel mode={mode} levelCount={levels.length} details={visibleResult?.calculation_details} assumptions={visibleResult?.assumptions} infusionDurationAdjustedForSafety={visibleResult?.infusion_duration_adjusted_for_safety} pkModelName={visibleResult?.pk_parameters?.pk_model_name} />
-          </SectionPanel>
-        </div>
-      </div>
-
-      <div className="sticky bottom-0 mt-auto border-t" style={{ borderTopColor: "var(--color-border)", background: "var(--color-bg)" }}>
-        <CalculatorActionBar
-          onCalculate={handleCalculate}
-          onReset={handleReset}
-          disabled={loading || rrt === null || rrt === true}
-          hideCalculate={hideCalculate}
-          showCaseId={canSaveHistory}
-          caseId={caseId}
-          onCaseIdChange={setCaseId}
-        />
-        {/* Inline disclaimer — always visible */}
-        <div className="border-t px-4 py-2" style={{ borderTopColor: "var(--color-border)" }}>
-          <p style={{ fontSize: 10, lineHeight: 1.6, color: "var(--color-dim)", fontFamily: "inherit", margin: 0 }}>
+        {/* Long-form disclaimer stays on the page (scrolls with the rail); the
+            regulatory strip at the bottom of every screen carries the short form. */}
+        <div className="px-3 py-2">
+          <p style={{ fontSize: 10, lineHeight: 1.55, color: "var(--color-dim)", fontFamily: "inherit", margin: 0 }}>
             Vancomyzer&trade; is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation. Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. It is not a substitute for clinical judgment, institutional protocols, or therapeutic drug monitoring.{" "}
             {/* A real button so the full disclaimer is reachable by keyboard and screen readers. */}
             <button
               type="button"
               onClick={() => setDisclaimerOpen(true)}
-              style={{ color: "var(--color-primary)", cursor: "pointer", textDecoration: "none", background: "transparent", border: "none", padding: 0, font: "inherit" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; }}
-              onFocus={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; }}
-              onBlur={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; }}
+              className="underline"
+              style={{ color: "var(--color-primary)", cursor: "pointer", background: "transparent", border: "none", padding: 0, font: "inherit" }}
             >
               [See Full Disclaimer]
             </button>
           </p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
+            {[
+              { href: "/disclaimer", label: "Disclaimer" },
+              { href: "/terms", label: "Terms" },
+              { href: "/privacy", label: "Privacy" },
+              { href: "/about", label: "About" },
+              { href: "/contact", label: "Contact" },
+            ].map(({ href, label }) => (
+              <a key={href} href={href} className="text-[10px] underline-offset-2 hover:underline" style={{ color: "var(--color-dim)" }}>
+                {label}
+              </a>
+            ))}
+            <span className="text-[10px]" style={{ color: "var(--color-dim)" }}>
+              {"©"} 2026 Vancomyzer{"™"} {"·"} Engineered by{" "}
+              <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>
+                D{"ō"}sys{"™"}
+              </a>
+            </span>
+          </div>
         </div>
-        {/* Footer links + copyright */}
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t px-4 py-2" style={{ borderTopColor: "var(--color-border)" }}>
-          {[
-            { href: "/disclaimer", label: "Disclaimer" },
-            { href: "/terms", label: "Terms" },
-            { href: "/privacy", label: "Privacy" },
-            { href: "/about", label: "About" },
-            { href: "/contact", label: "Contact" },
-          ].map(({ href, label }) => (
-            <a key={href} href={href} className="text-[10px] transition-colors" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "var(--color-dim)"; }}
-            >
-              {label}
-            </a>
-          ))}
-        </div>
-        <div className="border-t px-4 py-1.5" style={{ borderTopColor: "var(--color-border)", textAlign: "center" }}>
-          <span style={{ fontSize: 10, color: "var(--color-dim)", fontFamily: "inherit" }}>
-            {"\u00A9"} 2026 Vancomyzer{"\u2122"} {"\u00B7"} Engineered by{" "}
-            <a
-              href="https://dosys.health"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "inherit", textDecoration: "underline" }}
-            >
-              D{"\u014D"}sys{"\u2122"}
-            </a>{" "}
-            {"\u00B7"} All Rights Reserved
-          </span>
-        </div>
+      </div>
+
+      {/* Actions — sticky at the bottom of the rail; nothing else competes for that space. */}
+      <div className="sticky bottom-0 mt-auto border-t px-3 py-2" style={{ borderTopColor: "var(--color-border)", background: "var(--color-card)", boxShadow: "0 -4px 12px rgba(0,0,0,0.06)" }}>
+        <CalculatorActionBar
+          onCalculate={handleCalculate}
+          onReset={handleReset}
+          disabled={loading || rrt === null || rrt === true}
+          loading={loading}
+          hideCalculate={hideCalculate}
+          showCaseId={canSaveHistory}
+          caseId={caseId}
+          onCaseIdChange={setCaseId}
+        />
       </div>
     </div>
   );
 
-  const rightColumn = (
-    <div className="flex flex-col h-full gap-6">
-      <div className="border-l-4 border px-4 py-3 flex items-center gap-3" style={{ borderLeftColor: "var(--color-primary)", borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+  // ── Derived display values shared by the band, the table and the graph ──
+  const isPulse = regimen.doses_given === 1;
+  // One rule for every path: the active option's exposure, else the response's
+  // top-level exposure (the regimen as entered).
+  const metricAuc = activeOption?.auc24 ?? displayResult?.auc24;
+  const metricPeak = activeOption?.peak ?? displayResult?.peak;
+  const metricTrough = activeOption?.trough ?? displayResult?.trough;
+  const metricsCaption = isPulse
+    ? activeIsCurrent
+      ? `Loading dose continued as ${regimen.dose_mg} mg q${regimen.interval_hours}h — steady-state PK`
+      : `Maintenance after loading dose${activeOption ? ` — ${activeOption.dose_mg} mg q${activeOption.interval_hours}h` : ""} — steady-state PK`
+    : activeIsCurrent
+      ? "Current regimen (as entered) — predicted steady-state exposure"
+      : "Predicted steady-state exposure";
+  const currentRegimenRow =
+    displayResult?.recommendation_type === "existing_regimen" && regimen.dose_mg > 0 && (isPulse || regimen.interval_hours > 0)
+      ? {
+          dose_mg: regimen.dose_mg,
+          interval_hours: regimen.interval_hours,
+          auc24: displayResult.auc24,
+          peak: displayResult.peak,
+          trough: displayResult.trough,
+          label: isPulse ? "continued as entered" : "current",
+        }
+      : null;
+  // The engine's recommendation may fall outside the candidate list's display
+  // rule (dose ≥ 500 mg, AUC₂₄ ≤ 600). It is still shown as the recommendation
+  // — never swapped for an alternative — and flagged so the reviewer sees why.
+  const recommendedOutsideDisplayRule =
+    recommendedOption != null && !(recommendedOption.dose_mg >= 500 && recommendedOption.auc24 <= 600);
+  // Dashed reference on the graph: the engine recommendation whenever something
+  // else is selected (an alternative, the current regimen or the first dose).
+  const comparisonCurve =
+    recommendedOption?.curve && activeOption !== recommendedOption && !(activeOption?.is_recommended)
+      ? recommendedOption.curve
+      : null;
+  const comparisonLabel = recommendedOption
+    ? `Recommended ${recommendedOption.dose_mg} mg q${recommendedOption.interval_hours}h${isPulse ? " after loading dose" : " (steady state)"}`
+    : null;
+  const clinicalNote = activeOption?.clinical_note ?? displayResult?.documentation_preview?.clinical_note ?? "";
+  const exportsDisabled = resultObscured || !visibleResult;
+
+  const advisories: ReactNode[] = [];
+  if (displayResult?.timing_warnings && displayResult.timing_warnings.length > 0) {
+    advisories.push(
+      <Advisory key="timing" severity="caution" title="Lab timing advisory" role="status">
+        <ul className="list-disc pl-4">{displayResult.timing_warnings.map((w, i) => <li key={i}>{w}</li>)}</ul>
+      </Advisory>,
+    );
+  }
+  if (displayResult?.fit_quality_warnings && displayResult.fit_quality_warnings.length > 0) {
+    advisories.push(
+      <Advisory key="fit" severity="caution" title="Fit quality advisory" role="status">
+        <ul className="list-disc pl-4">{displayResult.fit_quality_warnings.map((w, i) => <li key={i}>{w}</li>)}</ul>
+      </Advisory>,
+    );
+  }
+  if (recommendedOutsideDisplayRule && recommendedOption && !displayResult?.empiric_dosing_blocked && !displayResult?.adjustment_dosing_blocked) {
+    advisories.push(
+      <Advisory
+        key="display-floor"
+        severity="caution"
+        title="Recommendation outside the candidate display rule."
+        summary={`The engine's recommendation (${recommendedOption.dose_mg} mg q${recommendedOption.interval_hours}h, AUC₂₄ ${recommendedOption.auc24}) is ${recommendedOption.dose_mg < 500 ? "below the 500 mg practical dose floor" : "above the 600 mg·h/L AUC₂₄ ceiling"} applied to the candidate list. It is shown as returned; verify against institutional protocol before use.`}
+        role="status"
+      />,
+    );
+  }
+  if (displayResult?.calculation_details && (metricAuc ?? 0) > 600) {
+    advisories.push(
+      <Advisory key="auc-high" severity="warning" title="Predicted AUC₂₄ > 600" summary="Potential for elevated nephrotoxicity risk. Proceed with extreme caution." role="alert" />,
+    );
+  }
+  const priorOnlyEmpiric = viewMode === "empiric" && displayResult?.calculation_details?.review_status.level === "prior_only";
+  if (displayResult?.calculation_details && !priorOnlyEmpiric) {
+    const rs = displayResult.calculation_details.review_status;
+    const sev = rs.level === "supported" ? "success" : rs.level === "caution" ? "caution" : "info";
+    advisories.push(
+      <Advisory key="review" severity={sev} title={rs.banner_title} summary={rs.banner_body} collapsible>
+        <p className="m-0"><strong>Evidence:</strong> {displayResult.calculation_details.evidence_strength}. {displayResult.calculation_details.data_quality_summary}</p>
+        {rs.next_actions.length > 0 && (
+          <ul className="mt-1 list-disc pl-4">{rs.next_actions.map((a, i) => <li key={i}>{a}</li>)}</ul>
+        )}
+      </Advisory>,
+    );
+  }
+  if (viewMode === "empiric" && displayResult && !displayResult.empiric_dosing_blocked) {
+    advisories.push(
+      <Advisory
+        key="sampling"
+        severity="info"
+        title={displayResult.calculation_details?.review_status.banner_title ?? "Prior-only maintenance suggestion"}
+        summary="Population prior only — no measured level used. Draw a level and re-run for an individualized Bayesian fit."
+        collapsible
+        action={
+          <button
+            type="button"
+            onClick={() => applyViewMode("one_level")}
+            className="rounded border px-2 py-0.5 text-[11px] font-semibold"
+            style={{ borderColor: "#2b6cb0", background: "#fff", color: "#1e3a5f", cursor: "pointer" }}
+          >
+            1-Level workflow →
+          </button>
+        }
+      >
+        {displayResult.calculation_details?.review_status.banner_body && (
+          <p className="m-0 mb-1">{displayResult.calculation_details.review_status.banner_body}</p>
+        )}
+        <ul className="list-disc pl-4">
+          <li><strong>Earliest meaningful:</strong> 1.5–6 h after dose 1 post-infusion end (sparse single-level workflow).</li>
+          <li><strong>Highest AUC accuracy:</strong> peak + trough near dose 3–4 at steady state (ASHP/IDSA 2020).</li>
+          <li>Target AUC₂₄ 400–600 mg·h/L within 48 h per ASHP/IDSA 2020.</li>
+        </ul>
+      </Advisory>,
+    );
+  }
+  if (patient.age > 65 && !rrt) {
+    advisories.push(
+      <Advisory key="age" severity="caution" title="Age > 65 — enhanced monitoring" summary="Renal function may decline faster than SCr reflects." collapsible>
+        <p className="m-0">
+          The {COLIN_2019.shortName} model includes an age-decline function (FDecline), but renal function in older adults may decline faster than SCr reflects — especially with low muscle mass. Consider:
+        </p>
+        <ul className="mt-1 list-disc pl-4">
+          <li>More frequent vancomycin level monitoring (every 24–48 h rather than 72 h)</li>
+          <li>Daily SCr to detect early renal deterioration</li>
+          <li>If SCr appears low relative to clinical status, rely on early measured levels rather than rounding SCr up (routine rounding to 1 mg/dL reduced dose-prediction accuracy in older adults; Bukhari 2024)</li>
+          <li>Measured levels with Bayesian refinement, rather than population estimates alone, to individualize dosing in patients &gt;65</li>
+        </ul>
+      </Advisory>,
+    );
+  }
+
+  const graphCurve =
+    activeOption?.curve
+    ?? (showEngineRecommended && displayResult?.curve_engine_recommended
+        ? displayResult.curve_engine_recommended
+        : displayResult?.curve ?? []);
+
+  const detailTabs = displayResult ? [
+    {
+      id: "pk",
+      label: "PK params",
+      content: (
+        <div className="flex flex-col gap-2">
+          {displayResult.pk_parameters ? (
+            <PKParametersMath params={displayResult.pk_parameters} />
+          ) : (
+            <p className="text-xs" style={{ color: "var(--color-dim)" }}>No PK parameters returned.</p>
+          )}
+          {displayResult.calculation_details?.key_inputs && displayResult.calculation_details.key_inputs.length > 0 && (
+            <div>
+              <p className="vz-kicker m-0 mb-1">Key inputs</p>
+              <ul className="list-disc pl-4 text-[11.5px] leading-5" style={{ color: "var(--color-secondary)" }}>
+                {displayResult.calculation_details.key_inputs.map((k, i) => <li key={i}>{k}</li>)}
+              </ul>
+            </div>
+          )}
+          <TeachingNote label="What are CL, V₁, Q, V₂?">
+            <p style={{ marginTop: 0 }}>
+              Vancomycin distributes through two compartments: a central one (the bloodstream + well-perfused
+              organs) and a peripheral one (less-perfused tissues). The four PK parameters describe this:
+            </p>
+            <ul style={{ marginTop: 6, paddingLeft: 18, listStyle: "disc" }}>
+              <li><strong>CL</strong> — clearance (L/h). How fast the body eliminates the drug. Falls with renal impairment and with age ({COLIN_2019.shortName} FDecline).</li>
+              <li><strong>V₁</strong> — central volume (L). Initial dilution space at the end of infusion; drives peak concentration.</li>
+              <li><strong>Q</strong> — intercompartmental clearance (L/h). Speed of redistribution between central and peripheral.</li>
+              <li><strong>V₂</strong> — peripheral volume (L). Where the drug temporarily &ldquo;hides&rdquo;; it slowly returns to central as the central level falls.</li>
+            </ul>
+            <p style={{ marginTop: 6 }}>
+              When you enter a measured level, the Bayesian MAP fit shifts these parameters from the population
+              prior toward your patient&rsquo;s individual values — bounded so a single observation can&rsquo;t over-fit.
+            </p>
+          </TeachingNote>
+        </div>
+      ),
+    },
+    {
+      id: "method",
+      label: "Method",
+      content: (
+        <div className="flex flex-col gap-2">
+          <CalculationMethodPanel
+            mode={mode}
+            levelCount={levels.length}
+            details={displayResult.calculation_details}
+            assumptions={displayResult.assumptions}
+            infusionDurationAdjustedForSafety={displayResult.infusion_duration_adjusted_for_safety}
+            pkModelName={displayResult.pk_parameters?.pk_model_name}
+          />
+          <TeachingNote label="What is AUC₂₄, and why 400–600?">
+            <p style={{ marginTop: 0 }}>
+              <strong>AUC₂₄</strong> is the area under the concentration-time curve over 24 hours
+              (mg·h/L). For vancomycin, it&rsquo;s the exposure metric that best correlates with
+              both efficacy against MRSA and the risk of acute kidney injury.
+            </p>
+            <p style={{ marginTop: 6 }}>
+              The 2020 ASHP/IDSA/PIDS/SIDP consensus guideline recommends a target of
+              <strong> 400–600 mg·h/L</strong>. Below 400 → underdosed (risk of treatment failure
+              and resistance selection). Above 600 → significant nephrotoxicity risk, especially
+              if sustained beyond 48 hours. The trough number alone is no longer the recommended
+              target — AUC integrates the entire dosing interval and is more clinically meaningful.
+            </p>
+          </TeachingNote>
+          {displayResult.pk_parameters?.used_posterior_refinement && (
+            <TeachingNote label="How does Bayesian feedback work?">
+              <p style={{ marginTop: 0 }}>
+                The engine starts with a population prior — what we&rsquo;d expect for an &ldquo;average&rdquo;
+                patient with this age, weight, and SCr, from the {COLIN_2019.shortName} model. Model source:{" "}
+                {COLIN_2019.sourcePopulation}
+                {" "}When you enter a measured level, MAP-Bayesian estimation shifts the patient&rsquo;s individual
+                PK parameters toward values that better explain the measurement, while a log-normal
+                prior penalty keeps the shift bounded — a single observation cannot move the estimates far
+                from what the population model considers plausible.
+              </p>
+              <p style={{ marginTop: 6 }}>
+                With one level the fit is bounded by the prior; with two or more well-timed levels
+                (peak + trough) the fit becomes much more individualized and the recommendation
+                can deviate further from population averages. If the residual stays large, you&rsquo;ll
+                see a Fit Quality Advisory — that&rsquo;s a signal to draw a confirmatory level
+                rather than over-trust the recommendation.
+              </p>
+            </TeachingNote>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: "interpretation",
+      label: "Interpretation",
+      content: (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>ANALYSIS WORKSPACE</p>
-          <h2 className="text-sm font-semibold leading-snug" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>Model outputs, exposure metrics &amp; regimen guidance</h2>
+          <FeatureGate
+            feature="interpretation.why_this_result"
+            fallback={
+              <div className="rounded-md border px-3 py-2" style={{ borderColor: "#bfdbfe", background: "#eff6ff" }}>
+                <p className="text-xs font-semibold" style={{ color: "#1e40af" }}>Why this result — Individual Pro</p>
+                <p className="mt-1 text-xs leading-relaxed" style={{ color: "#1e3a8a" }}>
+                  The plain-language clinical reasoning behind each recommendation (drivers, evidence, caveats) is part of the
+                  documentation suite on Individual Pro and above — alongside Copy Note and Export PDF.
+                </p>
+                <Link href="/pricing" className="mt-1.5 inline-block text-xs font-semibold underline" style={{ color: "#1e40af" }}>
+                  See pricing →
+                </Link>
+              </div>
+            }
+          >
+            <InterpretationSummaryCard interpretation_summary={activeOption?.interpretation_summary ?? displayResult.interpretation_summary} />
+          </FeatureGate>
+          <LimitationsCard limitations={displayResult.limitations} calculationDetails={displayResult.calculation_details} />
         </div>
-      </div>
-
-      {hasStaleResult && !loading && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 shadow-sm">
-          <p className="text-sm font-semibold text-amber-900">Draft inputs changed after the last PK run.</p>
-          <p className="mt-1 text-sm text-amber-800">Recalculate before using the exposure metrics or concentration-time graph for review.</p>
+      ),
+    },
+    ...(clinicalNote ? [{
+      id: "note",
+      label: "Note",
+      content: (
+        <div>
+          <p className="vz-kicker m-0 mb-1">Clinical note preview</p>
+          <pre className="m-0 whitespace-pre-wrap text-[11.5px] leading-5" style={{ fontFamily: "inherit", color: "var(--color-secondary)" }}>{clinicalNote}</pre>
         </div>
-      )}
+      ),
+    }] : []),
+  ] : [];
 
-      {/* Late-draw timing advisory — surfaced whenever the validator detected an
-          overshoot but accepted the inputs (within tolerance, or non-SS path). */}
-      {visibleResult?.timing_warnings && visibleResult.timing_warnings.length > 0 && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex gap-3">
-          <span className="text-base shrink-0">⏱️</span>
-          <div>
-            <p className="text-xs font-semibold text-amber-900">Lab Timing Advisory</p>
-            <ul className="mt-1 text-xs text-amber-800 leading-5 list-disc pl-4 space-y-0.5">
-              {visibleResult.timing_warnings.map((w, i) => (
-                <li key={i}>{w}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {/* Fit-quality advisory — the posterior MAP fit can't explain the measured
-          level within ~25% relative error. The patient's true PK differs from
-          everything the population prior + this level can constrain. */}
-      {visibleResult?.fit_quality_warnings && visibleResult.fit_quality_warnings.length > 0 && (
-        <div className="rounded-xl border border-amber-300 bg-amber-100 px-4 py-3 flex gap-3">
-          <span className="text-base shrink-0">⚠️</span>
-          <div>
-            <p className="text-xs font-semibold text-amber-900">Fit Quality Advisory</p>
-            <ul className="mt-1 text-xs text-amber-900 leading-5 list-disc pl-4 space-y-0.5">
-              {visibleResult.fit_quality_warnings.map((w, i) => (
-                <li key={i}>{w}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {/* Next-level sampling recommendation — persistent in empiric mode. Closes
-          the loop on the marketing claim that the calculator tells you when to
-          draw a level, and nudges users from prior-only → Bayesian-fit dosing. */}
-      {viewMode === "empiric" && visibleResult && (
-        <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 flex gap-3">
-          <span className="text-base shrink-0">🎯</span>
-          <div className="flex-1">
-            <p className="text-xs font-semibold text-teal-900">Next-Level Sampling Recommendation</p>
-            <p className="mt-1 text-xs text-teal-900 leading-5">
-              This dose is computed from the <strong>population prior only</strong> — no measured level was used. Draw a vancomycin level and re-run for an individualized Bayesian fit.
-            </p>
-            <ul className="mt-1 text-xs text-teal-900 leading-5 list-disc pl-4 space-y-0.5">
-              <li><strong>Earliest meaningful:</strong> 1.5–6h after dose 1 post-infusion end (sparse single-level workflow).</li>
-              <li><strong>Highest AUC accuracy:</strong> peak + trough near dose 3–4 at steady state (per ASHP/IDSA 2020).</li>
-            </ul>
-            <button
-              type="button"
-              onClick={() => applyViewMode("one_level")}
-              className="mt-2 inline-block rounded border border-teal-700 bg-white px-3 py-1 text-xs font-semibold text-teal-900 hover:bg-teal-100 transition-colors"
-            >
-              Switch to 1-Level workflow →
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Age >65 advisory — non-blocking, shown whenever age is entered */}
-      {patient.age > 65 && !rrt && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex gap-3">
-          <span className="text-base shrink-0">⚠️</span>
-          <div>
-            <p className="text-xs font-semibold text-amber-900">Age &gt;65 — Enhanced Monitoring Advisory</p>
-            <p className="mt-0.5 text-xs text-amber-800 leading-5">
-              The {COLIN_2019.shortName} model includes an age-decline function (FDecline), but renal function in older adults may decline faster than SCr reflects — especially in patients with low muscle mass. Consider:
-            </p>
-            <ul className="mt-1 text-xs text-amber-800 leading-5 list-disc pl-4 space-y-0.5">
-              <li>More frequent vancomycin level monitoring (every 24–48h rather than 72h)</li>
-              <li>Daily SCr to detect early renal deterioration</li>
-              <li>If SCr appears low relative to clinical status, rely on early measured levels rather than rounding SCr up (routine rounding to 1 mg/dL reduced dose-prediction accuracy in older adults; Bukhari 2024)</li>
-              <li>Measured levels with Bayesian refinement, rather than population estimates alone, to individualize dosing in patients &gt;65</li>
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {loading && (
-        <div className="flex-1 flex justify-center items-center min-h-[400px]">
-          <CalculatorLoadingState />
-        </div>
-      )}
-
+  const rightColumn = (
+    <div className="flex min-h-0 flex-1 flex-col gap-2 p-2 lg:p-2.5">
+      {/* Draft/stale banner replaced by the obscured-result overlay below; error keeps the layout. */}
       {!loading && error && (
-        <div className="border p-6" style={{ background: "var(--color-card)", borderColor: "rgba(255,51,51,0.5)" }}>
+        <div className="shrink-0">
           <CalculatorErrorState message={error.message} details={error.details} limitations={error.limitations} recoveryGuidance={error.recovery_guidance} fallbackWorkflow={error.fallback_workflow} onSwitchToInitialRegimen={handleSwitchToInitialRegimen} />
         </div>
       )}
 
-      {!loading && !error && (
-        <CalculatorResultState hasResult={visibleResult != null}>
-          {visibleResult ? (
-            <div className="flex flex-col gap-3">
-
-              {/* Row 1: Dose tabs + AUC/Peak/Trough — compact horizontal */}
-              <div className="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-3">
-
-                {/* Left: Dose recommendation with frequency tabs */}
-                <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                  <div className="flex items-center justify-between border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                    <span className="text-[15px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--color-primary)" }}>SUGGESTED DOSE<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span></span>
-                    <div className="flex items-center gap-2">
-                      <PdfExportGate
-                        tier={user?.subscriptionTier ?? "free"}
-                        onExport={handleExportPDF}
-                      />
-                      {(activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note) && (
-                        <NoteExportGate
-                          tier={user?.subscriptionTier ?? "free"}
-                          onCopy={handleCopyNote}
-                          noteText={activeOption?.clinical_note ?? visibleResult.documentation_preview?.clinical_note ?? ""}
-                        />
-                      )}
-                      <ResultScopeBanner recommendation_type={visibleResult.recommendation_type} />
-                    </div>
-                  </div>
-                  <div className="p-2">
-                    <DoseRecommendationCard
-                      recommended_dose={visibleResult.recommended_dose}
-                      recommended_interval_hours={visibleResult.recommended_interval_hours}
-                      recommendation_type={visibleResult.recommendation_type}
-                      calculationDetails={visibleResult.calculation_details}
-                      recommended_infusion_duration_hours={visibleResult.recommended_infusion_duration_hours}
-                      infusion_duration_adjusted_for_safety={visibleResult.infusion_duration_adjusted_for_safety}
-                      infusion_safety_note={visibleResult.infusion_safety_note}
-                      frequency_options={visibleResult.frequency_options}
-                      draftDiffersFromCalculated={hasStaleResult}
-                      onApplyRecommendation={handleApplyRecommendedRegimen}
-                      onApplyFrequency={(option) => {
-                        setRegimen((current) => ({
-                          ...current,
-                          dose_mg: option.dose_mg,
-                          interval_hours: option.interval_hours,
-                          infusion_duration_hours: option.infusion_duration_hours || (current.infusion_duration_hours > 0 ? current.infusion_duration_hours : 1),
-                        }));
-                      }}
-                      onSelectFrequency={handleSelectFrequency}
-                      onSimulateLoadingDose={handleSimulateLoadingDose}
-                      patientWeightKg={patient.weight_kg > 0 ? patient.weight_kg : null}
-                      auc_range_status={visibleResult.auc_range_status}
-                      arc_advisory={visibleResult.arc_advisory}
-                      auc24={visibleResult.auc24}
-                      isPulseDose={regimen.doses_given === 1}
-                      loadingDoseMg={regimen.doses_given === 1 ? regimen.dose_mg : null}
-                      onUndoLoadingDose={preLoadingDoseState.current ? handleUndoLoadingDose : undefined}
-                      empiricDosingBlocked={visibleResult.empiric_dosing_blocked}
-                      adjustmentDosingBlocked={visibleResult.adjustment_dosing_blocked}
-                    />
-                    <TeachingNote label="Why this dose?">
-                      {visibleResult.recommendation_type === "existing_regimen" ? (
-                        <>
-                          When the level data support an individualized fit, the engine evaluates doses of 250–2000 mg at
-                          q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄
-                          exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the
-                          midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor
-                          fit) it instead scales the current dose toward that midpoint at the current interval, within the same
-                          safety limits.
-                        </>
-                      ) : (
-                        <>
-                          The engine evaluates doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted
-                          peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄
-                          lands closest to the midpoint of the 400–600 target.
-                        </>
-                      )}{" "}
-                      Peak and trough are forward-predicted from the patient&rsquo;s posterior PK (or population prior if no
-                      level is fit) using the two-compartment model. The recommendation always favors options that stay
-                      within target rather than ones that hit midpoint exactly outside the window.
-                    </TeachingNote>
-                  </div>
-                </div>
-
-                {/* Right: Predicted PK metrics — compact column */}
-                <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)", minWidth: 280 }}>
-                  <div className="border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                    <span className="text-[13px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--color-primary)" }}>PREDICTED PK</span>
-                  </div>
-                  <div className="p-2 flex flex-col gap-2">
-                    {(() => {
-                      const isPulse = regimen.doses_given === 1;
-                      if (isPulse) {
-                        // Loading dose mode: show maintenance steady-state metrics for selected tab
-                        const maint = activeOption ?? visibleResult.frequency_options?.find(o => o.is_recommended) ?? null;
-                        const auc24 = maint?.auc24 ?? visibleResult.auc24;
-                        const peak = maint?.peak ?? visibleResult.peak;
-                        const trough = maint?.trough ?? visibleResult.trough;
-                        const label = maint ? `${maint.dose_mg}mg Q${maint.interval_hours}h` : "";
-                        return (
-                          <>
-                            <p className="text-[9px] font-bold uppercase tracking-wider text-center" style={{ color: "var(--color-dim)", margin: 0, fontFamily: "'Share Tech Mono', monospace" }}>
-                              STEADY-STATE PK {label && `— ${label}`}
-                            </p>
-                            <PrimaryMetricsCard auc24={auc24} peak={peak} trough={trough} />
-                          </>
-                        );
-                      }
-                      // Normal mode
-                      const auc24 = activeOption?.auc24 ?? visibleResult.auc24;
-                      const peak  = activeOption?.peak  ?? visibleResult.peak;
-                      const trough = activeOption?.trough ?? visibleResult.trough;
-                      return <PrimaryMetricsCard auc24={auc24} peak={peak} trough={trough} />;
-                    })()}
-                    {visibleResult.pk_parameters && (
-                      <div className="border px-3 py-2" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                        <PKParametersMath params={visibleResult.pk_parameters} />
-                      </div>
-                    )}
-                    <TeachingNote label="What are CL, V₁, Q, V₂?">
-                      <p style={{ marginTop: 0 }}>
-                        Vancomycin distributes through two compartments: a central one (the bloodstream + well-perfused
-                        organs) and a peripheral one (less-perfused tissues). The four PK parameters describe this:
-                      </p>
-                      <ul style={{ marginTop: 6, paddingLeft: 18, listStyle: "disc" }}>
-                        <li><strong>CL</strong> — clearance (L/h). How fast the body eliminates the drug. Falls with renal impairment and with age ({COLIN_2019.shortName} FDecline).</li>
-                        <li><strong>V₁</strong> — central volume (L). Initial dilution space at the end of infusion; drives peak concentration.</li>
-                        <li><strong>Q</strong> — intercompartmental clearance (L/h). Speed of redistribution between central and peripheral.</li>
-                        <li><strong>V₂</strong> — peripheral volume (L). Where the drug temporarily &ldquo;hides&rdquo;; it slowly returns to central as the central level falls.</li>
-                      </ul>
-                      <p style={{ marginTop: 6 }}>
-                        When you enter a measured level, the Bayesian MAP fit shifts these parameters from the population
-                        prior toward your patient&rsquo;s individual values — bounded so a single observation can&rsquo;t over-fit.
-                      </p>
-                    </TeachingNote>
-                  </div>
-                </div>
-              </div>
-
-              {/* Row 2: Graph — immediately visible */}
-              <section className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                {/* Pulse-dose curve toggle: lets the clinician compare the
-                    profile of their entered regimen vs. the engine's auto-
-                    recommended adjustment for this patient's posterior PK. */}
-                {visibleResult.curve_engine_recommended && !activeOption && !visibleResult.adjustment_dosing_blocked && (
-                  <div className="flex items-center justify-between gap-2 border-b px-3 py-2 text-xs"
-                    style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                    <span style={{ color: "var(--color-secondary)" }}>Showing curve for:</span>
-                    <div className="inline-flex rounded-md border" style={{ borderColor: "var(--color-border)" }}>
-                      <button
-                        type="button"
-                        onClick={() => setShowEngineRecommended(false)}
-                        className="px-3 py-1 text-xs font-semibold"
-                        style={{
-                          background: !showEngineRecommended ? "var(--color-primary)" : "transparent",
-                          color: !showEngineRecommended ? "var(--color-card)" : "var(--color-secondary)",
-                        }}
-                      >
-                        Your regimen ({visibleResult.pk_parameters?.age != null ? `${visibleResult.recommended_dose ?? regimen.dose_mg} mg q${regimen.interval_hours}h` : "as entered"})
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowEngineRecommended(true)}
-                        className="px-3 py-1 text-xs font-semibold"
-                        style={{
-                          background: showEngineRecommended ? "var(--color-primary)" : "transparent",
-                          color: showEngineRecommended ? "var(--color-card)" : "var(--color-secondary)",
-                        }}
-                      >
-                        Engine recommendation
-                      </button>
-                    </div>
-                  </div>
-                )}
-                <div className="p-2">
-                  <ConcentrationTimeGraph
-                    curve={
-                      activeOption?.curve
-                      ?? (showEngineRecommended && visibleResult.curve_engine_recommended
-                          ? visibleResult.curve_engine_recommended
-                          : visibleResult.curve)
-                    }
-                    measured_levels={visibleResult.measured_levels}
-                    calculationDetails={visibleResult.calculation_details}
-                    pk_model_name={visibleResult.pk_parameters?.pk_model_name}
-                    uncertainty_label={deriveBandUncertaintyLabel(visibleResult)}
-                  />
-                </div>
-              </section>
-
-              {/* Row 3: Clinical Signal Strip */}
-              {visibleResult.calculation_details && (
-                <ClinicalSignalStrip
-                  auc24={activeOption?.auc24 ?? visibleResult.auc24}
-                  trough={activeOption?.trough ?? visibleResult.trough}
-                  details={visibleResult.calculation_details}
-                />
+      <div className="vz-results">
+        {/* ── Primary recommendation band ── */}
+        <section className="vz-area-band vz-panel" aria-labelledby="vz-band-title" aria-busy={loading}>
+          <div className="vz-panel-head">
+            <div className="flex min-w-0 items-center gap-2">
+              <h2 id="vz-band-title" className="vz-panel-title m-0">
+                {displayResult?.recommendation_type === "existing_regimen" ? "Dosing adjustment" : "Dosing recommendation"}
+              </h2>
+              {displayResult && (
+                <span className="hidden md:inline">
+                  <span className="vz-chip vz-chip--neutral" title="Population PK model">
+                    {modelShortName(displayResult.pk_parameters?.pk_model_name)} · 2-compartment
+                  </span>
+                </span>
               )}
-
-              <TeachingNote label="What is AUC₂₄, and why 400–600?">
-                <p style={{ marginTop: 0 }}>
-                  <strong>AUC₂₄</strong> is the area under the concentration-time curve over 24 hours
-                  (mg·h/L). For vancomycin, it&rsquo;s the exposure metric that best correlates with
-                  both efficacy against MRSA and the risk of acute kidney injury.
-                </p>
-                <p style={{ marginTop: 6 }}>
-                  The 2020 ASHP/IDSA/PIDS/SIDP consensus guideline recommends a target of
-                  <strong> 400–600 mg·h/L</strong>. Below 400 → underdosed (risk of treatment failure
-                  and resistance selection). Above 600 → significant nephrotoxicity risk, especially
-                  if sustained beyond 48 hours. The trough number alone is no longer the recommended
-                  target — AUC integrates the entire dosing interval and is more clinically meaningful.
-                </p>
-              </TeachingNote>
-
-              {visibleResult.pk_parameters?.used_posterior_refinement && (
-                <TeachingNote label="How does Bayesian feedback work?">
-                  <p style={{ marginTop: 0 }}>
-                    The engine starts with a population prior — what we&rsquo;d expect for an &ldquo;average&rdquo;
-                    patient with this age, weight, and SCr, from the {COLIN_2019.shortName} model. Model source:{" "}
-                    {COLIN_2019.sourcePopulation}
-                    {" "}When you enter a measured level, MAP-Bayesian estimation shifts the patient&rsquo;s individual
-                    PK parameters toward values that better explain the measurement, while a log-normal
-                    prior penalty keeps the shift bounded — a single observation cannot move the estimates far
-                    from what the population model considers plausible.
-                  </p>
-                  <p style={{ marginTop: 6 }}>
-                    With one level the fit is bounded by the prior; with two or more well-timed levels
-                    (peak + trough) the fit becomes much more individualized and the recommendation
-                    can deviate further from population averages. If the residual stays large, you&rsquo;ll
-                    see a yellow Fit Quality Advisory — that&rsquo;s a signal to draw a confirmatory level
-                    rather than over-trust the recommendation.
-                  </p>
-                </TeachingNote>
+              {displayResult?.pk_parameters && (
+                <span className="hidden sm:inline">
+                  <span className={`vz-chip ${displayResult.pk_parameters.used_posterior_refinement ? "vz-chip--ok" : "vz-chip--neutral"}`}>
+                    {displayResult.pk_parameters.used_posterior_refinement ? "Bayesian fit" : "Prior only"}
+                  </span>
+                </span>
               )}
-
-              {/* Row 4: Clinical Interpretation + Details — all collapsed */}
-              <details className="group border p-3" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                <summary className="cursor-pointer text-[11px] font-semibold flex items-center outline-none list-none uppercase tracking-[0.1em]" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>
-                  <svg className="w-3.5 h-3.5 mr-2 transition-transform group-open:rotate-90" style={{ color: "var(--color-dim)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  CLINICAL INTERPRETATION &amp; DOCUMENTATION
-                </summary>
-                <div className="mt-3 flex flex-col gap-3 border-t pt-3" style={{ borderTopColor: "var(--color-border)" }}>
-                  <FeatureGate
-                    feature="interpretation.why_this_result"
-                    fallback={
-                      <div className="rounded-lg border px-4 py-3" style={{ borderColor: "#bfdbfe", background: "#eff6ff" }}>
-                        <p className="text-sm font-semibold" style={{ color: "#1e40af" }}>
-                          Why this result — Individual Pro
-                        </p>
-                        <p className="mt-1 text-xs leading-relaxed" style={{ color: "#1e3a8a" }}>
-                          The plain-language clinical reasoning behind each recommendation
-                          (drivers, evidence, caveats) is part of the documentation suite on
-                          Individual Pro and above — alongside Copy Note and Export PDF.
-                        </p>
-                        <Link
-                          href="/pricing"
-                          className="mt-2 inline-block text-xs font-semibold underline"
-                          style={{ color: "#1e40af" }}
-                        >
-                          See pricing →
-                        </Link>
-                      </div>
-                    }
-                  >
-                    <InterpretationSummaryCard
-                      interpretation_summary={
-                        activeOption?.interpretation_summary ?? visibleResult.interpretation_summary
-                      }
-                    />
-                  </FeatureGate>
-                  <LimitationsCard limitations={visibleResult.limitations} calculationDetails={visibleResult.calculation_details} />
-                </div>
-              </details>
-
-              {/* Free-tier upgrade prompt — self-gates, dismissible per session */}
-              <UpgradeBanner />
+              {loading && (
+                <span className="vz-chip vz-chip--neutral" role="status">Running PK model<span className="mx-blink">_</span></span>
+              )}
             </div>
-          ) : (
-            /* ── Empty state: zeroed layout mirroring the populated calculator ── */
-            <div className="flex flex-col gap-3">
+            <div className="flex shrink-0 items-center gap-1.5">
+              {displayResult && (
+                <div className={exportsDisabled ? "pointer-events-none opacity-40" : ""} aria-disabled={exportsDisabled}>
+                  <div className="flex items-center gap-1.5">
+                    {!isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (
+                      <LoadingDosePopover weightKg={patient.weight_kg > 0 ? patient.weight_kg : null} onSimulate={handleSimulateLoadingDose} />
+                    )}
+                    <PdfExportGate tier={user?.subscriptionTier ?? "free"} onExport={handleExportPDF} />
+                    {clinicalNote && (
+                      <NoteExportGate tier={user?.subscriptionTier ?? "free"} onCopy={handleCopyNote} noteText={clinicalNote} />
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
-              {/* Row 1: Dose + PK panels — zeroed */}
-              <div className="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-3">
-
-                {/* Left: Dose recommendation placeholder */}
-                <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                  <div className="flex items-center justify-between border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                    <span className="text-[15px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--color-primary)" }}>SUGGESTED DOSE<span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span></span>
-                    <div className="flex items-center gap-2">
-                      <span className="border px-2 py-0.5 text-[10px] font-semibold" style={{ borderColor: "var(--color-border)", color: "var(--color-dim)", opacity: 0.4 }}>EXPORT PDF</span>
-                      <span className="border px-2 py-0.5 text-[10px] font-semibold" style={{ borderColor: "var(--color-border)", color: "var(--color-dim)", opacity: 0.4 }}>COPY NOTE</span>
+          <div className={`p-2 ${resultObscured ? "vz-obscured" : ""}`}>
+            <div className={resultObscured ? "vz-obscured-content" : ""} aria-hidden={resultObscured}>
+              {displayResult ? (
+                <div className="flex flex-col gap-2">
+                  {/* Pulse-dose curve toggle */}
+                  {displayResult.curve_engine_recommended && !activeOption && !displayResult.adjustment_dosing_blocked && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <span style={{ color: "var(--color-secondary)" }}>Curve:</span>
+                      <div className="vz-seg">
+                        <button type="button" aria-pressed={!showEngineRecommended} onClick={() => setShowEngineRecommended(false)}>
+                          {isPulse ? `Loading dose continued (${regimen.dose_mg} mg q${regimen.interval_hours}h)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`}
+                        </button>
+                        <button type="button" aria-pressed={showEngineRecommended} onClick={() => setShowEngineRecommended(true)}>
+                          Engine recommendation
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  <DoseRecommendationCard
+                    layout="band"
+                    showOptionTabs={false}
+                    showLoadingDose={false}
+                    activeOption={activeOption}
+                    activeIsCurrent={activeIsCurrent}
+                    recommended_dose={displayResult.recommended_dose}
+                    recommended_interval_hours={displayResult.recommended_interval_hours}
+                    recommendation_type={displayResult.recommendation_type}
+                    calculationDetails={displayResult.calculation_details}
+                    recommended_infusion_duration_hours={displayResult.recommended_infusion_duration_hours}
+                    infusion_duration_adjusted_for_safety={displayResult.infusion_duration_adjusted_for_safety}
+                    infusion_safety_note={displayResult.infusion_safety_note}
+                    frequency_options={displayResult.frequency_options}
+                    draftDiffersFromCalculated={hasStaleResult}
+                    onApplyRecommendation={handleApplyRecommendedRegimen}
+                    onSelectFrequency={handleSelectFrequency}
+                    onSimulateLoadingDose={handleSimulateLoadingDose}
+                    patientWeightKg={patient.weight_kg > 0 ? patient.weight_kg : null}
+                    auc_range_status={displayResult.auc_range_status}
+                    arc_advisory={displayResult.arc_advisory}
+                    auc24={displayResult.auc24}
+                    predicted_auc24={displayResult.predicted_auc24}
+                    isPulseDose={isPulse}
+                    loadingDoseMg={isPulse ? regimen.dose_mg : null}
+                    onUndoLoadingDose={preLoadingDoseState.current ? handleUndoLoadingDose : undefined}
+                    empiricDosingBlocked={displayResult.empiric_dosing_blocked}
+                    adjustmentDosingBlocked={displayResult.adjustment_dosing_blocked}
+                    metricsSlot={
+                      <div className="flex-[1.4] min-w-[300px]">
+                        <PrimaryMetricsCard compact caption={metricsCaption} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />
+                      </div>
+                    }
+                  />
+                  <TeachingNote label="Why this dose?">
+                    {displayResult.recommendation_type === "existing_regimen" ? (
+                      <>
+                        When the level data support an individualized fit, the engine evaluates doses of 250–2000 mg at
+                        q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄
+                        exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the
+                        midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor
+                        fit) it instead scales the current dose toward that midpoint at the current interval, within the same
+                        safety limits.
+                      </>
+                    ) : (
+                      <>
+                        The engine evaluates doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted
+                        peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄
+                        lands closest to the midpoint of the 400–600 target.
+                      </>
+                    )}{" "}
+                    Peak and trough are forward-predicted from the patient&rsquo;s posterior PK (or population prior if no
+                    level is fit) using the two-compartment model. The recommendation always favors options that stay
+                    within target rather than ones that hit midpoint exactly outside the window.
+                  </TeachingNote>
+                  {advisories.length > 0 && <div className="flex flex-col gap-1.5">{advisories}</div>}
+                </div>
+              ) : (
+                /* ── Empty state: zeroed band mirroring the populated layout ── */
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-wrap items-stretch gap-2" style={{ opacity: 0.45 }} aria-hidden="true">
+                    <div className="flex-1 min-w-[260px] px-3 py-2" style={{ background: "var(--color-bg)", border: "1px solid var(--color-primary-a40)" }}>
+                      <p className="vz-kicker m-0 mb-0.5">Recommended regimen</p>
+                      <div className="flex items-baseline gap-x-1.5">
+                        <span className="text-[34px] leading-none font-extrabold tabular-nums" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>&mdash;</span>
+                        <span className="text-lg font-semibold" style={{ color: "var(--color-secondary)" }}>mg</span>
+                        <span className="text-sm mx-1" style={{ color: "var(--color-dim)" }}>every</span>
+                        <span className="text-[34px] leading-none font-extrabold tabular-nums" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>&mdash;</span>
+                        <span className="text-lg font-semibold" style={{ color: "var(--color-secondary)" }}>h</span>
+                      </div>
+                    </div>
+                    <div className="flex-[1.4] min-w-[300px]">
+                      <PrimaryMetricsCard compact caption="Predicted steady-state exposure" auc24={null} peak={null} trough={null} />
                     </div>
                   </div>
-                  <div className="p-2">
-                    {/* Safety guardrails — always applicable */}
-                    <section className="border-l-4 border-amber-500 bg-amber-50 px-3 py-2 mb-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h2 className="text-sm font-semibold text-amber-950">Safety guardrails</h2>
-                          <ul className="mt-1 space-y-1 text-xs text-amber-900">
-                            <li>Adult intermittent IV workflow only.</li>
-                            <li>Not for pediatrics, dialysis-specific, or continuous infusion.</li>
-                            <li>Prior-only maintenance support; not patient-specific severity direction.</li>
-                          </ul>
-                        </div>
-                        <a href="/transparent-dosing" className="text-xs font-medium text-amber-950 underline hover:no-underline">Evidence</a>
-                      </div>
-                    </section>
-
-                    {/* Greyed-out frequency option placeholders */}
-                    <div className="flex gap-1.5 pb-2">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="shrink-0 flex flex-col items-center border px-3 py-2 text-center" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)", opacity: 0.35, minWidth: 72 }}>
-                          <span className="font-bold text-sm" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>&mdash; mg</span>
-                          <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>q&mdash;h</span>
-                          <span className="mt-1 inline-flex border px-1.5 py-0.5 text-[10px] font-semibold leading-none" style={{ borderColor: "var(--color-border)", color: "var(--color-dim)" }}>&mdash;</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Zeroed dose display */}
-                    <div className="px-4 py-3" style={{ background: "var(--color-bg)", border: "1px solid var(--color-primary-a40)", boxShadow: "0 0 16px var(--color-primary-a06)", opacity: 0.4 }}>
-                      <div className="flex flex-wrap items-baseline gap-x-1.5">
-                        <span className="text-4xl font-extrabold tabular-nums" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>&mdash;</span>
-                        <span className="text-xl font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>mg</span>
-                        <span className="text-base font-medium mx-1" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>every</span>
-                        <span className="text-4xl font-extrabold tabular-nums" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>&mdash;</span>
-                        <span className="text-xl font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>h</span>
-                      </div>
-                      <p className="mt-1 text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>Infuse over &mdash; hours.</p>
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>AUC24</span>
-                        <span className="tabular-nums text-sm font-bold" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>&mdash;</span>
-                        <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>mg·h/L</span>
-                      </div>
+                  {loading ? (
+                    <Advisory severity="info" title="Running PK model" summary="Calculating exposure metrics and regimen guidance…" role="status" />
+                  ) : !error ? (
+                    <Advisory
+                      severity="info"
+                      title={rrt === true ? "Calculator blocked for RRT." : patientReady ? "Ready." : "Enter patient data to begin."}
+                      summary={
+                        rrt === true
+                          ? "The model is not validated for renal replacement therapy."
+                          : mode === "initial_regimen"
+                            ? "Age, weight, serum creatinine and RRT status are required; the Bayesian engine runs automatically once they are present."
+                            : "Enter the current regimen and measured level(s), then press Calculate."
+                      }
+                      role="status"
+                    />
+                  ) : null}
+                  <div className="vz-advisory vz-advisory--caution" role="note">
+                    <div className="vz-advisory-row">
+                      <span aria-hidden="true" className="inline-flex h-4 min-w-4 items-center justify-center px-1 text-[10px] font-black leading-none" style={{ border: "1px solid currentColor", borderRadius: 3, marginTop: 2 }}>!</span>
+                      <span className="min-w-0">
+                        <span className="font-bold">Safety guardrails:</span> adult intermittent IV workflow only · not for pediatrics, dialysis-specific or continuous infusion · {mode === "initial_regimen" ? "prior-only maintenance support; not patient-specific severity direction" : "requires interpretable same-interval timing and routine dose history"}.
+                      </span>
+                      <a href="/transparent-dosing" className="text-[11px] font-semibold underline" style={{ color: "inherit" }}>Evidence</a>
                     </div>
                   </div>
                 </div>
-
-                {/* Right: Predicted PK — zeroed */}
-                <div className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)", minWidth: 280 }}>
-                  <div className="border-b px-3 py-1.5" style={{ borderBottomColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                    <span className="text-[13px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--color-primary)" }}>PREDICTED PK</span>
-                  </div>
-                  <div className="p-2 flex flex-col gap-2">
-                    <PrimaryMetricsCard auc24={null} peak={null} trough={null} />
-                    <div className="border px-3 py-2" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}>
-                      <PKParametersMath params={{ CL: 0, V1: 0, Q: 0, V2: 0, used_posterior_refinement: false, scr: 0 }} />
-                    </div>
-                  </div>
+              )}
+            </div>
+            {resultObscured && (
+              <div className="vz-obscured-overlay" role="status" aria-live="polite">
+                <div className="rounded-md border px-4 py-2 text-center text-xs font-semibold shadow-md" style={{ background: "#fffbeb", borderColor: "#fcd34d", color: "#78350f" }}>
+                  {loading ? "Running PK model…" : autoRecalcArmed ? "Inputs changed — recalculating…" : "Inputs changed — press Calculate to refresh these results."}
                 </div>
               </div>
-
-              {/* Row 2: Graph — empty axes with no curve */}
-              <section className="overflow-hidden border" style={{ borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-                <div className="p-2">
-                  <ConcentrationTimeGraph curve={[]} measured_levels={[]} calculationDetails={null} />
-                </div>
-              </section>
+            )}
+          </div>
+          {displayResult && !resultObscured && (
+            <div className="border-t px-2 py-1 text-[10.5px]" style={{ borderTopColor: "var(--color-border)", color: "var(--color-dim)" }}>
+              Safety guardrails: adult intermittent IV workflow only · not for pediatrics, dialysis-specific or continuous infusion ·{" "}
+              {displayResult.recommendation_type === "initial_regimen" ? "prior-only maintenance support; not patient-specific severity direction" : "requires interpretable same-interval timing and routine dose history"}.{" "}
+              <a href="/transparent-dosing" className="underline">Evidence</a>
             </div>
           )}
-        </CalculatorResultState>
-      )}
+        </section>
+
+        {/* ── Concentration-time graph ── */}
+        <section className={`vz-area-graph vz-panel flex flex-col ${resultObscured ? "vz-obscured" : ""}`} aria-label="Concentration-time graph panel">
+          <div className={`flex min-h-0 flex-1 flex-col p-2 ${resultObscured ? "vz-obscured-content" : ""}`}>
+            <ConcentrationTimeGraph
+              fill={graphFill}
+              curve={graphCurve}
+              comparison_curve={comparisonCurve}
+              comparison_label={comparisonLabel}
+              measured_levels={displayResult?.measured_levels ?? []}
+              calculationDetails={displayResult?.calculation_details ?? null}
+              pk_model_name={displayResult?.pk_parameters?.pk_model_name}
+              uncertainty_label={displayResult ? deriveBandUncertaintyLabel(displayResult) : undefined}
+            />
+          </div>
+        </section>
+
+        {/* ── Side rail: alternatives + secondary detail ── */}
+        <aside className="vz-area-side flex flex-col gap-2" aria-label="Regimen comparison and calculation details">
+          <section className={`vz-panel shrink-0 ${resultObscured ? "vz-obscured" : ""}`} aria-labelledby="vz-alt-title">
+            <div className="vz-panel-head">
+              <h2 id="vz-alt-title" className="vz-panel-title m-0">Candidate regimens</h2>
+              {displayResult && (
+                <span className="text-[10px]" style={{ color: "var(--color-dim)" }}>select a row to preview</span>
+              )}
+            </div>
+            <div className={resultObscured ? "vz-obscured-content" : ""}>
+              {displayResult && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked ? (
+                <RegimenComparisonTable
+                  options={displayResult.frequency_options}
+                  activeOption={activeIsCurrent ? null : activeOption}
+                  onSelect={handleSelectFrequency}
+                  current={currentRegimenRow}
+                  onApply={displayResult.recommendation_type === "existing_regimen" && !isPulse ? (option) => {
+                    setRegimen((current) => ({
+                      ...current,
+                      dose_mg: option.dose_mg,
+                      interval_hours: option.interval_hours,
+                      infusion_duration_hours: option.infusion_duration_hours || (current.infusion_duration_hours > 0 ? current.infusion_duration_hours : 1),
+                    }));
+                  } : null}
+                />
+              ) : (
+                <p className="px-3 py-3 text-xs" style={{ color: "var(--color-dim)" }}>
+                  {displayResult ? "No candidate regimens — see the safety state above." : "Candidate regimens with predicted AUC₂₄, peak and trough appear here after calculation."}
+                </p>
+              )}
+            </div>
+          </section>
+
+          <section className={`vz-panel flex min-h-0 flex-1 flex-col ${resultObscured ? "vz-obscured" : ""}`} aria-label="Calculation details">
+            <div className={`flex min-h-0 flex-1 flex-col ${resultObscured ? "vz-obscured-content" : ""}`}>
+              {displayResult ? (
+                <ResultDetailTabs tabs={detailTabs} storageKey="vancomyzer_detail_tab" />
+              ) : (
+                <div className="p-2.5">
+                  <div className="vz-tabs -mx-2.5 -mt-2.5 mb-2" aria-hidden="true">
+                    <button type="button" role="tab" aria-selected="true" tabIndex={-1}>PK parameters</button>
+                    <button type="button" role="tab" aria-selected="false" tabIndex={-1}>Method</button>
+                    <button type="button" role="tab" aria-selected="false" tabIndex={-1}>Interpretation</button>
+                  </div>
+                  <PKParametersMath params={{ CL: 0, V1: 0, Q: 0, V2: 0, used_posterior_refinement: false, scr: 0 }} />
+                  <div className="mt-2">
+                    <CalculationMethodPanel mode={mode} levelCount={levels.length} details={null} assumptions={[]} infusionDurationAdjustedForSafety={false} pkModelName={null} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Free-tier upgrade prompt — self-gates, dismissible per session */}
+          <UpgradeBanner />
+        </aside>
+      </div>
     </div>
   );
 
   return (
-    <div className="relative flex h-screen flex-col overflow-hidden xl:overflow-hidden" style={{ background: "transparent", color: "var(--color-primary)" }}>
+    <div className="vz-app relative" style={{ background: "var(--color-bg)", color: "var(--color-primary)" }}>
       {/* LOGOUT only when someone is signed in; open-access visitors get a
           SIGN IN link in the same slot once the session check has settled. */}
       <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} userName={user?.username} userRole={user?.role} onLogout={user ? logout : undefined} showSignIn={!authLoading && !user} />
       {loadedCase && (
         <div
           role="status"
+          className="shrink-0"
           style={{
-            padding: "8px 16px",
+            padding: "4px 12px",
             background: "#eff6ff",
             borderBottom: "1px solid #bfdbfe",
             color: "#1e3a8a",
@@ -1540,9 +1456,7 @@ export default function CalculatorWorkspace() {
           </button>
         </div>
       )}
-      <div className="flex-1 overflow-auto xl:overflow-hidden h-full">
-        <CalculatorLayout left={leftColumn} right={rightColumn} />
-      </div>
+      <CalculatorLayout left={leftColumn} right={rightColumn} />
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <DisclaimerModal open={disclaimerOpen} onClose={() => setDisclaimerOpen(false)} />
     </div>

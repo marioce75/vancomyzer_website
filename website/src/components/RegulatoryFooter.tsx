@@ -12,6 +12,7 @@ export default function RegulatoryFooter() {
   return (
     <div
       role="contentinfo"
+      className="vz-regulatory-footer"
       aria-label="Regulatory disclaimer"
       style={{
         borderTop: "1px solid var(--color-border)",

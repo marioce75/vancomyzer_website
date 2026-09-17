@@ -10,14 +10,14 @@ interface RegimenFormProps {
 }
 
 const inputClass = (hasError: boolean) =>
-  `block w-full h-10 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 transition-colors ${
+  `block w-full h-9 px-2.5 border rounded-md text-sm focus:outline-none focus:ring-1 transition-colors ${
     hasError
       ? "border-red-500 ring-1 ring-red-500 bg-[rgba(239,68,68,0.06)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
       : "border-[var(--navy-border-strong)] bg-[rgba(255,255,255,0.05)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:ring-[var(--teal)] focus:border-[var(--teal)]"
   }`;
 
 const Label = ({ children }: { children: React.ReactNode }) => (
-  <label className="block text-sm font-medium text-slate-600 mb-1">
+  <label className="block text-xs font-semibold text-slate-600 mb-0.5">
     {children}
   </label>
 );
@@ -55,8 +55,8 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+    <div className="space-y-2.5">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-2">
         <InputGroup label="Dose (mg)" error={fieldErrors.dose_mg ?? parseErrors.dose}>
           <ClinicalNumberInput
             inputMode="decimal"
@@ -78,7 +78,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                   key={preset}
                   type="button"
                   onClick={() => update({ target_auc24: preset })}
-                  className={`flex-1 h-10 rounded-md border text-sm font-semibold transition ${
+                  className={`flex-1 h-9 rounded-md border text-sm font-semibold transition ${
                     (value.target_auc24 ?? 450) === preset
                       ? "border-blue-300 bg-blue-600 text-white shadow-sm"
                       : "border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50"
@@ -125,17 +125,17 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
         {infusionWarning && <p className="text-xs text-amber-700 mt-1">⚠ {infusionWarning}</p>}
 
         {/* Full-width doses given selector */}
-        <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">
-            Number of doses given before levels drawn
+        <div className="col-span-2">
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Doses given before levels drawn
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {[1, 2, 3, 4, 5].map((n) => (
               <button
                 key={n}
                 type="button"
                 onClick={() => handleDosesGiven(n)}
-                className={`flex-1 min-w-[52px] rounded-lg border py-2 text-sm font-semibold transition ${
+                className={`flex-1 min-w-[40px] rounded-md border py-1.5 text-xs font-semibold transition ${
                   (value.doses_given ?? 0) === n
                     ? "border-blue-300 bg-blue-600 text-white shadow-sm"
                     : "border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50"
@@ -147,7 +147,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
             <button
               type="button"
               onClick={() => handleDosesGiven(6)}
-              className={`flex-1 min-w-[52px] rounded-lg border py-2 text-sm font-semibold transition ${
+              className={`flex-1 min-w-[40px] rounded-md border py-1.5 text-xs font-semibold transition ${
                 (value.doses_given ?? 0) >= 6
                   ? "border-blue-300 bg-blue-600 text-white shadow-sm"
                   : "border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50"
@@ -157,14 +157,14 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
             </button>
           </div>
           {isPulseDose && (
-            <div className="mt-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2">
+            <div className="mt-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5">
               <p className="text-xs text-blue-800">
                 <strong>Pulse / single-dose Bayesian:</strong> One dose given. The Bayesian engine will estimate your patient&apos;s individual CL and V from this level and project a maintenance regimen to hit your AUC₂₄ target. No steady-state assumed.
               </p>
             </div>
           )}
           {(value.doses_given ?? 0) > 1 && (value.doses_given ?? 0) < 5 && (
-            <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+            <div className="mt-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5">
               <p className="text-xs text-amber-800">
                 <strong>Non-steady-state:</strong> With only {value.doses_given} doses, vancomycin has not yet reached steady state. Fewer than 5 doses is treated as non-steady state; see limitations in the result.
               </p>

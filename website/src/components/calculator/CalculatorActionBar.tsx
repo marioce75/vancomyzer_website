@@ -6,6 +6,8 @@ interface CalculatorActionBarProps {
   disabled?: boolean;
   /** When true, the Calculate button is hidden entirely (e.g. bedbound Phase 1 — awaiting level). */
   hideCalculate?: boolean;
+  /** A calculation is in flight — the button reads CALCULATING_. Other disabled reasons keep the CALCULATE label. */
+  loading?: boolean;
   /** When true, render the optional Case ID input (Pro+ users only). */
   showCaseId?: boolean;
   caseId?: string;
@@ -16,13 +18,14 @@ export default function CalculatorActionBar({
   onCalculate,
   onReset,
   disabled,
+  loading,
   hideCalculate,
   showCaseId,
   caseId,
   onCaseIdChange,
 }: CalculatorActionBarProps) {
   return (
-    <div className="mt-1 flex flex-col items-center gap-2">
+    <div className="flex flex-col items-stretch gap-1.5">
       {showCaseId && (
         <div className="flex w-full max-w-md items-center gap-2">
           <label
@@ -50,14 +53,8 @@ export default function CalculatorActionBar({
           />
         </div>
       )}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
-      <p
-        className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.16em] text-center"
-        style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em" }}
-      >
-        recalculate after{"\n"}any draft change
-      </p>
-      <div className="flex justify-center gap-3">
+      <div className="flex items-center justify-end gap-2">
+      <div className="flex flex-1 justify-end gap-2">
         <button
           type="button"
           onClick={onReset}
@@ -104,7 +101,8 @@ export default function CalculatorActionBar({
             type="button"
             onClick={onCalculate}
             disabled={disabled}
-            className="inline-flex items-center gap-2 px-6 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60"
+            title="Calculate (Ctrl/⌘ + Enter)"
+            className="inline-flex items-center gap-2 px-6 py-2 text-sm font-bold uppercase tracking-wider transition focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60"
             style={{
               background: "var(--color-primary)",
               border: "1px solid var(--color-primary)",
@@ -115,7 +113,7 @@ export default function CalculatorActionBar({
             onMouseEnter={e => { if (!disabled) { (e.currentTarget as HTMLButtonElement).style.background = "var(--color-secondary)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-secondary)"; } }}
             onMouseLeave={e => { if (!disabled) { (e.currentTarget as HTMLButtonElement).style.background = "var(--color-primary)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-primary)"; } }}
           >
-            {disabled && (
+            {loading && (
               /* Terminal blink instead of spinner */
               <span
                 className="mx-blink text-sm font-bold"
@@ -125,7 +123,7 @@ export default function CalculatorActionBar({
                 _
               </span>
             )}
-            {disabled ? "CALCULATING_" : "CALCULATE"}
+            {loading ? "CALCULATING_" : "CALCULATE"}
           </button>
         )}
       </div>

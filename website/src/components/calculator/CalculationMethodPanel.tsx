@@ -27,40 +27,29 @@ export default function CalculationMethodPanel({
   pkModelName,
 }: CalculationMethodPanelProps) {
   return (
-    <div className="rounded-[18px] border border-slate-200 bg-slate-50 p-4">
-      <h3 className="m-0 mb-3 text-base font-semibold text-slate-900">How this was calculated</h3>
-      
-      <div className="mb-3 grid gap-2 text-sm text-slate-700">
-        <div className="flex justify-between gap-4 rounded-xl border border-slate-200 bg-white px-3 py-2">
-          <span className="font-medium text-slate-500">Method</span>
-          <span>{details?.method ?? modeLabel(mode, levelCount)}</span>
-        </div>
-        <div className="flex justify-between gap-4 rounded-xl border border-slate-200 bg-white px-3 py-2">
-          <span className="font-medium text-slate-500">Model</span>
-          <span>{modelShortName(pkModelName)} &middot; Adult Intermittent IV</span>
-        </div>
-        <div className="flex justify-between gap-4 rounded-xl border border-slate-200 bg-white px-3 py-2">
-          <span className="font-medium text-slate-500">Safety Bounds</span>
-          <span>{infusionDurationAdjustedForSafety ? "Infusion rate maxed" : "Standard"}</span>
-        </div>
-      </div>
+    <div>
+      <h3 className="vz-kicker m-0 mb-1.5">How this was calculated</h3>
+      <dl className="vz-kv mb-2">
+        <dt>Method</dt><dd>{details?.method ?? modeLabel(mode, levelCount)}</dd>
+        <dt>Model</dt><dd>{modelShortName(pkModelName)} &middot; Adult intermittent IV &middot; two-compartment</dd>
+        <dt>Workflow</dt><dd>{details?.review_status.workflow_fit ?? modeLabel(mode, levelCount)}</dd>
+        <dt>Evidence</dt><dd>{details?.evidence_strength ?? "—"}</dd>
+        <dt>Safety bounds</dt><dd>{infusionDurationAdjustedForSafety ? "Infusion rate limited to 10 mg/min (duration extended)" : "Standard (10 mg/min max, ≥60 min)"}</dd>
+        <dt>Target</dt><dd>AUC₂₄ 400–600 mg·h/L (ASHP/IDSA/PIDS/SIDP 2020)</dd>
+      </dl>
 
-      <details className="group">
-        <summary className="list-none flex cursor-pointer items-center text-sm font-medium text-cyan-700 hover:text-cyan-900">
+      <details className="group" open>
+        <summary className="list-none flex cursor-pointer items-center text-xs font-semibold text-blue-700 hover:text-blue-900">
           <svg className="w-4 h-4 mr-1 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-          More details
+          Assumptions &amp; references
         </summary>
-        <div className="mt-3 flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-600">
-          <div>
-            <strong className="mb-1 block text-slate-800">Formulas</strong>
-            <p>Target AUC24: 400–600 mg·h/L. Logic path: {details?.review_status.workflow_fit ?? modeLabel(mode, levelCount)}</p>
-          </div>
+        <div className="mt-2 flex flex-col gap-2 text-xs text-slate-600">
           <div>
             <strong className="mb-1 block text-slate-800">Assumptions</strong>
             <ul className="list-disc pl-4 space-y-1">
-              {assumptions.slice(0, 3).map((a, i) => (
+              {assumptions.map((a, i) => (
                 <li key={i}>{a}</li>
               ))}
               {assumptions.length === 0 && <li>Adult intermittent IV workflow only. Steady state assumed unless prior doses specified.</li>}

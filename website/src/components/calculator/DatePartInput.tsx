@@ -83,8 +83,8 @@ function CalendarPopup({ selectedDate, anchorEl, onSelect, onClose }: CalendarPo
       ref={popupRef}
       style={{
         position: "absolute", top, left, zIndex: 9999,
-        background: 'var(--navy-card-raised, #ffffff)',
-        border: '1px solid var(--navy-border-strong, #cbd5e0)',
+        background: '#ffffff',
+        border: '1px solid #cbd5e0',
         boxShadow: '0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.05)',
       }}
       className="w-60 rounded-xl p-3 select-none"
@@ -152,7 +152,7 @@ function CalendarPopup({ selectedDate, anchorEl, onSelect, onClose }: CalendarPo
       </div>
 
       {/* Today shortcut */}
-      <div className="mt-2 pt-2 border-t" style={{borderTopColor: 'var(--navy-border)'}}>
+      <div className="mt-2 pt-2 border-t" style={{borderTopColor: '#e2e8f0'}}>
         <button
           type="button"
           onClick={() => { onSelect(today); onClose(); }}

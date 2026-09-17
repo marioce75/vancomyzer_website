@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { CalculationDetails } from "@/types/calculator";
 import { modelShortName } from "@/lib/pk/modelRegistry";
 
@@ -20,6 +20,20 @@ interface ConcentrationTimeGraphProps {
    *  illustrative band drawn around the predicted curve. The band is a fixed
    *  ± percentage, not a statistical confidence or prediction interval. */
   uncertainty_label?: "population_only" | "low" | "moderate" | "high" | "very_high";
+  /**
+   * Fill the parent panel's height (desktop cockpit) instead of the fixed
+   * 280px canvas. The draw loop reads the canvas's rendered size every frame,
+   * so the plot rescales with the panel; the PK data are untouched.
+   */
+  fill?: boolean;
+  /**
+   * Reference curve drawn as a dashed line beneath the predicted curve, so a
+   * selected alternative (or the current regimen) can be compared with the
+   * engine's recommendation without replacing it. Display only.
+   */
+  comparison_curve?: CurvePoint[] | null;
+  /** Legend label for the comparison curve (e.g. "Recommended 1250 mg q12h"). */
+  comparison_label?: string | null;
 }
 
 /**
@@ -46,6 +60,7 @@ function uncertaintyBandFactor(label: ConcentrationTimeGraphProps["uncertainty_l
 /* ── Constants ──────────────────────────────────────────────────── */
 
 const FONT = "'Share Tech Mono', 'Courier New', monospace";
+const ZOOM_STORAGE_KEY = "vancomyzer_graph_zoom";
 const PAD = { top: 24, right: 60, bottom: 42, left: 56 };
 /** Trough reference lines (mg/L). A reference only; the dosing target is AUC24 400–600 mg·h/L. */
 const TROUGH_REF_LOW = 10;
@@ -144,6 +159,7 @@ function drawGraph(
   mouse: { x: number; y: number } | null,
   animProgress: number,
   bandFactor: number,
+  comparison: CurvePoint[] = [],
 ) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -168,7 +184,7 @@ function drawGraph(
   const crossV = getCSSColor("--color-primary-a40", "rgba(0,255,65,0.4)");
   const crossH = getCSSColor("--color-primary-a20", "rgba(0,255,65,0.2)");
 
-  const { xMin, xMax, yMin, yMax } = calcDomains(curve, measured, zoom);
+  const { xMin, xMax, yMin, yMax } = calcDomains([...curve, ...comparison], measured, zoom);
   const gw = w - PAD.left - PAD.right;
   const gh = h - PAD.top - PAD.bottom;
 
@@ -348,6 +364,24 @@ function drawGraph(
       ctx.closePath();
       ctx.fill();
     }
+  }
+
+  // ─── Comparison curve (dashed reference — the engine recommendation while
+  //      an alternative or the current regimen is selected) ───
+  if (comparison.length > 1) {
+    ctx.save();
+    ctx.strokeStyle = secondary;
+    ctx.globalAlpha = 0.85;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(toX(comparison[0].time_hours), toY(comparison[0].concentration));
+    for (let i = 1; i < comparison.length; i++) {
+      ctx.lineTo(toX(comparison[i].time_hours), toY(comparison[i].concentration));
+    }
+    ctx.stroke();
+    ctx.restore();
   }
 
   // ─── Glow path ───
@@ -532,22 +566,38 @@ function drawGraph(
 /* ── Component ──────────────────────────────────────────────── */
 
 export default function ConcentrationTimeGraph({
+  fill = false,
   curve,
   measured_levels,
   calculationDetails,
   pk_model_name,
   uncertainty_label,
+  comparison_curve,
+  comparison_label,
 }: ConcentrationTimeGraphProps) {
   const bandFactor = uncertaintyBandFactor(uncertainty_label);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [zoom, setZoom] = useState(96);
+  // Zoom window persists for the session so recalculating keeps the view.
+  const [zoom, setZoomState] = useState(96);
+  useEffect(() => {
+    try {
+      const stored = Number(sessionStorage.getItem(ZOOM_STORAGE_KEY));
+      if ([24, 48, 96, 168].includes(stored)) setZoomState(stored);
+    } catch { /* storage unavailable */ }
+  }, []);
+  const setZoom = useCallback((z: number) => {
+    setZoomState(z);
+    try { sessionStorage.setItem(ZOOM_STORAGE_KEY, String(z)); } catch { /* ignore */ }
+  }, []);
   const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
   const animRef = useRef(0);
   const rafRef = useRef(0);
   const prevCurveLen = useRef(0);
 
-  const curveData = curve ?? [];
-  const measuredData = measured_levels ?? [];
+  // Stable references so the draw-loop effect only restarts when data changes.
+  const curveData = useMemo(() => curve ?? [], [curve]);
+  const measuredData = useMemo(() => measured_levels ?? [], [measured_levels]);
+  const comparisonData = useMemo(() => comparison_curve ?? [], [comparison_curve]);
 
   // Animate curve on new data
   useEffect(() => {
@@ -585,13 +635,13 @@ export default function ConcentrationTimeGraph({
       if (!running) return;
       const canvas = canvasRef.current;
       if (canvas) {
-        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandFactor);
+        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandFactor, comparisonData);
       }
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
     return () => { running = false; };
-  }, [curveData, measuredData, zoom, mouse, bandFactor]);
+  }, [curveData, measuredData, zoom, mouse, bandFactor, comparisonData]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -604,30 +654,32 @@ export default function ConcentrationTimeGraph({
   const evidenceLabel = calculationDetails?.evidence_strength ?? "";
 
   return (
-    <div className="flex flex-col gap-0 w-full" aria-label="Concentration-time graph">
+    <div className={`flex flex-col gap-0 w-full ${fill ? "vz-graph-fill" : ""}`} aria-label="Concentration-time graph">
       {/* Header line */}
       <div
-        className="flex flex-wrap items-center gap-2 px-1 pb-2"
+        className="flex items-center justify-between gap-2 px-1 pb-1.5 shrink-0"
         style={{ fontFamily: FONT }}
       >
+        <div className="flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap">
         <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: getCSSColor("--color-secondary", "#00cc44") }}>
           CONCENTRATION-TIME PROFILE
         </span>
         {modelLabel && (
-          <>
+          <span className="hidden md:contents">
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{modelLabel}</span>
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>Two-Compartment</span>
-          </>
+          </span>
         )}
         {evidenceLabel && (
-          <>
+          <span className="hidden md:contents">
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{evidenceLabel}</span>
-          </>
+          </span>
         )}
-        <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
+        </div>
+        <div className="flex shrink-0 items-center gap-1" role="group" aria-label="Time window">
         {[24, 48, 96, 168].map((z) => (
           <button
             key={z}
@@ -662,25 +714,31 @@ export default function ConcentrationTimeGraph({
             {z}H
           </button>
         ))}
+        </div>
       </div>
 
       {/* Canvas */}
       <canvas
         ref={canvasRef}
         className="w-full"
-        style={{ height: 280, background: "var(--color-card)", cursor: "crosshair" }}
+        style={{ height: fill ? undefined : "clamp(240px, 38vh, 320px)", background: "var(--color-card)", cursor: "crosshair" }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       />
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-3 px-1 pt-2" style={{ fontFamily: FONT }}>
-        <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 px-1 pt-1.5 shrink-0" style={{ fontFamily: FONT }}>
+        <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span className="inline-block w-4 h-0.5" style={{ background: getCSSColor("--color-primary", "#00ff41") }} /> Predicted
         </span>
+        {comparisonData.length > 1 && (
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
+            <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44"), borderTopWidth: 1.5 }} /> {comparison_label ?? "Reference"}
+          </span>
+        )}
         {bandFactor > 0 && (
           <span
-            className="flex items-center gap-1 text-[8px]"
+            className="flex items-center gap-1 text-[10px]"
             style={{ color: getCSSColor("--color-dim", "#009933") }}
             title={`Illustrative ±${(bandFactor * 100).toFixed(0)}% range for a "${uncertainty_label?.replace(/_/g, " ") ?? "unspecified"}" uncertainty label. A fixed percentage around the predicted curve, not a statistical confidence or prediction interval.`}
           >
@@ -688,20 +746,20 @@ export default function ConcentrationTimeGraph({
             Illustrative ±{(bandFactor * 100).toFixed(0)}% range (not a statistical confidence or prediction interval)
           </span>
         )}
-        <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
+        <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44") }} /> Trough reference 10–20 mg/L (not the dosing target; target is AUC₂₄ 400–600)
         </span>
-        <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
+        <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span className="inline-block w-3 h-3" style={{ background: "var(--color-primary-a08)", border: "1px solid var(--color-primary-a20)" }} /> AUC₂₄
         </span>
-        <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
+        <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           ◆ Trough
         </span>
-        <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
+        <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span style={{ color: getCSSColor("--color-primary", "#00ff41") }}>▲</span> Peak
         </span>
         {measuredData.length > 0 && (
-          <span className="flex items-center gap-1 text-[8px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
             <span className="inline-block w-2 h-2" style={{ background: "#fff", border: `1px solid ${getCSSColor("--color-primary", "#00ff41")}` }} /> Measured
           </span>
         )}

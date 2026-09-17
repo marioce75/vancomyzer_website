@@ -74,14 +74,14 @@ export { manualHoursCollectionTime };
 // ── Shared styles ─────────────────────────────────────────────
 
 const inputClass = (hasError: boolean) =>
-  `w-full h-[40px] px-3 border rounded text-sm focus:outline-none focus:ring-2 ${
+  `w-full h-9 px-2.5 border rounded text-sm focus:outline-none focus:ring-2 ${
     hasError
       ? "border-red-500 ring-1 ring-red-500 bg-[rgba(239,68,68,0.06)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
       : "border-[var(--navy-border-strong)] bg-[rgba(255,255,255,0.05)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:ring-[var(--teal)] focus:border-[var(--teal)]"
   }`;
 
 const Label = ({ children }: { children: React.ReactNode }) => (
-  <label className="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wide">
+  <label className="block text-xs font-semibold text-slate-600 mb-0.5">
     {children}
   </label>
 );
@@ -225,7 +225,7 @@ export default function LevelEntryTable({
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {levels.map((level, i) => {
         const timeError = fieldErrors[`levels[${i}].time_since_last_dose_hours`];
         const valueError = fieldErrors[`levels[${i}].value_mcg_ml`];
@@ -243,7 +243,7 @@ export default function LevelEntryTable({
           /^\d{4}-\d{2}-\d{2}$/.test(dt.doseDate);
 
         return (
-          <div key={i} className="rounded-xl p-3 flex flex-col gap-3" style={{border: '1px solid var(--navy-border)', background: 'rgba(10,22,40,0.4)'}}>
+          <div key={i} className="rounded-md p-2.5 flex flex-col gap-2.5" style={{border: '1px solid var(--color-border)', background: 'var(--color-highlight, #f7fafc)'}}>
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Level {i + 1}</span>
               <button
@@ -279,7 +279,7 @@ export default function LevelEntryTable({
                   className={(invalidText) => `${inputClass(Boolean(valueError || invalidText))} rounded-r-none`}
                   placeholder="e.g. 18.5"
                 />
-                <span className="flex items-center px-3 text-xs rounded-r h-[40px] shrink-0" style={{background: 'rgba(255,255,255,0.04)', border: '1px solid var(--navy-border-strong)', borderLeft: 'none', color: 'var(--text-muted)'}}>
+                <span className="flex items-center px-2.5 text-xs rounded-r h-9 shrink-0" style={{background: '#edf2f7', border: '1px solid #a0aec0', borderLeft: 'none', color: '#4a5568'}}>
                   mcg/mL
                 </span>
               </div>
@@ -305,7 +305,7 @@ export default function LevelEntryTable({
                         onChange={(v) => updateDateTime(i, "levelDate", v)}
                         hasError={Boolean(timeError || collectionError)}
                       />
-                      <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[10px] mt-0.5">Date (MM / DD / YYYY)</p>
+                      <p className="text-[10px] mt-0.5 text-slate-500">Date (MM / DD / YYYY)</p>
                     </div>
                     <div>
                       <div className="flex gap-1">
@@ -322,18 +322,18 @@ export default function LevelEntryTable({
                           type="button"
                           tabIndex={-1}
                           onClick={() => updateDateTime(i, "levelTime", nowHHMM())}
-                          className="shrink-0 h-[40px] px-2.5 rounded border text-xs font-semibold transition-colors"
-                          style={{border: '1px solid var(--navy-border-strong)', background: 'rgba(255,255,255,0.04)', color: 'var(--text-secondary)'}}
+                          className="shrink-0 h-9 px-2.5 rounded border text-xs font-semibold transition-colors"
+                          style={{border: '1px solid #a0aec0', background: '#fff', color: '#2b6cb0'}}
                           title="Stamp current time"
                         >
                           Now
                         </button>
                       </div>
-                      <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[10px] mt-0.5">Military time (HH:MM)</p>
+                      <p className="text-[10px] mt-0.5 text-slate-500">Military time (HH:MM)</p>
                       {dt.levelTimeErr && <p className="text-[10px] text-red-600">{dt.levelTimeErr}</p>}
                     </div>
                   </div>
-                  <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[11px] mt-1">Exact date and time blood was drawn</p>
+                  <p className="text-[11px] mt-1 text-slate-500">Exact date and time blood was drawn</p>
                 </div>
 
                 {/* Cross-midnight banner */}
@@ -356,7 +356,7 @@ export default function LevelEntryTable({
                         onChange={(v) => updateDateTime(i, "doseDate", v)}
                         hasError={false}
                       />
-                      <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[10px] mt-0.5">Date (MM / DD / YYYY)</p>
+                      <p className="text-[10px] mt-0.5 text-slate-500">Date (MM / DD / YYYY)</p>
                     </div>
                     <div>
                       <div className="flex gap-1">
@@ -373,18 +373,18 @@ export default function LevelEntryTable({
                           type="button"
                           tabIndex={-1}
                           onClick={() => updateDateTime(i, "doseTime", nowHHMM())}
-                          className="shrink-0 h-[40px] px-2.5 rounded border text-xs font-semibold transition-colors"
-                          style={{border: '1px solid var(--navy-border-strong)', background: 'rgba(255,255,255,0.04)', color: 'var(--text-secondary)'}}
+                          className="shrink-0 h-9 px-2.5 rounded border text-xs font-semibold transition-colors"
+                          style={{border: '1px solid #a0aec0', background: '#fff', color: '#2b6cb0'}}
                           title="Stamp current time"
                         >
                           Now
                         </button>
                       </div>
-                      <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[10px] mt-0.5">Military time (HH:MM)</p>
+                      <p className="text-[10px] mt-0.5 text-slate-500">Military time (HH:MM)</p>
                       {dt.doseTimeErr && <p className="text-[10px] text-red-600">{dt.doseTimeErr}</p>}
                     </div>
                   </div>
-                  <p style={{color:"var(--color-secondary, #e0e0e0)"}} className="text-[11px] mt-1">Start of the <strong>most recent</strong> infusion before this level was drawn</p>
+                  <p className="text-[11px] mt-1 text-slate-500">Start of the <strong>most recent</strong> infusion before this level was drawn</p>
                 </div>
 
                 {/* Live hours post-dose preview */}
@@ -425,7 +425,7 @@ export default function LevelEntryTable({
                     className={(invalidText) => `${inputClass(Boolean(timeError || collectionError || invalidText))} rounded-r-none`}
                     placeholder="e.g. 2.5"
                   />
-                  <span className="flex items-center px-3 text-xs rounded-r h-[40px] shrink-0" style={{background: 'rgba(255,255,255,0.04)', border: '1px solid var(--navy-border-strong)', borderLeft: 'none', color: 'var(--text-muted)'}}>
+                  <span className="flex items-center px-2.5 text-xs rounded-r h-9 shrink-0" style={{background: '#edf2f7', border: '1px solid #a0aec0', borderLeft: 'none', color: '#4a5568'}}>
                     hours
                   </span>
                 </div>

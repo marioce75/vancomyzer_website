@@ -442,7 +442,11 @@ export function buildAdjustmentRecommendation(
     }
   }
 
-  /** Best regimen from the screened grid, or null when the grid is empty. */
+  /**
+   * Best regimen from the screened grid, or null when the grid is empty.
+   * Every non-null return goes through the chokepoint.
+   * @safety-checked-via: finalizeRecommendation
+   */
   const gridRecommendation = (): AdjustmentRecommendation | null => {
     const inRangeCandidates = candidates.filter((candidate) => candidate.auc24 >= TARGET_AUC24_LOW && candidate.auc24 <= TARGET_AUC24_HIGH);
     if (inRangeCandidates.length > 0) {
@@ -481,6 +485,11 @@ export function buildAdjustmentRecommendation(
     return null;
   };
 
+  /**
+   * Fallback when the grid is empty: same-interval scaling (itself routed
+   * through finalizeRecommendation) or the current regimen re-checked.
+   * @safety-checked-via: finalizeRecommendation
+   */
   const lastResort = (): AdjustmentRecommendation =>
     auc24 > 0
       ? conservativeSameIntervalDose(current_regimen_dose_mg, current_regimen_interval_hours, auc24, current_regimen_infusion_hours, safety, maxTddMgPerDay, maxSingleDoseMg)
