@@ -1028,33 +1028,14 @@ export default function CalculatorWorkspace() {
     </div>
   );
 
-  // Does anything actually occupy the advisory rail? When nothing does, the
-  // two-column grid would reserve ~38% of the workspace for an empty column.
-  const hasAdvisoryRail =
-    (hasStaleResult && !loading) ||
-    (visibleResult?.timing_warnings?.length ?? 0) > 0 ||
-    (visibleResult?.fit_quality_warnings?.length ?? 0) > 0 ||
-    (viewMode === "empiric" && visibleResult != null) ||
-    (patient.age > 65 && !rrt);
-
   const rightColumn = (
-    <div className="flex flex-col h-full gap-3">
-      {/* Single-line strip: the two-line header cost ~30px of the fold for no
-          information the title bar does not already carry. */}
-      <div className="border-l-4 border px-4 py-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-0.5" style={{ borderLeftColor: "var(--color-primary)", borderColor: "var(--color-border)", background: "var(--color-card)" }}>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>ANALYSIS WORKSPACE</p>
-        <h2 className="text-xs font-semibold leading-snug" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>Model outputs, exposure metrics &amp; regimen guidance</h2>
+    <div className="flex flex-col h-full gap-6">
+      <div className="border-l-4 border px-4 py-3 flex items-center gap-3" style={{ borderLeftColor: "var(--color-primary)", borderColor: "var(--color-border)", background: "var(--color-card)" }}>
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>ANALYSIS WORKSPACE</p>
+          <h2 className="text-sm font-semibold leading-snug" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>Model outputs, exposure metrics &amp; regimen guidance</h2>
+        </div>
       </div>
-
-      {/* Two-column workspace. The advisory stack used to run full width ABOVE
-          the results, which pushed the concentration-time graph below the fold:
-          the clinician had to scroll to see the curve. The advisories now sit in
-          a parallel rail, so nothing is hidden or collapsed, and the dose, the
-          exposure metrics and the graph all land in the first screen. Below xl
-          the grid collapses to one column and the original stacked order
-          returns, so narrow displays are unchanged. */}
-      <div className={`grid grid-cols-1 gap-3 items-start ${hasAdvisoryRail ? "xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,1fr)]" : "xl:grid-cols-1"}`}>
-        <aside className="flex flex-col gap-3 min-w-0 xl:col-start-2 xl:row-start-1">
 
       {hasStaleResult && !loading && (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 shadow-sm">
@@ -1140,10 +1121,6 @@ export default function CalculatorWorkspace() {
           </div>
         </div>
       )}
-
-        </aside>
-
-        <div className="flex flex-col gap-3 min-w-0 xl:col-start-1 xl:row-start-1">
 
       {loading && (
         <div className="flex-1 flex justify-center items-center min-h-[400px]">
@@ -1521,9 +1498,6 @@ export default function CalculatorWorkspace() {
           )}
         </CalculatorResultState>
       )}
-
-        </div>
-      </div>
     </div>
   );
 
