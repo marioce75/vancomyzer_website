@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { CalculationDetails } from "@/types/calculator";
 import { modelShortName } from "@/lib/pk/modelRegistry";
+import { fmt } from "@/lib/formatNumber";
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -496,7 +497,7 @@ function drawGraph(
       ctx.font = `8px ${FONT}`;
       ctx.fillStyle = "rgba(255,255,255,0.7)";
       ctx.textAlign = "right";
-      ctx.fillText(`TROUGH ${lastTrough.concentration.toFixed(2)}`, PAD.left + gw - 4, ty - 3);
+      ctx.fillText(`TROUGH ${fmt(lastTrough.concentration, 2)}`, PAD.left + gw - 4, ty - 3);
     }
   }
 
@@ -542,9 +543,9 @@ function drawGraph(
       ctx.font = `10px ${FONT}`;
       ctx.textAlign = "left";
       ctx.fillStyle = secondary;
-      ctx.fillText(`T+${tHover.toFixed(1)}h`, tx + 6, ty + 14);
+      ctx.fillText(`T+${fmt(tHover, 1)}h`, tx + 6, ty + 14);
       ctx.fillStyle = primary;
-      ctx.fillText(`C = ${cInterp.toFixed(1)} mg/L`, tx + 6, ty + 28);
+      ctx.fillText(`C = ${fmt(cInterp, 1)} mg/L`, tx + 6, ty + 28);
       if (phase) {
         ctx.fillStyle = dim;
         ctx.font = `9px ${FONT}`;

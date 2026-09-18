@@ -4,6 +4,7 @@ import { COLIN_2019, computeBmi, HIGH_BMI_THRESHOLD_KG_M2, highBmiAdvisory } fro
 import BedboundAdvisoryPanel, { BedboundDoseData } from "./BedboundAdvisoryPanel";
 import ClinicalNumberInput from "./ClinicalNumberInput";
 import ObesityAdvisoryPanel from "./ObesityAdvisoryPanel";
+import { fmt } from "@/lib/formatNumber";
 
 /** BMI outside this range almost always means weight or height was entered in the wrong units. */
 const PLAUSIBLE_BMI_MIN = 12;
@@ -218,7 +219,7 @@ export default function PatientCharacteristicsForm({
         return (
           <>
             <div className="flex items-center gap-2 text-xs" style={{ color: isHighBmi ? "#92400e" : "var(--color-secondary)" }}>
-              <span style={{ fontWeight: 600 }}>BMI: {bmi.toFixed(1)} kg/m²</span>
+              <span style={{ fontWeight: 600 }}>BMI: {fmt(bmi, 1)} kg/m²</span>
             </div>
             {unitsImplausible && (
               <p className="text-xs text-amber-700 font-medium" role="status">⚠ Check units — weight in kg, height in cm</p>

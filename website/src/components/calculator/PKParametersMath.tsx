@@ -7,6 +7,7 @@ import {
   VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED,
   modelShortName,
 } from "@/lib/pk/modelRegistry";
+import { fmt } from "@/lib/formatNumber";
 
 interface PKParams {
   CL: number;
@@ -72,7 +73,7 @@ function colinCovariates(age: number, scrInput: number): ColinCovariates {
   return { PMA_yr, FMat, FDecline, SCRstd, FSCR, scr };
 }
 
-const f3 = (n: number): string => n.toFixed(3);
+const f3 = (n: number): string => fmt(n, 3);
 const weightOf = (p: PKParams): number => p.weight_kg ?? 70;
 const allometric = (p: PKParams): number => (weightOf(p) / 70) ** 0.75;
 
@@ -209,7 +210,7 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
               <div key={row.key} className="flex items-baseline justify-between" style={{ padding: "3px 6px", background: "var(--color-highlight, rgba(0,0,0,0.03))", border: "1px solid var(--color-border)" }}>
                 <span style={{ fontSize: 11, color: "var(--color-secondary)", fontWeight: 600, fontFamily: "var(--font-mono, monospace)" }}>{row.label}</span>
                 <span style={{ fontSize: 13, color: "var(--color-primary)", fontWeight: 700, fontFamily: "var(--font-mono, monospace)" }}>
-                  {typeof value === "number" ? value.toFixed(1) : "—"}{" "}
+                  {typeof value === "number" ? fmt(value, 1) : "—"}{" "}
                   <span style={{ fontSize: 9, color: "var(--color-dim)", fontWeight: 400 }}>{row.unit}</span>
                 </span>
               </div>
@@ -226,7 +227,7 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
                 <div className="flex items-baseline justify-between">
                   <span style={{ fontSize: 12, color: "var(--color-secondary)", fontWeight: 600, fontFamily: "var(--font-mono, monospace)" }}>{row.label}</span>
                   <span style={{ fontSize: 14, color: "var(--color-primary)", fontWeight: 700, fontFamily: "var(--font-mono, monospace)" }}>
-                    {typeof value === "number" ? value.toFixed(1) : "—"}{" "}
+                    {typeof value === "number" ? fmt(value, 1) : "—"}{" "}
                     <span style={{ fontSize: 10, color: "var(--color-secondary)", fontWeight: 400 }}>{row.unit}</span>
                   </span>
                 </div>
@@ -234,7 +235,7 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
                   <div>{row.equation}</div>
                   {row.key === "CL" && (
                     <div style={{ paddingLeft: 8 }}>
-                      <div>{COLIN_2019.equations.PMA} = {covariates.PMA_yr.toFixed(2)}</div>
+                      <div>{COLIN_2019.equations.PMA} = {fmt(covariates.PMA_yr, 2)}</div>
                       <div>{COLIN_2019.equations.FMat} = {f3(covariates.FMat)}</div>
                       <div>{COLIN_2019.equations.FDecline} = {f3(covariates.FDecline)}</div>
                       <div>{COLIN_2019.equations.SCRstd} = {f3(covariates.SCRstd)}</div>
@@ -247,15 +248,15 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
                   <div>
                     <span style={{ color: "var(--color-secondary)" }}>{row.substitute(params)}</span>
                     {params.used_posterior_refinement ? (
-                      <span style={{ color: "var(--color-secondary)" }}> = {prior.toFixed(1)} {row.unit} (population prior)</span>
+                      <span style={{ color: "var(--color-secondary)" }}> = {fmt(prior, 1)} {row.unit} (population prior)</span>
                     ) : (
-                      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}> = {typeof value === "number" ? value.toFixed(1) : "?"} {row.unit}</span>
+                      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}> = {typeof value === "number" ? fmt(value, 1) : "?"} {row.unit}</span>
                     )}
                   </div>
                   {params.used_posterior_refinement && (
                     <div>
                       <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>
-                        Bayesian estimate from measured levels: {typeof value === "number" ? value.toFixed(1) : "?"} {row.unit}
+                        Bayesian estimate from measured levels: {typeof value === "number" ? fmt(value, 1) : "?"} {row.unit}
                       </span>
                     </div>
                   )}

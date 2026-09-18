@@ -2,6 +2,7 @@
 
 import type { FrequencyOption } from "@/types/calculator";
 import { aucRangeLabel } from "@/components/calculator/DoseRecommendationCard";
+import { fmt } from "@/lib/formatNumber";
 
 /**
  * Compact, selectable comparison of the engine's candidate regimens.
@@ -99,8 +100,8 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
                 <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--color-dim)" }}>{current.label ?? "current"}</span>
               </td>
               <td style={MONO}>{current.auc24.toFixed(0)}</td>
-              <td style={MONO}>{current.peak.toFixed(1)}</td>
-              <td style={MONO}>{current.trough.toFixed(1)}</td>
+              <td style={MONO}>{fmt(current.peak, 1)}</td>
+              <td style={MONO}>{fmt(current.trough, 1)}</td>
               <td>
                 {current.single_dose ? (
                   <span className="vz-chip vz-chip--neutral" title="Single dose, first 24 h — not graded against the steady-state target" style={{ padding: "0 5px", fontSize: 10 }}>First 24 h</span>
@@ -129,8 +130,8 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
                   )}
                 </td>
                 <td style={MONO}>{o.auc24.toFixed(0)}</td>
-                <td style={MONO}>{o.peak.toFixed(1)}</td>
-                <td style={MONO}>{o.trough.toFixed(1)}</td>
+                <td style={MONO}>{fmt(o.peak, 1)}</td>
+                <td style={MONO}>{fmt(o.trough, 1)}</td>
                 <td>{statusChip(o.auc24)}</td>
               </tr>
             );

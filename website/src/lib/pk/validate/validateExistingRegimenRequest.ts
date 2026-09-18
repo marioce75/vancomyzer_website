@@ -1,6 +1,7 @@
 import { resolveExposureHorizon } from "../exposureHorizon";
 import type { NormalizedPatient, NormalizedRegimen, NormalizedLevel } from "../types";
 import { isManualHoursCollectionTime } from "@/lib/manualHoursTimestamp";
+import { fmt } from "@/lib/formatNumber";
 
 const TIMING_TOLERANCE_HOURS = 0.25;
 const MIN_POST_INFUSION_LEVEL_HOURS = 0.5;
@@ -155,7 +156,7 @@ export function validateExistingRegimenRequest(
       //     advisory. Beyond tolerance: reject (existing behavior + recovery).
       if (!isPulseDose && interval_hours > 0 && l.time_since_last_dose_hours > interval_hours) {
         const overshoot = l.time_since_last_dose_hours - interval_hours;
-        const overshootStr = overshoot.toFixed(2).replace(/\.?0+$/, "");
+        const overshootStr = fmt(overshoot, 2);
         if (isNonSteadyState) {
           if (overshoot <= tolerance) {
             warnings.push(
@@ -174,7 +175,7 @@ export function validateExistingRegimenRequest(
         } else {
           // Steady-state, beyond tolerance — keep the existing reject + recovery path.
           field_errors[`levels[${i}].time_since_last_dose_hours`] =
-            `Must be within the dosing interval for a repeating steady-state regimen (time_since_last_dose_hours ≤ interval_hours + ${tolerance.toFixed(2)} h tolerance for late draws).`;
+            `Must be within the dosing interval for a repeating steady-state regimen (time_since_last_dose_hours ≤ interval_hours + ${fmt(tolerance, 2)} h tolerance for late draws).`;
         }
       }
       if (l.time_since_last_dose_hours < infusion_hours) {

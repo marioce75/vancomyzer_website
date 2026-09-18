@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFeature } from "@/hooks/useFeature";
 import { modelShortName } from "@/lib/pk/modelRegistry";
+import { fmt } from "@/lib/formatNumber";
 
 interface HistoryRow {
   id: number;
@@ -273,10 +274,10 @@ export default function HistoryPage() {
                         {row.auc24 != null ? row.auc24.toFixed(0) : "—"}
                       </td>
                       <td style={{ padding: "10px 12px", color: "var(--color-secondary)" }}>
-                        {row.peak != null ? row.peak.toFixed(1) : "—"}
+                        {row.peak != null ? fmt(row.peak, 1) : "—"}
                       </td>
                       <td style={{ padding: "10px 12px", color: "var(--color-secondary)" }}>
-                        {row.trough != null ? row.trough.toFixed(1) : "—"}
+                        {row.trough != null ? fmt(row.trough, 1) : "—"}
                       </td>
                       <td style={{ padding: "10px 12px" }}>
                         {row.auc_in_range ? (

@@ -45,6 +45,7 @@ import { printReport, type ReportData } from "@/lib/generateReport";
 import { track } from "@/lib/analytics";
 import { parseClinicalNumber } from "@/lib/parseClinicalNumber";
 import { COLIN_2019, modelDisplayName, modelShortName } from "@/lib/pk/modelRegistry";
+import { fmt } from "@/lib/formatNumber";
 const defaultPatient: CalculateRequestPatient = { age: 0, weight_kg: 0, height_cm: 0, sex: "", serum_creatinine_mg_dl: 0 };
 const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0 };
 const defaultLevel = { value_mcg_ml: 0, collection_time: "", time_since_last_dose_hours: 0 };
@@ -523,12 +524,12 @@ export default function CalculatorWorkspace() {
         const aucMatch = aucDelta < 5;
         console.log(
           `\nVANCOMYZER PK VALIDATION\n========================\n` +
-          `Trough (panel):     ${Number(panelTrough).toFixed(2)} mg/L\n` +
-          `Trough (graph):     ${curveTrough.toFixed(2)} mg/L\n` +
-          `Match: ${troughMatch ? "✓ PASS" : "✗ FAIL (Δ=" + Math.abs(panelTrough - curveTrough).toFixed(2) + ")"}\n\n` +
-          `AUC24 (panel):      ${Number(panelAuc).toFixed(1)} mg·h/L\n` +
-          `AUC24 (trapezoid):  ${trapAuc.toFixed(1)} mg·h/L\n` +
-          `Δ: ${aucDelta.toFixed(1)} mg·h/L${aucMatch ? " — within tolerance" : " — EXCEEDS tolerance"}\n` +
+          `Trough (panel):     ${fmt(Number(panelTrough), 2)} mg/L\n` +
+          `Trough (graph):     ${fmt(curveTrough, 2)} mg/L\n` +
+          `Match: ${troughMatch ? "✓ PASS" : "✗ FAIL (Δ=" + fmt(Math.abs(panelTrough - curveTrough), 2) + ")"}\n\n` +
+          `AUC24 (panel):      ${fmt(Number(panelAuc), 1)} mg·h/L\n` +
+          `AUC24 (trapezoid):  ${fmt(trapAuc, 1)} mg·h/L\n` +
+          `Δ: ${fmt(aucDelta, 1)} mg·h/L${aucMatch ? " — within tolerance" : " — EXCEEDS tolerance"}\n` +
           `Match: ${aucMatch ? "✓ PASS" : "✗ FAIL"}\n\n` +
           `Model: ${modelDisplayName(data.pk_parameters?.pk_model_name)}\n` +
           `τ: ${data.recommended_interval_hours ?? "?"}h\n` +
@@ -972,7 +973,7 @@ export default function CalculatorWorkspace() {
         key="actual-history"
         severity="info"
         title={`Actual history — dose ${a.doses_given}:`}
-        summary={`modelled peak ${a.peak.toFixed(1)} / trough ${a.trough.toFixed(1)} mcg/mL; AUC over that interval ${a.auc_interval_n.toFixed(0)} mg·h/L (not a daily AUC)${ap ? `; ${(ap.fraction_of_steady_state * 100).toFixed(0)}% of steady state (t½ ${ap.terminal_half_life_hours.toFixed(1)} h)` : ""}. The AUC₂₄/peak/trough above are the steady-state projection of the current regimen, comparable with the candidates.`}
+        summary={`modelled peak ${fmt(a.peak, 1)} / trough ${fmt(a.trough, 1)} mcg/mL; AUC over that interval ${a.auc_interval_n.toFixed(0)} mg·h/L (not a daily AUC)${ap ? `; ${(ap.fraction_of_steady_state * 100).toFixed(0)}% of steady state (t½ ${fmt(ap.terminal_half_life_hours, 1)} h)` : ""}. The AUC₂₄/peak/trough above are the steady-state projection of the current regimen, comparable with the candidates.`}
         role="status"
       />,
     );

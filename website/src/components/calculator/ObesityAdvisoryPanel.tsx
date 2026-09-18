@@ -7,6 +7,7 @@ import {
   HIGH_BMI_THRESHOLD_KG_M2,
   highBmiAdvisory,
 } from "@/lib/pk/modelRegistry";
+import { fmt } from "@/lib/formatNumber";
 
 /**
  * High-BMI advisory shown under the patient form when BMI is 40 kg/m² or more.
@@ -71,7 +72,7 @@ export default function ObesityAdvisoryPanel({
       <div className="mt-2 space-y-1.5 text-xs" style={{ color: "#78350f" }}>
         <p style={{ margin: 0, lineHeight: 1.5 }}>
           {advisory ??
-            `BMI ${bmi.toFixed(1)} kg/m²: estimates use the ${COLIN_2019.shortName} model, the same model used for all adults. Obtain vancomycin levels early to individualize.`}
+            `BMI ${fmt(bmi, 1)} kg/m²: estimates use the ${COLIN_2019.shortName} model, the same model used for all adults. Obtain vancomycin levels early to individualize.`}
         </p>
 
         {hasSex && ffm > 0 ? (
@@ -81,7 +82,7 @@ export default function ObesityAdvisoryPanel({
             </p>
             <ul className="mt-1 list-disc pl-5" style={{ color: "#78350f", lineHeight: 1.5 }}>
               <li>
-                <strong>Fat-free mass:</strong> {ffm.toFixed(1)} kg{" "}
+                <strong>Fat-free mass:</strong> {fmt(ffm, 1)} kg{" "}
                 <span className="text-[10px]" style={{ color: "#92400e" }}>(Janmahasatian 2005: {ffmEquation})</span>
               </li>
               {breakdown && (

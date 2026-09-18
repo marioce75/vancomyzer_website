@@ -26,6 +26,7 @@ import {
   modelDisplayName,
   modelShortName,
 } from "./pk/modelRegistry";
+import { fmt } from "@/lib/formatNumber";
 
 /** Regulatory statement (short form) printed on every export. */
 const REGULATORY_SHORT =
@@ -118,9 +119,9 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
     `<tr>
       <td>${o.dose_mg} mg</td>
       <td>q${o.interval_hours}h</td>
-      <td>${o.auc24.toFixed(1)}</td>
-      <td>${o.peak.toFixed(2)}</td>
-      <td>${o.trough.toFixed(2)}</td>
+      <td>${fmt(o.auc24, 1)}</td>
+      <td>${fmt(o.peak, 2)}</td>
+      <td>${fmt(o.trough, 2)}</td>
       <td>${o.auc24 >= 400 && o.auc24 <= 600 ? "In range" : o.auc24 > 600 ? "Above" : "Below"}</td>
     </tr>`
   ).join("");
@@ -288,7 +289,7 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
       <span class="dose-primary">${escapeHtml(data.recommended_dose)} mg every ${data.recommended_interval_hours} h</span>
       ${data.recommended_infusion_duration_hours ? `<div class="dose-detail">Infuse over ${data.recommended_infusion_duration_hours} hours</div>` : ""}
       <div class="dose-detail" style="margin-top:6px">
-        AUC\u2082\u2084: <strong>${data.auc24.toFixed(1)} mg\u00b7h/L</strong>
+        AUC\u2082\u2084: <strong>${fmt(data.auc24, 1)} mg\u00b7h/L</strong>
         ${data.auc24 >= 400 && data.auc24 <= 600 ? '<span class="range-badge">IN RANGE</span>' : ""}
       </div>
     </div>
@@ -299,17 +300,17 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
     <div class="metrics-row">
       <div class="metric-card">
         <div class="metric-label">AUC\u2082\u2084</div>
-        <div class="metric-value">${data.auc24.toFixed(1)}</div>
+        <div class="metric-value">${fmt(data.auc24, 1)}</div>
         <div class="metric-unit">mg\u00b7h/L</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Peak</div>
-        <div class="metric-value">${data.peak.toFixed(2)}</div>
+        <div class="metric-value">${fmt(data.peak, 2)}</div>
         <div class="metric-unit">mcg/mL</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Trough</div>
-        <div class="metric-value">${data.trough.toFixed(2)}</div>
+        <div class="metric-value">${fmt(data.trough, 2)}</div>
         <div class="metric-unit">mcg/mL</div>
       </div>
     </div>
@@ -319,10 +320,10 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
   <div class="section">
     <div class="section-title">PK Parameters (${escapeHtml(modelShortName(data.pk_model_name))})</div>
     <div class="grid-2">
-      <div class="field"><span class="field-label">CL (Clearance)</span><span class="field-value">${data.pk_parameters.CL.toFixed(2)} L/h</span></div>
-      <div class="field"><span class="field-label">V1 (Central Volume)</span><span class="field-value">${data.pk_parameters.V1.toFixed(1)} L</span></div>
-      <div class="field"><span class="field-label">Q (Intercompartmental CL)</span><span class="field-value">${data.pk_parameters.Q.toFixed(2)} L/h</span></div>
-      <div class="field"><span class="field-label">V2 (Peripheral Volume)</span><span class="field-value">${data.pk_parameters.V2.toFixed(1)} L</span></div>
+      <div class="field"><span class="field-label">CL (Clearance)</span><span class="field-value">${fmt(data.pk_parameters.CL, 2)} L/h</span></div>
+      <div class="field"><span class="field-label">V1 (Central Volume)</span><span class="field-value">${fmt(data.pk_parameters.V1, 1)} L</span></div>
+      <div class="field"><span class="field-label">Q (Intercompartmental CL)</span><span class="field-value">${fmt(data.pk_parameters.Q, 2)} L/h</span></div>
+      <div class="field"><span class="field-label">V2 (Peripheral Volume)</span><span class="field-value">${fmt(data.pk_parameters.V2, 1)} L</span></div>
     </div>
   </div>
   ` : ""}

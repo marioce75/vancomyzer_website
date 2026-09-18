@@ -1,4 +1,5 @@
 import React from "react";
+import { fmt } from "@/lib/formatNumber";
 
 interface PrimaryMetricsCardProps {
   auc24?: number | null;
@@ -19,14 +20,14 @@ interface PrimaryMetricsCardProps {
   ungraded?: boolean;
 }
 
+// AUC₂₄ to at most 1 decimal, concentrations to at most 2 — trailing zeros
+// dropped, so a result reads 512 rather than 512.0 and 8.5 rather than 8.50.
 function formatAuc(value: number | null | undefined): string {
-  if (value == null || Number.isNaN(value)) return "—";
-  return Number(value).toFixed(1);
+  return fmt(value, 1);
 }
 
 function formatConc(value: number | null | undefined): string {
-  if (value == null || Number.isNaN(value)) return "—";
-  return Number(value).toFixed(2);
+  return fmt(value, 2);
 }
 
 /** AUC₂₄ target attainment (2020 ASHP/IDSA/PIDS/SIDP consensus range). Display only. */

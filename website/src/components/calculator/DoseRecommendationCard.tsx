@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { CalculationDetails, FrequencyOption, AucRangeStatus, ArcAdvisory } from "@/types/calculator";
+import { fmt } from "@/lib/formatNumber";
 
 interface DoseRecommendationCardProps {
   recommended_dose?: string | null;
@@ -604,7 +605,7 @@ function EmpiricDosingBlockedCard({
           {data.recommended_pulse_dose_mg.toLocaleString()} mg <span className="text-sm font-normal">× 1 (single dose)</span>
         </div>
         <div className="text-xs">
-          Estimated CL: <strong>{data.estimated_cl_l_h.toFixed(2)} L/h</strong>. Draw a vancomycin level
+          Estimated CL: <strong>{fmt(data.estimated_cl_l_h, 2)} L/h</strong>. Draw a vancomycin level
           after the pulse dose and switch to the <strong>1-Level</strong> tab above to compute
           level-guided redose timing.
         </div>
@@ -661,7 +662,7 @@ function AdjustmentDosingBlockedCard({
           {data.recommended_action}
         </div>
         <div className="text-xs">
-          Estimated CL: <strong>{data.estimated_cl_l_h.toFixed(2)} L/h</strong>.
+          Estimated CL: <strong>{fmt(data.estimated_cl_l_h, 2)} L/h</strong>.
         </div>
       </div>
       <p className="text-[11px]" style={{ color: "#7f1d1d" }}>
