@@ -22,8 +22,14 @@ export interface CurrentRegimenRow {
   auc24: number;
   peak: number;
   trough: number;
-  /** Row tag, e.g. "current" or "first dose". */
+  /** Row tag, e.g. "current" or "loading dose". */
   label?: string;
+  /**
+   * A single loading dose: the figures are that one dose over its first 24 h,
+   * not a steady-state regimen, so the row is shown as "× 1" and is not graded
+   * against the 400–600 steady-state target.
+   */
+  single_dose?: boolean;
 }
 
 interface RegimenComparisonTableProps {
@@ -89,13 +95,17 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
               onKeyDown={(e) => handleKey(e, () => onSelect(null))}
             >
               <td>
-                <span className="font-semibold" style={MONO}>{current.dose_mg} mg q{current.interval_hours}h</span>
+                <span className="font-semibold" style={MONO}>{current.single_dose ? `${current.dose_mg} mg × 1` : `${current.dose_mg} mg q${current.interval_hours}h`}</span>
                 <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--color-dim)" }}>{current.label ?? "current"}</span>
               </td>
               <td style={MONO}>{current.auc24.toFixed(0)}</td>
               <td style={MONO}>{current.peak.toFixed(1)}</td>
               <td style={MONO}>{current.trough.toFixed(1)}</td>
-              <td>{statusChip(current.auc24)}</td>
+              <td>
+                {current.single_dose ? (
+                  <span className="vz-chip vz-chip--neutral" title="Single dose, first 24 h — not graded against the steady-state target" style={{ padding: "0 5px", fontSize: 10 }}>First 24 h</span>
+                ) : statusChip(current.auc24)}
+              </td>
             </tr>
           )}
           {rows.map((o) => {
@@ -129,7 +139,7 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
       </table>
       <div className="flex items-start justify-between gap-2 px-2 pt-1.5">
         <p className="m-0 text-[10px] leading-4" style={{ color: "var(--color-dim)" }}>
-          Steady-state predictions from the same PK parameters. Candidates with AUC₂₄ above 600 or doses below 500 mg are not offered{recommendedOutsideRule ? "; the engine's own recommendation is always listed and flagged when it falls outside that rule" : ""}.
+          {current?.single_dose ? "Loading-dose row: that single dose over its first 24 h. Other rows: " : ""}Steady-state predictions from the same PK parameters. Candidates with AUC₂₄ above 600 or doses below 500 mg are not offered{recommendedOutsideRule ? "; the engine's own recommendation is always listed and flagged when it falls outside that rule" : ""}.
         </p>
         {onApply && activeOption && (
           <button

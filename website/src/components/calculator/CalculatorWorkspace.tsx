@@ -478,6 +478,7 @@ export default function CalculatorWorkspace() {
         exposure_horizon: data.exposure_horizon,
         steady_state_exposure: data.steady_state_exposure,
         actual_history_exposure: data.actual_history_exposure,
+        loading_dose_curve: Array.isArray(data.loading_dose_curve) ? data.loading_dose_curve : undefined,
         steady_state_approach: data.steady_state_approach,
         steady_state_warning: data.steady_state_warning,
         review_hold: data.review_hold,
@@ -620,10 +621,11 @@ export default function CalculatorWorkspace() {
   const recommendedOption = visibleResult?.frequency_options?.find((o) => o.is_recommended) ?? null;
   // Existing-regimen path: "current regimen" view is a synthetic option built
   // from the response's top-level exposure and curve, which describe the
-  // regimen as entered. On the pulse-dose path the engine's top-level curve is
-  // the loading dose CONTINUED at the entered dose/interval (not a single-dose
-  // profile), and each candidate's curve is loading → that maintenance, so the
-  // same row semantics apply. Nothing is recomputed.
+  // regimen as entered. On the pulse-dose path the top-level exposure is the
+  // loading dose alone over its first 24 h, so the row plots the engine's
+  // single-dose curve to match (the top-level curve is the dose continued at a
+  // placeholder interval the loading-dose form never asks for). Each
+  // candidate's curve is loading → that maintenance. Nothing is recomputed.
   const currentRegimenOption: FrequencyOption | null =
     viewCurrentRegimen && visibleResult?.recommendation_type === "existing_regimen"
       ? {
@@ -634,7 +636,7 @@ export default function CalculatorWorkspace() {
           peak: visibleResult.peak,
           trough: visibleResult.trough,
           is_recommended: false,
-          curve: visibleResult.curve,
+          curve: (regimen.doses_given === 1 ? visibleResult.loading_dose_curve : undefined) ?? visibleResult.curve,
           interpretation_summary: visibleResult.interpretation_summary,
           clinical_note: visibleResult.documentation_preview?.clinical_note,
         }
@@ -920,7 +922,7 @@ export default function CalculatorWorkspace() {
   const metricTrough = activeOption?.trough ?? displayResult?.trough;
   const metricsCaption = isPulse
     ? activeIsCurrent
-      ? `Loading dose continued as ${regimen.dose_mg} mg q${regimen.interval_hours}h — steady-state PK`
+      ? `Loading dose — ${regimen.dose_mg} mg × 1 · first 24 h, not steady state`
       : `Maintenance after loading dose${activeOption ? ` — ${activeOption.dose_mg} mg q${activeOption.interval_hours}h` : ""} — steady-state PK`
     : activeIsCurrent
       ? (displayResult?.exposure_horizon === "actual_history"
@@ -935,7 +937,8 @@ export default function CalculatorWorkspace() {
           auc24: displayResult.auc24,
           peak: displayResult.peak,
           trough: displayResult.trough,
-          label: isPulse ? "continued as entered" : "current",
+          label: isPulse ? "loading dose" : "current",
+          single_dose: isPulse,
         }
       : null;
   // The engine's recommendation may fall outside the candidate list's display
@@ -1278,7 +1281,7 @@ export default function CalculatorWorkspace() {
                         <p className="m-0 text-xs" style={{ color: "#7f1d1d" }}>Reconcile the discordant same-time levels, then recalculate.</p>
                       </div>
                       <div className="flex-[1.4] min-w-[300px]">
-                        <PrimaryMetricsCard compact caption={metricsCaption} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />
+                        <PrimaryMetricsCard compact caption={metricsCaption} ungraded={isPulse && activeIsCurrent} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />
                       </div>
                     </div>
                   )}
@@ -1312,7 +1315,7 @@ export default function CalculatorWorkspace() {
                     adjustmentDosingBlocked={displayResult.adjustment_dosing_blocked}
                     metricsSlot={
                       <div className="flex-[1.4] min-w-[300px]">
-                        <PrimaryMetricsCard compact caption={metricsCaption} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />
+                        <PrimaryMetricsCard compact caption={metricsCaption} ungraded={isPulse && activeIsCurrent} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />
                       </div>
                     }
                   />

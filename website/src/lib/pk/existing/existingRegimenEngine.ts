@@ -55,7 +55,14 @@ export function runExistingRegimenEngine(
   // For regular regimens: use standard multi-dose accumulation curve
   let curve: { time_hours: number; concentration: number }[];
   let curve_engine_recommended: { time_hours: number; concentration: number }[] | undefined;
+  let loading_dose_curve: { time_hours: number; concentration: number }[] | undefined;
   if (isPulseDose) {
+    // The loading dose on its own (no maintenance), over the first 48 h. This
+    // is the profile the top-level single-dose AUC/peak/trough describe, so
+    // the loading-dose row plots the same thing it reports.
+    loading_dose_curve = loadingDoseCurvePoints({ CL, V1, Q, V2 }, dose_mg, T_inf, 0, tau, T_inf)
+      .filter((p) => p.time_hours <= 48);
+
     // PRIMARY curve = user's entered regimen continued forward (loading +
     // same-dose maintenance at the user's interval). This is what the
     // clinician asked: "If I continue 500mg q24h, what does the profile
@@ -200,6 +207,7 @@ export function runExistingRegimenEngine(
     current_regimen_interval_hours: interval_hours,
     curve,
     curve_engine_recommended,
+    loading_dose_curve,
     measured_levels,
     level_count: levels.length,
     data_quality_note,

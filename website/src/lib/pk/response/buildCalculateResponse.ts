@@ -150,6 +150,7 @@ export function buildCalculateResponse(
     },
     documentation_preview: explain.documentation_preview,
     curve_engine_recommended: engineOutput.curve_engine_recommended,
+    loading_dose_curve: engineOutput.loading_dose_curve,
     fit_diagnostic: engineOutput.fit_diagnostic,
     // The engine's own fit diagnostic, so the graph's uncertainty band can use
     // uncertainty_label directly rather than reconstructing a width from other

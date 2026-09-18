@@ -12,6 +12,11 @@ interface PrimaryMetricsCardProps {
   compact?: boolean;
   /** Caption above the metrics (e.g. "Steady-state PK — 1250 mg q12h"). */
   caption?: string | null;
+  /**
+   * The figures describe a single dose (a loading dose's first 24 h), not a
+   * steady-state regimen, so they are not graded against the AUC target.
+   */
+  ungraded?: boolean;
 }
 
 function formatAuc(value: number | null | undefined): string {
@@ -63,8 +68,8 @@ const Metric = ({ label, value, unit, compact, emphasis, sub }: { label: string;
   </div>
 );
 
-export default function PrimaryMetricsCard({ auc24, peak, trough, compact = false, caption }: PrimaryMetricsCardProps) {
-  const status = aucStatus(auc24);
+export default function PrimaryMetricsCard({ auc24, peak, trough, compact = false, caption, ungraded = false }: PrimaryMetricsCardProps) {
+  const status = ungraded ? null : aucStatus(auc24);
   if (compact) {
     return (
       <div className="flex min-w-0 flex-col gap-1">
@@ -83,6 +88,8 @@ export default function PrimaryMetricsCard({ auc24, peak, trough, compact = fals
               <span className="flex flex-wrap items-center gap-1.5">
                 {status ? (
                   <span className={`vz-chip ${status.cls}`}><span aria-hidden="true">{status.glyph}</span> {status.label}</span>
+                ) : ungraded ? (
+                  <span className="vz-chip vz-chip--neutral">Single dose · first 24 h</span>
                 ) : (
                   <span className="vz-chip vz-chip--neutral">Target 400–600</span>
                 )}

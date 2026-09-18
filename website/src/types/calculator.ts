@@ -129,6 +129,8 @@ export interface CalculateResponse {
    *  engine's auto-recommended maintenance regimen. The primary `curve`
    *  reflects the user's entered regimen. */
   curve_engine_recommended?: { time_hours: number; concentration: number }[];
+  /** Pulse-dose mode only: the loading dose alone over the first 48 h. */
+  loading_dose_curve?: { time_hours: number; concentration: number }[];
   /** Posterior fit diagnostic — prior/posterior values + per-level residuals. */
   fit_diagnostic?: {
     prior_CL: number;

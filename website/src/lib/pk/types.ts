@@ -122,6 +122,9 @@ export interface ExistingRegimenEngineOutput {
    *  maintenance regimen, plotted alongside the user-entered regimen so the
    *  UI can offer a toggle between them. */
   curve_engine_recommended?: { time_hours: number; concentration: number }[];
+  /** Pulse-dose mode only: the loading dose alone over the first 48 h — the
+   *  profile the single-dose top-level AUC/peak/trough describe. */
+  loading_dose_curve?: { time_hours: number; concentration: number }[];
   measured_levels: { time_hours: number; concentration: number }[];
   level_count: number;
   data_quality_note: string;

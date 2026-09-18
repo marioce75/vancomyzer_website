@@ -118,6 +118,17 @@ interface CandidateScore {
  * carries `adjustment_dosing_blocked` which the UI uses to render the
  * safety state.
  */
+/**
+ * Preference tier for a maintenance interval started after a loading dose:
+ * q8h/q12h first, then q24h, then q6h/q18h, then extended intervals.
+ */
+function practicalIntervalTier(interval_hours: number): number {
+  if (interval_hours === 8 || interval_hours === 12) return 0;
+  if (interval_hours === 24) return 1;
+  if (interval_hours === 6 || interval_hours === 18) return 2;
+  return 3;
+}
+
 function finalizeRecommendation(
   dose_mg: number,
   interval_hours: number,
@@ -457,6 +468,16 @@ export function buildAdjustmentRecommendation(
     const inRangeCandidates = candidates.filter((candidate) => candidate.auc24 >= TARGET_AUC24_LOW && candidate.auc24 <= TARGET_AUC24_HIGH);
     if (inRangeCandidates.length > 0) {
       inRangeCandidates.sort((a, b) => {
+        // After a loading dose there is no current interval to anchor on, so
+        // closeness to the AUC target alone picked q36h/q48h regimens that no
+        // inpatient service would start. Every candidate here is already in
+        // the 400–600 range, so prefer the intervals used in practice first:
+        // shorter intervals reach a level sooner and give the team room to
+        // adjust while the patient is in hospital.
+        if (isPulseDose) {
+          const tierDelta = practicalIntervalTier(a.interval_hours) - practicalIntervalTier(b.interval_hours);
+          if (tierDelta !== 0) return tierDelta;
+        }
         const aucDelta = Math.abs(a.auc24 - targetAucMid) - Math.abs(b.auc24 - targetAucMid);
         if (aucDelta !== 0) return aucDelta;
         // For pulse dose, no current interval to prefer — rank by shorter interval for convenience

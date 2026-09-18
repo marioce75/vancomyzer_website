@@ -329,7 +329,10 @@ export default function DoseRecommendationCard({
   const displayInfusionHours = active?.infusion_duration_hours ?? recommended_infusion_duration_hours ?? 1;
   // Show AUC from active option, or fall back to the raw auc24 from the response
   const displayAUC = active?.auc24 ?? rawAuc24 ?? null;
-  const range = displayAUC != null ? aucRangeLabel(displayAUC) : null;
+  // The loading dose as entered is one dose, not a regimen: show it as "× 1"
+  // and do not grade its first-24 h AUC against the steady-state target.
+  const isSingleLoadingDose = Boolean(activeIsCurrent && isPulseDose);
+  const range = displayAUC != null && !isSingleLoadingDose ? aucRangeLabel(displayAUC) : null;
 
   const subline = `Infuse over ${displayInfusionHours} hour${displayInfusionHours === 1 ? "" : "s"}.`;
 
@@ -429,7 +432,7 @@ export default function DoseRecommendationCard({
           >
             <p className="vz-kicker" style={{ margin: "0 0 2px 0", ...FONT }}>
               {activeIsCurrent
-                ? (isPulseDose ? "LOADING DOSE CONTINUED AS ENTERED" : "CURRENT REGIMEN (AS ENTERED)")
+                ? (isPulseDose ? "LOADING DOSE (SINGLE DOSE)" : "CURRENT REGIMEN (AS ENTERED)")
                 : isPulseDose
                   ? (active?.is_recommended || !active ? "SUGGESTED MAINTENANCE REGIMEN" : "SELECTED MAINTENANCE ALTERNATIVE")
                   : active?.is_recommended || !active ? "RECOMMENDED REGIMEN" : "SELECTED ALTERNATIVE"}
@@ -442,14 +445,20 @@ export default function DoseRecommendationCard({
                 {displayDose}
               </span>
               <span className="text-lg font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>mg</span>
-              <span className="text-sm font-medium mx-1" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>every</span>
-              <span
-                className={`${isBand ? "text-[34px] leading-none" : "text-4xl"} font-extrabold tabular-nums mx-glow`}
-                style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 12px var(--color-glow-strong)" }}
-              >
-                {displayInterval}
-              </span>
-              <span className="text-lg font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>h</span>
+              {isSingleLoadingDose ? (
+                <span className="text-lg font-semibold mx-1" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>× 1</span>
+              ) : (
+                <>
+                  <span className="text-sm font-medium mx-1" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>every</span>
+                  <span
+                    className={`${isBand ? "text-[34px] leading-none" : "text-4xl"} font-extrabold tabular-nums mx-glow`}
+                    style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 12px var(--color-glow-strong)" }}
+                  >
+                    {displayInterval}
+                  </span>
+                  <span className="text-lg font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>h</span>
+                </>
+              )}
               <span className="ml-2 text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>{subline}</span>
             </div>
             {!isBand && displayAUC != null && range && (
