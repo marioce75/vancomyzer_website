@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.6" xsi:noNamespaceSchemaLocation="drug2.xsd">
+  <history>
+    <revisions>
+      <revision>
+        <revisionAction>creation</revisionAction>
+        <revisionAuthorName>Vancomyzer cross-check harness</revisionAuthorName>
+        <institution>-</institution>
+        <email>-</email>
+        <date>2026-09-18</date>
+        <comments><comment lang="en">Colin 2019 adult vancomycin prior encoded for engine cross-check only. Synthetic use; not a clinical model file.</comment></comments>
+      </revision>
+    </revisions>
+  </history>
+  <head>
+    <drugModelId>vancomyzer.crosscheck.colin2019</drugModelId>
+    <drugId>vancomycin</drugId>
+    <drugModelName><name lang="en">Vancomycin Colin 2019 (cross-check)</name></drugModelName>
+    <domainName><name lang="en">Adults</name></domainName>
+    <study>
+      <studyName><name lang="en">Colin PJ et al. Clin Pharmacokinet 2019;58:767-780</name></studyName>
+      <studyAuthors>Colin PJ et al.</studyAuthors>
+      <description><desc lang="en">Two-compartment model, allometric weight, maturation/age-decline sigmoid, SCr covariate on CL.</desc></description>
+      <references><reference type="bibtex">@article{colin2019, title={Vancomycin Pharmacokinetics Throughout Life}, author={Colin, Pieter J. and others}, journal={Clin Pharmacokinet}, year={2019}, volume={58}, pages={767--780}}</reference></references>
+    </study>
+    <comments/>
+  </head>
+  <drugModel>
+    <drugId>vancomycin</drugId>
+    <drugModelId>vancomyzer.crosscheck.colin2019</drugModelId>
+    <domain>
+      <description><desc lang="en">Adults (age &gt;= 18).</desc></description>
+      <constraints>
+        <constraint>
+          <constraintType>hard</constraintType>
+          <errorMessage><text lang="en">Age must be at least 18</text></errorMessage>
+          <requiredCovariates><covariateId>age</covariateId></requiredCovariates>
+          <checkOperation><softFormula><inputs><input><id>age</id><type>double</type></input></inputs>
+            <code><![CDATA[return (age >= 18);]]></code></softFormula><comments/></checkOperation>
+          <comments/>
+        </constraint>
+      </constraints>
+    </domain>
+    <covariates>
+      <covariate>
+        <covariateId>bodyweight</covariateId>
+        <name><name lang="en">Total body weight</name></name>
+        <description><desc lang="en">Total body weight</desc></description>
+        <unit>kg</unit>
+        <covariateType>standard</covariateType>
+        <dataType>double</dataType>
+        <interpolationType>direct</interpolationType>
+        <refreshPeriod><unit>d</unit><value>365</value></refreshPeriod>
+        <covariateValue><standardValue>70</standardValue></covariateValue>
+        <validation>
+          <errorMessage><text lang="en">out of range</text></errorMessage>
+          <operation><softFormula><inputs><input><id>bodyweight</id><type>double</type></input></inputs>
+            <code><![CDATA[return true;]]></code></softFormula><comments/></operation>
+          <comments/>
+        </validation>
+        <comments/>
+      </covariate>
+      <covariate>
+        <covariateId>age</covariateId>
+        <name><name lang="en">Age</name></name>
+        <description><desc lang="en">Age</desc></description>
+        <unit>y</unit>
+        <covariateType>standard</covariateType>
+        <dataType>double</dataType>
+        <interpolationType>direct</interpolationType>
+        <refreshPeriod><unit>d</unit><value>365</value></refreshPeriod>
+        <covariateValue><standardValue>35</standardValue></covariateValue>
+        <validation>
+          <errorMessage><text lang="en">out of range</text></errorMessage>
+          <operation><softFormula><inputs><input><id>age</id><type>double</type></input></inputs>
+            <code><![CDATA[return true;]]></code></softFormula><comments/></operation>
+          <comments/>
+        </validation>
+        <comments/>
+      </covariate>
+      <covariate>
+        <covariateId>scr</covariateId>
+        <name><name lang="en">Serum creatinine</name></name>
+        <description><desc lang="en">Serum creatinine</desc></description>
+        <unit>mg/dl</unit>
+        <covariateType>standard</covariateType>
+        <dataType>double</dataType>
+        <interpolationType>direct</interpolationType>
+        <refreshPeriod><unit>d</unit><value>365</value></refreshPeriod>
+        <covariateValue><standardValue>0.83</standardValue></covariateValue>
+        <validation>
+          <errorMessage><text lang="en">out of range</text></errorMessage>
+          <operation><softFormula><inputs><input><id>scr</id><type>double</type></input></inputs>
+            <code><![CDATA[return true;]]></code></softFormula><comments/></operation>
+          <comments/>
+        </validation>
+        <comments/>
+      </covariate>
+    </covariates>
+    <activeMoieties>
+      <activeMoiety>
+        <activeMoietyId>vancomycin</activeMoietyId>
+        <activeMoietyName><name lang="en">Vancomycin</name></activeMoietyName>
+        <unit>mg/l</unit>
+        <analyteIdList><analyteId>vancomycin</analyteId></analyteIdList>
+        <analytesToMoietyFormula><hardFormula>direct</hardFormula><comments/></analytesToMoietyFormula>
+        <targets>
+          <target>
+            <targetType>auc24</targetType>
+            <targetValues>
+              <unit>mg*h/l</unit>
+              <min><standardValue>400</standardValue></min>
+              <max><standardValue>600</standardValue></max>
+              <best><standardValue>500</standardValue></best>
+              <toxicityAlarm><standardValue>800</standardValue></toxicityAlarm>
+              <inefficacyAlarm><standardValue>300</standardValue></inefficacyAlarm>
+            </targetValues>
+            <comments/>
+          </target>
+        </targets>
+      </activeMoiety>
+    </activeMoieties>
+    <analyteGroups>
+      <analyteGroup>
+        <groupId>vancomycin</groupId>
+        <pkModelId>linear.2comp.macro</pkModelId>
+        <analytes>
+          <analyte>
+            <analyteId>vancomycin</analyteId>
+            <unit>mg/l</unit>
+            <molarMass><value>1449.3</value><unit>g/mol</unit></molarMass>
+            <description><desc lang="en">vancomycin</desc></description>
+            <errorModel>
+              <errorModelType>mixed</errorModelType>
+              <sigmas>
+                <sigma><standardValue>1.0</standardValue></sigma>
+                <sigma><standardValue>0.15</standardValue></sigma>
+              </sigmas>
+              <comments><comment lang="en">sigma = sqrt((sigma1*pred)^2 + sigma0^2); additive 1 mg/L, proportional 0.15. NOT identical in form to Vancomyzer max(1, 0.15*max(obs,pred)).</comment></comments>
+            </errorModel>
+            <comments/>
+          </analyte>
+        </analytes>
+        <dispositionParameters>
+          <parameters>
+            <parameter>
+              <parameterId>CL</parameterId>
+              <unit>l/h</unit>
+              <parameterValue>
+                <standardValue>4.102382</standardValue>
+                <aprioriComputation>
+                  <softFormula>
+                    <inputs><input><id>bodyweight</id><type>double</type></input><input><id>age</id><type>double</type></input><input><id>scr</id><type>double</type></input></inputs>
+                    <code><![CDATA[
+    wt = Math.max(30.0, bodyweight);
+    a = Math.max(18.0, age);
+    pma_yr = a + 40.0 / 52.0;
+    pma_wk = pma_yr * 52.0;
+    fsize = wt / 70.0;
+    g1 = 2.89;
+    fmat = Math.pow(pma_wk, g1) / (Math.pow(pma_wk, g1) + Math.pow(46.4, g1));
+    fdec = 1.0 / (1.0 + Math.pow(pma_yr / 61.6, 2.24));
+    scrstd = Math.exp(-1.228 + Math.log10(pma_yr) * 0.672 + 6.27 * Math.exp(-3.11 * pma_yr));
+    fscr = Math.exp(-0.649 * (scr - scrstd));
+    return 5.31 * Math.pow(fsize, 0.75) * fmat * fdec * fscr;
+]]></code>
+                  </softFormula>
+                  <comments/>
+                </aprioriComputation>
+              </parameterValue>
+              <bsv>
+                <bsvType>lognormal</bsvType>
+                <stdDevs><stdDev>0.35</stdDev></stdDevs>
+              </bsv>
+              <validation>
+                <errorMessage><text lang="en">must be positive</text></errorMessage>
+                <operation><softFormula><inputs><input><id>CL</id><type>double</type></input></inputs>
+                  <code><![CDATA[return CL > 0.0;]]></code></softFormula><comments/></operation>
+                <comments/>
+              </validation>
+              <comments/>
+            </parameter>
+            <parameter>
+              <parameterId>V1</parameterId>
+              <unit>l</unit>
+              <parameterValue>
+                <standardValue>42.9</standardValue>
+                <aprioriComputation>
+                  <softFormula>
+                    <inputs><input><id>bodyweight</id><type>double</type></input></inputs>
+                    <code><![CDATA[    wt = Math.max(30.0, bodyweight);
+    return 42.9 * (wt / 70.0);
+]]></code>
+                  </softFormula>
+                  <comments/>
+                </aprioriComputation>
+              </parameterValue>
+              <bsv>
+                <bsvType>lognormal</bsvType>
+                <stdDevs><stdDev>0.25</stdDev></stdDevs>
+              </bsv>
+              <validation>
+                <errorMessage><text lang="en">must be positive</text></errorMessage>
+                <operation><softFormula><inputs><input><id>V1</id><type>double</type></input></inputs>
+                  <code><![CDATA[return V1 > 0.0;]]></code></softFormula><comments/></operation>
+                <comments/>
+              </validation>
+              <comments/>
+            </parameter>
+            <parameter>
+              <parameterId>Q</parameterId>
+              <unit>l/h</unit>
+              <parameterValue>
+                <standardValue>3.22</standardValue>
+                <aprioriComputation>
+                  <softFormula>
+                    <inputs><input><id>bodyweight</id><type>double</type></input></inputs>
+                    <code><![CDATA[    wt = Math.max(30.0, bodyweight);
+    return 3.22 * Math.pow(wt / 70.0, 0.75);
+]]></code>
+                  </softFormula>
+                  <comments/>
+                </aprioriComputation>
+              </parameterValue>
+              <bsv>
+                <bsvType>lognormal</bsvType>
+                <stdDevs><stdDev>0.5</stdDev></stdDevs>
+              </bsv>
+              <validation>
+                <errorMessage><text lang="en">must be positive</text></errorMessage>
+                <operation><softFormula><inputs><input><id>Q</id><type>double</type></input></inputs>
+                  <code><![CDATA[return Q > 0.0;]]></code></softFormula><comments/></operation>
+                <comments/>
+              </validation>
+              <comments/>
+            </parameter>
+            <parameter>
+              <parameterId>V2</parameterId>
+              <unit>l</unit>
+              <parameterValue>
+                <standardValue>41.7</standardValue>
+                <aprioriComputation>
+                  <softFormula>
+                    <inputs><input><id>bodyweight</id><type>double</type></input></inputs>
+                    <code><![CDATA[    wt = Math.max(30.0, bodyweight);
+    return 41.7 * (wt / 70.0);
+]]></code>
+                  </softFormula>
+                  <comments/>
+                </aprioriComputation>
+              </parameterValue>
+              <bsv>
+                <bsvType>lognormal</bsvType>
+                <stdDevs><stdDev>0.5</stdDev></stdDevs>
+              </bsv>
+              <validation>
+                <errorMessage><text lang="en">must be positive</text></errorMessage>
+                <operation><softFormula><inputs><input><id>V2</id><type>double</type></input></inputs>
+                  <code><![CDATA[return V2 > 0.0;]]></code></softFormula><comments/></operation>
+                <comments/>
+              </validation>
+              <comments/>
+            </parameter>
+          </parameters>
+          <correlations/>
+        </dispositionParameters>
+      </analyteGroup>
+    </analyteGroups>
+    <formulationAndRoutes default="id0">
+      <formulationAndRoute>
+        <formulationAndRouteId>id0</formulationAndRouteId>
+        <formulation>parenteral solution</formulation>
+        <administrationName>IV infusion</administrationName>
+        <administrationRoute>intravenousDrip</administrationRoute>
+        <absorptionModel>infusion</absorptionModel>
+        <dosages>
+          <analyteConversions><analyteConversion><analyteId>vancomycin</analyteId><factor>1</factor></analyteConversion></analyteConversions>
+          <availableDoses>
+            <unit>mg</unit>
+            <default><standardValue>1000</standardValue></default>
+            <rangeValues><from><standardValue>250</standardValue></from><to><standardValue>4000</standardValue></to><step><standardValue>250</standardValue></step></rangeValues>
+          </availableDoses>
+          <intervals>
+            <unit>h</unit>
+            <default><standardValue>12</standardValue></default>
+            <fixedValues><value>8</value><value>12</value><value>24</value></fixedValues>
+          </intervals>
+          <infusions>
+            <unit>min</unit>
+            <default><standardValue>90</standardValue></default>
+            <fixedValues><value>60</value><value>90</value><value>105</value><value>120</value></fixedValues>
+          </infusions>
+          <comments/>
+        </dosages>
+        <absorptionParameters/>
+      </formulationAndRoute>
+    </formulationAndRoutes>
+    <timeConsiderations>
+      <halfLife>
+        <unit>h</unit>
+        <duration><standardValue>8</standardValue></duration>
+        <multiplier>100</multiplier>
+        <comments/>
+      </halfLife>
+      <outdatedMeasure>
+        <unit>d</unit>
+        <duration><standardValue>100</standardValue></duration>
+        <comments/>
+      </outdatedMeasure>
+    </timeConsiderations>
+    <comments/>
+  </drugModel>
+</model>

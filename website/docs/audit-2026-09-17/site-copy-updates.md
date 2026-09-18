@@ -19,7 +19,10 @@ Replace with (mirrors `modelRegistry.ts`):
 
 ## vancomyzer.com (this repo) — items to apply after counsel review
 - /privacy HIPAA Notice paragraph → draft in privacy-data-flow.md.
-- /transparent-dosing/engine-crosscheck: add "Snapshot of 30 May 2026; a
-  reproducible harness with committed fixtures now exists
-  (`src/lib/validation/crosscheck/`); the comparator run has not been repeated."
+- /transparent-dosing/engine-crosscheck: label the existing table "Snapshot of
+  30 May 2026 (pre-retirement engine)"; add the 18 Sep 2026 reproducible run
+  (Tucuxi-core `d09737e3`, n = 200 synthetic, CL median |Δ| 0.84 %, P95 4.8 %,
+  0 failures; error-model form difference stated) with a link to the committed
+  record `src/lib/validation/crosscheck/tucuxi/README.md`. Do not present it
+  as clinical validation or as agreement with commercial products.
 - Quick-reference / downloads: state manifest 2026-09-17.1 and the exposure-horizon labels.

@@ -1,0 +1,60 @@
+{
+ "compared_at": "2026-09-18T08:59:57.195Z",
+ "a": {
+  "product": "Vancomyzer (this repository, current working tree)",
+  "manifest": "2026-09-17.1"
+ },
+ "b": {
+  "product": "Tucuxi-core tucucli (sotalya/tucuxi-core, built from source in the audit sandbox)",
+  "version": "tucuxi-core@d09737e3"
+ },
+ "fixture": "crosscheck-seed42-n200.json",
+ "summary": {
+  "CL": {
+   "n": 200,
+   "median_abs_pct": 0.8448991365968749,
+   "p90_abs_pct": 2.5316356981841577,
+   "p95_abs_pct": 4.810536639713781,
+   "max_abs_pct": 9.224721263142468,
+   "mean_signed_pct": 0.49519042482706005
+  },
+  "V1": {
+   "n": 200,
+   "median_abs_pct": 0.8670711299637848,
+   "p90_abs_pct": 2.096400388286511,
+   "p95_abs_pct": 2.571299185129727,
+   "max_abs_pct": 7.590447925927198,
+   "mean_signed_pct": 0.3328076504928014
+  },
+  "Q": {
+   "n": 200,
+   "median_abs_pct": 0.48173948376633746,
+   "p90_abs_pct": 1.7430364500104278,
+   "p95_abs_pct": 2.655673411798716,
+   "max_abs_pct": 7.260467682994501,
+   "mean_signed_pct": 0.1486942059745042
+  },
+  "V2": {
+   "n": 200,
+   "median_abs_pct": 0.0290044004268685,
+   "p90_abs_pct": 0.0808012479149165,
+   "p95_abs_pct": 0.1263859671316221,
+   "max_abs_pct": 0.33059467235821016,
+   "mean_signed_pct": -0.018040327190033872
+  }
+ },
+ "outliers": {
+  "CL": [],
+  "V1": [],
+  "Q": [],
+  "V2": []
+ },
+ "excluded": [],
+ "criteria": {
+  "CL_median_abs_pct_le_2": true,
+  "CL_p95_abs_pct_le_10": true,
+  "V1_median_abs_pct_le_3": true,
+  "excluded_le_2pct": true,
+  "every_outlier_explained": "MANUAL — each |Δ|>10% case must be investigated and explained in the report"
+ }
+}

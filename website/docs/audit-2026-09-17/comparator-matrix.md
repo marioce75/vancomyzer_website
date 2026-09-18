@@ -11,7 +11,7 @@ Practical comparison set, not a market ranking. Reference case: 35 y, 70 kg,
 | DoseMeRx | — | proprietary Bayesian | — | — | **BLOCKED** (no authorised account) | — | — | — | — | |
 | InsightRX Nova | — | proprietary Bayesian | — | — | **BLOCKED** (no authorised account) | — | — | — | — | |
 | PrecisePK | — | proprietary Bayesian | — | — | **BLOCKED** (no authorised account) | — | — | — | — | |
-| Tucuxi (tucucli) | commit hash to record | Vancomyzer prior baked into .tdd | mixed σ (1.0 add, 0.15 prop) — not identical in form | — | **BLOCKED** (no binary / model files); harness ready in `src/lib/validation/crosscheck/` | — | — | — | — | May 2026 snapshot remains on the public page, now labelled as such |
+| Tucuxi (tucucli) | sotalya/tucuxi-core `d09737e3`, built from source 18 Sep 2026; model `vancomyzer.crosscheck.colin2019.tdd` sha256 49f6ebe6… | Colin 2019 encoded as Tucuxi softFormula; `linear.2comp.macro`; Tucuxi MAP | lognormal ω 0.35/0.25/0.5/0.5; `mixed` σ=√((0.15·pred)²+1²) — **not identical in form** to Vancomyzer | SCr direct (Colin) | **RUN** (synthetic, n=200): CL median \|Δ\| 0.84 %, P95 4.8 %, max 9.2 %, 0 excluded; tail fully attributed to σ form | 487.5 (prior; SS AUC per 12 h 243.76) | 4.102 (prior) | 31.92 / 12.93 | — (prediction only) | `src/lib/validation/crosscheck/tucuxi/README.md`; public May 2026 snapshot still labelled as such |
 
 Rules applied: no fabricated results; blocked runs are blocked; common-math
 checks (same model, same priors — Tucuxi) are separated from between-model

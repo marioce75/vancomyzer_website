@@ -44,6 +44,12 @@ Identifiability: two levels cannot identify four parameters; Q and V2 remain
 near the prior. Uncertainty band on the graph is illustrative only.
 Observation conflicts: same-time (≤0.25 h) entries differing by >20 % →
 `review_hold`.
+Independent cross-check (18 Sep 2026): against Tucuxi-core (`d09737e3`, built
+from source) with the same Colin prior, the same ω and a `mixed`
+σ = √((0.15·f)² + 1²), on 200 synthetic patients: CL median |Δ| 0.84 %
+(P95 4.8 %, max 9.2 %), V1 0.87 %, 0 failures; the whole tail is the
+σ-form difference (max(y, f) vs f-only), reproduced to ≤ 0.01 % by an
+independent refit. Record: `src/lib/validation/crosscheck/tucuxi/README.md`.
 
 ## Recommendation
 Grid: doses 250–2000 mg (adjustment) / 500–2000 (empiric) at q6/8/12/18/24/36/48 h;

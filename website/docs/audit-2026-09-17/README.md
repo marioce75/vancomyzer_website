@@ -58,7 +58,7 @@ log-SDs 0.35/0.25/0.50/0.50; error model; dose grid, caps and target; the
 
 ## 4. Not run / blocked (not passed)
 
-- Tucuxi comparator: no binary, `.tdd`/`.tqf` not committed → **BLOCKED** (`compare.ts` exits 1).
+- Tucuxi comparator: **RUN on 18 Sep 2026** — `tucucli` built from sotalya/tucuxi-core `d09737e3`; Colin 2019 encoded as a Tucuxi `.tdd`, prior validated against the oracle (1e-7) before any posterior run; 200/200 fits; CL median |Δ| 0.84 % (P95 4.8 %, max 9.2 %), V1 0.87 %, 0 excluded — all pre-set criteria met, tail attributed entirely to the residual error-model form by an independent refit. Record: `src/lib/validation/crosscheck/tucuxi/README.md`.
 - ClinCalc, VancoPK, DoseMeRx, InsightRX, PrecisePK: no authorised accounts → **BLOCKED**; see `comparator-matrix.md`.
 - Real-patient validation: not performed; separately governed project.
 - Independent re-minimisation with a second optimiser (e.g. SciPy L-BFGS/Powell on the identical objective) for the §4 tolerances.
@@ -69,5 +69,5 @@ log-SDs 0.35/0.25/0.50/0.50; error model; dose grid, caps and target; the
 
 **Clinical** — (a) Should the engine's grid offer sub-500 mg or q6h regimens for adults at all (surfaced, flagged "review")? (b) With sex blank, should the posterior CL cap use the female (lower) CrCl? (c) Is the 4-half-life criterion the right advisory threshold? (d) Duplicate-window 0.25 h / 20 % discordance thresholds.
 **Statistical** — (a) App-specific prior SDs vs Colin IIV (0.279/0.273/0.979; no published Q IIV) — documented model revision if changed. (b) The error model is not the published residual model. (c) Two levels do not identify four parameters; Q/V2 stay at the prior — say so in outputs? (d) No posterior covariance; the graph band is illustrative only (kept).
-**Access** — dosys-website repo; Tucuxi build; comparator accounts; the attached audit document.
+**Access** — dosys-website repo; commercial comparator accounts; the attached audit document. (Tucuxi build: done.)
 **Legal / privacy** — see `privacy-data-flow.md` and `regulatory-assessment-draft.md`; counsel decides FDA/HIPAA/state/FTC obligations and licence alignment. The BAA page statement (F10) needs correction before any BAA is signed.
