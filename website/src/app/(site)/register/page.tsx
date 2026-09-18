@@ -291,17 +291,19 @@ function RegisterPageInner() {
                 }}
               >
                 <h3 style={{ fontSize: 12, fontWeight: 700, color: "#1a3a5c", marginBottom: 8 }}>VANCOMYZER™ TERMS OF USE</h3>
-                <p style={{ fontSize: 10, color: "#718096", marginBottom: 8 }}>Last updated: March 2026</p>
+                <p style={{ fontSize: 10, color: "#718096", marginBottom: 8 }}>Last updated: September 18, 2026</p>
                 <p><strong>Acceptance of Terms</strong></p>
                 <p>By accessing or using Vancomyzer™, you agree to be bound by these Terms of Use and the Medical Disclaimer. If you do not agree, do not use this tool.</p>
                 <p><strong>Permitted Use</strong></p>
-                <p>Vancomyzer™ is provided for evaluation, educational use, and clinical decision-support review by qualified healthcare professionals. You are granted a limited, non-exclusive, non-transferable license to use this tool for lawful, non-commercial purposes only.</p>
+                <p>Vancomyzer™ is licensed to qualified healthcare professionals, and to institutions that subscribe on their behalf, for internal clinical, educational, and quality-improvement use. Subject to these Terms and payment of any applicable fees, you are granted a limited, non-exclusive, non-transferable, non-sublicensable license to access and use the tool for that purpose. Using it in the course of your practice or employment, including at a for-profit institution, is permitted.</p>
                 <p>You may not:</p>
                 <ul style={{ paddingLeft: 20, margin: "4px 0" }}>
+                  <li>Resell, rent, sublicense, white-label, or otherwise make the tool available to anyone who is not an authorized user under your own subscription</li>
+                  <li>Operate the tool as a service bureau or application service provider, or offer dosing services to third parties as a standalone product built on it</li>
                   <li>Modify, copy, reproduce, distribute, or create derivative works from this tool without prior written consent</li>
-                  <li>Use this tool for commercial purposes or to provide paid dosing services</li>
                   <li>Remove or alter any copyright, trademark, or legal notices</li>
-                  <li>Reverse-engineer or attempt to extract proprietary algorithms</li>
+                  <li>Reverse-engineer or attempt to extract proprietary algorithms or model parameters</li>
+                  <li>Access the tool in order to design or develop a competing product</li>
                 </ul>
                 <p><strong>Intellectual Property</strong></p>
                 <p>All content, design, algorithms, and code comprising Vancomyzer™ are the exclusive intellectual property of their respective owners. All rights reserved. The Vancomyzer™ name and logo are trademarks. Unauthorized use of any intellectual property associated with this tool is prohibited.</p>

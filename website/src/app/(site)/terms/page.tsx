@@ -5,7 +5,7 @@ export default function TermsPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <h1 className="text-3xl font-bold tracking-tight text-slate-900">Terms of Use</h1>
-      <p className="mt-2 text-sm text-slate-500">Last updated: March 2026</p>
+      <p className="mt-2 text-sm text-slate-500">Last updated: September 18, 2026</p>
 
       <CanonicalDocCallout docName="Terms of Use" href={LEGAL_LINKS.terms} />
 
@@ -21,14 +21,16 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Permitted Use</h2>
           <p>
-            Vancomyzer™ is provided for evaluation, educational use, and clinical decision-support review by qualified healthcare professionals. You are granted a limited, non-exclusive, non-transferable license to use this tool for lawful, non-commercial purposes only.
+            Vancomyzer™ is licensed to qualified healthcare professionals, and to institutions that subscribe on their behalf, for internal clinical, educational, and quality-improvement use. Subject to these Terms and payment of any applicable fees, you are granted a limited, non-exclusive, non-transferable, non-sublicensable license to access and use the tool for that purpose. Using it in the course of your practice or employment, including at a for-profit institution, is permitted.
           </p>
           <p className="mt-3">You may not:</p>
           <ul className="mt-2 list-disc pl-6 space-y-1 text-sm">
+            <li>Resell, rent, sublicense, white-label, or otherwise make the tool available to anyone who is not an authorized user under your own subscription</li>
+            <li>Operate the tool as a service bureau or application service provider, or offer dosing services to third parties as a standalone product built on it</li>
             <li>Modify, copy, reproduce, distribute, or create derivative works from this tool without prior written consent</li>
-            <li>Use this tool for commercial purposes or to provide paid dosing services</li>
             <li>Remove or alter any copyright, trademark, or legal notices</li>
-            <li>Reverse-engineer or attempt to extract proprietary algorithms</li>
+            <li>Reverse-engineer or attempt to extract proprietary algorithms or model parameters</li>
+            <li>Access the tool in order to design or develop a competing product</li>
           </ul>
         </section>
 
