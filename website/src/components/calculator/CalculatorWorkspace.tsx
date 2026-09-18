@@ -201,6 +201,17 @@ export default function CalculatorWorkspace() {
   // from the Retry-After header; explicit Calculate clicks are not blocked.
   const rateLimitedUntilRef = useRef<number>(0);
 
+  // Result lifecycle guard. Each submission takes a sequence number and the
+  // timestamp of the inputs it was built from. A response is applied only if it
+  // is the LATEST submission; an older response that completes late is
+  // discarded, so it can never overwrite a newer input, clear an RRT block or
+  // resurrect a superseded regimen. lastCalculatedAt is set to the SUBMIT time
+  // (not the response time), so inputs edited while the request was in flight
+  // still read as stale.
+  const requestSeqRef = useRef(0);
+  const rrtRef = useRef<boolean | null>(null);
+  useEffect(() => { rrtRef.current = rrt; }, [rrt]);
+
   // ── Restore from sessionStorage on mount (client-only) ──
   const didRestoreRef = useRef(false);
   useEffect(() => {
@@ -375,15 +386,22 @@ export default function CalculatorWorkspace() {
     setError(null);
     setLoading(true);
     const request = { ...buildRequest(), intent };
+    const seq = ++requestSeqRef.current;
+    const submittedAt = Date.now();
 
     try {
-      console.log("[Vancomyzer] submitting levels:", JSON.stringify(request.levels));
       const res = await fetch("/api/calculate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(request),
       });
       const data = await res.json().catch(() => ({}));
+
+      // Superseded by a newer submission, or the patient was switched to RRT
+      // while this request was in flight: discard, do not touch state.
+      if (seq !== requestSeqRef.current || rrtRef.current === true) {
+        return;
+      }
 
       if (!res.ok) {
         if (res.status === 429) {
@@ -457,8 +475,15 @@ export default function CalculatorWorkspace() {
         predicted_auc24: data.predicted_auc24,
         predicted_peak: data.predicted_peak,
         predicted_trough: data.predicted_trough,
+        exposure_horizon: data.exposure_horizon,
+        steady_state_exposure: data.steady_state_exposure,
+        actual_history_exposure: data.actual_history_exposure,
+        steady_state_approach: data.steady_state_approach,
+        steady_state_warning: data.steady_state_warning,
+        review_hold: data.review_hold,
+        result_snapshot: data.result_snapshot,
       });
-      setLastCalculatedAt(Date.now());
+      setLastCalculatedAt(submittedAt);
       setSelectedFrequencyOption(null);
       setViewCurrentRegimen(false);
       setError(null);
@@ -510,7 +535,7 @@ export default function CalculatorWorkspace() {
         );
       }
     } finally {
-      setLoading(false);
+      if (seq === requestSeqRef.current) setLoading(false);
     }
   }, [buildRequest, playSound]);
 
@@ -898,7 +923,9 @@ export default function CalculatorWorkspace() {
       ? `Loading dose continued as ${regimen.dose_mg} mg q${regimen.interval_hours}h — steady-state PK`
       : `Maintenance after loading dose${activeOption ? ` — ${activeOption.dose_mg} mg q${activeOption.interval_hours}h` : ""} — steady-state PK`
     : activeIsCurrent
-      ? "Current regimen (as entered) — predicted steady-state exposure"
+      ? (displayResult?.exposure_horizon === "actual_history"
+          ? `Current regimen — steady-state projection (actual history: ${displayResult.actual_history_exposure?.doses_given ?? "?"} doses given)`
+          : "Current regimen (as entered) — steady-state exposure")
       : "Predicted steady-state exposure";
   const currentRegimenRow =
     displayResult?.recommendation_type === "existing_regimen" && regimen.dose_mg > 0 && (isPulse || regimen.interval_hours > 0)
@@ -929,6 +956,24 @@ export default function CalculatorWorkspace() {
   const exportsDisabled = resultObscured || !visibleResult;
 
   const advisories: ReactNode[] = [];
+  if (displayResult?.review_hold) {
+    advisories.push(
+      <Advisory key="review-hold" severity="warning" title="Review required — no dose adjustment presented." summary={displayResult.review_hold.message} role="alert" />,
+    );
+  }
+  if (displayResult?.actual_history_exposure && displayResult.exposure_horizon === "actual_history") {
+    const a = displayResult.actual_history_exposure;
+    const ap = displayResult.steady_state_approach;
+    advisories.push(
+      <Advisory
+        key="actual-history"
+        severity="info"
+        title={`Actual history — dose ${a.doses_given}:`}
+        summary={`modelled peak ${a.peak.toFixed(1)} / trough ${a.trough.toFixed(1)} mcg/mL; AUC over that interval ${a.auc_interval_n.toFixed(0)} mg·h/L (not a daily AUC)${ap ? `; ${(ap.fraction_of_steady_state * 100).toFixed(0)}% of steady state (t½ ${ap.terminal_half_life_hours.toFixed(1)} h)` : ""}. The AUC₂₄/peak/trough above are the steady-state projection of the current regimen, comparable with the candidates.`}
+        role="status"
+      />,
+    );
+  }
   if (displayResult?.timing_warnings && displayResult.timing_warnings.length > 0) {
     advisories.push(
       <Advisory key="timing" severity="caution" title="Lab timing advisory" role="status">
@@ -936,11 +981,17 @@ export default function CalculatorWorkspace() {
       </Advisory>,
     );
   }
-  if (displayResult?.fit_quality_warnings && displayResult.fit_quality_warnings.length > 0) {
+  const fitWarnings = (displayResult?.fit_quality_warnings ?? []).filter((w) => w !== displayResult?.steady_state_warning);
+  if (fitWarnings.length > 0) {
     advisories.push(
       <Advisory key="fit" severity="caution" title="Fit quality advisory" role="status">
-        <ul className="list-disc pl-4">{displayResult.fit_quality_warnings.map((w, i) => <li key={i}>{w}</li>)}</ul>
+        <ul className="list-disc pl-4">{fitWarnings.map((w, i) => <li key={i}>{w}</li>)}</ul>
       </Advisory>,
+    );
+  }
+  if (displayResult?.steady_state_warning) {
+    advisories.push(
+      <Advisory key="ss-approach" severity="caution" title="Steady-state check" summary={displayResult.steady_state_warning} role="status" />,
     );
   }
   if (recommendedOutsideDisplayRule && recommendedOption && !displayResult?.empiric_dosing_blocked && !displayResult?.adjustment_dosing_blocked) {
@@ -1217,6 +1268,17 @@ export default function CalculatorWorkspace() {
                         <button type="button" aria-pressed={showEngineRecommended} onClick={() => setShowEngineRecommended(true)}>
                           Engine recommendation
                         </button>
+                      </div>
+                    </div>
+                  )}
+                  {displayResult.review_hold && (
+                    <div className="flex flex-wrap items-stretch gap-2">
+                      <div className="flex-1 min-w-[260px] px-3 py-2" style={{ background: "var(--color-bg)", border: "1px solid #fca5a5" }}>
+                        <p className="vz-kicker m-0 mb-0.5">Recommendation withheld</p>
+                        <p className="m-0 text-xs" style={{ color: "#7f1d1d" }}>Reconcile the discordant same-time levels, then recalculate.</p>
+                      </div>
+                      <div className="flex-[1.4] min-w-[300px]">
+                        <PrimaryMetricsCard compact caption={metricsCaption} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />
                       </div>
                     </div>
                   )}

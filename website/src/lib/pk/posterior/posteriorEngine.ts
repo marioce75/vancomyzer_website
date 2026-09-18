@@ -114,6 +114,7 @@ export function runPosteriorEngine(
     T_inf: context.T_inf,
     observations,
     doses_given: context.doses_given,
+    horizon: context.horizon,
     // Between-subject-variability overrides, when a model supplies them.
     // Colin 2019 does not, so these are undefined for every shipped result.
     omega_CL: prior.omega_CL,

@@ -155,6 +155,15 @@ export function buildCalculateResponse(
     // uncertainty_label directly rather than reconstructing a width from other
     // fields that happen to encode it.
     posterior_fit: engineOutput.posterior_fit,
+    // Explicit exposure-horizon semantics (exposureHorizon.ts). The top-level
+    // auc24/peak/trough describe `exposure_horizon`; the steady-state
+    // projection and the actual-history values are carried separately so no
+    // consumer can pair finite-dose peak/trough with a steady-state daily AUC.
+    exposure_horizon: engineOutput.exposure_horizon,
+    steady_state_exposure: engineOutput.steady_state_exposure,
+    actual_history_exposure: engineOutput.actual_history_exposure,
+    steady_state_approach: engineOutput.steady_state_approach,
+    steady_state_warning: engineOutput.steady_state_warning,
     // Where the regimen this response actually recommends sits against the
     // 400-600 band, plus the exposure it is predicted to produce. The empiric
     // path has always reported these; the adjustment path reported neither, so

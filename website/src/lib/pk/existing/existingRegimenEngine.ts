@@ -3,7 +3,8 @@
  */
 
 import { runPosteriorEngine } from "../posterior/posteriorEngine";
-import { computeExposure, curvePoints, isSteadyStateRegimen, loadingDoseCurvePoints, singleDoseAuc } from "../steadyStateTwoCompartment";
+import { computeExposure, curvePoints, finiteHistoryExposure, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
+import { assessSteadyStateApproach, resolveExposureHorizon, STEADY_STATE_HALF_LIVES } from "../exposureHorizon";
 import { computeSafeInfusionDurationHours } from "../recommend/infusionSafety";
 import type { ExistingRegimenEngineInput, ExistingRegimenEngineOutput } from "../types";
 import { modelShortName } from "../modelRegistry";
@@ -32,15 +33,23 @@ export function runExistingRegimenEngine(
   const tau = interval_hours;
   const T_inf = Math.min(Math.max(0, infusion_duration_hours), tau);
 
-  // Steady state is decided by the patient's own accumulation timescale, not by
-  // a fixed dose count — see isSteadyStateRegimen. The dose count remains a
-  // necessary condition, so this can only classify MORE patients as
-  // pre-steady-state than before, never fewer.
-  const isNonSteadyState =
-    doses_given !== undefined && !isSteadyStateRegimen(doses_given, tau, { CL, V1, Q, V2 });
-  const isPulseDose = doses_given === 1;
+  // The exposure horizon is decided ONCE for the request (exposureHorizon.ts)
+  // and shared with the posterior fit, so the fitted level, the current-regimen
+  // exposure and the candidate rows all describe the same thing. The model's
+  // own view of how close the patient is to steady state is an ADVISORY.
+  const exposure_horizon = resolveExposureHorizon(regimen);
+  const isNonSteadyState = exposure_horizon === "actual_history";
+  const isPulseDose = exposure_horizon === "single_dose";
 
+  // Canonical steady-state projection of the current regimen — the same
+  // function, parameters and infusion duration every candidate row uses.
   const steadyStateExposure = computeExposure({ CL, V1, Q, V2, dose_mg, tau, T_inf });
+  const steady_state_exposure = { ...steadyStateExposure, infusion_duration_hours: T_inf };
+  const steady_state_approach = assessSteadyStateApproach(doses_given, tau, { CL, V1, Q, V2 }) ?? undefined;
+  const steady_state_warning =
+    exposure_horizon === "steady_state" && steady_state_approach && !steady_state_approach.adequate
+      ? `Steady state was confirmed for this regimen, but with a terminal half-life of ${steady_state_approach.terminal_half_life_hours.toFixed(1)} h the model predicts only ${(steady_state_approach.fraction_of_steady_state * 100).toFixed(0)}% of the steady-state plateau after ${doses_given} doses (${steady_state_approach.half_lives_elapsed.toFixed(1)} of ${STEADY_STATE_HALF_LIVES} half-lives). If dosing history is incomplete or irregular, use the actual-history mode.`
+      : undefined;
 
   // For loading dose: build a realistic curve showing loading → maintenance transition
   // For regular regimens: use standard multi-dose accumulation curve
@@ -100,34 +109,32 @@ export function runExistingRegimenEngine(
     }
   }
 
-  // For steady-state, use the SS AUC24 = TDD/CL
-  // For non-steady-state, extract actual peak/trough from the Nth dose cycle in the curve
+  // Top-level triple — see ExistingRegimenEngineOutput. Finite-dose peak/trough
+  // are NEVER paired with the steady-state daily AUC. The actual-history values
+  // are computed analytically (not read off the plotted grid) and carried in
+  // their own block.
   let auc24 = steadyStateExposure.auc24;
   let peak = steadyStateExposure.peak;
   let trough = steadyStateExposure.trough;
-  if (isNonSteadyState) {
-    const doseStart = (doses_given - 1) * tau;
-    const doseEnd = doses_given * tau;
-    const doseCycle = curve.filter(p => p.time_hours >= doseStart && p.time_hours <= doseEnd);
-    if (doseCycle.length > 0) {
-      peak = Math.max(...doseCycle.map(p => p.concentration));
-      const endOfIntervalPoint = doseCycle.find(p => p.time_hours === doseEnd);
-      if (endOfIntervalPoint) {
-        trough = endOfIntervalPoint.concentration;
-      }
-    }
-
-    // For a loading dose (dose 1), report the area under the first 24 hours of
-    // that single dose. This previously integrated the first interval and scaled
-    // by 24/tau, which made a number labelled "first-dose AUC24" depend on an
-    // interval at which no dose had yet been given: the same 1500 mg dose and
-    // the same measured level read 476 at q8h, 408 at q12h and 274 at q24h —
-    // straddling the 400-600 target boundary on a value the clinician could not
-    // trace to any input, because the interval control is hidden in pulse mode.
-    // AUC0-24 of one dose is interval-independent, which is what the label
-    // promises and what the 400-600 target is compared against.
+  let actual_history_exposure: ExistingRegimenEngineOutput["actual_history_exposure"];
+  if ((isNonSteadyState || isPulseDose) && doses_given !== undefined && doses_given > 0) {
+    const finite = finiteHistoryExposure({ CL, V1, Q, V2, dose_mg, tau, T_inf }, doses_given);
+    actual_history_exposure = {
+      doses_given,
+      peak: Math.round(finite.peak * 100) / 100,
+      trough: Math.round(finite.trough * 100) / 100,
+      auc_interval_n: Math.round(finite.auc_interval_n * 10) / 10,
+      auc_0_24h: Math.round(finite.auc_0_24h * 10) / 10,
+    };
     if (isPulseDose) {
-      auc24 = singleDoseAuc({ CL, V1, Q, V2, dose_mg, tau, T_inf }, 0, 24);
+      // Loading dose (dose 1): report the first-dose profile and the area
+      // under the first 24 hours of that single dose — interval-independent,
+      // which is what the label promises and what the 400-600 target is
+      // compared against. (The former first-interval × 24/tau scaling read
+      // 476 at q8h, 408 at q12h and 274 at q24h for the same dose.)
+      auc24 = finite.auc_0_24h;
+      peak = finite.peak;
+      trough = finite.trough;
     }
   }
 
@@ -147,8 +154,10 @@ export function runExistingRegimenEngine(
   const steadyStateNote = isPulseDose
     ? "Loading dose simulation (single dose). AUC₂₄ is the area under the first 24 hours of this one dose, not steady-state exposure."
     : isNonSteadyState
-      ? `Non-steady-state analysis based on ${doses_given} dose${doses_given === 1 ? "" : "s"}.`
-      : "Steady-state assumed (≥5 doses).";
+      ? `Actual-history analysis: the level was fitted after exactly ${doses_given} dose${doses_given === 1 ? "" : "s"}; exposure of the current regimen is reported as its steady-state projection, with dose-${doses_given} peak/trough shown separately.`
+      : steady_state_warning
+        ? "Steady state confirmed by the clinician (model approach check flagged — see warning)."
+        : "Steady state confirmed by the clinician.";
 
   const priorMsg = `${modelShortName(model_name)} two-compartment adult population prior`;
 
@@ -176,6 +185,16 @@ export function runExistingRegimenEngine(
     auc24: Math.round(auc24 * 10) / 10,
     peak: Math.round(peak * 10) / 10,
     trough: Math.round(trough * 10) / 10,
+    exposure_horizon,
+    steady_state_exposure: {
+      auc24: Math.round(steady_state_exposure.auc24 * 10) / 10,
+      peak: Math.round(steady_state_exposure.peak * 100) / 100,
+      trough: Math.round(steady_state_exposure.trough * 100) / 100,
+      infusion_duration_hours: T_inf,
+    },
+    actual_history_exposure,
+    steady_state_approach,
+    steady_state_warning,
     scr: posteriorScr,
     current_regimen_dose_mg: dose_mg,
     current_regimen_interval_hours: interval_hours,

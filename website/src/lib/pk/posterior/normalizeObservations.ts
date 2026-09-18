@@ -4,6 +4,7 @@
  */
 
 import type { NormalizedLevel, NormalizedRegimen } from "../types";
+import { resolveExposureHorizon, type ExposureHorizon } from "../exposureHorizon";
 
 export interface NormalizedObservation {
   time_hours: number;
@@ -22,6 +23,8 @@ export interface ObservationContext {
    * gave no dose count (treated as steady state).
    */
   doses_given?: number;
+  /** Horizon decided once for the whole request (exposureHorizon.ts). */
+  horizon: ExposureHorizon;
 }
 
 function timeInInterval(t: number, tau: number): number {
@@ -78,6 +81,6 @@ export function normalizeObservations(
   });
   return {
     observations,
-    context: { tau: effectiveTau, T_inf, doses_given: regimen.doses_given },
+    context: { tau: effectiveTau, T_inf, doses_given: regimen.doses_given, horizon: resolveExposureHorizon(regimen) },
   };
 }

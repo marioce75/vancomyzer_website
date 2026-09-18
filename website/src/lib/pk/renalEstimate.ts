@@ -51,7 +51,12 @@ export const ARC_THRESHOLD_ML_MIN_1_73 = 130;
 export type CrClWeightDescriptor = "actual" | "ideal" | "adjusted";
 
 export interface DisplayedCrCl {
+  /** Value at the entered sex, or at the assumed sex when `sex_assumed` is set. */
   crcl_ml_min: number;
+  /** Set only when sex was blank: the value if the patient is female. */
+  crcl_if_female_ml_min?: number;
+  /** Set only when sex was blank, naming the assumption behind crcl_ml_min. */
+  sex_assumed?: "male";
   descriptor: CrClWeightDescriptor;
   weight_used_kg: number;
   /** Clinician-facing line naming the weight used and the basis. */
@@ -143,8 +148,15 @@ export function displayedCrCl(patient: {
     }
   }
 
+  // Sex is not a Colin 2019 covariate, so the dose does not need it; the
+  // contextual Cockcroft-Gault value does (×0.85 for women). A single number
+  // with an unstated male assumption overstated the estimate by ~18% for women
+  // who left the field blank, so when sex is missing BOTH values are shown and
+  // the assumption is explicit.
+  const sexKnown = sex === "male" || sex === "female";
   const crcl_ml_min = cockcroftGault(age, weight_used_kg, serum_creatinine_mg_dl, sex || "male");
   if (!(crcl_ml_min > 0)) return null;
+  const crcl_if_female_ml_min = sexKnown ? undefined : crcl_ml_min * 0.85;
 
   const weightPhrase =
     descriptor === "adjusted"
@@ -155,12 +167,17 @@ export function displayedCrCl(patient: {
           ? `actual body weight ${Math.round(weight_used_kg)} kg`
           : `actual body weight ${Math.round(weight_used_kg)} kg; height or sex not entered`;
 
+  const valuePhrase = sexKnown
+    ? `Estimated CrCl ${Math.round(crcl_ml_min)} mL/min`
+    : `Estimated CrCl ${Math.round(crcl_ml_min)} mL/min if male / ${Math.round(crcl_if_female_ml_min ?? 0)} mL/min if female (sex not entered)`;
   return {
     crcl_ml_min,
+    crcl_if_female_ml_min,
+    sex_assumed: sexKnown ? undefined : "male",
     descriptor,
     weight_used_kg,
     label:
-      `Estimated CrCl ${Math.round(crcl_ml_min)} mL/min ` +
+      `${valuePhrase} ` +
       `(Cockcroft-Gault, ${weightPhrase}; absolute, not indexed to 1.73 m²) — ` +
       `shown for context; the dose is calculated from serum creatinine and does not use this value`,
   };

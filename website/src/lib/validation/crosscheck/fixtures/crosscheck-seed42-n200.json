@@ -1,0 +1,7031 @@
+{
+ "generated_at": "2026-09-18T01:19:16.291Z",
+ "generator": "src/lib/validation/crosscheck/generateFixtures.ts",
+ "seed": 42,
+ "n": 200,
+ "engine_manifest_at_generation": "2026-09-15.1",
+ "truth_model": "Goti 2018-based individual parameters (predictive/goti2018.ts), between-subject variability per GOTI_2018_OMEGA",
+ "residual_error_model": {
+  "proportional": 0.2,
+  "additive_mg_l": 1
+ },
+ "design": {
+  "dose_mg_per_kg": 15,
+  "interval_hours": 12,
+  "infusion_hours": 1.5,
+  "doses_before_sampling": 5,
+  "sample_times_h_after_dose_start": [
+   3,
+   11.5
+  ],
+  "horizon": "steady_state (confirmed)"
+ },
+ "units": {
+  "concentration": "mg/L (= mcg/mL)",
+  "CL": "L/h",
+  "V": "L",
+  "time": "h"
+ },
+ "patients": [
+  {
+   "id": "p1",
+   "patient": {
+    "age": 48,
+    "weight_kg": 69.5,
+    "height_cm": 165,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.89
+   },
+   "truth": {
+    "CL": 3.4523793833317895,
+    "V1": 38.357017051178126,
+    "Q": 2.830202614129648,
+    "V2": 26.952647007222804
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 24.438396810996192,
+     "true_value": 31.71201643338076
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.56532637950183,
+     "true_value": 16.099437549346945
+    }
+   ]
+  },
+  {
+   "id": "p2",
+   "patient": {
+    "age": 59,
+    "weight_kg": 82.2,
+    "height_cm": 171,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.68
+   },
+   "truth": {
+    "CL": 3.4414930512078743,
+    "V1": 70.2091050527448,
+    "Q": 8.052054004339965,
+    "V2": 64.44288894972021
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 36.81628579391743,
+     "true_value": 35.34123525997495
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 28.693711298993435,
+     "true_value": 24.772127670489066
+    }
+   ]
+  },
+  {
+   "id": "p3",
+   "patient": {
+    "age": 80,
+    "weight_kg": 51.3,
+    "height_cm": 166,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 1.14
+   },
+   "truth": {
+    "CL": 1.6215884144820853,
+    "V1": 63.65337852213056,
+    "Q": 6.356387166709516,
+    "V2": 31.798253163420817
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 41.17420466149542,
+     "true_value": 41.944091821062685
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 45.83899133883009,
+     "true_value": 34.651632110570354
+    }
+   ]
+  },
+  {
+   "id": "p4",
+   "patient": {
+    "age": 55,
+    "weight_kg": 51.7,
+    "height_cm": 152,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.83
+   },
+   "truth": {
+    "CL": 3.7271056676314456,
+    "V1": 50.18794480677455,
+    "Q": 3.6967275081236166,
+    "V2": 29.56257391349104
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 14.734594039093363,
+     "true_value": 21.146764773896738
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 9.299003372801875,
+     "true_value": 12.029815863990397
+    }
+   ]
+  },
+  {
+   "id": "p5",
+   "patient": {
+    "age": 70,
+    "weight_kg": 67.6,
+    "height_cm": 173,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.78
+   },
+   "truth": {
+    "CL": 2.1566790107108513,
+    "V1": 55.091750893255146,
+    "Q": 16.212508346585686,
+    "V2": 37.472867006698806
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 43.199232352919836,
+     "true_value": 42.552205650829855
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 41.05991587015887,
+     "true_value": 33.78756381346417
+    }
+   ]
+  },
+  {
+   "id": "p6",
+   "patient": {
+    "age": 75,
+    "weight_kg": 102.5,
+    "height_cm": 170,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.71
+   },
+   "truth": {
+    "CL": 5.9106979754607645,
+    "V1": 138.5058200989014,
+    "Q": 6.288959659427314,
+    "V2": 59.74983906434755
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 24.219602440103344,
+     "true_value": 24.469338658143656
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 15.97633633036786,
+     "true_value": 17.360522219155747
+    }
+   ]
+  },
+  {
+   "id": "p7",
+   "patient": {
+    "age": 77,
+    "weight_kg": 46.8,
+    "height_cm": 173,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.82
+   },
+   "truth": {
+    "CL": 2.2393332803956594,
+    "V1": 37.01919502888443,
+    "Q": 6.982070822587027,
+    "V2": 17.736188206545442
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 31.65417701175753,
+     "true_value": 32.8780475657982
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 20.89386785702604,
+     "true_value": 22.084082570213436
+    }
+   ]
+  },
+  {
+   "id": "p8",
+   "patient": {
+    "age": 80,
+    "weight_kg": 69.1,
+    "height_cm": 169,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.52
+   },
+   "truth": {
+    "CL": 8.232383619032454,
+    "V1": 70.33749431184185,
+    "Q": 4.2320986688770965,
+    "V2": 27.42457207294112
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 18.339769031399943,
+     "true_value": 14.19415479419598
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 5.532693929335076,
+     "true_value": 5.830556908511655
+    }
+   ]
+  },
+  {
+   "id": "p9",
+   "patient": {
+    "age": 47,
+    "weight_kg": 49.1,
+    "height_cm": 174,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.36
+   },
+   "truth": {
+    "CL": 4.686351365442563,
+    "V1": 43.69384935667419,
+    "Q": 6.7700107772509455,
+    "V2": 30.257813680571886
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 12.01041987881471,
+     "true_value": 17.601772763025867
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.42869118079455,
+     "true_value": 8.760201911932212
+    }
+   ]
+  },
+  {
+   "id": "p10",
+   "patient": {
+    "age": 54,
+    "weight_kg": 64.6,
+    "height_cm": 172,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.18
+   },
+   "truth": {
+    "CL": 2.615714201157386,
+    "V1": 43.16899869989429,
+    "Q": 8.449147476789559,
+    "V2": 35.090276613885806
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 40.16374121898604,
+     "true_value": 37.53152147651697
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 29.233716603123767,
+     "true_value": 25.5392058502208
+    }
+   ]
+  },
+  {
+   "id": "p11",
+   "patient": {
+    "age": 44,
+    "weight_kg": 43.4,
+    "height_cm": 167,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.57
+   },
+   "truth": {
+    "CL": 1.435344628005536,
+    "V1": 31.266349466529682,
+    "Q": 1.9357389485509542,
+    "V2": 49.984061241863685
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 47.874463742344446,
+     "true_value": 50.89935224164479
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 28.256764630277996,
+     "true_value": 35.40514634121414
+    }
+   ]
+  },
+  {
+   "id": "p12",
+   "patient": {
+    "age": 92,
+    "weight_kg": 55.4,
+    "height_cm": 177,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.73
+   },
+   "truth": {
+    "CL": 2.144601223649779,
+    "V1": 27.66266706487898,
+    "Q": 11.794428129987375,
+    "V2": 32.92597873248683
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 40.36430761124167,
+     "true_value": 33.66003407756245
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 24.824636220696473,
+     "true_value": 23.32532888374072
+    }
+   ]
+  },
+  {
+   "id": "p13",
+   "patient": {
+    "age": 93,
+    "weight_kg": 67.9,
+    "height_cm": 169,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.49
+   },
+   "truth": {
+    "CL": 2.678526565325466,
+    "V1": 83.15386803850743,
+    "Q": 6.2968920659398275,
+    "V2": 30.940911660316374
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 30.268051729746485,
+     "true_value": 34.65964560323067
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 17.226444934306215,
+     "true_value": 27.030886145876853
+    }
+   ]
+  },
+  {
+   "id": "p14",
+   "patient": {
+    "age": 68,
+    "weight_kg": 68,
+    "height_cm": 162,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.75
+   },
+   "truth": {
+    "CL": 2.9227791389615825,
+    "V1": 49.67681881519176,
+    "Q": 7.565759103804473,
+    "V2": 29.741187838308036
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 31.822402438357763,
+     "true_value": 33.76780155762685
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 23.83677070927731,
+     "true_value": 22.631819989674803
+    }
+   ]
+  },
+  {
+   "id": "p15",
+   "patient": {
+    "age": 67,
+    "weight_kg": 76.1,
+    "height_cm": 178,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.77
+   },
+   "truth": {
+    "CL": 4.4656308256034905,
+    "V1": 94.29040160387466,
+    "Q": 7.486548523405801,
+    "V2": 45.95440404330174
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 28.813962316559522,
+     "true_value": 27.223125359282236
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 22.83658345865683,
+     "true_value": 18.966521542715594
+    }
+   ]
+  },
+  {
+   "id": "p16",
+   "patient": {
+    "age": 60,
+    "weight_kg": 64.5,
+    "height_cm": 154,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.52
+   },
+   "truth": {
+    "CL": 4.019152448711719,
+    "V1": 48.84027000017818,
+    "Q": 8.202570518113147,
+    "V2": 71.05676821942409
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 29.83066226520162,
+     "true_value": 25.995087035107602
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 16.140160389192165,
+     "true_value": 15.29654997865808
+    }
+   ]
+  },
+  {
+   "id": "p17",
+   "patient": {
+    "age": 44,
+    "weight_kg": 54.5,
+    "height_cm": 173,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.88
+   },
+   "truth": {
+    "CL": 6.887911434511592,
+    "V1": 54.16934430753336,
+    "Q": 3.713914334914872,
+    "V2": 38.68162733877964
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 7.923140387343183,
+     "true_value": 12.991313076342006
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 5.700256134727721,
+     "true_value": 5.044597622386957
+    }
+   ]
+  },
+  {
+   "id": "p18",
+   "patient": {
+    "age": 72,
+    "weight_kg": 52.1,
+    "height_cm": 163,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.64
+   },
+   "truth": {
+    "CL": 5.3811363185598005,
+    "V1": 50.26145782266532,
+    "Q": 5.420456449984139,
+    "V2": 58.90103933660388
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 16.402765382988783,
+     "true_value": 15.70943661302484
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 5.424169961419158,
+     "true_value": 7.418839533355155
+    }
+   ]
+  },
+  {
+   "id": "p19",
+   "patient": {
+    "age": 43,
+    "weight_kg": 60.2,
+    "height_cm": 170,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.3
+   },
+   "truth": {
+    "CL": 3.342726686768911,
+    "V1": 49.4473374051556,
+    "Q": 5.421187489447816,
+    "V2": 65.5036973873278
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 25.6272170151847,
+     "true_value": 30.708792705506482
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 23.152931356114095,
+     "true_value": 18.847166704095077
+    }
+   ]
+  },
+  {
+   "id": "p20",
+   "patient": {
+    "age": 67,
+    "weight_kg": 47.6,
+    "height_cm": 147,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.75
+   },
+   "truth": {
+    "CL": 2.732593310591062,
+    "V1": 45.16639799760281,
+    "Q": 3.8454824208386236,
+    "V2": 25.765962072805767
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 32.122828562030534,
+     "true_value": 27.69689695728671
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.409511295863528,
+     "true_value": 17.580045817042105
+    }
+   ]
+  },
+  {
+   "id": "p21",
+   "patient": {
+    "age": 68,
+    "weight_kg": 71.5,
+    "height_cm": 159,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.33
+   },
+   "truth": {
+    "CL": 6.180959151442286,
+    "V1": 63.23699665277513,
+    "Q": 7.784862686965426,
+    "V2": 76.66547654304553
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 14.920823208836165,
+     "true_value": 17.763526249015698
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 6.2242822588880715,
+     "true_value": 9.076402397724673
+    }
+   ]
+  },
+  {
+   "id": "p22",
+   "patient": {
+    "age": 64,
+    "weight_kg": 77.4,
+    "height_cm": 167,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.36
+   },
+   "truth": {
+    "CL": 11.547906837234338,
+    "V1": 75.96499378220788,
+    "Q": 6.827640622170635,
+    "V2": 26.43800510930613
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 18.913558725805572,
+     "true_value": 13.323319309958812
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 6.308223561883581,
+     "true_value": 4.515808457444565
+    }
+   ]
+  },
+  {
+   "id": "p23",
+   "patient": {
+    "age": 68,
+    "weight_kg": 87.6,
+    "height_cm": 173,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.77
+   },
+   "truth": {
+    "CL": 8.03624746012004,
+    "V1": 60.705869391555986,
+    "Q": 6.45885274967416,
+    "V2": 41.41504638744289
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 14.155212401698563,
+     "true_value": 18.38484173855949
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 8.732434827721065,
+     "true_value": 7.37182216241012
+    }
+   ]
+  },
+  {
+   "id": "p24",
+   "patient": {
+    "age": 54,
+    "weight_kg": 71,
+    "height_cm": 172,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.76
+   },
+   "truth": {
+    "CL": 3.388906308154577,
+    "V1": 35.60584931507386,
+    "Q": 4.825432780879031,
+    "V2": 38.05981751337012
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 29.369099486714063,
+     "true_value": 32.02742454342534
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 13.68104421092169,
+     "true_value": 16.868646365590752
+    }
+   ]
+  },
+  {
+   "id": "p25",
+   "patient": {
+    "age": 58,
+    "weight_kg": 35,
+    "height_cm": 165,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.59
+   },
+   "truth": {
+    "CL": 0.7654434876064311,
+    "V1": 30.088078935824463,
+    "Q": 2.1324777381398787,
+    "V2": 31.599486827652225
+   },
+   "regimen": {
+    "dose_mg": 500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 70.22033628289459,
+     "true_value": 59.51377589695307
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 43.69975815806298,
+     "true_value": 48.702170495686175
+    }
+   ]
+  },
+  {
+   "id": "p26",
+   "patient": {
+    "age": 41,
+    "weight_kg": 51.8,
+    "height_cm": 187,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.81
+   },
+   "truth": {
+    "CL": 1.7995540261449379,
+    "V1": 63.31098109454311,
+    "Q": 5.367948280718835,
+    "V2": 51.991664821419256
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 43.649134475472636,
+     "true_value": 38.27752057499313
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 33.18078240774402,
+     "true_value": 30.75795022113041
+    }
+   ]
+  },
+  {
+   "id": "p27",
+   "patient": {
+    "age": 59,
+    "weight_kg": 54.8,
+    "height_cm": 169,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.11
+   },
+   "truth": {
+    "CL": 1.4343912829241154,
+    "V1": 49.1674543479157,
+    "Q": 1.9574394063609948,
+    "V2": 21.442938164075716
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 57.88347235625567,
+     "true_value": 48.292742431517254
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 39.46995188526062,
+     "true_value": 38.07976444835811
+    }
+   ]
+  },
+  {
+   "id": "p28",
+   "patient": {
+    "age": 69,
+    "weight_kg": 112.5,
+    "height_cm": 169,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.64
+   },
+   "truth": {
+    "CL": 5.320645727688989,
+    "V1": 112.25296175861197,
+    "Q": 6.696978706106986,
+    "V2": 54.41348552212713
+   },
+   "regimen": {
+    "dose_mg": 1750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 34.50179617313604,
+     "true_value": 32.114497017094955
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 19.437977819698983,
+     "true_value": 22.120570986100557
+    }
+   ]
+  },
+  {
+   "id": "p29",
+   "patient": {
+    "age": 75,
+    "weight_kg": 92.3,
+    "height_cm": 166,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.95
+   },
+   "truth": {
+    "CL": 3.3283857175374054,
+    "V1": 48.14130613995936,
+    "Q": 9.538090866619394,
+    "V2": 47.577545892516824
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 46.51669618386663,
+     "true_value": 45.13985882486223
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 32.30071984311257,
+     "true_value": 29.304824896814914
+    }
+   ]
+  },
+  {
+   "id": "p30",
+   "patient": {
+    "age": 45,
+    "weight_kg": 74.2,
+    "height_cm": 157,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 1.02
+   },
+   "truth": {
+    "CL": 5.850029310547586,
+    "V1": 90.82584727122268,
+    "Q": 6.474837245618107,
+    "V2": 34.4350960993666
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 13.08734519383249,
+     "true_value": 17.464571706508078
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 7.054012802182018,
+     "true_value": 10.669759600375802
+    }
+   ]
+  },
+  {
+   "id": "p31",
+   "patient": {
+    "age": 58,
+    "weight_kg": 70.9,
+    "height_cm": 168,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.59
+   },
+   "truth": {
+    "CL": 4.637979619020423,
+    "V1": 68.25138116678174,
+    "Q": 12.71856636855256,
+    "V2": 38.21214770002149
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 20.810278918175488,
+     "true_value": 21.550787905951527
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 5.2641211641426064,
+     "true_value": 13.85811917179294
+    }
+   ]
+  },
+  {
+   "id": "p32",
+   "patient": {
+    "age": 63,
+    "weight_kg": 80.6,
+    "height_cm": 170,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.12
+   },
+   "truth": {
+    "CL": 3.5540000897508235,
+    "V1": 75.98744331540789,
+    "Q": 19.572155904581624,
+    "V2": 58.66744201411821
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 32.629933947920705,
+     "true_value": 33.0003684366953
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 26.32448323216852,
+     "true_value": 24.94254823131662
+    }
+   ]
+  },
+  {
+   "id": "p33",
+   "patient": {
+    "age": 64,
+    "weight_kg": 78.2,
+    "height_cm": 173,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.89
+   },
+   "truth": {
+    "CL": 5.814495170258416,
+    "V1": 72.37575178174188,
+    "Q": 6.415904578464914,
+    "V2": 48.66315954957787
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 21.49137858550308,
+     "true_value": 22.85641470091772
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 12.328017920912508,
+     "true_value": 12.629436942088203
+    }
+   ]
+  },
+  {
+   "id": "p34",
+   "patient": {
+    "age": 50,
+    "weight_kg": 96.4,
+    "height_cm": 177,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.97
+   },
+   "truth": {
+    "CL": 7.103946283682814,
+    "V1": 66.33347318209552,
+    "Q": 11.393692383760866,
+    "V2": 91.63569007360609
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 13.379669861251715,
+     "true_value": 23.171138712317926
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.819842293563678,
+     "true_value": 11.877400238912424
+    }
+   ]
+  },
+  {
+   "id": "p35",
+   "patient": {
+    "age": 49,
+    "weight_kg": 77.3,
+    "height_cm": 163,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.56
+   },
+   "truth": {
+    "CL": 4.041629940623914,
+    "V1": 53.061616532295446,
+    "Q": 6.15586739654624,
+    "V2": 37.81014980113951
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 31.875637262559536,
+     "true_value": 32.25779493761317
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 26.26321787165438,
+     "true_value": 18.81670947925472
+    }
+   ]
+  },
+  {
+   "id": "p36",
+   "patient": {
+    "age": 72,
+    "weight_kg": 81.1,
+    "height_cm": 166,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.46
+   },
+   "truth": {
+    "CL": 6.736237989547686,
+    "V1": 29.583807732096012,
+    "Q": 22.47547747566076,
+    "V2": 57.597455953682505
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 19.03441322684604,
+     "true_value": 18.832066488957647
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 7.698839537366419,
+     "true_value": 9.501522123404733
+    }
+   ]
+  },
+  {
+   "id": "p37",
+   "patient": {
+    "age": 55,
+    "weight_kg": 67,
+    "height_cm": 177,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.46
+   },
+   "truth": {
+    "CL": 5.449839194284275,
+    "V1": 29.28087537120117,
+    "Q": 5.4872873085489555,
+    "V2": 37.268478144098964
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 19.433475178072825,
+     "true_value": 22.493457311806598
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.279889961446056,
+     "true_value": 7.92594494469946
+    }
+   ]
+  },
+  {
+   "id": "p38",
+   "patient": {
+    "age": 42,
+    "weight_kg": 82.4,
+    "height_cm": 174,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.66
+   },
+   "truth": {
+    "CL": 9.714129215188828,
+    "V1": 80.6127613818358,
+    "Q": 16.995320287202446,
+    "V2": 65.22448968249745
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 19.265405366162526,
+     "true_value": 14.164117241716148
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 5.93128827703515,
+     "true_value": 6.939953785718212
+    }
+   ]
+  },
+  {
+   "id": "p39",
+   "patient": {
+    "age": 66,
+    "weight_kg": 59,
+    "height_cm": 177,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.97
+   },
+   "truth": {
+    "CL": 2.364438262906064,
+    "V1": 73.63420746487728,
+    "Q": 5.831585479852371,
+    "V2": 18.912611493379657
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 49.248816614260726,
+     "true_value": 39.181012407877816
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 37.55881275219407,
+     "true_value": 30.62283186556292
+    }
+   ]
+  },
+  {
+   "id": "p40",
+   "patient": {
+    "age": 34,
+    "weight_kg": 63.9,
+    "height_cm": 167,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.65
+   },
+   "truth": {
+    "CL": 7.050128362977412,
+    "V1": 62.906658603513755,
+    "Q": 17.29015258876276,
+    "V2": 29.399737914177166
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 18.36772043666103,
+     "true_value": 15.210733759714046
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 6.624248357796343,
+     "true_value": 7.715411570673732
+    }
+   ]
+  },
+  {
+   "id": "p41",
+   "patient": {
+    "age": 55,
+    "weight_kg": 58.9,
+    "height_cm": 159,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.58
+   },
+   "truth": {
+    "CL": 5.299754755817245,
+    "V1": 62.38580418819885,
+    "Q": 4.854242495354999,
+    "V2": 25.501144223390153
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 25.83207024247878,
+     "true_value": 20.307703177526697
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 9.92534775024867,
+     "true_value": 10.744111840141514
+    }
+   ]
+  },
+  {
+   "id": "p42",
+   "patient": {
+    "age": 42,
+    "weight_kg": 71.8,
+    "height_cm": 158,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.86
+   },
+   "truth": {
+    "CL": 3.5342830314574014,
+    "V1": 87.94464992499043,
+    "Q": 7.303171087461457,
+    "V2": 54.72314436751721
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 20.267416027630855,
+     "true_value": 26.942625160260434
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 18.964250206617496,
+     "true_value": 19.823174790051464
+    }
+   ]
+  },
+  {
+   "id": "p43",
+   "patient": {
+    "age": 58,
+    "weight_kg": 61.6,
+    "height_cm": 177,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.79
+   },
+   "truth": {
+    "CL": 3.43016014975863,
+    "V1": 56.51722471534728,
+    "Q": 5.11654187731654,
+    "V2": 38.71687171533358
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 23.82514376048835,
+     "true_value": 29.422742453223826
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 13.302344355364815,
+     "true_value": 18.713399819411023
+    }
+   ]
+  },
+  {
+   "id": "p44",
+   "patient": {
+    "age": 83,
+    "weight_kg": 67.4,
+    "height_cm": 174,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.46
+   },
+   "truth": {
+    "CL": 4.315569168079705,
+    "V1": 52.53012468320462,
+    "Q": 11.584040782190387,
+    "V2": 42.40577607283381
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 32.39324881723847,
+     "true_value": 23.670718676162586
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 12.433342304329871,
+     "true_value": 14.4073436167816
+    }
+   ]
+  },
+  {
+   "id": "p45",
+   "patient": {
+    "age": 65,
+    "weight_kg": 62.2,
+    "height_cm": 179,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.84
+   },
+   "truth": {
+    "CL": 3.166967921784548,
+    "V1": 23.470681618181608,
+    "Q": 5.795356748035344,
+    "V2": 25.161766768931844
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 29.058733804449282,
+     "true_value": 35.002981764888744
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 18.163351830791274,
+     "true_value": 16.75518203830331
+    }
+   ]
+  },
+  {
+   "id": "p46",
+   "patient": {
+    "age": 77,
+    "weight_kg": 84.2,
+    "height_cm": 165,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.82
+   },
+   "truth": {
+    "CL": 5.149318433349825,
+    "V1": 41.089111720012184,
+    "Q": 3.908812646362074,
+    "V2": 44.458490665802536
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 28.617390133076107,
+     "true_value": 28.560119503599118
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 13.69828660742784,
+     "true_value": 11.769500658151193
+    }
+   ]
+  },
+  {
+   "id": "p47",
+   "patient": {
+    "age": 58,
+    "weight_kg": 52.2,
+    "height_cm": 164,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.84
+   },
+   "truth": {
+    "CL": 2.725436118183984,
+    "V1": 59.814560914436896,
+    "Q": 6.630230103553006,
+    "V2": 27.15582761067883
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 31.530685952096903,
+     "true_value": 26.43583938946043
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 23.212411493305645,
+     "true_value": 18.964902558231646
+    }
+   ]
+  },
+  {
+   "id": "p48",
+   "patient": {
+    "age": 48,
+    "weight_kg": 63.6,
+    "height_cm": 167,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.74
+   },
+   "truth": {
+    "CL": 2.8820063857448766,
+    "V1": 48.54660092372247,
+    "Q": 10.902194941279655,
+    "V2": 71.65420655597124
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 39.29984546167688,
+     "true_value": 33.83837912715065
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 24.099250562821425,
+     "true_value": 23.67302844831607
+    }
+   ]
+  },
+  {
+   "id": "p49",
+   "patient": {
+    "age": 52,
+    "weight_kg": 82.5,
+    "height_cm": 161,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.64
+   },
+   "truth": {
+    "CL": 5.45282494332533,
+    "V1": 94.62652009675591,
+    "Q": 4.075702455859607,
+    "V2": 52.424687386676645
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 23.305155487022454,
+     "true_value": 23.154310993427753
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 19.106274915008736,
+     "true_value": 14.570708077927062
+    }
+   ]
+  },
+  {
+   "id": "p50",
+   "patient": {
+    "age": 38,
+    "weight_kg": 60.9,
+    "height_cm": 169,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.75
+   },
+   "truth": {
+    "CL": 4.059088518094492,
+    "V1": 52.525652574800496,
+    "Q": 10.167366964737177,
+    "V2": 41.39843513513358
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 32.77973999599565,
+     "true_value": 25.120663226717916
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.236446437492729,
+     "true_value": 15.451786360242027
+    }
+   ]
+  },
+  {
+   "id": "p51",
+   "patient": {
+    "age": 91,
+    "weight_kg": 65.6,
+    "height_cm": 177,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.69
+   },
+   "truth": {
+    "CL": 3.632087249953892,
+    "V1": 49.338306828250005,
+    "Q": 6.035186758836404,
+    "V2": 21.046783651071063
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 22.937050113335722,
+     "true_value": 28.37813570008719
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 16.797262176546145,
+     "true_value": 16.86972586084923
+    }
+   ]
+  },
+  {
+   "id": "p52",
+   "patient": {
+    "age": 55,
+    "weight_kg": 68.1,
+    "height_cm": 182,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.31
+   },
+   "truth": {
+    "CL": 13.761936261069458,
+    "V1": 42.41781321362729,
+    "Q": 6.544589864959488,
+    "V2": 28.17723954140136
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 11.082479679994279,
+     "true_value": 10.167863241450215
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 0.5739972813442988,
+     "true_value": 1.7245663583364004
+    }
+   ]
+  },
+  {
+   "id": "p53",
+   "patient": {
+    "age": 37,
+    "weight_kg": 93.6,
+    "height_cm": 170,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.58
+   },
+   "truth": {
+    "CL": 9.506204333730334,
+    "V1": 96.27446373562967,
+    "Q": 9.453441308391769,
+    "V2": 48.61364191127886
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 14.69264176753948,
+     "true_value": 17.429191455572873
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 7.584388682353086,
+     "true_value": 8.572780102422444
+    }
+   ]
+  },
+  {
+   "id": "p54",
+   "patient": {
+    "age": 93,
+    "weight_kg": 59.1,
+    "height_cm": 164,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.47
+   },
+   "truth": {
+    "CL": 5.026885921875032,
+    "V1": 54.570049746814966,
+    "Q": 7.808157660986685,
+    "V2": 30.127921294895206
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 23.204771174067538,
+     "true_value": 21.275514796555974
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.295712664659705,
+     "true_value": 11.433771031372393
+    }
+   ]
+  },
+  {
+   "id": "p55",
+   "patient": {
+    "age": 67,
+    "weight_kg": 52.3,
+    "height_cm": 186,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.92
+   },
+   "truth": {
+    "CL": 1.8669730006719896,
+    "V1": 73.97523047658794,
+    "Q": 5.470779064417026,
+    "V2": 29.435123161753374
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 44.598672246047144,
+     "true_value": 36.49027731611624
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 35.288783755366545,
+     "true_value": 29.993931721395455
+    }
+   ]
+  },
+  {
+   "id": "p56",
+   "patient": {
+    "age": 91,
+    "weight_kg": 76.7,
+    "height_cm": 172,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.49
+   },
+   "truth": {
+    "CL": 8.472123763452064,
+    "V1": 57.60396280008505,
+    "Q": 4.891416122098313,
+    "V2": 76.18534614174008
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 19.715670961174972,
+     "true_value": 18.199991383334147
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 5.7230169231089425,
+     "true_value": 6.40399324729125
+    }
+   ]
+  },
+  {
+   "id": "p57",
+   "patient": {
+    "age": 77,
+    "weight_kg": 62.9,
+    "height_cm": 170,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.02
+   },
+   "truth": {
+    "CL": 2.7384730085413067,
+    "V1": 63.2754743118955,
+    "Q": 4.720246827007125,
+    "V2": 34.16760446917568
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 36.866837941099774,
+     "true_value": 35.131972947148014
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 29.72801359499111,
+     "true_value": 25.163598379693013
+    }
+   ]
+  },
+  {
+   "id": "p58",
+   "patient": {
+    "age": 73,
+    "weight_kg": 48.7,
+    "height_cm": 187,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.52
+   },
+   "truth": {
+    "CL": 5.615378124688468,
+    "V1": 57.68205238073927,
+    "Q": 4.858921345968535,
+    "V2": 25.64476996324473
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 13.337489785724369,
+     "true_value": 14.779793576274464
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 7.889469058279419,
+     "true_value": 7.216416146188321
+    }
+   ]
+  },
+  {
+   "id": "p59",
+   "patient": {
+    "age": 61,
+    "weight_kg": 69.4,
+    "height_cm": 179,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.6
+   },
+   "truth": {
+    "CL": 7.0428057993277875,
+    "V1": 33.879391706649784,
+    "Q": 5.019401562560318,
+    "V2": 67.149081850948
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 15.572705580925863,
+     "true_value": 18.38070613829961
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 7.615962438182144,
+     "true_value": 5.4672249794308545
+    }
+   ]
+  },
+  {
+   "id": "p60",
+   "patient": {
+    "age": 50,
+    "weight_kg": 60.2,
+    "height_cm": 151,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.67
+   },
+   "truth": {
+    "CL": 2.448204647779233,
+    "V1": 42.15871366527074,
+    "Q": 5.262792242880822,
+    "V2": 23.962615153076158
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 33.37393628885729,
+     "true_value": 40.515705962718414
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 23.414551437082295,
+     "true_value": 26.86028563175422
+    }
+   ]
+  },
+  {
+   "id": "p61",
+   "patient": {
+    "age": 51,
+    "weight_kg": 61.9,
+    "height_cm": 155,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.58
+   },
+   "truth": {
+    "CL": 7.17921442764068,
+    "V1": 32.50762437578297,
+    "Q": 6.351146807848538,
+    "V2": 22.804027082527632
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 13.909096684162291,
+     "true_value": 17.642280043774935
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 5.532556471967683,
+     "true_value": 5.085761510554935
+    }
+   ]
+  },
+  {
+   "id": "p62",
+   "patient": {
+    "age": 66,
+    "weight_kg": 64.6,
+    "height_cm": 155,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.43
+   },
+   "truth": {
+    "CL": 3.9300976757304857,
+    "V1": 21.02363634331737,
+    "Q": 17.33630366940122,
+    "V2": 33.217434816733906
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 22.80107243445785,
+     "true_value": 25.668959162399535
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 19.16479584776603,
+     "true_value": 13.768298024816891
+    }
+   ]
+  },
+  {
+   "id": "p63",
+   "patient": {
+    "age": 70,
+    "weight_kg": 56.4,
+    "height_cm": 174,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.78
+   },
+   "truth": {
+    "CL": 2.6355268342100393,
+    "V1": 55.179725502445216,
+    "Q": 16.00040221620525,
+    "V2": 22.20021481468645
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 31.91033219222828,
+     "true_value": 26.795019467344815
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 17.59755913104446,
+     "true_value": 19.796115033076184
+    }
+   ]
+  },
+  {
+   "id": "p64",
+   "patient": {
+    "age": 55,
+    "weight_kg": 68.7,
+    "height_cm": 179,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.45
+   },
+   "truth": {
+    "CL": 7.732841795194894,
+    "V1": 85.72422015127457,
+    "Q": 7.556193397276191,
+    "V2": 34.080646327076856
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 17.61007984099782,
+     "true_value": 14.03867703441622
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 7.964402701817419,
+     "true_value": 7.23152379685872
+    }
+   ]
+  },
+  {
+   "id": "p65",
+   "patient": {
+    "age": 71,
+    "weight_kg": 55.8,
+    "height_cm": 159,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 1.35
+   },
+   "truth": {
+    "CL": 1.7943421971348872,
+    "V1": 42.62164597653983,
+    "Q": 9.2065947664888,
+    "V2": 24.53488804383342
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 44.95641736671271,
+     "true_value": 39.04426120176091
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 29.409246364812507,
+     "true_value": 29.822830253078145
+    }
+   ]
+  },
+  {
+   "id": "p66",
+   "patient": {
+    "age": 58,
+    "weight_kg": 65.3,
+    "height_cm": 176,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.46
+   },
+   "truth": {
+    "CL": 7.086145170071959,
+    "V1": 33.96307110901846,
+    "Q": 4.8476692006897935,
+    "V2": 35.61003548079295
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 18.280661665785146,
+     "true_value": 18.284030091003686
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 4.556743406225618,
+     "true_value": 5.244617032995482
+    }
+   ]
+  },
+  {
+   "id": "p67",
+   "patient": {
+    "age": 59,
+    "weight_kg": 55.4,
+    "height_cm": 178,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.58
+   },
+   "truth": {
+    "CL": 3.8460400224219566,
+    "V1": 46.904268054526156,
+    "Q": 4.062069106083749,
+    "V2": 24.69336682667966
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 17.684191670312543,
+     "true_value": 20.801339163388377
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 7.257579700534293,
+     "true_value": 11.34102257383855
+    }
+   ]
+  },
+  {
+   "id": "p68",
+   "patient": {
+    "age": 46,
+    "weight_kg": 67.7,
+    "height_cm": 181,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.5
+   },
+   "truth": {
+    "CL": 4.172573499539035,
+    "V1": 40.79165812646071,
+    "Q": 13.340981114865164,
+    "V2": 58.967605241332606
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 14.707807611465704,
+     "true_value": 24.516409544354936
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 12.945232515481592,
+     "true_value": 14.75103447862805
+    }
+   ]
+  },
+  {
+   "id": "p69",
+   "patient": {
+    "age": 50,
+    "weight_kg": 71,
+    "height_cm": 174,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.45
+   },
+   "truth": {
+    "CL": 8.13106660679345,
+    "V1": 67.50150852257873,
+    "Q": 10.470201366618825,
+    "V2": 41.62468906295741
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 18.154890847663513,
+     "true_value": 13.861639204966433
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 4.620548737463014,
+     "true_value": 6.358647578020473
+    }
+   ]
+  },
+  {
+   "id": "p70",
+   "patient": {
+    "age": 78,
+    "weight_kg": 69.3,
+    "height_cm": 186,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.16
+   },
+   "truth": {
+    "CL": 2.2630788917616957,
+    "V1": 95.99091721495162,
+    "Q": 2.9502428676375203,
+    "V2": 30.6394821443414
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 48.71557942493706,
+     "true_value": 40.061537194678735
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 29.881671944922974,
+     "true_value": 32.98941613126436
+    }
+   ]
+  },
+  {
+   "id": "p71",
+   "patient": {
+    "age": 71,
+    "weight_kg": 50.1,
+    "height_cm": 167,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.78
+   },
+   "truth": {
+    "CL": 1.2029409148973094,
+    "V1": 31.46709735712576,
+    "Q": 8.727393224220421,
+    "V2": 34.560761230339494
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 67.33648501173009,
+     "true_value": 57.213443072559095
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 62.884144022672146,
+     "true_value": 45.90172141202763
+    }
+   ]
+  },
+  {
+   "id": "p72",
+   "patient": {
+    "age": 57,
+    "weight_kg": 112,
+    "height_cm": 169,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.4
+   },
+   "truth": {
+    "CL": 10.193744598164484,
+    "V1": 83.25545811016819,
+    "Q": 20.61275167177529,
+    "V2": 77.73708956780492
+   },
+   "regimen": {
+    "dose_mg": 1750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 15.723393241356025,
+     "true_value": 18.670856681728306
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 8.766273193570026,
+     "true_value": 9.420993158290587
+    }
+   ]
+  },
+  {
+   "id": "p73",
+   "patient": {
+    "age": 74,
+    "weight_kg": 58.2,
+    "height_cm": 170,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.91
+   },
+   "truth": {
+    "CL": 3.075225992065369,
+    "V1": 26.517482188682667,
+    "Q": 8.626358469997815,
+    "V2": 47.166389857947514
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 27.177253601142166,
+     "true_value": 25.46100170585816
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 13.200111730717573,
+     "true_value": 14.572020940350999
+    }
+   ]
+  },
+  {
+   "id": "p74",
+   "patient": {
+    "age": 63,
+    "weight_kg": 79.6,
+    "height_cm": 174,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.21
+   },
+   "truth": {
+    "CL": 2.3228687983653593,
+    "V1": 76.35549226516416,
+    "Q": 5.483199711110504,
+    "V2": 125.66126231378617
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 50.8385879219388,
+     "true_value": 49.86390848605939
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 37.341945547908395,
+     "true_value": 39.243188726057994
+    }
+   ]
+  },
+  {
+   "id": "p75",
+   "patient": {
+    "age": 50,
+    "weight_kg": 63.7,
+    "height_cm": 181,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.84
+   },
+   "truth": {
+    "CL": 4.176167236043706,
+    "V1": 67.09345263033153,
+    "Q": 4.773725347780896,
+    "V2": 34.78321415027024
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 23.90223883333943,
+     "true_value": 24.357351754373916
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 17.393172523468287,
+     "true_value": 15.109323409581268
+    }
+   ]
+  },
+  {
+   "id": "p76",
+   "patient": {
+    "age": 58,
+    "weight_kg": 56.7,
+    "height_cm": 176,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.87
+   },
+   "truth": {
+    "CL": 3.4512222513777027,
+    "V1": 50.422940492783184,
+    "Q": 3.0842678619588577,
+    "V2": 17.90956548752565
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 22.719348774665885,
+     "true_value": 22.50901804660544
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 12.988911518676332,
+     "true_value": 13.23584040784099
+    }
+   ]
+  },
+  {
+   "id": "p77",
+   "patient": {
+    "age": 41,
+    "weight_kg": 103.1,
+    "height_cm": 187,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.63
+   },
+   "truth": {
+    "CL": 12.843533823112713,
+    "V1": 97.29785438691867,
+    "Q": 3.9771542466540075,
+    "V2": 49.3768795752153
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 20.08369684656573,
+     "true_value": 14.236702424718153
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 4.37408238968859,
+     "true_value": 5.058319005636024
+    }
+   ]
+  },
+  {
+   "id": "p78",
+   "patient": {
+    "age": 70,
+    "weight_kg": 54,
+    "height_cm": 181,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.7
+   },
+   "truth": {
+    "CL": 3.6435727676704777,
+    "V1": 74.83997542942681,
+    "Q": 3.7402400194344705,
+    "V2": 32.907387608468696
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 26.457244691848214,
+     "true_value": 20.205743538028457
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.416579299276481,
+     "true_value": 13.706779265129418
+    }
+   ]
+  },
+  {
+   "id": "p79",
+   "patient": {
+    "age": 65,
+    "weight_kg": 55.5,
+    "height_cm": 178,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.34
+   },
+   "truth": {
+    "CL": 6.1661292558944965,
+    "V1": 55.79529874535657,
+    "Q": 6.505599265365037,
+    "V2": 21.044867010534215
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 13.146152066926566,
+     "true_value": 13.648389741622413
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 4.799792444341752,
+     "true_value": 6.296944271204688
+    }
+   ]
+  },
+  {
+   "id": "p80",
+   "patient": {
+    "age": 73,
+    "weight_kg": 78.4,
+    "height_cm": 170,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.74
+   },
+   "truth": {
+    "CL": 2.661974572050679,
+    "V1": 50.845080806092334,
+    "Q": 14.166559854902848,
+    "V2": 54.68665437394402
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 36.02806878844995,
+     "true_value": 44.44877577930427
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 27.923701184045317,
+     "true_value": 33.01359808648041
+    }
+   ]
+  },
+  {
+   "id": "p81",
+   "patient": {
+    "age": 64,
+    "weight_kg": 58.4,
+    "height_cm": 176,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.73
+   },
+   "truth": {
+    "CL": 2.8165291313380214,
+    "V1": 47.27606607831184,
+    "Q": 4.084073322587829,
+    "V2": 29.8776256005744
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 33.53777959792341,
+     "true_value": 35.74512059656954
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 28.105955552968613,
+     "true_value": 22.8546710528649
+    }
+   ]
+  },
+  {
+   "id": "p82",
+   "patient": {
+    "age": 34,
+    "weight_kg": 56.9,
+    "height_cm": 164,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.33
+   },
+   "truth": {
+    "CL": 6.9075438198580095,
+    "V1": 48.979701961960984,
+    "Q": 10.535667315382346,
+    "V2": 26.02313308197954
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 8.958413612293851,
+     "true_value": 12.370333364888507
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 6.2878231028224,
+     "true_value": 5.261669924820322
+    }
+   ]
+  },
+  {
+   "id": "p83",
+   "patient": {
+    "age": 78,
+    "weight_kg": 84.7,
+    "height_cm": 155,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.58
+   },
+   "truth": {
+    "CL": 3.6987329830316775,
+    "V1": 94.65667507745155,
+    "Q": 7.232237413902576,
+    "V2": 55.75679900669977
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 34.54908110180741,
+     "true_value": 32.0998910529546
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 26.7934593368906,
+     "true_value": 23.746403757076678
+    }
+   ]
+  },
+  {
+   "id": "p84",
+   "patient": {
+    "age": 85,
+    "weight_kg": 54.5,
+    "height_cm": 180,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.72
+   },
+   "truth": {
+    "CL": 1.79712693877913,
+    "V1": 56.60334760655294,
+    "Q": 3.8809353186957543,
+    "V2": 23.532706307210482
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 36.26440627888995,
+     "true_value": 38.74152961140577
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 24.468727948738415,
+     "true_value": 30.235357022096498
+    }
+   ]
+  },
+  {
+   "id": "p85",
+   "patient": {
+    "age": 58,
+    "weight_kg": 63.1,
+    "height_cm": 167,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.52
+   },
+   "truth": {
+    "CL": 1.976138996813645,
+    "V1": 33.42146986792838,
+    "Q": 4.291699529134202,
+    "V2": 35.07688826529112
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 50.84062273962349,
+     "true_value": 50.488423727787996
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 17.26954702720686,
+     "true_value": 33.30258625630021
+    }
+   ]
+  },
+  {
+   "id": "p86",
+   "patient": {
+    "age": 63,
+    "weight_kg": 54.7,
+    "height_cm": 171,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.69
+   },
+   "truth": {
+    "CL": 2.3639250942294594,
+    "V1": 44.577054770549466,
+    "Q": 6.5593383178502505,
+    "V2": 21.629293133176425
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 27.948952735316304,
+     "true_value": 30.85868690671292
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 18.11540134204958,
+     "true_value": 21.391627300069914
+    }
+   ]
+  },
+  {
+   "id": "p87",
+   "patient": {
+    "age": 45,
+    "weight_kg": 48,
+    "height_cm": 183,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.38
+   },
+   "truth": {
+    "CL": 6.82642109114751,
+    "V1": 27.722451691175312,
+    "Q": 2.1793416407244575,
+    "V2": 44.39955625475934
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 18.20413269388286,
+     "true_value": 15.586019294173342
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 2.1524172515347004,
+     "true_value": 3.0326854180459075
+    }
+   ]
+  },
+  {
+   "id": "p88",
+   "patient": {
+    "age": 83,
+    "weight_kg": 92.2,
+    "height_cm": 150,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.74
+   },
+   "truth": {
+    "CL": 2.427512860796133,
+    "V1": 77.61829321998596,
+    "Q": 3.4658414834089952,
+    "V2": 83.00584526768537
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 72.73965248822928,
+     "true_value": 57.501051080851674
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 44.632515207654514,
+     "true_value": 44.5960688378268
+    }
+   ]
+  },
+  {
+   "id": "p89",
+   "patient": {
+    "age": 49,
+    "weight_kg": 55,
+    "height_cm": 178,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.87
+   },
+   "truth": {
+    "CL": 3.457216496341332,
+    "V1": 48.18309622086497,
+    "Q": 5.234842978142194,
+    "V2": 24.997835188723055
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 26.654535931430324,
+     "true_value": 22.38279821257671
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 13.925264921382423,
+     "true_value": 13.362117463126197
+    }
+   ]
+  },
+  {
+   "id": "p90",
+   "patient": {
+    "age": 63,
+    "weight_kg": 62.6,
+    "height_cm": 163,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.61
+   },
+   "truth": {
+    "CL": 6.070420119378211,
+    "V1": 97.52109612830623,
+    "Q": 14.292821374389224,
+    "V2": 29.508131754993705
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 16.955144208559414,
+     "true_value": 16.39596834981187
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 16.015191930113456,
+     "true_value": 10.580269295330368
+    }
+   ]
+  },
+  {
+   "id": "p91",
+   "patient": {
+    "age": 51,
+    "weight_kg": 68.4,
+    "height_cm": 163,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.66
+   },
+   "truth": {
+    "CL": 4.640133246406784,
+    "V1": 54.880883557700315,
+    "Q": 8.111967032576107,
+    "V2": 34.897676279347486
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 25.81213224881153,
+     "true_value": 22.648179553163445
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 12.189573217676436,
+     "true_value": 12.847072128064372
+    }
+   ]
+  },
+  {
+   "id": "p92",
+   "patient": {
+    "age": 86,
+    "weight_kg": 42.9,
+    "height_cm": 175,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.08
+   },
+   "truth": {
+    "CL": 1.184659067816575,
+    "V1": 20.849218202704535,
+    "Q": 1.5154126661487575,
+    "V2": 17.143821119309262
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 59.77737386694386,
+     "true_value": 63.51200935155403
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 41.399829100908455,
+     "true_value": 41.00097707950444
+    }
+   ]
+  },
+  {
+   "id": "p93",
+   "patient": {
+    "age": 78,
+    "weight_kg": 69.2,
+    "height_cm": 175,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.39
+   },
+   "truth": {
+    "CL": 6.109869682366109,
+    "V1": 81.90432410310918,
+    "Q": 7.656753779853069,
+    "V2": 28.751070431867536
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 14.95898902165311,
+     "true_value": 17.051651550083022
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 7.463237558195701,
+     "true_value": 9.84201956272549
+    }
+   ]
+  },
+  {
+   "id": "p94",
+   "patient": {
+    "age": 56,
+    "weight_kg": 57.1,
+    "height_cm": 148,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.41
+   },
+   "truth": {
+    "CL": 2.899114795182629,
+    "V1": 42.66267868267217,
+    "Q": 7.445207295696142,
+    "V2": 72.23959988298385
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 23.636993765648093,
+     "true_value": 26.130221188336645
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 19.309057601288025,
+     "true_value": 16.83401773400901
+    }
+   ]
+  },
+  {
+   "id": "p95",
+   "patient": {
+    "age": 46,
+    "weight_kg": 66.7,
+    "height_cm": 167,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.76
+   },
+   "truth": {
+    "CL": 8.333688830216845,
+    "V1": 38.29811677168556,
+    "Q": 4.447155092845404,
+    "V2": 22.901058892008507
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 13.455765019093839,
+     "true_value": 15.970108099593357
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 3.877552933891384,
+     "true_value": 3.977814664911259
+    }
+   ]
+  },
+  {
+   "id": "p96",
+   "patient": {
+    "age": 77,
+    "weight_kg": 66.5,
+    "height_cm": 154,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.3
+   },
+   "truth": {
+    "CL": 12.106864244749133,
+    "V1": 44.18941062862096,
+    "Q": 6.872853607478123,
+    "V2": 32.672371963212115
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 7.303835959722351,
+     "true_value": 11.219300273041936
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 1.7656753020120726,
+     "true_value": 2.3954933088612713
+    }
+   ]
+  },
+  {
+   "id": "p97",
+   "patient": {
+    "age": 43,
+    "weight_kg": 86.3,
+    "height_cm": 162,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.76
+   },
+   "truth": {
+    "CL": 3.928061988241276,
+    "V1": 70.81894355160834,
+    "Q": 5.131741867212244,
+    "V2": 27.092002731235446
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 23.856080400676777,
+     "true_value": 31.698636158457255
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 29.162214901165555,
+     "true_value": 20.715035275416966
+    }
+   ]
+  },
+  {
+   "id": "p98",
+   "patient": {
+    "age": 74,
+    "weight_kg": 57.7,
+    "height_cm": 159,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.44
+   },
+   "truth": {
+    "CL": 1.9783381214476692,
+    "V1": 58.80956060000101,
+    "Q": 15.599010967611799,
+    "V2": 27.694693220643977
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 36.55710632672804,
+     "true_value": 34.51074018579703
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 33.78386723167332,
+     "true_value": 27.912640402594825
+    }
+   ]
+  },
+  {
+   "id": "p99",
+   "patient": {
+    "age": 45,
+    "weight_kg": 71,
+    "height_cm": 179,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.8
+   },
+   "truth": {
+    "CL": 5.526221790827914,
+    "V1": 73.46562763729129,
+    "Q": 6.443692394894644,
+    "V2": 87.30625628167815
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 16.63916857139521,
+     "true_value": 19.049871332522905
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.759095762101321,
+     "true_value": 10.881105772613717
+    }
+   ]
+  },
+  {
+   "id": "p100",
+   "patient": {
+    "age": 52,
+    "weight_kg": 59,
+    "height_cm": 158,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.68
+   },
+   "truth": {
+    "CL": 1.7896027254044802,
+    "V1": 49.84928261453166,
+    "Q": 8.88126770150574,
+    "V2": 15.770199633903118
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 66.81455696836915,
+     "true_value": 51.6723720850942
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 37.977396155671045,
+     "true_value": 40.292263082761984
+    }
+   ]
+  },
+  {
+   "id": "p101",
+   "patient": {
+    "age": 95,
+    "weight_kg": 45.9,
+    "height_cm": 167,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.68
+   },
+   "truth": {
+    "CL": 0.8046331640294654,
+    "V1": 31.580656000983215,
+    "Q": 5.066805357097271,
+    "V2": 34.788543124976805
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 70.99109325940195,
+     "true_value": 84.15754076338587
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 89.05273998162144,
+     "true_value": 70.59134759095575
+    }
+   ]
+  },
+  {
+   "id": "p102",
+   "patient": {
+    "age": 50,
+    "weight_kg": 61,
+    "height_cm": 173,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.54
+   },
+   "truth": {
+    "CL": 5.830954966777699,
+    "V1": 74.93378915592405,
+    "Q": 7.629683726380047,
+    "V2": 68.02003857942918
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 17.928265631679963,
+     "true_value": 18.07398546558653
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.561091295713293,
+     "true_value": 10.287439280382724
+    }
+   ]
+  },
+  {
+   "id": "p103",
+   "patient": {
+    "age": 64,
+    "weight_kg": 64.7,
+    "height_cm": 166,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.61
+   },
+   "truth": {
+    "CL": 4.51038810770826,
+    "V1": 38.69196098418829,
+    "Q": 4.558019685477389,
+    "V2": 27.39578580927603
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 29.848166906039683,
+     "true_value": 25.275111492825783
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 5.611924121214263,
+     "true_value": 11.380567160081007
+    }
+   ]
+  },
+  {
+   "id": "p104",
+   "patient": {
+    "age": 67,
+    "weight_kg": 72.8,
+    "height_cm": 176,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.66
+   },
+   "truth": {
+    "CL": 3.789632809779097,
+    "V1": 46.0370984273274,
+    "Q": 7.158184819541731,
+    "V2": 38.52999652465969
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 28.397663247263825,
+     "true_value": 27.573106099755357
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 15.835241388680599,
+     "true_value": 16.00858614217066
+    }
+   ]
+  },
+  {
+   "id": "p105",
+   "patient": {
+    "age": 74,
+    "weight_kg": 54.4,
+    "height_cm": 160,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.83
+   },
+   "truth": {
+    "CL": 2.029684609903479,
+    "V1": 72.99003497524815,
+    "Q": 16.324049495555315,
+    "V2": 26.751395279088683
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 39.55944034729614,
+     "true_value": 33.28898677581729
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 23.39155169665472,
+     "true_value": 27.653926903888458
+    }
+   ]
+  },
+  {
+   "id": "p106",
+   "patient": {
+    "age": 53,
+    "weight_kg": 67.3,
+    "height_cm": 162,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.93
+   },
+   "truth": {
+    "CL": 4.295980212177137,
+    "V1": 35.537274456475494,
+    "Q": 7.725053444305384,
+    "V2": 53.238928308403814
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 27.517355824814686,
+     "true_value": 25.644179153022662
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 9.55453024545992,
+     "true_value": 12.904960272686116
+    }
+   ]
+  },
+  {
+   "id": "p107",
+   "patient": {
+    "age": 42,
+    "weight_kg": 86.6,
+    "height_cm": 173,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 1.34
+   },
+   "truth": {
+    "CL": 4.845391239935627,
+    "V1": 99.71453215848638,
+    "Q": 3.019426831996231,
+    "V2": 58.568410754695876
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 14.913663416609925,
+     "true_value": 25.396636106335073
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 20.821229956331045,
+     "true_value": 17.041932833289017
+    }
+   ]
+  },
+  {
+   "id": "p108",
+   "patient": {
+    "age": 44,
+    "weight_kg": 50.9,
+    "height_cm": 182,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.62
+   },
+   "truth": {
+    "CL": 2.873248543150195,
+    "V1": 53.96083731965843,
+    "Q": 12.883618345015307,
+    "V2": 19.748876071720613
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 27.881806716158184,
+     "true_value": 25.042026702070356
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 18.89185905380234,
+     "true_value": 17.665798649901856
+    }
+   ]
+  },
+  {
+   "id": "p109",
+   "patient": {
+    "age": 67,
+    "weight_kg": 49.6,
+    "height_cm": 154,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.3
+   },
+   "truth": {
+    "CL": 5.283074872967984,
+    "V1": 43.00193281369654,
+    "Q": 7.677542752691965,
+    "V2": 23.34462790848309
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 14.87706363839666,
+     "true_value": 15.90489951697031
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 4.24445511436121,
+     "true_value": 7.308434286853109
+    }
+   ]
+  },
+  {
+   "id": "p110",
+   "patient": {
+    "age": 62,
+    "weight_kg": 72.4,
+    "height_cm": 172,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.68
+   },
+   "truth": {
+    "CL": 2.3590985366175325,
+    "V1": 51.47483706111539,
+    "Q": 6.931025057270788,
+    "V2": 130.16821398635187
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 39.41720755795927,
+     "true_value": 40.88791632217984
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 31.228179604326204,
+     "true_value": 29.522173374302316
+    }
+   ]
+  },
+  {
+   "id": "p111",
+   "patient": {
+    "age": 73,
+    "weight_kg": 50.9,
+    "height_cm": 165,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.75
+   },
+   "truth": {
+    "CL": 2.7057893021128643,
+    "V1": 53.33423004534816,
+    "Q": 2.6980151608202902,
+    "V2": 13.98320140638492
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 15.614922083708832,
+     "true_value": 27.32919810014237
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.835372368053886,
+     "true_value": 18.275394280396757
+    }
+   ]
+  },
+  {
+   "id": "p112",
+   "patient": {
+    "age": 78,
+    "weight_kg": 64.6,
+    "height_cm": 181,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.78
+   },
+   "truth": {
+    "CL": 1.6909209128025757,
+    "V1": 56.073797200594555,
+    "Q": 7.020069346076523,
+    "V2": 34.801401109424596
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 46.43825746241304,
+     "true_value": 54.26849417394263
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 53.93627008509934,
+     "true_value": 43.658387024802835
+    }
+   ]
+  },
+  {
+   "id": "p113",
+   "patient": {
+    "age": 66,
+    "weight_kg": 53.8,
+    "height_cm": 179,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.47
+   },
+   "truth": {
+    "CL": 2.957278683756909,
+    "V1": 50.66210459118275,
+    "Q": 3.521237351527502,
+    "V2": 26.41409540139898
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 26.217508466298188,
+     "true_value": 25.528264691643834
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 20.111729818171245,
+     "true_value": 16.27863205820646
+    }
+   ]
+  },
+  {
+   "id": "p114",
+   "patient": {
+    "age": 45,
+    "weight_kg": 55.8,
+    "height_cm": 176,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.71
+   },
+   "truth": {
+    "CL": 3.152195116260037,
+    "V1": 46.834104170834074,
+    "Q": 5.169074081626471,
+    "V2": 19.654914605768464
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 39.11924458075099,
+     "true_value": 24.226537010194978
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 21.98891005868291,
+     "true_value": 14.914836250185674
+    }
+   ]
+  },
+  {
+   "id": "p115",
+   "patient": {
+    "age": 58,
+    "weight_kg": 54.4,
+    "height_cm": 170,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.48
+   },
+   "truth": {
+    "CL": 3.1930947629995337,
+    "V1": 44.26716681657278,
+    "Q": 4.505987832290275,
+    "V2": 33.791710397249474
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 23.933996666248376,
+     "true_value": 24.374326188970574
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 7.691025652046644,
+     "true_value": 14.430668130478898
+    }
+   ]
+  },
+  {
+   "id": "p116",
+   "patient": {
+    "age": 63,
+    "weight_kg": 58.9,
+    "height_cm": 189,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.09
+   },
+   "truth": {
+    "CL": 2.7794445471063924,
+    "V1": 31.714571910365514,
+    "Q": 10.439631081750068,
+    "V2": 34.531756620338086
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 29.32556835873149,
+     "true_value": 35.97727510370291
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 29.00828495406742,
+     "true_value": 22.833500406785706
+    }
+   ]
+  },
+  {
+   "id": "p117",
+   "patient": {
+    "age": 68,
+    "weight_kg": 65,
+    "height_cm": 182,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.76
+   },
+   "truth": {
+    "CL": 2.50013772169529,
+    "V1": 52.49020754361371,
+    "Q": 9.422613039970855,
+    "V2": 34.968436534602986
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 42.08751084178412,
+     "true_value": 38.15153498802497
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 24.31824987321125,
+     "true_value": 27.861232183525853
+    }
+   ]
+  },
+  {
+   "id": "p118",
+   "patient": {
+    "age": 54,
+    "weight_kg": 57.6,
+    "height_cm": 179,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.42
+   },
+   "truth": {
+    "CL": 11.420969733026842,
+    "V1": 34.48687135892904,
+    "Q": 8.747503352806566,
+    "V2": 52.67213968241515
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 7.022002106687137,
+     "true_value": 8.438381156260325
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 1.532036357538142,
+     "true_value": 2.062692263268907
+    }
+   ]
+  },
+  {
+   "id": "p119",
+   "patient": {
+    "age": 69,
+    "weight_kg": 86.8,
+    "height_cm": 168,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.73
+   },
+   "truth": {
+    "CL": 4.034295816138904,
+    "V1": 67.96348432905444,
+    "Q": 5.378597548687219,
+    "V2": 46.15131136606425
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 25.99346151216334,
+     "true_value": 31.241270473783214
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 12.902308106513443,
+     "true_value": 19.897208459916314
+    }
+   ]
+  },
+  {
+   "id": "p120",
+   "patient": {
+    "age": 50,
+    "weight_kg": 58.3,
+    "height_cm": 156,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.8
+   },
+   "truth": {
+    "CL": 4.724098848299665,
+    "V1": 60.28804031872375,
+    "Q": 8.70985929806118,
+    "V2": 29.753212752306617
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 21.515173990448726,
+     "true_value": 16.445012851255896
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.104961579910366,
+     "true_value": 9.638724584781212
+    }
+   ]
+  },
+  {
+   "id": "p121",
+   "patient": {
+    "age": 49,
+    "weight_kg": 72.9,
+    "height_cm": 183,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.1
+   },
+   "truth": {
+    "CL": 3.72364313133613,
+    "V1": 54.9003670666053,
+    "Q": 6.74604757215386,
+    "V2": 69.67796682580222
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 26.843719783176045,
+     "true_value": 27.477898603127976
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 17.68395963188555,
+     "true_value": 17.024950391253565
+    }
+   ]
+  },
+  {
+   "id": "p122",
+   "patient": {
+    "age": 60,
+    "weight_kg": 54.6,
+    "height_cm": 178,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.62
+   },
+   "truth": {
+    "CL": 3.998966556869449,
+    "V1": 68.55474147402869,
+    "Q": 8.723392501852189,
+    "V2": 33.07686759428923
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 16.681883528696474,
+     "true_value": 18.585208204249632
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.797780834886922,
+     "true_value": 12.307070603751368
+    }
+   ]
+  },
+  {
+   "id": "p123",
+   "patient": {
+    "age": 46,
+    "weight_kg": 55.6,
+    "height_cm": 181,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.63
+   },
+   "truth": {
+    "CL": 2.565666198861949,
+    "V1": 43.318960545696235,
+    "Q": 5.01312570463924,
+    "V2": 25.131709855677016
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 23.78604773605488,
+     "true_value": 29.159684882621015
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 24.30739618350873,
+     "true_value": 19.071909517560417
+    }
+   ]
+  },
+  {
+   "id": "p124",
+   "patient": {
+    "age": 59,
+    "weight_kg": 59.1,
+    "height_cm": 172,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.65
+   },
+   "truth": {
+    "CL": 3.1359710507310012,
+    "V1": 34.659814312217385,
+    "Q": 9.833032774497308,
+    "V2": 30.09822472438727
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 28.667876584204233,
+     "true_value": 32.48226982991442
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 18.955455006188977,
+     "true_value": 19.634801258803492
+    }
+   ]
+  },
+  {
+   "id": "p125",
+   "patient": {
+    "age": 62,
+    "weight_kg": 70.9,
+    "height_cm": 186,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.62
+   },
+   "truth": {
+    "CL": 5.765106705409147,
+    "V1": 63.39813039948557,
+    "Q": 4.1112103087938285,
+    "V2": 22.53566770146006
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 16.483180699033635,
+     "true_value": 19.024981879318215
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 9.968303698915756,
+     "true_value": 9.502463720270057
+    }
+   ]
+  },
+  {
+   "id": "p126",
+   "patient": {
+    "age": 79,
+    "weight_kg": 62.6,
+    "height_cm": 170,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.53
+   },
+   "truth": {
+    "CL": 4.341270052686256,
+    "V1": 74.15635797319206,
+    "Q": 7.533981055479536,
+    "V2": 55.586810717098324
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 24.022603454192588,
+     "true_value": 23.057766105280805
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 12.9489517709132,
+     "true_value": 15.004630521354
+    }
+   ]
+  },
+  {
+   "id": "p127",
+   "patient": {
+    "age": 62,
+    "weight_kg": 67.1,
+    "height_cm": 173,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.53
+   },
+   "truth": {
+    "CL": 5.717590961088026,
+    "V1": 48.26641335876133,
+    "Q": 5.474888176480411,
+    "V2": 59.12468270677468
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 27.432415194913155,
+     "true_value": 20.139599643182827
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.188714349083092,
+     "true_value": 8.927219994293965
+    }
+   ]
+  },
+  {
+   "id": "p128",
+   "patient": {
+    "age": 39,
+    "weight_kg": 63.4,
+    "height_cm": 172,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.26
+   },
+   "truth": {
+    "CL": 5.129742552458091,
+    "V1": 29.09216744326732,
+    "Q": 4.302100511597157,
+    "V2": 46.50333281388264
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 28.71029232391477,
+     "true_value": 24.268326750072944
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 4.386339826564876,
+     "true_value": 8.33889071757026
+    }
+   ]
+  },
+  {
+   "id": "p129",
+   "patient": {
+    "age": 58,
+    "weight_kg": 61.7,
+    "height_cm": 170,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.92
+   },
+   "truth": {
+    "CL": 4.607192327766472,
+    "V1": 85.45574607857024,
+    "Q": 16.16885007390898,
+    "V2": 65.32980310041921
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 26.547954669686444,
+     "true_value": 20.998586421717008
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 17.312970594261795,
+     "true_value": 14.82478460116122
+    }
+   ]
+  },
+  {
+   "id": "p130",
+   "patient": {
+    "age": 70,
+    "weight_kg": 82.5,
+    "height_cm": 173,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.57
+   },
+   "truth": {
+    "CL": 4.9372279299569275,
+    "V1": 76.89542269990666,
+    "Q": 9.191975201718126,
+    "V2": 50.7131438739254
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 11.633069150635484,
+     "true_value": 25.58066231087204
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 19.38155693751557,
+     "true_value": 16.215572241490445
+    }
+   ]
+  },
+  {
+   "id": "p131",
+   "patient": {
+    "age": 74,
+    "weight_kg": 55.9,
+    "height_cm": 171,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.71
+   },
+   "truth": {
+    "CL": 4.0553663272054274,
+    "V1": 32.093748248017874,
+    "Q": 5.664353270055787,
+    "V2": 37.153421317634624
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 10.809636891852973,
+     "true_value": 20.936908940951394
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 13.331508178992907,
+     "true_value": 9.700111364304334
+    }
+   ]
+  },
+  {
+   "id": "p132",
+   "patient": {
+    "age": 48,
+    "weight_kg": 68.7,
+    "height_cm": 171,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.51
+   },
+   "truth": {
+    "CL": 4.998202498629587,
+    "V1": 115.76828167202959,
+    "Q": 3.9119757126108885,
+    "V2": 34.42940112337181
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 21.827808105646206,
+     "true_value": 19.339315287940494
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 9.241680609163017,
+     "true_value": 13.597650657860887
+    }
+   ]
+  },
+  {
+   "id": "p133",
+   "patient": {
+    "age": 71,
+    "weight_kg": 83.3,
+    "height_cm": 171,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.81
+   },
+   "truth": {
+    "CL": 10.736485070599626,
+    "V1": 49.27096769762647,
+    "Q": 4.375457776833756,
+    "V2": 15.267140389187816
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 13.664251815672783,
+     "true_value": 15.797935025179552
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 3.1457477914171568,
+     "true_value": 3.4953424452634487
+    }
+   ]
+  },
+  {
+   "id": "p134",
+   "patient": {
+    "age": 84,
+    "weight_kg": 67.4,
+    "height_cm": 174,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.93
+   },
+   "truth": {
+    "CL": 3.2550055511675904,
+    "V1": 33.71903712792173,
+    "Q": 10.328116549218352,
+    "V2": 43.04270863780626
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 25.136118854216825,
+     "true_value": 31.364004937188433
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 15.180084841749352,
+     "true_value": 19.011434208419953
+    }
+   ]
+  },
+  {
+   "id": "p135",
+   "patient": {
+    "age": 26,
+    "weight_kg": 74.2,
+    "height_cm": 158,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.31
+   },
+   "truth": {
+    "CL": 5.277476659644373,
+    "V1": 46.781530789899115,
+    "Q": 4.921487195951783,
+    "V2": 79.05043078628749
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 20.271605918437903,
+     "true_value": 21.686975535552406
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 8.963881974817564,
+     "true_value": 9.829765781878576
+    }
+   ]
+  },
+  {
+   "id": "p136",
+   "patient": {
+    "age": 57,
+    "weight_kg": 93.3,
+    "height_cm": 169,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.03
+   },
+   "truth": {
+    "CL": 5.245248026834405,
+    "V1": 62.179865970962375,
+    "Q": 6.369141092762748,
+    "V2": 53.22496817853833
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 33.34649912347216,
+     "true_value": 30.609331328931876
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 18.38712607207663,
+     "true_value": 16.678875341429244
+    }
+   ]
+  },
+  {
+   "id": "p137",
+   "patient": {
+    "age": 47,
+    "weight_kg": 67.7,
+    "height_cm": 167,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 1.47
+   },
+   "truth": {
+    "CL": 3.0875461890690277,
+    "V1": 34.86559890298126,
+    "Q": 3.653921514401847,
+    "V2": 25.65053132253405
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 41.65804382844854,
+     "true_value": 34.94934975969605
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 21.832222010926174,
+     "true_value": 18.563903764148144
+    }
+   ]
+  },
+  {
+   "id": "p138",
+   "patient": {
+    "age": 78,
+    "weight_kg": 53,
+    "height_cm": 160,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.67
+   },
+   "truth": {
+    "CL": 2.254796879503094,
+    "V1": 40.71338234941681,
+    "Q": 6.5866999441842715,
+    "V2": 19.746153801467795
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 24.318993695909775,
+     "true_value": 32.43848212527815
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 24.863113591719003,
+     "true_value": 22.282022442164454
+    }
+   ]
+  },
+  {
+   "id": "p139",
+   "patient": {
+    "age": 47,
+    "weight_kg": 46.6,
+    "height_cm": 180,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.59
+   },
+   "truth": {
+    "CL": 2.5403505948030225,
+    "V1": 42.05732753709295,
+    "Q": 5.322090751693574,
+    "V2": 23.82236537057585
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 33.26069630611141,
+     "true_value": 29.448747823475845
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.511174913033424,
+     "true_value": 19.237272261105037
+    }
+   ]
+  },
+  {
+   "id": "p140",
+   "patient": {
+    "age": 48,
+    "weight_kg": 79.2,
+    "height_cm": 172,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.61
+   },
+   "truth": {
+    "CL": 8.157920408406962,
+    "V1": 39.538625136834455,
+    "Q": 6.5575535864276855,
+    "V2": 56.60996966886739
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 19.389390017981334,
+     "true_value": 19.50982606792489
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 6.001162393475297,
+     "true_value": 6.045838908320429
+    }
+   ]
+  },
+  {
+   "id": "p141",
+   "patient": {
+    "age": 89,
+    "weight_kg": 70.8,
+    "height_cm": 147,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.55
+   },
+   "truth": {
+    "CL": 4.3396638397282725,
+    "V1": 53.19940975364706,
+    "Q": 5.485246142769006,
+    "V2": 32.706891328324744
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 21.585980631722208,
+     "true_value": 24.436733831568432
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 9.26923182023658,
+     "true_value": 13.581047998168598
+    }
+   ]
+  },
+  {
+   "id": "p142",
+   "patient": {
+    "age": 48,
+    "weight_kg": 56.6,
+    "height_cm": 158,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.45
+   },
+   "truth": {
+    "CL": 5.764546873415961,
+    "V1": 41.196659953406574,
+    "Q": 3.878023490252906,
+    "V2": 69.98538965572378
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 13.531961984417062,
+     "true_value": 15.785447628120433
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 4.095510306333263,
+     "true_value": 5.9210563249381725
+    }
+   ]
+  },
+  {
+   "id": "p143",
+   "patient": {
+    "age": 75,
+    "weight_kg": 56.5,
+    "height_cm": 164,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 1.51
+   },
+   "truth": {
+    "CL": 1.5799234206351422,
+    "V1": 51.20656881668494,
+    "Q": 11.296572382155144,
+    "V2": 29.847308541178197
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 54.040566016490985,
+     "true_value": 43.073825407608936
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 28.395838103536388,
+     "true_value": 35.34039287652398
+    }
+   ]
+  },
+  {
+   "id": "p144",
+   "patient": {
+    "age": 57,
+    "weight_kg": 68.7,
+    "height_cm": 155,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.77
+   },
+   "truth": {
+    "CL": 2.920616640301284,
+    "V1": 55.85424141694978,
+    "Q": 3.3686037596280296,
+    "V2": 28.871944331468992
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 23.659038896293158,
+     "true_value": 33.927428212269476
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 24.379599523111224,
+     "true_value": 22.51313135155692
+    }
+   ]
+  },
+  {
+   "id": "p145",
+   "patient": {
+    "age": 46,
+    "weight_kg": 81.5,
+    "height_cm": 180,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.51
+   },
+   "truth": {
+    "CL": 8.195605865155793,
+    "V1": 65.15712541342697,
+    "Q": 9.925322804707621,
+    "V2": 57.71769002316827
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 17.72889470759637,
+     "true_value": 17.423947551207622
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.254270570736347,
+     "true_value": 7.804734515082986
+    }
+   ]
+  },
+  {
+   "id": "p146",
+   "patient": {
+    "age": 62,
+    "weight_kg": 72.2,
+    "height_cm": 167,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.63
+   },
+   "truth": {
+    "CL": 4.012565445544048,
+    "V1": 69.10794100211565,
+    "Q": 6.440191835778342,
+    "V2": 64.20566047926202
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 29.03995974490996,
+     "true_value": 24.991356808395178
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.382586691210093,
+     "true_value": 16.211017664196874
+    }
+   ]
+  },
+  {
+   "id": "p147",
+   "patient": {
+    "age": 51,
+    "weight_kg": 60.4,
+    "height_cm": 175,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.68
+   },
+   "truth": {
+    "CL": 2.7254465691766825,
+    "V1": 60.59064543187925,
+    "Q": 9.25591758514596,
+    "V2": 11.145390156482824
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 31.187360802249575,
+     "true_value": 34.98720758503115
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 24.088628789120225,
+     "true_value": 25.15445424287454
+    }
+   ]
+  },
+  {
+   "id": "p148",
+   "patient": {
+    "age": 80,
+    "weight_kg": 69.8,
+    "height_cm": 187,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.26
+   },
+   "truth": {
+    "CL": 1.5344684901390664,
+    "V1": 90.40696911766295,
+    "Q": 10.434141077022934,
+    "V2": 20.28445577462615
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 67.41795527095145,
+     "true_value": 57.36248293491299
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 48.90610136205066,
+     "true_value": 50.54803629091766
+    }
+   ]
+  },
+  {
+   "id": "p149",
+   "patient": {
+    "age": 64,
+    "weight_kg": 47.8,
+    "height_cm": 169,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.91
+   },
+   "truth": {
+    "CL": 0.9821092750929522,
+    "V1": 76.86415906133458,
+    "Q": 1.9819055089842483,
+    "V2": 43.87283789528032
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 91.3341917436784,
+     "true_value": 66.69341139532186
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 62.797196759252756,
+     "true_value": 59.96302951181693
+    }
+   ]
+  },
+  {
+   "id": "p150",
+   "patient": {
+    "age": 62,
+    "weight_kg": 63.9,
+    "height_cm": 175,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.38
+   },
+   "truth": {
+    "CL": 13.76232702639512,
+    "V1": 42.788512813679205,
+    "Q": 4.873723776761863,
+    "V2": 32.303194486191614
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 15.518761559832086,
+     "true_value": 10.498060491232382
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 0.6581136346479581,
+     "true_value": 1.6288775919410945
+    }
+   ]
+  },
+  {
+   "id": "p151",
+   "patient": {
+    "age": 42,
+    "weight_kg": 55,
+    "height_cm": 183,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.34
+   },
+   "truth": {
+    "CL": 4.389585083328625,
+    "V1": 40.33242237523319,
+    "Q": 2.92194915876525,
+    "V2": 21.423800307601564
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 16.295050128983977,
+     "true_value": 19.530749164949953
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 8.392595405981577,
+     "true_value": 8.668749022964128
+    }
+   ]
+  },
+  {
+   "id": "p152",
+   "patient": {
+    "age": 77,
+    "weight_kg": 79.2,
+    "height_cm": 162,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.3
+   },
+   "truth": {
+    "CL": 6.421476234719,
+    "V1": 83.6886825555659,
+    "Q": 6.883354543699452,
+    "V2": 41.025295415312634
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 18.8680515644477,
+     "true_value": 20.510967238479047
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.774565407188163,
+     "true_value": 11.55990708732
+    }
+   ]
+  },
+  {
+   "id": "p153",
+   "patient": {
+    "age": 76,
+    "weight_kg": 71,
+    "height_cm": 176,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.79
+   },
+   "truth": {
+    "CL": 1.4669660580356927,
+    "V1": 35.28687402414859,
+    "Q": 7.466339873077515,
+    "V2": 40.391125608835495
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 72.22424611713497,
+     "true_value": 63.80344551596307
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 47.92840108566419,
+     "true_value": 49.14603701541203
+    }
+   ]
+  },
+  {
+   "id": "p154",
+   "patient": {
+    "age": 63,
+    "weight_kg": 73.3,
+    "height_cm": 154,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.83
+   },
+   "truth": {
+    "CL": 2.8776700912481976,
+    "V1": 89.15889896234407,
+    "Q": 9.040979267889648,
+    "V2": 30.772330750977492
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 39.0059280664336,
+     "true_value": 32.13049646835463
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 17.984378879747744,
+     "true_value": 25.26524631531774
+    }
+   ]
+  },
+  {
+   "id": "p155",
+   "patient": {
+    "age": 29,
+    "weight_kg": 93,
+    "height_cm": 165,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.7
+   },
+   "truth": {
+    "CL": 10.01728960196629,
+    "V1": 48.39186337666635,
+    "Q": 8.05497775399346,
+    "V2": 31.931308738432836
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 22.294030128660786,
+     "true_value": 19.032669863911607
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 5.44856866911595,
+     "true_value": 5.571230961670303
+    }
+   ]
+  },
+  {
+   "id": "p156",
+   "patient": {
+    "age": 82,
+    "weight_kg": 66.9,
+    "height_cm": 163,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.87
+   },
+   "truth": {
+    "CL": 3.1165089297318107,
+    "V1": 47.89222221636775,
+    "Q": 11.858925878164627,
+    "V2": 70.42956724655073
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 24.63734837750698,
+     "true_value": 31.484297699918617
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 13.783209798649414,
+     "true_value": 21.628830860860806
+    }
+   ]
+  },
+  {
+   "id": "p157",
+   "patient": {
+    "age": 73,
+    "weight_kg": 96.8,
+    "height_cm": 167,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.63
+   },
+   "truth": {
+    "CL": 14.205596290122013,
+    "V1": 73.7218635073508,
+    "Q": 7.412846961002609,
+    "V2": 34.599416225796006
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 18.207121782073756,
+     "true_value": 13.766866707240148
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 3.2246629959335875,
+     "true_value": 3.747814738242914
+    }
+   ]
+  },
+  {
+   "id": "p158",
+   "patient": {
+    "age": 68,
+    "weight_kg": 60.1,
+    "height_cm": 169,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.64
+   },
+   "truth": {
+    "CL": 6.5126761482460624,
+    "V1": 56.41019907655739,
+    "Q": 12.016641399422959,
+    "V2": 16.26171211573236
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 14.690923673276254,
+     "true_value": 17.000797891935214
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 8.41977314437644,
+     "true_value": 7.8390406284933345
+    }
+   ]
+  },
+  {
+   "id": "p159",
+   "patient": {
+    "age": 64,
+    "weight_kg": 73.8,
+    "height_cm": 178,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.58
+   },
+   "truth": {
+    "CL": 3.2372188735844523,
+    "V1": 50.54704717266724,
+    "Q": 2.7198900789319116,
+    "V2": 35.20946884627688
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 42.01813952688185,
+     "true_value": 31.741969800417806
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 18.969743084395066,
+     "true_value": 19.144163794942884
+    }
+   ]
+  },
+  {
+   "id": "p160",
+   "patient": {
+    "age": 63,
+    "weight_kg": 70.2,
+    "height_cm": 195,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.47
+   },
+   "truth": {
+    "CL": 3.2383883144300967,
+    "V1": 83.59603194186779,
+    "Q": 7.698481927298553,
+    "V2": 49.995369843549064
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 28.745773678468602,
+     "true_value": 29.22604074993737
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 28.373739246566316,
+     "true_value": 21.827673435835553
+    }
+   ]
+  },
+  {
+   "id": "p161",
+   "patient": {
+    "age": 53,
+    "weight_kg": 56.5,
+    "height_cm": 172,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.47
+   },
+   "truth": {
+    "CL": 6.496117567959637,
+    "V1": 26.34209980988251,
+    "Q": 2.245772582089391,
+    "V2": 34.08495651062207
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 17.22461203317232,
+     "true_value": 16.284026924316922
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 3.1389820933832246,
+     "true_value": 3.246288116961612
+    }
+   ]
+  },
+  {
+   "id": "p162",
+   "patient": {
+    "age": 72,
+    "weight_kg": 65.8,
+    "height_cm": 150,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.59
+   },
+   "truth": {
+    "CL": 2.760003589208281,
+    "V1": 49.72795509801162,
+    "Q": 7.816341875407958,
+    "V2": 38.89941131442144
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 38.40010206630528,
+     "true_value": 35.475068890865955
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 22.767126861093395,
+     "true_value": 24.397306643495934
+    }
+   ]
+  },
+  {
+   "id": "p163",
+   "patient": {
+    "age": 80,
+    "weight_kg": 74.7,
+    "height_cm": 178,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.65
+   },
+   "truth": {
+    "CL": 3.1193418640902046,
+    "V1": 37.781090536614805,
+    "Q": 5.59439051302984,
+    "V2": 45.63101016394972
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 33.32941816024352,
+     "true_value": 33.70449158357914
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 15.746230152199123,
+     "true_value": 19.435974463111602
+    }
+   ]
+  },
+  {
+   "id": "p164",
+   "patient": {
+    "age": 66,
+    "weight_kg": 80.8,
+    "height_cm": 179,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.7
+   },
+   "truth": {
+    "CL": 7.564014241435696,
+    "V1": 76.92669111146355,
+    "Q": 11.886235950541867,
+    "V2": 27.8189207849093
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 18.96449019303527,
+     "true_value": 17.8294247832961
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.624264404937263,
+     "true_value": 9.145150967227886
+    }
+   ]
+  },
+  {
+   "id": "p165",
+   "patient": {
+    "age": 59,
+    "weight_kg": 69.7,
+    "height_cm": 162,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.58
+   },
+   "truth": {
+    "CL": 2.5055883089148288,
+    "V1": 63.70341868022497,
+    "Q": 3.768238179739091,
+    "V2": 31.983120180931465
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 38.76136978503992,
+     "true_value": 38.01978278860608
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 31.337531632501573,
+     "true_value": 27.86233511503878
+    }
+   ]
+  },
+  {
+   "id": "p166",
+   "patient": {
+    "age": 43,
+    "weight_kg": 89.1,
+    "height_cm": 165,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.33
+   },
+   "truth": {
+    "CL": 7.560764313252571,
+    "V1": 35.59028524754927,
+    "Q": 11.362555526278157,
+    "V2": 47.41558692175728
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 22.142364266517717,
+     "true_value": 19.237038812173225
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 6.594009951911588,
+     "true_value": 7.353813004841301
+    }
+   ]
+  },
+  {
+   "id": "p167",
+   "patient": {
+    "age": 49,
+    "weight_kg": 56.7,
+    "height_cm": 169,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.76
+   },
+   "truth": {
+    "CL": 2.4439197404261273,
+    "V1": 31.102199806475657,
+    "Q": 2.4899313776235754,
+    "V2": 53.32048077296933
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 40.29115503002663,
+     "true_value": 32.69339446640795
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 13.93993724568237,
+     "true_value": 18.078790920210952
+    }
+   ]
+  },
+  {
+   "id": "p168",
+   "patient": {
+    "age": 59,
+    "weight_kg": 59,
+    "height_cm": 178,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.41
+   },
+   "truth": {
+    "CL": 3.769630692620785,
+    "V1": 35.063975158860174,
+    "Q": 3.5118060690389368,
+    "V2": 13.367106267075485
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 21.378506750575536,
+     "true_value": 29.792033372062107
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 7.626868184340477,
+     "true_value": 13.793954201252474
+    }
+   ]
+  },
+  {
+   "id": "p169",
+   "patient": {
+    "age": 39,
+    "weight_kg": 76.6,
+    "height_cm": 176,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.75
+   },
+   "truth": {
+    "CL": 9.892587119683379,
+    "V1": 49.05965148658074,
+    "Q": 10.325413426130515,
+    "V2": 56.20764851030248
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 15.198225452599743,
+     "true_value": 15.51468617406783
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 4.6447163768993205,
+     "true_value": 5.275938204459793
+    }
+   ]
+  },
+  {
+   "id": "p170",
+   "patient": {
+    "age": 42,
+    "weight_kg": 52,
+    "height_cm": 168,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.79
+   },
+   "truth": {
+    "CL": 1.5218520280360663,
+    "V1": 77.67567647335537,
+    "Q": 8.055355104799736,
+    "V2": 32.379583068877885
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 42.42446408695693,
+     "true_value": 43.82562550363245
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 40.64817799332026,
+     "true_value": 37.85606229882656
+    }
+   ]
+  },
+  {
+   "id": "p171",
+   "patient": {
+    "age": 50,
+    "weight_kg": 81.5,
+    "height_cm": 180,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.76
+   },
+   "truth": {
+    "CL": 5.928342063648225,
+    "V1": 72.01407281835965,
+    "Q": 5.419899209354475,
+    "V2": 85.0696074406731
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 15.469611268843124,
+     "true_value": 22.683248690776026
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 9.414579931522233,
+     "true_value": 12.16563284063473
+    }
+   ]
+  },
+  {
+   "id": "p172",
+   "patient": {
+    "age": 53,
+    "weight_kg": 55.1,
+    "height_cm": 164,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.56
+   },
+   "truth": {
+    "CL": 1.9768389376312647,
+    "V1": 43.299439281752434,
+    "Q": 8.014616879217465,
+    "V2": 15.326394547409766
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 39.103169813196644,
+     "true_value": 35.95302723926466
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 26.592425527616477,
+     "true_value": 26.351096989258046
+    }
+   ]
+  },
+  {
+   "id": "p173",
+   "patient": {
+    "age": 65,
+    "weight_kg": 50.7,
+    "height_cm": 170,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.44
+   },
+   "truth": {
+    "CL": 2.978599476918282,
+    "V1": 75.97105747828745,
+    "Q": 2.9163158877012263,
+    "V2": 26.301346341348665
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 32.6231563416797,
+     "true_value": 24.02566102917586
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 18.54935402425299,
+     "true_value": 17.473436069458497
+    }
+   ]
+  },
+  {
+   "id": "p174",
+   "patient": {
+    "age": 69,
+    "weight_kg": 84.9,
+    "height_cm": 159,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.7
+   },
+   "truth": {
+    "CL": 6.9931615103683615,
+    "V1": 69.91535617125724,
+    "Q": 12.619344293814308,
+    "V2": 23.189007478806545
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 22.115352493491653,
+     "true_value": 19.23736708625601
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.050210565810563,
+     "true_value": 9.828804808931887
+    }
+   ]
+  },
+  {
+   "id": "p175",
+   "patient": {
+    "age": 67,
+    "weight_kg": 62,
+    "height_cm": 180,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.47
+   },
+   "truth": {
+    "CL": 2.543412865349459,
+    "V1": 42.82075255361985,
+    "Q": 7.500927607562168,
+    "V2": 47.530531024369594
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 38.23992831836377,
+     "true_value": 38.78220116040543
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 34.571252295312995,
+     "true_value": 26.32525855995109
+    }
+   ]
+  },
+  {
+   "id": "p176",
+   "patient": {
+    "age": 38,
+    "weight_kg": 65.9,
+    "height_cm": 160,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.38
+   },
+   "truth": {
+    "CL": 8.453880835253369,
+    "V1": 46.90506869322285,
+    "Q": 3.756919701882688,
+    "V2": 56.13042045662633
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 17.974299799214073,
+     "true_value": 15.445983567805177
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 4.740268334352874,
+     "true_value": 4.375540928427289
+    }
+   ]
+  },
+  {
+   "id": "p177",
+   "patient": {
+    "age": 82,
+    "weight_kg": 60,
+    "height_cm": 175,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.58
+   },
+   "truth": {
+    "CL": 4.846640862215477,
+    "V1": 60.76272644454966,
+    "Q": 5.976599142157808,
+    "V2": 21.271716210681294
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 26.479936348640972,
+     "true_value": 21.739182900239815
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 8.06815893030136,
+     "true_value": 12.144407430181001
+    }
+   ]
+  },
+  {
+   "id": "p178",
+   "patient": {
+    "age": 56,
+    "weight_kg": 83.5,
+    "height_cm": 174,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.12
+   },
+   "truth": {
+    "CL": 3.7782948503304397,
+    "V1": 60.67696965641836,
+    "Q": 8.959994183177901,
+    "V2": 24.97250277078185
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 38.09651340374291,
+     "true_value": 32.919252567803994
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 21.444069854560865,
+     "true_value": 21.40929385500891
+    }
+   ]
+  },
+  {
+   "id": "p179",
+   "patient": {
+    "age": 87,
+    "weight_kg": 69.6,
+    "height_cm": 161,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 1.37
+   },
+   "truth": {
+    "CL": 1.6541431734645857,
+    "V1": 95.72718557827463,
+    "Q": 5.486271136916711,
+    "V2": 45.27684670074058
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 68.4983478712843,
+     "true_value": 53.570772061299365
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 46.67041851257042,
+     "true_value": 46.65620275810508
+    }
+   ]
+  },
+  {
+   "id": "p180",
+   "patient": {
+    "age": 73,
+    "weight_kg": 38.9,
+    "height_cm": 170,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.6
+   },
+   "truth": {
+    "CL": 2.015112421326706,
+    "V1": 47.419633640677326,
+    "Q": 3.5228588190725323,
+    "V2": 36.204548751909535
+   },
+   "regimen": {
+    "dose_mg": 500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 20.740973683380293,
+     "true_value": 23.844098652176857
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 12.561061973222923,
+     "true_value": 17.15879219686451
+    }
+   ]
+  },
+  {
+   "id": "p181",
+   "patient": {
+    "age": 52,
+    "weight_kg": 81.5,
+    "height_cm": 160,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.95
+   },
+   "truth": {
+    "CL": 5.160338356233816,
+    "V1": 54.46618708252683,
+    "Q": 7.298571766319077,
+    "V2": 31.474523521219623
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 30.933422949860315,
+     "true_value": 26.155183704517228
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 14.700729462645217,
+     "true_value": 13.725102402869913
+    }
+   ]
+  },
+  {
+   "id": "p182",
+   "patient": {
+    "age": 69,
+    "weight_kg": 58.5,
+    "height_cm": 156,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.68
+   },
+   "truth": {
+    "CL": 2.6117671810491503,
+    "V1": 40.652756947665225,
+    "Q": 9.348053737825795,
+    "V2": 34.55878319173786
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 31.120041414984584,
+     "true_value": 37.57436606765701
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 18.292939771577437,
+     "true_value": 25.47631450966776
+    }
+   ]
+  },
+  {
+   "id": "p183",
+   "patient": {
+    "age": 45,
+    "weight_kg": 54.7,
+    "height_cm": 153,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.9
+   },
+   "truth": {
+    "CL": 2.099148535644124,
+    "V1": 46.57504581666176,
+    "Q": 8.198726265966837,
+    "V2": 21.398170953524513
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 27.429430377094338,
+     "true_value": 33.841071650654506
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 24.921796469829715,
+     "true_value": 24.9776539679135
+    }
+   ]
+  },
+  {
+   "id": "p184",
+   "patient": {
+    "age": 57,
+    "weight_kg": 85.1,
+    "height_cm": 166,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 1.09
+   },
+   "truth": {
+    "CL": 4.573562951555902,
+    "V1": 77.91309688697143,
+    "Q": 2.5000169660722786,
+    "V2": 40.63297923964048
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 28.599154939762197,
+     "true_value": 27.739002609397367
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 17.343410298718588,
+     "true_value": 17.17850408530123
+    }
+   ]
+  },
+  {
+   "id": "p185",
+   "patient": {
+    "age": 65,
+    "weight_kg": 53.7,
+    "height_cm": 176,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.63
+   },
+   "truth": {
+    "CL": 1.1931859481614002,
+    "V1": 46.9968803041646,
+    "Q": 5.831259579992345,
+    "V2": 30.384840106281054
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 64.22658704756738,
+     "true_value": 56.872401698740106
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 38.79395499716227,
+     "true_value": 47.307389596214016
+    }
+   ]
+  },
+  {
+   "id": "p186",
+   "patient": {
+    "age": 56,
+    "weight_kg": 61.7,
+    "height_cm": 181,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.43
+   },
+   "truth": {
+    "CL": 5.819001702245035,
+    "V1": 45.84717786004528,
+    "Q": 6.340558501108173,
+    "V2": 21.672030156771076
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 28.646641796028895,
+     "true_value": 19.73639160867333
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 10.474687654445022,
+     "true_value": 8.459643558908244
+    }
+   ]
+  },
+  {
+   "id": "p187",
+   "patient": {
+    "age": 84,
+    "weight_kg": 73.9,
+    "height_cm": 189,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.44
+   },
+   "truth": {
+    "CL": 1.8611347311230562,
+    "V1": 53.028490826558404,
+    "Q": 1.4078154826626568,
+    "V2": 41.942744577708964
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 52.27057722986367,
+     "true_value": 50.67630898825625
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 44.39580094364869,
+     "true_value": 37.89345394326927
+    }
+   ]
+  },
+  {
+   "id": "p188",
+   "patient": {
+    "age": 68,
+    "weight_kg": 75.2,
+    "height_cm": 165,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 1.06
+   },
+   "truth": {
+    "CL": 2.4481541335921047,
+    "V1": 70.33656391344024,
+    "Q": 13.585479644882678,
+    "V2": 39.497825931738426
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 57.60229785714558,
+     "true_value": 46.97295984326421
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 41.90630781251828,
+     "true_value": 37.33817202249397
+    }
+   ]
+  },
+  {
+   "id": "p189",
+   "patient": {
+    "age": 58,
+    "weight_kg": 65.4,
+    "height_cm": 163,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.54
+   },
+   "truth": {
+    "CL": 5.040350448334945,
+    "V1": 47.65966875617109,
+    "Q": 8.483688976459304,
+    "V2": 35.89660213203096
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 13.908637762139813,
+     "true_value": 21.555966351200688
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 12.07241087829902,
+     "true_value": 11.090613607460591
+    }
+   ]
+  },
+  {
+   "id": "p190",
+   "patient": {
+    "age": 73,
+    "weight_kg": 47.9,
+    "height_cm": 186,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.82
+   },
+   "truth": {
+    "CL": 1.2708434522291494,
+    "V1": 71.04878587496759,
+    "Q": 5.867211420351718,
+    "V2": 34.2324743362906
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 64.69734663513333,
+     "true_value": 52.30985917712508
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 48.31079954135724,
+     "true_value": 45.56479663812711
+    }
+   ]
+  },
+  {
+   "id": "p191",
+   "patient": {
+    "age": 62,
+    "weight_kg": 54.9,
+    "height_cm": 162,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 1.04
+   },
+   "truth": {
+    "CL": 2.118243934463077,
+    "V1": 58.46103781598283,
+    "Q": 6.585436330395831,
+    "V2": 34.296057932346756
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 42.28249225895387,
+     "true_value": 33.140200564780564
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 19.734862526849238,
+     "true_value": 25.423745564307016
+    }
+   ]
+  },
+  {
+   "id": "p192",
+   "patient": {
+    "age": 52,
+    "weight_kg": 55.6,
+    "height_cm": 176,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.55
+   },
+   "truth": {
+    "CL": 2.6531773156269374,
+    "V1": 27.71166568306209,
+    "Q": 6.738717486945739,
+    "V2": 37.37629300918194
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 20.575559737569737,
+     "true_value": 29.475427304715268
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 17.02358231812579,
+     "true_value": 17.191447332371247
+    }
+   ]
+  },
+  {
+   "id": "p193",
+   "patient": {
+    "age": 52,
+    "weight_kg": 56.2,
+    "height_cm": 173,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.72
+   },
+   "truth": {
+    "CL": 3.24158385108513,
+    "V1": 56.711393403377556,
+    "Q": 9.226662830981274,
+    "V2": 20.024235685953606
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 30.3696971994705,
+     "true_value": 22.65617307187873
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 15.681912380882801,
+     "true_value": 15.282056093901236
+    }
+   ]
+  },
+  {
+   "id": "p194",
+   "patient": {
+    "age": 64,
+    "weight_kg": 61.5,
+    "height_cm": 174,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.54
+   },
+   "truth": {
+    "CL": 4.1187895294342125,
+    "V1": 49.58834848753979,
+    "Q": 4.673848832770577,
+    "V2": 65.08241867094947
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 34.86659681396428,
+     "true_value": 26.034879115921804
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 21.315419561874172,
+     "true_value": 14.170184572782349
+    }
+   ]
+  },
+  {
+   "id": "p195",
+   "patient": {
+    "age": 62,
+    "weight_kg": 73.7,
+    "height_cm": 172,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.76
+   },
+   "truth": {
+    "CL": 4.554171005849308,
+    "V1": 64.94496168866608,
+    "Q": 9.957450567387301,
+    "V2": 24.685430607783417
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 24.66342546979038,
+     "true_value": 22.238463714367306
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 16.797871358126326,
+     "true_value": 13.73705663961644
+    }
+   ]
+  },
+  {
+   "id": "p196",
+   "patient": {
+    "age": 72,
+    "weight_kg": 55,
+    "height_cm": 165,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.58
+   },
+   "truth": {
+    "CL": 2.3489216485423565,
+    "V1": 36.84175147152219,
+    "Q": 4.346184546964247,
+    "V2": 28.370161506190094
+   },
+   "regimen": {
+    "dose_mg": 750,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 25.560566807635745,
+     "true_value": 32.27211987036296
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 11.095590093223251,
+     "true_value": 20.495228161592394
+    }
+   ]
+  },
+  {
+   "id": "p197",
+   "patient": {
+    "age": 53,
+    "weight_kg": 108.1,
+    "height_cm": 160,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.63
+   },
+   "truth": {
+    "CL": 5.814679537960452,
+    "V1": 154.4251305259487,
+    "Q": 6.587395667555582,
+    "V2": 74.26773365554554
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 28.87664338319024,
+     "true_value": 24.49329301180461
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 23.66628411472103,
+     "true_value": 18.05836221233424
+    }
+   ]
+  },
+  {
+   "id": "p198",
+   "patient": {
+    "age": 67,
+    "weight_kg": 81.2,
+    "height_cm": 174,
+    "sex": "male",
+    "serum_creatinine_mg_dl": 0.79
+   },
+   "truth": {
+    "CL": 2.178261492916231,
+    "V1": 44.9391777472808,
+    "Q": 21.46283241620048,
+    "V2": 51.64888708636807
+   },
+   "regimen": {
+    "dose_mg": 1250,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 58.23387408230382,
+     "true_value": 52.3677864421787
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 54.69136863340911,
+     "true_value": 41.70351347561824
+    }
+   ]
+  },
+  {
+   "id": "p199",
+   "patient": {
+    "age": 85,
+    "weight_kg": 64.5,
+    "height_cm": 158,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 1.2
+   },
+   "truth": {
+    "CL": 1.575739315620073,
+    "V1": 53.41341919657727,
+    "Q": 4.732174012435833,
+    "V2": 25.22991786222199
+   },
+   "regimen": {
+    "dose_mg": 1000,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 61.661819018624676,
+     "true_value": 58.35861561270926
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 51.62901004834817,
+     "true_value": 46.63801022705437
+    }
+   ]
+  },
+  {
+   "id": "p200",
+   "patient": {
+    "age": 66,
+    "weight_kg": 93.9,
+    "height_cm": 161,
+    "sex": "female",
+    "serum_creatinine_mg_dl": 0.63
+   },
+   "truth": {
+    "CL": 7.186679351481334,
+    "V1": 59.97347857714722,
+    "Q": 9.545677514747023,
+    "V2": 50.312387463926086
+   },
+   "regimen": {
+    "dose_mg": 1500,
+    "interval_hours": 12,
+    "infusion_duration_hours": 1.5,
+    "doses_given": 5,
+    "steady_state_confirmed": true
+   },
+   "levels": [
+    {
+     "time_since_last_dose_hours": 3,
+     "value_mcg_ml": 26.409500275145106,
+     "true_value": 23.498612768413757
+    },
+    {
+     "time_since_last_dose_hours": 11.5,
+     "value_mcg_ml": 8.932896999699189,
+     "true_value": 10.968902845702763
+    }
+   ]
+  }
+ ]
+}

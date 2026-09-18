@@ -10,7 +10,24 @@ import { hasFeature } from "@/lib/tiers";
 import { validateCaseId } from "@/lib/calculationHistory";
 import { authOptions } from "@/lib/authOptions";
 import { checkRateLimit, getCalculateRateLimitConfig, getClientIp } from "@/lib/rateLimit";
-import { computeBmi, HIGH_BMI_THRESHOLD_KG_M2 } from "@/lib/pk/modelRegistry";
+import { computeBmi, HIGH_BMI_THRESHOLD_KG_M2, MODEL_MANIFEST_VERSION } from "@/lib/pk/modelRegistry";
+import { createHash } from "node:crypto";
+
+/**
+ * Immutable snapshot attached to every result so the client can bind a
+ * rendered result, an export and a history row to exactly the inputs and model
+ * version that produced it (an out-of-order response can then be detected and
+ * discarded by comparing digests — see CalculatorWorkspace).
+ */
+function buildResultSnapshot(mode: Mode, data: RequestBody): { model_manifest_version: string; mode: Mode; input_digest: string; computed_at: string } {
+  const canonical = JSON.stringify({ mode, patient: data.patient ?? null, regimen: data.regimen ?? null, levels: data.levels ?? null });
+  return {
+    model_manifest_version: MODEL_MANIFEST_VERSION,
+    mode,
+    input_digest: createHash("sha256").update(canonical).digest("hex").slice(0, 32),
+    computed_at: new Date().toISOString(),
+  };
+}
 
 type Mode = "initial_regimen" | "existing_regimen";
 
@@ -307,6 +324,7 @@ export async function POST(request: NextRequest) {
       persistCalculation(userEmail, "empiric", result, caseId, patient);
     }
 
+    result.result_snapshot = buildResultSnapshot("initial_regimen", validated.data);
     return NextResponse.json(result);
   }
 
@@ -392,6 +410,7 @@ export async function POST(request: NextRequest) {
     persistCalculation(userEmail, "existing", resultObj, caseId, validated.data.patient as Record<string, unknown>);
   }
 
+  resultObj.result_snapshot = buildResultSnapshot("existing_regimen", validated.data);
   return NextResponse.json(result);
 }
 

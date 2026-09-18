@@ -5,22 +5,35 @@ import {
 } from "../steadyStateTwoCompartment";
 import type { PosteriorFitDiagnostics } from "../types";
 import type { NormalizedObservation } from "./normalizeObservations";
-
-const ASSAY_SD_FLOOR_MCG_ML = 1.0;
-const ASSAY_CV = 0.15;
+import type { ExposureHorizon } from "../exposureHorizon";
 
 /**
- * Doses after which the regimen is treated as steady state. Matches the
- * threshold existingRegimenEngine and validateExistingRegimenRequest use, so
- * the fit, the exposure summary and the validator cannot disagree about which
- * regime a patient is in.
+ * Error model (application-specific; not the published residual model):
+ *   σ_i = max(1 mg/L, 0.15 × max(observed_i, predicted_i))
+ * Objective (MAP, minimised in log-parameter space):
+ *   Σ_i [ 0.5·((y_i − f_i)/σ_i)² + ln σ_i ]  +  Σ_p 0.5·((ln θ_p − ln θ_p,prior)/ω_p)²
+ * with independent log-normal priors ω = (0.35, 0.25, 0.50, 0.50) for
+ * (CL, V1, Q, V2). Because σ_i depends on the prediction, the ln σ term is part
+ * of the objective (it is not a pure weighted least squares). No prior
+ * covariance is modelled. These ω are NOT the Colin 2019 published IIV
+ * (CV 27.9% / 27.3% / 97.9%); changing them is a documented model revision.
  */
-const STEADY_STATE_DOSE_THRESHOLD = 5;
+export const ASSAY_SD_FLOOR_MCG_ML = 1.0;
+export const ASSAY_CV = 0.15;
 
-const PRIOR_LOG_CL_SD = 0.35;
-const PRIOR_LOG_V1_SD = 0.25;
-const PRIOR_LOG_Q_SD = 0.5;
-const PRIOR_LOG_V2_SD = 0.5;
+export const PRIOR_LOG_CL_SD = 0.35;
+export const PRIOR_LOG_V1_SD = 0.25;
+export const PRIOR_LOG_Q_SD = 0.5;
+export const PRIOR_LOG_V2_SD = 0.5;
+
+/** Two entries closer than this in time are treated as the same sampling event. */
+export const DUPLICATE_SAMPLE_WINDOW_HOURS = 0.25;
+/** Same-time entries whose values differ by more than this are discordant. */
+export const DISCORDANT_SAMPLE_RELATIVE_DIFFERENCE = 0.2;
+
+/** Nelder–Mead settings (documented so tolerance changes are deliberate). */
+export const NM_MAX_ITERATIONS = 400;
+export const NM_TOLERANCE = 1e-6;
 
 export interface FitPosteriorInput {
   priorCL: number;
@@ -31,12 +44,15 @@ export interface FitPosteriorInput {
   tau: number;
   T_inf: number;
   observations: NormalizedObservation[];
-  /**
-   * Doses given so far. When present and below STEADY_STATE_DOSE_THRESHOLD the
-   * fit superposes exactly that many doses instead of the steady-state
-   * accumulation factor. Undefined means steady state.
-   */
+  /** Doses given so far (used by the actual-history and single-dose horizons). */
   doses_given?: number;
+  /**
+   * Exposure horizon decided once per request (exposureHorizon.ts). Under
+   * "steady_state" the fit uses the τ-accumulation form; under
+   * "actual_history"/"single_dose" it superposes exactly doses_given doses.
+   * When omitted, falls back to the legacy dose-count rule (≥5 → steady state).
+   */
+  horizon?: ExposureHorizon;
   // Optional between-subject-variability overrides. No shipped model sets these
   // since the custom obesity branch was retired on 15 Sep 2026; kept so a future
   // model can widen or narrow the prior without changing this file.
@@ -102,8 +118,10 @@ function predictConcentration(
 ): number {
   const { dose_mg, tau, T_inf, doses_given } = input;
   const base = { ...params, dose_mg, tau, T_inf };
+  const horizon: ExposureHorizon =
+    input.horizon ?? (doses_given === undefined || doses_given >= 5 ? "steady_state" : "actual_history");
 
-  if (doses_given === undefined || doses_given >= STEADY_STATE_DOSE_THRESHOLD) {
+  if (horizon === "steady_state" || doses_given === undefined) {
     return concentrationAtTime({ ...base, t: observation.time_in_interval });
   }
 
@@ -114,34 +132,48 @@ function predictConcentration(
   return total;
 }
 
+function priorSds(input: FitPosteriorInput) {
+  // Use between-subject-variability overrides if a model provided them.
+  return {
+    CL: input.omega_CL ?? PRIOR_LOG_CL_SD,
+    V1: input.omega_V1 ?? PRIOR_LOG_V1_SD,
+    Q:  input.omega_Q  ?? PRIOR_LOG_Q_SD,
+    V2: input.omega_V2 ?? PRIOR_LOG_V2_SD,
+  };
+}
+
+/** Objective and its components — exposed for verification. */
+export function objectiveComponents(
+  CL: number, V1: number, Q: number, V2: number,
+  input: FitPosteriorInput,
+) {
+  const { observations, priorCL, priorV1, priorQ, priorV2 } = input;
+  const sd = priorSds(input);
+  let nll = 0;
+  const perObservation = observations.map((observation) => {
+    const { concentration } = observation;
+    const predicted = predictConcentration({ CL, V1, Q, V2 }, input, observation);
+    const sigma = observationSd(predicted, concentration);
+    const residual = concentration - predicted;
+    const z = residual / sigma;
+    nll += 0.5 * z * z + Math.log(sigma);
+    return { time_hours: observation.time_hours, observed: concentration, predicted, residual, sigma, z };
+  });
+  const prior_penalty = {
+    CL: logPenalty(CL, priorCL, sd.CL),
+    V1: logPenalty(V1, priorV1, sd.V1),
+    Q: logPenalty(Q, priorQ, sd.Q),
+    V2: logPenalty(V2, priorV2, sd.V2),
+  };
+  const total = nll + prior_penalty.CL + prior_penalty.V1 + prior_penalty.Q + prior_penalty.V2;
+  return { nll_observations: nll, prior_penalty, total, perObservation };
+}
+
 function objective(
   CL: number, V1: number, Q: number, V2: number,
   input: FitPosteriorInput
 ): number {
-  const { observations, priorCL, priorV1, priorQ, priorV2 } = input;
-
-  // Use between-subject-variability overrides if a model provided them.
-  const sdCL = input.omega_CL ?? PRIOR_LOG_CL_SD;
-  const sdV1 = input.omega_V1 ?? PRIOR_LOG_V1_SD;
-  const sdQ  = input.omega_Q  ?? PRIOR_LOG_Q_SD;
-  const sdV2 = input.omega_V2 ?? PRIOR_LOG_V2_SD;
-
-  let nll = 0;
-  for (const observation of observations) {
-    const { concentration } = observation;
-    const predicted = predictConcentration({ CL, V1, Q, V2 }, input, observation);
-    const sd = observationSd(predicted, concentration);
-    const residual = concentration - predicted;
-    nll += 0.5 * (residual / sd) ** 2 + Math.log(sd);
-  }
-
-  return (
-    nll +
-    logPenalty(CL, priorCL, sdCL) +
-    logPenalty(V1, priorV1, sdV1) +
-    logPenalty(Q, priorQ, sdQ) +
-    logPenalty(V2, priorV2, sdV2)
-  );
+  return objectiveComponents(CL, V1, Q, V2, input).total;
 }
 
 // Simple Nelder-Mead optimization for 4 parameters in log-space.
@@ -150,10 +182,10 @@ function objective(
 function nelderMeadLogSpace(
   initValues: number[],
   input: FitPosteriorInput,
-  maxIters = 200,
-  tolerance = 1e-4,
+  maxIters = NM_MAX_ITERATIONS,
+  tolerance = NM_TOLERANCE,
   initialStep = 0.5,
-): number[] {
+): { point: number[]; iterations: number; converged: boolean } {
   const n = initValues.length;
   // Initialize simplex
   let simplex = [initValues.map(Math.log)];
@@ -171,14 +203,17 @@ function nelderMeadLogSpace(
   };
 
   let scores = simplex.map(evalPt);
+  let iterations = 0;
+  let converged = false;
 
   for (let iter = 0; iter < maxIters; iter++) {
+    iterations = iter + 1;
     // Sort
     const indices = Array.from({ length: n + 1 }, (_, i) => i).sort((a, b) => scores[a] - scores[b]);
     simplex = indices.map(i => simplex[i]);
     scores = indices.map(i => scores[i]);
 
-    if (scores[n] - scores[0] < tolerance) break;
+    if (scores[n] - scores[0] < tolerance) { converged = true; break; }
 
     // Centroid of the best n points
     const centroid = Array(n).fill(0);
@@ -238,7 +273,34 @@ function nelderMeadLogSpace(
     }
   }
 
-  return simplex[0].map(Math.exp);
+  // Final sort so the returned vertex is the best one even when we hit maxIters.
+  const order = Array.from({ length: n + 1 }, (_, i) => i).sort((a, b) => scores[a] - scores[b]);
+  return { point: simplex[order[0]].map(Math.exp), iterations, converged };
+}
+
+/**
+ * Same-time entries: two observations within DUPLICATE_SAMPLE_WINDOW_HOURS of
+ * each other. Two well-spaced samples (a peak and a trough) identify CL and V1;
+ * two entries at the same time do not — they are either assay replicates of
+ * one draw (then their disagreement is assay error) or a data-entry mistake.
+ * Discordant same-time entries are reported so the caller can hold the
+ * recommendation for reconciliation instead of fitting through the conflict.
+ */
+export function findObservationConflicts(observations: NormalizedObservation[]) {
+  const conflicts: NonNullable<PosteriorFitDiagnostics["observation_conflicts"]> = [];
+  for (let i = 0; i < observations.length; i++) {
+    for (let j = i + 1; j < observations.length; j++) {
+      const a = observations[i], b = observations[j];
+      if (Math.abs(a.time_hours - b.time_hours) > DUPLICATE_SAMPLE_WINDOW_HOURS) continue;
+      const hi = Math.max(a.concentration, b.concentration);
+      const lo = Math.min(a.concentration, b.concentration);
+      const rel = hi > 0 ? (hi - lo) / hi : 0;
+      if (rel > DISCORDANT_SAMPLE_RELATIVE_DIFFERENCE) {
+        conflicts.push({ index_a: i, index_b: j, time_hours: a.time_hours, values: [a.concentration, b.concentration], relative_difference: rel });
+      }
+    }
+  }
+  return conflicts;
 }
 
 function buildDefaultDiagnostics(
@@ -406,18 +468,23 @@ export function fitPosteriorParameters(
 
   let bestPoint: number[] = [priorCL, priorV1, priorQ, priorV2];
   let bestScore = Infinity;
-  for (const start of startingPoints) {
-    const candidate = nelderMeadLogSpace(start, normalizedInput);
+  let bestStart = -1;
+  let bestRun = { iterations: 0, converged: false };
+  startingPoints.forEach((start, startIndex) => {
+    const run = nelderMeadLogSpace(start, normalizedInput);
+    const candidate = run.point;
     if (
       !Number.isFinite(candidate[0]) || !Number.isFinite(candidate[1])
       || !Number.isFinite(candidate[2]) || !Number.isFinite(candidate[3])
-    ) continue;
+    ) return;
     const score = objective(candidate[0], candidate[1], candidate[2], candidate[3], normalizedInput);
     if (score < bestScore) {
       bestScore = score;
       bestPoint = candidate;
+      bestStart = startIndex;
+      bestRun = { iterations: run.iterations, converged: run.converged };
     }
-  }
+  });
 
   const [bestCL, bestV1, bestQ, bestV2] = bestPoint;
   const success = Number.isFinite(bestCL) && Number.isFinite(bestV1) && Number.isFinite(bestQ) && Number.isFinite(bestV2)
@@ -427,6 +494,12 @@ export function fitPosteriorParameters(
   const finalV1 = clamp(bestV1, priorV1 * 0.1, priorV1 * 10);
   const finalQ  = clamp(bestQ,  priorQ  * 0.1, priorQ  * 10);
   const finalV2 = clamp(bestV2, priorV2 * 0.1, priorV2 * 10);
+  // A clamp changes the answer the optimiser found; say so rather than hide it.
+  const boundary_hits: NonNullable<PosteriorFitDiagnostics["boundary_hits"]> = [];
+  if (finalCL !== bestCL) boundary_hits.push("CL");
+  if (finalV1 !== bestV1) boundary_hits.push("V1");
+  if (finalQ !== bestQ) boundary_hits.push("Q");
+  if (finalV2 !== bestV2) boundary_hits.push("V2");
 
   // Per-level residuals — observed vs posterior-predicted concentration at
   // the recorded time-in-interval. Surfaced so the API route can log fit
@@ -444,15 +517,39 @@ export function fitPosteriorParameters(
     },
   );
 
+  const summary = summarizeDiagnostics(normalizedInput, bestCL, bestV1, bestQ, bestV2, success);
+  const components = objectiveComponents(finalCL, finalV1, finalQ, finalV2, normalizedInput);
+  const conflicts = findObservationConflicts(normalizedInput.observations);
+  const sd = priorSds(normalizedInput);
+  const diagnostics: PosteriorFitDiagnostics = {
+    ...summary,
+    horizon: normalizedInput.horizon
+      ?? (normalizedInput.doses_given === undefined || normalizedInput.doses_given >= 5 ? "steady_state" : "actual_history"),
+    prior: { CL: priorCL, V1: priorV1, Q: priorQ, V2: priorV2 },
+    posterior: { CL: finalCL, V1: finalV1, Q: finalQ, V2: finalV2 },
+    prior_log_sd: sd,
+    error_model: `sigma = max(${ASSAY_SD_FLOOR_MCG_ML} mg/L, ${ASSAY_CV} x max(observed, predicted)); Gaussian NLL incl. ln(sigma)`,
+    objective: { nll_observations: components.nll_observations, prior_penalty: components.prior_penalty, total: components.total },
+    predicted_at_observations: components.perObservation,
+    convergence: {
+      method: "Nelder-Mead in log-parameter space, multi-start",
+      starts: startingPoints.length,
+      best_start_index: bestStart,
+      iterations: bestRun.iterations,
+      converged: bestRun.converged,
+      tolerance: NM_TOLERANCE,
+    },
+    boundary_hits,
+    observation_conflicts: conflicts,
+  };
+
   return {
     CL_posterior: finalCL,
     V1_posterior: finalV1,
     Q_posterior: finalQ,
     V2_posterior: finalV2,
     success,
-    diagnostics: summarizeDiagnostics(
-      normalizedInput, bestCL, bestV1, bestQ, bestV2, success
-    ),
+    diagnostics,
     per_level_residuals,
   };
 }

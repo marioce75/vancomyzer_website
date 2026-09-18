@@ -16,7 +16,13 @@ export interface NormalizedRegimen {
   dose_mg: number;
   interval_hours: number;
   infusion_duration_hours: number;
-  doses_given?: number; // number of doses administered; affects steady-state assumption
+  doses_given?: number; // number of doses administered; affects the exposure horizon
+  /**
+   * Clinician confirmation that the regimen is at steady state. See
+   * exposureHorizon.ts: true → steady-state horizon; false → actual-history
+   * horizon regardless of dose count; undefined → legacy dose-count rule.
+   */
+  steady_state_confirmed?: boolean;
   target_auc24?: number; // desired AUC₂₄ target for maintenance recommendation (pulse dose workflow)
 }
 
@@ -59,10 +65,52 @@ export interface FitDiagnostic {
   max_relative_error: number;
 }
 
-export interface ExistingRegimenEngineOutput {
+/** Steady-state projection of a regimen (canonical computeExposure output). */
+export interface SteadyStateExposureBlock {
   auc24: number;
   peak: number;
   trough: number;
+  infusion_duration_hours: number;
+}
+
+/** Exposure at the Nth dose of the actual history — never a daily AUC. */
+export interface ActualHistoryExposureBlock {
+  doses_given: number;
+  peak: number;
+  trough: number;
+  auc_interval_n: number;
+  auc_0_24h: number;
+}
+
+export interface SteadyStateApproachBlock {
+  terminal_half_life_hours: number;
+  elapsed_hours: number;
+  half_lives_elapsed: number;
+  fraction_of_steady_state: number;
+  adequate: boolean;
+}
+
+export interface ExistingRegimenEngineOutput {
+  /**
+   * Top-level exposure triple. Its horizon is stated in `exposure_horizon`:
+   *   steady_state   — canonical steady-state projection of the CURRENT regimen
+   *                    (same function and infusion duration as every candidate row);
+   *   actual_history — ALSO the steady-state projection (so current vs candidate
+   *                    comparisons are like-for-like); the finite-history values
+   *                    are in `actual_history_exposure`;
+   *   single_dose    — first-dose peak/trough and AUC over the first 24 h.
+   * Finite-dose peak/trough are never mixed with a steady-state daily AUC here.
+   */
+  auc24: number;
+  peak: number;
+  trough: number;
+  exposure_horizon: "steady_state" | "actual_history" | "single_dose";
+  steady_state_exposure: SteadyStateExposureBlock;
+  actual_history_exposure?: ActualHistoryExposureBlock;
+  /** Advisory only: how far along the approach to steady state the model thinks the patient is. */
+  steady_state_approach?: SteadyStateApproachBlock;
+  /** Set when the clinician confirmed steady state but the model says the approach is inadequate. */
+  steady_state_warning?: string;
   scr: number;
   current_regimen_dose_mg: number;
   current_regimen_interval_hours: number;
@@ -161,8 +209,31 @@ export interface ExplanationInput {
 }
 
 // ... more types
+export interface PosteriorObjectiveDiagnostics {
+  /** Sum over observations of 0.5·z² + ln σ (Gaussian NLL with the app's error model). */
+  nll_observations: number;
+  /** Sum of 0.5·z² log-normal prior penalties, per parameter. */
+  prior_penalty: { CL: number; V1: number; Q: number; V2: number };
+  total: number;
+}
+
 export interface PosteriorFitDiagnostics {
   observation_count: number;
+  /** Horizon the fit modelled the observations under. */
+  horizon?: "steady_state" | "actual_history" | "single_dose";
+  prior?: { CL: number; V1: number; Q: number; V2: number };
+  posterior?: { CL: number; V1: number; Q: number; V2: number };
+  /** Log-SDs of the log-normal prior actually used (application-specific, not the published IIV). */
+  prior_log_sd?: { CL: number; V1: number; Q: number; V2: number };
+  error_model?: string;
+  objective?: PosteriorObjectiveDiagnostics;
+  /** Observed vs posterior-predicted concentration at each level, with the σ used. */
+  predicted_at_observations?: { time_hours: number; observed: number; predicted: number; residual: number; sigma: number; z: number }[];
+  convergence?: { method: string; starts: number; best_start_index: number; iterations: number; converged: boolean; tolerance: number };
+  /** Parameters that were clamped to the 0.1×–10× prior bounds after optimisation. */
+  boundary_hits?: ("CL" | "V1" | "Q" | "V2")[];
+  /** Pairs of observations that appear to be duplicate/discordant entries at the same time. */
+  observation_conflicts?: { index_a: number; index_b: number; time_hours: number; values: [number, number]; relative_difference: number }[];
   fit_quality: "not_applicable" | "prior_only" | "weak" | "moderate" | "acceptable" | "good" | "excellent";
   fit_quality_reason: string;
   uncertainty_label: "population_only" | "low" | "moderate" | "high" | "very_high";

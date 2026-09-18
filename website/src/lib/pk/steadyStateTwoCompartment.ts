@@ -83,30 +83,109 @@ export function singleDoseConcentration(input: SteadyStateInput, t: number): num
 
 /**
  * Area under the concentration-time curve of a SINGLE dose over [from, to]
- * hours, by trapezoid on a fine grid. Used for the loading-dose workflow, where
+ * hours, integrated ANALYTICALLY from the biexponential solution (piecewise:
+ * during infusion, after infusion). Used for the loading-dose workflow, where
  * the quantity the clinician is shown must be the exposure from the one dose
  * actually given over a fixed 24 h window — independent of any dosing interval,
  * since no second dose has been given to define one.
+ *
+ * Until 17 Sep 2026 this was a 0.02 h trapezoid, which the independent oracle
+ * (src/lib/pk/__tests__/oracle) showed ran 1e-6 to 1.2e-5 relative LOW on
+ * every regimen. Analytic integration removes the quadrature error; the
+ * closed-form value is exact to floating point.
  */
 export function singleDoseAuc(
   input: SteadyStateInput,
   from: number,
   to: number,
-  step_hours: number = 0.02,
 ): number {
   if (!(to > from)) return 0;
-  const steps = Math.max(1, Math.ceil((to - from) / step_hours));
-  const dt = (to - from) / steps;
-  let area = 0;
-  let previous = singleDoseConcentration(input, from);
-  for (let i = 1; i <= steps; i++) {
-    const current = singleDoseConcentration(input, from + i * dt);
-    area += ((previous + current) / 2) * dt;
-    previous = current;
-  }
-  return area;
+  const { dose_mg, T_inf } = input;
+  const R0 = dose_mg / T_inf;
+  const { alpha, beta, A, B } = computeConstants(input);
+  const a = Math.max(0, from);
+  const b = to;
+  if (!(b > a)) return 0;
+
+  const termArea = (rate: number, coef: number): number => {
+    let area = 0;
+    // Infusion segment [a, min(b, T_inf)]
+    const a1 = a;
+    const b1 = Math.min(b, T_inf);
+    if (b1 > a1) {
+      area += (b1 - a1) - (Math.exp(-rate * a1) - Math.exp(-rate * b1)) / rate;
+    }
+    // Post-infusion segment [max(a, T_inf), b]
+    const a2 = Math.max(a, T_inf);
+    const b2 = b;
+    if (b2 > a2) {
+      area += ((1 - Math.exp(-rate * T_inf)) / rate) * (Math.exp(-rate * (a2 - T_inf)) - Math.exp(-rate * (b2 - T_inf)));
+    }
+    return (coef / rate) * area;
+  };
+
+  return R0 * (termArea(alpha, A) + termArea(beta, B));
 }
 
+/**
+ * Concentration after exactly `doses_given` doses of the same regimen, at
+ * `t_since_last_dose` hours after the START of the most recent infusion,
+ * by superposition of the single-dose solution (dose k was given k·tau hours
+ * before the most recent one). This is the ACTUAL-HISTORY horizon.
+ */
+export function finiteHistoryConcentration(
+  input: SteadyStateInput,
+  doses_given: number,
+  t_since_last_dose: number,
+): number {
+  const n = Math.max(1, Math.floor(doses_given));
+  let total = 0;
+  for (let k = 0; k < n; k++) {
+    total += singleDoseConcentration(input, t_since_last_dose + k * input.tau);
+  }
+  return total;
+}
+
+export interface FiniteHistoryExposure {
+  doses_given: number;
+  /** Concentration at the end of the infusion of dose N. */
+  peak: number;
+  /** Concentration at the end of the Nth dosing interval (just before dose N+1). */
+  trough: number;
+  /** AUC over the Nth dosing interval (mg·h/L) — NOT a daily AUC. */
+  auc_interval_n: number;
+  /** AUC over the first 24 h after dose 1 (mg·h/L) — first-day exposure. */
+  auc_0_24h: number;
+}
+
+/**
+ * Exposure for the ACTUAL-HISTORY horizon: exactly `doses_given` doses,
+ * evaluated analytically (never read off the plotted curve grid). Reported
+ * beside — never mixed with — the steady-state projection.
+ */
+export function finiteHistoryExposure(input: SteadyStateInput, doses_given: number): FiniteHistoryExposure {
+  const n = Math.max(1, Math.floor(doses_given));
+  const { tau, T_inf } = input;
+  const peak = finiteHistoryConcentration(input, n, T_inf);
+  const trough = finiteHistoryConcentration(input, n, tau);
+  // AUC over the Nth interval = sum over doses k of the single-dose AUC of dose k
+  // over the window it sees: dose k (k = 0 most recent) contributes its
+  // single-dose AUC over [k·tau, (k+1)·tau].
+  let aucIntervalN = 0;
+  for (let k = 0; k < n; k++) {
+    aucIntervalN += singleDoseAuc(input, k * tau, (k + 1) * tau);
+  }
+  // First 24 h after dose 1: doses given at 0, tau, 2tau, … within 24 h.
+  let auc0_24 = 0;
+  for (let k = 0; k < n; k++) {
+    const doseTime = k * tau;
+    if (doseTime >= 24) break;
+    auc0_24 += singleDoseAuc(input, 0, 24 - doseTime);
+  }
+  return { doses_given: n, peak, trough, auc_interval_n: aucIntervalN, auc_0_24h: auc0_24 };
+}
+
+/** Steady-state concentration at t hours after the start of an infusion (0 ≤ t ≤ tau). */
 export function concentrationAtTime(input: SteadyStateInput & { t: number }): number {
   const { dose_mg, tau, T_inf, t } = input;
   const R0 = dose_mg / T_inf;
@@ -140,40 +219,18 @@ export function terminalHalfLifeHours(params: TwoCompartmentParameters): number 
 }
 
 /**
- * Is the regimen at steady state?
+ * Steady-state exposure of a regimen — THE canonical function. Every number
+ * labelled "steady state" anywhere (current row, candidate rows, band, graph
+ * landmarks, interpretation, note, PDF) must come from here with the same
+ * parameters, dose, interval and infusion duration.
  *
- * A fixed count of 5 doses is not a steady-state criterion — it ignores how
- * fast the patient actually clears the drug. A 65 y/90 kg/SCr 1.5 patient has a
- * posterior terminal half-life of 35.4 h, so at 5 doses of q12h (60 h) they are
- * 1.7 half-lives in, at roughly 71% of steady state, while the engine asserted
- * "steady state assumed" and reported the projected steady-state trough as if
- * measured. Entering 4 versus 5 doses moved the daily dose by 33% on identical
- * PK purely because of that switch.
- *
- * Both conditions must hold: at least STEADY_STATE_MIN_DOSES doses AND enough
- * elapsed time to cover STEADY_STATE_HALF_LIVES terminal half-lives (~94% of
- * steady state at 4). The dose count is kept as a necessary condition so that
- * nothing previously treated as pre-steady-state is promoted by this change —
- * the predicate can only ever become more conservative.
+ * The former isSteadyStateRegimen() predicate (dose count + half-lives) lived
+ * here and silently changed which horizon the engine reported; horizon is now
+ * decided once in exposureHorizon.ts and the half-life check is an advisory.
  */
-export const STEADY_STATE_MIN_DOSES = 5;
-export const STEADY_STATE_HALF_LIVES = 4;
-
-export function isSteadyStateRegimen(
-  doses_given: number | undefined,
-  tau: number,
-  params: TwoCompartmentParameters,
-): boolean {
-  if (doses_given === undefined) return true; // caller gave no dose history
-  if (doses_given < STEADY_STATE_MIN_DOSES) return false;
-  if (!(tau > 0)) return false;
-  const halfLife = terminalHalfLifeHours(params);
-  if (!Number.isFinite(halfLife)) return false;
-  return doses_given * tau >= STEADY_STATE_HALF_LIVES * halfLife;
-}
-
 export function computeExposure(input: SteadyStateInput): ExposureResult {
   const { dose_mg, tau, T_inf, CL } = input;
+  // Linear PK at steady state: daily AUC = daily dose / CL.
   const auc24 = (dose_mg / CL) * (24 / tau);
   
   // Peak is at end of infusion
@@ -337,3 +394,6 @@ export function loadingDoseCurvePoints(
 
   return points;
 }
+
+/** Alias with the horizon in the name, for call sites that must be explicit. */
+export const steadyStateExposure = computeExposure;

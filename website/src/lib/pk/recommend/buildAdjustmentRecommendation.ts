@@ -305,10 +305,16 @@ function collectFrequencyOptions(
       if (dose_mg > maxSingleDoseMg) continue;
       const dailyDose = (dose_mg * 24) / interval_hours;
       if (dailyDose > maxTddMgPerDay) continue;
+      // Simulate with the infusion duration this option will actually report
+      // (the rate-limited safe duration for THIS dose). Simulating every dose at
+      // the current regimen's infusion time made the table's peak/trough
+      // disagree with the band's predicted_peak/trough for the same regimen
+      // (e.g. 38.7 vs 36.7 mcg/mL for 1500 mg q12h at 1.75 h vs 2.5 h).
+      const candidateTinf = Math.min(computeSafeInfusionDurationHours(dose_mg).infusion_duration_hours, interval_hours);
       const exp = simulateCandidateExposure(CL, V1, Q, V2, {
         dose_mg,
         interval_hours,
-        infusion_duration_hours: Math.min(infusion_hours, interval_hours),
+        infusion_duration_hours: candidateTinf,
       });
       if (exp.peak > MAX_PEAK_MCG_ML || exp.trough > MAX_TROUGH_MCG_ML || exp.auc24 > MAX_AUC24_MG_H_L) continue;
       allCandidates.push({

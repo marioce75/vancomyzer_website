@@ -446,9 +446,13 @@ export function computeInitialRegimen(
   let arc_advisory: ArcAdvisory | undefined;
   if (isArc) {
     const ci_rate = Math.round(TARGET_AUC24_MID * prior.CL / 24 * 10) / 10;
+    // Sex is not a Colin covariate, but Cockcroft-Gault needs it (×0.85 for
+    // women). With sex blank the screen used the male value silently; the
+    // assumption is now stated so the clinician can discount it.
+    const sexNote = patient.sex === "male" || patient.sex === "female" ? "" : "; sex not entered — male assumed for Cockcroft-Gault, ~18% lower if female";
     const basisPhrase = arcCrclIndexed !== null
-      ? `${Math.round(arcCrclIndexed)} mL/min/1.73 m\u00b2`
-      : `${Math.round(arcCrclTotalBw)} mL/min absolute (height not entered, so it could not be indexed)`;
+      ? `${Math.round(arcCrclIndexed)} mL/min/1.73 m\u00b2${sexNote}`
+      : `${Math.round(arcCrclTotalBw)} mL/min absolute (height not entered, so it could not be indexed${sexNote})`;
     arc_advisory = {
       detected: true,
       crcl_ml_min: Math.round(arcCrclTotalBw),

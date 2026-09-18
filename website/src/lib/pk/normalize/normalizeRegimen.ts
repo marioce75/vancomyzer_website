@@ -5,6 +5,7 @@ export interface RawRegimen {
   interval_hours?: unknown;
   infusion_duration_hours?: unknown;
   doses_given?: unknown;
+  steady_state_confirmed?: unknown;
   target_auc24?: unknown;
 }
 
@@ -14,7 +15,9 @@ export function normalizeRegimen(raw: RawRegimen): NormalizedRegimen {
   const infusion_duration_hours = typeof raw.infusion_duration_hours === "number" && !Number.isNaN(raw.infusion_duration_hours) ? raw.infusion_duration_hours : 0;
   const doses_given = typeof raw.doses_given === "number" && raw.doses_given > 0 ? Math.round(raw.doses_given) : undefined;
   const target_auc24 = typeof raw.target_auc24 === "number" && raw.target_auc24 > 0 ? raw.target_auc24 : undefined;
+  const steady_state_confirmed = typeof raw.steady_state_confirmed === "boolean" ? raw.steady_state_confirmed : undefined;
   return {
+    steady_state_confirmed,
     dose_mg: Math.max(0, dose_mg),
     interval_hours: Math.max(0, interval_hours),
     infusion_duration_hours: Math.max(0, infusion_duration_hours),

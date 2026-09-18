@@ -20,9 +20,24 @@
  *                retired from dosing; all adults use Colin 2019. (External
  *                review "Vancomyzer: international comparison and improvement
  *                plan", 15 Sep 2026, sections 06-07.)
+ *  2026-09-17.1  Engine semantics, no parameter change. (1) Explicit exposure
+ *                horizon (exposureHorizon.ts): steady_state (clinician-
+ *                confirmed) / actual_history / single_dose, decided once and
+ *                shared by the validator, the MAP fit and the exposure summary;
+ *                the former dose-count + half-life switch that reported finite-
+ *                dose peak/trough beside a steady-state AUC is removed and the
+ *                half-life check is an advisory. (2) Candidate regimens are
+ *                simulated at the infusion duration they report. (3) Single-
+ *                dose AUC integrated analytically (was a 0.02 h trapezoid,
+ *                ~1e-5 low). (4) MAP fit diagnostics exposed (objective
+ *                components, convergence, boundary hits, predicted-at-
+ *                observation); discordant same-time levels put the result in a
+ *                review hold. (5) Nelder-Mead tolerance 1e-4 → 1e-6, 200 → 400
+ *                iterations. Prior SDs, error model and Colin 2019 parameters
+ *                are unchanged.
  */
 
-export const MODEL_MANIFEST_VERSION = "2026-09-15.1";
+export const MODEL_MANIFEST_VERSION = "2026-09-17.1";
 
 /** Model ids that can appear in engine output or stored history rows. */
 export type PkModelId = "colin_2019" | "vancomyzer_obesity";

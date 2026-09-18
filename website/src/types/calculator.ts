@@ -23,7 +23,9 @@ export interface CalculateRequestRegimen {
   dose_mg: number;
   interval_hours: number;
   infusion_duration_hours: number;
-  doses_given?: number; // number of doses administered before levels drawn; affects steady-state assumption
+  doses_given?: number; // number of doses administered before levels drawn; affects the exposure horizon
+  /** Clinician confirmation of steady state (the "≥6 · steady state" control). false → actual-history horizon. */
+  steady_state_confirmed?: boolean;
   target_auc24?: number; // desired AUC₂₄ target for maintenance recommendation (pulse dose workflow)
 }
 
@@ -113,6 +115,16 @@ export interface CalculateResponse {
   timing_warnings?: string[];
   /** Surfaced when the posterior fit can't explain the level within tolerance. */
   fit_quality_warnings?: string[];
+  /** Which horizon the top-level auc24/peak/trough describe (see lib/pk/exposureHorizon.ts). */
+  exposure_horizon?: "steady_state" | "actual_history" | "single_dose";
+  steady_state_exposure?: { auc24: number; peak: number; trough: number; infusion_duration_hours: number };
+  actual_history_exposure?: { doses_given: number; peak: number; trough: number; auc_interval_n: number; auc_0_24h: number };
+  steady_state_approach?: { terminal_half_life_hours: number; elapsed_hours: number; half_lives_elapsed: number; fraction_of_steady_state: number; adequate: boolean };
+  steady_state_warning?: string;
+  /** Actionable adjustment withheld until the clinician reconciles the observations. */
+  review_hold?: { reason: string; message: string; conflicts?: unknown[] };
+  /** Immutable binding of this result to its inputs and model version. */
+  result_snapshot?: { model_manifest_version: string; mode: string; input_digest: string; computed_at: string };
   /** Alternate concentration-time curve when in pulse-dose mode — the
    *  engine's auto-recommended maintenance regimen. The primary `curve`
    *  reflects the user's entered regimen. */

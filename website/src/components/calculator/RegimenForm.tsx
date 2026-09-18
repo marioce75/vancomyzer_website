@@ -41,16 +41,21 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
     onChange({ ...value, ...updates });
   };
 
+  // Exposure horizon is explicit (lib/pk/exposureHorizon.ts): the "≥6 · steady
+  // state" control CONFIRMS steady state; every other count is actual history,
+  // fitted and reported for exactly that many doses. Dose count alone never
+  // promotes a regimen to steady state.
   const handleDosesGiven = (n: number) => {
     if (n === 1) {
       // Pulse dose: auto-set interval to 12 (placeholder for PK engine) and default target AUC
       update({
         doses_given: 1,
+        steady_state_confirmed: false,
         interval_hours: value.interval_hours > 0 ? value.interval_hours : 12,
         target_auc24: value.target_auc24 ?? 450,
       });
     } else {
-      update({ doses_given: n, target_auc24: undefined });
+      update({ doses_given: n, steady_state_confirmed: n >= 6, target_auc24: undefined });
     }
   };
 
@@ -98,6 +103,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
               className={inputClass(Boolean(fieldErrors.interval_hours))}
             >
               <option value="" disabled>Select...</option>
+              <option value={6}>6</option>
               <option value={8}>8</option>
               <option value={12}>12</option>
               <option value={18}>18</option>
@@ -153,7 +159,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                   : "border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50"
               }`}
             >
-              6+ (SS)
+              ≥6 · steady state
             </button>
           </div>
           {isPulseDose && (
@@ -166,12 +172,15 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
           {(value.doses_given ?? 0) > 1 && (value.doses_given ?? 0) < 5 && (
             <div className="mt-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5">
               <p className="text-xs text-amber-800">
-                <strong>Non-steady-state:</strong> With only {value.doses_given} doses, vancomycin has not yet reached steady state. Fewer than 5 doses is treated as non-steady state; see limitations in the result.
+                <strong>Actual history:</strong> with {value.doses_given} doses the level is fitted by superposing exactly {value.doses_given} doses; exposure at dose {value.doses_given} is reported separately from the steady-state projection.
               </p>
             </div>
           )}
-          {(value.doses_given ?? 0) >= 5 && (
-            <p className="text-xs text-slate-400 mt-1">≥5 doses — steady-state assumption applied</p>
+          {(value.doses_given ?? 0) === 5 && (
+            <p className="text-xs text-slate-500 mt-1">5 doses — fitted and reported as actual history (dose 5); choose “≥6 · steady state” only when the regimen has been given consistently to steady state.</p>
+          )}
+          {(value.doses_given ?? 0) >= 6 && (
+            <p className="text-xs text-slate-500 mt-1">Steady state confirmed by you — levels are interpreted with the steady-state equations. The engine will warn if its half-life estimate says the plateau has not been reached.</p>
           )}
         </div>
       </div>

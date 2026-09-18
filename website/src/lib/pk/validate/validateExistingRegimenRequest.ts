@@ -1,3 +1,4 @@
+import { resolveExposureHorizon } from "../exposureHorizon";
 import type { NormalizedPatient, NormalizedRegimen, NormalizedLevel } from "../types";
 import { isManualHoursCollectionTime } from "@/lib/manualHoursTimestamp";
 
@@ -126,7 +127,7 @@ export function validateExistingRegimenRequest(
   //
   // For non-SS, the multi-dose accumulation math does not require time ≤ interval —
   // a level drawn after the interval is just an extended trough.
-  const isNonSteadyState = regimen.doses_given !== undefined && regimen.doses_given < 5;
+  const isNonSteadyState = resolveExposureHorizon(regimen) === "actual_history";
   const tolerance = lateDrawToleranceHours(interval_hours);
   const infusion_hours = Math.min(
     Math.max(0, regimen.infusion_duration_hours),

@@ -192,8 +192,44 @@ export function runExistingRegimenPipeline(
     );
   }
 
+  if (engineOutput.steady_state_warning) {
+    fitQualityWarnings.push(engineOutput.steady_state_warning);
+  }
+
   if (fitQualityWarnings.length > 0) {
     (response as Record<string, unknown>).fit_quality_warnings = fitQualityWarnings;
+  }
+
+  // Discordant same-time entries: two levels at (nearly) the same time whose
+  // values disagree by more than assay-scale error. These are not two
+  // well-spaced samples and cannot identify the parameters; they are either
+  // replicate assays of one draw or a data-entry error. Hold the actionable
+  // adjustment until the clinician reconciles them — the exposure estimates
+  // and the fit diagnostics stay visible for review.
+  const conflicts = engineOutput.posterior_fit.observation_conflicts ?? [];
+  if (conflicts.length > 0) {
+    const described = conflicts
+      .map((c) => `${c.values[0]} and ${c.values[1]} mg/L both recorded at ${c.time_hours} h (${(c.relative_difference * 100).toFixed(0)}% apart)`)
+      .join("; ");
+    (response as Record<string, unknown>).review_hold = {
+      reason: "discordant_duplicate_samples",
+      message:
+        `Two levels were entered at the same time with discordant values: ${described}. Same-time entries are not independent ` +
+        "samples and cannot separate clearance from volume; the fit averaged through the conflict. Confirm whether these are " +
+        "assay replicates of one draw (enter one reconciled value) or a data-entry error (correct the time), then recalculate. " +
+        "No dose adjustment is presented until the observations are reconciled.",
+      conflicts,
+    };
+    // Withdraw the actionable recommendation; keep exposure estimates and candidates out of the "recommended" state.
+    const r = response as Record<string, unknown>;
+    r.recommended_dose = "";
+    r.recommended_interval_hours = 0;
+    r.recommended_infusion_duration_hours = undefined;
+    r.predicted_auc24 = undefined;
+    r.predicted_peak = undefined;
+    r.predicted_trough = undefined;
+    r.auc_range_status = undefined;
+    r.frequency_options = [];
   }
 
   return response;
