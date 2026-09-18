@@ -118,7 +118,7 @@ const EVIDENCE_LINKS = [
   {
     href: "/transparent-dosing/engine-crosscheck",
     title: "Engine Cross-Check",
-    body: "A developer-run synthetic analysis (not real patients): our individualized estimates compared with Tucuxi, a separately built dosing program given the same priors.",
+    body: "A developer-run synthetic analysis (not real patients): our individualized estimates compared with Tucuxi, a separately built dosing program given the same priors, scored against pre-set acceptance criteria.",
   },
   {
     href: "/faq",

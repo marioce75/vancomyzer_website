@@ -338,7 +338,8 @@ export default function TransparentDosingPage() {
             synthetic analyses, not real-patient validation. Predictive Performance compares
             Vancomyzer against 200 synthetic ICU patients generated from a different published
             model. Engine Cross-Check compares Vancomyzer against Tucuxi, a separately built
-            dosing program, when both are given the same priors.
+            dosing program, when both are given the same priors — a reproducible run scored against
+            pre-set criteria (18 Sep 2026), with the earlier snapshot retained.
           </p>
         </div>
       </section>
