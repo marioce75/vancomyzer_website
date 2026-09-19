@@ -104,7 +104,6 @@ const TIERS: TierCard[] = [
       "Seat count set by contract",
       "Service terms by contract",
       "Business Associate Agreement (available after legal review — not yet available)",
-      "SOC 2 Type I in progress (target Q4 2026)",
       "EMR/EHR integration via SMART on FHIR (in development — not yet available)",
       "Custom branding on outputs (in development — not yet available)",
     ],
