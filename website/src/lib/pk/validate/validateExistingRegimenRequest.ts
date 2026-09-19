@@ -101,6 +101,22 @@ export function validateExistingRegimenRequest(
 ): ValidationResult {
   const field_errors: Record<string, string> = {};
 
+  // A repeated copy of one observation is not a second independent sample.
+  // Preserve different dated samples, even when their elapsed times match.
+  for (let i = 0; i < levels.length; i++) {
+    for (let j = i + 1; j < levels.length; j++) {
+      const a = levels[i], b = levels[j];
+      const ta = parseCollectionTimeHours(a.collection_time);
+      const tb = parseCollectionTimeHours(b.collection_time);
+      const sameTime = ta !== null && tb !== null && Number.isFinite(ta) && Number.isFinite(tb)
+        ? ta === tb
+        : !a.collection_time && !b.collection_time && a.time_since_last_dose_hours === b.time_since_last_dose_hours;
+      if (sameTime && a.value_mcg_ml === b.value_mcg_ml) {
+        field_errors[`levels[${j}].value_mcg_ml`] = "Duplicate sample: the same concentration and collection time were entered twice. Remove the repeated entry or correct its time; one sample cannot count as two independent levels.";
+      }
+    }
+  }
+
   if (patient.age < 18 || patient.age > 120 || Number.isNaN(patient.age)) field_errors["patient.age"] = "Adult calculator requires age 18-120.";
   if (patient.weight_kg < 30 || patient.weight_kg > 400 || Number.isNaN(patient.weight_kg)) field_errors["patient.weight_kg"] = "Weight must be 30-400 kg.";
   if (patient.serum_creatinine_mg_dl < 0.1 || patient.serum_creatinine_mg_dl > 10 || Number.isNaN(patient.serum_creatinine_mg_dl)) field_errors["patient.serum_creatinine_mg_dl"] = "SCr must be 0.1-10 mg/dL.";

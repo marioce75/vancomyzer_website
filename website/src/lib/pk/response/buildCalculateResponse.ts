@@ -49,7 +49,12 @@ export function buildCalculateResponse(
       },
     };
     const optDocs = buildDocumentationPreview(optInput);
-    const optInterpretation = buildInterpretationSummary(optInput);
+    // Keep the entered regimen's exposure attached to its own label. Candidate
+    // values belong in an explicitly named projection, never under "Current regimen".
+    const optInterpretation = buildInterpretationSummary({
+      engineOutput,
+      recommendation: optInput.recommendation,
+    }) + ` Selected regimen steady-state projection (${opt.dose_mg} mg every ${opt.interval_hours} h): AUC24 ${opt.auc24} mg·h/L; peak ${opt.peak} mcg/mL; trough ${opt.trough} mcg/mL.`;
 
     // Per-option curve. For pulse-dose, plot loading→option-as-maintenance so
     // the chart updates coherently when the user clicks alternative regimens.

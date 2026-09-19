@@ -765,7 +765,7 @@ export default function CalculatorWorkspace() {
       mode: visibleResult.recommendation_type,
       recommended_dose: opt ? String(opt.dose_mg) : visibleResult.recommended_dose,
       recommended_interval_hours: opt?.interval_hours ?? visibleResult.recommended_interval_hours,
-      recommended_infusion_duration_hours: visibleResult.recommended_infusion_duration_hours,
+      recommended_infusion_duration_hours: opt?.infusion_duration_hours ?? visibleResult.recommended_infusion_duration_hours,
       auc24: opt?.auc24 ?? visibleResult.auc24,
       peak: opt?.peak ?? visibleResult.peak,
       trough: opt?.trough ?? visibleResult.trough,
@@ -973,7 +973,7 @@ export default function CalculatorWorkspace() {
         key="actual-history"
         severity="info"
         title={`Actual history — dose ${a.doses_given}:`}
-        summary={`modelled peak ${fmt(a.peak, 1)} / trough ${fmt(a.trough, 1)} mcg/mL; AUC over that interval ${a.auc_interval_n.toFixed(0)} mg·h/L (not a daily AUC)${ap ? `; ${(ap.fraction_of_steady_state * 100).toFixed(0)}% of steady state (t½ ${fmt(ap.terminal_half_life_hours, 1)} h)` : ""}. The AUC₂₄/peak/trough above are the steady-state projection of the current regimen, comparable with the candidates.`}
+        summary={`modelled peak ${fmt(a.peak, 1)} / trough ${fmt(a.trough, 1)} mcg/mL; AUC over that interval ${a.auc_interval_n.toFixed(0)} mg·h/L (not a daily AUC)${ap ? `; ${(ap.fraction_of_steady_state * 100).toFixed(0)}% of steady state (t½ ${fmt(ap.terminal_half_life_hours, 1)} h)` : ""}. These history values describe the entered dosing history. The AUC₂₄/peak/trough above describe the selected regimen at steady state.`}
         role="status"
       />,
     );

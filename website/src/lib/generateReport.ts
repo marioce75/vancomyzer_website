@@ -255,6 +255,8 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
     }
     @media print {
       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .section, .disclaimer { break-inside: avoid; }
+      .section-title { break-after: avoid; }
     }
     ${watermark.styleCss}
   </style>

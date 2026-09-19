@@ -44,6 +44,16 @@ const pair = [
   level(20, 3, "2026-09-19T03:00:00Z"),
   level(25, 3, "2026-09-19T15:00:00Z"),
 ];
+for (const date of ["2026-09-19T10:00:00Z", "2000-01-01T10:00:00.000Z"]) {
+  const duplicate = level(15, 10, date);
+  const out = run({ patient, regimen, levels: [duplicate, { ...duplicate }] });
+  check("ok" in out && out.ok === false && JSON.stringify(out).includes("Duplicate sample"), "identical dated/manual samples cannot strengthen a fit");
+}
+const sameConcentrationDifferentDates = run({ patient, regimen: { ...regimen, steady_state_confirmed: true }, levels: [
+  level(15, 10, "2026-09-19T10:00:00Z"),
+  level(15, 10, "2026-09-19T22:00:00Z"),
+] });
+check(!("ok" in sameConcentrationDifferentDates && sameConcentrationDifferentDates.ok === false), "separate dated draws remain distinct despite equal values");
 for (const levels of [pair, [...pair].reverse()]) {
   const out = run({ patient, regimen, levels });
   check(
