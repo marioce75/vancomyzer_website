@@ -6,11 +6,8 @@ import { getAuditLog, getAuditSummary } from "@/lib/auditLog";
 /**
  * GET /api/audit — Returns the calculation audit log. ADMIN ONLY.
  *
- * Entries contain de-identified clinical inputs, dosing outputs and the
- * email of the signed-in user who ran each calculation, so this must never
- * be readable by ordinary accounts. Middleware only requires *a* session for
- * /api/audit; the admin-role check lives here so the route stays protected
- * even if a request reaches the handler without passing through middleware.
+ * Entries contain operational status, timing and model version only. The
+ * admin-role check remains at the handler boundary.
  *
  * Query params:
  *   ?summary=true  — Returns summary statistics only

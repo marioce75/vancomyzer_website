@@ -1,3 +1,4 @@
+import { validateRawInput } from "./pk/validate/validateRawInput";
 /**
  * First-pass initial regimen calculation for Vancomyzer.
  * For new patients only; no existing regimen or measured levels.
@@ -335,7 +336,7 @@ export class InitialRegimenInputError extends Error {
 
 /** Bounds mirror validateRequest in the API route and validateExistingRegimenRequest. */
 function assertInitialRegimenInputs(patient: Patient): void {
-  const field_errors: Record<string, string> = {};
+  const field_errors: Record<string, string> = validateRawInput({ patient }, false);
   const { age, weight_kg, serum_creatinine_mg_dl } = patient;
   const height_cm = patient.height_cm ?? 0;
 

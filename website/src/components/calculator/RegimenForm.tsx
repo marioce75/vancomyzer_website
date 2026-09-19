@@ -41,10 +41,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
     onChange({ ...value, ...updates });
   };
 
-  // Exposure horizon is explicit (lib/pk/exposureHorizon.ts): the "≥6 · steady
-  // state" control CONFIRMS steady state; every other count is actual history,
-  // fitted and reported for exactly that many doses. Dose count alone never
-  // promotes a regimen to steady state.
+  // Dose count and clinician confirmation are separate decisions.
   const handleDosesGiven = (n: number) => {
     if (n === 1) {
       // Pulse dose: auto-set interval to 12 (placeholder for PK engine) and default target AUC
@@ -55,7 +52,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
         target_auc24: value.target_auc24 ?? 450,
       });
     } else {
-      update({ doses_given: n, steady_state_confirmed: n >= 6, target_auc24: undefined });
+      update({ doses_given: n, steady_state_confirmed: false, target_auc24: undefined });
     }
   };
 
@@ -159,7 +156,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                   : "border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50"
               }`}
             >
-              ≥6 · steady state
+              6 or more
             </button>
           </div>
           {isPulseDose && (
@@ -176,12 +173,24 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
               </p>
             </div>
           )}
-          {(value.doses_given ?? 0) === 5 && (
-            <p className="text-xs text-slate-500 mt-1">5 doses — fitted and reported as actual history (dose 5); choose “≥6 · steady state” only when the regimen has been given consistently to steady state.</p>
-          )}
           {(value.doses_given ?? 0) >= 6 && (
-            <p className="text-xs text-slate-500 mt-1">Steady state confirmed by you — levels are interpreted with the steady-state equations. The engine will warn if its half-life estimate says the plateau has not been reached.</p>
+            <label className="mt-2 block text-xs text-slate-600">
+              Exact number of doses given
+              <input aria-label="Exact number of doses given" type="number" min={6} max={1000} step={1}
+                className={inputClass(Boolean(fieldErrors.doses_given))} value={value.doses_given ?? 6}
+                onChange={(e) => update({ doses_given: Number(e.target.value), steady_state_confirmed: false })} />
+            </label>
           )}
+          {(value.doses_given ?? 0) > 1 && (
+            <label className="mt-2 flex items-start gap-2 text-xs text-slate-600">
+              <input type="checkbox" checked={value.steady_state_confirmed === true}
+                onChange={(e) => update({ steady_state_confirmed: e.target.checked })} />
+              <span>I have verified consistent dosing and sufficient time to reach steady state. Dose count alone does not establish steady state.</span>
+            </label>
+          )}
+          <p className="mt-1 text-xs text-slate-500">Without confirmation, the exact dose count is used. Finite-history samples must follow the same dose; changed or missed doses are unsupported.</p>
+          {fieldErrors.doses_given && <p className="text-xs text-red-600">{fieldErrors.doses_given}</p>}
+
         </div>
       </div>
     </div>

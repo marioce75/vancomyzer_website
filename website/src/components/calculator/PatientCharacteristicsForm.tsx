@@ -196,7 +196,7 @@ export default function PatientCharacteristicsForm({
       {estimatedCrCl && (
         <div className="-mt-1 flex flex-wrap items-baseline gap-x-2 text-xs" style={{ color: "var(--color-secondary)" }} role="status">
           <span className="font-semibold">Est. CrCl {estimatedCrCl.value} mL/min</span>
-          <span className="text-[10px] text-slate-500">{estimatedCrCl.note} · context only; the dose is calculated from SCr</span>
+          <span className="text-[10px] text-slate-500">{estimatedCrCl.note} · population prior uses SCr; a separate fitted-clearance limit uses CrCl</span>
         </div>
       )}
       {rrt === true && (

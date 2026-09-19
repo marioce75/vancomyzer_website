@@ -374,7 +374,7 @@ function LimitationsCard({ run }: { run: RunOutput }) {
     },
     {
       label: "One held-out concentration in one steady-state interval",
-      body: `Each patient contributes one held-out concentration, ${d.heldout_sample_time_hours.toFixed(1)} h into the same steady-state interval as the two fitted levels (between the two fitted sample times). There are no dose changes, no levels before steady state and no change in physiology over time. This is a narrow test: it does not show how well Vancomyzer forecasts later levels after a regimen change or as a patient's condition changes.`,
+      body: `Each patient contributes one held-out concentration, ${d.heldout_sample_time_hours.toFixed(1)} h into the same steady-state interval as the two fitted levels (between the two fitted sample times). There are no dose changes, no levels before steady state and no change in physiology over time. This is held-out interpolation, not future forecasting: it does not show how well Vancomyzer forecasts later levels after a regimen change or as a patient's condition changes.`,
     },
     {
       label: "Two-level sampling only",

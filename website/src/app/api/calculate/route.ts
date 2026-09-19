@@ -1,3 +1,4 @@
+import { validateRawInput } from "@/lib/pk/validate/validateRawInput";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { computeInitialRegimen, InitialRegimenInputError } from "@/lib/initialRegimen";
@@ -5,7 +6,7 @@ import { getSettingsForUser } from "@/lib/institutionalSettings";
 import { dosePolicyFromSettings } from "@/lib/pk/dosePolicy";
 import { runExistingRegimenPipeline } from "@/lib/pk/runExistingRegimenPipeline";
 import { logCalculation } from "@/lib/auditLog";
-import { logCalculationEntry, getUserTier, findUserByLogin, logSecurityEvent } from "@/lib/db";
+import { logCalculationEntry, getUserTier, findUserByLogin } from "@/lib/db";
 import { hasFeature } from "@/lib/tiers";
 import { validateCaseId } from "@/lib/calculationHistory";
 import { authOptions } from "@/lib/authOptions";
@@ -19,13 +20,14 @@ import { createHash } from "node:crypto";
  * version that produced it (an out-of-order response can then be detected and
  * discarded by comparing digests — see CalculatorWorkspace).
  */
-function buildResultSnapshot(mode: Mode, data: RequestBody): { model_manifest_version: string; mode: Mode; input_digest: string; computed_at: string } {
+function buildResultSnapshot(mode: Mode, data: RequestBody): { model_manifest_version: string; mode: Mode; input_digest: string; computed_at: string; source_revision: string | null } {
   const canonical = JSON.stringify({ mode, patient: data.patient ?? null, regimen: data.regimen ?? null, levels: data.levels ?? null });
   return {
     model_manifest_version: MODEL_MANIFEST_VERSION,
     mode,
     input_digest: createHash("sha256").update(canonical).digest("hex").slice(0, 32),
     computed_at: new Date().toISOString(),
+    source_revision: process.env.RENDER_GIT_COMMIT ?? process.env.VERCEL_GIT_COMMIT_SHA ?? null,
   };
 }
 
@@ -46,6 +48,8 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
   }
 
   const o = body as RequestBody;
+  const rawErrors = validateRawInput(body, o.mode !== "initial_regimen");
+  if (Object.keys(rawErrors).length) return { ok: false, error: { error_type: "validation_error", message: "Invalid or unsupported inputs.", field_errors: rawErrors } };
   const field_errors: Record<string, string> = {};
 
   const mode = o.mode as string | undefined;
@@ -374,35 +378,8 @@ export async function POST(request: NextRequest) {
     pk_parameters: extractPKParams(resultObj),
   });
 
-  // Bayesian fit diagnostic — log prior↔posterior shifts and per-level
-  // residuals so we can quantify fit quality across real cases. No PHI;
-  // PK parameters and residuals only.
-  const fitDiag = resultObj.fit_diagnostic as Record<string, unknown> | undefined;
-  if (fitDiag) {
-    try {
-      const dbUser = userEmail !== "anonymous" ? findUserByLogin(userEmail) : undefined;
-      logSecurityEvent({
-        user_id: dbUser?.id ?? null,
-        username: dbUser?.username ?? userEmail,
-        action: "BAYESIAN_FIT_DIAGNOSTIC",
-        details: JSON.stringify({
-          prior_CL: round2(fitDiag.prior_CL),
-          prior_V1: round2(fitDiag.prior_V1),
-          posterior_CL: round2(fitDiag.posterior_CL),
-          posterior_V1: round2(fitDiag.posterior_V1),
-          posterior_shift_cl_pct: round2(fitDiag.posterior_shift_cl_pct),
-          posterior_shift_v1_pct: round2(fitDiag.posterior_shift_v1_pct),
-          max_relative_error: round2(fitDiag.max_relative_error),
-          per_level: fitDiag.posterior_predicted_at_levels,
-          doses_given: inputs.doses_given,
-          level_count: inputs.level_count,
-        }),
-        severity: "info",
-      });
-    } catch (err) {
-      console.warn("[bayesian-fit-diagnostic] log failed:", err);
-    }
-  }
+  // Clinical fit diagnostics are returned to the caller, never written to
+  // security logs. A research workflow needs its own approved data store.
 
   // Calculation history — gated on history.calculation feature.
   // Auto-recalc never persists; only explicit user action does.

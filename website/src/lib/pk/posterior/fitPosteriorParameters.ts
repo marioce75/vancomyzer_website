@@ -111,7 +111,7 @@ function observationSd(predicted: number, observed: number): number {
  * one. This is the same superposition curvePoints() draws, so the fit and the
  * plotted curve now share one definition of the concentration-time profile.
  */
-function predictConcentration(
+export function predictConcentration(
   params: TwoCompartmentParameters,
   input: FitPosteriorInput,
   observation: NormalizedObservation,
@@ -291,7 +291,7 @@ export function findObservationConflicts(observations: NormalizedObservation[]) 
   for (let i = 0; i < observations.length; i++) {
     for (let j = i + 1; j < observations.length; j++) {
       const a = observations[i], b = observations[j];
-      if (Math.abs(a.time_hours - b.time_hours) > DUPLICATE_SAMPLE_WINDOW_HOURS) continue;
+      if (Math.abs((a.sample_time_hours ?? a.time_hours) - (b.sample_time_hours ?? b.time_hours)) > DUPLICATE_SAMPLE_WINDOW_HOURS) continue;
       const hi = Math.max(a.concentration, b.concentration);
       const lo = Math.min(a.concentration, b.concentration);
       const rel = hi > 0 ? (hi - lo) / hi : 0;
@@ -317,7 +317,7 @@ function buildDefaultDiagnostics(
   };
 }
 
-function summarizeDiagnostics(
+export function summarizeDiagnostics(
   input: FitPosteriorInput,
   posteriorCL: number,
   posteriorV1: number,
@@ -517,7 +517,7 @@ export function fitPosteriorParameters(
     },
   );
 
-  const summary = summarizeDiagnostics(normalizedInput, bestCL, bestV1, bestQ, bestV2, success);
+  const summary = summarizeDiagnostics(normalizedInput, finalCL, finalV1, finalQ, finalV2, success);
   const components = objectiveComponents(finalCL, finalV1, finalQ, finalV2, normalizedInput);
   const conflicts = findObservationConflicts(normalizedInput.observations);
   const sd = priorSds(normalizedInput);

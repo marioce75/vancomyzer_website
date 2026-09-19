@@ -9,6 +9,8 @@ import { resolveExposureHorizon, type ExposureHorizon } from "../exposureHorizon
 export interface NormalizedObservation {
   time_hours: number;
   concentration: number;
+  /** Absolute sample time for duplicate detection; never used as time since dose. */
+  sample_time_hours?: number;
   /** Time within the dosing interval [0, tau] for steady-state. */
   time_in_interval: number;
 }
@@ -25,12 +27,6 @@ export interface ObservationContext {
   doses_given?: number;
   /** Horizon decided once for the whole request (exposureHorizon.ts). */
   horizon: ExposureHorizon;
-}
-
-function timeInInterval(t: number, tau: number): number {
-  if (tau <= 0) return 0;
-  const n = Math.floor(t / tau);
-  return t - n * tau;
 }
 
 export function normalizeObservations(
@@ -61,23 +57,14 @@ export function normalizeObservations(
   const observations: NormalizedObservation[] = levels.map((l) => {
     const time_hours = Math.max(0, l.time_since_last_dose_hours);
     const concentration = Math.max(0, l.value_mcg_ml);
-    // When the level was drawn past the dosing interval (a "late trough" — the
-    // next dose hasn't been given yet), wrapping via modulo would put it at
-    // the next cycle's peak time, which is the wrong physical interpretation.
-    // Clamp to tau instead so the steady-state fitter sees it as the trough.
-    //
-    // This clamp only shapes `time_in_interval`, which is read by the
-    // steady-state prediction path. Pre-steady-state fits read `time_hours`
-    // below and superpose the doses actually given, so for those a late draw
-    // keeps its true elapsed time and is modelled as the extended trough it
-    // is (fitPosteriorParameters.predictConcentration).
-    let time_in_interval: number;
-    if (!isPulseDose && tau > 0 && time_hours > tau) {
-      time_in_interval = tau;
-    } else {
-      time_in_interval = timeInInterval(time_hours, effectiveTau);
-    }
-    return { time_hours, concentration, time_in_interval };
+    // The steady-state solution extends elimination beyond tau when the next
+    // infusion has not happened. Preserve actual elapsed time: clamping a late
+    // sample to tau biases the fit; wrapping would invent another dose.
+    const time_in_interval = time_hours;
+    const parsed = Date.parse(l.collection_time);
+    return { time_hours, concentration, time_in_interval,
+      sample_time_hours: Number.isFinite(parsed) ? parsed / 3600000 : undefined };
+
   });
   return {
     observations,

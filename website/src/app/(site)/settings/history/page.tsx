@@ -66,7 +66,7 @@ function HistoryUpgradeCard() {
       <ul style={{ margin: "0 0 16px", padding: 0, listStyle: "none", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.7 }}>
         <li style={{ paddingLeft: 18, position: "relative" }}>
           <span style={{ position: "absolute", left: 0, color: "#0d9488", fontWeight: 700 }}>✓</span>
-          Optional case IDs (no PHI — sanitized at write time)
+          Optional case IDs (do not enter patient identifiers)
         </li>
         <li style={{ paddingLeft: 18, position: "relative" }}>
           <span style={{ position: "absolute", left: 0, color: "#0d9488", fontWeight: 700 }}>✓</span>

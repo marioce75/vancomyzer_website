@@ -1,3 +1,4 @@
+import { validateRawInput } from "./validate/validateRawInput";
 import { normalizePatient } from "./normalize/normalizePatient";
 import { normalizeRegimen } from "./normalize/normalizeRegimen";
 import { normalizeLevels } from "./normalize/normalizeLevels";
@@ -28,6 +29,7 @@ export interface ExistingRegimenPipelineInput {
     interval_hours?: unknown;
     infusion_duration_hours?: unknown;
     doses_given?: unknown;
+    steady_state_confirmed?: unknown;
     target_auc24?: unknown;
     /** Not modelled — see hasAdministrationHistory. Accepted only so the
      *  request can be answered honestly rather than silently reinterpreted. */
@@ -60,30 +62,11 @@ export interface PipelineValidationError {
   fallback_workflow?: "initial_regimen" | "repeat_existing_regimen_sampling";
 }
 
-/**
- * True when the caller supplied any per-dose administration history: a loading
- * dose, an explicit dose list, or a regimen change. The engine models a single
- * uniform regimen, so these are not accounted for. Detecting them lets the
- * result say so rather than returning a number that silently assumes the
- * history away.
- */
-function hasAdministrationHistory(input: ExistingRegimenPipelineInput): boolean {
-  const top = input as unknown as Record<string, unknown>;
-  const regimen = (input.regimen ?? {}) as Record<string, unknown>;
-  const present = (value: unknown) =>
-    value !== undefined && value !== null && (!Array.isArray(value) || value.length > 0);
-  return (
-    present(top.administration_history) ||
-    present(top.dose_history) ||
-    present(regimen.administration_history) ||
-    present(regimen.dose_history) ||
-    present(regimen.loading_dose_mg)
-  );
-}
-
 export function runExistingRegimenPipeline(
   input: ExistingRegimenPipelineInput
 ): ReturnType<typeof buildCalculateResponse> | PipelineValidationError {
+  const rawErrors = validateRawInput(input);
+  if (Object.keys(rawErrors).length) return { ok: false, error_type: "validation_error", message: "Invalid or unsupported inputs; no calculation was performed.", field_errors: rawErrors };
   const patient: NormalizedPatient = normalizePatient(input.patient);
   const regimen = normalizeRegimen(input.regimen);
   const levels = normalizeLevels(input.levels);
@@ -140,16 +123,6 @@ export function runExistingRegimenPipeline(
   // High body size gets an advisory, never a different model (modelRegistry.ts).
   const bmiAdvisory = highBmiAdvisory(patient);
   if (bmiAdvisory) explain.limitations.unshift(bmiAdvisory);
-
-  if (hasAdministrationHistory(input)) {
-    explain.limitations.unshift(
-      "Administration history is not modelled. This result assumes every dose was the dose entered above, given exactly every " +
-        `${regimen.interval_hours} h and infused over the entered duration. A loading dose, a regimen change, a missed or held ` +
-        "dose, and an actual infusion end time that differs from the schedule are all ignored — the dose history supplied with " +
-        "this request did not change the fit. Where the real history differs, document the actual dose times and interpret this " +
-        "result accordingly, or use the loading-dose workflow for a single dose.",
-    );
-  }
 
   const response = buildCalculateResponse(
     "existing_regimen",

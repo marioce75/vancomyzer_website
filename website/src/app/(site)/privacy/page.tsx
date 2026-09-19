@@ -5,28 +5,20 @@ export default function PrivacyPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <h1 className="text-3xl font-bold tracking-tight text-slate-900">Privacy Policy</h1>
-      <p className="mt-2 text-sm text-slate-500">Last updated: September 14, 2026</p>
+      <p className="mt-2 text-sm text-slate-500">Last updated: September 19, 2026</p>
 
       <CanonicalDocCallout docName="Privacy Policy" href={LEGAL_LINKS.privacy} />
 
       <div className="mt-8 space-y-8 text-slate-700">
 
-        {/* Revised 2026-09-14 to match the code, pending legal review:
-            - calculation runs on the server: POST /api/calculate
-            - every request is written to the audit log (src/lib/auditLog.ts:
-              console output + in-memory buffer), with user_email when signed in
-            - Bayesian fit diagnostics go to security_audit_log (src/lib/db.ts)
-            - history-tier users get a calculation_log row with an optional case_id
-              (validated by validateCaseId in src/lib/calculationHistory.ts)
-            - inputs are kept in sessionStorage, cleared on reset and not restored
-              after 8 hours (CalculatorWorkspace.tsx). */}
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">How Calculator Information Is Handled</h2>
           <p>
             The dosing calculation is performed on our server, not in your browser. The clinical values you enter (such as age, weight, height, sex, serum creatinine, the current regimen, and measured levels with their timing) are sent over an encrypted connection (HTTPS) to our server, which calculates the result and returns it to your screen. This can happen automatically while you are still entering values. The calculator does not ask for patient names, medical record numbers, dates of birth or other identifiers, and you must not enter them.
           </p>
           <p className="mt-3">
-            For safety monitoring and quality improvement, our server records the de-identified clinical values and results of each calculation (for example age, weight, serum creatinine, the regimen entered, the number of levels, and the calculated AUC, peak, trough and recommended dose) in operational logs. If you are signed in, these records are linked to your account. If your plan includes calculation history, the calculations you run are also stored with your account, together with any optional case label you add. Case labels that look like identifiers, such as long strings of digits, email addresses, dates with a four-digit year, or text such as &ldquo;MRN:&rdquo; or &ldquo;DOB:&rdquo;, are refused.
+            Operational calculation logs contain request status, processing time and model version, without clinical inputs, results or account email. Fit diagnostics are returned with the result but are not written to security logs. If your plan includes calculation history, explicit calculations can still be stored with your account and optional case label for 90 days. Older releases recorded clinical values in operational logs and fit-diagnostic records; historical records and hosting backups remain subject to a separate retention review. These changes do not establish that old records have been deleted.
+
           </p>
           <p className="mt-3">
             So that your work is not lost if the page is refreshed, the calculator also keeps the values you entered within that browser tab. They are cleared when you reset the calculator or close the tab, and they are not restored after eight hours.
@@ -36,7 +28,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Important: Do Not Enter Identifiable Patient Information</h2>
           <p>
-            Because the values you enter are sent to our server and recorded as described above, users should treat this tool as they would any clinical software: <strong>do not enter patient names, medical record numbers, dates of birth, or other personally identifiable information (PII) or protected health information (PHI)</strong> into any field. The tool only requires anonymous clinical parameters (age, weight, renal function, etc.) to function.
+            Because the values you enter are sent to our server and recorded as described above, users should treat this tool as they would any clinical software: <strong>do not enter patient names, medical record numbers, dates of birth, or other personally identifiable information (PII) or protected health information (PHI)</strong> into any field. Clinical values and exact sample times can be identifiable in context. Do not use the public calculator for institutional patient-data research without an approved data arrangement.
           </p>
         </section>
 
@@ -56,14 +48,15 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Third-Party Services</h2>
           <p>
-            This site may be hosted on third-party infrastructure. Hosting providers may collect standard server logs (IP addresses, access times) for operational purposes. These logs are not linked to patient data and are subject to the hosting provider&apos;s own privacy practices.
+            This site may be hosted on third-party infrastructure. Hosting providers may collect standard server logs (IP addresses, access times) for operational purposes. Hosting log and backup retention must be assessed for the actual deployment; this policy does not certify that every historical record is anonymous.
           </p>
         </section>
 
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">HIPAA Notice</h2>
           <p>
-            Vancomyzer™ is not a HIPAA-covered entity and does not function as a business associate. As stated above, no PHI is transmitted or stored through this tool. Users remain responsible for ensuring their use of this tool complies with applicable privacy regulations including HIPAA, GDPR, and any applicable state or local laws.
+            Whether a business-associate relationship or other data agreement is required depends on the actual data and institutional use. The absence of names does not automatically make clinical data anonymous. Do not submit PHI to this public service. Institutional patient-data processing requires prior privacy, security and contractual review; this page is not a compliance certification.
+
           </p>
         </section>
 

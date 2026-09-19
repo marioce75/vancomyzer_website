@@ -1,7 +1,7 @@
 import { buildPriorParameters } from "./buildPriorParameters";
 import { crclOnTotalBodyWeight } from "../renalEstimate";
 import { normalizeObservations } from "./normalizeObservations";
-import { fitPosteriorParameters, type PerLevelResidual } from "./fitPosteriorParameters";
+import { fitPosteriorParameters, objectiveComponents, summarizeDiagnostics, type FitPosteriorInput, type PerLevelResidual } from "./fitPosteriorParameters";
 import type {
   NormalizedPatient,
   NormalizedRegimen,
@@ -104,7 +104,7 @@ export function runPosteriorEngine(
   }
 
   const { observations, context } = normalizeObservations(levels, regimen);
-  const fit = fitPosteriorParameters({
+  const fitInput: FitPosteriorInput = {
     priorCL: prior.CL,
     priorV1: prior.V1,
     priorQ: prior.Q,
@@ -121,7 +121,8 @@ export function runPosteriorEngine(
     omega_V1: prior.omega_V1,
     omega_Q: prior.omega_Q,
     omega_V2: prior.omega_V2,
-  });
+  };
+  const fit = fitPosteriorParameters(fitInput);
 
   if (!fit.success) {
     return {
@@ -159,6 +160,25 @@ export function runPosteriorEngine(
     posterior_cl_bound = "capped_renal";
   }
 
+  // All downstream quality flags describe the parameter vector used for exposure.
+  // Keep optimizer provenance explicitly separate from this post-fit policy bound.
+  let diagnostics = fit.diagnostics;
+  let residuals = fit.per_level_residuals;
+  if (posterior_cl_bound) {
+    const components = objectiveComponents(boundedCL, fit.V1_posterior, fit.Q_posterior, fit.V2_posterior, fitInput);
+    diagnostics = {
+      ...fit.diagnostics,
+      ...summarizeDiagnostics(fitInput, boundedCL, fit.V1_posterior, fit.Q_posterior, fit.V2_posterior, true),
+      pre_policy_bound: { posterior: fit.diagnostics.posterior!, objective: fit.diagnostics.objective! },
+      parameter_basis: "final_after_clearance_policy",
+      posterior: { CL: boundedCL, V1: fit.V1_posterior, Q: fit.Q_posterior, V2: fit.V2_posterior },
+      objective: { nll_observations: components.nll_observations, prior_penalty: components.prior_penalty, total: components.total },
+      predicted_at_observations: components.perObservation,
+    };
+    diagnostics.fit_quality_reason += " Diagnostics recomputed after the clearance policy bound; optimizer convergence refers to the pre-policy fit.";
+    residuals = components.perObservation.map(x => ({ observed: x.observed, predicted: x.predicted, relative_error: Math.abs(x.residual) / x.observed }));
+  }
+
   return {
     CL: boundedCL,
     posterior_cl_bound,
@@ -167,13 +187,13 @@ export function runPosteriorEngine(
     V2: fit.V2_posterior,
     scr: prior.scr,
     success: true,
-    diagnostics: fit.diagnostics,
+    diagnostics,
     model_name: prior.model_name,
     ffm_kg: prior.ffm_kg,
     prior_CL: prior.CL,
     prior_V1: prior.V1,
     prior_Q: prior.Q,
     prior_V2: prior.V2,
-    per_level_residuals: fit.per_level_residuals,
+    per_level_residuals: residuals,
   };
 }

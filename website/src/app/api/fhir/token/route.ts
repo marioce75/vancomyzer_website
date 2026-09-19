@@ -52,8 +52,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!tokenRes.ok) {
-      const errorBody = await tokenRes.text().catch(() => "");
-      console.error(`[SMART] Token exchange failed: ${tokenRes.status} — ${errorBody}`);
+      console.error(`[SMART] Token exchange failed: ${tokenRes.status}`);
       return NextResponse.json(
         { error: `Token exchange failed (${tokenRes.status}).` },
         { status: tokenRes.status },
@@ -62,8 +61,8 @@ export async function POST(request: NextRequest) {
 
     const tokenData = await tokenRes.json();
 
-    // Log SMART context (no PHI — just patient ID and scopes)
-    console.log(`[SMART] Token acquired — patient: ${tokenData.patient ?? "?"}, scope: ${tokenData.scope ?? "?"}`);
+    // Patient identifiers and token scopes are intentionally excluded from logs.
+    console.log("[SMART] Token acquired");
 
     // Return token data to client
     // The client stores this in sessionStorage (not localStorage — session-scoped)
@@ -79,8 +78,8 @@ export async function POST(request: NextRequest) {
       user: tokenData.user,
     });
 
-  } catch (err) {
-    console.error("[SMART] Token exchange error:", err);
+  } catch {
+    console.error("[SMART] Token exchange failed");
     return NextResponse.json(
       { error: "Failed to exchange token with authorization server." },
       { status: 502 },

@@ -47,7 +47,7 @@ import { parseClinicalNumber } from "@/lib/parseClinicalNumber";
 import { COLIN_2019, modelDisplayName, modelShortName } from "@/lib/pk/modelRegistry";
 import { fmt } from "@/lib/formatNumber";
 const defaultPatient: CalculateRequestPatient = { age: 0, weight_kg: 0, height_cm: 0, sex: "", serum_creatinine_mg_dl: 0 };
-const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0 };
+const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0, steady_state_confirmed: false };
 const defaultLevel = { value_mcg_ml: 0, collection_time: "", time_since_last_dose_hours: 0 };
 
 type WorkspaceViewMode = "empiric" | "one_level" | "two_levels";

@@ -1,25 +1,7 @@
-/**
- * Audit logging for Vancomyzer calculations.
- *
- * Every PK calculation is logged with:
- * - Timestamp (ISO 8601)
- * - Unique calculation ID
- * - Mode (initial_regimen / existing_regimen)
- * - De-identified patient parameters (age, weight, SCr — no names, MRN, or PHI)
- * - Regimen inputs
- * - Number of levels (not the values themselves in the summary)
- * - Calculation outputs (AUC24, peak, trough, recommended dose)
- * - Model used and evidence strength
- * - Duration of calculation (ms)
- * - Any errors or validation failures
- *
- * Logs are written to:
- * 1. Server console (structured JSON)
- * 2. In-memory ring buffer (last 500 entries, accessible via /api/audit)
- *
- * NO protected health information (PHI) is stored. Age, weight, and SCr are
- * clinical parameters — not patient identifiers under HIPAA.
+/** Operational calculation telemetry. Never persist clinical values or account identity here.
+ * Historical host logs are separate records and require a retention review.
  */
+import { MODEL_MANIFEST_VERSION } from "./pk/modelRegistry";
 
 export interface AuditEntry {
   id: string;
@@ -29,7 +11,8 @@ export interface AuditEntry {
   status: "success" | "error" | "validation_error";
 
   // De-identified inputs
-  inputs: {
+  model_manifest?: string;
+  inputs?: {
     age: number;
     weight_kg: number;
     serum_creatinine_mg_dl: number;
@@ -89,10 +72,14 @@ function generateId(): string {
 // ---------------------------------------------------------------------------
 
 export function logCalculation(entry: Omit<AuditEntry, "id" | "timestamp">): AuditEntry {
+  // Explicit allowlist: future additions to the caller cannot leak into logs.
   const full: AuditEntry = {
-    ...entry,
     id: generateId(),
     timestamp: new Date().toISOString(),
+    mode: entry.mode,
+    duration_ms: entry.duration_ms,
+    status: entry.status,
+    model_manifest: MODEL_MANIFEST_VERSION,
   };
 
   // Write to console as structured JSON

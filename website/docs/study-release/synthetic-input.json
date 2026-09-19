@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "study_id": "SYNTHETIC_DEMO",
+  "cases": [{
+    "case_id": "P001", "site_id": "S01",
+    "patient": {"age": 35, "weight_kg": 70, "height_cm": 175, "sex": "male", "serum_creatinine_mg_dl": 0.83, "dialysis_or_rrt": false, "ecmo": false},
+    "covariates_available_hour": 0,
+    "regimen": {"dose_mg": 1000, "interval_hours": 12, "infusion_duration_hours": 1.75, "doses_given": 3, "steady_state_confirmed": false},
+    "history_verified_uniform": true,
+    "steady_state_justification": "Finite history; synthetic demonstration only",
+    "cutoff_hour": 6, "forecast_hour": 22,
+    "forecast_basis": "operational", "plan_available_hour": 5,
+    "samples": [{"value_mcg_ml": 18, "collected_hour": 3, "available_hour": 5}],
+    "future_doses": [{"start_hour": 12, "dose_mg": 1000, "infusion_duration_hours": 1.75}]
+  }]
+}

@@ -127,6 +127,6 @@ export async function POST(req: Request) {
     ok: true,
     status: "pending",
     next_step:
-      "Your signed BAA has been received. The Dōsys Health LLC compliance team will countersign within one business day and email the fully-executed copy to your signer email. You can use the calculator freely while this completes; no PHI handling is gated.",
+      "Your signed BAA has been received for review. Submission does not establish an executed agreement or authorize patient-data processing. Confirm institutional authorization and any required fully executed agreement before using identifiable patient data.",
   });
 }

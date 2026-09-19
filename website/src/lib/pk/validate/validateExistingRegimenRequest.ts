@@ -233,7 +233,7 @@ export function validateExistingRegimenRequest(
           levels[j].time_since_last_dose_hours - levels[i].time_since_last_dose_hours;
 
         // Allow levels spanning up to 3 dosing intervals (common in clinical practice)
-        if (observedDelta > 3 * interval_hours + TIMING_TOLERANCE_HOURS) {
+        if (Math.abs(observedDelta) > 3 * interval_hours + TIMING_TOLERANCE_HOURS) {
           field_errors[`levels[${j}].collection_time`] =
             "Collection times span more than 3 dosing intervals — please verify dates are correct.";
           continue;
@@ -252,6 +252,11 @@ export function validateExistingRegimenRequest(
         // Sign is not constrained: entry order should not decide validity.
         const intervalsBetweenDoses = (observedDelta - reportedDelta) / interval_hours;
         const wholeIntervals = Math.round(intervalsBetweenDoses);
+        if ((isNonSteadyState || isPulseDose) && Math.abs(observedDelta - reportedDelta) > TIMING_TOLERANCE_HOURS) {
+          field_errors[`levels[${j}].collection_time`] =
+            "Cross-cycle finite-history samples are not supported: each sample requires its own preceding dose history. Use samples following the same dose, or an approved event-history workflow.";
+          continue;
+        }
         const offByHours = Math.abs(intervalsBetweenDoses - wholeIntervals) * interval_hours;
         if (offByHours > TIMING_TOLERANCE_HOURS + 0.5 || Math.abs(wholeIntervals) > 3) {
           field_errors[`levels[${j}].collection_time`] =

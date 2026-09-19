@@ -16,6 +16,10 @@
  *     documentation only. They are NOT implemented by the engine.
  *
  * CHANGELOG
+ *  2026-09-19.1 Study-readiness corrections: preserve late sample elapsed time;
+ *              refuse cross-cycle finite-history and unsupported administration
+ *              histories; distinguish duplicate sample chronology; recompute
+ *              diagnostics after policy bounds; strict raw input validation.
  *  2026-09-15.1  Registry created. The custom BMI >= 40 obesity branch was
  *                retired from dosing; all adults use Colin 2019. (External
  *                review "Vancomyzer: international comparison and improvement
@@ -37,7 +41,7 @@
  *                are unchanged.
  */
 
-export const MODEL_MANIFEST_VERSION = "2026-09-17.1";
+export const MODEL_MANIFEST_VERSION = "2026-09-19.1";
 
 /** Model ids that can appear in engine output or stored history rows. */
 export type PkModelId = "colin_2019" | "vancomyzer_obesity";
@@ -86,7 +90,7 @@ export const COLIN_2019 = {
     SCRstd: "SCRstd = exp(−1.228 + 0.672 × log10(PMA) + 6.27 × exp(−3.11 × PMA))",
   },
   renalCovariate:
-    `Serum creatinine is used directly (mg/dL) as the Colin 2019 renal covariate: FSCR = exp(−${P.thetaSCr} × (SCr − SCRstd)), where SCRstd is the age-standardised reference creatinine. Cockcroft-Gault creatinine clearance is not used to estimate vancomycin clearance.`,
+    `Serum creatinine is used directly (mg/dL) as the Colin 2019 renal covariate: FSCR = exp(−${P.thetaSCr} × (SCr − SCRstd)), where SCRstd is the age-standardised reference creatinine. Cockcroft-Gault does not enter this population prior; a separate post-fit safety policy can cap fitted clearance at twice estimated CrCl.`,
   /** Covariates in the published final model that Vancomyzer does not apply. */
   omittedCovariates: [
     "Haematological malignancy (+29.4% CL in the published model): not captured as an input.",

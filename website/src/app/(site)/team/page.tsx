@@ -637,7 +637,7 @@ export default function TeamPage() {
           }}
         >
           <span style={{ transform: showAudit ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s" }}>▶</span>
-          Calculation audit feed (institution-wide, no PHI)
+          Calculation history (institution-wide; authorized access only)
         </button>
         {showAudit && (
           auditLoading ? (

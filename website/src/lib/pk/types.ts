@@ -221,6 +221,11 @@ export interface PosteriorObjectiveDiagnostics {
 }
 
 export interface PosteriorFitDiagnostics {
+  parameter_basis?: "final_after_clearance_policy";
+  pre_policy_bound?: {
+    posterior: { CL: number; V1: number; Q: number; V2: number };
+    objective: PosteriorObjectiveDiagnostics;
+  };
   observation_count: number;
   /** Horizon the fit modelled the observations under. */
   horizon?: "steady_state" | "actual_history" | "single_dose";

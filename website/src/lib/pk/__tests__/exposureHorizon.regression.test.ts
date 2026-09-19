@@ -29,7 +29,7 @@ function near(a: number, b: number, rel: number) { return Math.abs(a - b) <= rel
 
 const patient = { age: 35, weight_kg: 70, height_cm: 175, sex: "male", serum_creatinine_mg_dl: 0.83, dialysis_or_rrt: false };
 const regimenSS = { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1.75, doses_given: 6, steady_state_confirmed: true };
-const lvl = (v: number, t: number) => ({ value_mcg_ml: v, collection_time: `2026-09-16T${String(Math.floor(t)).padStart(2, "0")}:${String(Math.round((t % 1) * 60)).padStart(2, "0")}:00`, time_since_last_dose_hours: t });
+const lvl = (v: number, t: number) => ({ value_mcg_ml: v, collection_time: `2026-09-16T${String(Math.floor(t)).padStart(2, "0")}:${String(Math.round((t % 1) * 60)).padStart(2, "0")}:00Z`, time_since_last_dose_hours: t });
 
 type R = Record<string, any>;
 function run(regimen: R, levels: R[]): R {

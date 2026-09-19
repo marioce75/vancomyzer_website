@@ -611,7 +611,7 @@ function testCase25(): void {
   const result = runExistingRegimenPipeline({
     patient: defaultPatient,
     regimen: { dose_mg: 1000, interval_hours: tau, infusion_duration_hours: 1.5, doses_given: dosesGiven },
-    levels: [{ value_mcg_ml: 7.5, collection_time: "2026-05-18T09:28:00", time_since_last_dose_hours: timeSinceLast }],
+    levels: [{ value_mcg_ml: 7.5, collection_time: "2026-05-18T09:28:00Z", time_since_last_dose_hours: timeSinceLast }],
   });
   assert(!("ok" in result && result.ok === false), "Case 25: expected success");
   const r = result as { measured_levels: { time_hours: number; concentration: number }[]; curve: { time_hours: number }[] };
@@ -629,7 +629,7 @@ function testCase25(): void {
   const pulseResult = runExistingRegimenPipeline({
     patient: defaultPatient,
     regimen: { dose_mg: 1500, interval_hours: 24, infusion_duration_hours: 1.5, doses_given: 1, target_auc24: 450 },
-    levels: [{ value_mcg_ml: 18, collection_time: "2026-05-18T09:00:00", time_since_last_dose_hours: 4 }],
+    levels: [{ value_mcg_ml: 18, collection_time: "2026-05-18T09:00:00Z", time_since_last_dose_hours: 4 }],
   });
   assert(!("ok" in pulseResult && pulseResult.ok === false), "Case 25 pulse: expected success");
   const pr = pulseResult as { measured_levels: { time_hours: number }[] };
@@ -642,7 +642,7 @@ function testCase25(): void {
   const ssResult = runExistingRegimenPipeline({
     patient: defaultPatient,
     regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 1, doses_given: 6 },
-    levels: [{ value_mcg_ml: 14, collection_time: "2026-05-18T09:00:00", time_since_last_dose_hours: 3 }],
+    levels: [{ value_mcg_ml: 14, collection_time: "2026-05-18T09:00:00Z", time_since_last_dose_hours: 3 }],
   });
   assert(!("ok" in ssResult && ssResult.ok === false), "Case 25 SS: expected success");
   const sr = ssResult as { measured_levels: { time_hours: number }[] };

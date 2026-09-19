@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "target": "ES2022", "incremental": false },
+  "include": ["scripts/research/**/*.ts", "src/lib/researchValidation/**/*.ts"],
+  "exclude": ["node_modules"]
+}
