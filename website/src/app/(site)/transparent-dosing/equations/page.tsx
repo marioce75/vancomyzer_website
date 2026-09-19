@@ -8,16 +8,13 @@ import {
   COLIN_2021_OBESE_EVALUATION,
   HIGH_BMI_THRESHOLD_KG_M2,
   MODEL_MANIFEST_VERSION,
-  PUBLISHED_OBESITY_COMPARATORS,
-  VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED,
   highBmiAdvisory,
-  modelShortName,
 } from "@/lib/pk/modelRegistry";
 
 export const metadata: Metadata = {
   title: "Equations & Derivations — Vancomyzer™",
   description:
-    `Full mathematical derivations for Vancomyzer's two-compartment PK engine — the ${COLIN_2019.shortName} population model, two-compartment rate constants, single-dose and multi-dose superposition, steady-state AUC₂₄, and why there is no separate obesity model. Open math; cite if useful.`,
+    `Full mathematical derivations for Vancomyzer's two-compartment PK engine — the ${COLIN_2019.shortName} population model, two-compartment rate constants, single-dose and multi-dose superposition, steady-state AUC₂₄, and body-weight scaling. Open math; cite if useful.`,
   openGraph: {
     title: "Equations & Derivations — Vancomyzer™",
     description: "The math behind every Vancomyzer dose recommendation, in the open.",
@@ -33,16 +30,7 @@ export const metadata: Metadata = {
  * supplies the engine's parameters, so this page cannot drift from the math. */
 
 const P = COLIN_2019_PARAMETERS;
-const RETIRED = VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED;
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-/** "2026-09-15" → "15 Sep 2026" */
-function formatIsoDate(iso: string): string {
-  const [year, month, day] = iso.split("-").map(Number);
-  return `${day} ${MONTHS[month - 1]} ${year}`;
-}
-
-const RETIRED_ON = formatIsoDate(RETIRED.retiredOn);
 const pct = (fraction: number) => `${(fraction * 100).toFixed(1)}%`;
 const doiUrl = (doi: string) => `https://doi.org/${doi}`;
 const COLIN_2021_PMID = COLIN_2021_OBESE_EVALUATION.citation.match(/PMID:\s*(\d+)/)?.[1];
@@ -78,7 +66,6 @@ const INFORMATIONAL_FORMULAS = [
   "  AdjBW = IBW + 0.4 × (TBW − IBW)",
 ].join("\n");
 
-const RETIRED_EQUATIONS = Object.values(RETIRED.equations).join("\n");
 
 const HIGH_BMI_EXAMPLE = highBmiAdvisory({ weight_kg: 130, height_cm: 175 });
 const HEIGHT_MISSING_EXAMPLE = highBmiAdvisory({ weight_kg: 130, height_cm: null });
@@ -394,64 +381,6 @@ two-compartment steady-state superposition formula
               PubMed ↗
             </a>
           </p>
-
-          {/* Retired model: kept only so historical calculations stay interpretable */}
-          <h3 className="mt-14 text-xl font-bold tracking-tight" style={{ color: "#0f172a" }}>
-            Retired: Vancomyzer custom obesity model (retired {RETIRED_ON})
-          </h3>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#334155" }}>
-            Former scope: {RETIRED.formerScope} It was replaced by {modelShortName(RETIRED.replacedBy)} for all adults
-            and is no longer used for dosing. Its former equations are listed so that calculations made before{" "}
-            {RETIRED_ON} remain interpretable.
-          </p>
-          <pre
-            className="mt-4 overflow-x-auto rounded-lg p-5 text-xs leading-relaxed sm:text-sm"
-            style={WRAPPED_PRE_STYLE}
-          >{RETIRED_EQUATIONS}</pre>
-          <p className="mt-6 text-sm font-semibold" style={{ color: "#0f172a" }}>
-            Why it was retired
-          </p>
-          <ul className="mt-2 max-w-3xl list-disc space-y-2 pl-5 text-sm leading-relaxed" style={{ color: "#334155" }}>
-            {RETIRED.whyRetired.map((reason) => (
-              <li key={reason}>{reason}</li>
-            ))}
-          </ul>
-
-          {/* Published comparators: documentation only, not implemented */}
-          <h3 className="mt-14 text-xl font-bold tracking-tight" style={{ color: "#0f172a" }}>
-            Published obesity models (not implemented)
-          </h3>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#334155" }}>
-            These published models were reviewed for comparison. Vancomyzer does not implement them, and their
-            equations are not used in any calculation.
-          </p>
-          {PUBLISHED_OBESITY_COMPARATORS.map((model) => (
-            <div key={model.id} className="mt-8">
-              <p className="text-base font-bold" style={{ color: "#0f172a" }}>
-                {model.shortName}{" "}
-                <span
-                  className="ml-1 rounded px-2 py-0.5 text-xs font-semibold uppercase tracking-wider"
-                  style={{ background: "#e2e8f0", color: "#334155" }}
-                >
-                  {model.status}
-                </span>
-              </p>
-              <pre
-                className="mt-3 overflow-x-auto rounded-lg p-5 text-xs leading-relaxed sm:text-sm"
-                style={WRAPPED_PRE_STYLE}
-              >{model.clearance}</pre>
-              <p className="mt-3 max-w-3xl text-sm leading-relaxed" style={{ color: "#334155" }}>
-                <span className="font-semibold" style={{ color: "#0f172a" }}>Population: </span>
-                {model.population}
-              </p>
-              <p className="mt-2 text-xs" style={{ color: "#64748b" }}>
-                {model.citation}&nbsp;
-                <a href={doiUrl(model.doi)} target="_blank" rel="noopener noreferrer" style={{ color: "#00c9b1" }}>
-                  doi:{model.doi} ↗
-                </a>
-              </p>
-            </div>
-          ))}
 
           <div className="mt-10 max-w-3xl rounded-md border-l-4 px-5 py-4" style={{ borderColor: "#00c9b1", background: "#f1f5f9" }}>
             <p className="text-sm font-semibold" style={{ color: "#0f172a" }}>

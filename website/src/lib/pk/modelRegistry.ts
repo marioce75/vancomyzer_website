@@ -120,8 +120,8 @@ export const VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED = {
   id: "vancomyzer_obesity" as const,
   status: "retired" as const,
   retiredOn: "2026-09-15",
-  shortName: "Vancomyzer custom obesity model (retired)",
-  displayName: "Vancomyzer custom obesity model — retired from dosing on 15 Sep 2026",
+  shortName: "Historical calculation",
+  displayName: "Historical calculation from an earlier software version",
   formerScope: "Adults with BMI of 40 kg/m2 or more when height and sex were entered (until 15 Sep 2026).",
   equations: {
     CL: "CL (L/h) = (0.0571 × CrCl[Cockcroft-Gault, total body weight] + 0.0158 × TBW) × 1/(1 + (age/61.6)^2.24)",
@@ -195,7 +195,7 @@ export function modelDisplayName(id: string | null | undefined): string {
 /** One-sentence description of how renal function enters the model that ran. */
 export function renalCovariateDescription(id: string | null | undefined): string {
   if (id === VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.id) {
-    return `Clearance used the retired custom obesity model: ${VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.equations.CL}.`;
+    return "Clearance belongs to a historical calculation. Recalculate with the current version before reviewing a dosing decision.";
   }
   return COLIN_2019.renalCovariate;
 }

@@ -390,7 +390,7 @@ function LimitationsCard({ run }: { run: RunOutput }) {
     },
     {
       label: "Version",
-      body: `Results reflect model manifest ${MODEL_MANIFEST_VERSION}, in which ${COLIN_2019.shortName} is used at every BMI. Versions of this page before 16 Sep 2026 used a since-retired custom model for patients with a BMI of 40 or more and evaluated the prediction at the same time as the fitted trough, so those earlier numbers are not comparable with these.`,
+      body: `Results reflect model manifest ${MODEL_MANIFEST_VERSION}, in which ${COLIN_2019.shortName} is used at every BMI. These results apply to the stated software version and study design; they are not independent clinical validation.`,
     },
   ];
   return (

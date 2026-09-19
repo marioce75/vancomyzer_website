@@ -3,8 +3,6 @@ import Link from "next/link";
 import { OPEN_ACCESS } from "@/lib/openAccess";
 import {
   COLIN_2019,
-  PUBLISHED_OBESITY_COMPARATORS,
-  VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED,
 } from "@/lib/pk/modelRegistry";
 
 export const metadata: Metadata = {
@@ -82,22 +80,10 @@ const SOURCES = [
     note: "Default adult prior, used for every adult at any body size. CC BY-NC.",
   },
   {
-    label: `${PUBLISHED_OBESITY_COMPARATORS[0].shortName} — published obesity vancomycin model (not implemented)`,
-    citation: PUBLISHED_OBESITY_COMPARATORS[0].citation,
-    doi: PUBLISHED_OBESITY_COMPARATORS[0].doi,
-    note: `Reviewed for comparison. ${PUBLISHED_OBESITY_COMPARATORS[0].population}`,
-  },
-  {
-    label: `${PUBLISHED_OBESITY_COMPARATORS[1].shortName} — published obesity vancomycin model (not implemented)`,
-    citation: PUBLISHED_OBESITY_COMPARATORS[1].citation,
-    doi: PUBLISHED_OBESITY_COMPARATORS[1].doi,
-    note: `Reviewed for comparison. ${PUBLISHED_OBESITY_COMPARATORS[1].population}`,
-  },
-  {
     label: "Janmahasatian S et al. — Quantification of lean bodyweight (FFM equations)",
     citation: "Clin Pharmacokinet. 2005;44(10):1051-1065.",
     doi: "10.2165/00003088-200544100-00004",
-    note: `Used by Vancomyzer's custom obesity model, retired from dosing on ${VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.retiredOn}. Historical reference only.`,
+    note: "Fat-free mass is displayed for clinical context; it does not change the Colin 2019 calculation.",
   },
   {
     label: "Rybak MJ et al. — Therapeutic monitoring of vancomycin (ASHP/IDSA/PIDS/SIDP 2020)",
@@ -392,13 +378,9 @@ export default function TransparentDosingPage() {
           </div>
 
           <p className="mt-10 max-w-2xl text-sm leading-relaxed" style={{ color: "#64748b" }}>
-            Smit 2020 and Zhang 2024 are shown above for comparison; Vancomyzer does not implement
-            either one. Vancomyzer&rsquo;s own custom obesity model was retired from dosing on{" "}
-            {VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.retiredOn} — its coefficients did not appear in
-            either published paper, it was never externally validated, and it produced a step change
-            in estimates at BMI 40. The {COLIN_2019.shortName} model is now used for every adult, at
-            any body size; published evaluation of {COLIN_2019.shortName} at BMI 40 or more is
-            limited (Colin 2021: 15 of 49 obese adults).
+            The {COLIN_2019.shortName} population model is used throughout the supported adult workflow.
+            Published evaluation at BMI 40 or more is limited (Colin 2021: 15 of 49 obese adults).
+            Review measured levels and the stated assumptions before making a dosing decision.
           </p>
         </div>
       </section>

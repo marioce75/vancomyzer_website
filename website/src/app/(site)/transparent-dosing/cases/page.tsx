@@ -18,7 +18,7 @@ import Link from "next/link";
 import { CASES } from "@/lib/validation/registry";
 import { runAllCases, summarize, type CaseSummary } from "@/lib/validation/runCase";
 import type { PublishedCase, CaseResult, ReferenceBand, ComparisonKind } from "@/lib/validation/types";
-import { COLIN_2019, VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED } from "@/lib/pk/modelRegistry";
+import { COLIN_2019 } from "@/lib/pk/modelRegistry";
 
 export const metadata = {
   title: "Literature Reproducibility — Vancomyzer",
@@ -690,10 +690,6 @@ function Limitations() {
           model or a cohort statistic. {CROSS_MODEL_WORDING} A difference does not show which model is more
           accurate for a given patient. Some of these cards use approximated or illustrative inputs; each
           card says which.
-        </li>
-        <li>
-          The former Vancomyzer custom obesity model was retired from dosing on{" "}
-          {formatIsoDate(VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.retiredOn)}.
         </li>
         <li>
           <strong>No pediatric, dialysis or post-transplant cases.</strong> These are outside

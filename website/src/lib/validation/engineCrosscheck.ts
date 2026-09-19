@@ -68,7 +68,7 @@ export const CROSSCHECK_META = {
   comparatorCommit: "d36cc10 (2026-05-28)",
   structuralModel: "two-compartment, IV infusion",
   engineVersion:
-    "Vancomyzer engine as of 30 May 2026, before the 15 Sep 2026 model change (retirement of the custom obesity model for BMI of 40 or more)",
+    "Vancomyzer engine snapshot dated 30 May 2026; not the current release",
   /** Settings documented in engine-crosscheck.md for the Tucuxi model files. */
   documentedTucuxiPriorLogSd: { CL: 0.35, V1: 0.25, Q: 0.5, V2: 0.5 },
   documentedTucuxiResidualError: "mixed: 1.0 mg/L additive and 15% proportional",

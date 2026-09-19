@@ -191,13 +191,8 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
       {/* Historical result from the retired model */}
       {isRetiredModel && (
         <div className="mb-1" style={{ fontSize: 10, color: "#92400e", background: "#fffbeb", border: "1px solid #fcd34d", padding: "4px 6px", lineHeight: 1.5 }}>
-          <strong>{RETIRED.displayName}.</strong> These stored values were calculated with that model, which is no longer
-          used for dosing. They cannot be reproduced with the {COLIN_2019.shortName} equations. Recalculate for current estimates.
-          {showMath && (
-            <div style={{ ...monoDim, color: "#92400e", marginTop: 4 }}>
-              {Object.values(RETIRED.equations).map((eq) => <div key={eq}>{eq}</div>)}
-            </div>
-          )}
+          <strong>Historical calculation.</strong> These stored values belong to an earlier software version.
+          Recalculate with the current version before reviewing a dosing decision.
         </div>
       )}
 

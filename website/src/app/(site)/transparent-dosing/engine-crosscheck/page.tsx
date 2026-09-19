@@ -24,7 +24,7 @@ import {
   auditCrosscheckCohort,
   type Outlier,
 } from "@/lib/validation/engineCrosscheck";
-import { COLIN_2019, VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED } from "@/lib/pk/modelRegistry";
+import { COLIN_2019 } from "@/lib/pk/modelRegistry";
 import {
   AGREEMENT_2026,
   CRITERIA_2026,
@@ -100,7 +100,7 @@ export default function EngineCrosscheckPage() {
         above, whose scripts, fixture and model file are committed to the repository. The numbers below are
         unchanged from the original publication.
       </p>
-      <SnapshotNotice highBmiCount={audit.cohort_matches_report ? audit.high_bmi.length : null} />
+      <SnapshotNotice />
       <ResultCard />
       <AccuracyCard />
       <OutlierCard audit={audit} />
@@ -443,7 +443,7 @@ function Breadcrumb() {
   );
 }
 
-function SnapshotNotice({ highBmiCount }: { highBmiCount: number | null }) {
+function SnapshotNotice() {
   return (
     <div style={{
       padding: "14px 18px",
@@ -460,16 +460,9 @@ function SnapshotNotice({ highBmiCount }: { highBmiCount: number | null }) {
       with the {CROSSCHECK_META.engineVersion}. It has not been re-run since, and running Tucuxi requires a
       separate local installation, so it is not part of the site build. The figures below are read directly
       from that run&rsquo;s saved results.{" "}
-      {highBmiCount == null ? (
-        <>Whether any synthetic patient used the since-retired custom obesity model could not be confirmed.</>
-      ) : (
-        <>
-          {highBmiCount} of the {CROSSCHECK.n} synthetic patients had a BMI of 40 or more with height and sex
-          recorded, so on the run date Vancomyzer used its custom obesity model for them; that model was retired
-          from dosing on {formatIsoDate(VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.retiredOn)}. Current results could differ,
-          particularly for those patients.
-        </>
-      )}
+      This is an archived software-version comparison, not an evaluation of the current release.
+      Model settings and prior assumptions differ from the current implementation. These figures must
+      not be used to claim current-product accuracy or independent clinical validation.
     </div>
   );
 }
@@ -601,11 +594,8 @@ function OutlierCard({ audit }: { audit: ReturnType<typeof auditCrosscheckCohort
         {audit.cohort_matches_report && highBmiListed.length > 0 && (
           <>
             {" "}Listed patients with a BMI of 40 or more:{" "}
-            {highBmiListed.map((p) => `${p.id} (BMI ${p.bmi.toFixed(1)})`).join(" and ")}. On the run date
-            Vancomyzer used its since-retired custom obesity model for{" "}
-            {highBmiListed.length === 1 ? "this patient" : "these patients"}. That model also used different prior variability from the single set of values documented for the
-            Tucuxi model files, which may contribute to these differences; this was not recorded and has not been
-            confirmed.
+            {highBmiListed.map((p) => `${p.id} (BMI ${p.bmi.toFixed(1)})`).join(" and ")}. These cases belong to the archived software version. Differences in prior settings between
+            the compared implementations were not fully recorded, so attribution remains unresolved.
           </>
         )}
         {" "}These individual disagreements have not been explained and should be investigated.
@@ -644,8 +634,7 @@ function MethodologyCard() {
           Simulate a steady-state peak and trough for each patient, with simulated residual error.
         </li>
         <li>
-          Compute Vancomyzer&rsquo;s per-patient prior ({COLIN_2019.shortName} on the run date, or the since-retired
-          custom obesity model for patients with a BMI of 40 or more), then run Vancomyzer&rsquo;s Bayesian fit on
+          Compute per-patient priors using the archived software version, then run that version&rsquo;s Bayesian fit on
           the two levels to estimate CL, V₁, Q and V₂.
         </li>
         <li>

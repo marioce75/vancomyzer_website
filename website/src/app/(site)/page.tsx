@@ -84,7 +84,7 @@ const CAPABILITIES: { title: string; body: string; source?: string }[] = [
   {
     title: "One model for all adults, with a high-BMI advisory",
     body:
-      `${COLIN_2019.shortName} is used for every adult, at any body size; there is no separate obesity model. At a BMI of ${HIGH_BMI_THRESHOLD_KG_M2} kg/m² or higher, an advisory notes that published evaluation at that size is limited, and fat-free mass and alternative creatinine-clearance estimates are shown for context only. They do not change the calculation.`,
+      `${COLIN_2019.shortName} is used throughout the supported adult workflow. At a BMI of ${HIGH_BMI_THRESHOLD_KG_M2} kg/m² or higher, an advisory notes that published evaluation at that size is limited, and fat-free mass and alternative creatinine-clearance estimates are shown for context only. They do not change the calculation.`,
     source: COLIN_2021_OBESE_EVALUATION.citation,
   },
   {

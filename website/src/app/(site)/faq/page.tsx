@@ -5,8 +5,6 @@ import {
   COLIN_2019,
   COLIN_2021_OBESE_EVALUATION,
   HIGH_BMI_THRESHOLD_KG_M2,
-  PUBLISHED_OBESITY_COMPARATORS,
-  VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED,
 } from "@/lib/pk/modelRegistry";
 
 /* ── FAQ Data ──────────────────────────────────────────────────── */
@@ -27,21 +25,8 @@ interface FaqItem {
  * src/lib/pk/modelRegistry.ts so this page cannot drift from the engine. */
 
 const COLIN = COLIN_2019;
-const RETIRED = VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED;
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-/** "2026-09-15" → "15 Sep 2026" */
-function formatIsoDate(iso: string): string {
-  const [year, month, day] = iso.split("-").map(Number);
-  return `${day} ${MONTHS[month - 1]} ${year}`;
-}
-
-function comparator(id: (typeof PUBLISHED_OBESITY_COMPARATORS)[number]["id"]) {
-  const model = PUBLISHED_OBESITY_COMPARATORS.find((m) => m.id === id);
-  if (!model) throw new Error(`Model registry has no published comparator "${id}"`);
-  return model;
-}
 
 function pubmedUrl(citation: string): string {
   const pmid = citation.match(/PMID:\s*(\d+)/)?.[1];
@@ -53,11 +38,7 @@ function pubmedUrl(citation: string): string {
 const doiUrl = (doi: string) => `https://doi.org/${doi}`;
 const bullets = (items: readonly string[]) => items.map((item) => `• ${item}`).join("\n");
 
-const RETIRED_ON = formatIsoDate(RETIRED.retiredOn);
 const BMI_40 = `BMI ≥ ${HIGH_BMI_THRESHOLD_KG_M2} kg/m²`;
-const SMIT = comparator("smit_2020");
-const ZHANG = comparator("zhang_2024");
-const COMPARATOR_NAMES = PUBLISHED_OBESITY_COMPARATORS.map((m) => m.shortName).join(" and ");
 const COLIN_2021_NOTE = `Colin 2021: ${COLIN_2021_OBESE_EVALUATION.summary}`;
 const VALIDATION_STATUS =
   "Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned.";
@@ -69,10 +50,6 @@ const REF_COLIN_2021: FaqRef = {
   label: COLIN_2021_OBESE_EVALUATION.citation,
   url: pubmedUrl(COLIN_2021_OBESE_EVALUATION.citation),
 };
-const REF_OBESITY_COMPARATORS: FaqRef[] = PUBLISHED_OBESITY_COMPARATORS.map((m) => ({
-  label: `${m.citation} [${m.status}]`,
-  url: doiUrl(m.doi),
-}));
 const REF_COCKCROFT_GAULT: FaqRef = {
   label: "Cockcroft DW, Gault MH. Prediction of creatinine clearance from serum creatinine. Nephron. 1976;16(1):31-41.",
   url: "https://pubmed.ncbi.nlm.nih.gov/1244564/",
@@ -101,7 +78,6 @@ const FAQ_ITEMS: FaqItem[] = [
       `Vancomyzer uses one population pharmacokinetic model for every adult: the ${COLIN.displayName}. Its inputs are age, total body weight and serum creatinine.`,
       `Source data: ${COLIN.sourcePopulation}`,
       `Scope in Vancomyzer: ${COLIN.vancomyzerScope}`,
-      `There is no separate obesity model. A custom Vancomyzer obesity model used for ${BMI_40} was retired from dosing on ${RETIRED_ON}. ${COMPARATOR_NAMES} are published obesity models that were reviewed for comparison; neither is implemented.`,
       "Equations, parameter values and Vancomyzer’s own settings (such as the Bayesian prior widths) are published on the Equations & derivations page.",
     ],
     refs: [REF_COLIN_2019],
@@ -113,7 +89,6 @@ const FAQ_ITEMS: FaqItem[] = [
       { formula: COLIN.equations.FSCR },
       "SCRstd is an age-standardised reference creatinine. Substituting a Cockcroft-Gault CrCl would mean running a different model from the one that was published and evaluated.",
       "This is a property of the model, not evidence that one renal estimate is better for every patient. Cockcroft-Gault remains widely used for drug dosing, and all creatinine-based estimates share the same weakness when muscle mass is low (see “What about muscle mass?”).",
-      `The retired custom obesity model (${BMI_40}, until ${RETIRED_ON}) did use Cockcroft-Gault CrCl for clearance. That model is no longer used for dosing.`,
     ],
     refs: [REF_COLIN_2019, REF_COCKCROFT_GAULT],
   },
@@ -222,7 +197,6 @@ const FAQ_ITEMS: FaqItem[] = [
     answer: [
       `Not for the dosing calculation. ${COLIN.renalCovariate}`,
       `Cockcroft-Gault estimates appear only in advisories: one can flag possible augmented renal clearance, and at ${BMI_40} fat-free mass and alternative creatinine-clearance estimates are shown for information only. None of these changes the clearance estimate.`,
-      `Until ${RETIRED_ON}, the retired custom obesity model used Cockcroft-Gault CrCl on total body weight for clearance at ${BMI_40}. It is no longer used for dosing.`,
     ],
     refs: [REF_COLIN_2019, REF_COCKCROFT_GAULT],
   },
@@ -232,29 +206,8 @@ const FAQ_ITEMS: FaqItem[] = [
       "Fat-free mass is the part of body weight that is not adipose tissue: muscle, bone, organs and water. The Janmahasatian 2005 equations estimate it from weight, height and sex:",
       { formula: "FFM (male)   = (9270 × TBW) / (6680 + 216 × BMI)\nFFM (female) = (9270 × TBW) / (8780 + 244 × BMI)" },
       `Vancomyzer does not use FFM in its calculation. ${COLIN.shortName} scales clearance and volumes with total body weight at every BMI. At ${BMI_40}, FFM is shown for information only.`,
-      "The retired custom obesity model scaled V1 and V2 to FFM. Vancomycin is hydrophilic, but how best to scale its dosing in obesity is still debated, and published obesity models take different approaches (see “Which published obesity models were reviewed, and are they used?”).",
     ],
     refs: [REF_JANMAHASATIAN_2005, REF_COLIN_2021],
-  },
-  {
-    question: "Why was the Vancomyzer custom obesity model retired?",
-    answer: [
-      `${RETIRED.displayName}. Former scope: ${RETIRED.formerScope} All adults are now calculated with ${COLIN.shortName}.`,
-      `Why it was retired:\n${bullets(RETIRED.whyRetired)}`,
-      `At ${BMI_40}, the calculator now shows an advisory recommending early vancomycin levels, because published evaluation of ${COLIN.shortName} at that body size is limited. ${COLIN_2021_NOTE}`,
-      `The former equations are kept on the Equations & derivations page so that calculations made before ${RETIRED_ON} remain interpretable.`,
-    ],
-    refs: [REF_COLIN_2021, ...REF_OBESITY_COMPARATORS],
-  },
-  {
-    question: "Which published obesity models were reviewed, and are they used?",
-    answer: [
-      `${COMPARATOR_NAMES} were reviewed for comparison. Neither is implemented in Vancomyzer.`,
-      ...PUBLISHED_OBESITY_COMPARATORS.map((m) => `${m.shortName} (${m.status}): ${m.clearance}.\nPopulation: ${m.population}`),
-      `The ${SMIT.shortName} authors caution against using their model in renal impairment or critical illness, and it showed large a-priori bias in the Colin 2021 evaluation in obese adults. ${ZHANG.shortName} found that CKD-EPI eGFR described clearance better than Cockcroft-Gault in their data.`,
-      `Vancomyzer uses ${COLIN.shortName} for all adults, with a high-BMI advisory that recommends early levels (see “Why was the Vancomyzer custom obesity model retired?”).`,
-    ],
-    refs: [...REF_OBESITY_COMPARATORS, REF_COLIN_2021],
   },
 ];
 
