@@ -32,13 +32,13 @@ const PRINCIPLES = [
     n: "01",
     title: "Show the math.",
     body:
-      `Every equation, every prior, every fit decision is visible in the UI. Vancomyzer shows its reasoning, not just its result. We render the ${COLIN_2019.shortName} covariate equations next to your patient's computed CL. We show the residual on every Bayesian fit. Turn on Teaching Mode and you get plain-language PK explanations inline with each result.`,
+      `The calculator shows the equations, starting estimates and reasons behind each result. Vancomyzer shows its reasoning, not just its result. We show the ${COLIN_2019.shortName} covariate equations next to your patient's estimated clearance (CL). For each Bayesian estimate, we show the difference between the measured and predicted drug level. Turn on Teaching Mode and you get plain-language pharmacokinetic explanations alongside each result.`,
   },
   {
     n: "02",
     title: "Honest uncertainty.",
     body:
-      "When the data can't constrain the answer, the UI says so — with an illustrative uncertainty band around the predicted concentration-time curve, not a statistical confidence, credible or prediction interval, and not a falsely confident single line. The band widens when no level is fit, narrows when two coherent levels are in. We'd rather be visibly humble than invisibly wrong.",
+      "When the available measurements leave uncertainty, the calculator shows it — with an illustrative uncertainty band around the predicted concentration-time curve, not a statistical confidence, credible or prediction interval, and not a falsely confident single line. The band widens when no level is fit, narrows when two coherent levels are in. We'd rather be visibly humble than invisibly wrong.",
   },
   {
     n: "03",
@@ -56,21 +56,21 @@ const PRINCIPLES = [
     n: "05",
     title: "Bayesian, not magic.",
     body:
-      "Posterior MAP estimation with log-normal prior penalties on every PK parameter. A single observation cannot override decades of population-PK data — that's a feature, not a bug. When the fit can't explain a measured level within ~25% relative error, the UI surfaces a Fit Quality Advisory and tells you to draw a confirmatory level. It does not silently loosen the prior to make the curve pass through the dot.",
+      "Posterior MAP estimation with log-normal prior penalties on every PK parameter. A single observation cannot override decades of population-PK data — this is an intentional safeguard. When the fit can't explain a measured level within ~25% relative error, the calculator displays a Fit Quality Advisory and tells you to draw a confirmatory level. It does not silently loosen the prior to make the curve pass through the dot.",
   },
   {
     n: "06",
     title: "Open methodology.",
     body:
-      "The Colin 2019 equations and parameter values shown throughout this site are generated from the same model registry the calculation engine uses. Every model, every parameter, every safety guardrail is documented with its primary citation. The pediatric clamp, dialysis exclusion, and continuous-infusion exclusion are explicit because Vancomyzer is not designed for those populations, not because we're saving features for an upgrade tier.",
+      "The Colin 2019 equations and parameter values shown throughout this site are drawn from the same set of model equations and values used by the calculator. Every model, every parameter, every safety guardrail is documented with its primary citation. The limits on pediatric use, dialysis and continuous infusion are stated explicitly because Vancomyzer is not designed for those populations, not because we're saving features for an upgrade tier.",
   },
 ];
 
 const ANTI_PROMISES = [
   "We will not claim FDA clearance we don't have. Vancomyzer™ is not FDA-cleared or approved; it is designed to meet the non-device clinical decision support criteria of FD&C Act §520(o)(1)(E). The disclaimer on every page is real, not legal noise.",
   "We will not fit your patient on a single outlier level by quietly loosening the prior. The fit is bounded; the residual is shown; the advisory tells you when to draw another level.",
-  "We will not pretend the calculator works for pediatrics, dialysis, continuous infusion, or extreme renal failure until those subpopulations have been validated and shipped with their own safety rails.",
-  "We will not gate basic AUC-guided dosing behind a hospital contract. Every plan uses the same calculation engine; paid plans add workflow features such as PDF export, notes, calculation history and team audit logs.",
+  "We will not pretend the calculator works for pediatrics, dialysis, continuous infusion, or extreme renal failure until those subpopulations have been validated and made available with appropriate safety checks.",
+  "Basic AUC-guided dosing will not require a hospital contract. Every plan uses the same calculation method; paid plans add workflow features such as PDF export, notes, calculation history and team audit logs.",
   "We will not replace clinician judgment. Every recommendation comes with the math, the residuals, and the assumptions so a pharmacist can override it with full context.",
 ];
 
@@ -185,7 +185,7 @@ export default function TransparentDosingPage() {
             What we believe
           </h2>
           <p className="mt-3 text-sm" style={{ color: "#64748b" }}>
-            Six commitments that shape every calculation the engine makes.
+            Six commitments that shape every calculation.
           </p>
           <div className="mt-12 space-y-12">
             {PRINCIPLES.map((p) => (

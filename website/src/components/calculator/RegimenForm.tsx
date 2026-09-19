@@ -162,7 +162,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
           {isPulseDose && (
             <div className="mt-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5">
               <p className="text-xs text-blue-800">
-                <strong>Pulse / single-dose Bayesian:</strong> One dose given. The Bayesian engine will estimate your patient&apos;s individual CL and V from this level and project a maintenance regimen to hit your AUC₂₄ target. No steady-state assumed.
+                <strong>Pulse / single-dose Bayesian:</strong> One dose given. The calculator will use Bayesian estimation to estimate your patient&apos;s individual CL and V from this level and project a maintenance regimen to hit your AUC₂₄ target. No steady-state assumed.
               </p>
             </div>
           )}

@@ -845,7 +845,7 @@ export default function CalculatorWorkspace() {
                   </Advisory>
                 ) : (
                   <Advisory severity="success" title="Phase 2 — level entered, ready to calculate" role="status">
-                    Press <strong>Calculate</strong> to run the Bayesian engine and receive a maintenance regimen recommendation.
+                    Press <strong>Calculate</strong> to calculate the Bayesian estimate and receive a maintenance regimen recommendation.
                   </Advisory>
                 )}
               </div>
@@ -1004,7 +1004,7 @@ export default function CalculatorWorkspace() {
         key="display-floor"
         severity="caution"
         title="Recommendation outside the candidate display rule."
-        summary={`The engine's recommendation (${recommendedOption.dose_mg} mg q${recommendedOption.interval_hours}h, AUC₂₄ ${recommendedOption.auc24}) is ${recommendedOption.dose_mg < 500 ? "below the 500 mg practical dose floor" : "above the 600 mg·h/L AUC₂₄ ceiling"} applied to the candidate list. It is shown as returned; verify against institutional protocol before use.`}
+        summary={`The calculator's recommendation (${recommendedOption.dose_mg} mg q${recommendedOption.interval_hours}h, AUC₂₄ ${recommendedOption.auc24}) is ${recommendedOption.dose_mg < 500 ? "below the 500 mg practical dose floor" : "above the 600 mg·h/L AUC₂₄ ceiling"} applied to the candidate list. It is shown as returned; verify against institutional protocol before use.`}
         role="status"
       />,
     );
@@ -1147,7 +1147,7 @@ export default function CalculatorWorkspace() {
           {displayResult.pk_parameters?.used_posterior_refinement && (
             <TeachingNote label="How does Bayesian feedback work?">
               <p style={{ marginTop: 0 }}>
-                The engine starts with a population prior — what we&rsquo;d expect for an &ldquo;average&rdquo;
+                The calculator starts with a population prior — what we&rsquo;d expect for an &ldquo;average&rdquo;
                 patient with this age, weight, and SCr, from the {COLIN_2019.shortName} model. Model source:{" "}
                 {COLIN_2019.sourcePopulation}
                 {" "}When you enter a measured level, MAP-Bayesian estimation shifts the patient&rsquo;s individual
@@ -1323,7 +1323,7 @@ export default function CalculatorWorkspace() {
                   <TeachingNote label="Why this dose?">
                     {displayResult.recommendation_type === "existing_regimen" ? (
                       <>
-                        When the level data support an individualized fit, the engine evaluates doses of 250–2000 mg at
+                        When the level data support an individualized fit, the calculator compares doses of 250–2000 mg at
                         q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄
                         exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the
                         midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor
@@ -1332,7 +1332,7 @@ export default function CalculatorWorkspace() {
                       </>
                     ) : (
                       <>
-                        The engine evaluates doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted
+                        The calculator compares doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted
                         peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄
                         lands closest to the midpoint of the 400–600 target.
                       </>
@@ -1371,7 +1371,7 @@ export default function CalculatorWorkspace() {
                         rrt === true
                           ? "The model is not validated for renal replacement therapy."
                           : mode === "initial_regimen"
-                            ? "Age, weight, serum creatinine and RRT status are required; the Bayesian engine runs automatically once they are present."
+                            ? "Age, weight, serum creatinine and RRT status are required; the Bayesian calculation starts automatically once they are present."
                             : "Enter the current regimen and measured level(s), then press Calculate."
                       }
                       role="status"

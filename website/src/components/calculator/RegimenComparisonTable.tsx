@@ -140,7 +140,7 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
       </table>
       <div className="flex items-start justify-between gap-2 px-2 pt-1.5">
         <p className="m-0 text-[10px] leading-4" style={{ color: "var(--color-dim)" }}>
-          {current?.single_dose ? "Loading-dose row: that single dose over its first 24 h. Other rows: " : ""}Steady-state predictions from the same PK parameters. Candidates with AUC₂₄ above 600 or doses below 500 mg are not offered{recommendedOutsideRule ? "; the engine's own recommendation is always listed and flagged when it falls outside that rule" : ""}.
+          {current?.single_dose ? "Loading-dose row: that single dose over its first 24 h. Other rows: " : ""}Steady-state predictions from the same PK parameters. Candidates with AUC₂₄ above 600 or doses below 500 mg are not offered{recommendedOutsideRule ? "; the calculator's recommendation is always listed and flagged when it falls outside that rule" : ""}.
         </p>
         {onApply && activeOption && (
           <button

@@ -211,7 +211,7 @@ export default function BedboundAdvisoryPanel({
         <p className="text-xs font-semibold text-blue-900">Recommended Level Draw Timing</p>
         <p className="mt-0.5 text-xs text-blue-800 leading-5">{levelDrawNote}</p>
         <p className="mt-1 text-[11px] text-blue-700">
-          After drawing the level, enter it in the <strong>Drug Levels</strong> section. The Bayesian engine will recommend a <strong>maintenance regimen</strong> — not another loading dose.
+          After drawing the level, enter it in the <strong>Drug Levels</strong> section. The calculator will suggest a <strong>maintenance regimen</strong> — not another loading dose.
         </p>
       </div>
 

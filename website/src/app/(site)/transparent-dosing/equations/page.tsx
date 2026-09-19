@@ -113,12 +113,12 @@ export default function EquationsPage() {
             Equations &amp; derivations
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#cbd5e1" }}>
-            The full math behind every Vancomyzer recommendation. Same equations the engine evaluates,
-            same constants, same references. Cite if useful, fork if you want to verify.
+            The full math behind every Vancomyzer recommendation. Same equations the calculator uses,
+            same constants, same references. Use the cited sources to review the method and check the calculations.
           </p>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed" style={{ color: "#94a3b8" }}>
-            Model names, citations and equations on this page are generated from the model registry that supplies
-            the engine&rsquo;s parameters (model manifest version{" "}
+            Model names, citations and equations on this page use the same reference values as
+            the calculator (model version{" "}
             <span style={{ color: "#e2e8f0", fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
               {MODEL_MANIFEST_VERSION}
             </span>
@@ -347,7 +347,7 @@ two-compartment steady-state superposition formula
           <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#334155" }}>
             At BMI {HIGH_BMI_THRESHOLD_KG_M2} kg/m² or more, the calculator adds an advisory because published
             evaluation of this model at that body size is limited. The text comes from the same registry function the
-            engine calls; for a patient weighing 130 kg with a height of 175 cm it reads:
+            calculator uses; for a patient weighing 130 kg with a height of 175 cm it reads:
           </p>
           {HIGH_BMI_EXAMPLE && (
             <blockquote

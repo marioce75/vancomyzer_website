@@ -667,7 +667,7 @@ function AdjustmentDosingBlockedCard({
       </div>
       <p className="text-[11px]" style={{ color: "#7f1d1d" }}>
         This is decision-support output only. Holding maintenance dosing is the
-        engine&apos;s safety position when no acceptable dose-down or interval-extension
+        calculator&apos;s safety recommendation when no acceptable dose-down or interval-extension
         exists in its search grid; clinical context (infection severity, hemodynamics,
         institutional protocol) remains the clinician&apos;s judgment.
       </p>

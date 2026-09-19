@@ -48,7 +48,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Third-Party Services</h2>
           <p>
-            This site may be hosted on third-party infrastructure. Hosting providers may collect standard server logs (IP addresses, access times) for operational purposes. Hosting log and backup retention must be assessed for the actual deployment; this policy does not certify that every historical record is anonymous.
+            This site may be hosted on third-party infrastructure. Hosting providers may collect standard server logs (IP addresses, access times) for operational purposes. How long hosting records and backups are kept must be reviewed for the service as it is configured; this policy does not certify that every historical record is anonymous.
           </p>
         </section>
 
