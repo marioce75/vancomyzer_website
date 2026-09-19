@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -15,7 +15,6 @@ function magicErrorMessage(code: string | null): string {
 }
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const expired = searchParams.get("expired") === "true";
   const magicToken = searchParams.get("magic");
@@ -42,47 +41,51 @@ function LoginForm() {
     magicAttemptedRef.current = true;
     setLoading(true);
     signIn("magic-link", { token: magicToken, redirect: false }).then(result => {
-      setLoading(false);
-      if (result?.error) {
-        if (result.error === "PENDING") setError("Your account is pending approval.");
-        else if (result.error === "DISABLED") setError("Your account has been disabled.");
-        else if (result.error === "LOCKED") setError("Account temporarily locked. Try again in 15 minutes.");
+      if (!result || result.error || !result.ok) {
+        if (result?.error === "PENDING") setError("Your account is pending approval.");
+        else if (result?.error === "DISABLED") setError("Your account has been disabled.");
+        else if (result?.error === "LOCKED") setError("Account temporarily locked. Try again in 15 minutes.");
         else setError("Sign-in link expired or invalid. Request a new one below.");
         return;
       }
-      router.push("/calculator");
-      router.refresh();
-    });
-  }, [magicToken, router]);
+      window.location.assign("/calculator");
+    }).catch(() => {
+      setError("Could not connect to sign in. Please try again.");
+    }).finally(() => setLoading(false));
+  }, [magicToken]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const result = await signIn("credentials", {
-      username,
-      password,
-      redirect: false,
-    });
+    try {
+      const result = await signIn("credentials", {
+        username,
+        password,
+        redirect: false,
+      });
 
-    setLoading(false);
-
-    if (result?.error) {
-      if (result.error === "PENDING") {
-        setError("Your account is pending approval. You will be notified by email when access is granted.");
-      } else if (result.error === "DISABLED") {
-        setError("Your account has been disabled. Contact your administrator.");
-      } else if (result.error === "LOCKED") {
-        setError("Account temporarily locked due to too many failed attempts. Try again in 15 minutes.");
-      } else {
-        setError("Incorrect username or password.");
+      if (!result || result.error || !result.ok) {
+        if (result?.error === "PENDING") {
+          setError("Your account is pending approval. You will be notified by email when access is granted.");
+        } else if (result?.error === "DISABLED") {
+          setError("Your account has been disabled. Contact your administrator.");
+        } else if (result?.error === "LOCKED") {
+          setError("Account temporarily locked due to too many failed attempts. Try again in 15 minutes.");
+        } else {
+          setError("Unable to sign in. Check your username and password, then try again.");
+        }
+        return;
       }
-      return;
-    }
 
-    router.push("/calculator");
-    router.refresh();
+      // Reload with the new session instead of reusing a prefetched anonymous route.
+      window.location.assign("/calculator");
+    } catch {
+      setError("Could not connect to sign in. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleMagicSubmit = async (e: React.FormEvent) => {

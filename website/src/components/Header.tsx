@@ -75,13 +75,13 @@ export default function Header() {
           </ul>
 
           {showSignIn && (
-            <Link
+            <a
               href="/login"
               className="hidden whitespace-nowrap text-sm font-medium transition lg:inline"
               style={{ color: "var(--color-secondary)" }}
             >
               Sign in
-            </Link>
+            </a>
           )}
 
           {/* Primary action — in the bar from 640px up; phones get it at the
@@ -132,14 +132,14 @@ export default function Header() {
             </Link>
           ))}
           {showSignIn && (
-            <Link
+            <a
               href="/login"
               onClick={() => setMobileOpen(false)}
               className="block py-2.5 px-3 text-sm font-semibold rounded transition"
               style={{ color: "var(--color-primary)", borderTop: "1px solid var(--color-border)" }}
             >
               Sign in
-            </Link>
+            </a>
           )}
         </div>
       )}

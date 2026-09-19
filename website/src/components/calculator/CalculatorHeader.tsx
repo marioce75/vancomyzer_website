@@ -261,7 +261,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             </button>
           )}
           {!onLogout && showSignIn && (
-            <Link
+            <a
               href="/login"
               className="ml-1 px-2 py-1 text-[11px] font-semibold transition"
               style={{
@@ -282,7 +282,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               }}
             >
               SIGN IN
-            </Link>
+            </a>
           )}
         </div>
 
@@ -321,13 +321,13 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             </button>
           )}
           {!onLogout && showSignIn && (
-            <Link
+            <a
               href="/login"
               className="px-2 py-1.5 text-[10px] font-semibold"
               style={{ color: "var(--color-secondary)", border: "1px solid var(--color-border)", background: "transparent", textDecoration: "none" }}
             >
               SIGN IN
-            </Link>
+            </a>
           )}
         </div>
 
