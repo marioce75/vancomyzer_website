@@ -5,7 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/admin", "/research", "/settings", "/login", "/register", "/reset-password", "/mfa-verify", "/upgrade", "/calculator"],
+      // Login and reset-password expose noindex metadata; do not block its discovery.
+      disallow: ["/api/", "/admin", "/research", "/settings", "/register", "/mfa-verify", "/upgrade", "/calculator"],
     },
     sitemap: "https://vancomyzer.com/sitemap.xml",
   };
