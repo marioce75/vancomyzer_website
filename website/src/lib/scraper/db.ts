@@ -75,6 +75,7 @@ export function ensureScraperTables(): void {
     );
 
     CREATE INDEX IF NOT EXISTS idx_scraper_posts_source ON scraper_posts(source, post_id);
+    CREATE INDEX IF NOT EXISTS idx_scraper_posts_url ON scraper_posts(url, scraped_at, id);
     CREATE INDEX IF NOT EXISTS idx_scraper_posts_scraped ON scraper_posts(scraped_at);
   `);
 
@@ -123,7 +124,7 @@ export function insertPost(post: Omit<ScraperPost, "id" | "scraped_at">): boolea
 export function getRecentPosts(days = 30, limit = 500): ScraperPost[] {
   ensureScraperTables();
   return db.prepare(
-    `SELECT * FROM scraper_posts WHERE scraped_at > datetime('now', '-${days} days') ORDER BY upvote_count DESC LIMIT ?`
+    `SELECT p.* FROM scraper_posts p WHERE p.scraped_at > datetime('now', '-${days} days') AND (p.url IS NULL OR p.url = '' OR NOT EXISTS (SELECT 1 FROM scraper_posts newer WHERE newer.url=p.url AND (newer.scraped_at>p.scraped_at OR (newer.scraped_at=p.scraped_at AND newer.id>p.id)))) ORDER BY p.upvote_count DESC, p.scraped_at DESC, p.id DESC LIMIT ?`
   ).all(limit) as ScraperPost[];
 }
 

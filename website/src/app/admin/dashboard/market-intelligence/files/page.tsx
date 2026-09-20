@@ -280,10 +280,10 @@ export default function MarketIntelligenceFilesPage() {
                 </div>
               )}
 
-              {/* Geographic Signals */}
+              {/* Country Mentions */}
               {Object.keys(geoSignals).length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Geographic Signals</p>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Country Mentions</p>
                   <div className="space-y-1">
                     {Object.entries(geoSignals).sort((a, b) => b[1] - a[1]).map(([region, count]) => (
                       <div key={region} className="flex items-center justify-between text-sm">
@@ -298,7 +298,7 @@ export default function MarketIntelligenceFilesPage() {
               {/* Top Posts */}
               {topPosts.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">High Signal Posts</p>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Source Records</p>
                   <div className="space-y-1.5">
                     {topPosts.map((p, i) => (
                       <div key={i} className="flex items-center justify-between text-sm border-b border-gray-100 pb-1">

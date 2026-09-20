@@ -35,6 +35,8 @@ async function main() {
     assert.ok(fs.existsSync(path.join(dir, "archives/latest_raw.json")));
     assert.equal(JSON.parse(fs.readFileSync(path.join(dir, "archives/latest_raw.json"), "utf8")).length, result.total);
     const first = posts[0]; assert.equal(db.insertPost({ ...first, upvote_count: 10 }), false); assert.equal(db.getAllPosts().find(p=>p.id===first.id)?.upvote_count,10);
+    db.insertPost({ ...first, post_id: "legacy-duplicate", title: "Newer version" });
+    assert.equal(db.getRecentPosts().filter(p => p.url === first.url).length, 1, "rolling summaries deduplicate legacy URLs");
     assert.ok(db.acquireJob("analyst")); assert.equal(db.acquireJob("analyst"),false); db.finishJob("analyst","failed","test"); assert.ok(db.acquireJob("analyst")); db.finishJob("analyst","completed","test");
     const { runAiAnalyst } = await import("../aiAnalyst");
     await assert.rejects(runAiAnalyst(), /not configured/);
