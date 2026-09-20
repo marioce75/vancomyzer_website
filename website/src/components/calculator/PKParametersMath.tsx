@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import {
   COLIN_2019,
   COLIN_2019_PARAMETERS,
@@ -28,7 +27,6 @@ interface PKParametersMathProps {
   params: PKParams;
 }
 
-const STORAGE_KEY = "vancomyzer_show_math";
 
 type ParamKey = keyof Pick<PKParams, "CL" | "V1" | "Q" | "V2">;
 
@@ -120,172 +118,81 @@ function buildColinRows(): ParamRow[] {
   ];
 }
 
-const PARAM_LABELS: { key: ParamKey; label: string; unit: string }[] = [
-  { key: "CL", label: "CL", unit: "L/h" },
-  { key: "V1", label: "V1", unit: "L" },
-  { key: "Q", label: "Q", unit: "L/h" },
-  { key: "V2", label: "V2", unit: "L" },
+const PARAM_LABELS: { key: ParamKey; label: string; unit: string; description: string }[] = [
+  { key: "CL", label: "Clearance", unit: "L/h", description: "Estimated ability to remove vancomycin from the body." },
+  { key: "V1", label: "Central volume", unit: "L", description: "Model volume for blood and rapidly equilibrating tissues." },
+  { key: "V2", label: "Peripheral volume", unit: "L", description: "Model volume for tissues that equilibrate more slowly." },
+  { key: "Q", label: "Distribution clearance", unit: "L/h", description: "Estimated exchange between the two model compartments." },
 ];
 
 const RETIRED = VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED;
 
 export default function PKParametersMath({ params }: PKParametersMathProps) {
-  // Collapsed by default. Expanded, the derivation runs ~350px and pushed the
-  // concentration-time graph below the fold, so the clinician had to scroll to
-  // see the curve. Nothing is hidden: the Show Math toggle sits directly above.
-  const [showMath, setShowMath] = useState(false);
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored !== null) setShowMath(stored === "true");
-    } catch { /* ignore */ }
-  }, []);
-
-  const toggleMath = () => {
-    const next = !showMath;
-    setShowMath(next);
-    try { localStorage.setItem(STORAGE_KEY, String(next)); } catch { /* ignore */ }
-  };
-
-  // A stored result from the retired custom obesity model cannot be reproduced
-  // with the Colin 2019 equations, so its values are shown without arithmetic.
   const isRetiredModel = params.pk_model_name === RETIRED.id;
-  const PARAM_ROWS = buildColinRows();
+  const rows = buildColinRows();
   const covariates = colinCovariates(params.age ?? MIN_ADULT_AGE_YEARS, params.scr);
   const modelHeaderLabel = modelShortName(params.pk_model_name);
-  const monoDim = { fontSize: 13, color: "var(--color-dim)", fontFamily: "var(--font-mono, monospace)", lineHeight: 1.4 } as const;
+  const equationStyle = { fontSize: 12, lineHeight: 1.6, overflowWrap: "anywhere" as const, color: "var(--color-secondary)" };
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-1">
-        <p className="text-sm font-bold uppercase tracking-[0.08em]" style={{ color: "var(--color-primary)", margin: 0 }}>
-          PK Parameters <span style={{ color: isRetiredModel ? "#92400e" : "var(--color-dim)", fontWeight: 500 }}>({modelHeaderLabel})</span>
-        </p>
-        <button
-          type="button"
-          onClick={toggleMath}
-          aria-expanded={showMath}
-          style={{
-            fontSize: 13,
-            color: "var(--color-primary)",
-            background: "transparent",
-            border: "1px solid var(--color-border)",
-            padding: "2px 8px",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-            (e.currentTarget as HTMLElement).style.color = "var(--color-card, #fff)";
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.background = "transparent";
-            (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
-          }}
-        >
-          {showMath ? "Hide calculation details" : "View calculation details"}
-        </button>
-      </div>
-
-      {/* Historical result from the retired model */}
+    <section aria-label="Pharmacokinetic estimates" style={{ minWidth: 0 }}>
+      <h3 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 4px", color: "var(--color-primary)" }}>Pharmacokinetic estimates</h3>
+      <p style={{ fontSize: 12, lineHeight: 1.5, margin: "0 0 12px", color: "var(--color-secondary)" }}>
+        Model: {modelHeaderLabel}. {params.used_posterior_refinement ? "Estimates updated using measured vancomycin levels." : "Estimates based on patient information, without measured-level adjustment."}
+      </p>
       {isRetiredModel && (
-        <div className="mb-1" style={{ fontSize: 13, color: "#92400e", background: "#fffbeb", border: "1px solid #fcd34d", padding: "4px 6px", lineHeight: 1.5 }}>
-          <strong>Historical calculation.</strong> These stored values belong to an earlier software version.
-          Recalculate with the current version before reviewing a dosing decision.
-        </div>
-      )}
-
-      {/* Compact parameter grid — 2x2 when math hidden (always for retired-model results), stacked when shown */}
-      {!showMath || isRetiredModel ? (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
-          {PARAM_LABELS.map((row) => {
-            const value = params[row.key];
-            return (
-              <div key={row.key} className="flex items-baseline justify-between" style={{ padding: "3px 6px", background: "var(--color-highlight, rgba(0,0,0,0.03))", border: "1px solid var(--color-border)" }}>
-                <span style={{ fontSize: 11, color: "var(--color-secondary)", fontWeight: 600, fontFamily: "var(--font-mono, monospace)" }}>{row.label}</span>
-                <span style={{ fontSize: 13, color: "var(--color-primary)", fontWeight: 700, fontFamily: "var(--font-mono, monospace)" }}>
-                  {typeof value === "number" ? fmt(value, 1) : "—"}{" "}
-                  <span style={{ fontSize: 13, color: "var(--color-dim)", fontWeight: 400 }}>{row.unit}</span>
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {PARAM_ROWS.map((row, i) => {
-            const value = params[row.key];
-            const prior = row.prior(params);
-            return (
-              <div key={row.key} style={{ borderTop: i === 0 ? "none" : "1px solid var(--color-border)", padding: "4px 0" }}>
-                <div className="flex items-baseline justify-between">
-                  <span style={{ fontSize: 12, color: "var(--color-secondary)", fontWeight: 600, fontFamily: "var(--font-mono, monospace)" }}>{row.label}</span>
-                  <span style={{ fontSize: 14, color: "var(--color-primary)", fontWeight: 700, fontFamily: "var(--font-mono, monospace)" }}>
-                    {typeof value === "number" ? fmt(value, 1) : "—"}{" "}
-                    <span style={{ fontSize: 13, color: "var(--color-secondary)", fontWeight: 400 }}>{row.unit}</span>
-                  </span>
-                </div>
-                <div style={{ ...monoDim, marginTop: 2, overflow: "auto" }}>
-                  <div>{row.equation}</div>
-                  {row.key === "CL" && (
-                    <div style={{ paddingLeft: 8 }}>
-                      <div>{COLIN_2019.equations.PMA} = {fmt(covariates.PMA_yr, 2)}</div>
-                      <div>{COLIN_2019.equations.FMat} = {f3(covariates.FMat)}</div>
-                      <div>{COLIN_2019.equations.FDecline} = {f3(covariates.FDecline)}</div>
-                      <div>{COLIN_2019.equations.SCRstd} = {f3(covariates.SCRstd)}</div>
-                      <div>
-                        {COLIN_2019.equations.FSCR} = {f3(covariates.FSCR)}
-                        {` (SCr values below ${MIN_SCR_MG_DL} mg/dL are raised to ${MIN_SCR_MG_DL} mg/dL before use)`}
-                      </div>
-                    </div>
-                  )}
-                  <div>
-                    <span style={{ color: "var(--color-secondary)" }}>{row.substitute(params)}</span>
-                    {params.used_posterior_refinement ? (
-                      <span style={{ color: "var(--color-secondary)" }}> = {fmt(prior, 1)} {row.unit} (population prior)</span>
-                    ) : (
-                      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}> = {typeof value === "number" ? fmt(value, 1) : "?"} {row.unit}</span>
-                    )}
-                  </div>
-                  {params.used_posterior_refinement && (
-                    <div>
-                      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>
-                        Bayesian estimate from measured levels: {typeof value === "number" ? fmt(value, 1) : "?"} {row.unit}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Bayesian note */}
-      {showMath && params.used_posterior_refinement && !isRetiredModel && (
-        <p style={{ fontSize: 13, color: "var(--color-dim)", fontStyle: "italic", marginTop: 4, margin: 0 }}>
-          {"↳"} Population-prior arithmetic shown; displayed values are the Bayesian estimates updated from measured levels
+        <p style={{ fontSize: 13, padding: 8, color: "#92400e", background: "#fffbeb" }}>
+          <strong>Saved historical calculation.</strong> Recalculate using the current calculator before reviewing a dosing decision.
         </p>
       )}
-
-      {/* Citation */}
+      <dl style={{ margin: 0 }}>
+        {PARAM_LABELS.map(row => (
+          <div key={row.key} style={{ borderTop: "1px solid var(--color-border)", padding: "10px 0" }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+              <dt style={{ fontSize: 13, fontWeight: 600, color: "var(--color-secondary)" }}>{row.label} <span style={{ fontWeight: 400 }}>({row.key})</span></dt>
+              <dd style={{ margin: 0, whiteSpace: "nowrap", fontSize: 16, fontWeight: 700, fontVariantNumeric: "tabular-nums", color: "var(--color-primary)" }}>
+                {fmt(params[row.key], 1)} <span style={{ fontSize: 12, fontWeight: 400, color: "var(--color-secondary)" }}>{row.unit}</span>
+              </dd>
+            </div>
+            <p style={{ fontSize: 12, lineHeight: 1.5, color: "var(--color-dim)", margin: "3px 0 0" }}>{row.description}</p>
+          </div>
+        ))}
+      </dl>
+      <p style={{ fontSize: 12, lineHeight: 1.5, margin: "4px 0 12px", color: "var(--color-dim)" }}>These are model estimates. The volumes are not measurements of body-fluid volume.</p>
       {!isRetiredModel && (
-        <div style={{ marginTop: 6, paddingTop: 4, borderTop: "1px solid var(--color-border)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
-          <span style={{ fontSize: 13, color: "var(--color-dim)" }}>{COLIN_2019.citation}</span>
-          <a
-            href={`https://doi.org/${COLIN_2019.doi}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ fontSize: 13, color: "var(--color-primary)", textDecoration: "none", fontWeight: 500 }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; }}
-          >
-            DOI {"↗"}
-          </a>
-        </div>
+        <details style={{ border: "1px solid var(--color-border)", borderRadius: 6, padding: "8px 10px", marginBottom: 12 }}>
+          <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 600, color: "var(--color-primary)" }}>Equations and calculation details</summary>
+          <p style={{ fontSize: 12, lineHeight: 1.5, color: "var(--color-secondary)" }}>The equations give the starting population estimates.{params.used_posterior_refinement ? " The results above also include adjustment using measured levels, so they may differ from these starting values." : ""}</p>
+          {rows.map(row => (
+            <section key={row.key} style={{ borderTop: "1px solid var(--color-border)", padding: "10px 0" }}>
+              <h4 style={{ fontSize: 13, margin: "0 0 6px", color: "var(--color-primary)" }}>{PARAM_LABELS.find(p => p.key === row.key)?.label} ({row.key})</h4>
+              <div style={equationStyle}>
+                <p style={{ margin: "0 0 6px" }}>{row.equation}</p>
+                <p style={{ margin: "0 0 6px" }}>{row.substitute(params)} = {fmt(row.prior(params), 1)} {row.unit} (starting estimate)</p>
+                {row.key === "CL" && (
+                  <details style={{ marginTop: 8 }}>
+                    <summary style={{ cursor: "pointer" }}>Age and creatinine factors</summary>
+                    <div style={{ paddingTop: 6 }}>
+                      <p>{COLIN_2019.equations.PMA} = {fmt(covariates.PMA_yr, 2)}</p>
+                      <p>{COLIN_2019.equations.FMat} = {f3(covariates.FMat)}</p>
+                      <p>{COLIN_2019.equations.FDecline} = {f3(covariates.FDecline)}</p>
+                      <p>{COLIN_2019.equations.SCRstd} = {f3(covariates.SCRstd)}</p>
+                      <p>{COLIN_2019.equations.FSCR} = {f3(covariates.FSCR)}</p>
+                      <p>For this model calculation, serum creatinine below {MIN_SCR_MG_DL} mg/dL is set to {MIN_SCR_MG_DL} mg/dL.</p>
+                    </div>
+                  </details>
+                )}
+              </div>
+            </section>
+          ))}
+        </details>
       )}
-    </div>
+      {!isRetiredModel && (
+        <p style={{ fontSize: 12, lineHeight: 1.5, margin: 0, color: "var(--color-dim)" }}>
+          {COLIN_2019.citation}{" "}
+          <a href={`https://doi.org/${COLIN_2019.doi}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-primary)", textDecoration: "underline" }}>Read the model study</a>
+        </p>
+      )}
+    </section>
   );
 }

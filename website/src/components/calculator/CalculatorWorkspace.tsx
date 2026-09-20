@@ -1082,13 +1082,13 @@ export default function CalculatorWorkspace() {
   const detailTabs = displayResult ? [
     {
       id: "pk",
-      label: "PK params",
+      label: "Drug handling",
       content: (
         <div className="flex flex-col gap-2">
           {displayResult.pk_parameters ? (
             <PKParametersMath params={displayResult.pk_parameters} />
           ) : (
-            <p className="text-xs" style={{ color: "var(--color-dim)" }}>No PK parameters returned.</p>
+            <p className="text-xs" style={{ color: "var(--color-dim)" }}>No pharmacokinetic estimates are available.</p>
           )}
           {displayResult.calculation_details?.key_inputs && displayResult.calculation_details.key_inputs.length > 0 && (
             <div>
