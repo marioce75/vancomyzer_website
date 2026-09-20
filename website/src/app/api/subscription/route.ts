@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { findUserById, getInstitutionalAccount } from "@/lib/db";
+import { findUserById, getInstitutionalAccount, getUserTier, getComplimentaryPro } from "@/lib/db";
 
 /**
  * GET /api/subscription — Returns the current user's subscription tier info.
@@ -23,7 +23,8 @@ export async function GET() {
     : null;
 
   return NextResponse.json({
-    tier: user.subscription_tier ?? "free",
+    tier: getUserTier(userId),
+    complimentaryPro: { active: getComplimentaryPro(userId).active, expiresAt: getComplimentaryPro(userId).expiresAt },
     expiry: user.subscription_expiry ?? null,
     institutionalAccount: institutionalAccount
       ? {

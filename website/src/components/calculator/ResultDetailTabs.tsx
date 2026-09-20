@@ -74,7 +74,7 @@ export default function ResultDetailTabs({ tabs, defaultTab, ariaLabel = "Result
         role="tabpanel"
         id={`vz-tabpanel-${current.id}`}
         aria-labelledby={`vz-tab-${current.id}`}
-        className="min-h-0 overflow-y-auto p-2.5 text-xs"
+        className="min-h-0 overflow-y-auto p-3 text-sm leading-relaxed"
       >
         {current.content}
       </div>

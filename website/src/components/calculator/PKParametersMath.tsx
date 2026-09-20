@@ -154,20 +154,21 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
   const PARAM_ROWS = buildColinRows();
   const covariates = colinCovariates(params.age ?? MIN_ADULT_AGE_YEARS, params.scr);
   const modelHeaderLabel = modelShortName(params.pk_model_name);
-  const monoDim = { fontSize: 10, color: "var(--color-dim)", fontFamily: "var(--font-mono, monospace)", lineHeight: 1.4 } as const;
+  const monoDim = { fontSize: 13, color: "var(--color-dim)", fontFamily: "var(--font-mono, monospace)", lineHeight: 1.4 } as const;
 
   return (
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-1">
-        <p className="text-[10px] font-bold uppercase tracking-[0.08em]" style={{ color: "var(--color-primary)", margin: 0 }}>
+        <p className="text-sm font-bold uppercase tracking-[0.08em]" style={{ color: "var(--color-primary)", margin: 0 }}>
           PK Parameters <span style={{ color: isRetiredModel ? "#92400e" : "var(--color-dim)", fontWeight: 500 }}>({modelHeaderLabel})</span>
         </p>
         <button
           type="button"
           onClick={toggleMath}
+          aria-expanded={showMath}
           style={{
-            fontSize: 9,
+            fontSize: 13,
             color: "var(--color-primary)",
             background: "transparent",
             border: "1px solid var(--color-border)",
@@ -184,13 +185,13 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
             (e.currentTarget as HTMLElement).style.color = "var(--color-primary)";
           }}
         >
-          {showMath ? "Hide Math" : "Show Math"}
+          {showMath ? "Hide calculation details" : "View calculation details"}
         </button>
       </div>
 
       {/* Historical result from the retired model */}
       {isRetiredModel && (
-        <div className="mb-1" style={{ fontSize: 10, color: "#92400e", background: "#fffbeb", border: "1px solid #fcd34d", padding: "4px 6px", lineHeight: 1.5 }}>
+        <div className="mb-1" style={{ fontSize: 13, color: "#92400e", background: "#fffbeb", border: "1px solid #fcd34d", padding: "4px 6px", lineHeight: 1.5 }}>
           <strong>Historical calculation.</strong> These stored values belong to an earlier software version.
           Recalculate with the current version before reviewing a dosing decision.
         </div>
@@ -206,7 +207,7 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
                 <span style={{ fontSize: 11, color: "var(--color-secondary)", fontWeight: 600, fontFamily: "var(--font-mono, monospace)" }}>{row.label}</span>
                 <span style={{ fontSize: 13, color: "var(--color-primary)", fontWeight: 700, fontFamily: "var(--font-mono, monospace)" }}>
                   {typeof value === "number" ? fmt(value, 1) : "—"}{" "}
-                  <span style={{ fontSize: 9, color: "var(--color-dim)", fontWeight: 400 }}>{row.unit}</span>
+                  <span style={{ fontSize: 13, color: "var(--color-dim)", fontWeight: 400 }}>{row.unit}</span>
                 </span>
               </div>
             );
@@ -223,7 +224,7 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
                   <span style={{ fontSize: 12, color: "var(--color-secondary)", fontWeight: 600, fontFamily: "var(--font-mono, monospace)" }}>{row.label}</span>
                   <span style={{ fontSize: 14, color: "var(--color-primary)", fontWeight: 700, fontFamily: "var(--font-mono, monospace)" }}>
                     {typeof value === "number" ? fmt(value, 1) : "—"}{" "}
-                    <span style={{ fontSize: 10, color: "var(--color-secondary)", fontWeight: 400 }}>{row.unit}</span>
+                    <span style={{ fontSize: 13, color: "var(--color-secondary)", fontWeight: 400 }}>{row.unit}</span>
                   </span>
                 </div>
                 <div style={{ ...monoDim, marginTop: 2, overflow: "auto" }}>
@@ -264,7 +265,7 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
 
       {/* Bayesian note */}
       {showMath && params.used_posterior_refinement && !isRetiredModel && (
-        <p style={{ fontSize: 9, color: "var(--color-dim)", fontStyle: "italic", marginTop: 4, margin: 0 }}>
+        <p style={{ fontSize: 13, color: "var(--color-dim)", fontStyle: "italic", marginTop: 4, margin: 0 }}>
           {"↳"} Population-prior arithmetic shown; displayed values are the Bayesian estimates updated from measured levels
         </p>
       )}
@@ -272,12 +273,12 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
       {/* Citation */}
       {!isRetiredModel && (
         <div style={{ marginTop: 6, paddingTop: 4, borderTop: "1px solid var(--color-border)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
-          <span style={{ fontSize: 9, color: "var(--color-dim)" }}>{COLIN_2019.citation}</span>
+          <span style={{ fontSize: 13, color: "var(--color-dim)" }}>{COLIN_2019.citation}</span>
           <a
             href={`https://doi.org/${COLIN_2019.doi}`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontSize: 9, color: "var(--color-primary)", textDecoration: "none", fontWeight: 500 }}
+            style={{ fontSize: 13, color: "var(--color-primary)", textDecoration: "none", fontWeight: 500 }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = "underline"; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = "none"; }}
           >

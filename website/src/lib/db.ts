@@ -1,3 +1,4 @@
+import { prepareComplimentaryPro, readComplimentaryPro, writeComplimentaryPro, revokeComplimentaryPro, effectiveTier } from "./complimentaryPro";
 import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
@@ -702,6 +703,8 @@ export function getReferralStats(userId: number): ReferralStats {
 
 /** Hard-delete a user. Use with care — irreversible. */
 export function deleteUser(id: number) {
+  prepareComplimentaryPro(getDb());
+  getDb().prepare("DELETE FROM complimentary_pro WHERE user_id = ?").run(id);
   getDb().prepare("DELETE FROM users WHERE id = ?").run(id);
 }
 
@@ -985,7 +988,7 @@ export function getSecuritySummary() {
 
 export function getUserTier(userId: number): TierId {
   const row = getDb().prepare("SELECT subscription_tier FROM users WHERE id = ?").get(userId) as { subscription_tier: string } | undefined;
-  return normalizeTier(row?.subscription_tier);
+  return effectiveTier(row?.subscription_tier, getComplimentaryPro(userId));
 }
 
 export function isPaidTier(tier: string): boolean {
@@ -1992,4 +1995,21 @@ export function claimBillingAcknowledgment(subscriptionId: string): boolean {
 }
 export function finishBillingAcknowledgment(subscriptionId: string, status: "sent" | "needs_review") {
   getDb().prepare("UPDATE billing_acknowledgments SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE subscription_id = ?").run(status, subscriptionId);
+}
+
+// Complimentary access is separate from Stripe-managed subscription fields.
+export function getComplimentaryPro(userId: number) {
+  const db = getDb();
+  prepareComplimentaryPro(db);
+  return readComplimentaryPro(db, userId);
+}
+export function grantComplimentaryPro(userId: number, adminId: number, reason: unknown, expiresAt: unknown) {
+  const db = getDb();
+  prepareComplimentaryPro(db);
+  writeComplimentaryPro(db, userId, adminId, reason, expiresAt);
+}
+export function removeComplimentaryPro(userId: number) {
+  const db = getDb();
+  prepareComplimentaryPro(db);
+  revokeComplimentaryPro(db, userId);
 }

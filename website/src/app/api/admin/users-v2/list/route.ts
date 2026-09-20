@@ -25,7 +25,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { listUsersPaginated, type UserListFilter } from "@/lib/db";
+import { getComplimentaryPro, listUsersPaginated, type UserListFilter } from "@/lib/db";
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
@@ -73,6 +73,7 @@ export async function GET(req: Request) {
       mfa_enabled: u.mfa_enabled,
       failed_login_attempts: u.failed_login_attempts,
       locked_until: u.locked_until,
+      complimentary_pro: getComplimentaryPro(u.id),
       subscription_tier: u.subscription_tier,
       subscription_status: u.subscription_status,
       subscription_expiry: u.subscription_expiry,

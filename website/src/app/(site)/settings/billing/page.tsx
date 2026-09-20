@@ -132,7 +132,7 @@ function BillingPageInner() {
   };
 
   const tier = TIERS[user.subscriptionTier];
-  const onPaidTier = isPaidTier(user.subscriptionTier);
+  const onPaidTier = isPaidTier(user.billingTier);
   const status = user.subscriptionStatus ?? "active";
 
   return (
@@ -174,6 +174,11 @@ function BillingPageInner() {
         </div>
       )}
 
+      {user.complimentaryPro?.active && <div className="mb-6 border border-teal-700 p-4">
+        <h2 className="font-semibold">Complimentary Pro access</h2>
+        <p>{user.complimentaryPro.expiresAt ? `Ends ${new Date(user.complimentaryPro.expiresAt).toUTCString()}.` : "No expiration date."} No card required and no automatic paid renewal.</p>
+        <p>When this grant ends, your underlying plan applies. Any existing paid subscription continues separately; use Manage billing to review or cancel it.</p>
+      </div>}
       {/* Current plan card */}
       <div style={{
         padding: 20,
@@ -191,7 +196,7 @@ function BillingPageInner() {
               {tier.name}
             </div>
             <div style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 2 }}>
-              {onPaidTier ? "Your existing subscription amount and renewal terms are shown in Manage billing." : tier.priceLabel}
+              {onPaidTier ? "Your existing subscription amount and renewal terms are shown in Manage billing." : user.complimentaryPro?.active ? "Complimentary · $0" : tier.priceLabel}
             </div>
           </div>
           {onPaidTier && (
@@ -236,7 +241,7 @@ function BillingPageInner() {
       </div>
 
       {/* Upgrade card — only for free users */}
-      {!onPaidTier && (
+      {!onPaidTier && !user.complimentaryPro?.active && (
         <div style={{
           padding: 20,
           marginBottom: 24,

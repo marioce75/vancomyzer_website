@@ -19,6 +19,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import {
+  getComplimentaryPro,
   findUserByLogin,
   setStripeCustomerId,
   userHasActiveDiscount,
@@ -49,6 +50,8 @@ export async function POST(req: Request) {
   if (!dbUser) {
     return NextResponse.json({ error: "User not found." }, { status: 404 });
   }
+
+  if (getComplimentaryPro(dbUser.id).active) return NextResponse.json({ error: "You already have complimentary Pro access. No purchase is needed." }, { status: 409 });
 
   const stripe = getStripe();
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";

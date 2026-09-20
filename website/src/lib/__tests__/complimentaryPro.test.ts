@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict';
+import Database from 'better-sqlite3';
+import { prepareComplimentaryPro, readComplimentaryPro, writeComplimentaryPro, revokeComplimentaryPro, effectiveTier } from '../complimentaryPro';
+const db = new Database(':memory:');
+db.exec("CREATE TABLE users (id INTEGER PRIMARY KEY, subscription_tier TEXT, subscription_status TEXT); INSERT INTO users VALUES (1,'free','active');");
+prepareComplimentaryPro(db);
+const now = Date.parse('2026-09-20T12:00:00Z');
+assert.equal(readComplimentaryPro(db,1,now).active,false);
+writeComplimentaryPro(db,1,99,'Reviewer', '2026-10-01T00:00:00Z',now);
+let grant = readComplimentaryPro(db,1,now);
+assert.equal(effectiveTier('free',grant),'individual_pro');
+assert.equal(effectiveTier('department',grant),'department');
+assert.equal(effectiveTier('hospital',grant),'hospital');
+assert.equal(readComplimentaryPro(db,1,Date.parse('2026-10-01T00:00:00Z')).active,false);
+// A paid subscription update followed by cancellation cannot remove the separate grant.
+db.prepare("UPDATE users SET subscription_tier='individual_pro', subscription_status='active' WHERE id=1").run();
+db.prepare("UPDATE users SET subscription_tier='free', subscription_status='canceled' WHERE id=1").run();
+assert.equal(readComplimentaryPro(db,1,now).active,true);
+revokeComplimentaryPro(db,1);
+assert.equal(effectiveTier('free',readComplimentaryPro(db,1,now)),'free');
+assert.equal(effectiveTier('individual_pro',readComplimentaryPro(db,1,now)),'individual_pro');
+writeComplimentaryPro(db,1,99,'Ongoing reviewer',null,now);
+assert.equal(readComplimentaryPro(db,1,now+10*365*86400000).active,true);
+for (const expiry of ['not-a-date','2026-09-19',123]) assert.throws(()=>writeComplimentaryPro(db,1,99,'Reason',expiry,now));
+for (const reason of ['', ' ', 'a'.repeat(501), null]) assert.throws(()=>writeComplimentaryPro(db,1,99,reason,null,now));
+assert.equal((db.prepare('SELECT subscription_status FROM users WHERE id=1').get() as any).subscription_status,'canceled');
+db.close();
+console.log('Complimentary Pro: grants, expiry boundary, revocation, paid-tier precedence, billing independence and invalid inputs passed.');

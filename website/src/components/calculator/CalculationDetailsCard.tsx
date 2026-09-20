@@ -27,7 +27,7 @@ export default function CalculationDetailsCard({
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Calculation details</h2>
           <p className="mt-1 text-sm text-gray-600">
-            Core method and evidence summary first. Expanded detail stays compact.
+            Review the method, inputs and evidence limits for this estimate.
           </p>
         </div>
         <span

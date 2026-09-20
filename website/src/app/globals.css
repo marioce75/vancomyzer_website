@@ -1086,3 +1086,6 @@ body.theme-basic .manifesto-dark a.cta-outline {
 /* Graph fills its panel on desktop */
 .vz-graph-fill { display: flex; flex-direction: column; min-height: 0; height: 100%; }
 .vz-graph-fill canvas { flex: 1 1 auto; min-height: 220px; height: auto !important; }
+
+/* The synthetic example is a light panel inside the dark landing hero. */
+body.theme-basic .manifesto-dark .synthetic-example p { color: #334155 !important; }

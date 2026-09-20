@@ -14,6 +14,8 @@ export interface AuthUser {
   credentials: string;
   first_login_acknowledged: number;
   subscriptionTier: TierId;
+  billingTier: TierId;
+  complimentaryPro: { active: boolean; expiresAt: string | null } | null;
   subscriptionStatus: string;
   subscriptionExpiry: string | null;
   institutionalAccountId: number | null;
@@ -44,6 +46,8 @@ function AuthInner({ children }: { children: React.ReactNode }) {
     institution: (session.user as Record<string, unknown>).institution as string ?? null,
     credentials: (session.user as Record<string, unknown>).credentials as string ?? "",
     first_login_acknowledged: (session.user as Record<string, unknown>).first_login_acknowledged as number ?? 0,
+    billingTier: normalizeTier((session.user as Record<string, unknown>).billingTier),
+    complimentaryPro: ((session.user as Record<string, unknown>).complimentaryPro as AuthUser["complimentaryPro"]) ?? null,
     subscriptionTier: normalizeTier((session.user as Record<string, unknown>).subscriptionTier),
     subscriptionStatus: ((session.user as Record<string, unknown>).subscriptionStatus as string) ?? "active",
     subscriptionExpiry: ((session.user as Record<string, unknown>).subscriptionExpiry as string | null) ?? null,

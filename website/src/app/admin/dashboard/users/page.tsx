@@ -36,6 +36,7 @@ interface UserRow {
   mfa_enabled: number;
   failed_login_attempts: number;
   locked_until: string | null;
+  complimentary_pro: { active: boolean; expiresAt: string | null; reason: string };
   subscription_tier: string;
   subscription_status: string;
   subscription_expiry: string | null;
@@ -576,7 +577,7 @@ function UserRowComp({
         <div className="text-[10px] text-gray-500">@{user.username} · {user.credentials}</div>
       </td>
       <td className="px-3 py-2 text-gray-700">{user.email}</td>
-      <td className="px-3 py-2"><TierBadge tier={user.subscription_tier} /></td>
+      <td className="px-3 py-2"><TierBadge tier={user.complimentary_pro?.active && user.subscription_tier === "free" ? "individual_pro" : user.subscription_tier} />{user.complimentary_pro?.active && <span className="ml-1 text-xs text-teal-800">Complimentary</span>}</td>
       <td className="px-3 py-2 text-gray-700">{user.country_code ? getCountryName(user.country_code) : <span className="text-gray-400">—</span>}</td>
       <td className="px-3 py-2 text-gray-700 truncate" style={{ maxWidth: 140 }}>{user.institution_type ? getInstitutionTypeName(user.institution_type) : <span className="text-gray-400">—</span>}</td>
       <td className="px-3 py-2"><StatusBadge status={user.status} role={user.role} locked={Boolean(user.locked_until && new Date(user.locked_until) > new Date())} /></td>
@@ -708,7 +709,7 @@ function UserDetailDrawer({
             <DetailRow k="Email" v={user.email} />
             <DetailRow k="Status" v={<StatusBadge status={user.status} role={user.role} locked={Boolean(user.locked_until && new Date(user.locked_until) > new Date())} />} />
             <DetailRow k="System role" v={user.role} />
-            <DetailRow k="Tier" v={<TierBadge tier={user.subscription_tier} />} />
+            <DetailRow k="Underlying tier" v={<TierBadge tier={user.subscription_tier} />} />
             <DetailRow k="Joined" v={fmtDateLong(user.created_at)} />
             <DetailRow k="Approved" v={user.approved_at ? `${fmtDateLong(user.approved_at)} by ${user.approved_by ?? "?"}` : "—"} />
             <DetailRow k="Last login" v={fmtDateLong(user.last_login)} />
@@ -732,6 +733,9 @@ function UserDetailDrawer({
             )}
           </DetailSection>
 
+          <DetailSection title="Complimentary Pro">
+            <ComplimentaryProForm key={user.id} user={user} onAction={onAction} />
+          </DetailSection>
           <DetailSection title="Actions">
             <div className="grid grid-cols-2 gap-2">
               {user.status === "pending" && <DrawerActionBtn label="Approve" onClick={() => onAction(user.id, "approve")} />}
@@ -905,4 +909,25 @@ function fmtDateLong(iso: string | null): string {
     const s = iso.includes("T") || iso.includes("Z") ? iso : iso.replace(" ", "T") + "Z";
     return new Date(s).toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   } catch { return iso; }
+}
+
+function ComplimentaryProForm({ user, onAction }: { user: UserRow; onAction: (id: number, action: string, extra?: Record<string, unknown>) => void }) {
+  const [reason, setReason] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const grant = user.complimentary_pro;
+  return <form key={user.id} className="space-y-3 text-sm" onSubmit={e => {
+    e.preventDefault();
+    if (!confirm(`Grant complimentary Pro to ${user.email}${expiry ? ` until ${expiry} at 00:00 UTC` : " with no expiration"}? Existing subscription charges will continue unless separately canceled.`)) return;
+    onAction(user.id, "grant_complimentary_pro", { reason, expiresAt: expiry ? `${expiry}T00:00:00.000Z` : null });
+  }}>
+    <p>{grant?.active ? `Active · ${grant.expiresAt ? `ends ${new Date(grant.expiresAt).toUTCString()}` : "no expiration"}` : "No active complimentary grant"}</p>
+    {grant?.reason && <p>Recorded reason: {grant.reason}</p>}
+    <p>Includes Individual Pro features. No card or automatic paid renewal. Existing paid subscriptions are billed separately and are not canceled by this grant.</p>
+    <label className="block">Reason<input required maxLength={500} value={reason} onChange={e => setReason(e.target.value)} className="block w-full border p-2" /></label>
+    <label className="block">Expires at start of date (UTC), optional<input type="date" value={expiry} onChange={e => setExpiry(e.target.value)} className="block w-full border p-2" /></label>
+    <button type="submit" className="rounded border border-teal-700 px-3 py-2 font-semibold">Grant complimentary Pro</button>
+    {grant?.active && <button type="button" className="ml-2 underline" onClick={() => {
+      if (confirm(`Revoke complimentary Pro for ${user.email}? Paid access, if any, remains unchanged.`)) onAction(user.id, "revoke_complimentary_pro");
+    }}>Revoke grant</button>}
+  </form>;
 }

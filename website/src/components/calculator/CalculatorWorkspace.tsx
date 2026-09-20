@@ -864,7 +864,7 @@ export default function CalculatorWorkspace() {
         {/* Long-form disclaimer stays on the page (scrolls with the rail); the
             regulatory strip at the bottom of every screen carries the short form. */}
         <div className="px-3 py-2">
-          <p style={{ fontSize: 10, lineHeight: 1.55, color: "var(--color-dim)", fontFamily: "inherit", margin: 0 }}>
+          <p style={{ fontSize: 13, lineHeight: 1.55, color: "var(--color-dim)", fontFamily: "inherit", margin: 0 }}>
             Vancomyzer&trade; is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation. Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. It is not a substitute for clinical judgment, institutional protocols, or therapeutic drug monitoring.{" "}
             {/* A real button so the full disclaimer is reachable by keyboard and screen readers. */}
             <button

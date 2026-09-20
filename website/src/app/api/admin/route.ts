@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import {
+  grantComplimentaryPro,
+  removeComplimentaryPro,
   listAllUsers,
   approveUser,
   disableUser,
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
   const admin = await requireAdmin();
   if (!admin) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
 
-  let body: { action: string; userId: number; role?: string; tier?: string };
+  let body: { action: string; userId: number; role?: string; tier?: string; reason?: string; expiresAt?: string | null };
   try {
     body = await request.json();
   } catch {
@@ -88,6 +90,17 @@ export async function POST(request: NextRequest) {
       { error: "You can't perform this action on your own account. Ask another superadmin." },
       { status: 400 },
     );
+  }
+
+  if (action === "grant_complimentary_pro" || action === "revoke_complimentary_pro") {
+    if (action === "grant_complimentary_pro") {
+      try { grantComplimentaryPro(userId, adminId, body.reason, body.expiresAt ?? null); }
+      catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : "Invalid grant." }, { status: 400 }); }
+    } else { removeComplimentaryPro(userId); }
+    logSecurityEvent({ user_id: adminId, username: adminUsername,
+      action: action === "grant_complimentary_pro" ? "COMPLIMENTARY_PRO_GRANTED" : "COMPLIMENTARY_PRO_REVOKED",
+      details: JSON.stringify({ target_user_id: userId, reason: body.reason, expiresAt: body.expiresAt ?? null }), severity: "info" });
+    return NextResponse.json({ ok: true, message: "Complimentary access updated. Existing billing is unchanged." });
   }
 
   if (action === "approve") {

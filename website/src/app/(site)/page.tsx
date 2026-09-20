@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import OpenCalculatorButton from "@/components/landing/OpenCalculatorButton";
-import AucCurveIllustration from "@/components/landing/AucCurveIllustration";
+import SyntheticExample from "@/components/landing/SyntheticExample";
 import { OPEN_ACCESS } from "@/lib/openAccess";
 import {
   COLIN_2019,
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Vancomyzer™ — Free Bayesian Vancomycin AUC Dosing Calculator",
     description:
-      "AUC-guided vancomycin dosing support for clinicians: empiric regimens, refinement with one or two measured levels, and every model and equation documented in the open.",
+      "AUC-guided vancomycin dosing support for clinicians: empiric regimens, refinement with one or two measured levels, with published methods and stated limitations.",
     type: "website",
     url: "https://vancomyzer.com",
     siteName: "Vancomyzer™",
@@ -103,7 +103,7 @@ const EVIDENCE_LINKS = [
   {
     href: "/transparent-dosing/equations",
     title: "Equations & Derivations",
-    body: "The full equations behind every calculation, each with its primary citation.",
+    body: "Population-model equations and references. Bayesian fitting also uses numerical optimization.",
   },
   {
     href: "/transparent-dosing/cases",
@@ -155,16 +155,16 @@ const PAGE_CSS = `
 `;
 
 const CTA_PRIMARY_CLASS =
-  "cta-primary inline-flex items-center justify-center gap-2 rounded-md px-7 py-3.5 text-sm font-bold uppercase tracking-wider transition hover:brightness-110";
-const CTA_PRIMARY_STYLE = { background: "#00c9b1", color: "#0f172a", letterSpacing: "0.08em" };
+  "cta-primary inline-flex items-center justify-center gap-2 rounded-md px-7 py-3.5 text-sm font-bold tracking-normal transition hover:brightness-110";
+const CTA_PRIMARY_STYLE = { background: "#00c9b1", color: "#0f172a", letterSpacing: "normal" };
 const CTA_OUTLINE_CLASS =
-  "cta-outline inline-flex items-center justify-center rounded-md border-2 px-7 py-3.5 text-center text-sm font-bold uppercase tracking-wider transition";
-const CTA_OUTLINE_STYLE = { borderColor: "#cbd5e1", color: "#ffffff", letterSpacing: "0.08em" };
+  "cta-outline inline-flex items-center justify-center rounded-md border-2 px-7 py-3.5 text-center text-sm font-bold tracking-normal transition";
+const CTA_OUTLINE_STYLE = { borderColor: "#cbd5e1", color: "#ffffff", letterSpacing: "normal" };
 
 function Eyebrow({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
   return (
     <span
-      className="block text-xs font-bold uppercase tracking-[0.18em]"
+      className="block text-sm font-semibold"
       style={{ color: dark ? "#00c9b1" : "#0f766e" }}
     >
       {children}
@@ -182,22 +182,9 @@ export default function LandingPage() {
         className="manifesto-dark relative overflow-hidden px-6 py-16 sm:py-24"
         style={{
           background:
-            "radial-gradient(900px 480px at 88% -8%, rgba(0,201,177,0.16), transparent 62%), linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
+            "#0f172a",
         }}
       >
-        {/* Faint chart-paper grid behind the hero */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(148,163,184,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.07) 1px, transparent 1px)",
-            backgroundSize: "44px 44px",
-            WebkitMaskImage: "radial-gradient(ellipse at 70% 35%, #000 15%, transparent 70%)",
-            maskImage: "radial-gradient(ellipse at 70% 35%, #000 15%, transparent 70%)",
-          }}
-        />
-
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
           <div>
             <div className="vz-rise vz-d1 mb-5">
@@ -207,17 +194,13 @@ export default function LandingPage() {
               className="vz-rise vz-d2 text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl xl:text-6xl"
               style={{ color: "#ffffff" }}
             >
-              Bayesian, AUC-guided vancomycin dosing{" "}
-              <span style={{ color: "#00c9b1" }}>— free for clinicians.</span>
+              Vancomycin AUC calculator for adult patients.
             </h1>
             <p
               className="vz-rise vz-d3 mt-6 max-w-2xl text-lg leading-relaxed sm:text-xl"
               style={{ color: "#cbd5e1" }}
             >
-              Start with an empiric regimen built from your patient&rsquo;s characteristics, then
-              refine it with one or two measured levels. Targets follow the 2020 ASHP/IDSA/PIDS/SIDP
-              consensus guideline, and the model, assumptions and limitations are shown with every
-              result.
+              Estimate a starting regimen or use measured levels to compare dosing options. Review the model assumptions and limitations before using an estimate.
             </p>
 
             <p className="vz-rise vz-d4 mt-5 text-sm font-semibold sm:text-base" style={{ color: "#e2e8f0" }}>
@@ -254,8 +237,8 @@ export default function LandingPage() {
           </div>
 
           {/* Illustration is decorative context; phones keep the hero focused on the action. */}
-          <div className="vz-rise vz-d3 hidden sm:block">
-            <AucCurveIllustration />
+          <div className="vz-rise vz-d3 min-w-0">
+            <SyntheticExample />
           </div>
         </div>
       </section>
@@ -274,12 +257,12 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-10 grid gap-x-10 gap-y-6 sm:grid-cols-2">
             {CAPABILITIES.map((c, i) => (
               <li
                 key={c.title}
-                className="flex flex-col rounded-lg border p-6"
-                style={{ borderColor: "#e2e8f0", background: "#f8fafc" }}
+                className="flex flex-col border-t py-6"
+                style={{ borderColor: "#e2e8f0", background: "#ffffff" }}
               >
                 <span className="font-mono text-sm font-bold text-[#0f766e]">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="mt-2 text-lg font-bold leading-snug" style={{ color: "#0f172a" }}>
@@ -311,7 +294,7 @@ export default function LandingPage() {
               Review the evidence before you rely on it.
             </h2>
             <p className="mt-3 text-base leading-relaxed" style={{ color: "#334155" }}>
-              Every model, equation and published source is documented. Vancomyzer has not yet been
+              Method pages document the model equations, assumptions and sources. Vancomyzer has not yet been
               validated in real patients. Its equations are checked against published values and
               synthetic test cases; external validation with patient data is planned. The results of
               those developer-run checks are public.
@@ -323,7 +306,7 @@ export default function LandingPage() {
               <li key={l.href}>
                 <Link
                   href={l.href}
-                  className="group flex h-full flex-col rounded-lg border border-[#e2e8f0] bg-[#ffffff] p-5 transition hover:border-[#0d9488]"
+                  className="group flex h-full flex-col border-t border-[#cbd5e1] py-5 transition hover:border-[#0d9488]"
                 >
                   <span className="flex items-center justify-between gap-3 text-base font-bold text-[#0f172a]">
                     {l.title}
@@ -404,7 +387,7 @@ export default function LandingPage() {
           className="mx-auto mt-12 max-w-6xl rounded-lg border p-6"
           style={{ borderColor: "#cbd5e1", background: "#f8fafc" }}
         >
-          <span className="block text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#475569" }}>
+          <span className="block text-sm font-semibold" style={{ color: "#475569" }}>
             Regulatory status
           </span>
           <p className="mt-2 text-sm leading-relaxed" style={{ color: "#334155" }}>

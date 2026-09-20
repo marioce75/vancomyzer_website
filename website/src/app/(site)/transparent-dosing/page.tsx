@@ -8,11 +8,11 @@ import {
 export const metadata: Metadata = {
   title: "Transparent Dosing — Vancomyzer™",
   description:
-    "Vancomyzer is a transparent Bayesian vancomycin dosing calculator: the model, the priors and an illustrative uncertainty band are shown in the open, with every equation documented and cited.",
+    "Vancomyzer is a transparent Bayesian vancomycin dosing calculator: the model, the priors and an illustrative uncertainty band are shown in the open, with model equations and references available for review.",
   openGraph: {
     title: "Transparent Vancomycin Dosing — Vancomyzer™",
     description:
-      "Every equation and every prior is documented in the open, with an illustrative uncertainty band on the concentration-time graph. Free for clinicians.",
+      "Review the population-model equations, Bayesian fitting approach and limitations. Independent clinical validation is pending.",
     type: "website",
     url: "https://vancomyzer.com/transparent-dosing",
     siteName: "Vancomyzer™",
@@ -26,50 +26,19 @@ export const metadata: Metadata = {
 };
 
 const PRINCIPLES = [
-  {
-    n: "01",
-    title: "Show the math.",
-    body:
-      `The calculator shows the equations, starting estimates and reasons behind each result. Vancomyzer shows its reasoning, not just its result. We show the ${COLIN_2019.shortName} covariate equations next to your patient's estimated clearance (CL). For each Bayesian estimate, we show the difference between the measured and predicted drug level. Turn on Teaching Mode and you get plain-language pharmacokinetic explanations alongside each result.`,
-  },
-  {
-    n: "02",
-    title: "Honest uncertainty.",
-    body:
-      "When the available measurements leave uncertainty, the calculator shows it — with an illustrative uncertainty band around the predicted concentration-time curve, not a statistical confidence, credible or prediction interval, and not a falsely confident single line. The band widens when no level is fit, narrows when two coherent levels are in. We'd rather be visibly humble than invisibly wrong.",
-  },
-  {
-    n: "03",
-    title: "The prior is published, peer-reviewed, and pooled from 14 studies.",
-    body:
-      `${COLIN_2019.citation} ${COLIN_2019.sourcePopulation} Vancomyzer shows the model, assumptions and evidence behind each estimate.`,
-  },
-  {
-    n: "04",
-    title: "Free for the people who need it most.",
-    body:
-      "Pharmacy students, residents, individual clinicians: the full calculator is free, permanently. Institutional plans add workflow features for hospitals and health systems — team audit logs are live today; EMR/EHR integration, SSO, custom branding and a Business Associate Agreement are not yet available. None of it changes the math clinicians rely on.",
-  },
-  {
-    n: "05",
-    title: "Bayesian, not magic.",
-    body:
-      "Posterior MAP estimation with log-normal prior penalties on every PK parameter. A single observation cannot override decades of population-PK data — this is an intentional safeguard. When the fit can't explain a measured level within ~25% relative error, the calculator displays a Fit Quality Advisory and tells you to draw a confirmatory level. It does not silently loosen the prior to make the curve pass through the dot.",
-  },
-  {
-    n: "06",
-    title: "Open methodology.",
-    body:
-      "The Colin 2019 equations and parameter values shown throughout this site are drawn from the same set of model equations and values used by the calculator. Every model, every parameter, every safety guardrail is documented with its primary citation. The limits on pediatric use, dialysis and continuous infusion are stated explicitly because Vancomyzer is not designed for those populations, not because we're saving features for an upgrade tier.",
-  },
+  { n: "01", title: "Population-model equations", body: `The ${COLIN_2019.shortName} covariate equations are shown next to the estimated pharmacokinetic parameters. Bayesian fitting also uses numerical optimization; it is not a calculation that can be reproduced by substituting inputs into one equation.` },
+  { n: "02", title: "Illustrative uncertainty band", body: "The shaded band around a predicted curve is a fixed percentage that varies with fit quality. It is not a statistical confidence, credible or prediction interval." },
+  { n: "03", title: "Published starting model", body: `${COLIN_2019.citation} ${COLIN_2019.sourcePopulation} Published model evidence does not establish clinical validation of Vancomyzer.` },
+  { n: "04", title: "Access and pricing", body: "The core calculator is free. Paid plans add account and team features. See the pricing page for current features and terms; all plans use the same calculation method." },
+  { n: "05", title: "Fit to measured levels", body: "Bayesian estimates combine the population model with measured levels. The calculator shows measured-versus-predicted differences and flags a poor fit for clinical review." },
+  { n: "06", title: "Scope and evaluation", body: "Vancomyzer supports adults receiving intermittent intravenous vancomycin. Pediatric dosing, dialysis and continuous infusion are outside its scope. Independent clinical validation is pending." },
 ];
 
 const ANTI_PROMISES = [
-  "We will not claim FDA clearance we don't have. Vancomyzer™ is not FDA-cleared or approved; it is designed to meet the non-device clinical decision support criteria of FD&C Act §520(o)(1)(E). The disclaimer on every page is real, not legal noise.",
-  "We will not fit your patient on a single outlier level by quietly loosening the prior. The fit is bounded; the residual is shown; the advisory tells you when to draw another level.",
-  "We will not pretend the calculator works for pediatrics, dialysis, continuous infusion, or extreme renal failure until those subpopulations have been validated and made available with appropriate safety checks.",
-  "Basic AUC-guided dosing will not require a hospital contract. Every plan uses the same calculation method; paid plans add workflow features such as PDF export, notes, calculation history and team audit logs.",
-  "We will not replace clinician judgment. Every recommendation comes with the math, the residuals, and the assumptions so a pharmacist can override it with full context.",
+  "Vancomyzer is not FDA-cleared or approved. Its intended regulatory basis and limitations are described in the medical disclaimer.",
+  "A poor fit to measured levels requires review of timing, data quality and the clinical situation. It does not establish that a proposed regimen is appropriate.",
+  "Published-case checks and synthetic comparisons are developer-run software checks, not independent clinical validation.",
+  "The clinician must review a recommendation against the patient’s condition, local protocol and therapeutic drug monitoring.",
 ];
 
 const SOURCES = [
@@ -103,18 +72,17 @@ export default function TransparentDosingPage() {
             className="mb-6 text-xs font-bold uppercase tracking-[0.18em]"
             style={{ color: "#00c9b1" }}
           >
-            Transparent Dosing — A Position
+            Vancomyzer methods
           </p>
           <h1
             className="text-4xl font-extrabold leading-tight tracking-tight sm:text-6xl"
             style={{ color: "#ffffff" }}
           >
-            Show the model. Show the evidence. Show the uncertainty.
+            Methods and limitations
           </h1>
           <p className="mt-6 max-w-3xl text-lg leading-relaxed sm:text-xl" style={{ color: "#cbd5e1" }}>
             Vancomyzer&trade; is a transparent Bayesian dosing calculator for clinical pharmacists.
-            Every equation and every prior is in the open, with an illustrative uncertainty band
-            — because the math behind your dose decisions should be auditable, not just trusted.
+            Review the equations, sources and assumptions, including how measured levels affect an estimate.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Link
@@ -171,7 +139,7 @@ export default function TransparentDosingPage() {
             What we believe
           </h2>
           <p className="mt-3 text-sm" style={{ color: "#64748b" }}>
-            Six commitments that shape every calculation.
+            How to review a calculation.
           </p>
           <div className="mt-12 space-y-12">
             {PRINCIPLES.map((p) => (

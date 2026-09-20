@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import {
+  getUserTier,
+  getComplimentaryPro,
   findUserByLogin,
   findUserByEmail,
   findUserById,
@@ -277,12 +279,15 @@ export const authOptions: NextAuthOptions = {
         if (token.id) {
           try {
             const fresh = findUserById(Number(token.id));
-            (session.user as Record<string, unknown>).subscriptionTier = normalizeTier(fresh?.subscription_tier);
+            (session.user as Record<string, unknown>).subscriptionTier = getUserTier(Number(token.id));
+            (session.user as Record<string, unknown>).billingTier = normalizeTier(fresh?.subscription_tier);
+            const grant = getComplimentaryPro(Number(token.id));
+            (session.user as Record<string, unknown>).complimentaryPro = { active: grant.active, expiresAt: grant.expiresAt };
             (session.user as Record<string, unknown>).subscriptionStatus = fresh?.subscription_status ?? "active";
             (session.user as Record<string, unknown>).subscriptionExpiry = fresh?.subscription_expiry ?? null;
           } catch {
-            // DB read failure — fall back to JWT-cached tier
-            (session.user as Record<string, unknown>).subscriptionTier = normalizeTier(token.subscriptionTier);
+            // Do not retain an expired or revoked grant when the access check fails.
+            (session.user as Record<string, unknown>).subscriptionTier = "free";
             (session.user as Record<string, unknown>).subscriptionStatus = "active";
             (session.user as Record<string, unknown>).subscriptionExpiry = null;
           }
