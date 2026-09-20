@@ -1371,7 +1371,7 @@ export default function CalculatorWorkspace() {
                         rrt === true
                           ? "The model is not validated for renal replacement therapy."
                           : mode === "initial_regimen"
-                            ? "Age, weight, serum creatinine and RRT status are required; the Bayesian calculation starts automatically once they are present."
+                            ? "Enter age, weight, serum creatinine and renal replacement therapy status. The population-model estimate starts automatically when the required inputs are valid."
                             : "Enter the current regimen and measured level(s), then press Calculate."
                       }
                       role="status"
@@ -1381,7 +1381,7 @@ export default function CalculatorWorkspace() {
                     <div className="vz-advisory-row">
                       <span aria-hidden="true" className="inline-flex h-4 min-w-4 items-center justify-center px-1 text-[10px] font-black leading-none" style={{ border: "1px solid currentColor", borderRadius: 3, marginTop: 2 }}>!</span>
                       <span className="min-w-0">
-                        <span className="font-bold">Safety guardrails:</span> adult intermittent IV workflow only · not for pediatrics, dialysis-specific or continuous infusion · {mode === "initial_regimen" ? "prior-only maintenance support; not patient-specific severity direction" : "requires interpretable same-interval timing and routine dose history"}.
+                        <span className="font-bold">Scope:</span> Adults receiving intermittent IV vancomycin only. Not for children, dialysis or continuous infusion. {mode === "initial_regimen" ? "Starting maintenance estimates use patient characteristics without measured levels; review infection severity separately." : "Enter accurate dose and sample times from the same dosing interval and a consistent prior dosing schedule."}
                       </span>
                       <a href="/transparent-dosing" className="text-[11px] font-semibold underline" style={{ color: "inherit" }}>Evidence</a>
                     </div>
@@ -1460,16 +1460,10 @@ export default function CalculatorWorkspace() {
               {displayResult ? (
                 <ResultDetailTabs tabs={detailTabs} storageKey="vancomyzer_detail_tab" />
               ) : (
-                <div className="p-2.5">
-                  <div className="vz-tabs -mx-2.5 -mt-2.5 mb-2" aria-hidden="true">
-                    <button type="button" role="tab" aria-selected="true" tabIndex={-1}>PK parameters</button>
-                    <button type="button" role="tab" aria-selected="false" tabIndex={-1}>Method</button>
-                    <button type="button" role="tab" aria-selected="false" tabIndex={-1}>Interpretation</button>
-                  </div>
-                  <PKParametersMath params={{ CL: 0, V1: 0, Q: 0, V2: 0, used_posterior_refinement: false, scr: 0 }} />
-                  <div className="mt-2">
-                    <CalculationMethodPanel mode={mode} levelCount={levels.length} details={null} assumptions={[]} infusionDurationAdjustedForSafety={false} pkModelName={null} />
-                  </div>
+                <div className="p-3 text-sm" style={{ color: "var(--color-secondary)" }}>
+                  <h3 className="mb-2 font-semibold">Calculation details</h3>
+                  <p>Enter patient details to view calculations. Parameters and substituted equations appear after a valid result is available.</p>
+                  <a href="/transparent-dosing/equations" className="mt-3 inline-block underline">Review model equations and references</a>
                 </div>
               )}
             </div>

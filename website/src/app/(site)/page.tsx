@@ -220,6 +220,11 @@ export default function LandingPage() {
               result.
             </p>
 
+            <p className="vz-rise vz-d4 mt-5 text-sm font-semibold sm:text-base" style={{ color: "#e2e8f0" }}>
+              Adults receiving intermittent IV vancomycin only. For clinician review.
+              Independent clinical validation is pending.
+            </p>
+
             <div className="vz-rise vz-d4 mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <OpenCalculatorButton source="landing_hero" className={CTA_PRIMARY_CLASS} style={CTA_PRIMARY_STYLE}>
                 Open Calculator <span aria-hidden="true">→</span>
