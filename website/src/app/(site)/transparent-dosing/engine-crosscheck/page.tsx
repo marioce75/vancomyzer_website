@@ -37,6 +37,7 @@ import {
 } from "@/lib/validation/engineCrosscheck2026";
 
 export const metadata = {
+  alternates: { canonical: "https://vancomyzer.com/transparent-dosing/engine-crosscheck" },
   title: "Engine Cross-Check — Vancomyzer",
   description:
     "A developer-run synthetic analysis (not real patients): Vancomyzer's Bayesian fitting compared with Tucuxi-core " +

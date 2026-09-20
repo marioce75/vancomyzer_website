@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "https://vancomyzer.com/about" },
+};
+
 // Locked: practical not brand-heavy; CASE-001 and quick summary as support links; mission, philosophy, intended users
 export default function AboutPage() {
   return (

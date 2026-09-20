@@ -32,6 +32,7 @@ import {
  */
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://vancomyzer.com/" },
   title: "Vancomycin AUC Dosing Calculator — Free Bayesian Dosing Support | Vancomyzer™",
   description:
     `Free Bayesian, AUC-guided vancomycin dosing calculator for pharmacists, physicians and other clinicians. Empiric dosing from patient characteristics, refinement with one or two measured levels, the ${COLIN_2019.shortName} population model for all adults with a high-BMI advisory, and AUC24 targets aligned with the 2020 ASHP/IDSA/PIDS/SIDP consensus guideline.`,

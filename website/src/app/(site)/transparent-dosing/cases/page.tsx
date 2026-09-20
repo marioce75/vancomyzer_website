@@ -21,6 +21,7 @@ import type { PublishedCase, CaseResult, ReferenceBand, ComparisonKind } from "@
 import { COLIN_2019 } from "@/lib/pk/modelRegistry";
 
 export const metadata = {
+  alternates: { canonical: "https://vancomyzer.com/transparent-dosing/cases" },
   title: "Literature Reproducibility — Vancomyzer",
   description:
     "Vancomyzer's Colin 2019 equations checked against published values, plus published results from other models shown for context. " +

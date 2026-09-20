@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "https://vancomyzer.com/privacy" },
+};
+
 import CanonicalDocCallout from "@/components/CanonicalDocCallout";
 import { LEGAL_LINKS } from "@/lib/legalLinks";
 

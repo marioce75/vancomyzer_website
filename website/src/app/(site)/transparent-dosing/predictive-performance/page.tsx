@@ -40,6 +40,7 @@ import {
 import { COLIN_2019, MODEL_MANIFEST_VERSION } from "@/lib/pk/modelRegistry";
 
 export const metadata = {
+  alternates: { canonical: "https://vancomyzer.com/transparent-dosing/predictive-performance" },
   title: "Predictive Performance — Vancomyzer",
   description:
     "A developer-run synthetic analysis (not real patients): Vancomyzer's Bayesian engine predicts a held-out " +

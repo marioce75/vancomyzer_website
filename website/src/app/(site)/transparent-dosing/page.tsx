@@ -6,6 +6,7 @@ import {
 } from "@/lib/pk/modelRegistry";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://vancomyzer.com/transparent-dosing" },
   title: "Transparent Dosing — Vancomyzer™",
   description:
     "Vancomyzer is a transparent Bayesian vancomycin dosing calculator: the model, the priors and an illustrative uncertainty band are shown in the open, with model equations and references available for review.",

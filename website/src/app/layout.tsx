@@ -13,6 +13,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://vancomyzer.com"),
   title: "VANCOMYZER\u2122",
   description:
     "Vancomycin dosing support with visible assumptions, review-critical limitations, and clinician-readable outputs.",

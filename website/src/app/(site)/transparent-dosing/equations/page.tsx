@@ -12,6 +12,7 @@ import {
 } from "@/lib/pk/modelRegistry";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://vancomyzer.com/transparent-dosing/equations" },
   title: "Equations & Derivations — Vancomyzer™",
   description:
     `Full mathematical derivations for Vancomyzer's two-compartment PK engine — the ${COLIN_2019.shortName} population model, two-compartment rate constants, single-dose and multi-dose superposition, steady-state AUC₂₄, and body-weight scaling. Open math; cite if useful.`,
