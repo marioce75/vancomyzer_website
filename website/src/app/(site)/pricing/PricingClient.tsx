@@ -189,7 +189,7 @@ export default function PricingClient() {
       </div>
 
       {/* Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {DISPLAY_TIERS.map((tier) => {
           const isFeatured = tier.name === "Individual Pro";
           const cyclePrice = tier.price.annual;
