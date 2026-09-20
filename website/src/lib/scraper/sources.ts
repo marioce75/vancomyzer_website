@@ -78,8 +78,8 @@ export const NEGATIVE_WORDS = ["expensive", "slow", "black box", "wrong", "compl
 
 // Country keywords describe article coverage, not the location or size of a market.
 export const REGIONAL_SEARCHES = [
-  { name: "Latin America", query: '(vancomycin OR vancomicina) AND (AUC OR Bayesian OR monitoring) AND (Brazil OR Brasil OR Mexico OR Argentina OR Chile OR Colombia OR "Latin America")' },
-  { name: "Europe / Spain", query: '(vancomycin OR vancomicina) AND (AUC OR Bayesian OR monitoring) AND (Spain OR España OR Europe OR "United Kingdom")' },
-  { name: "Asia", query: 'vancomycin AND (AUC OR Bayesian OR monitoring) AND (China OR Japan OR India OR Singapore OR Thailand OR Malaysia OR Korea)' },
-  { name: "Africa", query: 'vancomycin AND (AUC OR Bayesian OR monitoring) AND (Africa OR Nigeria OR Kenya OR Egypt)' },
+  { name: "Latin America", query: 'TITLE_ABS:(vancomycin OR vancomicina) AND TITLE_ABS:(AUC OR Bayesian OR pharmacokinetic* OR "therapeutic drug monitoring" OR "area under the curve") AND (Brazil OR Brasil OR Mexico OR Argentina OR Chile OR Colombia OR "Latin America")' },
+  { name: "Europe / Spain", query: 'TITLE_ABS:(vancomycin OR vancomicina) AND TITLE_ABS:(AUC OR Bayesian OR pharmacokinetic* OR "therapeutic drug monitoring" OR "area under the curve") AND (Spain OR España OR Europe OR "United Kingdom")' },
+  { name: "Asia", query: 'TITLE_ABS:vancomycin AND TITLE_ABS:(AUC OR Bayesian OR pharmacokinetic* OR "therapeutic drug monitoring" OR "area under the curve") AND (China OR Japan OR India OR Singapore OR Thailand OR Malaysia OR Korea)' },
+  { name: "Africa", query: 'TITLE_ABS:vancomycin AND TITLE_ABS:(AUC OR Bayesian OR pharmacokinetic* OR "therapeutic drug monitoring" OR "area under the curve") AND (Africa OR Nigeria OR Kenya OR Egypt)' },
 ];

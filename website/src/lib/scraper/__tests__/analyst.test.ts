@@ -1,6 +1,6 @@
 import { csvRow } from "../csv";
 import assert from "node:assert/strict";
-import { callAnalyst, parseReport, selectEvidence, buildAnalystPrompt, AnalystError } from "../analystCore";
+import { callAnalyst, parseReport, selectEvidence, relevantRegionalEvidence, buildAnalystPrompt, AnalystError } from "../analystCore";
 
 async function main() {
   assert.equal(csvRow(["a,b", '"quoted"', "=1+1", "line\nbreak"]), '"a,b","""quoted""","\'=1+1","line\nbreak"');
@@ -9,9 +9,12 @@ async function main() {
   assert.equal(selectEvidence(evidence).length, 1, "zero-upvote research retained");
   assert.equal(selectEvidence([...evidence, ...evidence]).length, 1, "URL duplicates removed");
   const regions = ["Africa", "Asia", "Europe", "Latin America"];
-  const regional = regions.flatMap(region => Array.from({ length: 20 }, (_, i) => ({ ...evidence[0], source: "europepmc", source_identifier: region, url: `https://example.org/${region}/${i}` })));
+  const regional = regions.flatMap(region => Array.from({ length: 20 }, (_, i) => ({ ...evidence[0], title: "Vancomycin pharmacokinetics", source: "europepmc", source_identifier: region, url: `https://example.org/${region}/${i}` })));
   const selected = selectEvidence(regional);
   for (const region of regions) assert.equal(selected.filter(p => p.source_identifier === region).length, 5);
+  assert.equal(relevantRegionalEvidence({ title: "Vancomycin resistance surveillance", body_text: "General microbiology" }), false);
+  assert.equal(relevantRegionalEvidence({ title: "Vancomycin AUC monitoring", body_text: null }), true);
+  assert.throws(() => parseReport(JSON.stringify({ ...valid, executive_brief: "Independent validation and regulatory clearance are pending." }), evidence), /unconfirmed regulatory/);
   const prompt = buildAnalystPrompt(evidence, { status: "partial" });
   assert.ok(prompt.user.includes(evidence[0].url));
   assert.ok(prompt.system.includes("untrusted data"));

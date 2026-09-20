@@ -340,6 +340,7 @@ export default function MarketIntelligencePage() {
           </button>
         </div>
 
+        <p className="text-xs text-gray-600 mb-2">AI draft: review source context and factual claims before using this analysis for outreach or business decisions.</p>
         <p className="text-xs text-gray-600 mb-2">{data?.analystConfigured ? `AI service configured · ${data.analystModel}` : "AI service needs an Anthropic API key in the hosting environment."}</p>
         {analystResult && <p role="status" className="p-3 mb-3 bg-slate-50 text-sm text-slate-800">{analystResult}</p>}
         {data?.aiReport && data.aiReport.run_id !== latest?.run_id && <p className="text-sm text-amber-800 mb-3">This report predates the latest collection. Re-run analysis to refresh it.</p>}
