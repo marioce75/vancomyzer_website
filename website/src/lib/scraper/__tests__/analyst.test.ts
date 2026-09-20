@@ -18,6 +18,8 @@ async function main() {
   assert.ok(!prompt.system.includes("$25-50M"));
   assert.deepEqual(parseReport(JSON.stringify(valid), evidence), valid);
   assert.deepEqual(parseReport('```json\n'+JSON.stringify(valid)+'\n```', evidence), valid);
+  const equivalent = { ...valid, strategic_recommendations: [{ ...valid.strategic_recommendations[0], source_urls: [evidence[0].url.replace(/\/$/, "") + "#abstract"] }] };
+  assert.deepEqual(parseReport(JSON.stringify(equivalent), evidence), valid);
   assert.throws(() => parseReport("not JSON", evidence), /invalid JSON/);
   assert.throws(() => parseReport('{}', evidence), /report format/);
   assert.throws(() => parseReport(JSON.stringify({ ...valid, strategic_recommendations: [{ ...valid.strategic_recommendations[0], source_urls: ["https://invented.invalid/"] }] }), evidence), /outside the collected evidence/);

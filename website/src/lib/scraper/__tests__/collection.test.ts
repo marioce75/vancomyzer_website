@@ -42,6 +42,20 @@ async function main() {
     await assert.rejects(runAiAnalyst(), /not configured/);
     assert.equal(db.getJob("analyst")?.state,"failed");
     assert.equal(db.getLatestAiReport(),undefined,"no empty successful report");
+    process.env.ANTHROPIC_API_KEY = "test-only-key";
+    let calls = 0;
+    const report = { executive_brief: "Synthetic test only.", market_opportunities: [], competitive_gaps: [], innovation_ideas: [], risk_signals: [], strategic_recommendations: [{ recommendation: "Review", rationale: "Test evidence", priority: 1, timeline: "Next review", source_urls: [first.url!] }] };
+    global.fetch = async () => {
+      calls++;
+      const generated = calls === 1 ? { ...report, strategic_recommendations: [{ ...report.strategic_recommendations[0], source_urls: ["https://uncollected.invalid/"] }] } : report;
+      return Response.json({ stop_reason: "end_turn", content: [{ type: "text", text: JSON.stringify(generated) }] });
+    };
+    const reportId = await runAiAnalyst(result.runId);
+    assert.equal(calls, 2, "one bounded repair attempt after unrecognized citation");
+    assert.equal(db.getLatestAiReport()?.id, reportId);
+    assert.equal(db.getLatestAiReport()?.run_id, result.runId);
+    assert.equal(db.getJob("analyst")?.state, "completed");
+    delete process.env.ANTHROPIC_API_KEY;
     assert.equal(visibleText('<script>nonce1</script><main>Public content</main>'), visibleText('<script>nonce2</script><main>Public content</main>'));
     const { getFileContents } = await import("../filePersistence");
     assert.equal(getFileContents("../archives-neighbor/secret.json"),null);

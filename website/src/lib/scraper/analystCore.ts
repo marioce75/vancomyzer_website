@@ -49,10 +49,17 @@ export function parseReport(response: string, evidence: Evidence[]): AnalystRepo
   catch { throw new AnalystError("invalid_response", "The AI service returned incomplete or invalid JSON. No report was saved; retry the analysis."); }
   const result = reportSchema.safeParse(parsed);
   if (!result.success) throw new AnalystError("invalid_response", "The AI response did not match the report format. No report was saved; retry the analysis.");
-  const allowed = new Set(evidence.map(e => e.url));
+  // A trailing slash or fragment does not change the cited document. Keep the
+  // exact collected URL in saved output; do not accept different paths/domains.
+  const canonical = (value: string) => { const url = new URL(value); url.hash = ""; url.pathname = url.pathname.replace(/\/$/, "") || "/"; return url.toString(); };
+  const allowed = new Map(evidence.map(e => [canonical(e.url), e.url]));
   for (const key of ["market_opportunities", "competitive_gaps", "innovation_ideas", "strategic_recommendations", "risk_signals"] as const) {
-    if (result.data[key].some(item => item.source_urls.some(url => !allowed.has(url)))) {
-      throw new AnalystError("unverified_sources", "The AI cited a source outside the collected evidence. No report was saved; retry the analysis.");
+    for (const item of result.data[key]) {
+      item.source_urls = item.source_urls.map(url => {
+        const original = allowed.get(canonical(url));
+        if (!original) throw new AnalystError("unverified_sources", "The AI cited a source outside the collected evidence. No report was saved; retry the analysis.");
+        return original;
+      });
     }
   }
   return result.data;
