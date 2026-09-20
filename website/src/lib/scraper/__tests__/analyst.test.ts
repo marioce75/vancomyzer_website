@@ -8,6 +8,10 @@ async function main() {
   const valid = { executive_brief: "Limited evidence; no market size inference.", market_opportunities: [], competitive_gaps: [], innovation_ideas: [], strategic_recommendations: [{ recommendation: "Review the evidence", rationale: "Requires assessment", priority: 1, timeline: "Next review", source_urls: [evidence[0].url] }], risk_signals: [] };
   assert.equal(selectEvidence(evidence).length, 1, "zero-upvote research retained");
   assert.equal(selectEvidence([...evidence, ...evidence]).length, 1, "URL duplicates removed");
+  const regions = ["Africa", "Asia", "Europe", "Latin America"];
+  const regional = regions.flatMap(region => Array.from({ length: 20 }, (_, i) => ({ ...evidence[0], source: "europepmc", source_identifier: region, url: `https://example.org/${region}/${i}` })));
+  const selected = selectEvidence(regional);
+  for (const region of regions) assert.equal(selected.filter(p => p.source_identifier === region).length, 5);
   const prompt = buildAnalystPrompt(evidence, { status: "partial" });
   assert.ok(prompt.user.includes(evidence[0].url));
   assert.ok(prompt.system.includes("untrusted data"));
@@ -21,7 +25,7 @@ async function main() {
   for (const status of [400,401,403,404,429,500]) {
     await assert.rejects(callAnalyst("", "", { apiKey: "fake", fetcher: async () => new Response("secret upstream body", { status }) }), (e: AnalystError) => e.code === `provider_${status}` && !e.message.includes("secret"));
   }
-  await assert.rejects(callAnalyst("", "", { apiKey: "fake", fetcher: async () => { throw new Error("timeout"); } }), /timed out/);
+  await assert.rejects(callAnalyst("", "", { apiKey: "fake", fetcher: async () => { throw new Error("timeout"); } }), /could not be reached/);
   await assert.rejects(callAnalyst("", "", { apiKey: "fake", fetcher: async () => Response.json({ stop_reason: "max_tokens", content: [] }) }), /length limit/);
   await assert.rejects(callAnalyst("", "", { apiKey: "fake", fetcher: async () => Response.json({ content: [] }) }), /no report/);
   const output = await callAnalyst("s", "u", { apiKey: "fake", fetcher: async (_url, init) => {

@@ -1,6 +1,6 @@
 # Market intelligence operations
 
-The admin dashboard is on-demand. It starts collection with POST; collection then attempts one AI analysis. SQLite job leases prevent duplicate jobs and expose status/failures across refreshes. Interrupted jobs expire (15 minutes collection, 150 seconds analysis). This background execution assumes the existing persistent Render Node service, not a short-lived serverless request host. No new scheduler or email subscription is installed.
+The admin dashboard is on-demand. It starts collection with POST; collection then attempts one AI analysis. SQLite job leases prevent duplicate jobs and expose status/failures across refreshes. Interrupted jobs expire (15 minutes collection, 240 seconds analysis). This background execution assumes the existing persistent Render Node service, not a short-lived serverless request host. No new scheduler or email subscription is installed.
 
 Sources: up to two recent queries per configured Reddit community (only with an approved API access token); four PubMed searches (20 metadata records each); four regional Europe PMC searches (15 metadata/abstract records each); public pages for five verified competitors. Countries are article keywords, not evidence of demand. Blocked/rate-limited hosts are not retried during the run. DosOpt and the ID-ODS app surface remain explicitly disabled pending verified public URLs. Europe PMC MED records are deduplicated against PubMed by canonical article URL within each collection.
 

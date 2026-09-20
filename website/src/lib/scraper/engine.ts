@@ -76,7 +76,7 @@ export async function runFullScrape(options: { analyze?: boolean; quick?: boolea
       }
     }
     for (const search of (options.quick ? PUBMED_SEARCHES.slice(0, 1) : PUBMED_SEARCHES)) {
-      const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(search.query)}&mindate=${search.minDate}&datetype=pdat&sort=pub_date&retmax=20&retmode=json`;
+      const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(search.query)}&mindate=${search.minDate}&maxdate=${new Date().toISOString().slice(0,10).replace(/-/g,"/")}&datetype=pdat&sort=pub_date&retmax=20&retmode=json`;
       const found = await request(`PubMed: ${search.query}`, url);
       if (!found) continue;
       const ids = json<{ esearchresult?: { idlist?: string[] } }>(found)?.esearchresult?.idlist;
@@ -88,6 +88,8 @@ export async function runFullScrape(options: { analyze?: boolean; quick?: boolea
       if (!articles) { result.entry.state = "failed"; result.entry.detail = "Missing PubMed article metadata"; continue; }
       for (const id of ids) {
         const a = articles[id]; if (!a?.title) continue;
+        const year = Number(a.pubdate?.match(/\b(?:19|20)\d{2}\b/)?.[0]);
+        if (year && year < Number(search.minDate.slice(0,4))) continue;
         insert({ source: "pubmed", source_identifier: search.query, post_id: id, title: a.title, body_text: `${a.sortfirstauthor ?? ""} — ${a.source ?? ""}. Metadata only; abstract/full text not collected.`, url: `https://pubmed.ncbi.nlm.nih.gov/${id}/`, published_at: pubmedDate(a.pubdate ?? ""), upvote_count: 0, comment_count: 0, top_comments: "[]" });
         result.entry.records++;
       }
@@ -112,7 +114,7 @@ export async function runFullScrape(options: { analyze?: boolean; quick?: boolea
         if (content.length < 150 || /^(access denied|just a moment|please enable javascript)/i.test(content)) { res.entry.state = "failed"; res.entry.detail = "No usable public page text"; continue; }
         const hash = crypto.createHash("sha256").update(content).digest("hex");
         const prev = getLatestSnapshot(comp.name, url);
-        const changed = Boolean(prev && prev.content_hash !== hash);
+        const changed = Boolean(prev && prev.content_hash.length === 64 && prev.content_hash !== hash);
         insertSnapshot(comp.name, url, hash, changed);
         if (changed) changes.push({ name: comp.name, url });
         // Keywords are not verified capabilities; the analyst gets the page excerpt and URL.

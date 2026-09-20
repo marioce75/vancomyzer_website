@@ -251,8 +251,8 @@ export function insertSnapshot(competitor: string, url: string, hash: string, ch
 export function getCompetitorChanges(days = 30): { competitor_name: string; url: string; scraped_at: string; change_detected: number }[] {
   ensureScraperTables();
   return db.prepare(
-    `SELECT competitor_name, url, scraped_at, change_detected FROM competitor_snapshots
-     WHERE scraped_at > datetime('now', '-${days} days') AND change_detected = 1
+    `SELECT competitor_name, url, scraped_at, change_detected FROM competitor_snapshots s
+     WHERE length(content_hash) = 64 AND EXISTS (SELECT 1 FROM competitor_snapshots prior WHERE prior.competitor_name=s.competitor_name AND prior.url=s.url AND prior.id<s.id AND length(prior.content_hash)=64) AND scraped_at > datetime('now', '-${days} days') AND change_detected = 1
      ORDER BY scraped_at DESC`
   ).all() as { competitor_name: string; url: string; scraped_at: string; change_detected: number }[];
 }
@@ -271,8 +271,8 @@ export function logRequest(url: string, statusCode: number | null, responseTimeM
 
 export function getEvidencePosts(): ScraperPost[] {
   ensureScraperTables();
-  const sources = db.prepare("SELECT DISTINCT source FROM scraper_posts WHERE scraped_at > datetime('now','-30 days')").all() as { source: string }[];
-  return sources.flatMap(({ source }) => db.prepare("SELECT * FROM scraper_posts WHERE source = ? AND scraped_at > datetime('now','-30 days') ORDER BY scraped_at DESC, id DESC LIMIT 25").all(source) as ScraperPost[]);
+  const sources = db.prepare("SELECT DISTINCT source, source_identifier FROM scraper_posts WHERE scraped_at > datetime('now','-30 days')").all() as { source: string; source_identifier: string }[];
+  return sources.flatMap(({ source, source_identifier }) => db.prepare("SELECT * FROM scraper_posts WHERE source = ? AND source_identifier = ? AND scraped_at > datetime('now','-30 days') ORDER BY scraped_at DESC, id DESC LIMIT 8").all(source, source_identifier) as ScraperPost[]);
 }
 export interface JobStatus { kind: string; state: string; started_at: string | null; expires_at: string | null; message: string; updated_at: string }
 export function getJob(kind: string): JobStatus | undefined {

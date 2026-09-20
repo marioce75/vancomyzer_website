@@ -2,7 +2,7 @@ import { getLatestRun, getRunById, getEvidencePosts, insertAiReport, acquireJob,
 import { AnalystError, ANALYST_MODEL, buildAnalystPrompt, selectEvidence, callAnalyst, parseReport } from "./analystCore";
 
 export async function runAiAnalyst(runId?: number): Promise<number> {
-  if (!acquireJob("analyst", 150)) throw new AnalystError("already_running", "AI analysis is already running. Wait for the current report.", 409);
+  if (!acquireJob("analyst", 240)) throw new AnalystError("already_running", "AI analysis is already running. Wait for the current report.", 409);
   try {
     const run = runId === undefined ? getLatestRun() : getRunById(runId);
     if (!run) throw new AnalystError("no_data", "No scrape data is available. Run the scraper first.", 422);

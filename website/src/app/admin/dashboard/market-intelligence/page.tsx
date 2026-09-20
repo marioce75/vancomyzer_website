@@ -55,6 +55,7 @@ interface DashboardData {
   scraperStartedAt?: string | null;
 }
 
+function serverDate(value: string): Date { return new Date(value.includes("T") ? value : value.replace(" ", "T") + "Z"); }
 function safeJSON<T>(value: string | undefined, fallback: T): T {
   try { const parsed = JSON.parse(value || "null"); return parsed ?? fallback; } catch { return fallback; }
 }
@@ -196,7 +197,7 @@ export default function MarketIntelligencePage() {
             <tbody>
               {data?.runs?.map(r => (
                 <tr key={r.run_id} className="border-b border-gray-100">
-                  <td className="py-2">{new Date(r.run_date).toLocaleDateString()}</td>
+                  <td className="py-2">{serverDate(r.run_date).toLocaleDateString()}</td>
                   <td className="py-2">{r.total_posts_scraped}</td>
                   <td className="py-2 font-semibold">{r.new_posts_this_run}</td>
                   <td className="py-2">{r.run_duration_seconds.toFixed(1)}s</td>
@@ -320,7 +321,7 @@ export default function MarketIntelligencePage() {
           <h2 className={heading}>Competitor Page Changes Detected</h2>
           {data?.competitorChanges?.map((c, i) => (
             <div key={i} className="text-sm text-amber-800">
-              <strong>{c.competitor_name}</strong> — change detected at {new Date(c.scraped_at).toLocaleDateString()}
+              <strong>{c.competitor_name}</strong> — change detected at {serverDate(c.scraped_at).toLocaleDateString()}
             </div>
           ))}
         </div>
@@ -354,7 +355,7 @@ export default function MarketIntelligencePage() {
             <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-lg">
               <p className="text-xs font-bold text-indigo-800 uppercase tracking-wider mb-1">Executive Brief</p>
               <p className="text-sm text-indigo-900 leading-relaxed">{data.aiReport.executive_brief || "—"}</p>
-              <p className="text-xs text-indigo-400 mt-2">Generated: {new Date(data.aiReport.report_date).toLocaleString()}</p>
+              <p className="text-xs text-indigo-400 mt-2">Generated: {serverDate(data.aiReport.report_date).toLocaleString()}</p>
             </div>
 
             {/* Market Opportunities */}
@@ -479,7 +480,7 @@ export default function MarketIntelligencePage() {
       {/* Export Center */}
       <div className={card}>
         <h2 className={heading}>Download Reports</h2>
-        <p className="text-xs text-gray-500 mb-3">Last data: {latest ? new Date(latest.run_date).toLocaleDateString() : "No runs yet"}</p>
+        <p className="text-xs text-gray-500 mb-3">Last data: {latest ? serverDate(latest.run_date).toLocaleDateString() : "No runs yet"}</p>
         <div className="flex flex-wrap gap-2">
           <button onClick={() => download("export_summary_json")} className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50">
             Latest Collection (JSON)
