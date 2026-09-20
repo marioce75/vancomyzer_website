@@ -89,7 +89,7 @@ const COLOR_PRESETS: Record<MatrixSettings["colorMode"], ColorPreset> = {
     "--color-primary": "#355c7d",
     "--color-secondary": "#52616f",
     "--color-dim": "#52616f",
-    "--color-bg": "#f7f8fa",
+    "--color-bg": "#eaf2f8",
     "--color-border": "#c5cdd8",
     "--color-card": "#ffffff",
     "--color-input": "#ffffff",

@@ -114,7 +114,7 @@ body.no-blink .mx-blink { animation: none !important; opacity: 1 !important; }
 body.theme-basic {
   font-family: 'Inter', 'Helvetica Neue', 'Arial', system-ui, sans-serif !important;
   color: #23313f !important;
-  background: #f7f8fa !important;
+  background: #eaf2f8 !important;
 }
 
 /* ── Nav bar — dark navy (Vigilanz style) ────────────────────── */
@@ -790,12 +790,12 @@ body.theme-basic .manifesto-dark a {
   color: #355c7d !important;
 }
 
-/* Primary CTA button — teal background, dark text. Higher specificity
+/* Primary CTA on dark sections — pale blue background, dark text. Higher specificity
    (one extra class) wins over the default-link rule above. Forcing
    background-color too so the visual doesn't depend on inline style. */
 body.theme-basic .manifesto-dark a.cta-primary {
-  color: #0f172a !important;
-  background-color: #355c7d !important;
+  color: #23313f !important;
+  background-color: #d9eaf7 !important;
 }
 
 /* Outline CTA button — transparent background, white text, light border. */
@@ -1091,7 +1091,7 @@ body.theme-basic .manifesto-dark a.cta-outline {
 body.theme-basic .manifesto-dark .synthetic-example p { color: #334155 !important; }
 
 /* Approved Palette A, shared with Dosys Health. Clinical status colors unchanged. */
-:root { --brand-primary: #355c7d; --brand-ink: #23313f; --brand-paper: #f7f8fa; --brand-muted: #52616f; }
+:root { --brand-primary: #355c7d; --brand-ink: #23313f; --brand-paper: #eaf2f8; --brand-muted: #52616f; }
 body.theme-basic .brand-light { background: var(--brand-paper) !important; }
 body.theme-basic .brand-light h1, body.theme-basic .brand-light h2,
 body.theme-basic .brand-light h3 { color: var(--brand-ink) !important; }
@@ -1103,3 +1103,11 @@ body.theme-basic .brand-light a.cta-outline { color: var(--brand-primary) !impor
 
 body.theme-basic header[class*="shrink-0"] .dosys-d { color: #c6dcee !important; }
 body.theme-basic .manifesto-dark a { color: #c6dcee !important; }
+
+/* Context-specific button pairs: never steel-blue text on dark surfaces. */
+body.theme-basic .evidence-action { background: #355c7d !important; color: #fff !important; border-color: #355c7d !important; }
+body.theme-basic .evidence-action:hover { background: #294b68 !important; }
+body.theme-basic .manifesto-dark .cta-primary:hover { background: #edf5fc !important; }
+body.theme-basic .manifesto-dark .cta-primary span { color: #23313f !important; }
+body.theme-basic .manifesto-dark > div > span { color: #c6dcee !important; }
+body.theme-basic #app-root > header { background: #dce9f3 !important; }

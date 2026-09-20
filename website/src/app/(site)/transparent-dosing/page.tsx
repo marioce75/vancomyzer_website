@@ -189,7 +189,7 @@ export default function TransparentDosingPage() {
             {"\n"}
             <span style={{ color: "#94a3b8" }}>{"Source: Clin Pharmacokinet. 2019;58(6):767-780, Table 3"}</span>
             {"\n\n"}
-            <span style={{ color: "#355c7d" }}>CL</span>
+            <span style={{ color: "#c6dcee" }}>CL</span>
             {" = θ·CL  ×  (weight / 70)"}
             <span style={{ color: "#fbbf24" }}>{"^0.75"}</span>
             {"        "}
@@ -239,10 +239,10 @@ export default function TransparentDosingPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href="/transparent-dosing/equations"
-              className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
+              className="evidence-action inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
               style={{
-                background: "#0f172a",
-                color: "#355c7d",
+                background: "#355c7d",
+                color: "#ffffff",
                 border: "1px solid #1e293b",
                 letterSpacing: "0.08em",
               }}
@@ -251,10 +251,10 @@ export default function TransparentDosingPage() {
             </Link>
             <Link
               href="/transparent-dosing/cases"
-              className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
+              className="evidence-action inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
               style={{
-                background: "#0f172a",
-                color: "#355c7d",
+                background: "#355c7d",
+                color: "#ffffff",
                 border: "1px solid #1e293b",
                 letterSpacing: "0.08em",
               }}
@@ -263,10 +263,10 @@ export default function TransparentDosingPage() {
             </Link>
             <Link
               href="/transparent-dosing/predictive-performance"
-              className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
+              className="evidence-action inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
               style={{
-                background: "#0f172a",
-                color: "#355c7d",
+                background: "#355c7d",
+                color: "#ffffff",
                 border: "1px solid #1e293b",
                 letterSpacing: "0.08em",
               }}
@@ -275,10 +275,10 @@ export default function TransparentDosingPage() {
             </Link>
             <Link
               href="/transparent-dosing/engine-crosscheck"
-              className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
+              className="evidence-action inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
               style={{
-                background: "#0f172a",
-                color: "#355c7d",
+                background: "#355c7d",
+                color: "#ffffff",
                 border: "1px solid #1e293b",
                 letterSpacing: "0.08em",
               }}
