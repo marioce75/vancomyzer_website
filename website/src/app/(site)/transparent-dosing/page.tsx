@@ -71,7 +71,7 @@ export default function TransparentDosingPage() {
         <div className="mx-auto max-w-4xl">
           <p
             className="mb-6 text-xs font-bold uppercase tracking-[0.18em]"
-            style={{ color: "#00c9b1" }}
+            style={{ color: "#355c7d" }}
           >
             Vancomyzer methods
           </p>
@@ -89,7 +89,7 @@ export default function TransparentDosingPage() {
             <Link
               href={OPEN_ACCESS ? "/calculator" : "/register"}
               className="cta-primary inline-block rounded-md px-6 py-3 text-center text-sm font-bold uppercase tracking-wider transition"
-              style={{ background: "#00c9b1", color: "#0f172a", letterSpacing: "0.08em" }}
+              style={{ background: "#355c7d", color: "#0f172a", letterSpacing: "0.08em" }}
             >
               Try Vancomyzer free →
             </Link>
@@ -147,7 +147,7 @@ export default function TransparentDosingPage() {
               <div key={p.n} className="grid gap-4 sm:grid-cols-[80px_1fr] sm:gap-8">
                 <div
                   className="text-3xl font-extrabold"
-                  style={{ color: "#00c9b1", fontFamily: "'JetBrains Mono', monospace" }}
+                  style={{ color: "#355c7d", fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   {p.n}
                 </div>
@@ -189,7 +189,7 @@ export default function TransparentDosingPage() {
             {"\n"}
             <span style={{ color: "#94a3b8" }}>{"Source: Clin Pharmacokinet. 2019;58(6):767-780, Table 3"}</span>
             {"\n\n"}
-            <span style={{ color: "#00c9b1" }}>CL</span>
+            <span style={{ color: "#355c7d" }}>CL</span>
             {" = θ·CL  ×  (weight / 70)"}
             <span style={{ color: "#fbbf24" }}>{"^0.75"}</span>
             {"        "}
@@ -242,7 +242,7 @@ export default function TransparentDosingPage() {
               className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
               style={{
                 background: "#0f172a",
-                color: "#00c9b1",
+                color: "#355c7d",
                 border: "1px solid #1e293b",
                 letterSpacing: "0.08em",
               }}
@@ -254,7 +254,7 @@ export default function TransparentDosingPage() {
               className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
               style={{
                 background: "#0f172a",
-                color: "#00c9b1",
+                color: "#355c7d",
                 border: "1px solid #1e293b",
                 letterSpacing: "0.08em",
               }}
@@ -266,7 +266,7 @@ export default function TransparentDosingPage() {
               className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
               style={{
                 background: "#0f172a",
-                color: "#00c9b1",
+                color: "#355c7d",
                 border: "1px solid #1e293b",
                 letterSpacing: "0.08em",
               }}
@@ -278,7 +278,7 @@ export default function TransparentDosingPage() {
               className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
               style={{
                 background: "#0f172a",
-                color: "#00c9b1",
+                color: "#355c7d",
                 border: "1px solid #1e293b",
                 letterSpacing: "0.08em",
               }}
@@ -338,7 +338,7 @@ export default function TransparentDosingPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-2 inline-block text-xs font-mono"
-                  style={{ color: "#00c9b1" }}
+                  style={{ color: "#355c7d" }}
                 >
                   doi:{s.doi} ↗
                 </a>
@@ -396,7 +396,7 @@ export default function TransparentDosingPage() {
             <Link
               href={OPEN_ACCESS ? "/calculator" : "/register"}
               className="cta-primary inline-block rounded-md px-8 py-3 text-sm font-bold uppercase tracking-wider transition"
-              style={{ background: "#00c9b1", color: "#0f172a", letterSpacing: "0.08em" }}
+              style={{ background: "#355c7d", color: "#0f172a", letterSpacing: "0.08em" }}
             >
               Start free →
             </Link>
@@ -413,7 +413,7 @@ export default function TransparentDosingPage() {
             professionals only. Not FDA-cleared or approved. Designed to meet the non-device
             clinical decision support criteria of FD&amp;C Act §520(o)(1)(E); not reviewed by
             the FDA. Engineered by{" "}
-            <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" style={{ color: "#00c9b1" }}>
+            <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" style={{ color: "#355c7d" }}>
               Dōsys&trade;
             </a>
             .

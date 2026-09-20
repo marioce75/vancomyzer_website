@@ -46,9 +46,9 @@ export default function UpgradeBanner() {
       style={{
         marginTop: 12,
         padding: "10px 14px",
-        background: "#f0fdfa",
-        border: "1px solid #99f6e4",
-        borderLeft: "3px solid #0d9488",
+        background: "#edf2f6",
+        border: "1px solid #d7dfe5",
+        borderLeft: "3px solid #355c7d",
         borderRadius: 4,
         display: "flex",
         alignItems: "center",
@@ -57,10 +57,10 @@ export default function UpgradeBanner() {
       }}
     >
       <div style={{ flex: 1, minWidth: 240 }}>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#115e59", lineHeight: 1.4 }}>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#294b68", lineHeight: 1.4 }}>
           Export clinical notes for the chart &amp; save calculation history.
         </p>
-        <p style={{ margin: "2px 0 0", fontSize: 11, color: "#0f766e", lineHeight: 1.4 }}>
+        <p style={{ margin: "2px 0 0", fontSize: 11, color: "#355c7d", lineHeight: 1.4 }}>
           Vancomyzer&trade; Individual Pro · 14-day free trial · $49.99/year.
         </p>
       </div>
@@ -70,7 +70,7 @@ export default function UpgradeBanner() {
           padding: "6px 14px",
           fontSize: 12,
           fontWeight: 700,
-          background: "#0d9488",
+          background: "#355c7d",
           color: "#ffffff",
           textDecoration: "none",
           borderRadius: 4,
@@ -86,7 +86,7 @@ export default function UpgradeBanner() {
         style={{
           background: "transparent",
           border: "none",
-          color: "#0f766e",
+          color: "#355c7d",
           fontSize: 18,
           lineHeight: 1,
           cursor: "pointer",

@@ -73,8 +73,8 @@ const PLACEHOLDER_STYLE = { minHeight: "100vh" } as const;
  *    0,2,0 or higher), which outranks those type/attribute-based overrides;
  *    `!important` is used only where the competing global rule has it.
  *  - :focus-visible, :hover, :disabled and media queries cannot be inline.
- * Colour contrast: body text, links, eyebrow (#0f766e) and muted text all meet
- * WCAG AA on their backgrounds; the teal focus ring (#0d9488) is >= 3:1.
+ * Colour contrast: body text, links, eyebrow (#355c7d) and muted text all meet
+ * WCAG AA on their backgrounds; the teal focus ring (#355c7d) is >= 3:1.
  */
 const GATE_CSS = `
 .vmz-gate {
@@ -123,7 +123,7 @@ const GATE_CSS = `
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #0f766e;
+  color: #355c7d;
 }
 .vmz-gate .vmz-gate-title {
   margin: 0;
@@ -258,11 +258,11 @@ const GATE_CSS = `
 .vmz-gate .vmz-gate-btn:focus-visible,
 .vmz-gate .vmz-gate-checkbox:focus-visible,
 .vmz-gate .vmz-gate-body a:focus-visible {
-  outline: 3px solid #0d9488 !important;
+  outline: 3px solid #355c7d !important;
   outline-offset: 2px !important;
 }
 .vmz-gate .vmz-gate-body:focus-visible {
-  outline: 3px solid #0d9488 !important;
+  outline: 3px solid #355c7d !important;
   outline-offset: -3px;
 }
 @media (max-width: 520px) {

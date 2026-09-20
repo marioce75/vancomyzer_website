@@ -371,7 +371,7 @@ export default function TeamPage() {
                     padding: "8px 14px",
                     fontSize: 12,
                     fontWeight: 700,
-                    background: tierChanging ? "var(--color-border)" : "#0d9488",
+                    background: tierChanging ? "var(--color-border)" : "#355c7d",
                     color: "#ffffff",
                     border: "none",
                     borderRadius: 4,

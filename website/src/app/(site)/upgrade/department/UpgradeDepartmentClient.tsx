@@ -66,7 +66,7 @@ export default function UpgradeDepartmentClient() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-16">
       <div className="mb-10 text-center">
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#0d9488" }}>
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#355c7d" }}>
           Department · self-serve
         </p>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: "var(--color-primary)" }}>
@@ -125,7 +125,7 @@ export default function UpgradeDepartmentClient() {
         </div>
 
         {/* Live pricing summary */}
-        <div className="rounded-md border-l-4 px-5 py-4" style={{ borderColor: "#0d9488", background: "rgba(13,148,136,0.05)" }}>
+        <div className="rounded-md border-l-4 px-5 py-4" style={{ borderColor: "#355c7d", background: "rgba(53,92,125,0.05)" }}>
           <div className="flex items-baseline justify-between">
             <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
               Department · {pricing.label}
@@ -150,7 +150,7 @@ export default function UpgradeDepartmentClient() {
             "Onboarding assistance",
           ].map((feature) => (
             <li key={feature} className="flex items-start gap-2">
-              <svg className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "#0d9488" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "#355c7d" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               {feature}
@@ -183,7 +183,7 @@ export default function UpgradeDepartmentClient() {
             disabled={!canSubmit}
             className="rounded-md px-6 py-2.5 text-sm font-bold uppercase tracking-wider transition"
             style={{
-              background: canSubmit ? "#0d9488" : "var(--color-border)",
+              background: canSubmit ? "#355c7d" : "var(--color-border)",
               color: canSubmit ? "#ffffff" : "var(--color-dim)",
               cursor: canSubmit ? "pointer" : "not-allowed",
               letterSpacing: "0.06em",

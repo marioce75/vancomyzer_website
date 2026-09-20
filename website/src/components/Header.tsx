@@ -16,7 +16,7 @@ const navItems = [
 // inline style so no hover JS is needed; teal-700 keeps white text above
 // 4.5:1 contrast on the light header.
 const CALCULATOR_BUTTON_CLASS =
-  "items-center justify-center rounded-md bg-[#0f766e] font-semibold text-white whitespace-nowrap transition hover:bg-[#115e59] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f766e]";
+  "items-center justify-center rounded-md bg-[#355c7d] font-semibold text-white whitespace-nowrap transition hover:bg-[#294b68] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#355c7d]";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);

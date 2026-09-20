@@ -17,7 +17,7 @@ import {
  *
  * Styling notes: the app always runs the basic theme, which forces h1–h3
  * colours and inline font-families. Dark bands therefore use the shared
- * `.manifesto-dark` / `.cta-primary` / `.cta-outline` classes (globals.css),
+ * `.brand-light` / `.cta-primary` / `.cta-outline` classes (globals.css),
  * accent text inside them uses <span> rather than <p>, and colours are
  * inline styles or arbitrary Tailwind values (named slate/gray utilities are
  * remapped globally).
@@ -157,7 +157,7 @@ const PAGE_CSS = `
 
 const CTA_PRIMARY_CLASS =
   "cta-primary inline-flex items-center justify-center gap-2 rounded-md px-7 py-3.5 text-sm font-bold tracking-normal transition hover:brightness-110";
-const CTA_PRIMARY_STYLE = { background: "#00c9b1", color: "#0f172a", letterSpacing: "normal" };
+const CTA_PRIMARY_STYLE = { background: "#355c7d", color: "#ffffff", letterSpacing: "normal" };
 const CTA_OUTLINE_CLASS =
   "cta-outline inline-flex items-center justify-center rounded-md border-2 px-7 py-3.5 text-center text-sm font-bold tracking-normal transition";
 const CTA_OUTLINE_STYLE = { borderColor: "#cbd5e1", color: "#ffffff", letterSpacing: "normal" };
@@ -166,7 +166,7 @@ function Eyebrow({ children, dark = false }: { children: React.ReactNode; dark?:
   return (
     <span
       className="block text-sm font-semibold"
-      style={{ color: dark ? "#00c9b1" : "#0f766e" }}
+      style={{ color: dark ? "#355c7d" : "#355c7d" }}
     >
       {children}
     </span>
@@ -180,10 +180,10 @@ export default function LandingPage() {
 
       {/* ── HERO ───────────────────────────────────────────── */}
       <section
-        className="manifesto-dark relative overflow-hidden px-6 py-16 sm:py-24"
+        className="brand-light relative overflow-hidden px-6 py-16 sm:py-24"
         style={{
           background:
-            "#0f172a",
+            "#f7f8fa",
         }}
       >
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
@@ -193,18 +193,18 @@ export default function LandingPage() {
             </div>
             <h1
               className="vz-rise vz-d2 text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl xl:text-6xl"
-              style={{ color: "#ffffff" }}
+              style={{ color: "#23313f" }}
             >
               Vancomycin AUC calculator for adult patients.
             </h1>
             <p
               className="vz-rise vz-d3 mt-6 max-w-2xl text-lg leading-relaxed sm:text-xl"
-              style={{ color: "#cbd5e1" }}
+              style={{ color: "#52616f" }}
             >
               Estimate a starting regimen or use measured levels to compare dosing options. Review the model assumptions and limitations before using an estimate.
             </p>
 
-            <p className="vz-rise vz-d4 mt-5 text-sm font-semibold sm:text-base" style={{ color: "#e2e8f0" }}>
+            <p className="vz-rise vz-d4 mt-5 text-sm font-semibold sm:text-base" style={{ color: "#52616f" }}>
               Adults receiving intermittent IV vancomycin only. For clinician review.
               Independent clinical validation is pending.
             </p>
@@ -224,14 +224,14 @@ export default function LandingPage() {
                 className="mt-0.5 h-5 w-5 shrink-0"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#00c9b1"
+                stroke="#355c7d"
                 strokeWidth={2.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
                 <path d="M5 13l4 4L19 7" />
               </svg>
-              <span className="text-sm font-semibold sm:text-base" style={{ color: "#e2e8f0" }}>
+              <span className="text-sm font-semibold sm:text-base" style={{ color: "#52616f" }}>
                 {LAUNCH_LINE}
               </span>
             </div>
@@ -265,7 +265,7 @@ export default function LandingPage() {
                 className="flex flex-col border-t py-6"
                 style={{ borderColor: "#e2e8f0", background: "#ffffff" }}
               >
-                <span className="font-mono text-sm font-bold text-[#0f766e]">{String(i + 1).padStart(2, "0")}</span>
+                <span className="font-mono text-sm font-bold text-[#355c7d]">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="mt-2 text-lg font-bold leading-snug" style={{ color: "#0f172a" }}>
                   {c.title}
                 </h3>
@@ -307,11 +307,11 @@ export default function LandingPage() {
               <li key={l.href}>
                 <Link
                   href={l.href}
-                  className="group flex h-full flex-col border-t border-[#cbd5e1] py-5 transition hover:border-[#0d9488]"
+                  className="group flex h-full flex-col border-t border-[#cbd5e1] py-5 transition hover:border-[#355c7d]"
                 >
                   <span className="flex items-center justify-between gap-3 text-base font-bold text-[#0f172a]">
                     {l.title}
-                    <span aria-hidden="true" className="text-[#0f766e] transition group-hover:translate-x-1">
+                    <span aria-hidden="true" className="text-[#355c7d] transition group-hover:translate-x-1">
                       →
                     </span>
                   </span>
@@ -339,7 +339,7 @@ export default function LandingPage() {
                 <li
                   key={a}
                   className="rounded-md border px-3 py-1.5 text-sm font-medium"
-                  style={{ borderColor: "#99f6e4", background: "#f0fdfa", color: "#115e59" }}
+                  style={{ borderColor: "#d7dfe5", background: "#edf2f6", color: "#294b68" }}
                 >
                   {a}
                 </li>
@@ -357,8 +357,8 @@ export default function LandingPage() {
             <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "#0f172a" }}>
               Know where it applies.
             </h2>
-            <div className="mt-6 rounded-md border-l-4 p-5" style={{ borderLeftColor: "#0d9488", background: "#f0fdfa" }}>
-              <span className="block text-sm font-bold" style={{ color: "#115e59" }}>
+            <div className="mt-6 rounded-md border-l-4 p-5" style={{ borderLeftColor: "#355c7d", background: "#edf2f6" }}>
+              <span className="block text-sm font-bold" style={{ color: "#294b68" }}>
                 Designed for
               </span>
               <span className="mt-1 block text-base leading-relaxed" style={{ color: "#334155" }}>
@@ -403,7 +403,7 @@ export default function LandingPage() {
           <Link
             href="/disclaimer"
             className="mt-3 inline-block text-sm font-semibold underline underline-offset-2"
-            style={{ color: "#0f766e" }}
+            style={{ color: "#355c7d" }}
           >
             Read the full medical disclaimer →
           </Link>
@@ -411,12 +411,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── CLOSING CTA ────────────────────────────────────── */}
-      <section className="manifesto-dark px-6 py-16 sm:py-20" style={{ background: "#0f172a" }}>
+      <section className="brand-light px-6 py-16 sm:py-20" style={{ background: "#f7f8fa" }}>
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ color: "#ffffff" }}>
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ color: "#23313f" }}>
             Open the calculator.
           </h2>
-          <p className="mt-4 text-lg leading-relaxed" style={{ color: "#cbd5e1" }}>
+          <p className="mt-4 text-lg leading-relaxed" style={{ color: "#52616f" }}>
             {LAUNCH_LINE}
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4">

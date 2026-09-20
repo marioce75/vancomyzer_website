@@ -242,7 +242,7 @@ function LoginForm() {
               disabled={magicSending}
               style={{
                 width: "100%", padding: "10px", fontSize: 13, fontWeight: 600,
-                background: "#0d9488", color: "#ffffff", border: "none",
+                background: "#355c7d", color: "#ffffff", border: "none",
                 cursor: magicSending ? "wait" : "pointer", opacity: magicSending ? 0.7 : 1,
                 borderRadius: 4,
               }}
@@ -256,7 +256,7 @@ function LoginForm() {
             onClick={() => setShowMagic(true)}
             style={{
               width: "100%", padding: "10px", fontSize: 13, fontWeight: 500,
-              background: "#ffffff", color: "#0d9488", border: "1px solid #0d9488",
+              background: "#ffffff", color: "#355c7d", border: "1px solid #355c7d",
               cursor: "pointer", borderRadius: 4,
             }}
           >
