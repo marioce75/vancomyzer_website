@@ -1,0 +1,15 @@
+# Market intelligence operations
+
+The admin dashboard is on-demand. It starts collection with POST; collection then attempts one AI analysis. SQLite job leases prevent duplicate jobs and expose status/failures across refreshes. Interrupted jobs expire (15 minutes collection, 150 seconds analysis). This background execution assumes the existing persistent Render Node service, not a short-lived serverless request host. No new scheduler or email subscription is installed.
+
+Sources: up to two recent queries per configured Reddit community (only with an approved API access token); four PubMed searches (20 metadata records each); four regional Europe PMC searches (15 metadata/abstract records each); public pages for five verified competitors. Countries are article keywords, not evidence of demand. Blocked/rate-limited hosts are not retried during the run. DosOpt and the ID-ODS app surface remain explicitly disabled pending verified public URLs. Europe PMC MED records are deduplicated against PubMed by canonical article URL within each collection.
+
+ANTHROPIC_API_KEY is server-only. MARKET_INTEL_MODEL defaults to claude-sonnet-4-6, replacing the model retired June15 2026. Failures never create successful blank reports. Reports must pass schema validation and every item must cite an exact supplied URL. Public-source text is untrusted; prompts forbid source instructions, unsupported regulatory/financial claims and demand inferences from incomplete coverage. Human review remains essential.
+
+Files use /data/market_intelligence on the existing persistent disk, otherwise the repo directory (or MARKET_INTEL_DIR override). A first-use migration copies an existing legacy directory if present; nothing is deleted. Existing older production archives lost before this change cannot be reconstructed except from database/historical sources. JSON and CSV exports preserve evidence; CSV text cannot activate spreadsheet formulas. Full export includes all stored body text (collection itself caps excerpts at 2,000 characters).
+
+The separate Python research_intelligence_daemon writes repository reports and is NOT the dashboard collector or its scheduler. Its status must not be used to imply dashboard refresh success. Reconcile the two workflows before enabling an unattended production schedule. Existing manual/script digest operations are separate from the dashboard; dashboard testing sends no emails.
+
+Verification: npm run test:market-intel; npm run build. The collection tests use a temporary directory/database and mocked public sources, never production records or a real API key. Native better-sqlite3 must match the Node ABI installed with node_modules.
+
+Future expansions: curated SEFH/Farmacia Hospitalaria and ILAPHAR feeds for Spanish-language professional practice, SciELO/LILACS structured discovery for Latin America, ClinicalTrials.gov/WHO ICTRP study discovery, and official society/health-system guidance for Asia/Africa. Verify APIs, permissions, dates and relevance before adding each connector. Do not scrape membership portals, sign-in apps or bypass403 responses.

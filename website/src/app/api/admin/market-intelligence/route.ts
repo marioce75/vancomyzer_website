@@ -13,6 +13,7 @@ import {
   importHistoricalData,
 } from "@/lib/scraper/filePersistence";
 import path from "path";
+import { csvRow } from "@/lib/scraper/csv";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
   // GET /api/admin/market-intelligence?action=run&date=YYYY-MM-DD
   if (action === "run") {
     const date = searchParams.get("date");
-    if (!date) return NextResponse.json({ error: "date parameter required (YYYY-MM-DD)" }, { status: 400 });
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return NextResponse.json({ error: "date parameter required (YYYY-MM-DD)" }, { status: 400 });
     const results = getRunsByDate(date);
     if (results.length === 0) return NextResponse.json({ error: `No runs found for ${date}` }, { status: 404 });
     return NextResponse.json(results.length === 1 ? results[0] : results);
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
   // GET /api/admin/market-intelligence?action=week&week=YYYY-WNN
   if (action === "week") {
     const week = searchParams.get("week");
-    if (!week) return NextResponse.json({ error: "week parameter required (YYYY-WNN)" }, { status: 400 });
+    if (!week || !/^\d{4}-W\d{2}$/.test(week)) return NextResponse.json({ error: "week parameter required (YYYY-WNN)" }, { status: 400 });
     const digest = getWeeklyDigestFile(week);
     if (!digest) return NextResponse.json({ error: `No digest found for week ${week}` }, { status: 404 });
     return NextResponse.json(digest);
@@ -99,9 +100,7 @@ export async function GET(request: NextRequest) {
 
     const posts = JSON.parse(contents.toString()) as { source: string; source_identifier: string; post_id: string; title: string; url: string | null; upvote_count: number; comment_count: number; published_at: string | null }[];
     const header = "source,source_identifier,post_id,title,url,upvote_count,comment_count,published_at";
-    const rows = posts.map(p =>
-      [p.source, p.source_identifier, p.post_id, `"${(p.title ?? "").replace(/"/g, '""')}"`, p.url ?? "", p.upvote_count, p.comment_count, p.published_at ?? ""].join(","),
-    );
+    const rows = posts.map(p => csvRow([p.source, p.source_identifier, p.post_id, p.title, p.url, p.upvote_count, p.comment_count, p.published_at]));
     const csv = [header, ...rows].join("\n");
     return new Response(csv, {
       headers: {
@@ -121,7 +120,7 @@ export async function GET(request: NextRequest) {
     const analysis = JSON.parse(contents.toString()) as { top_pain_points?: { text: string; count: number }[] };
     const pp = analysis.top_pain_points ?? [];
     const header = "pain_point,frequency";
-    const rows = pp.map(p => `"${p.text.replace(/"/g, '""')}",${p.count}`);
+    const rows = pp.map(p => csvRow([p.text, p.count]));
     const csv = [header, ...rows].join("\n");
     return new Response(csv, {
       headers: {

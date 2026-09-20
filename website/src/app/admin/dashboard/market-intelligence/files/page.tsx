@@ -24,6 +24,7 @@ function formatBytes(bytes: number): string {
 export default function MarketIntelligenceFilesPage() {
   const [entries, setEntries] = useState<IndexEntry[]>([]);
   const [miDir, setMiDir] = useState("");
+  const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedEntry, setSelectedEntry] = useState<IndexEntry | null>(null);
   const [analysis, setAnalysis] = useState<Record<string, unknown> | null>(null);
@@ -40,8 +41,9 @@ export default function MarketIntelligenceFilesPage() {
         const data = await res.json();
         setEntries(data.entries || []);
         setMiDir(data.mi_dir || "");
-      }
-    } catch { /* ignore */ }
+        setLoadError("");
+      } else { setLoadError("Unable to load files. Check your admin session and retry."); }
+    } catch { setLoadError("Unable to reach the server. Retry shortly."); }
     setLoading(false);
   }, []);
 
@@ -51,11 +53,10 @@ export default function MarketIntelligenceFilesPage() {
     setSelectedEntry(entry);
     setAnalysisLoading(true);
     try {
-      const dateStr = entry.run_date.split("T")[0];
-      const res = await fetch(`/api/admin/market-intelligence?action=run&date=${dateStr}`);
+      const res = await fetch(`/api/admin/market-intelligence?action=download&file=${encodeURIComponent(entry.path)}`);
       if (res.ok) {
         const data = await res.json();
-        setAnalysis(Array.isArray(data) ? data[0] : data);
+        setAnalysis(data);
       }
     } catch { /* ignore */ }
     setAnalysisLoading(false);
@@ -138,6 +139,7 @@ export default function MarketIntelligenceFilesPage() {
 
   return (
     <div className="space-y-6">
+      {loadError && <p role="alert" className="text-red-700">{loadError}</p>}
       {/* Header + Tab Navigation */}
       <div className="flex items-center justify-between">
         <div>

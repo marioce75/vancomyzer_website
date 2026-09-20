@@ -946,7 +946,7 @@ const REQUIRED_CHECKS: CheckDefinition[] = [
           const label = `existing option ${option.dose_mg} mg q${option.interval_hours}h`;
           expectExposureText(c, `${label} quick_summary`, option.quick_summary, option);
           expectExposureText(c, `${label} clinical_note`, option.clinical_note, option);
-          const [enteredSummary, selectedSummary] = option.interpretation_summary.split(" Selected regimen steady-state projection");
+          const [enteredSummary, selectedSummary] = (option.interpretation_summary ?? "").split(" Selected regimen steady-state projection");
           expectExposureText(c, `${label} entered-regimen interpretation`, enteredSummary, existing);
           c.expect(Boolean(selectedSummary), `${label}: missing selected-regimen projection label`);
           expectExposureText(c, `${label} selected-regimen interpretation`, selectedSummary ?? "", option);

@@ -16,6 +16,7 @@ interface AnalysisRun {
   run_duration_seconds: number;
   status: string;
   error_message: string | null;
+  source_health?: string;
 }
 
 interface HighSignalPost {
@@ -26,13 +27,22 @@ interface HighSignalPost {
   upvote_count: number;
 }
 
+interface JobStatus { state: string; message: string; started_at: string | null }
+
 interface DashboardData {
+  scraper?: JobStatus;
+  analyst?: JobStatus;
+  analystConfigured?: boolean;
+  analystModel?: string;
   runs: AnalysisRun[];
   latest: AnalysisRun | null;
   highSignal: HighSignalPost[];
   competitorChanges: { competitor_name: string; url: string; scraped_at: string }[];
   aiReport?: {
     id: number;
+    run_id: number;
+    evidence_json?: string;
+    model?: string;
     report_date: string;
     executive_brief: string;
     market_opportunities: string;
@@ -45,70 +55,56 @@ interface DashboardData {
   scraperStartedAt?: string | null;
 }
 
+function safeJSON<T>(value: string | undefined, fallback: T): T {
+  try { const parsed = JSON.parse(value || "null"); return parsed ?? fallback; } catch { return fallback; }
+}
+function Sources({ urls }: { urls?: string[] }) {
+  return urls?.length ? <p className="text-xs mt-2">Sources: {urls.filter(url => /^https?:\/\//i.test(url)).map((url, i) => <a key={url} href={url} target="_blank" rel="noopener noreferrer" className="underline text-teal-700 mr-2">[{i+1}]</a>)}</p> : null;
+}
 const card = "bg-white border border-gray-200 rounded-lg p-5";
 const heading = "text-sm font-bold text-slate-900 uppercase tracking-wider mb-3";
 
 export default function MarketIntelligencePage() {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [analystRunning, setAnalystRunning] = useState(false);
+  const [analystResult, setAnalystResult] = useState("");
+  const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [runResult, setRunResult] = useState<string>("");
 
   const fetchData = useCallback(async () => {
-    const res = await fetch("/api/admin/scraper");
-    if (res.ok) setData(await res.json());
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
-
-  // Poll for scraper status when running
-  useEffect(() => {
-    if (!running) return;
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch("/api/admin/scraper?action=status");
-        if (res.ok) {
-          const status = await res.json();
-          if (!status.running) {
-            setRunning(false);
-            setRunResult("Scrape complete. Refreshing data...");
-            fetchData();
-          }
-        }
-      } catch { /* ignore */ }
-    }, 5000); // Poll every 5 seconds
-    return () => clearInterval(interval);
-  }, [running, fetchData]);
-
-  // Check if scraper is already running on page load
-  useEffect(() => {
-    if (data?.scraperRunning) {
-      setRunning(true);
-      setRunResult("Scraper is running in the background...");
-    }
-  }, [data]);
-
-  const handleRunScraper = async () => {
-    setRunning(true);
-    setRunResult("Scraper started — running in the background. You can navigate away safely.");
     try {
-      const res = await fetch("/api/admin/scraper", { method: "POST" });
+      const res = await fetch("/api/admin/scraper", { cache: "no-store" });
+      if (!res.ok) throw new Error(res.status === 403 ? "Your admin session expired. Sign in again." : "Could not load Market Intel. Retry shortly.");
+      const next: DashboardData = await res.json();
+      setData(next); setLoadError("");
+      setRunning(next.scraper?.state === "running");
+      setAnalystRunning(next.analyst?.state === "running");
+      if (next.scraper) setRunResult(next.scraper.message);
+      if (next.analyst) setAnalystResult(next.analyst.message);
+    } catch (error) { setLoadError((error as Error).message); }
+    finally { setLoading(false); }
+  }, []);
+  useEffect(() => { void fetchData(); }, [fetchData]);
+  useEffect(() => {
+    if (!running && !analystRunning) return;
+    const timer = setInterval(() => { void fetchData(); }, 5000);
+    return () => clearInterval(timer);
+  }, [running, analystRunning, fetchData]);
+
+  const startJob = async (analyst: boolean) => {
+    const setBusy = analyst ? setAnalystRunning : setRunning;
+    const setMessage = analyst ? setAnalystResult : setRunResult;
+    setBusy(true); setMessage(analyst ? "Analyzing collected evidence…" : "Collecting public sources…");
+    try {
+      const res = await fetch(`/api/admin/scraper${analyst ? "?action=run_analyst" : ""}`, { method: "POST" });
       const result = await res.json();
-      if (!res.ok) {
-        if (res.status === 409) {
-          setRunResult("Scraper is already running. Please wait for it to finish.");
-        } else {
-          setRunResult(`Failed to start: ${result.error}`);
-          setRunning(false);
-        }
-      }
-      // Don't setRunning(false) here — the poll loop handles completion
-    } catch {
-      setRunResult("Failed to start scraper.");
-      setRunning(false);
-    }
+      if (!res.ok) throw new Error(result.error || "Could not start the job.");
+      setMessage(result.message); await fetchData();
+    } catch (error) { setMessage((error as Error).message); setBusy(false); }
   };
+  const handleRunScraper = () => startJob(false);
 
   const download = async (action: string) => {
     try {
@@ -129,18 +125,18 @@ export default function MarketIntelligencePage() {
   if (loading) return <div className="p-8 text-gray-500">Loading market intelligence...</div>;
 
   const latest = data?.latest;
-  const painPoints = latest ? JSON.parse(latest.top_pain_points || "[]") as { text: string; count: number }[] : [];
-  const drugMentions = latest ? JSON.parse(latest.drug_mentions || "{}") as Record<string, number> : {};
-  const competitorMentions = latest ? JSON.parse(latest.competitor_mentions || "{}") as Record<string, { count: number; positive: number; neutral: number; negative: number; posts: string[] }> : {};
-  const topPosts = latest ? JSON.parse(latest.top_posts || "[]") as { title: string; source: string; url: string; upvote_count: number }[] : [];
-  const geoSignals = latest ? JSON.parse(latest.geographic_signals || "{}") as Record<string, number> : {};
+  const painPoints = latest ? safeJSON(latest.top_pain_points, []) as { text: string; count: number }[] : [];
+  const drugMentions = latest ? safeJSON(latest.drug_mentions, {}) as Record<string, number> : {};
+  const competitorMentions = latest ? safeJSON(latest.competitor_mentions, {}) as Record<string, { count: number; positive: number; neutral: number; negative: number; posts: string[] }> : {};
+  const topPosts = latest ? safeJSON(latest.top_posts, []) as { title: string; source: string; url: string; upvote_count: number }[] : [];
+  const geoSignals = latest ? safeJSON(latest.geographic_signals, {}) as Record<string, number> : {};
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-900">Market Intelligence</h1>
-          <p className="text-sm text-gray-500">Automated competitive and opportunity monitoring</p>
+          <p className="text-sm text-gray-500">Public-source monitoring and evidence-linked research</p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -172,6 +168,15 @@ export default function MarketIntelligencePage() {
         </div>
       )}
 
+      {loadError && <div role="alert" className="p-3 bg-red-50 text-red-800">{loadError} <button onClick={() => void fetchData()} className="underline">Retry</button></div>}
+      <div className={card}>
+        <h2 className={heading}>Source coverage</h2>
+        <p className="text-xs text-gray-600 mb-3">Totals count unique records actually collected. Keyword summaries cover records seen in the last 30 days, not market size. Vendor pages are self-reported; country mentions do not establish demand or location. Older totals used estimated query limits and are not comparable.</p>
+        {!latest?.source_health && <p className="text-sm text-amber-800">Run the updated scraper to measure source coverage.</p>}
+        <div className="space-y-2">{safeJSON<{name: string; url: string; state: string; records: number; detail?: string}[]>(latest?.source_health, []).map((source, i) => (
+          <div key={i} className="text-xs border-b pb-2"><a href={source.url} target="_blank" rel="noopener noreferrer" className="text-teal-700 underline">{source.name}</a> — {source.state}, {source.records} records{source.detail && <span className="block text-gray-600">{source.detail}</span>}</div>
+        ))}</div>
+      </div>
       {/* Run History */}
       <div className={card}>
         <h2 className={heading}>Run History</h2>
@@ -182,7 +187,7 @@ export default function MarketIntelligencePage() {
             <thead>
               <tr className="border-b text-left text-gray-500">
                 <th className="pb-2 font-medium">Date</th>
-                <th className="pb-2 font-medium">Total</th>
+                <th className="pb-2 font-medium">Collected</th>
                 <th className="pb-2 font-medium">New</th>
                 <th className="pb-2 font-medium">Duration</th>
                 <th className="pb-2 font-medium">Status</th>
@@ -210,7 +215,7 @@ export default function MarketIntelligencePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Pain Points */}
         <div className={card}>
-          <h2 className={heading}>Top Pain Points</h2>
+          <h2 className={heading}>Discussion phrase signals</h2>
           {painPoints.length === 0 ? (
             <p className="text-sm text-gray-400">No data yet.</p>
           ) : (
@@ -273,7 +278,7 @@ export default function MarketIntelligencePage() {
 
         {/* Geographic Signals */}
         <div className={card}>
-          <h2 className={heading}>Geographic Signals</h2>
+          <h2 className={heading}>Country mentions (not demand)</h2>
           {Object.keys(geoSignals).length === 0 ? (
             <p className="text-sm text-gray-400">No data yet.</p>
           ) : (
@@ -291,7 +296,7 @@ export default function MarketIntelligencePage() {
 
       {/* High Signal Posts */}
       <div className={card}>
-        <h2 className={heading}>High Signal Posts (200+ Upvotes)</h2>
+        <h2 className={heading}>High-engagement Reddit posts</h2>
         {(data?.highSignal?.length ?? 0) === 0 ? (
           <p className="text-sm text-gray-400">No high-signal posts in the last 30 days.</p>
         ) : (
@@ -326,20 +331,25 @@ export default function MarketIntelligencePage() {
         <div className="flex items-center justify-between mb-3">
           <h2 className={heading + " mb-0"}>AI Market Research Analyst</h2>
           <button
-            onClick={async () => {
-              const res = await fetch("/api/admin/scraper?action=run_analyst");
-              if (res.ok) fetchData();
-            }}
+            onClick={() => void startJob(true)}
+            disabled={analystRunning || running}
             className="px-3 py-1 text-xs font-semibold text-indigo-700 border border-indigo-300 rounded hover:bg-indigo-50"
           >
-            Re-run Analysis
+            {analystRunning ? "Analyzing…" : "Re-run Analysis"}
           </button>
         </div>
 
+        <p className="text-xs text-gray-600 mb-2">{data?.analystConfigured ? `AI service configured · ${data.analystModel}` : "AI service needs an Anthropic API key in the hosting environment."}</p>
+        {analystResult && <p role="status" className="p-3 mb-3 bg-slate-50 text-sm text-slate-800">{analystResult}</p>}
+        {data?.aiReport && data.aiReport.run_id !== latest?.run_id && <p className="text-sm text-amber-800 mb-3">This report predates the latest collection. Re-run analysis to refresh it.</p>}
+        {data?.aiReport && (!data.aiReport.evidence_json || data.aiReport.evidence_json === "[]") && <p className="text-sm text-amber-800 mb-3">Legacy report: source links and evidence quality were not verified. Regenerate before using its conclusions.</p>}
         {!data?.aiReport ? (
           <p className="text-sm text-gray-400">No AI analysis yet. Run the scraper to generate insights.</p>
         ) : (
           <div className="space-y-4">
+            <div className="text-xs text-gray-600">Linked evidence used in this report:
+              <ul className="list-disc pl-4">{safeJSON<{title:string;url:string;source:string}[]>(data.aiReport.evidence_json, []).map((source, i) => <li key={i}><a href={source.url} target="_blank" rel="noopener noreferrer" className="text-teal-700 underline">{source.title}</a> ({source.source})</li>)}</ul>
+            </div>
             {/* Executive Brief */}
             <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-lg">
               <p className="text-xs font-bold text-indigo-800 uppercase tracking-wider mb-1">Executive Brief</p>
@@ -349,7 +359,7 @@ export default function MarketIntelligencePage() {
 
             {/* Market Opportunities */}
             {(() => {
-              const opps = JSON.parse(data.aiReport.market_opportunities || "[]") as { title: string; description: string; priority: string; action_items?: string[] }[];
+              const opps = safeJSON(data.aiReport.market_opportunities, []) as { title: string; description: string; priority: string; action_items?: string[]; source_urls?: string[] }[];
               if (opps.length === 0) return null;
               return (
                 <div>
@@ -361,7 +371,7 @@ export default function MarketIntelligencePage() {
                           <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${o.priority === "high" ? "bg-red-100 text-red-700" : o.priority === "medium" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"}`}>{o.priority}</span>
                           <span className="text-sm font-semibold text-gray-900">{o.title}</span>
                         </div>
-                        <p className="text-xs text-gray-600 mt-1 leading-relaxed">{o.description}</p>
+                        <p className="text-xs text-gray-600 mt-1 leading-relaxed">{o.description}</p><Sources urls={o.source_urls} />
                         {o.action_items && o.action_items.length > 0 && (
                           <ul className="mt-1 text-xs text-gray-500 list-disc pl-4">
                             {o.action_items.map((a, j) => <li key={j}>{a}</li>)}
@@ -376,7 +386,7 @@ export default function MarketIntelligencePage() {
 
             {/* Competitive Gaps */}
             {(() => {
-              const gaps = JSON.parse(data.aiReport.competitive_gaps || "[]") as { competitor: string; gap: string; vancomyzer_advantage: string; action: string }[];
+              const gaps = safeJSON(data.aiReport.competitive_gaps, []) as { competitor: string; gap: string; vancomyzer_advantage: string; action: string; source_urls?: string[] }[];
               if (gaps.length === 0) return null;
               return (
                 <div>
@@ -388,7 +398,7 @@ export default function MarketIntelligencePage() {
                         <span className="text-gray-400"> — </span>
                         <span className="text-gray-700">{g.gap}</span>
                         <p className="text-green-700 mt-1">Vancomyzer advantage: {g.vancomyzer_advantage}</p>
-                        <p className="text-gray-500">Action: {g.action}</p>
+                        <p className="text-gray-500">Action: {g.action}</p><Sources urls={g.source_urls} />
                       </div>
                     ))}
                   </div>
@@ -398,7 +408,7 @@ export default function MarketIntelligencePage() {
 
             {/* Innovation Ideas */}
             {(() => {
-              const ideas = JSON.parse(data.aiReport.innovation_ideas || "[]") as { idea: string; rationale: string; effort: string; impact: string; timeline: string }[];
+              const ideas = safeJSON(data.aiReport.innovation_ideas, []) as { idea: string; rationale: string; effort: string; impact: string; timeline: string; source_urls?: string[] }[];
               if (ideas.length === 0) return null;
               return (
                 <div>
@@ -412,7 +422,7 @@ export default function MarketIntelligencePage() {
                           <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-blue-50 text-blue-600">{idea.effort} effort</span>
                         </div>
                         <p className="text-gray-600 mt-1">{idea.rationale}</p>
-                        <p className="text-gray-400 mt-1">Timeline: {idea.timeline}</p>
+                        <p className="text-gray-400 mt-1">Timeline: {idea.timeline}</p><Sources urls={idea.source_urls} />
                       </div>
                     ))}
                   </div>
@@ -422,7 +432,7 @@ export default function MarketIntelligencePage() {
 
             {/* Strategic Recommendations */}
             {(() => {
-              const recs = JSON.parse(data.aiReport.strategic_recommendations || "[]") as { recommendation: string; rationale: string; priority: number; timeline: string }[];
+              const recs = safeJSON(data.aiReport.strategic_recommendations, []) as { recommendation: string; rationale: string; priority: number; timeline: string; source_urls?: string[] }[];
               if (recs.length === 0) return null;
               return (
                 <div>
@@ -432,7 +442,7 @@ export default function MarketIntelligencePage() {
                       <li key={i} className="text-xs text-gray-700">
                         <span className="font-semibold">{r.recommendation}</span>
                         <span className="text-gray-400"> — {r.timeline}</span>
-                        <p className="text-gray-500 mt-0.5">{r.rationale}</p>
+                        <p className="text-gray-500 mt-0.5">{r.rationale}</p><Sources urls={r.source_urls} />
                       </li>
                     ))}
                   </ol>
@@ -442,7 +452,7 @@ export default function MarketIntelligencePage() {
 
             {/* Risk Signals */}
             {(() => {
-              const risks = JSON.parse(data.aiReport.risk_signals || "[]") as { risk: string; severity: string; evidence: string; mitigation: string }[];
+              const risks = safeJSON(data.aiReport.risk_signals, []) as { risk: string; severity: string; evidence: string; mitigation: string; source_urls?: string[] }[];
               if (risks.length === 0) return null;
               return (
                 <div>
@@ -455,7 +465,7 @@ export default function MarketIntelligencePage() {
                           <span className="font-semibold text-gray-900">{r.risk}</span>
                         </div>
                         <p className="text-gray-600 mt-1">Evidence: {r.evidence}</p>
-                        <p className="text-gray-500 mt-1">Mitigation: {r.mitigation}</p>
+                        <p className="text-gray-500 mt-1">Mitigation: {r.mitigation}</p><Sources urls={r.source_urls} />
                       </div>
                     ))}
                   </div>
@@ -472,10 +482,10 @@ export default function MarketIntelligencePage() {
         <p className="text-xs text-gray-500 mb-3">Last data: {latest ? new Date(latest.run_date).toLocaleDateString() : "No runs yet"}</p>
         <div className="flex flex-wrap gap-2">
           <button onClick={() => download("export_summary_json")} className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50">
-            Weekly Summary (JSON)
+            Latest Collection (JSON)
           </button>
           <button onClick={() => download("export_posts_csv")} className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50">
-            All Posts (CSV)
+            Recent Records (CSV)
           </button>
           <button onClick={() => download("export_all_posts")} className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50">
             Full Export (CSV)

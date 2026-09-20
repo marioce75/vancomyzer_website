@@ -1,411 +1,135 @@
-/**
- * Market Intelligence Scraper Engine.
- *
- * Fetches posts from Reddit, PubMed, and competitor pages.
- * Stores results in SQLite and runs analysis.
- */
-
-import crypto from "crypto";
-import { insertPost, logRequest, getLatestSnapshot, insertSnapshot, getRunById } from "./db";
-import type { ScraperPost } from "./db";
-import { REDDIT_SOURCES, PUBMED_SEARCHES, COMPETITOR_URLS, COMPETITOR_DISCOVERY_TERMS } from "./sources";
+/** Public-source collection. No bypasses of blocked sources or sign-in surfaces. */
+import crypto from "node:crypto";
+import { insertPost, logRequest, getLatestSnapshot, insertSnapshot, getRunById, acquireJob, finishJob } from "./db";
+import { REDDIT_SOURCES, PUBMED_SEARCHES, COMPETITOR_URLS, REGIONAL_SEARCHES } from "./sources";
 import { runAnalysis } from "./analysis";
 import { saveRunToFiles, type RawPost } from "./filePersistence";
 
-const USER_AGENT = "Dosys Health LLC-MarketResearch/1.0";
-
-// Collect every post fetched during a run for file persistence
-let _collected: RawPost[] = [];
-
-function trackAndInsert(post: Omit<ScraperPost, "id" | "scraped_at">): boolean {
-  _collected.push({
-    source: post.source,
-    source_identifier: post.source_identifier,
-    post_id: post.post_id,
-    title: post.title,
-    body_text: post.body_text,
-    url: post.url,
-    upvote_count: post.upvote_count,
-    comment_count: post.comment_count,
-    published_at: post.published_at,
-    top_comments: post.top_comments,
-  });
-  return insertPost(post);
+export interface SourceHealth { name: string; url: string; state: "ok" | "failed" | "blocked" | "skipped"; records: number; detail?: string }
+export function visibleText(html: string): string {
+  return html.replace(/<(script|style|nav|footer|header)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<[^>]+>/g, " ").replace(/&nbsp;|&#160;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim();
 }
-
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+export function pubmedDate(value: string): string | null {
+  const year = value.match(/\b(19|20)\d{2}\b/)?.[0];
+  return year ? value : null; // Preserve source precision; never fabricate a publication day.
 }
-
-async function fetchWithLog(url: string): Promise<{ ok: boolean; status: number; text: string }> {
+export async function runFullScrape(options: { analyze?: boolean; quick?: boolean } = {}) {
+  if (!acquireJob("scraper", 900)) throw new Error("Scraper is already running.");
   const start = Date.now();
-  try {
-    const res = await fetch(url, {
-      headers: { "User-Agent": USER_AGENT },
-    });
-    const text = await res.text();
-    const elapsed = Date.now() - start;
-    logRequest(url, res.status, elapsed);
-    return { ok: res.ok, status: res.status, text };
-  } catch (err) {
-    const elapsed = Date.now() - start;
-    logRequest(url, null, elapsed, (err as Error).message);
-    return { ok: false, status: 0, text: "" };
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Reddit Scraper
-// ---------------------------------------------------------------------------
-
-interface RedditPost {
-  data: {
-    id: string;
-    title: string;
-    selftext: string;
-    url: string;
-    permalink: string;
-    ups: number;
-    num_comments: number;
-    created_utc: number;
-    subreddit: string;
-  };
-}
-
-async function scrapeRedditSubreddit(subreddit: string, term: string): Promise<number> {
-  const url = `https://www.reddit.com/r/${subreddit}/search.json?q=${encodeURIComponent(term)}&sort=top&t=year&limit=100&restrict_sr=1`;
-  const res = await fetchWithLog(url);
-
-  if (res.status === 429) {
-    console.log(`[SCRAPER] Rate limited on r/${subreddit}/${term} — waiting 60s`);
-    await sleep(60000);
-    const retry = await fetchWithLog(url);
-    if (!retry.ok) return 0;
-    res.text = retry.text;
-    res.ok = retry.ok;
-  }
-
-  if (!res.ok) return 0;
-
-  let data: { data?: { children?: RedditPost[] } };
-  try {
-    data = JSON.parse(res.text);
-  } catch {
-    return 0;
-  }
-
-  const posts = data?.data?.children ?? [];
-  let newCount = 0;
-
-  for (const post of posts) {
-    const p = post.data;
-    const inserted = trackAndInsert({
-      source: "reddit",
-      source_identifier: subreddit,
-      post_id: p.id,
-      title: p.title,
-      body_text: p.selftext?.substring(0, 2000) || null,
-      url: `https://www.reddit.com${p.permalink}`,
-      upvote_count: p.ups || 0,
-      comment_count: p.num_comments || 0,
-      published_at: new Date(p.created_utc * 1000).toISOString(),
-      top_comments: "[]", // Would need separate API call per post
-    });
-    if (inserted) newCount++;
-  }
-
-  return newCount;
-}
-
-export async function scrapeReddit(): Promise<{ total: number; newPosts: number }> {
-  let total = 0;
+  const collected = new Map<string, RawPost>();
+  const health: SourceHealth[] = [];
+  const blocked = new Set<string>();
   let newPosts = 0;
-
-  for (const source of REDDIT_SOURCES) {
-    for (const term of source.terms) {
-      console.log(`[SCRAPER] Reddit r/${source.subreddit} — "${term}"`);
-      const n = await scrapeRedditSubreddit(source.subreddit, term);
-      total += 100; // approximate max per query
-      newPosts += n;
-      await sleep(1500); // Rate limit: 1.5s between calls
-    }
-  }
-
-  return { total, newPosts };
-}
-
-// ---------------------------------------------------------------------------
-// PubMed Scraper
-// ---------------------------------------------------------------------------
-
-async function scrapePubMed(): Promise<{ total: number; newPosts: number }> {
-  let total = 0;
-  let newPosts = 0;
-
-  for (const search of PUBMED_SEARCHES) {
-    const searchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(search.query)}&mindate=${search.minDate}&maxdate=3000&retmax=20&retmode=json`;
-    const searchRes = await fetchWithLog(searchUrl);
-    if (!searchRes.ok) continue;
-
-    let searchData: { esearchresult?: { idlist?: string[] } };
-    try {
-      searchData = JSON.parse(searchRes.text);
-    } catch {
-      continue;
-    }
-
-    const ids = searchData?.esearchresult?.idlist ?? [];
-    if (ids.length === 0) continue;
-
-    await sleep(500);
-
-    const fetchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(",")}&retmode=json`;
-    const fetchRes = await fetchWithLog(fetchUrl);
-    if (!fetchRes.ok) continue;
-
-    let fetchData: { result?: Record<string, { uid?: string; title?: string; source?: string; pubdate?: string; sortfirstauthor?: string }> };
-    try {
-      fetchData = JSON.parse(fetchRes.text);
-    } catch {
-      continue;
-    }
-
-    const results = fetchData?.result ?? {};
-    for (const pmid of ids) {
-      const article = results[pmid];
-      if (!article?.title) continue;
-
-      const inserted = trackAndInsert({
-        source: "pubmed",
-        source_identifier: "pubmed",
-        post_id: pmid,
-        title: article.title,
-        body_text: `${article.sortfirstauthor ?? ""} — ${article.source ?? ""}`,
-        url: `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`,
-        upvote_count: 0,
-        comment_count: 0,
-        published_at: article.pubdate ?? null,
-        top_comments: "[]",
-      });
-      if (inserted) newPosts++;
-      total++;
-    }
-
-    await sleep(1000);
-  }
-
-  return { total, newPosts };
-}
-
-// ---------------------------------------------------------------------------
-// Competitor Monitor
-// ---------------------------------------------------------------------------
-
-async function scrapeCompetitors(): Promise<{ changes: { name: string; url: string }[] }> {
   const changes: { name: string; url: string }[] = [];
-
-  for (const comp of COMPETITOR_URLS) {
-    console.log(`[SCRAPER] Checking competitor: ${comp.name}`);
-    const res = await fetchWithLog(comp.url);
-
-    if (!res.ok) {
-      console.log(`[SCRAPER] ${comp.name} returned ${res.status} — skipping`);
-      continue;
-    }
-
-    const hash = crypto.createHash("md5").update(res.text).digest("hex");
-    const prev = getLatestSnapshot(comp.name, comp.url);
-    const changed = prev ? prev.content_hash !== hash : false;
-
-    insertSnapshot(comp.name, comp.url, hash, changed);
-
-    if (changed) {
-      changes.push({ name: comp.name, url: comp.url });
-      console.log(`[SCRAPER] CHANGE DETECTED: ${comp.name}`);
-    }
-
-    await sleep(1000);
+  const profiles: { name: string; features: string[] }[] = [];
+  const pause = () => new Promise(resolve => setTimeout(resolve, options.quick ? 400 : 600));
+  function insert(post: RawPost) {
+    const id = post.url || `${post.source}:${post.post_id}`;
+    if (collected.has(id)) return;
+    collected.set(id, post);
+    if (insertPost(post)) newPosts++;
   }
-
-  return { changes };
-}
-
-// ---------------------------------------------------------------------------
-// Competitor Discovery — find new/unknown TDM software from Reddit
-// ---------------------------------------------------------------------------
-
-async function scrapeCompetitorDiscovery(): Promise<{ total: number; newPosts: number }> {
-  let total = 0;
-  let newPosts = 0;
-
-  // Search general subreddits for TDM/dosing software discussions
-  const discoverySubreddits = ["pharmacy", "medicine", "healthIT", "clinicalpharmacology"];
-
-  for (const sub of discoverySubreddits) {
-    for (const term of COMPETITOR_DISCOVERY_TERMS) {
-      console.log(`[SCRAPER] Competitor discovery r/${sub} — "${term}"`);
-      const n = await scrapeRedditSubreddit(sub, term);
-      total += 100;
-      newPosts += n;
-      await sleep(1500);
-    }
+  async function request(name: string, url: string): Promise<{ body: string; entry: SourceHealth } | null> {
+    const entry: SourceHealth = { name, url, state: "failed", records: 0 }; health.push(entry);
+    const host = new URL(url).hostname;
+    if (blocked.has(host)) { entry.state = "skipped"; entry.detail = "Earlier request was blocked or rate limited; no bypass attempted."; return null; }
+    if (Date.now() - start > 720000) { entry.detail = "Run time limit reached; retry later."; return null; }
+    const begun = Date.now();
+    try {
+      const res = await fetch(url, { headers: { "User-Agent": "DosysHealth-MarketResearch/1.1 (+https://dosys.health)", ...(host === "oauth.reddit.com" && process.env.REDDIT_ACCESS_TOKEN ? { Authorization: `Bearer ${process.env.REDDIT_ACCESS_TOKEN}` } : {}) }, signal: AbortSignal.timeout(15000) });
+      logRequest(url, res.status, Date.now() - begun);
+      if (!res.ok) {
+        entry.state = [401,403,429].includes(res.status) ? "blocked" : "failed";
+        entry.detail = `HTTP ${res.status}`;
+        if (entry.state === "blocked") blocked.add(host);
+        return null;
+      }
+      const body = await res.text();
+      if (!body.trim()) { entry.detail = "Empty response"; return null; }
+      entry.state = "ok";
+      return { body, entry };
+    } catch (error) {
+      entry.detail = error instanceof Error && error.name === "TimeoutError" ? "Request timed out" : "Network or DNS failure";
+      logRequest(url, null, Date.now() - begun, entry.detail);
+      return null;
+    } finally { await pause(); }
   }
-
-  return { total, newPosts };
-}
-
-// ---------------------------------------------------------------------------
-// Competitor Product Page Scraper — extract features and offerings
-// ---------------------------------------------------------------------------
-
-async function scrapeCompetitorProducts(): Promise<{
-  profiles: { name: string; url: string; content: string; features: string[] }[];
-}> {
-  const profiles: { name: string; url: string; content: string; features: string[] }[] = [];
-
-  const featureKeywords = [
-    "bayesian", "AUC", "precision dosing", "model-informed", "MIPD",
-    "real-time", "EHR integration", "EPIC", "Cerner", "FHIR", "HL7",
-    "FDA cleared", "FDA approved", "CE marked", "machine learning", "AI",
-    "population PK", "vancomycin", "aminoglycoside", "tacrolimus",
-    "gentamicin", "tobramycin", "phenytoin", "continuous infusion",
-    "mobile", "cloud", "SaaS", "on-premise", "dashboard", "reporting",
-    "clinical decision support", "CDS", "antimicrobial stewardship",
-    "therapeutic drug monitoring", "TDM", "renal", "obesity", "pediatric",
-    "neonatal", "oncology", "transplant", "free trial", "pricing",
-    "per-patient", "subscription", "enterprise", "hospital",
-  ];
-
-  for (const comp of COMPETITOR_URLS) {
-    const productUrl = (comp as { productUrl?: string }).productUrl ?? comp.url;
-    console.log(`[SCRAPER] Scraping product page: ${comp.name} — ${productUrl}`);
-    const res = await fetchWithLog(productUrl);
-
-    if (!res.ok) {
-      console.log(`[SCRAPER] ${comp.name} product page ${res.status} — skipping`);
-      continue;
-    }
-
-    // Strip HTML to plain text (simple extraction)
-    const plainText = res.text
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s+/g, " ")
-      .substring(0, 5000)
-      .trim();
-
-    // Extract which features they mention
-    const detectedFeatures: string[] = [];
-    for (const kw of featureKeywords) {
-      if (plainText.toLowerCase().includes(kw.toLowerCase())) {
-        detectedFeatures.push(kw);
+  function json<T>(res: { body: string; entry: SourceHealth }): T | null {
+    try { return JSON.parse(res.body) as T; } catch { res.entry.state = "failed"; res.entry.detail = "Invalid JSON response"; return null; }
+  }
+  try {
+    // A small, recent, relevant sample; never infer market size from Reddit counts.
+    if (!process.env.REDDIT_ACCESS_TOKEN) health.push({ name: "Reddit", url: "https://www.reddit.com/dev/api/", state: "skipped", records: 0, detail: "Approved Reddit API access/token not configured. Public JSON requests returned403; no bypass attempted." });
+    for (const source of (!process.env.REDDIT_ACCESS_TOKEN ? [] : options.quick ? REDDIT_SOURCES.slice(0, 1) : REDDIT_SOURCES)) {
+      for (const term of (options.quick ? source.terms.slice(0, 1) : source.terms.slice(0, 2))) {
+        const url = `https://oauth.reddit.com/r/${source.subreddit}/search?q=${encodeURIComponent(term)}&sort=new&t=month&limit=25&restrict_sr=1`;
+        const res = await request(`Reddit r/${source.subreddit}: ${term}`, url);
+        if (!res) continue;
+        const data = json<{ data?: { children?: { data: { id: string; title: string; selftext?: string; permalink: string; ups?: number; num_comments?: number; created_utc: number } }[] } }>(res);
+        if (!data?.data?.children) { res.entry.state = "failed"; res.entry.detail = "No Reddit result structure"; continue; }
+        for (const { data: p } of data.data.children) {
+          if (!p.id || !p.title || !p.permalink || !Number.isFinite(p.created_utc)) continue;
+          insert({ source: "reddit", source_identifier: source.subreddit, post_id: p.id, title: p.title, body_text: p.selftext?.slice(0, 2000) ?? null, url: `https://www.reddit.com${p.permalink}`, upvote_count: p.ups ?? 0, comment_count: p.num_comments ?? 0, published_at: new Date(p.created_utc * 1000).toISOString(), top_comments: "[]" });
+          res.entry.records++;
+        }
       }
     }
-
-    profiles.push({
-      name: comp.name,
-      url: productUrl,
-      content: plainText.substring(0, 2000),
-      features: detectedFeatures,
-    });
-
-    // Also save as a post for the analysis engine to pick up
-    trackAndInsert({
-      source: "competitor_product",
-      source_identifier: comp.name,
-      post_id: `product-${comp.name}-${new Date().toISOString().split("T")[0]}`,
-      title: `${comp.name} Product Page — ${detectedFeatures.length} features detected`,
-      body_text: `Features: ${detectedFeatures.join(", ")}\n\n${plainText.substring(0, 1500)}`,
-      url: productUrl,
-      upvote_count: 0,
-      comment_count: 0,
-      published_at: new Date().toISOString(),
-      top_comments: "[]",
-    });
-
-    // Also check blog/news for changes
-    const hash = crypto.createHash("md5").update(res.text).digest("hex");
-    const prev = getLatestSnapshot(comp.name, productUrl);
-    const changed = prev ? prev.content_hash !== hash : false;
-    insertSnapshot(comp.name, productUrl, hash, changed);
-    if (changed) {
-      console.log(`[SCRAPER] PRODUCT CHANGE: ${comp.name}`);
+    for (const search of (options.quick ? PUBMED_SEARCHES.slice(0, 1) : PUBMED_SEARCHES)) {
+      const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(search.query)}&mindate=${search.minDate}&datetype=pdat&sort=pub_date&retmax=20&retmode=json`;
+      const found = await request(`PubMed: ${search.query}`, url);
+      if (!found) continue;
+      const ids = json<{ esearchresult?: { idlist?: string[] } }>(found)?.esearchresult?.idlist;
+      if (!ids) { found.entry.state = "failed"; found.entry.detail = "Missing PubMed search results"; continue; }
+      if (!ids.length) continue;
+      const result = await request(`PubMed article metadata: ${search.query}`, `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(",")}&retmode=json`);
+      if (!result) continue;
+      const articles = json<{ result?: Record<string, { title?: string; source?: string; pubdate?: string; sortfirstauthor?: string }> }>(result)?.result;
+      if (!articles) { result.entry.state = "failed"; result.entry.detail = "Missing PubMed article metadata"; continue; }
+      for (const id of ids) {
+        const a = articles[id]; if (!a?.title) continue;
+        insert({ source: "pubmed", source_identifier: search.query, post_id: id, title: a.title, body_text: `${a.sortfirstauthor ?? ""} — ${a.source ?? ""}. Metadata only; abstract/full text not collected.`, url: `https://pubmed.ncbi.nlm.nih.gov/${id}/`, published_at: pubmedDate(a.pubdate ?? ""), upvote_count: 0, comment_count: 0, top_comments: "[]" });
+        result.entry.records++;
+      }
     }
-
-    await sleep(1500);
-  }
-
-  return { profiles };
-}
-
-// ---------------------------------------------------------------------------
-// Full Run
-// ---------------------------------------------------------------------------
-
-export async function runFullScrape(): Promise<{
-  total: number;
-  newPosts: number;
-  duration: number;
-  changes: { name: string; url: string }[];
-  competitorProfiles: { name: string; features: string[] }[];
-  runId: number;
-}> {
-  const startTime = Date.now();
-  _collected = [];
-  console.log("[SCRAPER] Starting full scrape run...");
-
-  // Reddit — clinical discussions
-  const reddit = await scrapeReddit();
-  console.log(`[SCRAPER] Reddit clinical: ${reddit.newPosts} new posts`);
-
-  // Reddit — competitor discovery
-  const discovery = await scrapeCompetitorDiscovery();
-  console.log(`[SCRAPER] Competitor discovery: ${discovery.newPosts} new posts`);
-
-  // PubMed
-  const pubmed = await scrapePubMed();
-  console.log(`[SCRAPER] PubMed: ${pubmed.newPosts} new articles`);
-
-  // Competitor page monitoring (change detection)
-  const competitors = await scrapeCompetitors();
-
-  // Competitor product page deep scrape (features extraction)
-  const products = await scrapeCompetitorProducts();
-  console.log(`[SCRAPER] Product pages: ${products.profiles.length} competitors profiled`);
-
-  const total = reddit.total + discovery.total + pubmed.total;
-  const newPosts = reddit.newPosts + discovery.newPosts + pubmed.newPosts;
-  const duration = (Date.now() - startTime) / 1000;
-
-  // Run keyword analysis
-  const runId = runAnalysis(total, newPosts, duration);
-
-  // File persistence — save to market_intelligence/
-  try {
-    const analysisRow = getRunById(runId);
-    if (analysisRow) {
-      const { filesWritten, errors } = saveRunToFiles([..._collected], analysisRow);
-      console.log(`[SCRAPER] File persistence: ${filesWritten.length} files written${errors.length > 0 ? `, ${errors.length} error(s)` : ""}`);
+    for (const region of REGIONAL_SEARCHES) {
+      const query = `${region.query} AND FIRST_PDATE:[2023-01-01 TO ${new Date().toISOString().slice(0,10)}] sort_date:y`;
+      const res = await request(`Europe PMC: ${region.name}`, `https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=${encodeURIComponent(query)}&format=json&resultType=core&pageSize=${options.quick ? 3 : 15}`);
+      if (!res) continue;
+      const data = json<{ resultList?: { result?: { id: string; source: string; pmid?: string; title: string; abstractText?: string; firstPublicationDate?: string }[] } }>(res);
+      if (!data?.resultList?.result) { res.entry.state = "failed"; res.entry.detail = "Missing Europe PMC result structure"; continue; }
+      for (const a of data.resultList.result) {
+        if (!a.id || !a.title) continue;
+        insert({ source: "europepmc", source_identifier: region.name, post_id: `${a.source}:${a.id}`, title: a.title, body_text: visibleText(a.abstractText ?? "Abstract unavailable; title/metadata only.").slice(0,2000), url: a.pmid ? `https://pubmed.ncbi.nlm.nih.gov/${a.pmid}/` : `https://europepmc.org/article/${a.source}/${a.id}`, published_at: a.firstPublicationDate ?? null, upvote_count: 0, comment_count: 0, top_comments: "[]" });
+        res.entry.records++;
+      }
     }
-  } catch (err) {
-    console.error("[SCRAPER] File persistence failed (non-blocking):", err);
-  }
-
-  // Run AI Market Research Analyst
-  try {
-    const { runAiAnalyst } = await import("./aiAnalyst");
-    await runAiAnalyst(runId);
-  } catch (err) {
-    console.error("[SCRAPER] AI Analyst failed (non-blocking):", err);
-  }
-
-  console.log(`[SCRAPER] Complete: ${newPosts} new posts, ${duration.toFixed(1)}s, run #${runId}`);
-
-  return {
-    total, newPosts, duration,
-    changes: competitors.changes,
-    competitorProfiles: products.profiles.map(p => ({ name: p.name, features: p.features })),
-    runId,
-  };
+    for (const comp of COMPETITOR_URLS) {
+      if (comp.disabledReason) { health.push({ name: comp.name, url: comp.url, state: "skipped", records: 0, detail: comp.disabledReason }); continue; }
+      for (const url of Array.from(new Set([comp.url, comp.productUrl]))) {
+        const res = await request(comp.name, url); if (!res) continue;
+        const content = visibleText(res.body);
+        if (content.length < 150 || /^(access denied|just a moment|please enable javascript)/i.test(content)) { res.entry.state = "failed"; res.entry.detail = "No usable public page text"; continue; }
+        const hash = crypto.createHash("sha256").update(content).digest("hex");
+        const prev = getLatestSnapshot(comp.name, url);
+        const changed = Boolean(prev && prev.content_hash !== hash);
+        insertSnapshot(comp.name, url, hash, changed);
+        if (changed) changes.push({ name: comp.name, url });
+        // Keywords are not verified capabilities; the analyst gets the page excerpt and URL.
+        insert({ source: "competitor_product", source_identifier: comp.name, post_id: `page-${crypto.createHash("sha256").update(url).digest("hex").slice(0,16)}`, title: `${comp.name}: public vendor page (self-reported)`, body_text: content.slice(0,2000), url, published_at: null, upvote_count: 0, comment_count: 0, top_comments: "[]" });
+        res.entry.records = 1;
+      }
+      profiles.push({ name: comp.name, features: [] });
+    }
+    const duration = (Date.now() - start)/1000;
+    const runId = runAnalysis(collected.size, newPosts, duration, health);
+    const row = getRunById(runId)!;
+    try { const saved = saveRunToFiles(Array.from(collected.values()), row); if (saved.errors.length) throw new Error("File archive incomplete"); } catch { finishJob("scraper", "partial", "Source data saved, but file archive failed. Check persistent storage."); throw new Error("Source data saved, but file archive failed."); }
+    finishJob("scraper", row.status, `Collected ${collected.size} unique records (${newPosts} new). ${health.filter(h=>h.state !== "ok").length} source checks unavailable; see coverage details.`);
+    if (options.analyze !== false && collected.size > 0) {
+      try { const { runAiAnalyst } = await import("./aiAnalyst"); await runAiAnalyst(runId); }
+      catch (error) { console.error("[AI_ANALYST]", error instanceof Error ? error.message : "Analysis failed"); }
+    }
+    return { total: collected.size, newPosts, duration, changes, competitorProfiles: profiles, runId, health, status: row.status };
+  } catch (error) { finishJob("scraper", "failed", error instanceof Error ? error.message : "Scraper failed"); throw error; }
 }

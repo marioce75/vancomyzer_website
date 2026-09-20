@@ -19,9 +19,9 @@ const COMPETITORS = [
 ];
 
 const COUNTRIES = [
-  "United States", "USA", "US", "Canada", "UK", "United Kingdom", "Australia",
+  "United States", "USA", "Canada", "UK", "United Kingdom", "Australia",
   "India", "Germany", "France", "Brazil", "Saudi Arabia", "UAE", "Singapore",
-  "South Korea", "Japan", "Mexico", "Nigeria", "South Africa",
+  "South Korea", "Japan", "Mexico", "Nigeria", "South Africa", "Spain", "España", "China", "Kenya", "Argentina", "Chile", "Colombia", "Thailand", "Malaysia", "Indonesia",
 ];
 
 function countInText(text: string, phrases: string[]): Record<string, number> {
@@ -52,7 +52,7 @@ function classifySentiment(text: string): "positive" | "neutral" | "negative" {
   return "neutral";
 }
 
-export function runAnalysis(totalScraped: number, newPosts: number, durationSeconds: number): number {
+export function runAnalysis(totalScraped: number, newPosts: number, durationSeconds: number, health: { name: string; state: string; records: number; detail?: string }[] = []): number {
   const posts = getRecentPosts(30, 2000);
 
   // Combine all text for analysis
@@ -94,7 +94,7 @@ export function runAnalysis(totalScraped: number, newPosts: number, durationSeco
     for (const comp of COMPETITORS) {
       if (text.toLowerCase().includes(comp.toLowerCase())) {
         competitorMentions[comp].count++;
-        const sentiment = classifySentiment(text);
+        const sentiment = post.source === "reddit" ? classifySentiment(text) : "neutral";
         competitorMentions[comp][sentiment]++;
         if (competitorMentions[comp].posts.length < 5) {
           competitorMentions[comp].posts.push(post.title.substring(0, 100));
@@ -136,8 +136,9 @@ export function runAnalysis(totalScraped: number, newPosts: number, durationSeco
     top_posts: JSON.stringify(topPosts),
     geographic_signals: JSON.stringify(geoSignals),
     run_duration_seconds: durationSeconds,
-    status: "completed",
-    error_message: null,
+    status: health.some(h => h.state !== "ok") ? (health.some(h => h.state === "ok") ? "partial" : "failed") : "completed",
+    error_message: health.filter(h => h.state !== "ok").map(h => `${h.name}: ${h.detail ?? h.state}`).join("; ") || null,
+    source_health: JSON.stringify(health),
   });
 
   return runId;

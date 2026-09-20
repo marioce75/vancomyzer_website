@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p ${PORT:-10000}",
     "lint": "next lint",
-    "test": "npm run test:pk && npm run test:oracle && npm run test:horizon && npm run test:hmac && npm run test:baa && npm run test:cases && npm run test:safety-pattern && npm run test:predictive && npm run test:report-suite && npm run test:study-readiness",
+    "test": "npm run test:pk && npm run test:oracle && npm run test:horizon && npm run test:hmac && npm run test:baa && npm run test:cases && npm run test:safety-pattern && npm run test:predictive && npm run test:report-suite && npm run test:study-readiness && npm run test:market-intel",
     "test:pk": "node --import tsx src/lib/pk/__tests__/existingRegimen.integration.test.ts && node --import tsx src/lib/pk/__tests__/initialRegimen.integration.test.ts",
     "test:report-suite": "node --import tsx src/lib/pk/__tests__/reportVerificationSuite.test.ts && node --import tsx src/lib/pk/__tests__/selectedRegimenReport.test.ts",
     "test:oracle": "node --import tsx src/lib/pk/__tests__/oracle/oracle.test.ts",
@@ -18,7 +18,8 @@
     "test:predictive": "node --import tsx scripts/verify-predictive-performance.ts",
     "test:horizon": "node --import tsx src/lib/pk/__tests__/exposureHorizon.regression.test.ts",
     "test:study-readiness": "node --import tsx src/lib/pk/__tests__/studyReadiness.test.ts && node --import tsx scripts/research/cli.test.ts",
-    "typecheck:research": "tsc -p tsconfig.research.json"
+    "typecheck:research": "tsc -p tsconfig.research.json",
+    "test:market-intel": "node --import tsx src/lib/scraper/__tests__/analyst.test.ts && node --import tsx src/lib/scraper/__tests__/collection.test.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

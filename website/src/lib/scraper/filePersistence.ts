@@ -34,7 +34,7 @@ function findRepoRoot(): string {
 }
 
 export const REPO_ROOT = findRepoRoot();
-export const MI_DIR = path.join(REPO_ROOT, "market_intelligence");
+export const MI_DIR = process.env.MARKET_INTEL_DIR || (fs.existsSync("/data") ? "/data/market_intelligence" : path.join(REPO_ROOT, "market_intelligence"));
 export const RAW_DIR = path.join(MI_DIR, "raw");
 export const ANALYSIS_DIR = path.join(MI_DIR, "analysis");
 export const WEEKLY_DIR = path.join(MI_DIR, "weekly_digests");
@@ -97,7 +97,7 @@ function pad2(n: number): string {
 }
 
 export function formatTimestamp(date: Date): string {
-  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}_${pad2(date.getHours())}-${pad2(date.getMinutes())}`;
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}_${pad2(date.getHours())}-${pad2(date.getMinutes())}-${pad2(date.getSeconds())}-${date.getMilliseconds()}`;
 }
 
 export function getISOWeekString(date: Date): string {
@@ -118,6 +118,10 @@ function safeJsonParse<T>(raw: string, fallback: T): T {
 // ---------------------------------------------------------------------------
 
 export function ensureDirectories(): void {
+  const legacy = path.join(REPO_ROOT, "market_intelligence");
+  if (MI_DIR === "/data/market_intelligence" && !fs.existsSync(MI_DIR) && fs.existsSync(legacy)) {
+    fs.cpSync(legacy, MI_DIR, { recursive: true, errorOnExist: true, force: false });
+  }
   for (const dir of [MI_DIR, RAW_DIR, ANALYSIS_DIR, WEEKLY_DIR, REPORTS_DIR]) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   }
@@ -131,6 +135,7 @@ export function ensureDirectories(): void {
 // ---------------------------------------------------------------------------
 
 function readIndex(): ScraperIndex {
+  ensureDirectories();
   if (!fs.existsSync(INDEX_FILE)) return { entries: [], last_updated: new Date().toISOString() };
   return safeJsonParse(fs.readFileSync(INDEX_FILE, "utf-8"), { entries: [], last_updated: new Date().toISOString() });
 }
@@ -181,41 +186,13 @@ function mergeAnalysisIntoDigest(
   digest.aggregated.total_posts += analysis.total_posts_scraped;
   digest.aggregated.new_posts += analysis.new_posts_this_run;
 
-  // Pain points
-  const newPP = safeJsonParse<{ text: string; count: number }[]>(analysis.top_pain_points, []);
-  for (const pp of newPP) {
-    const ex = digest.aggregated.pain_points.find(e => e.text === pp.text);
-    if (ex) ex.count += pp.count;
-    else digest.aggregated.pain_points.push({ ...pp });
-  }
-  digest.aggregated.pain_points.sort((a, b) => b.count - a.count);
+  // Each analysis covers a rolling 30-day window. Summing snapshots counts the
+  // same mentions repeatedly; retain the latest snapshot instead.
+  digest.aggregated.pain_points = safeJsonParse(analysis.top_pain_points, []);
+  digest.aggregated.drug_mentions = safeJsonParse(analysis.drug_mentions, {});
+  digest.aggregated.competitor_mentions = safeJsonParse(analysis.competitor_mentions, {});
+  digest.aggregated.geographic_signals = safeJsonParse(analysis.geographic_signals, {});
 
-  // Drug mentions
-  const newDrugs = safeJsonParse<Record<string, number>>(analysis.drug_mentions, {});
-  for (const [drug, count] of Object.entries(newDrugs)) {
-    digest.aggregated.drug_mentions[drug] = (digest.aggregated.drug_mentions[drug] ?? 0) + count;
-  }
-
-  // Competitor mentions
-  const newComps = safeJsonParse<Record<string, { count: number; positive: number; neutral: number; negative: number; posts: string[] }>>(analysis.competitor_mentions, {});
-  for (const [name, data] of Object.entries(newComps)) {
-    if (!digest.aggregated.competitor_mentions[name]) {
-      digest.aggregated.competitor_mentions[name] = { ...data };
-    } else {
-      const ex = digest.aggregated.competitor_mentions[name];
-      ex.count += data.count || 0;
-      ex.positive += data.positive || 0;
-      ex.neutral += data.neutral || 0;
-      ex.negative += data.negative || 0;
-      if (data.posts) ex.posts = [...ex.posts, ...data.posts].slice(0, 10);
-    }
-  }
-
-  // Geographic signals
-  const newGeo = safeJsonParse<Record<string, number>>(analysis.geographic_signals, {});
-  for (const [region, count] of Object.entries(newGeo)) {
-    digest.aggregated.geographic_signals[region] = (digest.aggregated.geographic_signals[region] ?? 0) + count;
-  }
 }
 
 function emptyDigest(weekStr: string): WeeklyDigest {
@@ -249,6 +226,7 @@ function analysisToObject(row: ScraperAnalysisRow): Record<string, unknown> {
     run_duration_seconds: row.run_duration_seconds,
     status: row.status,
     error_message: row.error_message,
+    source_health: safeJsonParse(row.source_health ?? "[]", []),
   };
 }
 
@@ -456,6 +434,7 @@ export function getAnalysisRange(startDate: string, endDate: string): Record<str
 
   const merged = {
     date_range: { start: startDate, end: endDate },
+    scope: "Totals are collection observations (records may recur across runs); keyword fields are the latest rolling-window snapshot, not summed mentions.",
     run_count: 0,
     total_posts: 0,
     total_new_posts: 0,
@@ -481,37 +460,12 @@ export function getAnalysisRange(startDate: string, endDate: string): Record<str
       run_duration_seconds: a.run_duration_seconds,
     });
 
-    // Pain points
-    const pp = (a.top_pain_points || []) as { text: string; count: number }[];
-    for (const p of pp) {
-      const ex = merged.pain_points.find(e => e.text === p.text);
-      if (ex) ex.count += p.count; else merged.pain_points.push({ ...p });
-    }
-
-    // Drug mentions
-    const dm = (a.drug_mentions || {}) as Record<string, number>;
-    for (const [drug, count] of Object.entries(dm)) {
-      merged.drug_mentions[drug] = (merged.drug_mentions[drug] ?? 0) + count;
-    }
-
-    // Competitor mentions
-    const cm = (a.competitor_mentions || {}) as Record<string, { count: number; positive: number; neutral: number; negative: number }>;
-    for (const [name, data] of Object.entries(cm)) {
-      if (!merged.competitor_mentions[name]) {
-        merged.competitor_mentions[name] = { ...data };
-      } else {
-        const ex = merged.competitor_mentions[name] as Record<string, number>;
-        ex.count = (ex.count || 0) + (data.count || 0);
-        ex.positive = (ex.positive || 0) + (data.positive || 0);
-        ex.neutral = (ex.neutral || 0) + (data.neutral || 0);
-        ex.negative = (ex.negative || 0) + (data.negative || 0);
-      }
-    }
-
-    // Geographic signals
-    const geo = (a.geographic_signals || {}) as Record<string, number>;
-    for (const [region, count] of Object.entries(geo)) {
-      merged.geographic_signals[region] = (merged.geographic_signals[region] ?? 0) + count;
+    const latestSnapshot = matching.every(other => other.run_date <= entry.run_date);
+    if (latestSnapshot) {
+      merged.pain_points = (a.top_pain_points || []) as typeof merged.pain_points;
+      merged.drug_mentions = (a.drug_mentions || {}) as typeof merged.drug_mentions;
+      merged.competitor_mentions = (a.competitor_mentions || {}) as typeof merged.competitor_mentions;
+      merged.geographic_signals = (a.geographic_signals || {}) as typeof merged.geographic_signals;
     }
   }
 
@@ -521,8 +475,9 @@ export function getAnalysisRange(startDate: string, endDate: string): Record<str
 
 export function getFileContents(relativePath: string): Buffer | null {
   const fullPath = path.resolve(MI_DIR, relativePath);
-  if (!fullPath.startsWith(path.resolve(MI_DIR))) return null; // prevent traversal
+  if (!fullPath.startsWith(path.resolve(MI_DIR) + path.sep)) return null; // prevent traversal
   if (!fs.existsSync(fullPath)) return null;
+  if (!fs.statSync(fullPath).isFile() || !fs.realpathSync(fullPath).startsWith(fs.realpathSync(MI_DIR) + path.sep)) return null;
   return fs.readFileSync(fullPath);
 }
 

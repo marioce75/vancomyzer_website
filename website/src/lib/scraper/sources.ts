@@ -40,13 +40,13 @@ export const PUBMED_SEARCHES = [
 
 // Known competitors — monitor their pages for changes and new content
 export const COMPETITOR_URLS = [
-  { name: "InsightRX", url: "https://www.insight-rx.com/blog/", productUrl: "https://www.insight-rx.com/platform/" },
-  { name: "DoseMeRx", url: "https://doseme-rx.com/vancomycin/articles", productUrl: "https://doseme-rx.com/our-solution" },
+  { name: "InsightRX", url: "https://www.insight-rx.com/", productUrl: "https://www.insight-rx.com/provider/drug-modules" },
+  { name: "DoseMeRx", url: "https://doseme-rx.com/vancomycin/articles", productUrl: "https://doseme-rx.com/why-dosemerx/vancomycin-models" },
   { name: "VancoCalc", url: "https://www.vancocalc.com", productUrl: "https://www.vancocalc.com" },
   { name: "MwPharm++", url: "https://www.mediware.cz/en/mwpharm-online/", productUrl: "https://www.mediware.cz/en/mwpharm-online/" },
-  { name: "DosOpt", url: "https://dosopt.com", productUrl: "https://dosopt.com" },
+  { name: "DosOpt", url: "https://dosopt.com", productUrl: "https://dosopt.com", disabledReason: "Domain did not resolve at September 2026 verification; reverify before enabling." },
   { name: "PrecisePK", url: "https://www.precisepk.com", productUrl: "https://www.precisepk.com" },
-  { name: "ID-ODS", url: "https://www.id-ods.com", productUrl: "https://www.id-ods.com" },
+  { name: "ID-ODS", url: "https://www.id-ods.com", productUrl: "https://www.id-ods.com", disabledReason: "Redirects to an application sign-in surface; a public evidence page must be identified first." },
 ];
 
 // Search terms specifically for discovering competitors and new TDM software
@@ -74,3 +74,12 @@ export const PAIN_POINT_PHRASES = [
 
 export const POSITIVE_WORDS = ["great", "accurate", "helpful", "love", "recommend", "excellent", "reliable", "fast"];
 export const NEGATIVE_WORDS = ["expensive", "slow", "black box", "wrong", "complicated", "buggy", "inaccurate", "frustrating"];
+
+
+// Country keywords describe article coverage, not the location or size of a market.
+export const REGIONAL_SEARCHES = [
+  { name: "Latin America", query: '(vancomycin OR vancomicina) AND (AUC OR Bayesian OR monitoring) AND (Brazil OR Brasil OR Mexico OR Argentina OR Chile OR Colombia OR "Latin America")' },
+  { name: "Europe / Spain", query: '(vancomycin OR vancomicina) AND (AUC OR Bayesian OR monitoring) AND (Spain OR España OR Europe OR "United Kingdom")' },
+  { name: "Asia", query: 'vancomycin AND (AUC OR Bayesian OR monitoring) AND (China OR Japan OR India OR Singapore OR Thailand OR Malaysia OR Korea)' },
+  { name: "Africa", query: 'vancomycin AND (AUC OR Bayesian OR monitoring) AND (Africa OR Nigeria OR Kenya OR Egypt)' },
+];
