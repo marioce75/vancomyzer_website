@@ -32,12 +32,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   }
 
-  let body: { institution_name?: unknown; seats?: unknown };
+  let body: { institution_name?: unknown; seats?: unknown; renewalConsent?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
+
+  if (body.renewalConsent !== true) return NextResponse.json({ error: "Please agree to the monthly renewal terms before checkout." }, { status: 400 });
 
   const institutionName = typeof body.institution_name === "string" ? body.institution_name.trim() : "";
   if (institutionName.length === 0 || institutionName.length > MAX_NAME_LEN) {
@@ -89,12 +91,16 @@ export async function POST(req: Request) {
 
   const checkout = await stripe.checkout.sessions.create({
     mode: "subscription",
+    custom_text: { submit: { message: `14 days free, then USD ${seats <= 10 ? 500 : 1000} per month until canceled. Cancel online through the team billing portal before the trial ends to avoid a charge, or before renewal to stop the next charge. BAA requires separate review and execution.` } },
     customer: customer.id,
     line_items: [{ price: priceId, quantity: 1 }],
     subscription_data: {
       trial_period_days: TRIAL_DAYS,
       metadata: {
         kind: "department",
+        renewal_consent: "true",
+        renewal_consent_version: "2026-09-20-department",
+        renewal_consent_at: new Date().toISOString(),
         institution_name: institutionName,
         admin_user_id: String(dbUser.id),
         admin_email: dbUser.email,

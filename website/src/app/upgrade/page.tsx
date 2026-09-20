@@ -21,7 +21,8 @@ const FEATURES = [
 
 export default function UpgradePage() {
   const [trialStatus, setTrialStatus] = useState<TrialStatusResult | null>(null)
-  const [plan, setPlan] = useState<'monthly' | 'annual'>('annual')
+  const [plan, setPlan] = useState<'annual'>('annual')
+  const [renewalConsent, setRenewalConsent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -39,7 +40,7 @@ export default function UpgradePage() {
       const res = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, renewalConsent }),
       })
       const data = await res.json()
       if (data.url) {
@@ -83,7 +84,6 @@ export default function UpgradePage() {
             {[
               { label: 'Cases', value: stats.totalCases, sub: null as string | null },
               { label: 'AUC Attainment', value: stats.aucTargetAttainmentRate != null ? `${stats.aucTargetAttainmentRate.toFixed(0)}%` : '—', sub: null as string | null },
-              { label: 'Custom obesity model (retired)', value: stats.obesityModelActivations, sub: 'uses before 15 Sep 2026' as string | null },
               { label: 'ICU Cases', value: stats.icuCases, sub: null as string | null },
             ].map(s => (
               <div key={s.label}>
@@ -99,7 +99,7 @@ export default function UpgradePage() {
         <>
           {/* Plan selector */}
           <div style={{ display: 'flex', gap: 12, marginBottom: 24, justifyContent: 'center' }}>
-            {(['annual', 'monthly'] as const).map(p => (
+            {(['annual'] as const).map(p => (
               <button
                 key={p}
                 type="button"
@@ -114,22 +114,26 @@ export default function UpgradePage() {
                   color: plan === p ? NAVY : SLATE,
                 }}
               >
-                {p === 'annual' ? '$9.99 / month' : '$19.99 / month'}
+                $49.99 / year
                 {p === 'annual' && (
                   <span style={{ display: 'block', fontSize: 10, fontWeight: 400, marginTop: 2 }}>
-                    billed annually · saves ~50%
+                    billed annually · cancel online
                   </span>
                 )}
               </button>
             ))}
           </div>
 
+          <label style={{ display: 'block', marginBottom: 20, fontSize: 14 }}>
+            <input type="checkbox" checked={renewalConsent} onChange={e => setRenewalConsent(e.target.checked)} />{' '}
+            I agree to automatic renewal: after the 14-day trial, $49.99 is charged yearly until I cancel online in Billing. Any verified discount is shown before payment. Cancel before the trial ends to avoid a charge; otherwise cancel before renewal to stop the next charge.
+          </label>
           {/* CTA */}
           <div style={{ textAlign: 'center', marginBottom: 36 }}>
             <button
               type="button"
               onClick={handleCheckout}
-              disabled={loading}
+              disabled={loading || !renewalConsent}
               style={{
                 background: GREEN, color: NAVY, border: 'none',
                 padding: '14px 40px', fontSize: 15, fontWeight: 700,
@@ -138,7 +142,7 @@ export default function UpgradePage() {
                 letterSpacing: '0.04em',
               }}
             >
-              {loading ? 'Redirecting to Checkout…' : `Subscribe ${plan === 'annual' ? '— $9.99/mo billed annually' : '— $19.99/mo'}`}
+              {loading ? 'Redirecting to Checkout…' : 'Start 14-day trial — then $49.99/year'}
             </button>
             <div style={{ fontSize: 11, color: SLATE, marginTop: 8 }}>
               Secure checkout via Stripe · Cancel anytime

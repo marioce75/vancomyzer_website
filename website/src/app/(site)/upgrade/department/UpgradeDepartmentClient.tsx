@@ -20,6 +20,7 @@ function priceForSeats(seats: number): { amount: number; band: "small" | "large"
 export default function UpgradeDepartmentClient() {
   const [institutionName, setInstitutionName] = useState("");
   const [seats, setSeats] = useState<number>(SMALL_BAND);
+  const [renewalConsent, setRenewalConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +32,7 @@ export default function UpgradeDepartmentClient() {
     [],
   );
 
-  const canSubmit = institutionName.trim().length > 0 && seats >= MIN_SEATS && seats <= MAX_SEATS && !submitting;
+  const canSubmit = institutionName.trim().length > 0 && seats >= MIN_SEATS && seats <= MAX_SEATS && renewalConsent && !submitting;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,7 +43,7 @@ export default function UpgradeDepartmentClient() {
       const res = await fetch("/api/billing/department-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ institution_name: institutionName.trim(), seats }),
+        body: JSON.stringify({ institution_name: institutionName.trim(), seats, renewalConsent }),
       });
       const data = await res.json();
       if (!res.ok || !data.url) {
@@ -164,6 +165,10 @@ export default function UpgradeDepartmentClient() {
           </div>
         )}
 
+        <label className="block text-sm">
+          <input type="checkbox" checked={renewalConsent} onChange={e => setRenewalConsent(e.target.checked)} />{" "}
+          I agree to automatic renewal: after 14 days, ${pricing.amount.toLocaleString()} is charged monthly until canceled online through team billing. Cancel before the trial ends to avoid a charge, or before renewal to stop the next charge. BAA requires separate review and execution.
+        </label>
         {/* Submit */}
         <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link

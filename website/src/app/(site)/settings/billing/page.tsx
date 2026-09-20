@@ -6,18 +6,13 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { TIERS, isPaidTier } from "@/lib/tiers";
 
-type CheckoutPlan = "monthly" | "annual";
+type CheckoutPlan = "annual";
 
 const PLAN_LABELS: Record<CheckoutPlan, { label: string; price: string; sub: string }> = {
-  monthly: {
-    label: "Monthly",
-    price: "$19.99",
-    sub: "billed monthly · cancel anytime",
-  },
   annual: {
     label: "Annual",
-    price: "$9.99 / mo",
-    sub: "billed yearly · save ~50%",
+    price: "$49.99 / year",
+    sub: "billed yearly · cancel online",
   },
 };
 
@@ -69,6 +64,7 @@ function BillingPageInner() {
   const checkoutResult = searchParams.get("checkout");
 
   const [plan, setPlan] = useState<CheckoutPlan>("annual");
+  const [renewalConsent, setRenewalConsent] = useState(false);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [banner, setBanner] = useState<string | null>(null);
@@ -102,7 +98,7 @@ function BillingPageInner() {
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, renewalConsent }),
       });
       const body = await res.json();
       if (!res.ok || !body.url) {
@@ -195,7 +191,7 @@ function BillingPageInner() {
               {tier.name}
             </div>
             <div style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 2 }}>
-              {tier.priceLabel}
+              {onPaidTier ? "Your existing subscription amount and renewal terms are shown in Manage billing." : tier.priceLabel}
             </div>
           </div>
           {onPaidTier && (
@@ -230,7 +226,7 @@ function BillingPageInner() {
                 cursor: working ? "wait" : "pointer", opacity: working ? 0.7 : 1,
               }}
             >
-              {working ? "Opening…" : "Manage billing"}
+              {working ? "Opening…" : "Manage billing / cancel"}
             </button>
             <span style={{ fontSize: 11, color: "var(--color-dim)", alignSelf: "center" }}>
               Change plan, update payment method, download invoices, or cancel — all in Stripe&apos;s secure portal.
@@ -299,10 +295,14 @@ function BillingPageInner() {
             })}
           </div>
 
+          <label style={{ display: "block", marginBottom: 16, fontSize: 14 }}>
+            <input type="checkbox" checked={renewalConsent} onChange={e => setRenewalConsent(e.target.checked)} />{" "}
+            I agree to automatic renewal: after the 14-day trial, $49.99 is charged yearly until I cancel online in Billing. Any verified discount is shown before payment. Cancel before the trial ends to avoid a charge; otherwise cancel before renewal to stop the next charge.
+          </label>
           <button
             type="button"
             onClick={startCheckout}
-            disabled={working}
+            disabled={working || !renewalConsent}
             style={{
               width: "100%",
               padding: 14,

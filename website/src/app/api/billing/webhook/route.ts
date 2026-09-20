@@ -1,3 +1,6 @@
+import { claimBillingAcknowledgment, finishBillingAcknowledgment } from "@/lib/db";
+import { sendBillingAcknowledgment } from "@/lib/email";
+import { PRO_ANNUAL_LOOKUP_KEY, isApprovedProPrice } from "@/lib/billingPolicy";
 /**
  * POST /api/billing/webhook
  *
@@ -87,7 +90,8 @@ async function handleSubscriptionEvent(sub: Stripe.Subscription) {
   }
 
   const priceId = sub.items.data[0]?.price?.id ?? null;
-  const tier = tierForPriceId(priceId) ?? "free";
+  const subscriptionPrice = sub.items.data[0]?.price;
+  const tier = tierForPriceId(priceId) ?? (subscriptionPrice?.lookup_key === PRO_ANNUAL_LOOKUP_KEY && isApprovedProPrice({ ...subscriptionPrice, active: true }) ? "individual_pro" : "free");
   const status = localStatusFromStripe(sub.status);
 
   applySubscriptionUpdate(user.id, {
@@ -122,9 +126,9 @@ async function handleSubscriptionEvent(sub: Stripe.Subscription) {
   }
 }
 
-// Single month of Individual Pro at the current public price. Hardcoded
+// Fixed referral reward retained when annual Pro pricing changed. Hardcoded
 // because the referrer's plan may be free, in which case we still owe them
-// one month of Pro value as a credit usable when they upgrade.
+// the existing $9.99 credit usable when they upgrade.
 const REFERRAL_CREDIT_CENTS = 999;
 
 async function fireReferralCreditIfApplicable(referredUser: { id: number; email: string }) {
@@ -364,6 +368,30 @@ async function handleSubscriptionDeleted(sub: Stripe.Subscription) {
   });
 }
 
+async function acknowledgeSubscription(sub: Stripe.Subscription) {
+  // Legacy events without the new explicit consent marker are not a new enrollment.
+  if (sub.metadata?.renewal_consent !== "true") return;
+  const stripe = getStripe();
+  const customer = typeof sub.customer === "string" ? await stripe.customers.retrieve(sub.customer) : sub.customer;
+  if (customer.deleted || !customer.email) throw new Error("Subscription customer email unavailable");
+  const price = sub.items.data[0]?.price;
+  if (!price?.recurring || price.unit_amount === null) throw new Error("Subscription price unavailable");
+  const date = sub.trial_end ?? sub.current_period_end;
+  const billingUrl = sub.metadata.kind === "department" ? "https://vancomyzer.com/team" : "https://vancomyzer.com/settings/billing";
+  const amount = new Intl.NumberFormat("en-US", { style: "currency", currency: price.currency }).format(price.unit_amount / 100);
+  const text = `Your Vancomyzer subscription has been created.\n\nPlan: ${sub.metadata.kind === "department" ? "Department" : "Individual Pro"}\nStandard renewal price: ${amount} every ${price.recurring.interval_count} ${price.recurring.interval}(s). Any discount agreed at checkout is reflected in your billing portal and invoice; check its duration there.\n${sub.trial_end ? "Trial ends" : "Current period ends"}: ${date ? new Date(date * 1000).toISOString().slice(0,10) : "See billing portal"} (UTC).\n\nYou agreed to automatic renewal. Your payment method will be charged at the end of the trial and each renewal until canceled. Cancel online before the trial ends to avoid a charge, or before renewal to stop the next charge: ${billingUrl} → Manage billing / cancel.\n\nFree calculator access does not require a paid subscription.\nTerms: https://vancomyzer.com/terms\nQuestions: contact@vancomyzer.com\nConsent version: ${sub.metadata.renewal_consent_version}`;
+  if (!claimBillingAcknowledgment(sub.id)) return;
+  try {
+    await sendBillingAcknowledgment(customer.email, text);
+    finishBillingAcknowledgment(sub.id, "sent");
+  } catch (err) {
+    // SMTP errors can have an uncertain delivery outcome. Do not automatically resend.
+    finishBillingAcknowledgment(sub.id, "needs_review");
+    logSecurityEvent({ action: "BILLING_ACKNOWLEDGMENT_NEEDS_REVIEW", details: JSON.stringify({ subscription_id: sub.id }), severity: "warn" });
+    console.error("[stripe-webhook] Billing acknowledgment needs review", err instanceof Error ? err.message : "unknown");
+  }
+}
+
 export async function POST(req: Request) {
   const sig = req.headers.get("stripe-signature");
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -391,6 +419,7 @@ export async function POST(req: Request) {
       case "customer.subscription.created":
       case "customer.subscription.updated":
         await handleSubscriptionEvent(event.data.object as Stripe.Subscription);
+        if (event.type === "customer.subscription.created") await acknowledgeSubscription(event.data.object as Stripe.Subscription);
         break;
 
       case "customer.subscription.deleted":

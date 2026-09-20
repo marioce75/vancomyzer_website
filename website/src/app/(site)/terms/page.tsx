@@ -12,6 +12,14 @@ export default function TermsPage() {
       <div className="mt-8 space-y-8 text-slate-700">
 
         <section>
+          <h2 className="text-lg font-semibold text-slate-900 mb-2">Subscriptions, renewal and cancellation</h2>
+          <p>Individual Pro is $49.99 per year, billed annually after a 14-day trial when you explicitly choose that subscription. It renews yearly until canceled. Verified discounts and their duration are shown at checkout. Free accounts and free pilots are never automatically converted to paid billing.</p>
+          <p className="mt-3">Cancel online through Settings → Billing → Manage billing / cancel. Department administrators use Team → Manage billing. Cancel before the trial ends to avoid a charge, or before the next renewal to stop that charge. Cancellation stops future renewal; access continues through the remaining paid period unless otherwise stated in your agreement.</p>
+          <p className="mt-3">A confirmation email records your subscription and cancellation details. Renewal reminders include management links. We will provide required advance notice of accepted fee changes, including 7–30 days before a change takes effect where California law applies. The new public prices do not automatically change existing subscription agreements.</p>
+          <p className="mt-3">Hospital Site licenses cost $990/year for up to 100 beds or $2,500/year for 101–400 beds, with unlimited individual users at one named site and no implementation fee. Annual or two-year agreements require site review and account setup before billing. Team administration, audit logs, multi-site arrangements and any BAA require separate Department terms and review. No plan currently includes EHR integration.</p>
+        </section>
+
+        <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Acceptance of Terms</h2>
           <p>
             By accessing or using Vancomyzer™, you agree to be bound by these Terms of Use and the Medical Disclaimer. If you do not agree, do not use this tool.
@@ -58,7 +66,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold text-slate-900 mb-2">Modifications</h2>
           <p>
-            These terms may be updated at any time without prior notice. Continued use of the tool after changes constitutes acceptance of the revised terms.
+            We may update these terms. Subscription changes remain subject to applicable notice and consent requirements; continued free use does not authorize paid billing.
           </p>
         </section>
 

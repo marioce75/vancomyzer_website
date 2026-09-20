@@ -9,13 +9,11 @@
  * "not yet available" rather than listed as included.
  */
 
-import { useState } from "react";
 import Link from "next/link";
 import { OPEN_ACCESS } from "@/lib/openAccess";
 import { track } from "@/lib/analytics";
 import { COLIN_2019 } from "@/lib/pk/modelRegistry";
 
-type BillingCycle = "annual" | "monthly";
 
 /** A normal link/button CTA, or (open-access launch only) a plain, non-clickable label. */
 type TierCta =
@@ -58,8 +56,7 @@ const TIERS: TierCard[] = [
     name: "Individual Pro",
     audience: "Pharmacists, Physicians, NPs, PAs",
     price: {
-      annual: { amount: "$9.99", suffix: "/mo · billed annually" },
-      monthly: { amount: "$19.99", suffix: "/mo" },
+      annual: { amount: "$49.99", suffix: "/year · billed annually" },
     },
     features: [
       "Everything in Free",
@@ -71,11 +68,26 @@ const TIERS: TierCard[] = [
     ],
     cta: { label: "Start 14-Day Trial", href: "/settings/billing" },
     ctaSubLabel: "card required at signup · cancel anytime",
-    badge: "Most Popular",
+    badge: "Individual plan",
+  },
+  {
+    name: "Hospital Site",
+    audience: "One hospital, unlimited users",
+    scope: "Includes critical-access hospitals",
+    price: { annual: { amount: "$990 / $2,500", suffix: "/year · up to 100 beds / 101–400 beds" } },
+    features: [
+      "Individual Pro access for users at one site",
+      "No implementation fee",
+      "Annual term; two-year agreement available",
+      "Standalone calculator; no EHR integration",
+      "Team administration, audit logs and BAA review: Department plan",
+      "Site eligibility and account setup confirmed before billing",
+    ],
+    cta: { label: "Request site license", href: "https://dosys.health/contact?type=site-license", external: true },
   },
   {
     name: "Department",
-    audience: "Hospital pharmacy departments — self-serve",
+    audience: "Teams needing administration and audit logs",
     scope: "5–20 seats · 14-day free trial",
     price: {
       annual: { amount: "$500 / $1,000", suffix: "/month · up to 10 seats or 11–20 seats" },
@@ -87,6 +99,8 @@ const TIERS: TierCard[] = [
       "Admin panel with user management & roles",
       "Institution-scoped audit log (90-day retention)",
       "Priority email support (service terms by contract)",
+      "BAA subject to legal review and execution",
+      "Multi-site departments: request a scoped quote",
       "Onboarding assistance",
     ],
     cta: { label: "Start 14-Day Trial", href: "/upgrade/department" },
@@ -143,7 +157,6 @@ const DISPLAY_TIERS: TierCard[] = OPEN_ACCESS
   : TIERS;
 
 export default function PricingClient() {
-  const [cycle, setCycle] = useState<BillingCycle>("annual");
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-16">
@@ -160,7 +173,7 @@ export default function PricingClient() {
             During the launch period, PDF export, clinical-note copy and &ldquo;why this result&rdquo;
             interpretation are also free for everyone, with no account needed. After the launch period
             they return to Individual Pro. Calculation history requires Individual Pro; team administration
-            and audit logs require a Department plan.
+            and audit logs require a Department plan. Free users are never automatically enrolled in paid billing.
           </p>
         </div>
       )}
@@ -175,48 +188,11 @@ export default function PricingClient() {
         </p>
       </div>
 
-      {/* Billing-cycle toggle */}
-      <div className="mb-12 flex items-center justify-center gap-3">
-        <div
-          className="inline-flex rounded-full p-1"
-          role="tablist"
-          aria-label="Billing cycle"
-          style={{ background: "var(--color-bg)", border: "1px solid var(--color-border)" }}
-        >
-          {(["monthly", "annual"] as const).map((c) => {
-            const active = cycle === c;
-            return (
-              <button
-                key={c}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setCycle(c)}
-                className="rounded-full px-4 py-1.5 text-sm font-semibold transition"
-                style={{
-                  background: active ? "#0d9488" : "transparent",
-                  color: active ? "#ffffff" : "var(--color-secondary)",
-                  cursor: "pointer",
-                }}
-              >
-                {c === "monthly" ? "Monthly" : "Annual"}
-              </button>
-            );
-          })}
-        </div>
-        <span
-          className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
-          style={{ background: "rgba(13,148,136,0.12)", color: "#0d9488" }}
-        >
-          Save 50% with annual billing
-        </span>
-      </div>
-
       {/* Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-5">
         {DISPLAY_TIERS.map((tier) => {
-          const isFeatured = tier.badge === "Most Popular";
-          const cyclePrice = cycle === "monthly" && tier.price.monthly ? tier.price.monthly : tier.price.annual;
+          const isFeatured = tier.name === "Individual Pro";
+          const cyclePrice = tier.price.annual;
           return (
             <div
               key={tier.name}

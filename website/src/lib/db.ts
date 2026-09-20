@@ -1980,3 +1980,16 @@ export function disableInstitutionUsers(institutionalAccountId: number): number 
     .run(institutionalAccountId);
   return result.changes;
 }
+
+// A persistent delivery ledger prevents duplicate subscription acknowledgments on webhook retries.
+export function claimBillingAcknowledgment(subscriptionId: string): boolean {
+  const db = getDb();
+  db.exec(`CREATE TABLE IF NOT EXISTS billing_acknowledgments (
+    subscription_id TEXT PRIMARY KEY, status TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`);
+  return db.prepare("INSERT OR IGNORE INTO billing_acknowledgments(subscription_id, status) VALUES (?, 'sending')").run(subscriptionId).changes === 1;
+}
+export function finishBillingAcknowledgment(subscriptionId: string, status: "sent" | "needs_review") {
+  getDb().prepare("UPDATE billing_acknowledgments SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE subscription_id = ?").run(status, subscriptionId);
+}

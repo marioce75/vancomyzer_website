@@ -126,7 +126,7 @@ export default function ReferralCard() {
       </div>
 
       <p style={{ fontSize: 11, color: "var(--color-dim)", margin: 0, lineHeight: 1.55 }}>
-        Share your link with colleagues. When they subscribe to Pro, $9.99 (one month of Pro) is credited to your next Stripe invoice automatically. If you&apos;re still on Free, the credit is held until your first paid subscription.
+        Share your link with colleagues. When they subscribe to Pro, a $9.99 referral credit is applied to your next Stripe invoice automatically. If you&apos;re still on Free, the credit is held until your first paid subscription.
       </p>
     </section>
   );

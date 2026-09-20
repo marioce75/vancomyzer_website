@@ -737,3 +737,10 @@ export async function sendRejectionNotification(user: {
     console.error("[EMAIL] Failed to send rejection notification:", err);
   }
 }
+
+/** Subscription acknowledgment; caller maintains a persistent delivery ledger. */
+export async function sendBillingAcknowledgment(to: string, text: string) {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) throw new Error("Billing email delivery is not configured");
+  const result = await transporter.sendMail({ from: FROM, to, subject: "Your Vancomyzer subscription and cancellation details", text });
+  if (!result.accepted?.length) throw new Error("Billing email was not accepted by the mail provider");
+}

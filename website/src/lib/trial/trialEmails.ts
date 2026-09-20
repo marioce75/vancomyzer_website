@@ -68,7 +68,7 @@ export async function sendTrialExpiringEmail(user: { email: string; name: string
       <p>Subscribe now to keep your calculation history after the pilot ends. The core calculator
       remains free.</p>
       <p><a href="https://vancomyzer.com/upgrade" style="color:#00d4aa;font-weight:bold;">
-        Subscribe — $9.99/mo billed annually or $19.99/mo →
+        Subscribe — $49.99/year →
       </a></p>
       <p>— The Dosys Health LLC Team</p>
     `

@@ -212,7 +212,7 @@ export default function PilotDashboardPage() {
               cursor: 'pointer', textDecoration: 'none',
             }}
           >
-            Subscribe — $9.99/mo billed annually · $19.99/mo
+            Subscribe — $49.99/year
           </a>
         )}
       </div>

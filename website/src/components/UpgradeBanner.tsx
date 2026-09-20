@@ -61,7 +61,7 @@ export default function UpgradeBanner() {
           Export clinical notes for the chart &amp; save calculation history.
         </p>
         <p style={{ margin: "2px 0 0", fontSize: 11, color: "#0f766e", lineHeight: 1.4 }}>
-          Vancomyzer&trade; Individual Pro · 14-day free trial · $9.99/mo billed annually.
+          Vancomyzer&trade; Individual Pro · 14-day free trial · $49.99/year.
         </p>
       </div>
       <Link
