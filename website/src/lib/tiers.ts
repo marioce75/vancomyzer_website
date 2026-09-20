@@ -112,7 +112,7 @@ export const TIERS: Record<TierId, TierConfig> = {
       "Multi-site departments: request a scoped quote",
       "Onboarding assistance",
     ],
-    cta: { label: "Start 14-Day Trial", href: "/upgrade/department" },
+    cta: { label: "Start 14-Day Trial", href: `${CONTACT_URL}?type=site-license` },
     paid: true,
   },
   hospital: {

@@ -424,7 +424,7 @@ export default function LandingPage() {
             </OpenCalculatorButton>
             {OPEN_ACCESS ? (
               <Link href="/pricing" className={CTA_OUTLINE_CLASS} style={CTA_OUTLINE_STYLE}>
-                Department &amp; hospital plans
+                Hospital Site licenses
               </Link>
             ) : (
               <Link href="/register" className={CTA_OUTLINE_CLASS} style={CTA_OUTLINE_STYLE}>

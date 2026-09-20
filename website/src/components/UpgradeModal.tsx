@@ -56,12 +56,12 @@ const DEFAULT_COPY: Partial<Record<FeatureId, { title: string; description: stri
   "org.admin_panel": {
     title: "Team management is a Department feature",
     description:
-      "Invite teammates, manage roles, and view your institution's calculation audit log. Available on Department and Hospital plans.",
+      "Invite teammates, manage roles, and view your institution's calculation audit log. Institutional availability requires a scope review.",
   },
   "org.invite_users": {
     title: "Invitations are a Department feature",
     description:
-      "Add teammates to your shared workspace. Available on Department and Hospital plans.",
+      "Add teammates to your shared workspace. Institutional availability requires a scope review.",
   },
 };
 
@@ -87,19 +87,19 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
 
   const upgradeTier = upgradeTargetFor(feature);
   const copy = DEFAULT_COPY[feature] ?? {
-    title: `${upgradeTier.name} plan required`,
-    description: `This feature is available on ${upgradeTier.name} and higher plans.`,
+    title: "Institutional feature",
+    description: "Contact Dosys to discuss institutional requirements and availability.",
   };
   const headline = title ?? copy.title;
   const body = description ?? copy.description;
 
   // Individual Pro and Department are self-serve (trial checkout).
   // Hospital CTA goes to dosys.health/contact (sales).
-  const isSelfServe = upgradeTier.id === "individual_pro" || upgradeTier.id === "department";
+  const isSelfServe = upgradeTier.id === "individual_pro";
   const primaryHref = isSelfServe
-    ? upgradeTier.id === "individual_pro" ? "/settings/billing" : "/upgrade/department"
-    : upgradeTier.cta.href;
-  const primaryLabel = isSelfServe ? "Start 14-day trial" : upgradeTier.cta.label;
+    ? "/settings/billing"
+    : "https://dosys.health/contact?type=site-license";
+  const primaryLabel = isSelfServe ? "Start 14-day trial" : "Discuss site requirements";
   const primaryExternal = !isSelfServe;
 
   return (

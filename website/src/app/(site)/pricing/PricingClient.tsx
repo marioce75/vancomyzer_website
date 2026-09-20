@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Pricing presentation page (Free, Individual Pro, Department, Hospital).
+ * Pricing presentation page (Free, Individual Pro, Hospital Site).
  * Decoupled from lib/tiers.ts, which stays the feature-gate source of truth.
  * Keep the plan facts here, in lib/tiers.ts and on dosys.health/pricing in
  * step. Since the 15 Sep 2026 review: the core calculator is free
@@ -80,49 +80,12 @@ const TIERS: TierCard[] = [
       "No implementation fee",
       "Annual term; two-year agreement available",
       "Standalone calculator; no EHR integration",
-      "Team administration, audit logs and BAA review: Department plan",
+      "Institutional data use and any BAA require review before setup",
       "Site eligibility and account setup confirmed before billing",
     ],
     cta: { label: "Request site license", href: "https://dosys.health/contact?type=site-license", external: true },
   },
-  {
-    name: "Department",
-    audience: "Teams needing administration and audit logs",
-    scope: "5–20 seats · 14-day free trial",
-    price: {
-      annual: { amount: "$500 / $1,000", suffix: "/month · up to 10 seats or 11–20 seats" },
-    },
-    features: [
-      "Everything in Individual Pro",
-      "Up to 10 seats — $500/month",
-      "11–20 seats — $1,000/month",
-      "Admin panel with user management & roles",
-      "Institution-scoped audit log (90-day retention)",
-      "Priority email support (service terms by contract)",
-      "BAA subject to legal review and execution",
-      "Multi-site departments: request a scoped quote",
-      "Onboarding assistance",
-    ],
-    cta: { label: "Start 14-Day Trial", href: "/upgrade/department" },
-    ctaSubLabel: "card required at signup · cancel anytime",
-  },
-  {
-    name: "Hospital",
-    audience: "Health systems",
-    scope: "Scoped to your institution",
-    price: {
-      annual: { amount: "Custom quote", suffix: "" },
-    },
-    features: [
-      "Everything in Department",
-      "Seat count set by contract",
-      "Service terms by contract",
-      "Business Associate Agreement (available after legal review — not yet available)",
-      "EMR/EHR integration via SMART on FHIR (in development — not yet available)",
-      "Custom branding on outputs (in development — not yet available)",
-    ],
-    cta: { label: "Contact Sales", href: "https://dosys.health/contact", external: true },
-  },
+
 ];
 
 /**
@@ -130,8 +93,7 @@ const TIERS: TierCard[] = [
  * calculator (free permanently), PDF export, clinical-note copy and "why this
  * result" interpretation are free for everyone without an account. Only the
  * self-serve Free and Individual Pro calls to action change; calculation
- * history still needs Individual Pro, and the Department and Hospital cards
- * are unchanged. With NEXT_PUBLIC_OPEN_ACCESS=false this is exactly TIERS,
+ * history still needs Individual Pro; Hospital Site remains available by inquiry. With NEXT_PUBLIC_OPEN_ACCESS=false this is exactly TIERS,
  * so the page renders as it did before the launch period.
  */
 const DISPLAY_TIERS: TierCard[] = OPEN_ACCESS
@@ -173,7 +135,7 @@ export default function PricingClient() {
             During the launch period, PDF export, clinical-note copy and &ldquo;why this result&rdquo;
             interpretation are also free for everyone, with no account needed. After the launch period
             they return to Individual Pro. Calculation history requires Individual Pro; team administration
-            and audit logs require a Department plan. Free users are never automatically enrolled in paid billing.
+            and institutional features require a separate scope review. Free users are never automatically enrolled in paid billing.
           </p>
         </div>
       )}

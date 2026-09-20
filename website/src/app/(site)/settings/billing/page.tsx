@@ -351,7 +351,7 @@ function BillingPageInner() {
           rel="noopener noreferrer"
           style={{ color: "var(--color-primary)", textDecoration: "underline" }}
         >
-          Department &amp; Hospital plans
+          Hospital Site licenses
         </a>{" "}
         on dosys.health.
       </div>

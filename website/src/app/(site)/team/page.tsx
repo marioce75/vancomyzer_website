@@ -285,7 +285,7 @@ export default function TeamPage() {
           {loadError}
         </div>
         <p style={{ fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.6 }}>
-          Team management is available on Department and Hospital plans, and only to users
+          Team management requires an existing institutional agreement, and is available only to users
           designated as institutional admins. If your team needs this feature, see{" "}
           <a
             href="https://dosys.health/pricing"
@@ -293,7 +293,7 @@ export default function TeamPage() {
             rel="noopener noreferrer"
             style={{ color: "var(--color-primary)", textDecoration: "underline" }}
           >
-            Department &amp; Hospital plans
+            Hospital Site licenses
           </a>{" "}
           on dosys.health.
         </p>
