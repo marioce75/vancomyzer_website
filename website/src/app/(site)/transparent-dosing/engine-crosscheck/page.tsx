@@ -451,7 +451,7 @@ function SnapshotNotice() {
       background: "#eff6ff",
       border: "1px solid #bfdbfe",
       borderLeft: "3px solid #2563eb",
-      color: "#1e3a5f",
+      color: "#14232f",
       borderRadius: 4,
       fontSize: 13,
       lineHeight: 1.55,

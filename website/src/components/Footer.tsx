@@ -20,10 +20,10 @@ export default function Footer() {
                 />
               </a>
               <div>
-                <span className="text-sm font-bold" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>
+                <span className="text-sm font-semibold uppercase" style={{ color: "var(--color-primary)", letterSpacing: "0.12em" }}>
                   Vancomyzer™
                 </span>
-                <p className="text-[11px] leading-none mt-0.5" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
+                <p className="text-[12px] leading-none mt-1" style={{ color: "var(--color-dim)" }}>
                   Engineered by{" "}
                   <a
                     href="https://dosys.health"
@@ -37,10 +37,10 @@ export default function Footer() {
                 </p>
               </div>
             </div>
-            <p className="text-sm leading-6" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>
+            <p className="text-sm leading-6" style={{ color: "var(--color-secondary)" }}>
               For use by qualified healthcare professionals only. Vancomyzer™ is a clinical decision-support tool and does not constitute medical advice. All dosing recommendations must be independently reviewed and validated by a licensed clinician prior to patient administration. Not a substitute for professional judgment, institutional protocols, or therapeutic drug monitoring.
             </p>
-            <p className="mt-4 text-xs" style={{ color: "var(--color-border)", fontFamily: "'Share Tech Mono', monospace" }}>
+            <p className="mt-4 text-xs" style={{ color: "var(--color-dim)" }}>
               © 2026 Vancomyzer™. All Rights Reserved. &nbsp;·&nbsp;{" "}
               <Link href="/disclaimer" className="underline" style={{ color: "var(--color-secondary)" }}>Full Medical Disclaimer</Link>
             </p>
@@ -52,7 +52,7 @@ export default function Footer() {
             <nav className="grid grid-cols-2 gap-x-6 gap-y-2">
               {[
                 { href: "/calculator", label: "Calculator" },
-                { href: "/transparent-dosing", label: "Transparency" },
+                { href: "/transparent-dosing", label: "Evidence" },
                 { href: "/faq", label: "FAQ" },
                 { href: "/about", label: "About" },
                 { href: "/contact", label: "Contact" },
@@ -62,7 +62,7 @@ export default function Footer() {
                   key={href}
                   href={href}
                   className="transition"
-                  style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
+                  style={{ color: "var(--color-secondary)" }}
                 >
                   {label}
                 </Link>
@@ -73,7 +73,7 @@ export default function Footer() {
             <nav className="flex flex-col gap-2">
               <span
                 className="text-[10px] font-bold uppercase tracking-[0.18em]"
-                style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
+                style={{ color: "var(--color-dim)" }}
               >
                 Legal · dosys.health
               </span>
@@ -89,7 +89,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition"
-                  style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
+                  style={{ color: "var(--color-secondary)" }}
                 >
                   {label} ↗
                 </a>

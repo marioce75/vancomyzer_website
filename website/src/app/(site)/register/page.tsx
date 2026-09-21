@@ -113,7 +113,7 @@ function RegisterPageInner() {
 
   const inputStyle = {
     width: "100%", padding: "10px 12px", fontSize: 14,
-    border: "1px solid #a0aec0", background: "#ffffff", color: "#1a202c",
+    border: "1px solid #a0aec0", background: "#ffffff", color: "#14232f",
     boxSizing: "border-box" as const, borderRadius: 4,
   };
   const labelStyle = { display: "block" as const, fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 };
@@ -129,7 +129,7 @@ function RegisterPageInner() {
           </p>
           <Link href="/login" style={{
             display: "inline-block", marginTop: 20, padding: "10px 20px",
-            background: "#1e4d8c", color: "#fff", fontSize: 13, fontWeight: 600,
+            background: "#1f5e96", color: "#fff", fontSize: 13, fontWeight: 600,
             textDecoration: "none", borderRadius: 4,
           }}>
             Sign in now →
@@ -151,10 +151,10 @@ function RegisterPageInner() {
           <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 12px" }}>
             <img src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
           </a>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1e4d8c", margin: 0 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1f5e96", margin: 0 }}>
             {step === 1 ? "Create an Account" : "Legal Agreements"}
           </h1>
-          <p style={{ fontSize: 12, color: "#718096", marginTop: 4 }}>Step {step} of 2</p>
+          <p style={{ fontSize: 12, color: "#546471", marginTop: 4 }}>Step {step} of 2</p>
         </div>
 
         {error && (
@@ -231,7 +231,7 @@ function RegisterPageInner() {
               <label style={labelStyle}>Confirm Password *</label>
               <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder="Re-enter password" style={inputStyle} />
             </div>
-            <button type="submit" style={{ width: "100%", padding: 12, fontSize: 14, fontWeight: 600, background: "#1e4d8c", color: "#fff", border: "none", cursor: "pointer", borderRadius: 4 }}>
+            <button type="submit" style={{ width: "100%", padding: 12, fontSize: 14, fontWeight: 600, background: "#1f5e96", color: "#fff", border: "none", cursor: "pointer", borderRadius: 4 }}>
               Continue to Agreements →
             </button>
           </form>
@@ -246,7 +246,7 @@ function RegisterPageInner() {
             {/* Medical Disclaimer scroll */}
             <div style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: "#1a3a5c" }}>1. Medical Disclaimer</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: "#14232f" }}>1. Medical Disclaimer</span>
                 {disclaimerScrolled && <span style={{ fontSize: 10, color: "#047857", fontWeight: 600 }}>✓ Read</span>}
               </div>
               <div
@@ -258,7 +258,7 @@ function RegisterPageInner() {
                   color: "#2d3748", lineHeight: 1.6, borderRadius: 4,
                 }}
               >
-                <h3 style={{ fontSize: 12, fontWeight: 700, color: "#1a3a5c", marginBottom: 8 }}>VANCOMYZER™ MEDICAL DISCLAIMER</h3>
+                <h3 style={{ fontSize: 12, fontWeight: 700, color: "#14232f", marginBottom: 8 }}>VANCOMYZER™ MEDICAL DISCLAIMER</h3>
                 <p><strong>For Healthcare Professionals Only</strong></p>
                 <p>Vancomyzer™ is intended solely for use by qualified healthcare professionals, including licensed physicians, pharmacists, and other clinicians with appropriate training in vancomycin pharmacokinetics and therapeutic drug monitoring. This tool is not intended for use by patients, caregivers, or non-clinical personnel.</p>
                 <p><strong>Not Medical Advice</strong></p>
@@ -278,7 +278,7 @@ function RegisterPageInner() {
             {/* Terms of Use scroll */}
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: "#1a3a5c" }}>2. Terms of Use</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: "#14232f" }}>2. Terms of Use</span>
                 {termsScrolled && <span style={{ fontSize: 10, color: "#047857", fontWeight: 600 }}>✓ Read</span>}
               </div>
               <div
@@ -290,8 +290,8 @@ function RegisterPageInner() {
                   color: "#2d3748", lineHeight: 1.6, borderRadius: 4,
                 }}
               >
-                <h3 style={{ fontSize: 12, fontWeight: 700, color: "#1a3a5c", marginBottom: 8 }}>VANCOMYZER™ TERMS OF USE</h3>
-                <p style={{ fontSize: 10, color: "#718096", marginBottom: 8 }}>Last updated: September 18, 2026</p>
+                <h3 style={{ fontSize: 12, fontWeight: 700, color: "#14232f", marginBottom: 8 }}>VANCOMYZER™ TERMS OF USE</h3>
+                <p style={{ fontSize: 10, color: "#546471", marginBottom: 8 }}>Last updated: September 18, 2026</p>
                 <p><strong>Acceptance of Terms</strong></p>
                 <p>By accessing or using Vancomyzer™, you agree to be bound by these Terms of Use and the Medical Disclaimer. If you do not agree, do not use this tool.</p>
                 <p><strong>Permitted Use</strong></p>
@@ -328,13 +328,13 @@ function RegisterPageInner() {
                 { checked: confirmedHcp, set: setConfirmedHcp, label: "I confirm I am a licensed healthcare professional" },
                 { checked: confirmedAge, set: setConfirmedAge, label: "I confirm I am 18 years of age or older" },
               ].map((item, i) => (
-                <label key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, color: bothScrolled ? "#1a202c" : "#a0aec0", cursor: bothScrolled ? "pointer" : "not-allowed" }}>
+                <label key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, color: bothScrolled ? "#14232f" : "#a0aec0", cursor: bothScrolled ? "pointer" : "not-allowed" }}>
                   <input
                     type="checkbox"
                     checked={item.checked}
                     onChange={() => { if (bothScrolled) item.set(!item.checked); }}
                     disabled={!bothScrolled}
-                    style={{ marginTop: 2, accentColor: "#1e4d8c" }}
+                    style={{ marginTop: 2, accentColor: "#1f5e96" }}
                   />
                   <span>{item.label}</span>
                 </label>
@@ -350,7 +350,7 @@ function RegisterPageInner() {
                 disabled={!allAgreed || loading}
                 style={{
                   flex: 2, padding: 12, fontSize: 14, fontWeight: 600,
-                  background: allAgreed ? "#1e4d8c" : "#cbd5e0",
+                  background: allAgreed ? "#1f5e96" : "#cbd5e0",
                   color: allAgreed ? "#fff" : "#a0aec0",
                   border: "none", cursor: allAgreed && !loading ? "pointer" : "not-allowed",
                   borderRadius: 4,
@@ -362,8 +362,8 @@ function RegisterPageInner() {
           </div>
         )}
 
-        <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#718096" }}>
-          Already have an account? <Link href="/login" style={{ color: "#1e4d8c", fontWeight: 600, textDecoration: "none" }}>Sign In</Link>
+        <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#546471" }}>
+          Already have an account? <Link href="/login" style={{ color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}>Sign In</Link>
         </p>
       </div>
     </div>

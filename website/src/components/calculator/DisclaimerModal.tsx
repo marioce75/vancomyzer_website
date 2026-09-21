@@ -156,7 +156,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
               fontSize: 14,
               fontWeight: 700,
               letterSpacing: "0.12em",
-              color: "#00d4aa",
+              color: "#1f5e96",
               ...FONT,
             }}
           >
@@ -166,7 +166,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
             type="button"
             onClick={onClose}
             style={{
-              background: "#1e4d8c",
+              background: "#1f5e96",
               border: "none",
               color: "#ffffff",
               padding: "6px 16px",
@@ -190,7 +190,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
                   fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: "0.1em",
-                  color: "#00d4aa",
+                  color: "#1f5e96",
                   marginBottom: 8,
                   ...FONT,
                 }}
@@ -215,7 +215,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
           <p
             style={{
               fontSize: 11,
-              color: "#718096",
+              color: "#546471",
               textAlign: "center",
               marginTop: 16,
               ...FONT,

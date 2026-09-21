@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import OpenCalculatorButton from "@/components/landing/OpenCalculatorButton";
 import SyntheticExample from "@/components/landing/SyntheticExample";
@@ -10,17 +11,15 @@ import {
 } from "@/lib/pk/modelRegistry";
 
 /**
- * Public landing page at "/".
+ * Public landing page at "/" — Direction A ("Clinical record"), Sep 2026.
  *
  * Lives in the (site) route group so it gets the marketing Header + Footer.
  * The calculator itself is at /calculator (src/app/calculator/page.tsx).
  *
  * Styling notes: the app always runs the basic theme, which forces h1–h3
- * colours and inline font-families. Dark bands therefore use the shared
- * `.brand-light` / `.cta-primary` / `.cta-outline` classes (globals.css),
- * accent text inside them uses <span> rather than <p>, and colours are
- * inline styles or arbitrary Tailwind values (named slate/gray utilities are
- * remapped globally).
+ * colours and inline font-families; marketing headings opt into the serif
+ * display face with `.vz-serif`, buttons use `.vz-mbtn`, sections use the
+ * `.vz-record` margin-column grid (globals.css, "Direction A" block).
  *
  * Copy rules: plain clinical language; no invented statistics, testimonials
  * or outcome claims; cited facts only (published sources already referenced
@@ -28,14 +27,15 @@ import {
  * @/lib/pk/modelRegistry. Validation, regulatory and pricing wording follows
  * the approved wording bank from the 15 Sep 2026 review remediation. The
  * launch-period line follows OPEN_ACCESS so the page stays truthful when the
- * switch is turned off.
+ * switch is turned off. The screenshot is the real calculator for a
+ * labelled fictional case; it is never edited.
  */
 
 export const metadata: Metadata = {
-  alternates: { canonical: "https://vancomyzer.com/" },
   title: "Vancomycin AUC Dosing Calculator — Free Bayesian Dosing Support | Vancomyzer™",
   description:
     `Free Bayesian, AUC-guided vancomycin dosing calculator for pharmacists, physicians and other clinicians. Empiric dosing from patient characteristics, refinement with one or two measured levels, the ${COLIN_2019.shortName} population model for all adults with a high-BMI advisory, and AUC24 targets aligned with the 2020 ASHP/IDSA/PIDS/SIDP consensus guideline.`,
+  alternates: { canonical: "https://vancomyzer.com/" },
   openGraph: {
     title: "Vancomyzer™ — Free Bayesian Vancomycin AUC Dosing Calculator",
     description:
@@ -58,6 +58,9 @@ export const metadata: Metadata = {
 const LAUNCH_LINE = OPEN_ACCESS
   ? "The core calculator is free, permanently. During our launch period, PDF export, note copy and result interpretation are free too — no account needed."
   : "The core calculator is free for individual clinicians, permanently — create a free account or sign in to get started.";
+
+const FICTIONAL_CASE_CAPTION =
+  "Fictional case for illustration — synthetic inputs (58 y, 82 kg, 172 cm, SCr 1.1 mg/dL, no RRT). Not a patient. Screenshot of the current calculator, unaltered.";
 
 const CAPABILITIES: { title: string; body: string; source?: string }[] = [
   {
@@ -95,37 +98,15 @@ const CAPABILITIES: { title: string; body: string; source?: string }[] = [
   },
 ];
 
-const EVIDENCE_LINKS = [
-  {
-    href: "/transparent-dosing",
-    title: "Transparent Dosing",
-    body: "Our approach in plain terms: the models, the published sources behind them, and what the calculator will not do.",
-  },
-  {
-    href: "/transparent-dosing/equations",
-    title: "Equations & Derivations",
-    body: "Population-model equations and references. Bayesian fitting also uses numerical optimization.",
-  },
-  {
-    href: "/transparent-dosing/cases",
-    title: "Literature Reproducibility",
-    body: "Published vancomycin cases run through the calculator. Same-model Colin 2019 reproductions are pass/fail; cases from other published models are shown for context only.",
-  },
-  {
-    href: "/transparent-dosing/predictive-performance",
-    title: "Predictive Performance",
-    body: "A developer-run synthetic analysis (not real patients): predictions compared with simulated ICU patients generated from a different published model.",
-  },
-  {
-    href: "/transparent-dosing/engine-crosscheck",
-    title: "Engine Cross-Check",
-    body: "A developer-run synthetic analysis (not real patients): our individualized estimates compared with Tucuxi, a separately built dosing program given the same priors, scored against pre-set acceptance criteria.",
-  },
-  {
-    href: "/faq",
-    title: "Frequently Asked Questions",
-    body: "Inputs, methods, limitations and common clinical questions.",
-  },
+// Evidence status: published model evidence and developer-run checks are kept
+// apart from the pending independent validation. Each row links to its page.
+const EVIDENCE_STATUS: { item: string; covers: string; status: string; kind: "ok" | "warn"; href: string }[] = [
+  { item: "Population model", covers: `${COLIN_2019.shortName} two-compartment model; population-model equations and references (Bayesian fitting also uses numerical optimization)`, status: "Published", kind: "ok", href: "/transparent-dosing/equations" },
+  { item: "Literature reproducibility", covers: "Published vancomycin cases run through the calculator; same-model reproductions are pass/fail", status: "Developer-run", kind: "ok", href: "/transparent-dosing/cases" },
+  { item: "Predictive performance", covers: "Synthetic analysis (not real patients): predictions against simulated ICU patients from a different published model", status: "Developer-run", kind: "ok", href: "/transparent-dosing/predictive-performance" },
+  { item: "Engine cross-check", covers: "Synthetic analysis: individualized estimates compared with Tucuxi, a separately built program, against pre-set acceptance criteria", status: "Developer-run", kind: "ok", href: "/transparent-dosing/engine-crosscheck" },
+  { item: "Independent clinical validation", covers: "Study with patient data at a participating institution", status: "Pending", kind: "warn", href: "/transparent-dosing" },
+  { item: "FDA review", covers: "Designed to meet non-device CDS criteria, FD&C §520(o)(1)(E); not reviewed by the FDA", status: "Not reviewed", kind: "warn", href: "/disclaimer" },
 ];
 
 const AUDIENCE = [
@@ -143,31 +124,59 @@ const NOT_FOR = [
   "Continuous-infusion vancomycin",
 ];
 
-// Staggered hero entrance, disabled for reduced-motion users.
-const PAGE_CSS = `
-@media (prefers-reduced-motion: no-preference) {
-  .vz-rise { animation: vz-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-  .vz-d1 { animation-delay: 0.05s; }
-  .vz-d2 { animation-delay: 0.15s; }
-  .vz-d3 { animation-delay: 0.25s; }
-  .vz-d4 { animation-delay: 0.35s; }
-}
-@keyframes vz-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-`;
+const INK = "#14232f";
+const INK2 = "#4a5a68";
+const INK3 = "#546471";
+const RULE = "#cbd6e0";
+const ACTION = "#1f5e96";
 
-const CTA_PRIMARY_CLASS =
-  "cta-primary inline-flex items-center justify-center gap-2 rounded-md px-7 py-3.5 text-sm font-bold tracking-normal transition hover:brightness-110";
-const CTA_PRIMARY_STYLE = { background: "#355c7d", color: "#ffffff", letterSpacing: "normal" };
-const CTA_OUTLINE_CLASS =
-  "cta-outline inline-flex items-center justify-center rounded-md border-2 px-7 py-3.5 text-center text-sm font-bold tracking-normal transition";
-const CTA_OUTLINE_STYLE = { borderColor: "#cbd5e1", color: "#ffffff", letterSpacing: "normal" };
-
-function Eyebrow({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
+function Section({
+  id,
+  label,
+  note,
+  children,
+  last = false,
+}: {
+  id?: string;
+  label: string;
+  note?: string;
+  children: React.ReactNode;
+  last?: boolean;
+}) {
   return (
-    <span
-      className="block text-sm font-semibold"
-      style={{ color: dark ? "#355c7d" : "#355c7d" }}
-    >
+    <section id={id} className="mx-auto max-w-[1180px] px-4 sm:px-6" style={{ borderBottom: last ? "none" : `1px solid ${RULE}` }}>
+      <div className="vz-record py-12 md:py-[72px]">
+        <div className="pt-2.5">
+          <span className="block text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: INK3 }}>{label}</span>
+          {note && <span className="mt-2 block text-[13px] leading-[1.45]" style={{ color: INK3 }}>{note}</span>}
+        </div>
+        <div className="min-w-0">{children}</div>
+      </div>
+    </section>
+  );
+}
+
+function H2({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="vz-serif text-[clamp(26px,3vw,36px)] leading-[1.15]" style={{ color: INK }}>
+      {children}
+    </h2>
+  );
+}
+
+function H3({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="vz-serif text-[22px] leading-[1.25]" style={{ color: INK }}>
+      {children}
+    </h3>
+  );
+}
+
+function Chip({ kind, children }: { kind: "ok" | "warn" | "crit"; children: React.ReactNode }) {
+  const glyph = kind === "ok" ? "✓" : kind === "warn" ? "!" : "✕";
+  return (
+    <span className={`vz-mchip vz-mchip--${kind}`}>
+      <span aria-hidden="true">{glyph}</span>
       {children}
     </span>
   );
@@ -175,223 +184,215 @@ function Eyebrow({ children, dark = false }: { children: React.ReactNode; dark?:
 
 export default function LandingPage() {
   return (
-    <div style={{ background: "#f8fafc", color: "#0f172a" }}>
-      <style dangerouslySetInnerHTML={{ __html: PAGE_CSS }} />
-
+    <div style={{ color: INK }}>
       {/* ── HERO ───────────────────────────────────────────── */}
-      <section
-        className="brand-light relative overflow-hidden px-6 py-16 sm:py-24"
-        style={{
-          background:
-            "#f7f8fa",
-        }}
-      >
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
-          <div>
-            <div className="vz-rise vz-d1 mb-5">
-              <Eyebrow dark>Vancomycin dosing support for clinicians</Eyebrow>
-            </div>
-            <h1
-              className="vz-rise vz-d2 text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl xl:text-6xl"
-              style={{ color: "#23313f" }}
-            >
-              Vancomycin AUC calculator for adult patients.
-            </h1>
-            <p
-              className="vz-rise vz-d3 mt-6 max-w-2xl text-lg leading-relaxed sm:text-xl"
-              style={{ color: "#52616f" }}
-            >
-              Estimate a starting regimen or use measured levels to compare dosing options. Review the model assumptions and limitations before using an estimate.
-            </p>
-
-            <p className="vz-rise vz-d4 mt-5 text-sm font-semibold sm:text-base" style={{ color: "#52616f" }}>
-              Adults receiving intermittent IV vancomycin only. For clinician review.
-              Independent clinical validation is pending.
-            </p>
-
-            <div className="vz-rise vz-d4 mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
-              <OpenCalculatorButton source="landing_hero" className={CTA_PRIMARY_CLASS} style={CTA_PRIMARY_STYLE}>
-                Open Calculator <span aria-hidden="true">→</span>
-              </OpenCalculatorButton>
-              <Link href="/transparent-dosing" className={CTA_OUTLINE_CLASS} style={CTA_OUTLINE_STYLE}>
-                See how it works
-              </Link>
-            </div>
-
-            <div className="vz-rise vz-d4 mt-6 flex items-start gap-2.5">
-              <svg
-                aria-hidden="true"
-                className="mt-0.5 h-5 w-5 shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#355c7d"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 13l4 4L19 7" />
-              </svg>
-              <span className="text-sm font-semibold sm:text-base" style={{ color: "#52616f" }}>
-                {LAUNCH_LINE}
-              </span>
-            </div>
+      <section className="mx-auto max-w-[1180px] px-4 sm:px-6" style={{ borderBottom: `1px solid ${RULE}` }}>
+        <div className="py-14 md:pb-14 md:pt-[72px]">
+          <span className="mb-[18px] block text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: INK3 }}>
+            Vancomycin dosing support for clinicians
+          </span>
+          <h1 className="vz-serif max-w-[22ch] text-[clamp(34px,4.6vw,56px)] leading-[1.08]" style={{ color: INK }}>
+            Vancomycin AUC calculator for adult patients, with the model in view.
+          </h1>
+          <p className="mt-[22px] max-w-[60ch] text-xl leading-[1.5]" style={{ color: INK2 }}>
+            Estimate a starting regimen or use measured levels to compare dosing options. Targets follow
+            the 2020 ASHP/IDSA/PIDS/SIDP consensus guideline. Review the model assumptions and
+            limitations before using an estimate.
+          </p>
+          <p className="mt-4 max-w-[60ch] text-[15px] font-semibold" style={{ color: INK2 }}>
+            Adults receiving intermittent IV vancomycin only. For clinician review. Independent clinical
+            validation is pending.
+          </p>
+          <div className="mt-[30px] flex flex-wrap gap-3">
+            <OpenCalculatorButton source="landing_hero" className="vz-mbtn vz-mbtn--primary">
+              Open the calculator
+            </OpenCalculatorButton>
+            <Link href="#how" className="vz-mbtn vz-mbtn--outline">
+              See how a result is built
+            </Link>
           </div>
-
-          {/* Illustration is decorative context; phones keep the hero focused on the action. */}
-          <div className="vz-rise vz-d3 min-w-0">
-            <SyntheticExample />
-          </div>
+          <p className="mt-5 max-w-[70ch] text-[15px]" style={{ color: INK2 }}>{LAUNCH_LINE}</p>
         </div>
       </section>
+
+      {/* ── HOW A RESULT IS BUILT ──────────────────────────── */}
+      <Section id="how" label="How a result is built" note="One screen, read left to right.">
+        <figure className="border bg-white p-2.5" style={{ borderColor: RULE, boxShadow: "0 1px 2px rgba(20,35,47,.06), 0 12px 32px -12px rgba(31,94,150,.25)" }}>
+          <Image
+            src="/images/calculator-result-fictional.png"
+            alt="Vancomyzer calculator result screen: patient inputs on the left, recommended regimen 750 mg every 12 h with AUC 521.5 in target, a concentration–time graph, candidate regimens and PK parameters."
+            width={1600}
+            height={1000}
+            sizes="(max-width: 1200px) 100vw, 960px"
+            className="block h-auto w-full border"
+            style={{ borderColor: RULE }}
+            priority
+          />
+          <figcaption className="px-1 pb-0.5 pt-2.5 text-[13px] leading-[1.45]" style={{ color: INK3 }}>
+            {FICTIONAL_CASE_CAPTION}
+          </figcaption>
+        </figure>
+        <div className="mt-8 grid gap-8 md:grid-cols-3">
+          <div>
+            <H3>1 · Patient</H3>
+            <p className="mt-2" style={{ color: INK2 }}>
+              Age, weight, height, serum creatinine and renal replacement status. Estimated creatinine
+              clearance is shown for context; the dose is calculated from serum creatinine as the{" "}
+              {COLIN_2019.shortName} covariate.
+            </p>
+          </div>
+          <div>
+            <H3>2 · Recommendation</H3>
+            <p className="mt-2" style={{ color: INK2 }}>
+              Dose, interval and a safe infusion duration, with AUC₂₄, peak and trough against the
+              400–600 mg·h/L target. Advisories sit under the decision, not above it.
+            </p>
+          </div>
+          <div>
+            <H3>3 · Alternatives and parameters</H3>
+            <p className="mt-2" style={{ color: INK2 }}>
+              Other regimens computed from the same parameters, the four PK parameters, the method, and
+              a note you can copy into the chart.
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── SYNTHETIC EXAMPLE (computed by the engine, labelled) ── */}
+      <Section label="Synthetic example" note="Computed by the current calculator from stated inputs; not a patient.">
+        <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-start">
+          <div>
+            <H2>What a starting-regimen comparison looks like</H2>
+            <p className="mt-2.5 max-w-[60ch] text-lg" style={{ color: INK2 }}>
+              The table is produced by the same calculation method as the application for a stated set
+              of synthetic inputs. It is an illustration of the output, not evidence of clinical
+              validation, and the regimens are not for use with a patient.
+            </p>
+          </div>
+          <SyntheticExample />
+        </div>
+      </Section>
 
       {/* ── CAPABILITIES ───────────────────────────────────── */}
-      <section className="px-6 py-16 sm:py-20" style={{ background: "#ffffff", borderBottom: "1px solid #e2e8f0" }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="max-w-3xl">
-            <Eyebrow>What it does</Eyebrow>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "#0f172a" }}>
-              From the first dose to level-guided adjustment.
-            </h2>
-            <p className="mt-3 text-base leading-relaxed" style={{ color: "#334155" }}>
-              Clinical decision support for adults receiving intermittent intravenous vancomycin, built
-              on published models and guideline targets.
-            </p>
-          </div>
-
-          <ul className="mt-10 grid gap-x-10 gap-y-6 sm:grid-cols-2">
-            {CAPABILITIES.map((c, i) => (
-              <li
-                key={c.title}
-                className="flex flex-col border-t py-6"
-                style={{ borderColor: "#e2e8f0", background: "#ffffff" }}
-              >
-                <span className="font-mono text-sm font-bold text-[#355c7d]">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className="mt-2 text-lg font-bold leading-snug" style={{ color: "#0f172a" }}>
-                  {c.title}
-                </h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed" style={{ color: "#334155" }}>
-                  {c.body}
-                </p>
+      <Section label="What it does" note="For adults receiving intermittent intravenous vancomycin.">
+        <H2>From the first dose to level-guided adjustment</H2>
+        <dl className="mt-7 grid gap-x-10 gap-y-7 md:grid-cols-2">
+          {CAPABILITIES.map((c) => (
+            <div key={c.title} className="border-t pt-4" style={{ borderTopColor: RULE }}>
+              <dt className="text-[17px] font-semibold" style={{ color: INK }}>{c.title}</dt>
+              <dd className="mt-1.5 text-[15.5px] leading-relaxed" style={{ color: INK2 }}>
+                {c.body}
                 {c.source && (
-                  <span
-                    className="mt-4 block border-t pt-3 text-xs"
-                    style={{ borderTopColor: "#e2e8f0", color: "#64748b" }}
-                  >
-                    {c.source}
-                  </span>
+                  <span className="mt-2 block text-[13px]" style={{ color: INK3 }}>{c.source}</span>
                 )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
 
-      {/* ── EVIDENCE / TRUST ───────────────────────────────── */}
-      <section className="px-6 py-16 sm:py-20">
-        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.85fr_1.15fr]">
+      {/* ── EVIDENCE STATUS ────────────────────────────────── */}
+      <Section id="evidence" label="Evidence status" note="What has been checked, by whom, and what has not.">
+        <H2>Review the evidence before you rely on it</H2>
+        <p className="mb-6 mt-2.5 max-w-[60ch] text-xl leading-[1.5]" style={{ color: INK2 }}>
+          Method pages document the model equations, assumptions and sources. Vancomyzer has not yet
+          been validated in real patients; published model evidence and developer-run checks are not
+          independent validation. This table keeps them apart, and every row links to the full record.
+        </p>
+        <div className="overflow-x-auto" tabIndex={0} aria-label="Evidence status table; scrolls horizontally on small screens">
+          <table className="vz-ledger">
+            <thead>
+              <tr>
+                <th scope="col">Item</th>
+                <th scope="col">What it covers</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {EVIDENCE_STATUS.map((r) => (
+                <tr key={r.item}>
+                  <td className="whitespace-nowrap font-semibold">
+                    <Link href={r.href} className="underline underline-offset-2" style={{ color: INK }}>
+                      {r.item}
+                    </Link>
+                  </td>
+                  <td style={{ color: INK2 }}>{r.covers}</td>
+                  <td><Chip kind={r.kind}>{r.status}</Chip></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-[30px] flex flex-wrap gap-3">
+          <Link href="/transparent-dosing" className="vz-mbtn vz-mbtn--outline">Methods, equations and published checks</Link>
+          <Link href="/faq" className="vz-mbtn vz-mbtn--outline">Frequently asked questions</Link>
+        </div>
+      </Section>
+
+      {/* ── SCOPE ──────────────────────────────────────────── */}
+      <Section label="Scope" note="Who it is for, and where it does not apply.">
+        <div className="grid gap-10 md:grid-cols-2">
           <div>
-            <Eyebrow>Check our work</Eyebrow>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "#0f172a" }}>
-              Review the evidence before you rely on it.
-            </h2>
-            <p className="mt-3 text-base leading-relaxed" style={{ color: "#334155" }}>
-              Method pages document the model equations, assumptions and sources. Vancomyzer has not yet been
-              validated in real patients. Its equations are checked against published values and
-              synthetic test cases; external validation with patient data is planned. The results of
-              those developer-run checks are public.
+            <H3>Designed for</H3>
+            <p className="mt-2" style={{ color: INK2 }}>
+              Adults (18 years and older) receiving intermittent intravenous vancomycin.
             </p>
-          </div>
-
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {EVIDENCE_LINKS.map((l) => (
-              <li key={l.href}>
-                <Link
-                  href={l.href}
-                  className="group flex h-full flex-col border-t border-[#cbd5e1] py-5 transition hover:border-[#355c7d]"
-                >
-                  <span className="flex items-center justify-between gap-3 text-base font-bold text-[#0f172a]">
-                    {l.title}
-                    <span aria-hidden="true" className="text-[#355c7d] transition group-hover:translate-x-1">
-                      →
-                    </span>
-                  </span>
-                  <span className="mt-1.5 block text-sm leading-relaxed text-[#475569]">{l.body}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ── WHO IT'S FOR + SCOPE ───────────────────────────── */}
-      <section
-        className="px-6 py-16 sm:py-20"
-        style={{ background: "#ffffff", borderTop: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0" }}
-      >
-        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2">
-          <div>
-            <Eyebrow>Who it&rsquo;s for</Eyebrow>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "#0f172a" }}>
-              Built for the clinicians who dose and monitor vancomycin.
-            </h2>
-            <ul className="mt-6 flex flex-wrap gap-2">
+            <ul className="mt-4 flex flex-wrap gap-2" aria-label="Intended users">
               {AUDIENCE.map((a) => (
-                <li
-                  key={a}
-                  className="rounded-md border px-3 py-1.5 text-sm font-medium"
-                  style={{ borderColor: "#d7dfe5", background: "#edf2f6", color: "#294b68" }}
-                >
+                <li key={a} className="border px-3 py-1.5 text-sm font-medium" style={{ borderColor: RULE, background: "#ffffff", color: INK }}>
                   {a}
                 </li>
               ))}
             </ul>
-            <p className="mt-6 text-sm leading-relaxed" style={{ color: "#475569" }}>
+            <p className="mt-4 text-[15px] leading-relaxed" style={{ color: INK2 }}>
               Intended for qualified healthcare professionals and clinical trainees. Every
               recommendation must be independently reviewed by a licensed clinician before any change
               to therapy. Not intended for patients or caregivers.
             </p>
           </div>
-
           <div>
-            <Eyebrow>Scope and limitations</Eyebrow>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "#0f172a" }}>
-              Know where it applies.
-            </h2>
-            <div className="mt-6 rounded-md border-l-4 p-5" style={{ borderLeftColor: "#355c7d", background: "#edf2f6" }}>
-              <span className="block text-sm font-bold" style={{ color: "#294b68" }}>
-                Designed for
-              </span>
-              <span className="mt-1 block text-base leading-relaxed" style={{ color: "#334155" }}>
-                Adults (18 years and older) receiving intermittent intravenous vancomycin.
-              </span>
-            </div>
-            <div className="mt-4 rounded-md border-l-4 p-5" style={{ borderLeftColor: "#dc2626", background: "#fef2f2" }}>
-              <span className="block text-sm font-bold" style={{ color: "#991b1b" }}>
-                Not designed for
-              </span>
-              <ul className="mt-2 space-y-1.5">
-                {NOT_FOR.map((item) => (
-                  <li key={item} className="flex gap-2.5 text-base leading-relaxed" style={{ color: "#334155" }}>
-                    <span aria-hidden="true" style={{ color: "#dc2626", fontWeight: 700 }}>
-                      ✕
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <H3>Not designed for</H3>
+            <ul className="mt-3 grid gap-2.5">
+              {NOT_FOR.map((item) => (
+                <li key={item} className="flex gap-2.5 text-base leading-relaxed" style={{ color: INK }}>
+                  <span aria-hidden="true" style={{ color: "#a32d2d", fontWeight: 700 }}>✕</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 text-[15px] leading-relaxed" style={{ color: INK2 }}>
+              Recommendations are withheld when renal replacement therapy is selected. Continuous
+              infusion and paediatric dosing use different models and are out of scope.
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── PRICING + REGULATORY ───────────────────────────── */}
+      <Section label="Pricing" note="Free for individual clinicians; site licences by bed count." last>
+        <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+          <div>
+            <H2>Open the calculator</H2>
+            <p className="mt-2.5 max-w-[60ch] text-lg" style={{ color: INK2 }}>{LAUNCH_LINE}</p>
+          </div>
+          <div className="flex flex-wrap gap-3 md:flex-col">
+            <OpenCalculatorButton source="landing_closing" className="vz-mbtn vz-mbtn--primary">
+              Open the calculator
+            </OpenCalculatorButton>
+            {OPEN_ACCESS ? (
+              <Link href="/pricing" className="vz-mbtn vz-mbtn--outline">Hospital Site licenses</Link>
+            ) : (
+              <Link href="/register" className="vz-mbtn vz-mbtn--outline">Create a free account</Link>
+            )}
           </div>
         </div>
 
         {/* Regulatory statement — approved long-form wording (15 Sep 2026); RegulatoryFooter carries the short form. */}
-        <div
-          className="mx-auto mt-12 max-w-6xl rounded-lg border p-6"
-          style={{ borderColor: "#cbd5e1", background: "#f8fafc" }}
-        >
-          <span className="block text-sm font-semibold" style={{ color: "#475569" }}>
+        <div className="mt-10 border bg-white px-[18px] py-4" style={{ borderColor: RULE }}>
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK }}>
             Regulatory status
           </span>
-          <p className="mt-2 text-sm leading-relaxed" style={{ color: "#334155" }}>
+          <p className="text-sm leading-relaxed" style={{ color: INK2 }}>
             Vancomyzer&trade; is designed to meet the criteria for non-device clinical decision support
             in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060
             of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by
@@ -403,38 +404,12 @@ export default function LandingPage() {
           <Link
             href="/disclaimer"
             className="mt-3 inline-block text-sm font-semibold underline underline-offset-2"
-            style={{ color: "#355c7d" }}
+            style={{ color: ACTION }}
           >
             Read the full medical disclaimer →
           </Link>
         </div>
-      </section>
-
-      {/* ── CLOSING CTA ────────────────────────────────────── */}
-      <section className="brand-light px-6 py-16 sm:py-20" style={{ background: "#f7f8fa" }}>
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ color: "#23313f" }}>
-            Open the calculator.
-          </h2>
-          <p className="mt-4 text-lg leading-relaxed" style={{ color: "#52616f" }}>
-            {LAUNCH_LINE}
-          </p>
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4">
-            <OpenCalculatorButton source="landing_closing" className={CTA_PRIMARY_CLASS} style={CTA_PRIMARY_STYLE}>
-              Open Calculator <span aria-hidden="true">→</span>
-            </OpenCalculatorButton>
-            {OPEN_ACCESS ? (
-              <Link href="/pricing" className={CTA_OUTLINE_CLASS} style={CTA_OUTLINE_STYLE}>
-                Hospital Site licenses
-              </Link>
-            ) : (
-              <Link href="/register" className={CTA_OUTLINE_CLASS} style={CTA_OUTLINE_STYLE}>
-                Create a free account
-              </Link>
-            )}
-          </div>
-        </div>
-      </section>
+      </Section>
     </div>
   );
 }

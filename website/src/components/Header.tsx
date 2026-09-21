@@ -5,18 +5,16 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
-  { href: "/transparent-dosing", label: "Transparency" },
+  { href: "/transparent-dosing", label: "Evidence" },
   { href: "/faq", label: "FAQ" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
 
-// Primary "Calculator" action. Tailwind arbitrary classes rather than an
-// inline style so no hover JS is needed; teal-700 keeps white text above
-// 4.5:1 contrast on the light header.
+// Primary "Calculator" action (Direction A action blue, white text 6.8:1).
 const CALCULATOR_BUTTON_CLASS =
-  "items-center justify-center rounded-md bg-[#355c7d] font-semibold text-white whitespace-nowrap transition hover:bg-[#294b68] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#355c7d]";
+  "items-center justify-center rounded-[3px] bg-[#1f5e96] font-semibold text-white whitespace-nowrap transition hover:bg-[#184b78] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#b45309]";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -31,18 +29,17 @@ export default function Header() {
       style={{
         background: "var(--color-bg)",
         borderBottomColor: "var(--color-border)",
-        boxShadow: "0 1px 0 var(--color-primary-a15)",
       }}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-3 sm:gap-6 px-3 sm:px-4 py-3">
+      <nav className="mx-auto flex max-w-[1180px] items-center justify-between gap-3 sm:gap-6 px-4 sm:px-6 py-3.5">
         <div className="flex items-center gap-2 sm:gap-3">
           <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-signal.svg" alt="Dōsys™" width={96} height={28} className="shrink-0 sm:w-[124px] sm:h-9" />
           </a>
           <Link href="/" className="whitespace-nowrap" style={{ textDecoration: "none" }}>
-            <span className="font-bold text-[15px] sm:text-lg" style={{ letterSpacing: "3px", color: "var(--color-primary)", textShadow: "0 0 8px var(--color-glow)" }}>
-              VANCOMYZER<sup className="text-[7px] sm:text-[8px] font-semibold ml-0.5 align-super" style={{ color: "var(--color-secondary)" }}>{"™"}</sup>
+            <span className="font-semibold text-[13px] sm:text-[14px] uppercase" style={{ letterSpacing: "0.14em", color: "var(--color-secondary)" }}>
+              Vancomyzer<sup className="text-[7px] sm:text-[8px] font-semibold ml-0.5 align-super">{"™"}</sup>
             </span>
           </Link>
           {/* Badge moved from lg to xl so the added Sign in + Calculator
@@ -50,10 +47,9 @@ export default function Header() {
           <span
             className="hidden px-2.5 py-1 text-[11px] font-medium xl:inline-flex"
             style={{
-              border: "1px solid var(--color-primary-a40)",
-              background: "var(--color-primary-a05)",
+              border: "1px solid var(--color-border)",
+              background: "var(--color-card)",
               color: "var(--color-secondary)",
-              fontFamily: "'Share Tech Mono', monospace",
             }}
           >
             clinician review support
@@ -67,7 +63,7 @@ export default function Header() {
           <ul className="hidden items-center gap-6 lg:flex">
             {navItems.map(({ href, label }) => (
               <li key={href}>
-                <Link href={href} className="text-sm font-medium transition" style={{ color: "var(--color-secondary)" }}>
+                <Link href={href} className="border-b-2 border-transparent py-1 text-[15px] font-medium transition hover:border-[var(--color-border)] hover:text-[var(--color-primary)]" style={{ color: "var(--color-secondary)" }}>
                   {label}
                 </Link>
               </li>
@@ -97,7 +93,7 @@ export default function Header() {
             className="lg:hidden p-2 -mr-2"
             style={{ color: "var(--color-secondary)" }}
             aria-label="Toggle menu"
-            aria-controls="site-mobile-menu"
+            aria-controls={mobileOpen ? "site-mobile-menu" : undefined}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               {mobileOpen ? (

@@ -33,9 +33,9 @@ export default function TeachingNote({ label = "Why?", children }: TeachingNoteP
         onClick={() => setOpen(!open)}
         className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider transition"
         style={{
-          background: open ? "#dbeafe" : "#eff6ff",
-          color: "#1e40af",
-          border: "1px solid #bfdbfe",
+          background: open ? "#e6eef5" : "#e6eef5",
+          color: "#1f5e96",
+          border: "1px solid #c6d6e6",
           borderRadius: 4,
           cursor: "pointer",
           letterSpacing: "0.06em",
@@ -49,10 +49,10 @@ export default function TeachingNote({ label = "Why?", children }: TeachingNoteP
         <div
           className="mt-2 px-3 py-2 text-xs leading-relaxed"
           style={{
-            background: "#eff6ff",
-            border: "1px solid #bfdbfe",
+            background: "#e6eef5",
+            border: "1px solid #c6d6e6",
             borderLeftWidth: 3,
-            color: "#1e3a8a",
+            color: "#14232f",
             borderRadius: 4,
           }}
         >

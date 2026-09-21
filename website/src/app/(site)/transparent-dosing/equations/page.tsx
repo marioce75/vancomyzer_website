@@ -90,7 +90,7 @@ export default function EquationsPage() {
           <Link
             href="/transparent-dosing"
             className="text-xs font-bold uppercase tracking-[0.18em]"
-            style={{ color: "#355c7d" }}
+            style={{ color: "#1f5e96" }}
           >
             ← Back to the manifesto
           </Link>
@@ -176,7 +176,7 @@ export default function EquationsPage() {
 
           <p className="mt-6 text-xs" style={{ color: "#64748b" }}>
             {COLIN_2019.citation}&nbsp;
-            <a href={doiUrl(COLIN_2019.doi)} target="_blank" rel="noopener noreferrer" style={{ color: "#355c7d" }}>
+            <a href={doiUrl(COLIN_2019.doi)} target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
               doi:{COLIN_2019.doi} ↗
             </a>
           </p>
@@ -373,17 +373,17 @@ two-compartment steady-state superposition formula
           >{INFORMATIONAL_FORMULAS}</pre>
           <p className="mt-4 text-xs" style={{ color: "#64748b" }}>
             Janmahasatian S, et al. <em>Clin Pharmacokinet</em>. 2005;44(10):1051–1065.&nbsp;
-            <a href="https://doi.org/10.2165/00003088-200544100-00004" target="_blank" rel="noopener noreferrer" style={{ color: "#355c7d" }}>
+            <a href="https://doi.org/10.2165/00003088-200544100-00004" target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
               doi:10.2165/00003088-200544100-00004 ↗
             </a>
             &nbsp;·&nbsp;
             Cockcroft DW, Gault MH. <em>Nephron</em>. 1976;16(1):31–41.&nbsp;
-            <a href="https://pubmed.ncbi.nlm.nih.gov/1244564/" target="_blank" rel="noopener noreferrer" style={{ color: "#355c7d" }}>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/1244564/" target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
               PubMed ↗
             </a>
           </p>
 
-          <div className="mt-10 max-w-3xl rounded-md border-l-4 px-5 py-4" style={{ borderColor: "#355c7d", background: "#f1f5f9" }}>
+          <div className="mt-10 max-w-3xl rounded-md border-l-4 px-5 py-4" style={{ borderColor: "#1f5e96", background: "#f1f5f9" }}>
             <p className="text-sm font-semibold" style={{ color: "#0f172a" }}>
               Evidence for {COLIN_2019.shortName} in obesity
             </p>
@@ -399,7 +399,7 @@ two-compartment steady-state superposition formula
                     href={`https://pubmed.ncbi.nlm.nih.gov/${COLIN_2021_PMID}/`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ color: "#355c7d" }}
+                    style={{ color: "#1f5e96" }}
                   >
                     PubMed ↗
                   </a>
@@ -473,7 +473,7 @@ Prior log-SDs (Vancomyzer settings, all adults):
           </p>
           <p className="mt-4 text-xs" style={{ color: "#64748b" }}>
             Rybak MJ et al. <em>Am J Health Syst Pharm</em>. 2020;77(11):835–864.&nbsp;
-            <a href="https://doi.org/10.1093/ajhp/zxaa036" target="_blank" rel="noopener noreferrer" style={{ color: "#355c7d" }}>
+            <a href="https://doi.org/10.1093/ajhp/zxaa036" target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
               doi:10.1093/ajhp/zxaa036 ↗
             </a>
           </p>
@@ -507,7 +507,7 @@ Prior log-SDs (Vancomyzer settings, all adults):
               professionals, who must independently review the basis for each recommendation. Vancomyzer has not
               yet been validated in real patients. Its equations are checked against published values and synthetic
               test cases; external validation with patient data is planned. See the full{" "}
-              <a href="/disclaimer" style={{ color: "#355c7d", textDecoration: "underline" }}>Medical Disclaimer</a>.
+              <a href="/disclaimer" style={{ color: "#1f5e96", textDecoration: "underline" }}>Medical Disclaimer</a>.
             </p>
           </div>
 
@@ -515,7 +515,7 @@ Prior log-SDs (Vancomyzer settings, all adults):
             <Link
               href="/transparent-dosing"
               className="cta-primary inline-block rounded-md px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition"
-              style={{ background: "#355c7d", color: "#0f172a", letterSpacing: "0.08em" }}
+              style={{ background: "#1f5e96", color: "#ffffff", letterSpacing: "0.08em" }}
             >
               ← Back to manifesto
             </Link>

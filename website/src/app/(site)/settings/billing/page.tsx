@@ -258,7 +258,7 @@ function BillingPageInner() {
           <ul style={{ margin: "0 0 16px", padding: 0, listStyle: "none", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.7 }}>
             {TIERS.individual_pro.features.map(f => (
               <li key={f} style={{ paddingLeft: 18, position: "relative" }}>
-                <span style={{ position: "absolute", left: 0, color: "#355c7d", fontWeight: 700 }}>✓</span>
+                <span style={{ position: "absolute", left: 0, color: "#1f5e96", fontWeight: 700 }}>✓</span>
                 {f}
               </li>
             ))}

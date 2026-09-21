@@ -147,7 +147,7 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
             type="button"
             onClick={() => onApply(activeOption)}
             className="shrink-0 rounded border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-            style={{ borderColor: "#2b6cb0", color: "#1e3a5f", background: "#fff", cursor: "pointer" }}
+            style={{ borderColor: "#1f5e96", color: "#14232f", background: "#fff", cursor: "pointer" }}
             title="Copy the selected regimen into the dosing-history draft"
           >
             Use as draft

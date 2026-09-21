@@ -323,7 +323,7 @@ export default function LevelEntryTable({
                           tabIndex={-1}
                           onClick={() => updateDateTime(i, "levelTime", nowHHMM())}
                           className="shrink-0 h-9 px-2.5 rounded border text-xs font-semibold transition-colors"
-                          style={{border: '1px solid #a0aec0', background: '#fff', color: '#2b6cb0'}}
+                          style={{border: '1px solid #a0aec0', background: '#fff', color: '#1f5e96'}}
                           title="Stamp current time"
                         >
                           Now
@@ -374,7 +374,7 @@ export default function LevelEntryTable({
                           tabIndex={-1}
                           onClick={() => updateDateTime(i, "doseTime", nowHHMM())}
                           className="shrink-0 h-9 px-2.5 rounded border text-xs font-semibold transition-colors"
-                          style={{border: '1px solid #a0aec0', background: '#fff', color: '#2b6cb0'}}
+                          style={{border: '1px solid #a0aec0', background: '#fff', color: '#1f5e96'}}
                           title="Stamp current time"
                         >
                           Now

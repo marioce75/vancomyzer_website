@@ -49,7 +49,7 @@ export default function AucCurveIllustration() {
         }}
       >
         <div className="mb-3 flex items-center justify-between gap-3">
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "#00c9b1" }}>
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "#1f5e96" }}>
             AUC-guided dosing
           </span>
           <span className="text-[10px] uppercase tracking-[0.14em]" style={{ color: "#64748b" }}>
@@ -71,9 +71,9 @@ export default function AucCurveIllustration() {
             <line key={y} x1={44} x2={464} y1={y} y2={y} stroke="#1e293b" strokeWidth={1} />
           ))}
 
-          <path d={AUC_WINDOW} fill="#00c9b1" fillOpacity={0.16} className="vz-auc" />
-          <line x1={254} x2={254} y1={18} y2={212} stroke="#00c9b1" strokeOpacity={0.45} strokeDasharray="4 4" />
-          <line x1={464} x2={464} y1={18} y2={212} stroke="#00c9b1" strokeOpacity={0.45} strokeDasharray="4 4" />
+          <path d={AUC_WINDOW} fill="#1f5e96" fillOpacity={0.16} className="vz-auc" />
+          <line x1={254} x2={254} y1={18} y2={212} stroke="#1f5e96" strokeOpacity={0.45} strokeDasharray="4 4" />
+          <line x1={464} x2={464} y1={18} y2={212} stroke="#1f5e96" strokeOpacity={0.45} strokeDasharray="4 4" />
 
           <line x1={44} x2={464} y1={212} y2={212} stroke="#475569" strokeWidth={1.5} />
           <line x1={44} x2={44} y1={14} y2={212} stroke="#475569" strokeWidth={1.5} />
@@ -81,7 +81,7 @@ export default function AucCurveIllustration() {
           <path
             d={CURVE}
             fill="none"
-            stroke="#00c9b1"
+            stroke="#1f5e96"
             strokeWidth={2.5}
             strokeLinejoin="round"
             strokeLinecap="round"
@@ -90,7 +90,7 @@ export default function AucCurveIllustration() {
           />
 
           {DOSE_X.map((x) => (
-            <path key={x} d={`M${x - 4} 225 L${x + 4} 225 L${x} 218 Z`} fill="#00c9b1" fillOpacity={0.75} />
+            <path key={x} d={`M${x - 4} 225 L${x + 4} 225 L${x} 218 Z`} fill="#1f5e96" fillOpacity={0.75} />
           ))}
 
           {LEVELS.map((l) => (

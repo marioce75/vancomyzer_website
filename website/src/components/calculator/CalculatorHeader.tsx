@@ -63,7 +63,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                     window.open("https://dosys.health", "_blank", "noopener,noreferrer");
                   }}
                 >
-                  <span style={{ fontWeight: 700 }}>D<span className="dosys-d" style={{ color: "#355c7d" }}>{"\u014D"}</span>sys</span><sup style={{ fontSize: "7px", verticalAlign: "super", marginLeft: "1px" }}>{"\u2122"}</sup>
+                  <span style={{ fontWeight: 700 }}>D<span className="dosys-d" style={{ color: "#1f5e96" }}>{"\u014D"}</span>sys</span><sup style={{ fontSize: "7px", verticalAlign: "super", marginLeft: "1px" }}>{"\u2122"}</sup>
                 </button>
               </span>
             </p>
@@ -138,7 +138,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
               (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #14232f)";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -155,7 +155,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
               (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #14232f)";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -172,7 +172,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
               (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #14232f)";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -190,7 +190,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               onMouseEnter={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
                 (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-                (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-card, #14232f)";
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -214,7 +214,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               onMouseEnter={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
                 (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-                (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-card, #14232f)";
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "transparent";

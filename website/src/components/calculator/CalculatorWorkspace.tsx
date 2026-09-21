@@ -1040,7 +1040,7 @@ export default function CalculatorWorkspace() {
             type="button"
             onClick={() => applyViewMode("one_level")}
             className="rounded border px-2 py-0.5 text-[11px] font-semibold"
-            style={{ borderColor: "#2b6cb0", background: "#fff", color: "#1e3a5f", cursor: "pointer" }}
+            style={{ borderColor: "#1f5e96", background: "#fff", color: "#14232f", cursor: "pointer" }}
           >
             1-Level workflow →
           </button>
@@ -1175,13 +1175,13 @@ export default function CalculatorWorkspace() {
           <FeatureGate
             feature="interpretation.why_this_result"
             fallback={
-              <div className="rounded-md border px-3 py-2" style={{ borderColor: "#bfdbfe", background: "#eff6ff" }}>
-                <p className="text-xs font-semibold" style={{ color: "#1e40af" }}>Why this result — Individual Pro</p>
-                <p className="mt-1 text-xs leading-relaxed" style={{ color: "#1e3a8a" }}>
+              <div className="rounded-md border px-3 py-2" style={{ borderColor: "#c6d6e6", background: "#e6eef5" }}>
+                <p className="text-xs font-semibold" style={{ color: "#1f5e96" }}>Why this result — Individual Pro</p>
+                <p className="mt-1 text-xs leading-relaxed" style={{ color: "#14232f" }}>
                   The plain-language clinical reasoning behind each recommendation (drivers, evidence, caveats) is part of the
                   documentation suite on Individual Pro and above — alongside Copy Note and Export PDF.
                 </p>
-                <Link href="/pricing" className="mt-1.5 inline-block text-xs font-semibold underline" style={{ color: "#1e40af" }}>
+                <Link href="/pricing" className="mt-1.5 inline-block text-xs font-semibold underline" style={{ color: "#1f5e96" }}>
                   See pricing →
                 </Link>
               </div>
@@ -1487,9 +1487,9 @@ export default function CalculatorWorkspace() {
           className="shrink-0"
           style={{
             padding: "4px 12px",
-            background: "#eff6ff",
-            borderBottom: "1px solid #bfdbfe",
-            color: "#1e3a8a",
+            background: "#e6eef5",
+            borderBottom: "1px solid #c6d6e6",
+            color: "#14232f",
             fontSize: 12,
             display: "flex",
             alignItems: "center",
@@ -1502,7 +1502,7 @@ export default function CalculatorWorkspace() {
           </span>
           <a
             href={`/transparent-dosing/cases#${loadedCase.id}`}
-            style={{ marginLeft: "auto", color: "#1e3a8a", textDecoration: "underline", fontWeight: 600 }}
+            style={{ marginLeft: "auto", color: "#14232f", textDecoration: "underline", fontWeight: 600 }}
           >
             View case page →
           </a>
@@ -1510,7 +1510,7 @@ export default function CalculatorWorkspace() {
             type="button"
             onClick={() => setLoadedCase(null)}
             aria-label="Dismiss case banner"
-            style={{ background: "transparent", border: "none", color: "#1e3a8a", cursor: "pointer", fontSize: 16, padding: "0 4px" }}
+            style={{ background: "transparent", border: "none", color: "#14232f", cursor: "pointer", fontSize: 16, padding: "0 4px" }}
           >
             ×
           </button>

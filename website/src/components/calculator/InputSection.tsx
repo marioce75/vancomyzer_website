@@ -29,7 +29,7 @@ export default function InputSection({ id, title, completed, hint, focusSection,
   return (
     <section ref={ref} id={`section-panel-${id}`} className="vz-section" aria-labelledby={`section-title-${id}`}>
       <header className="vz-section-head">
-        <h2 id={`section-title-${id}`} className="m-0 text-[12px] font-bold uppercase tracking-[0.1em]" style={{ color: "#1a3a5c" }}>
+        <h2 id={`section-title-${id}`} className="m-0 text-[12px] font-bold uppercase tracking-[0.1em]" style={{ color: "#14232f" }}>
           {title}
         </h2>
         <span className="flex items-center gap-2">

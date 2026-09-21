@@ -126,9 +126,9 @@ export default function PricingClient() {
       {OPEN_ACCESS && (
         <div
           className="mx-auto mb-10 max-w-3xl rounded-lg border px-5 py-4 text-center"
-          style={{ borderColor: "#355c7d", background: "rgba(53,92,125,0.08)" }}
+          style={{ borderColor: "#1f5e96", background: "rgba(31,94,150,0.08)" }}
         >
-          <p className="text-base font-semibold" style={{ color: "#355c7d" }}>
+          <p className="text-base font-semibold" style={{ color: "#1f5e96" }}>
             The core Vancomyzer calculator is free, permanently.
           </p>
           <p className="mt-1 text-sm" style={{ color: "var(--color-secondary)" }}>
@@ -160,17 +160,17 @@ export default function PricingClient() {
               key={tier.name}
               className="relative flex flex-col rounded-lg border p-6"
               style={{
-                borderColor: isFeatured ? "#355c7d" : "var(--color-border)",
+                borderColor: isFeatured ? "#1f5e96" : "var(--color-border)",
                 background: "var(--color-bg)",
                 boxShadow: isFeatured
-                  ? "0 0 0 2px #355c7d, 0 4px 24px rgba(53,92,125,0.12)"
+                  ? "0 0 0 2px #1f5e96, 0 4px 24px rgba(31,94,150,0.12)"
                   : "0 1px 3px rgba(0,0,0,0.06)",
               }}
             >
               {tier.badge && (
                 <span
                   className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold text-white whitespace-nowrap"
-                  style={{ background: "#355c7d" }}
+                  style={{ background: "#1f5e96" }}
                 >
                   {tier.badge}
                 </span>
@@ -204,7 +204,7 @@ export default function PricingClient() {
                   <li key={f} className="flex items-start gap-2 text-sm" style={{ color: "var(--color-foreground)" }}>
                     <svg
                       className="mt-0.5 h-4 w-4 shrink-0"
-                      style={{ color: "#355c7d" }}
+                      style={{ color: "#1f5e96" }}
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -221,12 +221,12 @@ export default function PricingClient() {
                 // Filled-style (featured: Individual Pro) vs outlined-style (all others).
                 // Hover darkens to teal-700 across the board; outlined fills in on hover.
                 const baseStyle: React.CSSProperties = isFeatured
-                  ? { background: "#355c7d", color: "#ffffff", border: "1px solid #355c7d" }
-                  : { background: "transparent", color: "#355c7d", border: "1px solid #355c7d" };
+                  ? { background: "#1f5e96", color: "#ffffff", border: "1px solid #1f5e96" }
+                  : { background: "transparent", color: "#1f5e96", border: "1px solid #1f5e96" };
                 const hoverStyle: React.CSSProperties = {
-                  background: "#355c7d",
+                  background: "#1f5e96",
                   color: "#ffffff",
-                  border: "1px solid #355c7d",
+                  border: "1px solid #1f5e96",
                 };
                 const onEnter = (e: React.MouseEvent<HTMLElement>) => {
                   const el = e.currentTarget;
@@ -249,9 +249,9 @@ export default function PricingClient() {
                     <span
                       className={btnClass}
                       style={{
-                        background: "rgba(53,92,125,0.08)",
-                        color: "#355c7d",
-                        border: "1px dashed #355c7d",
+                        background: "rgba(31,94,150,0.08)",
+                        color: "#1f5e96",
+                        border: "1px dashed #1f5e96",
                         cursor: "default",
                       }}
                     >

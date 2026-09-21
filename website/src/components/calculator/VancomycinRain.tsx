@@ -11,7 +11,7 @@ const COLOR_MAP: Record<
   VancomycinRainProps["colorMode"],
   { primary: string; fade: string }
 > = {
-  "basic": { primary: "#2b6cb0", fade: "rgba(43,108,176," },
+  "basic": { primary: "#1f5e96", fade: "rgba(31,94,150," },
 };
 
 const SYMBOLS = ["OH", "NH", "C=O", "Cl", "\u03B1", "\u03B2", "\u03A3", "\u03BB", "\u03BC", "K"];

@@ -82,7 +82,7 @@ export default function ContactPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       {/* Header */}
-      <p className="text-sm font-semibold uppercase tracking-widest text-teal-600">
+      <p className="text-sm font-semibold uppercase tracking-widest text-[#1f5e96]">
         Contact ·{" "}
         <a
           href="https://dosys.health"
@@ -116,12 +116,12 @@ export default function ContactPage() {
               {ch.email ? (
                 <a
                   href={`mailto:${ch.email}`}
-                  className="text-sm text-teal-600 hover:underline"
+                  className="text-sm text-[#1f5e96] hover:underline"
                 >
                   {ch.email}
                 </a>
               ) : ch.subtitle ? (
-                <p className="text-sm font-medium text-teal-600">{ch.subtitle}</p>
+                <p className="text-sm font-medium text-[#1f5e96]">{ch.subtitle}</p>
               ) : null}
             </div>
             <p className="text-sm text-gray-500 leading-relaxed">{ch.description}</p>
@@ -164,7 +164,7 @@ export default function ContactPage() {
                     onChange={(e) => setName(e.target.value)}
                     required
                     placeholder="Full name"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96]"
                   />
                 </div>
                 <div>
@@ -177,19 +177,20 @@ export default function ContactPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     placeholder="you@hospital.org"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                <label htmlFor="contact-topic" className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                   Topic
                 </label>
                 <select
+                  id="contact-topic"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 bg-white"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96] bg-white"
                 >
                   {topics.map((t) => (
                     <option key={t.value} value={t.value}>{t.label}</option>
@@ -207,7 +208,7 @@ export default function ContactPage() {
                   required
                   rows={4}
                   placeholder="Tell us about your institution and what you're looking for..."
-                  className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 resize-vertical"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96] resize-vertical"
                 />
               </div>
 
@@ -221,7 +222,7 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1f5e96] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? "Sending..." : "Submit inquiry"}
                 </button>
