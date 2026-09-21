@@ -151,7 +151,7 @@ export function LoadingDoseConfigurator({ weightKg, onSimulate }: LoadingDoseCon
             border: "none", cursor: "pointer", letterSpacing: "0.1em",
           }}
         >
-          SIMULATE {customDose} mg LOADING DOSE PK →
+          Estimate exposure after {customDose} mg loading dose
         </button>
       )}
 
@@ -178,8 +178,8 @@ function LoadingDoseGuidance({ weightKg, onSimulate }: LoadingDoseConfiguratorPr
         aria-expanded={expanded}
         className="flex items-center gap-1.5 w-full text-left"
         style={{
-          background: "#dbeafe",
-          border: "1px solid #bfdbfe",
+          background: "#e6eef5",
+          border: "1px solid #c6d6e6",
           cursor: "pointer",
           padding: "5px 10px",
           transition: "background 0.15s, border-color 0.15s",
@@ -224,9 +224,9 @@ export function LoadingDosePopover({ weightKg, onSimulate }: LoadingDoseConfigur
         aria-expanded={open}
         aria-controls="vz-loading-dose-popover"
         className="border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
-        style={{ borderColor: "#bfdbfe", background: open ? "#bfdbfe" : "#dbeafe", color: "#1e3a5f", cursor: "pointer", ...FONT }}
+        style={{ borderColor: "#c6d6e6", background: open ? "#c6d6e6" : "#e6eef5", color: "#14232f", cursor: "pointer", ...FONT }}
       >
-        Loading dose {open ? "▴" : "▾"}
+        {open ? "Hide loading dose" : "Loading dose"}
       </button>
       {open && (
         <div
@@ -310,9 +310,9 @@ export default function DoseRecommendationCard({
   // render the safety state and DO NOT fall through to the standard
   // regimen card. Two refusal modes:
   //   - empiric_dosing_blocked: no safe fixed-interval regimen exists
-  //     for the patient (severe AKI, etc.) → pulse-then-level workflow
+  //     for the patient (severe AKI, etc.)  pulse-then-level workflow
   //   - adjustment_dosing_blocked: existing patient on too-aggressive
-  //     regimen, no safe adjustment exists → hold + recheck level
+  //     regimen, no safe adjustment exists  hold + recheck level
   if (empiricDosingBlocked) {
     return <EmpiricDosingBlockedCard data={empiricDosingBlocked} />;
   }
@@ -361,8 +361,8 @@ export default function DoseRecommendationCard({
                 }
                 onMouseEnter={e => {
                   if (isActive) return;
-                  (e.currentTarget as HTMLElement).style.background = "#dbeafe";
-                  (e.currentTarget as HTMLElement).style.borderColor = "#93c5fd";
+                  (e.currentTarget as HTMLElement).style.background = "#e6eef5";
+                  (e.currentTarget as HTMLElement).style.borderColor = "#c6d6e6";
                 }}
                 onMouseLeave={e => {
                   if (isActive) return;

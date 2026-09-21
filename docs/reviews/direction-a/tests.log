@@ -1,0 +1,480 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test
+> npm run test:pk && npm run test:oracle && npm run test:horizon && npm run test:hmac && npm run test:baa && npm run test:cases && npm run test:safety-pattern && npm run test:predictive && npm run test:report-suite && npm run test:study-readiness && npm run test:market-intel
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:pk
+> node --import tsx src/lib/pk/__tests__/existingRegimen.integration.test.ts && node --import tsx src/lib/pk/__tests__/initialRegimen.integration.test.ts
+
+All 28 existing_regimen integration tests passed, including posterior fit-quality/uncertainty, recommendation-search, infusion-timing, near-continuous-infusion boundary behavior, conservative sparse-fit recommendation checks, positive-level validation, required multi-level collection-time semantics, recovery-path guidance for irregular timing, exact post-infusion boundary behavior, bounded interval extension for clearly supra-therapeutic sparse single-level cases, cross-midnight level timing validation, pulse-dose single-dose Bayesian workflow, late-lab-draw tolerance with non-SS multi-dose accumulation, chart-marker placement on the correct absolute-time interval, same-cycle peak+trough cycle-offset acceptance, severe-AKI adjustment-refusal peak-cap safety guard, and AUC-cap enforcement in adjustment recommendations.
+Initial regimen integration tests passed, including bounded empiric loading-dose guidance checks, low-body-weight optional loading-dose behavior, geriatric-obesity FDecline guardrail, severe-renal-impairment empiric-refusal safety guards, and 500mg dose-floor enforcement.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:oracle
+> node --import tsx src/lib/pk/__tests__/oracle/oracle.test.ts
+
+
+== A. closed-form oracle vs scipy expm fixtures (1e-6 relative)
+  ok   reference prior parameters match fixture
+  ok   [reference_1000_q12_1p75] single-dose curve (101 pts)
+  ok   [reference_1000_q12_1p75] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [reference_1000_q12_1p75] finite train n=6: curve, peak, trough, AUC, mass
+  ok   [reference_1000_q12_1p75] steady state (closed-form accumulation vs long simulation)
+  ok   [reference_1000_q12_1p75] micro-constant discriminant matches
+  ok   [q18h_1250_1h] single-dose curve (148 pts)
+  ok   [q18h_1250_1h] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [q18h_1250_1h] finite train n=5: curve, peak, trough, AUC, mass
+  ok   [q18h_1250_1h] steady state (closed-form accumulation vs long simulation)
+  ok   [q18h_1250_1h] micro-constant discriminant matches
+  ok   [q36h_1500_2h] single-dose curve (290 pts)
+  ok   [q36h_1500_2h] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [q36h_1500_2h] finite train n=4: curve, peak, trough, AUC, mass
+  ok   [q36h_1500_2h] steady state (closed-form accumulation vs long simulation)
+  ok   [q36h_1500_2h] micro-constant discriminant matches
+  ok   [q8h_750_tinf0.5] single-dose curve (100 pts)
+  ok   [q8h_750_tinf0.5] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [q8h_750_tinf0.5] finite train n=7: curve, peak, trough, AUC, mass
+  ok   [q8h_750_tinf0.5] steady state (closed-form accumulation vs long simulation)
+  ok   [q8h_750_tinf0.5] micro-constant discriminant matches
+  ok   [q8h_750_tinf1.0] single-dose curve (100 pts)
+  ok   [q8h_750_tinf1.0] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [q8h_750_tinf1.0] finite train n=7: curve, peak, trough, AUC, mass
+  ok   [q8h_750_tinf1.0] steady state (closed-form accumulation vs long simulation)
+  ok   [q8h_750_tinf1.0] micro-constant discriminant matches
+  ok   [q8h_750_tinf2.0] single-dose curve (100 pts)
+  ok   [q8h_750_tinf2.0] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [q8h_750_tinf2.0] finite train n=7: curve, peak, trough, AUC, mass
+  ok   [q8h_750_tinf2.0] steady state (closed-form accumulation vs long simulation)
+  ok   [q8h_750_tinf2.0] micro-constant discriminant matches
+  ok   [q8h_750_tinf3.0] single-dose curve (100 pts)
+  ok   [q8h_750_tinf3.0] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [q8h_750_tinf3.0] finite train n=7: curve, peak, trough, AUC, mass
+  ok   [q8h_750_tinf3.0] steady state (closed-form accumulation vs long simulation)
+  ok   [q8h_750_tinf3.0] micro-constant discriminant matches
+  ok   [q8h_750_tinf4.0] single-dose curve (100 pts)
+  ok   [q8h_750_tinf4.0] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [q8h_750_tinf4.0] finite train n=7: curve, peak, trough, AUC, mass
+  ok   [q8h_750_tinf4.0] steady state (closed-form accumulation vs long simulation)
+  ok   [q8h_750_tinf4.0] micro-constant discriminant matches
+  ok   [slow_CL0.3_V40_q24] single-dose curve (195 pts)
+  ok   [slow_CL0.3_V40_q24] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [slow_CL0.3_V40_q24] finite train n=5: curve, peak, trough, AUC, mass
+  ok   [slow_CL0.3_V40_q24] steady state (closed-form accumulation vs long simulation)
+  ok   [slow_CL0.3_V40_q24] micro-constant discriminant matches
+  ok   [near_degenerate_alpha_eq_beta] single-dose curve (100 pts)
+  ok   [near_degenerate_alpha_eq_beta] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [near_degenerate_alpha_eq_beta] finite train n=4: curve, peak, trough, AUC, mass
+  ok   [near_degenerate_alpha_eq_beta] steady state (closed-form accumulation vs long simulation)
+  ok   [near_degenerate_alpha_eq_beta] micro-constant discriminant matches
+  ok   [colin_age65_wt90_scr1.5_q12_1000_1h] single-dose curve (100 pts)
+  ok   [colin_age65_wt90_scr1.5_q12_1000_1h] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [colin_age65_wt90_scr1.5_q12_1000_1h] finite train n=6: curve, peak, trough, AUC, mass
+  ok   [colin_age65_wt90_scr1.5_q12_1000_1h] steady state (closed-form accumulation vs long simulation)
+  ok   [colin_age65_wt90_scr1.5_q12_1000_1h] micro-constant discriminant matches
+  ok   [colin_age25_wt55_scr0.6_q12_1000_1h] single-dose curve (100 pts)
+  ok   [colin_age25_wt55_scr0.6_q12_1000_1h] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [colin_age25_wt55_scr0.6_q12_1000_1h] finite train n=6: curve, peak, trough, AUC, mass
+  ok   [colin_age25_wt55_scr0.6_q12_1000_1h] steady state (closed-form accumulation vs long simulation)
+  ok   [colin_age25_wt55_scr0.6_q12_1000_1h] micro-constant discriminant matches
+  ok   [colin_age80_wt110_scr2.2_q12_1000_1h] single-dose curve (100 pts)
+  ok   [colin_age80_wt110_scr2.2_q12_1000_1h] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [colin_age80_wt110_scr2.2_q12_1000_1h] finite train n=6: curve, peak, trough, AUC, mass
+  ok   [colin_age80_wt110_scr2.2_q12_1000_1h] steady state (closed-form accumulation vs long simulation)
+  ok   [colin_age80_wt110_scr2.2_q12_1000_1h] micro-constant discriminant matches
+  ok   [colin_age45_wt122.5_scr0.83_q12_1000_1h] single-dose curve (100 pts)
+  ok   [colin_age45_wt122.5_scr0.83_q12_1000_1h] single-dose AUC 0-24, 0-500 (analytic vs expm-augmented)
+  ok   [colin_age45_wt122.5_scr0.83_q12_1000_1h] finite train n=6: curve, peak, trough, AUC, mass
+  ok   [colin_age45_wt122.5_scr0.83_q12_1000_1h] steady state (closed-form accumulation vs long simulation)
+  ok   [colin_age45_wt122.5_scr0.83_q12_1000_1h] micro-constant discriminant matches
+
+== B. literal reference values (age 35, 70 kg, SCr 0.83; 1000 mg q12h over 1.75 h)
+  ok   CL 4.102381651824105, V1 42.9, Q 3.22, V2 41.7
+  ok   steady-state AUC24 487.521681243555
+  ok   steady-state peak 31.920450104043 (end of infusion)
+  ok   steady-state trough 12.927927800297 (pre-dose)
+  ok   six doses from zero: peak 30.608889261698, trough 12.008178342517
+  ok   BMI continuity: 122.19375 kg -> CL 6.230161, 122.5 kg -> 6.241868, ratio == (122.5/122.19375)^0.75
+
+== C. property tests on the oracle
+  ok   [reference; 1000 mg q12h/1.75h] positivity & continuity at end of infusion
+  ok   [reference; 1000 mg q12h/1.75h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [reference; 1000 mg q12h/1.75h] superposition (train == sum of single doses)
+  ok   [reference; 1000 mg q12h/1.75h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [reference; 1000 mg q12h/1.75h] finite train converges to steady state (N -> large)
+  ok   [reference; 1000 mg q12h/1.75h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [reference; 1000 mg q12h/1.75h] single-dose AUC(0,inf) == D/CL
+  ok   [reference; 1250 mg q18h/1h] positivity & continuity at end of infusion
+  ok   [reference; 1250 mg q18h/1h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [reference; 1250 mg q18h/1h] superposition (train == sum of single doses)
+  ok   [reference; 1250 mg q18h/1h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [reference; 1250 mg q18h/1h] finite train converges to steady state (N -> large)
+  ok   [reference; 1250 mg q18h/1h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [reference; 1250 mg q18h/1h] single-dose AUC(0,inf) == D/CL
+  ok   [reference; 1500 mg q36h/2h] positivity & continuity at end of infusion
+  ok   [reference; 1500 mg q36h/2h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [reference; 1500 mg q36h/2h] superposition (train == sum of single doses)
+  ok   [reference; 1500 mg q36h/2h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [reference; 1500 mg q36h/2h] finite train converges to steady state (N -> large)
+  ok   [reference; 1500 mg q36h/2h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [reference; 1500 mg q36h/2h] single-dose AUC(0,inf) == D/CL
+  ok   [reference; 750 mg q8h/0.5h] positivity & continuity at end of infusion
+  ok   [reference; 750 mg q8h/0.5h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [reference; 750 mg q8h/0.5h] superposition (train == sum of single doses)
+  ok   [reference; 750 mg q8h/0.5h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [reference; 750 mg q8h/0.5h] finite train converges to steady state (N -> large)
+  ok   [reference; 750 mg q8h/0.5h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [reference; 750 mg q8h/0.5h] single-dose AUC(0,inf) == D/CL
+  ok   [reference; 750 mg q8h/4h] positivity & continuity at end of infusion
+  ok   [reference; 750 mg q8h/4h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [reference; 750 mg q8h/4h] superposition (train == sum of single doses)
+  ok   [reference; 750 mg q8h/4h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [reference; 750 mg q8h/4h] finite train converges to steady state (N -> large)
+  ok   [reference; 750 mg q8h/4h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [reference; 750 mg q8h/4h] single-dose AUC(0,inf) == D/CL
+  ok   [reference; 2000 mg q24h/3h] positivity & continuity at end of infusion
+  ok   [reference; 2000 mg q24h/3h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [reference; 2000 mg q24h/3h] superposition (train == sum of single doses)
+  ok   [reference; 2000 mg q24h/3h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [reference; 2000 mg q24h/3h] finite train converges to steady state (N -> large)
+  ok   [reference; 2000 mg q24h/3h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [reference; 2000 mg q24h/3h] single-dose AUC(0,inf) == D/CL
+  ok   [slow CL0.3 V40; 1000 mg q12h/1.75h] positivity & continuity at end of infusion
+  ok   [slow CL0.3 V40; 1000 mg q12h/1.75h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [slow CL0.3 V40; 1000 mg q12h/1.75h] superposition (train == sum of single doses)
+  ok   [slow CL0.3 V40; 1000 mg q12h/1.75h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [slow CL0.3 V40; 1000 mg q12h/1.75h] finite train converges to steady state (N -> large)
+  ok   [slow CL0.3 V40; 1000 mg q12h/1.75h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [slow CL0.3 V40; 1000 mg q12h/1.75h] single-dose AUC(0,inf) == D/CL
+  ok   [slow CL0.3 V40; 1250 mg q18h/1h] positivity & continuity at end of infusion
+  ok   [slow CL0.3 V40; 1250 mg q18h/1h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [slow CL0.3 V40; 1250 mg q18h/1h] superposition (train == sum of single doses)
+  ok   [slow CL0.3 V40; 1250 mg q18h/1h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [slow CL0.3 V40; 1250 mg q18h/1h] finite train converges to steady state (N -> large)
+  ok   [slow CL0.3 V40; 1250 mg q18h/1h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [slow CL0.3 V40; 1250 mg q18h/1h] single-dose AUC(0,inf) == D/CL
+  ok   [slow CL0.3 V40; 1500 mg q36h/2h] positivity & continuity at end of infusion
+  ok   [slow CL0.3 V40; 1500 mg q36h/2h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [slow CL0.3 V40; 1500 mg q36h/2h] superposition (train == sum of single doses)
+  ok   [slow CL0.3 V40; 1500 mg q36h/2h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [slow CL0.3 V40; 1500 mg q36h/2h] finite train converges to steady state (N -> large)
+  ok   [slow CL0.3 V40; 1500 mg q36h/2h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [slow CL0.3 V40; 1500 mg q36h/2h] single-dose AUC(0,inf) == D/CL
+  ok   [slow CL0.3 V40; 750 mg q8h/0.5h] positivity & continuity at end of infusion
+  ok   [slow CL0.3 V40; 750 mg q8h/0.5h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [slow CL0.3 V40; 750 mg q8h/0.5h] superposition (train == sum of single doses)
+  ok   [slow CL0.3 V40; 750 mg q8h/0.5h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [slow CL0.3 V40; 750 mg q8h/0.5h] finite train converges to steady state (N -> large)
+  ok   [slow CL0.3 V40; 750 mg q8h/0.5h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [slow CL0.3 V40; 750 mg q8h/0.5h] single-dose AUC(0,inf) == D/CL
+  ok   [slow CL0.3 V40; 750 mg q8h/4h] positivity & continuity at end of infusion
+  ok   [slow CL0.3 V40; 750 mg q8h/4h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [slow CL0.3 V40; 750 mg q8h/4h] superposition (train == sum of single doses)
+  ok   [slow CL0.3 V40; 750 mg q8h/4h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [slow CL0.3 V40; 750 mg q8h/4h] finite train converges to steady state (N -> large)
+  ok   [slow CL0.3 V40; 750 mg q8h/4h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [slow CL0.3 V40; 750 mg q8h/4h] single-dose AUC(0,inf) == D/CL
+  ok   [slow CL0.3 V40; 2000 mg q24h/3h] positivity & continuity at end of infusion
+  ok   [slow CL0.3 V40; 2000 mg q24h/3h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [slow CL0.3 V40; 2000 mg q24h/3h] superposition (train == sum of single doses)
+  ok   [slow CL0.3 V40; 2000 mg q24h/3h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [slow CL0.3 V40; 2000 mg q24h/3h] finite train converges to steady state (N -> large)
+  ok   [slow CL0.3 V40; 2000 mg q24h/3h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [slow CL0.3 V40; 2000 mg q24h/3h] single-dose AUC(0,inf) == D/CL
+  ok   [near-degenerate alpha~beta; 1000 mg q12h/1.75h] positivity & continuity at end of infusion
+  ok   [near-degenerate alpha~beta; 1000 mg q12h/1.75h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [near-degenerate alpha~beta; 1000 mg q12h/1.75h] superposition (train == sum of single doses)
+  ok   [near-degenerate alpha~beta; 1000 mg q12h/1.75h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [near-degenerate alpha~beta; 1000 mg q12h/1.75h] finite train converges to steady state (N -> large)
+  ok   [near-degenerate alpha~beta; 1000 mg q12h/1.75h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [near-degenerate alpha~beta; 1000 mg q12h/1.75h] single-dose AUC(0,inf) == D/CL
+  ok   [near-degenerate alpha~beta; 1250 mg q18h/1h] positivity & continuity at end of infusion
+  ok   [near-degenerate alpha~beta; 1250 mg q18h/1h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [near-degenerate alpha~beta; 1250 mg q18h/1h] superposition (train == sum of single doses)
+  ok   [near-degenerate alpha~beta; 1250 mg q18h/1h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [near-degenerate alpha~beta; 1250 mg q18h/1h] finite train converges to steady state (N -> large)
+  ok   [near-degenerate alpha~beta; 1250 mg q18h/1h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [near-degenerate alpha~beta; 1250 mg q18h/1h] single-dose AUC(0,inf) == D/CL
+  ok   [near-degenerate alpha~beta; 1500 mg q36h/2h] positivity & continuity at end of infusion
+  ok   [near-degenerate alpha~beta; 1500 mg q36h/2h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [near-degenerate alpha~beta; 1500 mg q36h/2h] superposition (train == sum of single doses)
+  ok   [near-degenerate alpha~beta; 1500 mg q36h/2h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [near-degenerate alpha~beta; 1500 mg q36h/2h] finite train converges to steady state (N -> large)
+  ok   [near-degenerate alpha~beta; 1500 mg q36h/2h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [near-degenerate alpha~beta; 1500 mg q36h/2h] single-dose AUC(0,inf) == D/CL
+  ok   [near-degenerate alpha~beta; 750 mg q8h/0.5h] positivity & continuity at end of infusion
+  ok   [near-degenerate alpha~beta; 750 mg q8h/0.5h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [near-degenerate alpha~beta; 750 mg q8h/0.5h] superposition (train == sum of single doses)
+  ok   [near-degenerate alpha~beta; 750 mg q8h/0.5h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [near-degenerate alpha~beta; 750 mg q8h/0.5h] finite train converges to steady state (N -> large)
+  ok   [near-degenerate alpha~beta; 750 mg q8h/0.5h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [near-degenerate alpha~beta; 750 mg q8h/0.5h] single-dose AUC(0,inf) == D/CL
+  ok   [near-degenerate alpha~beta; 750 mg q8h/4h] positivity & continuity at end of infusion
+  ok   [near-degenerate alpha~beta; 750 mg q8h/4h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [near-degenerate alpha~beta; 750 mg q8h/4h] superposition (train == sum of single doses)
+  ok   [near-degenerate alpha~beta; 750 mg q8h/4h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [near-degenerate alpha~beta; 750 mg q8h/4h] finite train converges to steady state (N -> large)
+  ok   [near-degenerate alpha~beta; 750 mg q8h/4h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [near-degenerate alpha~beta; 750 mg q8h/4h] single-dose AUC(0,inf) == D/CL
+  ok   [near-degenerate alpha~beta; 2000 mg q24h/3h] positivity & continuity at end of infusion
+  ok   [near-degenerate alpha~beta; 2000 mg q24h/3h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [near-degenerate alpha~beta; 2000 mg q24h/3h] superposition (train == sum of single doses)
+  ok   [near-degenerate alpha~beta; 2000 mg q24h/3h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [near-degenerate alpha~beta; 2000 mg q24h/3h] finite train converges to steady state (N -> large)
+  ok   [near-degenerate alpha~beta; 2000 mg q24h/3h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [near-degenerate alpha~beta; 2000 mg q24h/3h] single-dose AUC(0,inf) == D/CL
+  ok   [elderly 80y 110kg SCr2.2; 1000 mg q12h/1.75h] positivity & continuity at end of infusion
+  ok   [elderly 80y 110kg SCr2.2; 1000 mg q12h/1.75h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [elderly 80y 110kg SCr2.2; 1000 mg q12h/1.75h] superposition (train == sum of single doses)
+  ok   [elderly 80y 110kg SCr2.2; 1000 mg q12h/1.75h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [elderly 80y 110kg SCr2.2; 1000 mg q12h/1.75h] finite train converges to steady state (N -> large)
+  ok   [elderly 80y 110kg SCr2.2; 1000 mg q12h/1.75h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [elderly 80y 110kg SCr2.2; 1000 mg q12h/1.75h] single-dose AUC(0,inf) == D/CL
+  ok   [elderly 80y 110kg SCr2.2; 1250 mg q18h/1h] positivity & continuity at end of infusion
+  ok   [elderly 80y 110kg SCr2.2; 1250 mg q18h/1h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [elderly 80y 110kg SCr2.2; 1250 mg q18h/1h] superposition (train == sum of single doses)
+  ok   [elderly 80y 110kg SCr2.2; 1250 mg q18h/1h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [elderly 80y 110kg SCr2.2; 1250 mg q18h/1h] finite train converges to steady state (N -> large)
+  ok   [elderly 80y 110kg SCr2.2; 1250 mg q18h/1h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [elderly 80y 110kg SCr2.2; 1250 mg q18h/1h] single-dose AUC(0,inf) == D/CL
+  ok   [elderly 80y 110kg SCr2.2; 1500 mg q36h/2h] positivity & continuity at end of infusion
+  ok   [elderly 80y 110kg SCr2.2; 1500 mg q36h/2h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [elderly 80y 110kg SCr2.2; 1500 mg q36h/2h] superposition (train == sum of single doses)
+  ok   [elderly 80y 110kg SCr2.2; 1500 mg q36h/2h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [elderly 80y 110kg SCr2.2; 1500 mg q36h/2h] finite train converges to steady state (N -> large)
+  ok   [elderly 80y 110kg SCr2.2; 1500 mg q36h/2h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [elderly 80y 110kg SCr2.2; 1500 mg q36h/2h] single-dose AUC(0,inf) == D/CL
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/0.5h] positivity & continuity at end of infusion
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/0.5h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/0.5h] superposition (train == sum of single doses)
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/0.5h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/0.5h] finite train converges to steady state (N -> large)
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/0.5h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/0.5h] single-dose AUC(0,inf) == D/CL
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/4h] positivity & continuity at end of infusion
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/4h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/4h] superposition (train == sum of single doses)
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/4h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/4h] finite train converges to steady state (N -> large)
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/4h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [elderly 80y 110kg SCr2.2; 750 mg q8h/4h] single-dose AUC(0,inf) == D/CL
+  ok   [elderly 80y 110kg SCr2.2; 2000 mg q24h/3h] positivity & continuity at end of infusion
+  ok   [elderly 80y 110kg SCr2.2; 2000 mg q24h/3h] dose linearity (2x dose -> 2x C, 2x AUC)
+  ok   [elderly 80y 110kg SCr2.2; 2000 mg q24h/3h] superposition (train == sum of single doses)
+  ok   [elderly 80y 110kg SCr2.2; 2000 mg q24h/3h] conservation of mass: A1 + A2 + CL*AUC == infused
+  ok   [elderly 80y 110kg SCr2.2; 2000 mg q24h/3h] finite train converges to steady state (N -> large)
+  ok   [elderly 80y 110kg SCr2.2; 2000 mg q24h/3h] steady-state daily AUC == daily dose / CL; first-24h AUC differs
+  ok   [elderly 80y 110kg SCr2.2; 2000 mg q24h/3h] single-dose AUC(0,inf) == D/CL
+  ok   infusion durations 0.5..4 h (step 0.25) reproduce reference q12h steady-state identity and peak ordering
+  ok   alpha~beta guard: discriminant tiny, values finite, agree with fixture
+  ok   BMI continuity across a fine weight sweep (CL is smooth in WT^0.75)
+
+== D. PRODUCTION vs oracle (imports from src/lib/pk) — 1e-6 relative
+  ok   buildPriorParameters (Colin prior) vs oracle on reference + BMI patients
+  ok   production BMI continuity: CL ratio 122.5/122.19375 == (122.5/122.19375)^0.75
+  ok   production reference regimen (1000 mg q12h / 1.75 h) vs oracle
+  ok   production vs oracle on every fixture case (incl. slow, near-degenerate, q18/q36, T_inf 0.5-4)
+  (random regimen grid seed = 20260917; override with ORACLE_SEED=<int>)
+  ok   production vs oracle on 20 seeded random adult regimens
+  ok   production singleDoseAuc (trapezoid, step 0.02 h) vs analytic AUC at 1e-6
+
+254 passed, 0 failed
+
+PRODUCTION vs ORACLE: no discrepancies at 1e-6 relative.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:horizon
+> node --import tsx src/lib/pk/__tests__/exposureHorizon.regression.test.ts
+
+
+exposureHorizon regression: 56 passed, 0 failed
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:hmac
+> node --import tsx src/lib/pilotApplication/__tests__/hmac.fixture.test.ts
+
+✓ signPilotPayload is deterministic
+✓ signature is lowercase hex, 64 chars
+  fixture digest: be7edd02793c072a2301d8da6c56a8c0dd303c63a505afb53d93a747cb289741
+✓ verifyPilotSignature accepts the fixture
+✓ tampered body rejected
+✓ wrong timestamp rejected (sig was bound to original timestamp)
+✓ stale timestamp rejected
+✓ missing prefix rejected
+✓ missing secret rejected (fail-closed)
+✓ non-integer timestamp rejected
+
+All HMAC fixture assertions passed.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:baa
+> node --import tsx src/lib/baa/__tests__/baa.test.ts
+
+All 8 BAA unit tests passed — storage guards, approval gate, PDF generation, draft-watermark conditional.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:cases
+> node --import tsx scripts/verify-cases.ts
+
+Literature case verification
+----------------------------
+Cases:                               6
+Same-model reproductions (pass/fail): 2 (pass 2, fail 0)
+Cross-model references (context):     3
+Reference bands (no engine run):      1
+Reproductions, median |AUC₂₄ Δ|:      0.05%
+Reproductions, max |AUC₂₄ Δ|:         0.06%
+Reproductions, max |CL Δ|:            0.06%
+
+  ✓ colin-2019-typical-adult               AUC Δ   -0.06%  CL Δ   +0.06%  (reproduction)
+  ✓ colin-2019-elderly-mild-ckd            AUC Δ   -0.05%  CL Δ   +0.05%  (reproduction)
+  · smit-2020-morbidly-obese               AUC Δ  +19.71%  CL Δ  -16.50%  (cross-model reference, context only)
+  · adane-2015-extreme-obesity             AUC Δ  +19.88%  CL Δ  -12.48%  (cross-model reference, context only)
+  · carreno-2017-sparse-bayesian-obese     AUC Δ  -14.54%  CL Δ        —  (cross-model reference, context only)
+  · patanwala-2022-multi-platform          AUC Δ        —  CL Δ        —  (reference band, no engine run)
+
+✓ All same-model reproduction cases are within tolerance.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:safety-pattern
+> bash scripts/check-safety-pattern.sh
+
+Safety-pattern check passed: every dose-emitting function carries the @safety-checked-via annotation.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:predictive
+> node --import tsx scripts/verify-predictive-performance.ts
+
+Predictive performance: developer-run synthetic analysis (not real patients)
+-----------------------------------------------------------------------------
+Engine:              Vancomyzer posterior engine, Colin 2019 prior, model manifest 2026-09-19.1
+Truth model:         Goti 2018-based (weight scaling, variability and residual error are developer choices)
+Synthetic cohort:    200 ICU-like adults, seed 42; CrCl > 130 mL/min: 52, at the 200 mL/min cap: 13; BMI >= 40: 2
+Regimen:             15 mg/kg q12h (rounded to the nearest 250 mg, limited to 500–3000 mg), 1.5 h infusion
+Fitted levels:       3.0 h and 11.5 h after the start of dose 5 (steady-state equations)
+Held-out endpoint:   6.0 h after the start of the same dose (4.5 h after the end of the infusion); not used in the fit
+Posterior fits OK:   200 of 200
+
+Prediction vs synthetic observation at the held-out time (truth + residual error):
+  n                  200
+  Bias  (mg/L)       +0.48   signed mean error
+  rBias (%)          +8.12
+  RMSE  (mg/L)       6.18
+  rRMSE (%)          31.63
+
+Prediction vs noise-free truth at the held-out time:
+  n                  200
+  Bias  (mg/L)       +0.77   signed mean error
+  rBias (%)          +4.73
+  RMSE  (mg/L)       3.51
+  rRMSE (%)          15.94
+
+No acceptance threshold was prespecified. A ±20% rBias threshold is a later convention, not a Sheiner–Beal criterion.
+
+Context only, NOT comparable (real ICU patients, different cohort, sampling and truth definition):
+  Bai 2025 a posteriori rBias -16.03% to 0.10%, rRMSE 27.69% to 37.64%
+  Bai G, et al. Predictive performance of Bayesian dosing software for vancomycin in intensive care unit patients. Ther Drug Monit. 2025;47(5):594–602, Table 3 (a posteriori).
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:report-suite
+> node --import tsx src/lib/pk/__tests__/reportVerificationSuite.test.ts && node --import tsx src/lib/pk/__tests__/selectedRegimenReport.test.ts
+
+Vancomyzer report verification suite (§10 cases the next release should survive)
+
+[PASS] a  §10 Published anchor: Colin 2019 anchor: 35 y, 70 kg, SCr 0.83 mg/dL
+  · CL 4.1024 L/h (+0.058% vs 4.10), V1 42.90 L, V2 41.70 L, Q 3.220 L/h; AUC24 1000 mg q12h = 487.52 (-0.057% vs 487.8)
+
+[PASS] b  §10 Second anchor: 60 y, 65 kg, SCr 0.97 anchor and independent Colin 2019 re-implementation
+  · CL 2.5514 L/h (+0.015% vs 2.551); AUC24 750 mg q12h = 587.91 (+0.002% vs 587.9)
+  · independent re-implementation: 10800 grid points (age 18–95, 40–250 kg, SCr 0.4–6, heights and sexes varied), max relative difference 0.0e+0
+
+[PASS] c  §10 Registry consistency: Registry parameters, equation strings and labels agree
+  · 9 parameter placements verbatim; all parameters equal published Table 3; modelShortName "Colin 2019"; renal covariate text uses exp(); referenceCheck matches the engine
+
+[PASS] d  §10 BMI boundary / no model switch: BMI 39.9 → 40.0 keeps Colin 2019 with allometric CL and linear V1; BMI 35–70 sweep is continuous
+  · 60 y M 170 cm SCr 1.0: BMI 39.900 → 40.000; CL 3.8463 → 3.8535 L/h (ratio 1.00188, allometric 1.00188); V1 70.67 → 70.85 L (ratio 1.00251, weight 1.00251); model colin_2019 → colin_2019
+  · 35 y M 175 cm SCr 0.83: BMI 39.902 → 40.000; CL 6.2304 → 6.2419 L/h (ratio 1.00184, allometric 1.00184); V1 74.89 → 75.08 L (ratio 1.00245, weight 1.00245); model colin_2019 → colin_2019
+  · sweep BMI 35–70 in 0.1 kg steps: 5 patients, 5107 weights, all colin_2019; max step CL +0.089%, V1 +0.119%; removing height and/or sex changed nothing
+
+[PASS] e  §10 High-BMI advisory: Advisory at BMI ≥ 40 and for ≥ 120 kg without height, in both engines' limitations
+  · BMI 40.0 and 125 kg without height: advisory present; BMI 39.9 and 119.9 kg without height: absent (initial and existing-regimen limitations)
+
+[PASS] f  §10 Older adult / low SCr: 80 y, 60 kg: SCr 0.6 vs 1.0 changes CL by exp(0.649 × 0.4); entered SCr ≥ 0.4 is used unchanged
+  · CL ratio SCr 0.6/1.0 = 1.29641 (exp(0.649 × 0.4) = 1.29641); computeInitialRegimen ratio 1.29641; 192 SCr values ≥ 0.4 at ages 65–95 used unchanged (note: SCr 0.3 is floored to 0.3 by buildPriorParameters)
+
+[PASS] g  §10 Exposure invariants: Dose linearity, daily-AUC equivalence, AUC24 = dose × 24/τ ÷ CL, model self-checks
+  · 4 parameter sets: dose doubling max deviation 0.0e+0; 1 g q12h vs 2 g q24h AUC24 0.0e+0 (q24h peak higher by at least +2.7%); q36h/q48h formula 1.2e-16, curve area 1.0e-12; self-checks: superposition 2.0e-15, RK4 ODE 2.5e-14
+
+[PASS] h  §10 Invalid / extreme inputs: Age < 18, non-positive level and during-infusion level rejected; severe renal impairment refuses empiric dosing
+  · validator and pipeline reject: age 17, level 0 mcg/mL, level −5 mcg/mL, level 0.5 h into a 1 h infusion; 85 y F 79 kg SCr 4.53 → empiric_dosing_blocked (estimated CL 0.2 L/h), AUC24/peak/trough/interval all 0
+
+[PASS] i  §10 Interface consistency: Notes repeat the numeric fields, curves match peak/trough, model label matches, no retired-model text
+  · initial 1000 mg q12h: AUC24 487.5, peak 31.9, trough 12.9; final-interval curve max 31.76, min 12.75; labels ["Colin 2019"]
+  · existing 1000 mg q12h, 2 levels: AUC24 488.9, peak 33.6, trough 12.6; final-interval curve max 33.47, min 12.45; 5 options consistent; labels ["Colin 2019"]
+  · retired-model text scan: 443 strings from 9 responses (normal, BMI 40–46.7, no height, refusal, pulse dose, doses_given 3): 0 hits
+
+[PASS] j  §10 Decimal parsing: parseClinicalNumber cases; SCr 88.4 (µmol/L typed as mg/dL) rejected by the existing-regimen validator
+  · 15 parser cases as specified; SCr 88.4 rejected by validateExistingRegimenRequest ("SCr must be 0.1-10 mg/dL.") and by runExistingRegimenPipeline (initial path: see j2)
+
+[PASS] j2  §10 Decimal parsing (unit errors): Initial-regimen inputs are validated below the route: SCr 88.4 and age 17 rejected
+  · SCr 88.4 mg/dL (µmol/L typed as mg/dL): threw Patient inputs are outside the adult intermittent-infusion scope of this calculator.
+  · age 17: threw Patient inputs are outside the adult intermittent-infusion scope of this calculator.
+
+[PASS] p1  §10 Non-steady-state fit: doses_given = 2 trough simulated from known PK: posterior steady-state AUC24 within 15% of truth
+  · 55 y/80 kg/SCr 1.0, truth = prior: trough 10.2 mcg/mL → posterior AUC24 636.6 (response auc24 636.6) vs truth 634.9 (+0.3%)
+  · 70 y/70 kg/SCr 1.2, truth CL = 0.8 × prior: trough 16.1 mcg/mL → posterior AUC24 1098.6 (response auc24 1098.6) vs truth 1255.1 (-12.5%)
+  · 45 y/90 kg/SCr 0.9, truth CL = 1.25 × prior: trough 6.3 mcg/mL → posterior AUC24 402.7 (response auc24 402.7) vs truth 379.3 (+6.2%)
+
+[PASS] p2  §10 Single-dose AUC window: doses_given = 1: first-dose AUC24 is AUC0–24 of the dose given, distinct from the steady-state projection
+  · 1500 mg q8h, level 16 mcg/mL at 6 h: auc24 290.1; AUC0–24 290.1; AUC0–τ × 24/τ 476.6; steady-state projection 1441.0; actual_history_exposure.auc_0_24h = 290.1
+  · 1500 mg q12h, level 16 mcg/mL at 6 h: auc24 290.1; AUC0–24 290.1; AUC0–τ × 24/τ 408.3; steady-state projection 960.7; actual_history_exposure.auc_0_24h = 290.1
+
+[PASS] p3  §10 Extreme weight: 350 kg in the existing-regimen path is rejected or used as entered, never computed as 300 kg
+  · accepted; weight used 350 kg; prior CL 10.947 L/h (350 kg prior 10.947); AUC24 389.3
+
+[PASS] p4  §10 Late draw / missed dose: Level 23.5 h after the last dose on q12h is rejected, or flagged and not fitted as an on-time trough
+  · steady state (doses_given unset): rejected (levels[0].time_since_last_dose_hours)
+  · doses_given = 3: accepted, warning: "Level 1 drawn 11.5 h past the dosing interval. Treated as an extended …"; CL late 2.8299 vs on-time 3.8987 L/h
+
+[PASS] p5  §10 Administration history: Loading dose then maintenance change gets an explicit unsupported/abstention message
+  · rejected: "Administration history is not modelled: loading-to-maintenance changes, irregular, held or interrupt"
+
+[PASS] p6  §10 Dialysis / RRT: Dialysis/RRT status is part of the API input contract
+  · CalculateRequestPatient RRT field: present; route validateRequest RRT handling: present
+
+[PASS] p7  §10 Level-pair chronology: Trough before dose N+1 then peak after dose N+1, entered in that order, is accepted
+  · trough 19:30 then peak 22:00: accepted; same pair entered peak-first: accepted
+
+Summary
+ID | Report reference                   | Status   | Result
+---|------------------------------------|----------|-------
+a  | §10 Published anchor               | REQUIRED | PASS  
+b  | §10 Second anchor                  | REQUIRED | PASS  
+c  | §10 Registry consistency           | REQUIRED | PASS  
+d  | §10 BMI boundary / no model switch | REQUIRED | PASS  
+e  | §10 High-BMI advisory              | REQUIRED | PASS  
+f  | §10 Older adult / low SCr          | REQUIRED | PASS  
+g  | §10 Exposure invariants            | REQUIRED | PASS  
+h  | §10 Invalid / extreme inputs       | REQUIRED | PASS  
+i  | §10 Interface consistency          | REQUIRED | PASS  
+j  | §10 Decimal parsing                | REQUIRED | PASS  
+j2 | §10 Decimal parsing (unit errors)  | REQUIRED | PASS  
+p1 | §10 Non-steady-state fit           | REQUIRED | PASS  
+p2 | §10 Single-dose AUC window         | REQUIRED | PASS  
+p3 | §10 Extreme weight                 | REQUIRED | PASS  
+p4 | §10 Late draw / missed dose        | REQUIRED | PASS  
+p5 | §10 Administration history         | REQUIRED | PASS  
+p6 | §10 Dialysis / RRT                 | REQUIRED | PASS  
+p7 | §10 Level-pair chronology          | REQUIRED | PASS  
+
+REQUIRED: 18/18 passed. PENDING: 0 still failing, 0 now passing (promote to REQUIRED).
+Selected-regimen report: 5 distinct options retain current and selected exposure labels.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:study-readiness
+> node --import tsx src/lib/pk/__tests__/studyReadiness.test.ts && node --import tsx scripts/research/cli.test.ts
+
+Study readiness: 59 checks passed.
+Research CLI: 8 checks passed; synthetic files retained in temporary test directory.

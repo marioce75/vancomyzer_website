@@ -173,7 +173,7 @@ function CalendarPopup({ selectedDate, anchorEl, onSelect, onClose }: CalendarPo
 //
 // Key invariants:
 //   • onChange is called ONLY with a complete YYYY-MM-DD string, never with "".
-//   • The value→parts sync effect only runs for complete incoming dates,
+//   • The valueparts sync effect only runs for complete incoming dates,
 //     preventing feedback loops that would clear in-progress user input.
 //   • Tab between segments does not clear values.
 
@@ -192,7 +192,7 @@ export default function DatePartInput({ value, onChange, hasError }: DatePartInp
   const [parts, setParts] = useState(() => splitDate(value));
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  // Sync external value → parts ONLY when value is a complete YYYY-MM-DD.
+  // Sync external value  parts ONLY when value is a complete YYYY-MM-DD.
   // Ignoring empty/partial values prevents re-render feedback loops that would
   // clear the MM/DD/YYYY fields while the user is mid-entry.
   useEffect(() => {

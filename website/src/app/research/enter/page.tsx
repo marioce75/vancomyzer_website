@@ -431,7 +431,7 @@ export default function ResearchEntryForm() {
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 16px 80px", fontFamily: "system-ui, -apple-system, sans-serif" }}>
       {/* Header */}
       <Link href="/research" style={{ fontSize: 13, color: NAVY, textDecoration: "none", fontWeight: 600 }}>
-        &larr; Back to Dashboard
+         Back to Dashboard
       </Link>
       <h1 style={{ fontSize: 22, fontWeight: 700, color: NAVY, margin: "12px 0 4px" }}>New Research Record</h1>
       <p style={{ fontSize: 13, color: GRAY, marginBottom: 24 }}>

@@ -27,7 +27,7 @@ import type { PublishedCase } from "../types";
 export const ADANE_2015_EXTREME_OBESITY: PublishedCase = {
   id: "adane-2015-extreme-obesity",
   what_it_tests:
-    `The published cohort median AUC₂₄ (583 mg·h/L, IQR 514–726) and population clearance (6.54 L/h, one-compartment model) in 31 adults with BMI ≥ 40, next to the engine's ${COLIN_2019.shortName} values for one approximated cohort-median patient at 2000 mg every 12 h.`,
+    `The published cohort median AUC₂₄ (583 mg·h/L, IQR 514–726) and population clearance (6.54 L/h, one-compartment model) in 31 adults with BMI ≥ 40, next to the calculator's ${COLIN_2019.shortName} values for one approximated cohort-median patient at 2000 mg every 12 h.`,
   source: {
     citation:
       "Adane ED, Herald M, Koura F. Pharmacokinetics of Vancomycin in Extremely Obese Patients with Suspected or Confirmed Staphylococcus aureus Infections. Pharmacotherapy. 2015;35(2):127-139",
@@ -71,6 +71,6 @@ export const ADANE_2015_EXTREME_OBESITY: PublishedCase = {
   comparison_kind: "cross_model_reference",
   tolerance: null,
   notes_for_page:
-    "Adane 2015 measured three steady-state concentrations per patient in 31 adults with BMI ≥ 40 at one hospital and fitted a one-compartment model. The published AUC and CL summarize that cohort, while the engine value is for one approximated patient, so they are not expected to match and the difference is not a test of accuracy.",
+    "Adane 2015 measured three steady-state concentrations per patient in 31 adults with BMI ≥ 40 at one hospital and fitted a one-compartment model. The published AUC and CL summarize that cohort, while the calculator value is for one approximated patient, so they are not expected to match and the difference is not a test of accuracy.",
   workflow_type: "prior_at_regimen",
 };

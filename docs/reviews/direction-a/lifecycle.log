@@ -1,0 +1,9 @@
+ok   A: superseded response does not overwrite newer result — 540.4 → 540.4
+ok   A: result carries a snapshot digest
+ok   A: two requests were issued — 2
+ok   B: RRT block persists after late response
+ok   B: no recommendation rendered after late response — emptyBand=1 numericDose=false
+ok   C: stale overlay shown after input edit
+ok   C: exports disabled while stale
+
+result-lifecycle: all checks passed

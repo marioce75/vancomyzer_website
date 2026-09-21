@@ -63,7 +63,7 @@ function buildRecoveryGuidance(fieldErrors: Record<string, string>): {
   ) {
     guidance.add("This looks more like irregular, delayed, held, or cross-interval dosing history than routine steady state.");
     guidance.add("Use a non-steady-state recovery path: do not force a steady-state interpretation when the actual dose history was irregular.");
-    guidance.add("Either document the actual dose times or use a first-pass maintenance workflow until cleaner data are available.");
+    guidance.add("Either document the actual dose times or use a initial maintenance workflow until cleaner data are available.");
     fallback = "initial_regimen";
   }
 

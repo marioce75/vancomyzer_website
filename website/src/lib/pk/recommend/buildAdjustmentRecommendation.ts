@@ -636,7 +636,7 @@ function buildAdjustmentRefusal(args: {
     `predicted steady-state ${exceeded.join("; ")}. ` +
     `Recommended action: hold maintenance dosing, recheck a vancomycin level when ` +
     `the trough falls below ${WARN_TROUGH_MCG_ML} mcg/mL, then redose using the ` +
-    `1-Level workflow for level-guided pulse dosing.`;
+    `single-level calculation for level-guided pulse dosing.`;
 
   return {
     recommended_dose: "—",
@@ -645,7 +645,7 @@ function buildAdjustmentRefusal(args: {
     frequency_options: [],
     adjustment_dosing_blocked: {
       reason: `No regimen in the search grid satisfies peak ≤ ${MAX_PEAK_MCG_ML} mcg/mL, trough ≤ ${MAX_TROUGH_MCG_ML} mcg/mL, AND AUC₂₄ ≤ ${MAX_AUC24_MG_H_L} mg·h/L at estimated CL ${CL.toFixed(2)} L/h.`,
-      recommended_action: `Hold maintenance dosing; recheck level when trough < ${WARN_TROUGH_MCG_ML} mcg/mL; redose via 1-Level workflow.`,
+      recommended_action: `Hold maintenance dosing; recheck level when trough < ${WARN_TROUGH_MCG_ML} mcg/mL; redose via single-level calculation.`,
       safety_message: safetyMessage,
       estimated_cl_l_h: Math.round(CL * 100) / 100,
     },

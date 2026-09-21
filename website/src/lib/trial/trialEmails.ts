@@ -50,7 +50,7 @@ export async function sendReportReadyEmail(user: { email: string; name: string }
       <p>The report documents your AUC target attainment rate and case volume —
       everything you need to make the case for an institutional subscription to your pharmacy director.</p>
       <p><a href="https://vancomyzer.com/dashboard/pilot" style="color:#00d4aa;font-weight:bold;">
-        Generate my report →
+        Generate my report
       </a></p>
       <p>You have 15 days remaining in your free pilot.</p>
       <p>— The Dosys Health LLC Team</p>
@@ -68,7 +68,7 @@ export async function sendTrialExpiringEmail(user: { email: string; name: string
       <p>Subscribe now to keep your calculation history after the pilot ends. The core calculator
       remains free.</p>
       <p><a href="https://vancomyzer.com/upgrade" style="color:#00d4aa;font-weight:bold;">
-        Subscribe — $49.99/year →
+        Subscribe — $49.99/year
       </a></p>
       <p>— The Dosys Health LLC Team</p>
     `

@@ -122,7 +122,7 @@ const FAQ_ITEMS: FaqItem[] = [
       `Serum creatinine comes from muscle, so it reflects muscle mass as well as kidney function. In older, sarcopenic or bedbound patients, a low SCr can overstate renal function whichever equation is used: Cockcroft-Gault, CKD-EPI or the ${COLIN.shortName} SCr covariate. No creatinine-based equation corrects for this in an individual patient.`,
       `${COLIN.shortName} includes age (through an age-standardised reference creatinine and an age-decline factor on clearance), but that describes the average effect of age, not an individual patient’s muscle mass. When the renal estimate is doubtful, measured vancomycin levels entered into the Bayesian fit let the estimate move away from the population prediction.`,
       "Vancomyzer uses the SCr you enter and does not round low values up (the model input has a lower bound of 0.4 mg/dL). In a single-centre retrospective study of 245 patients aged 65 and older (Bukhari 2024), dosing with SCr rounded up to 1 mg/dL was less accurate than dosing with the actual SCr.",
-      "The calculator shows an enhanced-monitoring advisory for patients older than 65 and, when the bedbound workflow is selected, a warning when SCr is below 0.7 mg/dL. Review any renal estimate you consider unreliable, and obtain levels early.",
+      "The calculator shows an enhanced-monitoring advisory for patients older than 65 and, when the bedbound option is selected, a warning when SCr is below 0.7 mg/dL. Review any renal estimate you consider unreliable, and obtain levels early.",
     ],
     refs: [REF_COLIN_2019, REF_BUKHARI_2024],
   },
@@ -188,7 +188,7 @@ const FAQ_ITEMS: FaqItem[] = [
     ],
     refs: [
       { label: "Literature reproducibility cases", url: "/transparent-dosing/cases" },
-      { label: "Engine cross-check vs Tucuxi (developer-run, synthetic)", url: "/transparent-dosing/engine-crosscheck" },
+      { label: "Comparison with Tucuxi (developer-run, synthetic)", url: "/transparent-dosing/engine-crosscheck" },
       { label: "Medical disclaimer", url: "/disclaimer" },
     ],
   },
@@ -264,11 +264,10 @@ function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
             fontSize: 16,
             flexShrink: 0,
             transition: "transform 0.2s",
-            transform: open ? "rotate(90deg)" : "rotate(0deg)",
             fontFamily: "'Share Tech Mono', monospace",
           }}
         >
-          {"\u25B6"}
+          {open ? "Hide" : "Show"}
         </span>
       </button>
 

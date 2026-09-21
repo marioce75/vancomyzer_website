@@ -699,9 +699,9 @@ export default function ConcentrationTimeGraph({
             }}
             onMouseEnter={e => {
               if (zoom !== z) {
-                (e.currentTarget as HTMLElement).style.background = getCSSColor("--color-primary", "#2b6cb0");
+                (e.currentTarget as HTMLElement).style.background = getCSSColor("--color-primary", "#1f5e96");
                 (e.currentTarget as HTMLElement).style.color = getCSSColor("--color-card", "#fff");
-                (e.currentTarget as HTMLElement).style.borderColor = getCSSColor("--color-primary", "#2b6cb0");
+                (e.currentTarget as HTMLElement).style.borderColor = getCSSColor("--color-primary", "#1f5e96");
               }
             }}
             onMouseLeave={e => {

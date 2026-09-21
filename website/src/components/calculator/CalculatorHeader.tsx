@@ -63,7 +63,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                     window.open("https://dosys.health", "_blank", "noopener,noreferrer");
                   }}
                 >
-                  <span style={{ fontWeight: 700 }}>D<span className="dosys-d" style={{ color: "#355c7d" }}>{"\u014D"}</span>sys</span><sup style={{ fontSize: "7px", verticalAlign: "super", marginLeft: "1px" }}>{"\u2122"}</sup>
+                  <span style={{ fontWeight: 700 }}>D<span className="dosys-d" style={{ color: "#1f5e96" }}>{"\u014D"}</span>sys</span><sup style={{ fontSize: "7px", verticalAlign: "super", marginLeft: "1px" }}>{"\u2122"}</sup>
                 </button>
               </span>
             </p>
@@ -133,12 +133,12 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
         <div className="hidden lg:flex flex-1 items-center justify-end gap-2">
           <Link
             href="/"
-            className="px-2.5 py-1 text-[13px] font-medium transition"
+            className="vz-header-action px-2.5 py-1 text-[13px] font-medium transition"
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
               (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #14232f)";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -150,12 +150,12 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           </Link>
           <Link
             href="/faq"
-            className="px-2.5 py-1 text-[13px] font-medium transition"
+            className="vz-header-action px-2.5 py-1 text-[13px] font-medium transition"
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
               (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #14232f)";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -167,12 +167,12 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           </Link>
           <Link
             href="/transparent-dosing"
-            className="px-2.5 py-1 text-[13px] font-medium transition"
+            className="vz-header-action px-2.5 py-1 text-[13px] font-medium transition"
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
               (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #14232f)";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -180,17 +180,17 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
             }}
           >
-            Transparency
+            Evidence
           </Link>
           {userRole === "admin" && (
             <Link
               href="/admin/dashboard"
-              className="px-2.5 py-1 text-[13px] font-medium transition"
+              className="vz-header-action px-2.5 py-1 text-[13px] font-medium transition"
               style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace", fontWeight: 700 }}
               onMouseEnter={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
                 (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-                (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-card, #14232f)";
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -205,7 +205,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             <button
               type="button"
               onClick={onSettingsOpen}
-              className="ml-1 p-1.5 transition"
+              className="vz-header-action ml-1 p-1.5 transition"
               style={{
                 color: "var(--color-secondary)",
                 border: "1px solid transparent",
@@ -214,7 +214,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               onMouseEnter={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary-a40)";
                 (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-                (e.currentTarget as HTMLElement).style.color = "var(--color-card, #1a202c)";
+                (e.currentTarget as HTMLElement).style.color = "var(--color-card, #14232f)";
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.borderColor = "transparent";
@@ -239,7 +239,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             <button
               type="button"
               onClick={onLogout}
-              className="ml-1 px-2 py-1 text-[11px] font-semibold transition"
+              className="vz-header-action ml-1 px-2 py-1 text-[11px] font-semibold transition"
               style={{
                 color: "var(--color-secondary)",
                 border: "1px solid var(--color-border)",
@@ -263,7 +263,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           {!onLogout && showSignIn && (
             <a
               href="/login"
-              className="ml-1 px-2 py-1 text-[11px] font-semibold transition"
+              className="vz-header-action ml-1 px-2 py-1 text-[11px] font-semibold transition"
               style={{
                 color: "var(--color-secondary)",
                 border: "1px solid var(--color-border)",

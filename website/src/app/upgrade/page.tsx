@@ -72,7 +72,7 @@ export default function UpgradePage() {
         <p style={{ fontSize: 15, color: SLATE, lineHeight: 1.6, maxWidth: 480, margin: '0 auto' }}>
           {isConverted
             ? 'Your case history is preserved and all Pro features are active.'
-            : 'Subscribe before your pilot ends to retain your full case history and unlock Pro features.'}
+            : 'Subscribe before your pilot ends to retain your full case history and use Pro features.'}
         </p>
       </div>
 
@@ -173,10 +173,10 @@ export default function UpgradePage() {
           >
             <div style={{ fontSize: 13, color: NAVY }}>{f.label}</div>
             <div style={{ textAlign: 'center' as const, fontSize: 14, color: f.free ? GREEN : '#cbd5e1' }}>
-              {f.free ? '✓' : '—'}
+              {f.free ? 'Included' : 'Not included'}
             </div>
             <div style={{ textAlign: 'center' as const, fontSize: 14, color: f.pro ? GREEN : '#cbd5e1' }}>
-              {f.pro ? '✓' : '—'}
+              {f.pro ? 'Included' : 'Not included'}
             </div>
           </div>
         ))}
@@ -184,7 +184,7 @@ export default function UpgradePage() {
 
       <div style={{ marginTop: 28, textAlign: 'center' as const }}>
         <Link href="/calculator" style={{ fontSize: 12, color: SLATE, textDecoration: 'none' }}>
-          ← Back to Calculator
+           Back to Calculator
         </Link>
         {' · '}
         <Link href="/pricing" style={{ fontSize: 12, color: SLATE, textDecoration: 'none' }}>

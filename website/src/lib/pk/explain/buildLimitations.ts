@@ -7,7 +7,7 @@ export function buildLimitations(input: ExplanationInput): string[] {
 
   const items = usedRefinement
     ? [
-        "Simple two-compartment adult prior model with bounded first-pass MAP refinement from level(s), not a full Bayesian engine.",
+        "Simple two-compartment adult prior model with bounded initial MAP refinement from level(s), not a full Bayesian engine.",
         "Population prior comes from an adult literature model and may fit poorly outside typical adult populations or when physiology is changing quickly.",
         "Clinical judgment and levels-based reassessment remain essential.",
       ]
@@ -21,7 +21,7 @@ export function buildLimitations(input: ExplanationInput): string[] {
   const isPulseDose = engineOutput.doses_given === 1;
 
   if (engineOutput.level_count === 1 && !usedRefinement) {
-    items.unshift("Single level limits precision; adjustment is a first-pass estimate.");
+    items.unshift("Single level limits precision; adjustment is a initial estimate.");
   }
   if (isPulseDose) {
     items.unshift("Bayesian estimate based on single pre-steady-state level — monitor and confirm with a follow-up level after additional doses.");
@@ -31,7 +31,7 @@ export function buildLimitations(input: ExplanationInput): string[] {
   }
   items.unshift("Near-continuous infusion regimens are outside this intermittent steady-state model; infusion duration should remain materially shorter than the dosing interval.");
   if (engineOutput.level_count === 1 && usedRefinement) {
-    items.unshift("Single level used for first-pass parameter refinement; posterior fit quality may be weak even when the model returns a bounded estimate.");
+    items.unshift("Single level used for initial parameter refinement; posterior fit quality may be weak even when the model returns a bounded estimate.");
   }
   if (posteriorFit?.fit_quality === "weak") {
     items.unshift("Posterior fit quality was weak; sparse or mismatched levels should not be overinterpreted as precise patient-specific PK.");

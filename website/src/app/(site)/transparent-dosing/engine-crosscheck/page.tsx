@@ -1,5 +1,5 @@
 /**
- * /transparent-dosing/engine-crosscheck — Engine Cross-Check (Vancomyzer vs Tucuxi).
+ * /transparent-dosing/engine-crosscheck — Comparison with Tucuxi (Vancomyzer vs Tucuxi).
  *
  * Two developer-run synthetic analyses (not real patients):
  *   - 18 Sep 2026: the reproducible run from src/lib/validation/crosscheck/
@@ -8,7 +8,7 @@
  *     result files via engineCrosscheck2026.ts; nothing is retyped.
  *   - 30 May 2026: the earlier one-off snapshot (engine-crosscheck-report.json),
  *     kept below, labelled, because it was published and because it used the
- *     engine before the 15 Sep 2026 model change.
+ *     calculator before the 15 Sep 2026 model change.
  *
  * Scope (stated on the page): same prior, same data, independently
  * implemented MAP estimator — a common-math check. It does not validate the
@@ -38,7 +38,7 @@ import {
 
 export const metadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing/engine-crosscheck" },
-  title: "Engine Cross-Check — Vancomyzer",
+  title: "Comparison with Tucuxi — Vancomyzer",
   description:
     "A developer-run synthetic analysis (not real patients): Vancomyzer's Bayesian fitting compared with Tucuxi-core " +
     "given the same Colin 2019 prior and the same simulated levels, against pre-set acceptance criteria (n=200, run 18 Sep 2026; " +
@@ -66,7 +66,7 @@ export default function EngineCrosscheckPage() {
       <Breadcrumb />
 
       <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--color-primary)", marginBottom: 6, lineHeight: 1.2 }}>
-        Engine Cross-Check
+        Comparison with Tucuxi
       </h1>
       <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 12, maxWidth: 760 }}>
         A developer-run synthetic analysis (not real patients). Vancomyzer&rsquo;s Bayesian fitting was compared
@@ -93,12 +93,12 @@ export default function EngineCrosscheckPage() {
       <ScopeCard2026 />
 
       <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--color-primary)", margin: "40px 0 6px" }}>
-        Earlier snapshot — {CROSSCHECK_META.displayDate}
+        Earlier comparison — {CROSSCHECK_META.displayDate}
       </h2>
       <p style={{ fontSize: 13, color: "var(--color-dim)", lineHeight: 1.55, marginTop: 0, marginBottom: 16, maxWidth: 760 }}>
-        The first comparison, run once with the engine as it was on that date, before the 15 Sep 2026 model
+        The first comparison, run once with the calculator as it was on that date, before the 15 Sep 2026 model
         change. It is kept here because it was published; it has been superseded by the reproducible run
-        above, whose scripts, fixture and model file are committed to the repository. The numbers below are
+        above, whose analysis scripts, test data and model file are committed to the repository. The numbers below are
         unchanged from the original publication.
       </p>
       <SnapshotNotice />
@@ -125,9 +125,9 @@ function RunNotice() {
       lineHeight: 1.55,
       marginBottom: 24,
     }}>
-      <strong>Reproducible run of {m.displayDate}, engine manifest {m.engineManifest}.</strong> The synthetic
+      <strong>Reproducible run of {m.displayDate}, calculation version {m.engineManifest}.</strong> The synthetic
       cohort (seed {m.seed}), the Tucuxi model file, the per-patient query generator, the raw result files and the
-      comparison script are committed to the repository (<code>{m.recordPath}</code>), so the run can be repeated
+      comparison script are committed to the repository (<a href={`https://github.com/marioce75/vancomyzer_website/blob/design/direction-a/website/${m.recordPath}`} style={{ textDecoration: "underline" }}>reproducibility instructions</a>), so the run can be repeated
       by anyone with a Tucuxi build. Tucuxi itself is built from source and is not part of the site build, so the
       figures below are read from that run&rsquo;s saved result files rather than recomputed on each visit.
     </div>
@@ -283,7 +283,7 @@ function AccuracyCard2026() {
         </table>
       </div>
       <p style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 12, marginBottom: 0, lineHeight: 1.6 }}>
-        As in the earlier snapshot, only <strong>clearance</strong> improves materially with a two-level fit
+        As in the earlier comparison, only <strong>clearance</strong> improves materially with a two-level fit
         ({a.CL.prior.toFixed(1)}% with the prior alone, {a.CL.vz.toFixed(1)}% for Vancomyzer,{" "}
         {a.CL.tucuxi.toFixed(1)}% for Tucuxi). The synthetic truth comes from a different published model
         (Goti 2018) than the prior, so this is a check that the fit moves toward the truth, not a claim about
@@ -359,29 +359,26 @@ function MethodologyCard2026() {
       <ol style={{ margin: "10px 0 0", paddingLeft: 18, fontSize: 13, lineHeight: 1.65, color: "var(--color-secondary)" }}>
         <li>
           Generate {m.n} synthetic ICU patients (seed {m.seed}) with &ldquo;true&rdquo; parameters drawn from a
-          Goti 2018–based model; simulate two levels with assay error ({m.design}). The fixture is committed.
+          Goti 2018–based model; simulate two levels with assay error ({m.design}). The test data are available in the source repository.
         </li>
         <li>
-          Run Vancomyzer&rsquo;s engine (manifest {m.engineManifest}) on each patient: {COLIN_2019.shortName}{" "}
+          Run Vancomyzer&rsquo;s calculator (calculation version {m.engineManifest}) on each patient: {COLIN_2019.shortName}{" "}
           prior from the covariates, then the Bayesian fit on the two levels.
         </li>
         <li>
-          Write the Colin 2019 equations into a Tucuxi model file ({m.modelFile}, SHA-256{" "}
-          <code style={{ fontSize: 11 }}>{m.modelFileSha256.slice(0, 16)}…</code>) with prior variability
+          Use the Colin 2019 equations in Tucuxi with prior variability
           (log-scale SD: CL {sd.CL}, V₁ {sd.V1}, Q {sd.Q}, V₂ {sd.V2}) and Tucuxi&rsquo;s mixed residual error
           (1.0 mg/L additive, 15% proportional). Check its prior-only prediction against the reference patient
           (table above). Then give Tucuxi the same dosing history and the same two levels per patient and run its
           Bayesian fit.
         </li>
         <li>
-          Score the two sets of estimates with the committed comparison script against the criteria written
+          Score the two sets of estimates with the published analysis against the criteria written
           down on 17 Sep 2026, before the run; re-fit every tail case independently under both error models.
         </li>
       </ol>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 14, marginBottom: 0, lineHeight: 1.55 }}>
-        Comparator: {m.comparator} ({m.comparatorRepo}, commit {m.comparatorCommit}), built from source. The
-        fixture, model file, query generator, raw result files, comparison and attribution scripts are in the
-        repository at <code>src/lib/validation/crosscheck/</code>.
+        Comparator: {m.comparator}. The exact program version, test data, model definitions and analysis scripts are available in the <a href="https://github.com/marioce75/vancomyzer_website/tree/design/direction-a/website/src/lib/validation/crosscheck" style={{ textDecoration: "underline" }}>reproducibility materials</a>.
       </p>
     </section>
   );
@@ -436,10 +433,10 @@ function Breadcrumb() {
   return (
     <div style={{ display: "flex", gap: 12, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
       <Link href="/transparent-dosing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-        ← Transparent Dosing
+         Evidence
       </Link>
       <span style={{ color: "var(--color-border)" }}>·</span>
-      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Engine Cross-Check</span>
+      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Comparison with Tucuxi</span>
     </div>
   );
 }
@@ -451,13 +448,13 @@ function SnapshotNotice() {
       background: "#eff6ff",
       border: "1px solid #bfdbfe",
       borderLeft: "3px solid #2563eb",
-      color: "#1e3a5f",
+      color: "#14232f",
       borderRadius: 4,
       fontSize: 13,
       lineHeight: 1.55,
       marginBottom: 24,
     }}>
-      <strong>Fixed snapshot from {CROSSCHECK_META.displayDate}.</strong> The developer ran this comparison once,
+      <strong>Results from {CROSSCHECK_META.displayDate}.</strong> The developer ran this comparison once,
       with the {CROSSCHECK_META.engineVersion}. It has not been re-run since, and running Tucuxi requires a
       separate local installation, so it is not part of the site build. The figures below are read directly
       from that run&rsquo;s saved results.{" "}
@@ -679,8 +676,8 @@ function ScopeCard() {
       body: "A steady-state peak and trough mainly inform clearance. Agreement on Q and V₂ largely reflects both programs staying near the shared starting estimate.",
     },
     {
-      label: "Run date and engine version",
-      body: `Run once on ${CROSSCHECK_META.displayDate} with the ${CROSSCHECK_META.engineVersion}. It has not been repeated with the current engine.`,
+      label: "Run date and calculator version",
+      body: `Run once on ${CROSSCHECK_META.displayDate} with the ${CROSSCHECK_META.engineVersion}. It has not been repeated with the current calculator.`,
     },
   ];
   return (

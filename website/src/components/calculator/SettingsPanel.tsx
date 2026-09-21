@@ -222,7 +222,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     ...FONT,
                   }}
                 >
-                  {label} →
+                  {label}
                 </Link>
               ))}
             </div>
@@ -411,13 +411,13 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               }}
             >
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                      <span style={{ fontSize: 11, color: "#1a3a5c", fontWeight: 600, fontFamily: "Inter, system-ui, sans-serif" }}>
+                      <span style={{ fontSize: 11, color: "#14232f", fontWeight: 600, fontFamily: "Inter, system-ui, sans-serif" }}>
                         AUC{"\u2082\u2084"}:
                       </span>
-                      <span style={{ fontSize: 22, fontWeight: 700, color: "#1e4d8c", fontFamily: "'JetBrains Mono', monospace" }}>
+                      <span style={{ fontSize: 22, fontWeight: 700, color: "#1f5e96", fontFamily: "'JetBrains Mono', monospace" }}>
                         487
                       </span>
-                      <span style={{ fontSize: 11, color: "#718096", fontFamily: "Inter, system-ui, sans-serif" }}>mg·h/L</span>
+                      <span style={{ fontSize: 11, color: "#546471", fontFamily: "Inter, system-ui, sans-serif" }}>mg·h/L</span>
                     </div>
               <p style={{ fontSize: 10, color: "#276749", fontWeight: 600, marginTop: 4, fontFamily: "Inter, system-ui, sans-serif" }}>
                 WITHIN TARGET RANGE

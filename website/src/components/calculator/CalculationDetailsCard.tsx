@@ -45,7 +45,7 @@ export default function CalculationDetailsCard({
           <p className="mt-1 text-sm text-gray-700">{details.method}</p>
         </div>
         <div>
-          <p className="text-sm font-medium text-gray-900">Workflow fit / data quality</p>
+          <p className="text-sm font-medium text-gray-900">Suitability and data quality</p>
           <p className="mt-1 text-sm text-gray-700">{details.data_quality_summary}</p>
         </div>
       </div>

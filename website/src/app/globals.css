@@ -8,29 +8,34 @@
    ─────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Primary palette — overwritten at runtime by the settings context */
-  --color-primary:      #00ff41;
-  --color-secondary:    #00cc44;
-  --color-dim:          #009933;
-  --color-bg:           #000000;
-  --color-border:       #004422;
-  --color-card:         #050505;
-  --color-input:        #0d0d0d;
-  --color-highlight:    #0a1a0a;
-  --color-glow:         rgba(0,255,65,0.5);
-  --color-glow-strong:  rgba(0,255,65,0.8);
-  --color-primary-a05:  rgba(0,255,65,0.05);
-  --color-primary-a06:  rgba(0,255,65,0.06);
-  --color-primary-a08:  rgba(0,255,65,0.08);
-  --color-primary-a10:  rgba(0,255,65,0.10);
-  --color-primary-a12:  rgba(0,255,65,0.12);
-  --color-primary-a15:  rgba(0,255,65,0.15);
-  --color-primary-a20:  rgba(0,255,65,0.20);
-  --color-primary-a25:  rgba(0,255,65,0.25);
-  --color-primary-a30:  rgba(0,255,65,0.30);
-  --color-primary-a35:  rgba(0,255,65,0.35);
-  --color-primary-a40:  rgba(0,255,65,0.40);
-  --color-primary-a50:  rgba(0,255,65,0.50);
+  /* Basic theme on the first server render, before settings are restored.
+     Keep these defaults aligned with COLOR_PRESETS.basic. */
+  --color-primary:      #1f5e96;
+  --color-secondary:    #4a5a68;
+  --color-dim:          #546471;
+  --color-bg:           #f7f9fb;
+  --color-border:       #cbd6e0;
+  --color-card:         #ffffff;
+  --color-input:        #ffffff;
+  --color-highlight:    #e6eef5;
+  --color-glow:         rgba(31,94,150,0.15);
+  --color-glow-strong:  rgba(31,94,150,0.3);
+  --color-primary-a05:  rgba(31,94,150,0.05);
+  --color-primary-a06:  rgba(31,94,150,0.06);
+  --color-primary-a08:  rgba(31,94,150,0.08);
+  --color-primary-a10:  rgba(31,94,150,0.10);
+  --color-primary-a12:  rgba(31,94,150,0.12);
+  --color-primary-a15:  rgba(31,94,150,0.15);
+  --color-primary-a20:  rgba(31,94,150,0.20);
+  --color-primary-a25:  rgba(31,94,150,0.25);
+  --color-primary-a30:  rgba(31,94,150,0.30);
+  --color-primary-a35:  rgba(31,94,150,0.35);
+  --color-primary-a40:  rgba(31,94,150,0.40);
+  --color-primary-a50:  rgba(31,94,150,0.50);
+  --color-nav-bg:       #f7f9fb;
+  --color-nav-border:   #cbd6e0;
+  --font-mono:          'IBM Plex Mono', 'JetBrains Mono', 'Courier New', monospace;
+  --mx-scanline-opacity: 0;
 
   /* Fixed semantic colors — don't change with color mode */
   --mx-error:           #ff3333;
@@ -46,8 +51,8 @@
   --text-secondary:     var(--color-secondary);
   --text-muted:         var(--color-dim);
   --foreground:         var(--color-primary);
-  --teal:               #00d4aa;
-  --teal-light:         #00d4aa;
+  --teal:               #1f5e96;
+  --teal-light:         #1f5e96;
   --teal-border:        rgba(0,212,170,0.3);
   --teal-glow:          rgba(0,212,170,0.1);
   --vc-text:            var(--color-primary);
@@ -112,18 +117,18 @@ body.no-blink .mx-blink { animation: none !important; opacity: 1 !important; }
    ─────────────────────────────────────────────────────────────────── */
 
 body.theme-basic {
-  font-family: 'Inter', 'Helvetica Neue', 'Arial', system-ui, sans-serif !important;
-  color: #23313f !important;
-  background: #eaf2f8 !important;
+  font-family: 'Source Sans 3', 'Inter', 'Helvetica Neue', system-ui, sans-serif !important;
+  color: #14232f !important;
+  background: #f7f9fb !important;
 }
 
 /* ── Nav bar — dark navy (Vigilanz style) ────────────────────── */
 
 body.theme-basic header.shrink-0,
 body.theme-basic header[class*="shrink-0"] {
-  background: #2c3e5a !important;
-  border-bottom-color: #1e2d45 !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+  background: #f7f9fb !important;
+  border-bottom-color: #cbd6e0 !important;
+  box-shadow: none !important;
 }
 body.theme-basic header.shrink-0 h1[class],
 body.theme-basic header.shrink-0 a[class],
@@ -135,96 +140,102 @@ body.theme-basic header[class*="shrink-0"] a,
 body.theme-basic header[class*="shrink-0"] button,
 body.theme-basic header[class*="shrink-0"] p,
 body.theme-basic header[class*="shrink-0"] span {
-  color: rgba(255,255,255,0.9) !important;
+  color: #14232f !important;
   text-shadow: none !important;
 }
 body.theme-basic header[class*="shrink-0"] .vancomyzer-title {
-  color: #ffffff !important;
+  color: #14232f !important;
 }
 body.theme-basic header[class*="shrink-0"] .dosys-brand {
-  color: rgba(255,255,255,0.85) !important;
+  color: #4a5a68 !important;
   letter-spacing: 0 !important;
-  font-family: 'Inter', 'Helvetica Neue', sans-serif !important;
+  font-family: 'Source Sans 3', 'Inter', 'Helvetica Neue', sans-serif !important;
 }
 body.theme-basic header[class*="shrink-0"] .dosys-d,
 body.theme-basic header[class*="shrink-0"] .dosys-brand .dosys-d,
 body.theme-basic header[class*="shrink-0"] button.dosys-brand span .dosys-d {
-  color: #355c7d !important;
+  color: #1f5e96 !important;
 }
 /* Mode tabs — active white on navy, inactive semi-transparent */
 body.theme-basic header[class*="shrink-0"] button[role="tab"][aria-selected="true"] {
-  background: #355c7d !important;
+  background: #1f5e96 !important;
   color: #ffffff !important;
 }
 body.theme-basic header[class*="shrink-0"] button[role="tab"][aria-selected="false"] {
-  background: #d8dce3 !important;
-  color: #23313f !important;
-  border-color: #c0c7d1 !important;
+  background: #e6eef5 !important;
+  color: #14232f !important;
+  border-color: #cbd6e0 !important;
   transition: background 0.15s !important;
 }
 body.theme-basic header[class*="shrink-0"] button[role="tab"][aria-selected="false"]:hover {
-  background: #355c7d !important;
-  border-color: #355c7d !important;
+  background: #1f5e96 !important;
+  border-color: #1f5e96 !important;
   color: #ffffff !important;
 }
 /* Clinical decision support badge */
 body.theme-basic header[class*="shrink-0"] span[class*="tracking"] {
-  border-color: rgba(255,255,255,0.25) !important;
-  background: rgba(255,255,255,0.08) !important;
-  color: rgba(255,255,255,0.85) !important;
+  border-color: #cbd6e0 !important;
+  background: #ffffff !important;
+  color: #4a5a68 !important;
 }
 /* Settings gear */
 body.theme-basic header[class*="shrink-0"] svg {
-  color: rgba(255,255,255,0.7) !important;
+  color: #4a5a68 !important;
+}
+
+/* Toolbar actions keep a light foreground when their hover background darkens. */
+body.theme-basic header.shrink-0 .vz-header-action:hover,
+body.theme-basic header.shrink-0 .vz-header-action:hover svg {
+  color: #ffffff !important;
 }
 
 /* ── Section toggles (Patient Info, Dosing, Levels, Method) ─── */
 
 body.theme-basic button[aria-expanded] {
-  background: #edf0f5 !important;
-  border-color: #c5cdd8 !important;
+  background: #eef3f7 !important;
+  border-color: #cbd6e0 !important;
   transition: background 0.15s, border-color 0.15s !important;
 }
 body.theme-basic button[aria-expanded="true"] {
   background: #ffffff !important;
-  border-color: #355c7d !important;
-  border-left: 3px solid #355c7d !important;
+  border-color: #1f5e96 !important;
+  border-left: 3px solid #1f5e96 !important;
 }
 body.theme-basic button[aria-expanded]:hover {
-  background: #dce4ef !important;
-  border-color: #355c7d !important;
+  background: #e6eef5 !important;
+  border-color: #1f5e96 !important;
 }
 body.theme-basic button[aria-expanded="true"]:hover {
-  background: #f0f5ff !important;
+  background: #eef3f7 !important;
 }
 
 /* Input fields — blue border on hover */
 body.theme-basic input:hover,
 body.theme-basic select:hover,
 body.theme-basic textarea:hover {
-  border-color: #355c7d !important;
-  background-color: #f7f9ff !important;
+  border-color: #1f5e96 !important;
+  background-color: #f7f9fb !important;
 }
 
 /* Dose/option buttons — prominent blue hover */
 body.theme-basic .hover\:bg-blue-50:hover {
-  background-color: #355c7d !important;
+  background-color: #1f5e96 !important;
   color: #ffffff !important;
-  border-color: #355c7d !important;
+  border-color: #1f5e96 !important;
 }
 
 /* Bedbound/toggle buttons — blue hover */
 body.theme-basic .hover\:bg-amber-50:hover {
-  background-color: #dce4ef !important;
-  border-color: #355c7d !important;
-  color: #23313f !important;
+  background-color: #e6eef5 !important;
+  border-color: #1f5e96 !important;
+  color: #14232f !important;
 }
 
 /* RRT / generic slate buttons — blue hover */
 body.theme-basic .hover\:bg-slate-100:hover {
-  background-color: #355c7d !important;
+  background-color: #1f5e96 !important;
   color: #ffffff !important;
-  border-color: #355c7d !important;
+  border-color: #1f5e96 !important;
 }
 
 /* Rounded corners */
@@ -242,7 +253,7 @@ body.theme-basic [style] {
 body.theme-basic input[style],
 body.theme-basic select[style],
 body.theme-basic textarea[style] {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', 'Courier New', monospace !important;
 }
 
 /* Text colors — override green/dim inline colors */
@@ -263,17 +274,17 @@ body.theme-basic label[style] {
 body.theme-basic input,
 body.theme-basic select,
 body.theme-basic textarea {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
-  color: #23313f !important;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace !important;
+  color: #14232f !important;
   background-color: #ffffff !important;
   border: 1px solid #a0aec0 !important;
-  caret-color: #23313f !important;
+  caret-color: #14232f !important;
 }
 body.theme-basic input:focus,
 body.theme-basic select:focus,
 body.theme-basic textarea:focus {
-  border-color: #355c7d !important;
-  box-shadow: 0 0 0 2px rgba(43,108,176,0.25) !important;
+  border-color: #1f5e96 !important;
+  box-shadow: 0 0 0 2px rgba(31,94,150,0.25) !important;
   outline: none !important;
 }
 body.theme-basic input::placeholder,
@@ -282,14 +293,14 @@ body.theme-basic textarea::placeholder {
 }
 body.theme-basic select option {
   background-color: #ffffff !important;
-  color: #23313f !important;
+  color: #14232f !important;
 }
 
 /* ── Numeric values — mono, no glow ──────────────────────────── */
 
 body.theme-basic .tabular-nums,
 body.theme-basic .mx-glow {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace !important;
   animation: none !important;
   text-shadow: none !important;
 }
@@ -297,7 +308,7 @@ body.theme-basic .mx-glow {
 /* ── Headings — deep navy ────────────────────────────────────── */
 
 body.theme-basic h1, body.theme-basic h2, body.theme-basic h3 {
-  color: #1a3a5c !important;
+  color: #14232f !important;
   text-shadow: none !important;
 }
 
@@ -321,7 +332,7 @@ body.theme-basic .custom-scrollbar::-webkit-scrollbar-thumb { background: #a0aec
 
 /* VANCOMYZER title — muted slate blue matching screenshot 3 */
 body.theme-basic .vancomyzer-title {
-  color: #355c7d !important;
+  color: #1f5e96 !important;
   text-shadow: none !important;
   letter-spacing: 5px !important;
 }
@@ -329,12 +340,12 @@ body.theme-basic .vancomyzer-title {
 /* Dōsys brand — dark text with teal ō accent. The .dosys-d class is now
    only applied to the ō glyph; the D and the rest stay parent-colored. */
 body.theme-basic .dosys-brand {
-  color: #23313f !important;
+  color: #14232f !important;
   letter-spacing: 1px !important;
   font-weight: 700 !important;
 }
 body.theme-basic .dosys-d {
-  color: #355c7d !important;
+  color: #1f5e96 !important;
 }
 
 /* ── Range slider — clinical blue ────────────────────────────── */
@@ -344,19 +355,19 @@ body.theme-basic input[type='range'].mx-range-slider {
   border-color: #cbd5e0 !important;
 }
 body.theme-basic input[type='range'].mx-range-slider::-webkit-slider-thumb {
-  background: #355c7d !important;
-  border-color: #355c7d !important;
+  background: #1f5e96 !important;
+  border-color: #1f5e96 !important;
   box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
 }
 body.theme-basic input[type='range'].mx-range-slider::-moz-range-thumb {
-  background: #355c7d !important;
-  border-color: #355c7d !important;
+  background: #1f5e96 !important;
+  border-color: #1f5e96 !important;
 }
 body.theme-basic input[type='range'].mx-range-slider::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #cbd5e0, #355c7d) !important;
+  background: linear-gradient(to right, #cbd5e0, #1f5e96) !important;
 }
 body.theme-basic input[type='range'].mx-range-slider::-moz-range-track {
-  background: linear-gradient(to right, #cbd5e0, #355c7d) !important;
+  background: linear-gradient(to right, #cbd5e0, #1f5e96) !important;
 }
 
 /* ── Basic theme: clinical warning/status color overrides ────── */
@@ -396,10 +407,10 @@ body.theme-basic .border-red-300  { border-color: #fca5a5 !important; }
 body.theme-basic .border-red-500  { border-color: #ef4444 !important; }
 
 /* Blue/info — deep blue text on light blue bg */
-body.theme-basic .text-blue-950  { color: #1e3a5f !important; }
-body.theme-basic .text-blue-900  { color: #1e3a5f !important; }
-body.theme-basic .text-blue-800  { color: #355c7d !important; }
-body.theme-basic .text-blue-700  { color: #355c7d !important; }
+body.theme-basic .text-blue-950  { color: #14232f !important; }
+body.theme-basic .text-blue-900  { color: #14232f !important; }
+body.theme-basic .text-blue-800  { color: #1f5e96 !important; }
+body.theme-basic .text-blue-700  { color: #1f5e96 !important; }
 body.theme-basic .text-blue-600  { color: #3182ce !important; }
 body.theme-basic .bg-blue-50     { background-color: #ebf8ff !important; }
 body.theme-basic .bg-blue-100    { background-color: #bee3f8 !important; }
@@ -407,12 +418,12 @@ body.theme-basic .border-blue-200 { border-color: #90cdf4 !important; }
 body.theme-basic .border-blue-300 { border-color: #63b3ed !important; }
 
 /* Slate/gray — proper dark text on white panels */
-body.theme-basic .text-slate-950 { color: #23313f !important; }
-body.theme-basic .text-slate-900 { color: #23313f !important; }
+body.theme-basic .text-slate-950 { color: #14232f !important; }
+body.theme-basic .text-slate-900 { color: #14232f !important; }
 body.theme-basic .text-slate-800 { color: #2d3748 !important; }
-body.theme-basic .text-slate-700 { color: #52616f !important; }
-body.theme-basic .text-slate-600 { color: #52616f !important; }
-body.theme-basic .text-slate-500 { color: #52616f !important; }
+body.theme-basic .text-slate-700 { color: #4a5a68 !important; }
+body.theme-basic .text-slate-600 { color: #4a5a68 !important; }
+body.theme-basic .text-slate-500 { color: #4a5a68 !important; }
 body.theme-basic .text-slate-400 { color: #a0aec0 !important; }
 body.theme-basic .bg-white       { background-color: #ffffff !important; }
 body.theme-basic .bg-slate-50    { background-color: #f7fafc !important; }
@@ -436,23 +447,23 @@ body.theme-basic .bg-violet-50     { background-color: #f5f3ff !important; }
 body.theme-basic .border-violet-200 { border-color: #ddd6fe !important; }
 
 /* Gray — proper dark values for buttons, proper light for backgrounds */
-body.theme-basic .text-gray-900 { color: #23313f !important; }
+body.theme-basic .text-gray-900 { color: #14232f !important; }
 body.theme-basic .text-gray-800 { color: #2d3748 !important; }
-body.theme-basic .text-gray-700 { color: #52616f !important; }
-body.theme-basic .text-gray-600 { color: #52616f !important; }
-body.theme-basic .text-gray-500 { color: #52616f !important; }
-body.theme-basic .bg-gray-900   { background-color: #355c7d !important; }
-body.theme-basic .bg-gray-800   { background-color: #294b68 !important; }
+body.theme-basic .text-gray-700 { color: #4a5a68 !important; }
+body.theme-basic .text-gray-600 { color: #4a5a68 !important; }
+body.theme-basic .text-gray-500 { color: #4a5a68 !important; }
+body.theme-basic .bg-gray-900   { background-color: #1f5e96 !important; }
+body.theme-basic .bg-gray-800   { background-color: #184b78 !important; }
 body.theme-basic .bg-gray-50    { background-color: #f7fafc !important; }
 body.theme-basic .bg-gray-100   { background-color: #edf2f7 !important; }
-body.theme-basic .hover\:bg-gray-800:hover { background-color: #294b68 !important; }
+body.theme-basic .hover\:bg-gray-800:hover { background-color: #184b78 !important; }
 body.theme-basic .border-gray-200 { border-color: #e2e8f0 !important; }
 body.theme-basic .border-gray-300 { border-color: #cbd5e0 !important; }
-body.theme-basic .focus-visible\:ring-gray-900 { --tw-ring-color: #355c7d !important; }
+body.theme-basic .focus-visible\:ring-gray-900 { --tw-ring-color: #1f5e96 !important; }
 
 /* Slate dark — buttons need dark navy in Basic */
-body.theme-basic .bg-slate-950  { background-color: #355c7d !important; }
-body.theme-basic .hover\:bg-slate-800:hover { background-color: #294b68 !important; }
+body.theme-basic .bg-slate-950  { background-color: #1f5e96 !important; }
+body.theme-basic .hover\:bg-slate-800:hover { background-color: #184b78 !important; }
 
 /* ── Shimmer border — green highlight traveling around the border ── */
 
@@ -657,11 +668,11 @@ input, select, textarea {
 body.theme-basic input,
 body.theme-basic select,
 body.theme-basic textarea {
-  color: #23313f !important;
+  color: #14232f !important;
   background-color: #ffffff !important;
   border-color: #a0aec0 !important;
-  caret-color: #23313f !important;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  caret-color: #14232f !important;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace !important;
 }
 input::placeholder, textarea::placeholder {
   color: var(--color-dim) !important;
@@ -714,6 +725,11 @@ input[type='number'] { -moz-appearance: textfield; }
 .text-gray-700    { color: var(--color-secondary) !important; }
 .text-gray-600    { color: var(--color-secondary) !important; }
 .text-gray-500    { color: var(--color-dim) !important; }
+/* Visible keyboard focus everywhere (inputs keep their ring, set above). */
+body.theme-basic a:focus-visible, body.theme-basic button:focus-visible, body.theme-basic [tabindex]:focus-visible, body.theme-basic summary:focus-visible {
+  outline: 3px solid #b45309 !important;
+  outline-offset: 3px !important;
+}
 .text-gray-400    { color: var(--color-dim) !important; }
 .border-gray-50   { border-color: var(--color-border) !important; }
 .border-gray-100  { border-color: var(--color-border) !important; }
@@ -771,7 +787,7 @@ input[type='range'].mx-range-slider:focus {
 }
 
 /* ── Marketing manifesto: light text on dark sections ─────────────
-   The basic-theme body cascade `color: #23313f !important` beats
+   The basic-theme body cascade `color: #14232f !important` beats
    inline white styles, so dark hero/CTA sections render unreadable.
    Mark those sections with `.manifesto-dark` and let the heading +
    paragraph colors actually be light, as designed. */
@@ -787,14 +803,14 @@ body.theme-basic .manifesto-dark ul {
 }
 /* Default text-style links in dark sections render teal. */
 body.theme-basic .manifesto-dark a {
-  color: #355c7d !important;
+  color: #1f5e96 !important;
 }
 
 /* Primary CTA on dark sections — pale blue background, dark text. Higher specificity
    (one extra class) wins over the default-link rule above. Forcing
    background-color too so the visual doesn't depend on inline style. */
 body.theme-basic .manifesto-dark a.cta-primary {
-  color: #23313f !important;
+  color: #14232f !important;
   background-color: #d9eaf7 !important;
 }
 
@@ -960,28 +976,34 @@ body.theme-basic .manifesto-dark a.cta-outline {
   border: 1px solid #a0aec0;
   border-radius: 4px;
   background: #fff;
-  color: #23313f;
+  color: #14232f;
   font-variant-numeric: tabular-nums;
 }
 .vz-input[aria-invalid="true"] { border-color: #dc2626 !important; box-shadow: 0 0 0 1px #dc2626 !important; }
 
 /* Segmented control */
-.vz-seg { display: inline-flex; border: 1px solid #c5cdd8; border-radius: 4px; overflow: hidden; }
+.vz-seg { display: inline-flex; border: 1px solid #cbd6e0; border-radius: 4px; overflow: hidden; }
 .vz-seg > button {
   padding: 5px 12px;
   font-size: 12px;
   font-weight: 600;
   background: #fff;
-  color: #52616f;
+  color: #4a5a68;
   border: 0;
-  border-right: 1px solid #c5cdd8;
+  border-right: 1px solid #cbd6e0;
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
 }
 .vz-seg > button:last-child { border-right: 0; }
-.vz-seg > button[aria-pressed="true"] { background: #355c7d; color: #fff; }
+.vz-seg > button[aria-pressed="true"] { background: #1f5e96; color: #fff; }
 .vz-seg > button:hover:not([aria-pressed="true"]) { background: #edf2f7; }
-.vz-seg > button:focus-visible { outline: 2px solid #355c7d; outline-offset: -2px; }
+.vz-seg > button:focus-visible { outline: 3px solid #b45309; outline-offset: -3px; }
+/* These controls clip outside outlines. The white inner rim also keeps focus
+   visible when a selected button has a blue or red background. */
+body.theme-basic .vz-seg > button:focus-visible {
+  outline-offset: -3px !important;
+  box-shadow: inset 0 0 0 5px #ffffff;
+}
 
 /* Advisory rows — severity by border + icon + label, never color alone */
 .vz-advisory {
@@ -993,7 +1015,7 @@ body.theme-basic .manifesto-dark a.cta-outline {
   line-height: 1.45;
   min-width: 0;
 }
-.vz-advisory--info    { border-color: #90cdf4; border-left-color: #355c7d; background: #ebf8ff; color: #1e3a5f; }
+.vz-advisory--info    { border-color: #90cdf4; border-left-color: #1f5e96; background: #ebf8ff; color: #14232f; }
 .vz-advisory--caution { border-color: #fcd34d; border-left-color: #d97706; background: #fffbeb; color: #78350f; }
 .vz-advisory--warning { border-color: #fca5a5; border-left-color: #dc2626; background: #fef2f2; color: #7f1d1d; }
 .vz-advisory--success { border-color: #6ee7b7; border-left-color: #059669; background: #ecfdf5; color: #064e3b; }
@@ -1028,7 +1050,7 @@ body.theme-basic .manifesto-dark a.cta-outline {
 .vz-chip--ok      { background: #ecfdf5; border-color: #6ee7b7; color: #047857; }
 .vz-chip--caution { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
 .vz-chip--warn    { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
-.vz-chip--neutral { background: #edf2f7; border-color: #cbd5e0; color: #52616f; }
+.vz-chip--neutral { background: #edf2f7; border-color: #cbd5e0; color: #4a5a68; }
 
 /* Comparison table */
 .vz-table { width: 100%; border-collapse: collapse; font-size: 11.5px; table-layout: auto; }
@@ -1049,8 +1071,10 @@ body.theme-basic .manifesto-dark a.cta-outline {
 .vz-table tr[role="radio"] { cursor: pointer; }
 .vz-table tr[role="radio"]:hover td { background: #edf2f7; }
 .vz-table tr[role="radio"][aria-checked="true"] td { background: #dbeafe; font-weight: 600; }
-.vz-table tr[role="radio"][aria-checked="true"] td:first-child { box-shadow: inset 3px 0 0 #355c7d; }
-.vz-table tr[role="radio"]:focus-visible { outline: 2px solid #355c7d; outline-offset: -2px; }
+.vz-table tr[role="radio"][aria-checked="true"] td:first-child { box-shadow: inset 3px 0 0 #1f5e96; }
+.vz-table tr[role="radio"]:focus-visible { outline: 3px solid #b45309; outline-offset: -3px; }
+body.theme-basic .vz-table tr[role="radio"]:focus-visible { outline-offset: -3px !important; }
+body.theme-basic .vz-table th, body.theme-basic .vz-table td { border-radius: 0 !important; }
 
 /* Detail tabs */
 .vz-tabs { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 1px solid var(--color-border); background: var(--color-highlight); }
@@ -1068,7 +1092,8 @@ body.theme-basic .manifesto-dark a.cta-outline {
   white-space: nowrap;
 }
 .vz-tabs > button[aria-selected="true"] { color: var(--color-primary); border-bottom-color: var(--color-primary); background: var(--color-card); }
-.vz-tabs > button:focus-visible { outline: 2px solid #355c7d; outline-offset: -2px; }
+.vz-tabs > button:focus-visible { outline: 3px solid #b45309; outline-offset: -3px; }
+body.theme-basic .vz-tabs > button:focus-visible { outline-offset: -3px !important; }
 
 /* Key/value list for PK & method details */
 .vz-kv { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; row-gap: 3px; font-size: 12px; }
@@ -1091,7 +1116,7 @@ body.theme-basic .manifesto-dark a.cta-outline {
 body.theme-basic .manifesto-dark .synthetic-example p { color: #334155 !important; }
 
 /* Approved Palette A, shared with Dosys Health. Clinical status colors unchanged. */
-:root { --brand-primary: #355c7d; --brand-ink: #23313f; --brand-paper: #eaf2f8; --brand-muted: #52616f; }
+:root { --brand-primary: #1f5e96; --brand-ink: #14232f; --brand-paper: #f7f9fb; --brand-muted: #4a5a68; --brand-frame: #e6eef5; }
 body.theme-basic .brand-light { background: var(--brand-paper) !important; }
 body.theme-basic .brand-light h1, body.theme-basic .brand-light h2,
 body.theme-basic .brand-light h3 { color: var(--brand-ink) !important; }
@@ -1101,13 +1126,37 @@ body.theme-basic .brand-light a.cta-primary, body.theme-basic .brand-light a.cta
 body.theme-basic .brand-light a.cta-primary { background: var(--brand-primary) !important; }
 body.theme-basic .brand-light a.cta-outline { color: var(--brand-primary) !important; border-color: var(--brand-primary) !important; background: transparent !important; }
 
-body.theme-basic header[class*="shrink-0"] .dosys-d { color: #c6dcee !important; }
+body.theme-basic header[class*="shrink-0"] .dosys-d { color: #1f5e96 !important; }
 body.theme-basic .manifesto-dark a { color: #c6dcee !important; }
 
 /* Context-specific button pairs: never steel-blue text on dark surfaces. */
-body.theme-basic .evidence-action { background: #355c7d !important; color: #fff !important; border-color: #355c7d !important; }
-body.theme-basic .evidence-action:hover { background: #294b68 !important; }
+body.theme-basic .evidence-action { background: #1f5e96 !important; color: #fff !important; border-color: #1f5e96 !important; }
+body.theme-basic .evidence-action:hover { background: #184b78 !important; }
 body.theme-basic .manifesto-dark .cta-primary:hover { background: #edf5fc !important; }
-body.theme-basic .manifesto-dark .cta-primary span { color: #23313f !important; }
+body.theme-basic .manifesto-dark .cta-primary span { color: #14232f !important; }
 body.theme-basic .manifesto-dark > div > span { color: #c6dcee !important; }
-body.theme-basic #app-root > header { background: #dce9f3 !important; }
+body.theme-basic #app-root > header { background: #f7f9fb !important; }
+
+/* ── Direction A marketing pages (Sep 2026) ───────────────────
+   Record-style sections: a margin column for the section label, content to
+   the right. Serif display type on marketing pages only (the calculator
+   keeps its sans headings). Tokens follow src/contexts/MatrixSettingsContext. */
+body.theme-basic .vz-serif { font-family: 'Newsreader', Georgia, 'Times New Roman', serif !important; font-weight: 500 !important; letter-spacing: -0.01em; text-wrap: balance; }
+.vz-record { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 32px; }
+@media (max-width: 820px) { .vz-record { grid-template-columns: minmax(0, 1fr); gap: 12px; } }
+.vz-site-frame { background: var(--color-bg, #f7f9fb); }
+@media (min-width: 641px) { .vz-site-frame { margin: 12px; min-height: calc(100vh - 24px); border: 1px solid #d6e3ef; } body.theme-basic { background: #e6eef5 !important; } }
+body.theme-basic .vz-mbtn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 18px; font-size: 15px; font-weight: 600; line-height: 1.2; border: 1px solid transparent; border-radius: 3px !important; cursor: pointer; text-decoration: none; transition: background-color .15s, border-color .15s, color .15s; }
+body.theme-basic .vz-mbtn--primary { background: #1f5e96 !important; color: #ffffff !important; border-color: #1f5e96 !important; }
+body.theme-basic .vz-mbtn--primary:hover { background: #184b78 !important; border-color: #184b78 !important; }
+body.theme-basic .vz-mbtn--outline { background: #ffffff !important; color: #14232f !important; border-color: #546471 !important; }
+body.theme-basic .vz-mbtn--outline:hover { border-color: #14232f !important; background: #e6eef5 !important; }
+body.theme-basic .vz-mbtn:focus-visible { outline: 3px solid #b45309 !important; outline-offset: 3px !important; }
+body.theme-basic .vz-ledger { width: 100%; border-collapse: collapse; background: #ffffff; border: 1px solid #cbd6e0; font-size: 15px; }
+body.theme-basic .vz-ledger th, body.theme-basic .vz-ledger td { text-align: left; padding: 14px 16px; border-bottom: 1px solid #cbd6e0; vertical-align: top; border-radius: 0 !important; }
+body.theme-basic .vz-ledger th { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #546471; font-weight: 600; }
+body.theme-basic .vz-ledger tr:last-child td { border-bottom: 0; }
+body.theme-basic .vz-mchip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; padding: 3px 9px; border: 1px solid transparent; border-radius: 3px !important; white-space: nowrap; }
+body.theme-basic .vz-mchip--ok { background: #e7f3ec; color: #1e6b3e !important; border-color: rgba(30,107,62,.3); }
+body.theme-basic .vz-mchip--warn { background: #fbf1dc; color: #7a4e00 !important; border-color: rgba(122,78,0,.3); }
+body.theme-basic .vz-mchip--crit { background: #fce9e9; color: #a32d2d !important; border-color: rgba(163,45,45,.3); }

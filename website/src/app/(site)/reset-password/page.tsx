@@ -53,7 +53,7 @@ function ResetPasswordForm() {
 
   const inputStyle = {
     width: "100%", padding: "10px 12px", fontSize: 14,
-    border: "1px solid #a0aec0", background: "#ffffff", color: "#1a202c",
+    border: "1px solid #a0aec0", background: "#ffffff", color: "#14232f",
     boxSizing: "border-box" as const, borderRadius: 4,
   };
 
@@ -69,7 +69,7 @@ function ResetPasswordForm() {
           <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 12px" }}>
             <img src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
           </a>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1e4d8c", margin: 0 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1f5e96", margin: 0 }}>
             {token ? "Set New Password" : "Forgot Password"}
           </h1>
         </div>
@@ -88,20 +88,20 @@ function ResetPasswordForm() {
             <p style={{ fontSize: 13, color: "#4a5568", marginTop: 8, lineHeight: 1.6 }}>
               If an account with that email exists, you will receive a password reset link. Check your inbox (and spam folder).
             </p>
-            <Link href="/login" style={{ display: "inline-block", marginTop: 20, fontSize: 13, color: "#1e4d8c", fontWeight: 600, textDecoration: "none" }}>
-              ← Back to Sign In
+            <Link href="/login" style={{ display: "inline-block", marginTop: 20, fontSize: 13, color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}>
+               Back to Sign In
             </Link>
           </div>
         )}
 
         {success && (
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
+            <div style={{ fontSize: 40, marginBottom: 12 }}></div>
             <p style={{ fontSize: 14, color: "#047857", fontWeight: 600 }}>Password reset successfully!</p>
             <p style={{ fontSize: 13, color: "#4a5568", marginTop: 8 }}>You can now sign in with your new password.</p>
             <Link href="/login" style={{
               display: "inline-block", marginTop: 16, padding: "10px 24px",
-              background: "#1e4d8c", color: "#ffffff", textDecoration: "none",
+              background: "#1f5e96", color: "#ffffff", textDecoration: "none",
               fontWeight: 600, fontSize: 14, borderRadius: 4,
             }}>
               Sign In
@@ -124,13 +124,13 @@ function ResetPasswordForm() {
             </div>
             <button type="submit" disabled={loading} style={{
               width: "100%", padding: 12, fontSize: 14, fontWeight: 600,
-              background: "#1e4d8c", color: "#ffffff", border: "none",
+              background: "#1f5e96", color: "#ffffff", border: "none",
               cursor: loading ? "wait" : "pointer", opacity: loading ? 0.7 : 1, borderRadius: 4,
             }}>
               {loading ? "Sending..." : "Send Reset Link"}
             </button>
-            <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#718096" }}>
-              <Link href="/login" style={{ color: "#1e4d8c", fontWeight: 600, textDecoration: "none" }}>← Back to Sign In</Link>
+            <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#546471" }}>
+              <Link href="/login" style={{ color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}> Back to Sign In</Link>
             </p>
           </form>
         )}
@@ -154,7 +154,7 @@ function ResetPasswordForm() {
             </div>
             <button type="submit" disabled={loading} style={{
               width: "100%", padding: 12, fontSize: 14, fontWeight: 600,
-              background: "#1e4d8c", color: "#ffffff", border: "none",
+              background: "#1f5e96", color: "#ffffff", border: "none",
               cursor: loading ? "wait" : "pointer", opacity: loading ? 0.7 : 1, borderRadius: 4,
             }}>
               {loading ? "Resetting..." : "Reset Password"}

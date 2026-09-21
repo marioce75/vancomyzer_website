@@ -112,7 +112,7 @@ function formatDate(): string {
 export function generateReportHTML(data: ReportData, tier: string = "free"): string {
   const now = formatDate();
   const modeLabel = data.mode === "initial_regimen" ? "Initial Regimen (Prior-Based)" : "Existing Regimen (Bayesian)";
-  const posteriorLabel = data.pk_parameters?.used_posterior_refinement ? "Posterior-updated" : "Population prior only";
+  const posteriorLabel = data.pk_parameters?.used_posterior_refinement ? "Posterior-updated" : "Patient characteristics only";
   const watermark = buildExportWatermark(tier);
 
   const freqRows = (data.frequency_options ?? []).map(o =>

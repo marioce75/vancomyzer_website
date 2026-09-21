@@ -173,7 +173,7 @@ function PendingCard({
           className="inline-block rounded border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
           download
         >
-          Download customer-signed PDF ↓
+          Download customer-signed PDF
         </a>
         <span className="text-xs text-gray-500">
           Countersign it externally, then upload the fully-executed PDF below.

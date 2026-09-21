@@ -31,7 +31,7 @@ const DAILY_DOSE_MG = 4500;
 export const SMIT_2020_MORBIDLY_OBESE: PublishedCase = {
   id: "smit-2020-morbidly-obese",
   what_it_tests:
-    `${SMIT_2020.shortName}'s typical clearance at 130 kg (5.72 × (130/70)^0.535 = ${SMIT_CL_L_H.toFixed(2)} L/h) and the AUC₂₄ it implies at 2250 mg every 12 h, next to the engine's ${COLIN_2019.shortName} values for the same inputs.`,
+    `${SMIT_2020.shortName}'s typical clearance at 130 kg (5.72 × (130/70)^0.535 = ${SMIT_CL_L_H.toFixed(2)} L/h) and the AUC₂₄ it implies at 2250 mg every 12 h, next to the calculator's ${COLIN_2019.shortName} values for the same inputs.`,
   source: {
     citation: SMIT_2020.citation,
     doi: SMIT_2020.doi,

@@ -60,7 +60,7 @@ export interface DisclaimerSection {
 export const SECTIONS: readonly DisclaimerSection[] = [
   {
     heading: "INTENDED USE",
-    body: `D\u014Dsys\u2122 provides Vancomyzer\u2122 \u2014 a Vancomycin Dosage Calculator using Bayesian modeling and pharmacokinetics \u2014 to support the care of patients with bacterial infections. Vancomyzer is intended for licensed healthcare professionals. The core calculator is free permanently. Paid plans (Individual Pro and Hospital Site) add account features such as calculation history, team administration and audit logs; during the launch period, PDF export, clinical-note copy and result interpretation are free for everyone. The pharmacokinetic model, equations, and clinical safety guardrails are identical across all plans.
+    body: `D\u014Dsys\u2122 provides Vancomyzer\u2122 \u2014 a Vancomycin Dosage Calculator using Bayesian modeling and pharmacokinetics \u2014 to support the care of patients with bacterial infections. Vancomyzer is intended for licensed healthcare professionals. The core calculator is free permanently. Paid plans (Individual Pro and Hospital Site) add account features such as calculation history, team administration and audit logs; during the launch period, PDF export, clinical-note copy and result interpretation are free for everyone. The pharmacokinetic model, equations, and clinical safety checks are identical across all plans.
 
 D\u014Dsys\u2122 makes no representations or warranties regarding the accuracy, quality, completeness, timeliness, appropriateness, or suitability of this tool. D\u014Dsys\u2122 assumes no obligation to update the tool or advise on further developments concerning vancomycin dosage. Medical information changes rapidly. YOU AS THE USER (\u201CUSER\u201D) ACKNOWLEDGE THAT THE TOOL IS PROVIDED ON AN \u201CAS IS\u201D BASIS AND THAT ANY USE OF OR RELIANCE ON THE TOOL SHALL BE AT YOUR SOLE RISK.`,
   },
@@ -156,7 +156,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
               fontSize: 14,
               fontWeight: 700,
               letterSpacing: "0.12em",
-              color: "#00d4aa",
+              color: "#1f5e96",
               ...FONT,
             }}
           >
@@ -166,7 +166,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
             type="button"
             onClick={onClose}
             style={{
-              background: "#1e4d8c",
+              background: "#1f5e96",
               border: "none",
               color: "#ffffff",
               padding: "6px 16px",
@@ -190,7 +190,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
                   fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: "0.1em",
-                  color: "#00d4aa",
+                  color: "#1f5e96",
                   marginBottom: 8,
                   ...FONT,
                 }}
@@ -215,7 +215,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
           <p
             style={{
               fontSize: 11,
-              color: "#718096",
+              color: "#546471",
               textAlign: "center",
               marginTop: 16,
               ...FONT,

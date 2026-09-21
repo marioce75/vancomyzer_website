@@ -114,7 +114,7 @@ export default function ReferralCard() {
             minWidth: 110,
           }}
         >
-          {copied ? "✓ Copied!" : "Copy link"}
+          {copied ? "Copied!" : "Copy link"}
         </button>
       </div>
 

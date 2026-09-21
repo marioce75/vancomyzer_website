@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://vancomyzer.com"),
   title: "VANCOMYZER\u2122",
   description:
-    "Vancomycin dosing support with visible assumptions, review-critical limitations, and clinician-readable outputs.",
+    "Vancomycin dosing estimates for adults, with model assumptions, limitations and references.",
   icons: {
     icon: { url: "/favicon.svg", type: "image/svg+xml" },
     apple: "/favicon.svg",
@@ -34,7 +34,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
         <link
@@ -42,7 +42,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen flex flex-col antialiased" suppressHydrationWarning>
+      <body className="theme-basic min-h-screen flex flex-col antialiased" suppressHydrationWarning>
         <Providers>
           <div className="flex-1">{children}</div>
           <RegulatoryFooter />

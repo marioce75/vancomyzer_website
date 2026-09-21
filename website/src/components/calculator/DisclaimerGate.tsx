@@ -73,8 +73,9 @@ const PLACEHOLDER_STYLE = { minHeight: "100vh" } as const;
  *    0,2,0 or higher), which outranks those type/attribute-based overrides;
  *    `!important` is used only where the competing global rule has it.
  *  - :focus-visible, :hover, :disabled and media queries cannot be inline.
- * Colour contrast: body text, links, eyebrow (#355c7d) and muted text all meet
- * WCAG AA on their backgrounds; the teal focus ring (#355c7d) is >= 3:1.
+ * Colour contrast: body text, links, eyebrow (#1f5e96) and muted text all meet
+ * WCAG AA on their backgrounds; the amber focus ring (#b45309) is >= 3:1.
+ * Tokens follow the Direction A identity (Sep 2026).
  */
 const GATE_CSS = `
 .vmz-gate {
@@ -123,7 +124,7 @@ const GATE_CSS = `
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #355c7d;
+  color: #1f5e96;
 }
 .vmz-gate .vmz-gate-title {
   margin: 0;
@@ -155,7 +156,7 @@ const GATE_CSS = `
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1.4;
-  color: #1e4d8c !important;
+  color: #1f5e96 !important;
 }
 .vmz-gate .vmz-gate-section-text {
   margin: 0;
@@ -193,17 +194,17 @@ const GATE_CSS = `
 }
 .vmz-gate .vmz-gate-consent:hover,
 .vmz-gate .vmz-gate-consent-checked {
-  border-color: #1e4d8c;
+  border-color: #1f5e96;
 }
 .vmz-gate .vmz-gate-consent-checked {
-  background: #eff6ff;
+  background: #e6eef5;
 }
 .vmz-gate .vmz-gate-checkbox {
   flex: none;
   width: 18px;
   height: 18px;
   margin: 2px 0 0;
-  accent-color: #1e4d8c;
+  accent-color: #1f5e96;
   cursor: pointer;
 }
 .vmz-gate .vmz-gate-checkbox:focus {
@@ -241,28 +242,40 @@ const GATE_CSS = `
   border-color: #94a3b8;
 }
 .vmz-gate .vmz-gate-btn-primary {
-  background: #1e4d8c;
-  border-color: #1e4d8c;
+  background: #1f5e96;
+  border-color: #1f5e96;
   color: #ffffff;
 }
 .vmz-gate .vmz-gate-btn-primary:hover:not(:disabled) {
-  background: #173d70;
-  border-color: #173d70;
+  background: #184b78;
+  border-color: #184b78;
 }
+/* Pending state: the button is disabled until the attestation is ticked. It
+   must still read as a real control with a reason, so the text keeps >= 4.5:1
+   (#3f4f5d on #e6eef5 = 6.9:1), the border stays visible, and a hint beside
+   the buttons says what unlocks it. */
 .vmz-gate .vmz-gate-btn-primary:disabled {
-  background: #e2e8f0;
-  border-color: #cbd5e1;
-  color: #64748b;
+  background: #e6eef5;
+  border-color: #b9c6d2;
+  color: #3f4f5d;
   cursor: not-allowed;
 }
+.vmz-gate .vmz-gate-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #7a4e00;
+}
+.vmz-gate .vmz-gate-hint[hidden] { display: none; }
 .vmz-gate .vmz-gate-btn:focus-visible,
 .vmz-gate .vmz-gate-checkbox:focus-visible,
 .vmz-gate .vmz-gate-body a:focus-visible {
-  outline: 3px solid #355c7d !important;
+  outline: 3px solid #b45309 !important;
   outline-offset: 2px !important;
 }
 .vmz-gate .vmz-gate-body:focus-visible {
-  outline: 3px solid #355c7d !important;
+  outline: 3px solid #b45309 !important;
   outline-offset: -3px;
 }
 @media (max-width: 520px) {
@@ -322,6 +335,7 @@ function DisclaimerAcceptanceDialog({ onAccept }: { onAccept: () => void }) {
   const idBase = useId();
   const titleId = `${idBase}-title`;
   const introId = `${idBase}-intro`;
+  const hintId = `${idBase}-hint`;
 
   const handleExit = useCallback(() => {
     if (leavingRef.current) return; // ignore repeat clicks while navigating
@@ -459,6 +473,9 @@ function DisclaimerAcceptanceDialog({ onAccept }: { onAccept: () => void }) {
             <span>{ATTESTATION_TEXT}</span>
           </label>
           <div className="vmz-gate-actions">
+            <p id={hintId} className="vmz-gate-hint" hidden={agreed} aria-live="polite">
+              Tick the box above to enable &ldquo;Accept and continue&rdquo;.
+            </p>
             <button type="button" className="vmz-gate-btn vmz-gate-btn-secondary" onClick={handleExit}>
               Exit
             </button>
@@ -467,6 +484,7 @@ function DisclaimerAcceptanceDialog({ onAccept }: { onAccept: () => void }) {
               className="vmz-gate-btn vmz-gate-btn-primary"
               onClick={onAccept}
               disabled={!agreed}
+              aria-describedby={agreed ? undefined : hintId}
             >
               Accept and continue
             </button>

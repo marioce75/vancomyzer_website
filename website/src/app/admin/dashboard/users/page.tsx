@@ -552,7 +552,7 @@ function ColumnHeader({ label, sortKey, currentSort, onSort }: { label: string; 
         className={`flex items-center gap-1 ${active ? "text-blue-700" : "text-gray-500 hover:text-gray-700"}`}
       >
         {label}
-        {active && <span>↓</span>}
+        {active && <span className="text-xs">Sorted</span>}
       </button>
     </th>
   );
@@ -828,7 +828,7 @@ function Pagination({
           onClick={() => onChange(page - 1)}
           className="px-2 py-1 border border-gray-200 rounded disabled:opacity-40 hover:bg-gray-50"
         >
-          ← Prev
+           Prev
         </button>
         <button
           type="button"
@@ -836,7 +836,7 @@ function Pagination({
           onClick={() => onChange(page + 1)}
           className="px-2 py-1 border border-gray-200 rounded disabled:opacity-40 hover:bg-gray-50"
         >
-          Next →
+          Next
         </button>
       </div>
     </div>

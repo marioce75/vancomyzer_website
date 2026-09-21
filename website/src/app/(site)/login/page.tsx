@@ -123,10 +123,10 @@ function LoginForm() {
         borderRadius: 8,
       }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1e4d8c", margin: 0 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1f5e96", margin: 0 }}>
             Sign in to Vancomyzer
           </h1>
-          <p style={{ fontSize: 13, color: "#718096", marginTop: 6 }}>
+          <p style={{ fontSize: 13, color: "#546471", marginTop: 6 }}>
             Clinical decision support for vancomycin dosing
           </p>
         </div>
@@ -142,10 +142,11 @@ function LoginForm() {
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>
+            <label htmlFor="login-username" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>
               Username or Email
             </label>
             <input
+              id="login-username"
               type="text"
               value={username}
               onChange={e => setUsername(e.target.value)}
@@ -153,18 +154,19 @@ function LoginForm() {
               autoComplete="username"
               style={{
                 width: "100%", padding: "10px 12px", fontSize: 14,
-                border: "1px solid #a0aec0", background: "#ffffff", color: "#1a202c",
+                border: "1px solid #a0aec0", background: "#ffffff", color: "#14232f",
                 boxSizing: "border-box", borderRadius: 4,
               }}
             />
           </div>
 
           <div style={{ marginBottom: 20 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>
+            <label htmlFor="login-password" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>
               Password
             </label>
             <div style={{ position: "relative" }}>
               <input
+              id="login-password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -172,7 +174,7 @@ function LoginForm() {
                 autoComplete="current-password"
                 style={{
                   width: "100%", padding: "10px 12px", paddingRight: 60, fontSize: 14,
-                  border: "1px solid #a0aec0", background: "#ffffff", color: "#1a202c",
+                  border: "1px solid #a0aec0", background: "#ffffff", color: "#14232f",
                   boxSizing: "border-box", borderRadius: 4,
                 }}
               />
@@ -181,7 +183,7 @@ function LoginForm() {
                 onClick={() => setShowPassword(!showPassword)}
                 style={{
                   position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-                  background: "none", border: "none", color: "#718096", cursor: "pointer", fontSize: 12,
+                  background: "none", border: "none", color: "#546471", cursor: "pointer", fontSize: 12,
                 }}
               >
                 {showPassword ? "HIDE" : "SHOW"}
@@ -194,7 +196,7 @@ function LoginForm() {
             disabled={loading}
             style={{
               width: "100%", padding: "12px", fontSize: 14, fontWeight: 600,
-              background: "#1e4d8c", color: "#ffffff", border: "none",
+              background: "#1f5e96", color: "#ffffff", border: "none",
               cursor: loading ? "wait" : "pointer", opacity: loading ? 0.7 : 1,
               borderRadius: 4,
             }}
@@ -207,7 +209,7 @@ function LoginForm() {
           <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: 0 }} />
           <span style={{
             position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",
-            background: "#ffffff", padding: "0 12px", fontSize: 11, color: "#718096", letterSpacing: "0.05em",
+            background: "#ffffff", padding: "0 12px", fontSize: 11, color: "#546471", letterSpacing: "0.05em",
           }}>OR</span>
         </div>
 
@@ -233,7 +235,7 @@ function LoginForm() {
               placeholder="you@hospital.org"
               style={{
                 width: "100%", padding: "10px 12px", fontSize: 14, marginBottom: 10,
-                border: "1px solid #a0aec0", background: "#ffffff", color: "#1a202c",
+                border: "1px solid #a0aec0", background: "#ffffff", color: "#14232f",
                 boxSizing: "border-box", borderRadius: 4,
               }}
             />
@@ -242,7 +244,7 @@ function LoginForm() {
               disabled={magicSending}
               style={{
                 width: "100%", padding: "10px", fontSize: 13, fontWeight: 600,
-                background: "#355c7d", color: "#ffffff", border: "none",
+                background: "#1f5e96", color: "#ffffff", border: "none",
                 cursor: magicSending ? "wait" : "pointer", opacity: magicSending ? 0.7 : 1,
                 borderRadius: 4,
               }}
@@ -256,7 +258,7 @@ function LoginForm() {
             onClick={() => setShowMagic(true)}
             style={{
               width: "100%", padding: "10px", fontSize: 13, fontWeight: 500,
-              background: "#ffffff", color: "#355c7d", border: "1px solid #355c7d",
+              background: "#ffffff", color: "#1f5e96", border: "1px solid #1f5e96",
               cursor: "pointer", borderRadius: 4,
             }}
           >
@@ -265,13 +267,13 @@ function LoginForm() {
         )}
 
         <p style={{ textAlign: "center", marginTop: 16, fontSize: 13 }}>
-          <Link href="/reset-password" style={{ color: "#718096", textDecoration: "none" }}>
+          <Link href="/reset-password" style={{ color: "#546471", textDecoration: "none" }}>
             Forgot password?
           </Link>
         </p>
-        <p style={{ textAlign: "center", marginTop: 8, fontSize: 13, color: "#718096" }}>
+        <p style={{ textAlign: "center", marginTop: 8, fontSize: 13, color: "#546471" }}>
           Don&apos;t have an account?{" "}
-          <Link href="/register" style={{ color: "#1e4d8c", textDecoration: "none", fontWeight: 600 }}>
+          <Link href="/register" style={{ color: "#1f5e96", textDecoration: "none", fontWeight: 600 }}>
             Register
           </Link>
         </p>

@@ -17,7 +17,7 @@ export function buildExistingRegimenReviewStatus(
       banner_body:
         "This result depends mainly on prior-model assumptions rather than measured-level refinement.",
       next_actions: [
-        "Confirm the workflow fits an adult intermittent-infusion use case.",
+        "Confirm the model suitabilitys an adult intermittent-infusion use case.",
         "Use measured levels when available for a more individualized fit.",
       ],
     };
@@ -55,7 +55,7 @@ export function buildExistingRegimenReviewStatus(
   return {
     level: "caution",
     workflow_fit: "single_level",
-    banner_title: "Review workflow fit before acting",
+    banner_title: "Review model suitability before acting",
     banner_body:
       "This result may be useful for review, but timing or data-quality limitations still need confirmation.",
     next_actions: [
@@ -69,11 +69,11 @@ export function buildInitialRegimenReviewStatus(): ReviewStatus {
   return {
     level: "prior_only",
     workflow_fit: "prior_only",
-    banner_title: "Prior-only maintenance suggestion",
+    banner_title: "Estimate without measured levels",
     banner_body:
       "This initial-regimen result is a prior-only maintenance suggestion without measured-level refinement.",
     next_actions: [
-      "Use this as first-pass maintenance support, not individualized certainty.",
+      "Use this as initial maintenance support, not individualized certainty.",
       "Reassess after measured levels are available.",
     ],
   };

@@ -139,7 +139,7 @@ function BillingPageInner() {
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px 80px" }}>
       <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
         <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-          ← Institutional Settings
+           Institutional Settings
         </Link>
         <span style={{ color: "var(--color-border)" }}>·</span>
         <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Billing</span>
@@ -258,7 +258,7 @@ function BillingPageInner() {
           <ul style={{ margin: "0 0 16px", padding: 0, listStyle: "none", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.7 }}>
             {TIERS.individual_pro.features.map(f => (
               <li key={f} style={{ paddingLeft: 18, position: "relative" }}>
-                <span style={{ position: "absolute", left: 0, color: "#355c7d", fontWeight: 700 }}>✓</span>
+
                 {f}
               </li>
             ))}

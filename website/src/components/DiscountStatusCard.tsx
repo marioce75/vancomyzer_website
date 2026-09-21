@@ -58,7 +58,7 @@ export default function DiscountStatusCard() {
         <header style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
           <h2 style={titleStyle}>{label} discount active 🎓</h2>
           <span style={{ ...badgeStyle, background: "#ecfdf5", color: "#047857", border: "1px solid #6ee7b7" }}>
-            ✓ Verified
+            Verified
           </span>
         </header>
         <p style={{ fontSize: 12, color: "var(--color-secondary)", lineHeight: 1.55, margin: 0 }}>

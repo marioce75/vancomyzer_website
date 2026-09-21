@@ -85,7 +85,7 @@ export async function sendDiscountDecisionEmail(args: {
     const body = args.approved
       ? `
         <div style="font-family: Arial, sans-serif; max-width: 520px;">
-          <h2 style="color: #047857; margin-bottom: 4px;">${typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1)} discount approved ✓</h2>
+          <h2 style="color: #047857; margin-bottom: 4px;">${typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1)} discount approved </h2>
           <p style="font-size: 14px; color: #2d3748;">Hello ${args.to_name},</p>
           <p style="font-size: 14px; color: #2d3748; line-height: 1.55;">
             Your Vancomyzer ${typeLabel} discount has been approved. The discount will be applied automatically the next time you start a Pro subscription — you'll see the reduced price at checkout.
@@ -169,7 +169,7 @@ export async function sendReferralConvertedEmail(args: {
       subject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 520px;">
-          <h2 style="color: #047857; margin-bottom: 4px;">A referral converted ✓</h2>
+          <h2 style="color: #047857; margin-bottom: 4px;">A referral converted </h2>
           <p style="font-size: 14px; color: #2d3748;">
             Hello ${args.referrer_full_name},
           </p>
@@ -219,7 +219,7 @@ export async function sendWelcomeEmail(user: {
       subject: "Welcome to Vancomyzer™ — your account is active",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 520px;">
-          <h2 style="color: #047857; margin-bottom: 4px;">Welcome to Vancomyzer™ ✓</h2>
+          <h2 style="color: #047857; margin-bottom: 4px;">Welcome to Vancomyzer™ </h2>
           <p style="font-size: 14px; color: #2d3748;">
             Hello ${user.full_name},
           </p>
@@ -245,7 +245,7 @@ export async function sendWelcomeEmail(user: {
             Useful next steps:
           </p>
           <ul style="font-size: 11px; color: #4a5568; padding-left: 20px; line-height: 1.55;">
-            <li><a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/transparent-dosing" style="color: #1e4d8c;">Read how the engine works</a> (Transparent Dosing manifesto)</li>
+            <li><a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/transparent-dosing" style="color: #1e4d8c;">Read how the calculator works</a> (Transparent Dosing manifesto)</li>
             <li><a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/transparent-dosing/cases" style="color: #1e4d8c;">See our Literature Reproducibility tests</a></li>
             <li><a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/calculator" style="color: #1e4d8c;">Run your first calculation</a></li>
           </ul>
@@ -281,7 +281,7 @@ export async function sendApprovalNotification(user: {
       subject: "Your Vancomyzer™ Account Has Been Approved",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 500px;">
-          <h2 style="color: #047857; margin-bottom: 4px;">Account Approved ✓</h2>
+          <h2 style="color: #047857; margin-bottom: 4px;">Account Approved </h2>
           <p style="font-size: 14px; color: #2d3748;">
             Hello ${user.full_name},
           </p>
@@ -465,7 +465,7 @@ export async function sendPilotWelcomeEmail(args: {
       subject: `Your Vancomyzer™ Hospital Pilot is Ready — ${args.hospitalName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 540px;">
-          <h2 style="color: #047857; margin-bottom: 4px;">Your Hospital Pilot is Ready ✓</h2>
+          <h2 style="color: #047857; margin-bottom: 4px;">Your Hospital Pilot is Ready </h2>
           <p style="font-size: 14px; color: #2d3748;">Hello ${escape(args.applicantName)},</p>
           <p style="font-size: 14px; color: #2d3748;">
             Your 90-day Vancomyzer™ pilot for <strong>${escape(args.hospitalName)}</strong> has been approved
@@ -532,7 +532,7 @@ export async function sendDepartmentWelcomeEmail(args: {
       subject: `Welcome to Vancomyzer™ Department — ${args.institutionName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 540px;">
-          <h2 style="color: #047857; margin-bottom: 4px;">Your Department is set up ✓</h2>
+          <h2 style="color: #047857; margin-bottom: 4px;">Your Department is set up </h2>
           <p style="font-size: 14px; color: #2d3748;">Hello ${escape(args.adminName)},</p>
           <p style="font-size: 14px; color: #2d3748;">
             Vancomyzer™ Department has been activated for <strong>${escape(args.institutionName)}</strong>

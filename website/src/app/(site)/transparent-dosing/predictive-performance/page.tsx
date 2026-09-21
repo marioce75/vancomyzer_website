@@ -43,7 +43,7 @@ export const metadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing/predictive-performance" },
   title: "Predictive Performance — Vancomyzer",
   description:
-    "A developer-run synthetic analysis (not real patients): Vancomyzer's Bayesian engine predicts a held-out " +
+    "A developer-run synthetic analysis (not real patients): Vancomyzer's Bayesian model predicts a held-out " +
     "vancomycin concentration in 200 simulated ICU patients generated from a different model. " +
     "Vancomyzer has not yet been validated in real patients.",
 };
@@ -62,7 +62,7 @@ export default function PredictivePerformancePage() {
       </h1>
       <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 760 }}>
         A developer-run synthetic analysis (not real patients). For each of {run.n_attempted} simulated
-        ICU patients, Vancomyzer&rsquo;s Bayesian engine is fitted to two simulated vancomycin levels
+        ICU patients, Vancomyzer&rsquo;s Bayesian model is fitted to two simulated vancomycin levels
         and then predicts a third concentration that was not used in the fit. The simulated
         patients&rsquo; &ldquo;true&rdquo; pharmacokinetics come from a different model than the one
         Vancomyzer uses.
@@ -89,7 +89,7 @@ function Breadcrumb() {
   return (
     <div style={{ display: "flex", gap: 12, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
       <Link href="/transparent-dosing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-        ← Transparent Dosing
+         Evidence
       </Link>
       <span style={{ color: "var(--color-border)" }}>·</span>
       <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Predictive Performance</span>
@@ -145,7 +145,7 @@ function DesignCard({ run }: { run: RunOutput }) {
       label: "Engine",
       body: (
         <>
-          Vancomyzer a posteriori (Bayesian) engine with the {COLIN_2019.shortName} prior. Model manifest
+          Vancomyzer a posteriori (Bayesian) calculator with the {COLIN_2019.shortName} prior. Calculation version
           version <code>{MODEL_MANIFEST_VERSION}</code>.
         </>
       ),
@@ -207,7 +207,7 @@ function DesignCard({ run }: { run: RunOutput }) {
         <>
           The concentration {d.heldout_sample_time_hours.toFixed(1)} h after the start of the same dose
           ({d.heldout_hours_after_infusion_end.toFixed(1)} h after the end of the infusion), predicted from
-          the fitted engine. This time is not used in the fit. The prediction is compared with (a) a synthetic
+          the fitted calculator. This time is not used in the fit. The prediction is compared with (a) a synthetic
           observation at that time (truth plus residual error) and (b) the noise-free truth, reported
           separately.
         </>
@@ -248,8 +248,8 @@ function ResultsCard({ run, vsObservation, vsTruth }: { run: RunOutput; vsObserv
     <section style={cardStyle}>
       <h2 style={sectionTitleStyle}>Results · developer-run synthetic analysis (not real patients)</h2>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}>
-        Error of the engine&rsquo;s prediction at the held-out time, one prediction per patient
-        (seed {run.seed}, model manifest {MODEL_MANIFEST_VERSION}). Metric definitions are below.
+        Error of the calculator&rsquo;s prediction at the held-out time, one prediction per patient
+        (seed {run.seed}, calculation version {MODEL_MANIFEST_VERSION}). Metric definitions are below.
       </p>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
@@ -293,7 +293,7 @@ function DefinitionsCard() {
     <section style={cardStyle}>
       <h2 style={sectionTitleStyle}>Metric definitions</h2>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 10, lineHeight: 1.55 }}>
-        C<sub>pred</sub> is the engine&rsquo;s predicted concentration and C<sub>ref</sub> is the value it is
+        C<sub>pred</sub> is the calculator&rsquo;s predicted concentration and C<sub>ref</sub> is the value it is
         compared with (the synthetic observation or the noise-free truth). Means are taken over patients.
       </p>
       <div style={{ overflowX: "auto" }}>
@@ -379,7 +379,7 @@ function LimitationsCard({ run }: { run: RunOutput }) {
     },
     {
       label: "Two-level sampling only",
-      body: "The engine always receives two levels, one after the infusion and one before the next dose. Trough-only sampling and levels drawn before steady state were not simulated.",
+      body: "The calculator always receives two levels, one after the infusion and one before the next dose. Trough-only sampling and levels drawn before steady state were not simulated.",
     },
     {
       label: "Truth model is partly developer-defined",
@@ -391,7 +391,7 @@ function LimitationsCard({ run }: { run: RunOutput }) {
     },
     {
       label: "Version",
-      body: `Results reflect model manifest ${MODEL_MANIFEST_VERSION}, in which ${COLIN_2019.shortName} is used at every BMI. These results apply to the stated software version and study design; they are not independent clinical validation.`,
+      body: `Results reflect calculation version ${MODEL_MANIFEST_VERSION}, in which ${COLIN_2019.shortName} is used at every BMI. These results apply to the stated software version and study design; they are not independent clinical validation.`,
     },
   ];
   return (

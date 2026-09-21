@@ -86,28 +86,30 @@ interface ColorPreset {
 
 const COLOR_PRESETS: Record<MatrixSettings["colorMode"], ColorPreset> = {
   "basic": {
-    "--color-primary": "#355c7d",
-    "--color-secondary": "#52616f",
-    "--color-dim": "#52616f",
-    "--color-bg": "#eaf2f8",
-    "--color-border": "#c5cdd8",
+    // Direction A "Clinical record" tokens (Sep 2026): action blue, ink text,
+    // off-white ground inside a light-blue frame. Contrast-checked >= 4.5:1.
+    "--color-primary": "#1f5e96",
+    "--color-secondary": "#4a5a68",
+    "--color-dim": "#546471",
+    "--color-bg": "#f7f9fb",
+    "--color-border": "#cbd6e0",
     "--color-card": "#ffffff",
     "--color-input": "#ffffff",
-    "--color-highlight": "#dae1ea",
-    "--color-glow": "rgba(53,92,125,0.15)",
-    "--color-glow-strong": "rgba(53,92,125,0.3)",
-    "--color-primary-a05": "rgba(53,92,125,0.05)",
-    "--color-primary-a06": "rgba(53,92,125,0.06)",
-    "--color-primary-a08": "rgba(53,92,125,0.08)",
-    "--color-primary-a10": "rgba(53,92,125,0.10)",
-    "--color-primary-a12": "rgba(53,92,125,0.12)",
-    "--color-primary-a15": "rgba(53,92,125,0.15)",
-    "--color-primary-a20": "rgba(53,92,125,0.20)",
-    "--color-primary-a25": "rgba(53,92,125,0.25)",
-    "--color-primary-a30": "rgba(53,92,125,0.30)",
-    "--color-primary-a35": "rgba(53,92,125,0.35)",
-    "--color-primary-a40": "rgba(53,92,125,0.40)",
-    "--color-primary-a50": "rgba(53,92,125,0.50)",
+    "--color-highlight": "#e6eef5",
+    "--color-glow": "rgba(31,94,150,0.15)",
+    "--color-glow-strong": "rgba(31,94,150,0.3)",
+    "--color-primary-a05": "rgba(31,94,150,0.05)",
+    "--color-primary-a06": "rgba(31,94,150,0.06)",
+    "--color-primary-a08": "rgba(31,94,150,0.08)",
+    "--color-primary-a10": "rgba(31,94,150,0.10)",
+    "--color-primary-a12": "rgba(31,94,150,0.12)",
+    "--color-primary-a15": "rgba(31,94,150,0.15)",
+    "--color-primary-a20": "rgba(31,94,150,0.20)",
+    "--color-primary-a25": "rgba(31,94,150,0.25)",
+    "--color-primary-a30": "rgba(31,94,150,0.30)",
+    "--color-primary-a35": "rgba(31,94,150,0.35)",
+    "--color-primary-a40": "rgba(31,94,150,0.40)",
+    "--color-primary-a50": "rgba(31,94,150,0.50)",
   },
 };
 
@@ -181,10 +183,10 @@ function applySettingsToDom(settings: MatrixSettings): void {
   // --- Theme class (always basic) ---
   body.classList.add("theme-basic");
   body.classList.remove("theme-matrix");
-  body.style.fontFamily = "'Inter', 'Helvetica Neue', 'Arial', system-ui, sans-serif";
-  rootStyle.setProperty("--font-mono", "'JetBrains Mono', 'Fira Code', 'Courier New', monospace");
-  rootStyle.setProperty("--color-nav-bg", "#2c3e5a");
-  rootStyle.setProperty("--color-nav-border", "#1e2d45");
+  body.style.fontFamily = "'Source Sans 3', 'Inter', 'Helvetica Neue', system-ui, sans-serif";
+  rootStyle.setProperty("--font-mono", "'IBM Plex Mono', 'JetBrains Mono', 'Courier New', monospace");
+  rootStyle.setProperty("--color-nav-bg", "#f7f9fb");
+  rootStyle.setProperty("--color-nav-border", "#cbd6e0");
 
   // --- Font size ---
   rootStyle.setProperty("font-size", FONT_SIZE_MAP[settings.fontSize]);

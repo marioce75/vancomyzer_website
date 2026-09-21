@@ -59,7 +59,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
   const sparseHighExposureNote = buildSparseHighExposureNote(input);
   const estimateLabel = used_posterior_refinement
     ? "Posterior-updated"
-    : "First-pass population";
+    : "Initial population";
 
   // A refusal must not also state a recommendation. Both lines below are pasted
   // into the chart and exported in the PDF, where a blocked result printed
@@ -89,8 +89,8 @@ export function buildDocumentationPreview(input: ExplanationInput): {
     ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
     // Must name the prior that actually ran — this line goes into the chart.
     engineOutput.model_name === COLIN_2019.id
-      ? `SCr: ${scr} mg/dL (direct ${COLIN_2019.shortName} covariate in the population prior; separate fitted-clearance cap uses Cockcroft-Gault). Explicit adult prior model: ${COLIN_2019.shortName} two-compartment; ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`
-      : `SCr: ${scr} mg/dL. Explicit adult prior model: ${modelShortName(engineOutput.model_name)}; ${used_posterior_refinement ? "bounded first-pass posterior update from level(s)." : "no posterior update."}`,
+      ? `SCr: ${scr} mg/dL (direct ${COLIN_2019.shortName} covariate in the population prior; separate fitted-clearance cap uses Cockcroft-Gault). Explicit adult prior model: ${COLIN_2019.shortName} two-compartment; ${used_posterior_refinement ? "bounded initial posterior update from level(s)." : "no posterior update."}`
+      : `SCr: ${scr} mg/dL. Explicit adult prior model: ${modelShortName(engineOutput.model_name)}; ${used_posterior_refinement ? "bounded initial posterior update from level(s)." : "no posterior update."}`,
     `Posterior fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"} (${posterior_fit?.fit_quality_reason ?? "no measured levels available"}). Uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Sparse levels do not justify overconfident patient-specific precision.`,
   ].join("\n");
 
