@@ -23,13 +23,13 @@ function assumptionsNote(details?: CalculationDetails | null): {
   if (details.review_status.level === "caution") {
     return {
       className: "border-amber-200 bg-amber-50 text-amber-900",
-      text: "Assumptions deserve extra review because workflow fit or data quality is limited.",
+      text: "Review these assumptions carefully: the available data or model suitability is limited.",
     };
   }
 
   return {
     className: "border-emerald-200 bg-emerald-50 text-emerald-900",
-    text: "Assumptions still matter, but the workflow fit is more reviewable for this result.",
+    text: "Review the model assumptions alongside the measured levels and patient information.",
   };
 }
 

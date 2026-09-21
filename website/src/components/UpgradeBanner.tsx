@@ -77,7 +77,7 @@ export default function UpgradeBanner() {
           whiteSpace: "nowrap",
         }}
       >
-        Start trial →
+        Start trial
       </Link>
       <button
         type="button"

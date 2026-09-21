@@ -1,5 +1,5 @@
 /**
- * Admin → Usage: the privacy-first analytics dashboard (Plausible or Umami).
+ * Admin  Usage: the privacy-first analytics dashboard (Plausible or Umami).
  *
  * ANALYTICS_DASHBOARD_URL is deliberately server-only (no NEXT_PUBLIC_ prefix):
  * a shared dashboard link grants read access to the stats, so it must never be
@@ -109,7 +109,7 @@ export default function UsagePage() {
               className="inline-block rounded px-3 py-1.5 text-xs font-semibold text-white"
               style={{ background: BRAND }}
             >
-              Open full dashboard ↗
+              Open full dashboard
             </a>
           </div>
           <iframe

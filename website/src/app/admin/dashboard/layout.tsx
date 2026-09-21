@@ -64,7 +64,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
       <div className="px-3 pb-5 flex flex-col gap-2">
         <Link href="/calculator" className="text-white hover:text-blue-100 text-xs font-medium px-3 py-1.5 transition-colors hover:bg-white/10 rounded">
-          ← Back to Calculator
+           Back to Calculator
         </Link>
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}

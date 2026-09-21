@@ -8,29 +8,34 @@
    ─────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Primary palette — overwritten at runtime by the settings context */
-  --color-primary:      #00ff41;
-  --color-secondary:    #00cc44;
-  --color-dim:          #009933;
-  --color-bg:           #000000;
-  --color-border:       #004422;
-  --color-card:         #050505;
-  --color-input:        #0d0d0d;
-  --color-highlight:    #0a1a0a;
-  --color-glow:         rgba(0,255,65,0.5);
-  --color-glow-strong:  rgba(0,255,65,0.8);
-  --color-primary-a05:  rgba(0,255,65,0.05);
-  --color-primary-a06:  rgba(0,255,65,0.06);
-  --color-primary-a08:  rgba(0,255,65,0.08);
-  --color-primary-a10:  rgba(0,255,65,0.10);
-  --color-primary-a12:  rgba(0,255,65,0.12);
-  --color-primary-a15:  rgba(0,255,65,0.15);
-  --color-primary-a20:  rgba(0,255,65,0.20);
-  --color-primary-a25:  rgba(0,255,65,0.25);
-  --color-primary-a30:  rgba(0,255,65,0.30);
-  --color-primary-a35:  rgba(0,255,65,0.35);
-  --color-primary-a40:  rgba(0,255,65,0.40);
-  --color-primary-a50:  rgba(0,255,65,0.50);
+  /* Basic theme on the first server render, before settings are restored.
+     Keep these defaults aligned with COLOR_PRESETS.basic. */
+  --color-primary:      #1f5e96;
+  --color-secondary:    #4a5a68;
+  --color-dim:          #546471;
+  --color-bg:           #f7f9fb;
+  --color-border:       #cbd6e0;
+  --color-card:         #ffffff;
+  --color-input:        #ffffff;
+  --color-highlight:    #e6eef5;
+  --color-glow:         rgba(31,94,150,0.15);
+  --color-glow-strong:  rgba(31,94,150,0.3);
+  --color-primary-a05:  rgba(31,94,150,0.05);
+  --color-primary-a06:  rgba(31,94,150,0.06);
+  --color-primary-a08:  rgba(31,94,150,0.08);
+  --color-primary-a10:  rgba(31,94,150,0.10);
+  --color-primary-a12:  rgba(31,94,150,0.12);
+  --color-primary-a15:  rgba(31,94,150,0.15);
+  --color-primary-a20:  rgba(31,94,150,0.20);
+  --color-primary-a25:  rgba(31,94,150,0.25);
+  --color-primary-a30:  rgba(31,94,150,0.30);
+  --color-primary-a35:  rgba(31,94,150,0.35);
+  --color-primary-a40:  rgba(31,94,150,0.40);
+  --color-primary-a50:  rgba(31,94,150,0.50);
+  --color-nav-bg:       #f7f9fb;
+  --color-nav-border:   #cbd6e0;
+  --font-mono:          'IBM Plex Mono', 'JetBrains Mono', 'Courier New', monospace;
+  --mx-scanline-opacity: 0;
 
   /* Fixed semantic colors — don't change with color mode */
   --mx-error:           #ff3333;
@@ -176,6 +181,12 @@ body.theme-basic header[class*="shrink-0"] span[class*="tracking"] {
 /* Settings gear */
 body.theme-basic header[class*="shrink-0"] svg {
   color: #4a5a68 !important;
+}
+
+/* Toolbar actions keep a light foreground when their hover background darkens. */
+body.theme-basic header.shrink-0 .vz-header-action:hover,
+body.theme-basic header.shrink-0 .vz-header-action:hover svg {
+  color: #ffffff !important;
 }
 
 /* ── Section toggles (Patient Info, Dosing, Levels, Method) ─── */
@@ -987,6 +998,12 @@ body.theme-basic .manifesto-dark a.cta-outline {
 .vz-seg > button[aria-pressed="true"] { background: #1f5e96; color: #fff; }
 .vz-seg > button:hover:not([aria-pressed="true"]) { background: #edf2f7; }
 .vz-seg > button:focus-visible { outline: 3px solid #b45309; outline-offset: -3px; }
+/* These controls clip outside outlines. The white inner rim also keeps focus
+   visible when a selected button has a blue or red background. */
+body.theme-basic .vz-seg > button:focus-visible {
+  outline-offset: -3px !important;
+  box-shadow: inset 0 0 0 5px #ffffff;
+}
 
 /* Advisory rows — severity by border + icon + label, never color alone */
 .vz-advisory {
@@ -1056,6 +1073,8 @@ body.theme-basic .manifesto-dark a.cta-outline {
 .vz-table tr[role="radio"][aria-checked="true"] td { background: #dbeafe; font-weight: 600; }
 .vz-table tr[role="radio"][aria-checked="true"] td:first-child { box-shadow: inset 3px 0 0 #1f5e96; }
 .vz-table tr[role="radio"]:focus-visible { outline: 3px solid #b45309; outline-offset: -3px; }
+body.theme-basic .vz-table tr[role="radio"]:focus-visible { outline-offset: -3px !important; }
+body.theme-basic .vz-table th, body.theme-basic .vz-table td { border-radius: 0 !important; }
 
 /* Detail tabs */
 .vz-tabs { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 1px solid var(--color-border); background: var(--color-highlight); }
@@ -1074,6 +1093,7 @@ body.theme-basic .manifesto-dark a.cta-outline {
 }
 .vz-tabs > button[aria-selected="true"] { color: var(--color-primary); border-bottom-color: var(--color-primary); background: var(--color-card); }
 .vz-tabs > button:focus-visible { outline: 3px solid #b45309; outline-offset: -3px; }
+body.theme-basic .vz-tabs > button:focus-visible { outline-offset: -3px !important; }
 
 /* Key/value list for PK & method details */
 .vz-kv { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; row-gap: 3px; font-size: 12px; }

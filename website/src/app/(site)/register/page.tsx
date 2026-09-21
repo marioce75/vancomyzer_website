@@ -122,7 +122,7 @@ function RegisterPageInner() {
     return (
       <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ maxWidth: 420, padding: 32, background: "#ffffff", border: "1px solid #cbd5e0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", borderRadius: 8, textAlign: "center" }}>
-          <div style={{ fontSize: 40, marginBottom: 16 }}>✓</div>
+          <div style={{ fontSize: 40, marginBottom: 16 }}></div>
           <h1 style={{ fontSize: 18, fontWeight: 700, color: "#047857" }}>Account active — welcome to Vancomyzer</h1>
           <p style={{ fontSize: 13, color: "#4a5568", marginTop: 12, lineHeight: 1.6 }}>
             A welcome email is on its way to <strong>{email}</strong>. You can sign in right now and start using the calculator.
@@ -132,7 +132,7 @@ function RegisterPageInner() {
             background: "#1f5e96", color: "#fff", fontSize: 13, fontWeight: 600,
             textDecoration: "none", borderRadius: 4,
           }}>
-            Sign in now →
+            Sign in now
           </Link>
         </div>
       </div>
@@ -232,7 +232,7 @@ function RegisterPageInner() {
               <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder="Re-enter password" style={inputStyle} />
             </div>
             <button type="submit" style={{ width: "100%", padding: 12, fontSize: 14, fontWeight: 600, background: "#1f5e96", color: "#fff", border: "none", cursor: "pointer", borderRadius: 4 }}>
-              Continue to Agreements →
+              Continue to Agreements
             </button>
           </form>
         )}
@@ -247,7 +247,7 @@ function RegisterPageInner() {
             <div style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                 <span style={{ fontSize: 11, fontWeight: 600, color: "#14232f" }}>1. Medical Disclaimer</span>
-                {disclaimerScrolled && <span style={{ fontSize: 10, color: "#047857", fontWeight: 600 }}>✓ Read</span>}
+                {disclaimerScrolled && <span style={{ fontSize: 10, color: "#047857", fontWeight: 600 }}>Read</span>}
               </div>
               <div
                 ref={disclaimerRef}
@@ -279,7 +279,7 @@ function RegisterPageInner() {
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                 <span style={{ fontSize: 11, fontWeight: 600, color: "#14232f" }}>2. Terms of Use</span>
-                {termsScrolled && <span style={{ fontSize: 10, color: "#047857", fontWeight: 600 }}>✓ Read</span>}
+                {termsScrolled && <span style={{ fontSize: 10, color: "#047857", fontWeight: 600 }}>Read</span>}
               </div>
               <div
                 ref={termsRef}
@@ -343,7 +343,7 @@ function RegisterPageInner() {
 
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => setStep(1)} style={{ flex: 1, padding: 12, fontSize: 13, background: "#f7fafc", color: "#4a5568", border: "1px solid #cbd5e0", cursor: "pointer", borderRadius: 4 }}>
-                ← Back
+                 Back
               </button>
               <button
                 onClick={handleSubmit}

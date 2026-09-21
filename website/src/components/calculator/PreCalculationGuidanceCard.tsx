@@ -16,7 +16,7 @@ export default function PreCalculationGuidanceCard({
       <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <p className="text-sm font-medium text-blue-950">
           {isInitial
-            ? "First-pass maintenance workflow. Patient characteristics only."
+            ? "Estimate a maintenance regimen from patient characteristics."
             : "Use only interpretable current-interval regimen and level timing."}
         </p>
         <details className="text-sm text-blue-900">

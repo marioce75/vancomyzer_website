@@ -75,7 +75,7 @@ export const TIERS: Record<TierId, TierConfig> = {
     features: [
       "Full AUC calculator (Empiric, 1-level, 2-level)",
       `${COLIN_2019.shortName} two-compartment PK model (every adult, every BMI)`,
-      "All safety guardrails active",
+      "All safety checks included",
       "DOI-linked inline references on every result",
       "Community support",
     ],

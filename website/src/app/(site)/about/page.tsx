@@ -14,8 +14,7 @@ export default function AboutPage() {
           About Vancomyzer™
         </h1>
         <p className="mt-4 text-gray-600">
-          Vancomyzer™ is designed to help clinicians review vancomycin dosing
-          workflow with greater clarity, interpretability, and transparency.
+          Vancomyzer™ estimates vancomycin regimens for adults receiving intermittent intravenous therapy. Clinicians can review predicted exposure, model assumptions and published references.
         </p>
       </section>
 
@@ -25,10 +24,7 @@ export default function AboutPage() {
           Why Vancomyzer™ exists
         </h2>
         <p className="mt-3 text-gray-600">
-          Vancomycin dosing can be hard to interpret. Clinicians benefit from
-          clearer workflow support. Transparency and explainability are central
-          design goals: the product aims to make assumptions, methods, and
-          outputs easier to review and communicate.
+          A dose estimate needs context: patient information, measured concentrations and the limits of the model. Vancomyzer presents these alongside regimen comparisons and a clinical note.
         </p>
       </section>
 
@@ -38,10 +34,10 @@ export default function AboutPage() {
           Product philosophy
         </h2>
         <ul className="mt-4 space-y-2 text-gray-600">
-          <li>Transparency in how every estimate is produced</li>
-          <li>Interpretability over vague sophistication claims</li>
-          <li>Clinician oversight over algorithmic authority</li>
-          <li>Documentation clarity for communication</li>
+          <li>Show the model and assumptions used</li>
+          <li>State where evidence or input data are limited</li>
+          <li>Keep dosing decisions with the treating clinician</li>
+          <li>Provide results that can be reviewed and documented</li>
         </ul>
       </section>
 
@@ -52,7 +48,7 @@ export default function AboutPage() {
         </h2>
         <p className="mt-3 text-gray-600">
           The tool is designed for clinical pharmacists, antimicrobial
-          stewardship teams, hospital clinicians reviewing dosing workflows,
+          stewardship teams, hospital clinicians reviewing dosing options,
           and learners exploring vancomycin dosing interpretation.
         </p>
       </section>

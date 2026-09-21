@@ -24,7 +24,7 @@ const DAILY_DOSE_MG = 1500;
 export const COLIN_2019_ELDERLY_MILD_CKD: PublishedCase = {
   id: "colin-2019-elderly-mild-ckd",
   what_it_tests:
-    `The engine's ${COLIN_2019.shortName} prior for a 60-year-old, 65-kg patient with SCr 0.97 mg/dL should match the published CL (2.55 L/h) and the AUC₂₄ it implies at 750 mg every 12 h, each within 1%. This exercises the age-decline and serum creatinine terms together.`,
+    `The calculator's ${COLIN_2019.shortName} prior for a 60-year-old, 65-kg patient with SCr 0.97 mg/dL should match the published CL (2.55 L/h) and the AUC₂₄ it implies at 750 mg every 12 h, each within 1%. This exercises the age-decline and serum creatinine terms together.`,
   source: {
     citation: COLIN_2019.citation,
     doi: COLIN_2019.doi,
@@ -62,7 +62,7 @@ export const COLIN_2019_ELDERLY_MILD_CKD: PublishedCase = {
     extraction_method:
       "CL (2.55 L/h) read from page 8. AUC₂₄ derived from the published CL: 1500 mg/day / 2.55 L/h = 588.2 mg·h/L.",
     tolerance_rationale:
-      "±1% on CL and AUC₂₄. The published CL comes from the same equations the engine implements; it is rounded to three significant figures (about ±0.2%). A larger difference means the age-decline or serum creatinine term changed and must be investigated.",
+      "±1% on CL and AUC₂₄. The published CL comes from the same equations the calculator implements; it is rounded to three significant figures (about ±0.2%). A larger difference means the age-decline or serum creatinine term changed and must be investigated.",
   },
   comparison_kind: "same_model_reproduction",
   tolerance: {
@@ -73,6 +73,6 @@ export const COLIN_2019_ELDERLY_MILD_CKD: PublishedCase = {
     v1_pct: 1,
   },
   notes_for_page:
-    "Same model as the engine. Colin 2019 states CL = 2.55 L/h for this patient; the engine's equations give about 2.551 L/h. This checks that the age and renal terms are implemented as published; it does not test clinical accuracy.",
+    "Same model as the calculator. Colin 2019 states CL = 2.55 L/h for this patient; the calculator's equations give about 2.551 L/h. This checks that the age and renal terms are implemented as published; it does not test clinical accuracy.",
   workflow_type: "prior_at_regimen",
 };

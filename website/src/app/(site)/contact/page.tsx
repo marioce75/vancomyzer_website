@@ -35,7 +35,7 @@ const channels = [
     ),
     title: "Clinical support",
     subtitle: "Response in < 1 business day",
-    description: "Calculator questions, clinical edge cases, and dosing workflow guidance.",
+    description: "Questions about the calculator or interpreting its results.",
   },
 ];
 
@@ -133,7 +133,7 @@ export default function ContactPage() {
       <div className="mt-10 rounded-lg border border-gray-200 bg-white p-6 sm:p-8">
         {success ? (
           <div className="text-center py-8">
-            <div className="text-3xl mb-3">✓</div>
+            <div className="text-3xl mb-3"></div>
             <h2 className="text-lg font-semibold text-gray-900">Inquiry sent</h2>
             <p className="mt-2 text-sm text-gray-600">
               Thank you for reaching out. We will respond within 1 business day.

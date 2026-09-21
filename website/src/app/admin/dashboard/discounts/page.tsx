@@ -196,7 +196,7 @@ function PendingCard({
             className="rounded px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
             style={{ background: "#047857" }}
           >
-            ✓ Approve
+            Approve
           </button>
           <button
             type="button"
@@ -212,7 +212,7 @@ function PendingCard({
               href={`mailto:${app.supervisor_email}?subject=Verifying%20${row.full_name || row.username}%27s%20training%20status%20%E2%80%94%20Vancomyzer%20discount&body=Hi%20${encodeURIComponent(app.supervisor_name ?? "")},%0A%0AWe%27re%20reviewing%20a%20discount%20application%20from%20${encodeURIComponent(row.full_name || row.username)}%20(${encodeURIComponent(row.email)})%20who%20listed%20you%20as%20their%20supervisor.%20Could%20you%20confirm%20they%27re%20currently%20in%20training%20at%20${encodeURIComponent(app.institution_name ?? "")}%3F%0A%0AThanks,%0AVancomyzer`}
               className="text-xs text-blue-700 hover:underline ml-2"
             >
-              Email supervisor →
+              Email supervisor
             </a>
           )}
         </div>

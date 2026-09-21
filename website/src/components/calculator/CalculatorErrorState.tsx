@@ -11,7 +11,7 @@ function fallbackLabel(
   fallbackWorkflow?: "initial_regimen" | "repeat_existing_regimen_sampling"
 ): string | null {
   if (fallbackWorkflow === "initial_regimen") {
-    return "Use the initial-regimen workflow if the current dose history is too irregular for steady-state interpretation.";
+    return "Use the initial dosing calculation if the current dose history is too irregular for steady-state interpretation.";
   }
   if (fallbackWorkflow === "repeat_existing_regimen_sampling") {
     return "Repeat sampling later in a clearly interpretable dosing interval.";

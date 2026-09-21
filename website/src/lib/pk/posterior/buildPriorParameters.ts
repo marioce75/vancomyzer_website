@@ -33,8 +33,8 @@
  * Adult-only scope: FMat ≈ 1.000 for all adults ≥18yo (PMA >> PMA50 in weeks).
  * PMA for adults = (age_years + 40/52) years, or (age_years × 52 + 40) weeks.
  *
- * Note: STDY10 (haematological malignancy ×1.294) and STDY13 (heel prick) 
- * covariates are not included here as they are not clinically relevant 
+ * Note: STDY10 (haematological malignancy ×1.294) and STDY13 (heel prick)
+ * covariates are not included here as they are not clinically relevant
  * for standard adult TDM dosing contexts.
  *
  * Colin 2019 is used for EVERY adult, at every body size. The former custom
@@ -90,7 +90,7 @@ export const ADULT_VANCOMYCIN_PRIOR_MODEL = {
     equation: COLIN_2019.equations.CL,
     age_decline: COLIN_2019.equations.FDecline,
     scr_note: COLIN_2019.renalCovariate,
-    reference_patient: `${COLIN_2019.referenceCheck.input} → CL ${COLIN_2019.referenceCheck.expectedCL_L_h.toFixed(2)} L/h`,
+    reference_patient: `${COLIN_2019.referenceCheck.input}  CL ${COLIN_2019.referenceCheck.expectedCL_L_h.toFixed(2)} L/h`,
     source: `${COLIN_2019.citation} Eqs 6–13, Table 3.`,
   },
 } as const;

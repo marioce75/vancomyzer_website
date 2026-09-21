@@ -50,11 +50,10 @@ function statusChip(auc: number) {
   const r = aucRangeLabel(auc);
   const inRange = auc >= 400 && auc <= 600;
   const cls = inRange ? "vz-chip--ok" : auc > 600 ? "vz-chip--caution" : "vz-chip--warn";
-  const glyph = inRange ? "✓" : auc > 600 ? "▲" : "▼";
   const short = inRange ? "In range" : auc > 600 ? "High" : "Low";
   return (
     <span className={`vz-chip ${cls}`} title={`${r.label}: AUC₂₄ ${auc} mg·h/L (target 400–600)`} style={{ padding: "0 5px", fontSize: 10 }}>
-      <span aria-hidden="true">{glyph}</span> {short}<span className="sr-only"> ({r.label})</span>
+      {short}<span className="sr-only"> ({r.label})</span>
     </span>
   );
 }
@@ -123,7 +122,7 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
                 <td>
                   <span className="font-semibold" style={MONO}>{o.dose_mg} mg q{o.interval_hours}h</span>
                   {o.is_recommended && (
-                    <span className="ml-1 text-[11px] font-bold" style={{ color: "var(--color-primary)" }} title="Engine recommendation">★<span className="sr-only"> recommended</span></span>
+                    <span className="block text-[9px] font-semibold" style={{ color: "var(--color-primary)" }} title="Suggested regimen">Recommended</span>
                   )}
                   {o.is_recommended && !(o.dose_mg >= 500 && o.auc24 <= 600) && (
                     <span className="ml-1 vz-chip vz-chip--caution" style={{ padding: "0 4px", fontSize: 9 }} title="Outside the candidate display rule (dose ≥ 500 mg, AUC₂₄ ≤ 600)">review</span>

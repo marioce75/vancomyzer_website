@@ -305,7 +305,7 @@ export default function TeamPage() {
     <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 16px 80px" }}>
       <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
         <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-          ← Settings
+           Settings
         </Link>
         <span style={{ color: "var(--color-border)" }}>·</span>
         <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Team Management</span>
@@ -381,7 +381,7 @@ export default function TeamPage() {
                   }}
                   title="Switch to the 20-seat plan ($1,000/mo). Prorated through Stripe."
                 >
-                  {tierChanging ? "Updating…" : "Upgrade to 20 seats →"}
+                  {tierChanging ? "Updating…" : "Upgrade to 20 seats "}
                 </button>
               )}
               {seats.allocated === 20 && seats.used <= 10 && (
@@ -401,7 +401,7 @@ export default function TeamPage() {
                   }}
                   title="Switch back to the 10-seat plan ($500/mo). Refunded difference prorated through Stripe."
                 >
-                  {tierChanging ? "Updating…" : "← Downgrade to 10 seats"}
+                  {tierChanging ? "Updating…" : " Downgrade to 10 seats"}
                 </button>
               )}
               <button
@@ -420,7 +420,7 @@ export default function TeamPage() {
                 }}
                 title="Update payment method, view invoices, or cancel your subscription. Opens the Stripe-hosted billing portal."
               >
-                {portalLoading ? "Opening…" : "Manage billing →"}
+                {portalLoading ? "Opening…" : "Manage billing "}
               </button>
             </div>
           </div>
@@ -636,7 +636,7 @@ export default function TeamPage() {
             cursor: "pointer", borderRadius: 4, width: "100%", textAlign: "left",
           }}
         >
-          <span style={{ transform: showAudit ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s" }}>▶</span>
+          {showAudit ? "Hide" : "Show"}
           Calculation history (institution-wide; authorized access only)
         </button>
         {showAudit && (

@@ -15,15 +15,15 @@ export function getModeScopedFieldErrors(
 
 export function getPreCalculationGuidanceItems(mode: CalculatorMode): string[] {
   const shared = [
-    "Adult intermittent-infusion vancomycin workflow only.",
+    "Adults receiving intermittent IV vancomycin only.",
     "Not for pediatric, dialysis-specific, or continuous-infusion use.",
   ];
 
   const modeSpecific =
     mode === "initial_regimen"
       ? [
-          "This workflow provides first-pass maintenance support from patient characteristics, not a high-certainty individualized regimen.",
-          "Any loading-dose language should be treated as optional empiric support for clinician review, not as a severity-aware directive.",
+          "This estimate uses patient characteristics without measured levels. It may not reflect the patient’s individual drug clearance.",
+          "Loading-dose suggestions require clinician review and do not account for illness severity.",
         ]
       : [
           "Use levels from the current dosing interval and avoid levels drawn during infusion or immediately after infusion completion.",
@@ -42,8 +42,8 @@ export function getResultScopeItems(
   recommendationType?: "initial_regimen" | "existing_regimen" | null
 ): string[] {
   const shared = [
-    "Adult intermittent-infusion vancomycin workflow only; not for pediatric, dialysis-specific, or continuous-infusion use.",
-    "Uses an explicit adult population prior with bounded first-pass level-based refinement when applicable; this is not presented as a validated commercial Bayesian platform.",
+    "Adults receiving intermittent IV vancomycin only; not for pediatric, dialysis-specific, or continuous-infusion use.",
+    "Uses an explicit adult population prior with bounded initial level-based refinement when applicable; this is not presented as a validated commercial Bayesian platform.",
     "Review the assumptions, limitations, and clinical context before applying any dose change.",
   ];
 
@@ -68,11 +68,11 @@ export function evidenceTone(level: CalculationDetails["review_status"]["level"]
 export function reviewabilityStatusLabel(details: CalculationDetails): string {
   switch (details.review_status.level) {
     case "supported":
-      return "Reviewability: stronger fit for review";
+      return "Measured levels included";
     case "caution":
-      return "Reviewability: caution — limited interpretability";
+      return "Caution: limited interpretability";
     default:
-      return "Reviewability: prior-only estimate";
+      return "Estimate without measured levels";
   }
 }
 

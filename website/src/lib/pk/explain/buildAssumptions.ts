@@ -34,8 +34,8 @@ export function buildAssumptions(input: ExplanationInput): string[] {
       ? "Level must be drawn in the post-distributive elimination phase (≥2 h after infusion completion) for valid single-dose PK estimation per ASHP/IDSA/SIDP 2020."
       : "Level collection time assumed within the current dosing interval (time_since_last_dose ≤ interval).",
     usedRefinement
-      ? "Measured level(s) can produce a bounded MAP-style first-pass posterior refinement around that adult prior; this is not a full Bayesian commercial engine."
-      : "First-pass evaluation only; outputs remain on the explicit adult population prior model.",
+      ? "Measured level(s) can produce a bounded MAP-style initial posterior refinement around that adult prior; this is not a full Bayesian commercial engine."
+      : "Initial evaluation only; outputs remain on the explicit adult population prior model.",
     fitText,
   ];
 }

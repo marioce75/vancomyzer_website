@@ -46,7 +46,7 @@ const TIERS: TierCard[] = [
     features: [
       "Full AUC calculator",
       `${COLIN_2019.shortName} PK model for all adults`,
-      "Empiric, 1-level, 2-level workflows",
+      "Initial dosing and estimates using one or two levels",
       "DOI-linked references",
       "In-app bug reporting (free account)",
     ],
@@ -202,16 +202,7 @@ export default function PricingClient() {
               <ul className="mb-8 flex-1 space-y-3">
                 {tier.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm" style={{ color: "var(--color-foreground)" }}>
-                    <svg
-                      className="mt-0.5 h-4 w-4 shrink-0"
-                      style={{ color: "#1f5e96" }}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2.5}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+
                     {f}
                   </li>
                 ))}

@@ -91,7 +91,7 @@ export default function Footer() {
                   className="transition"
                   style={{ color: "var(--color-secondary)" }}
                 >
-                  {label} ↗
+                  {label}
                 </a>
               ))}
             </nav>

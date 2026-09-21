@@ -13,9 +13,9 @@ export default function ResultScopeBanner({
     <section className="border-l-4 border-amber-500 bg-amber-50 px-3 py-2">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-amber-950">Safety guardrails</h2>
+          <h2 className="text-sm font-semibold text-amber-950">Use limitations</h2>
           <ul className="mt-1 space-y-1 text-xs text-amber-900">
-            <li>Adult intermittent IV workflow only.</li>
+            <li>For adults receiving intermittent IV vancomycin only.</li>
             <li>Not for pediatrics, dialysis-specific, or continuous infusion.</li>
             {isInitial ? (
               <li>Prior-only maintenance support; not patient-specific severity direction.</li>

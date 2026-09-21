@@ -133,7 +133,7 @@ export default function ObesityAdvisoryPanel({
             className="underline hover:no-underline"
             style={{ color: "#92400e" }}
           >
-            {COLIN_2019.shortName} ({COLIN_2019.doi}) ↗
+            {COLIN_2019.shortName} ({COLIN_2019.doi})
           </a>
           {colin2021Pmid ? (
             <a
@@ -144,7 +144,7 @@ export default function ObesityAdvisoryPanel({
               style={{ color: "#92400e" }}
               title={COLIN_2021_OBESE_EVALUATION.summary}
             >
-              Colin 2021 evaluation in obese adults (PMID {colin2021Pmid}) ↗
+              Colin 2021 evaluation in obese adults (PMID {colin2021Pmid})
             </a>
           ) : (
             <span title={COLIN_2021_OBESE_EVALUATION.summary}>{COLIN_2021_OBESE_EVALUATION.citation}</span>

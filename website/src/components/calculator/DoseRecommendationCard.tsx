@@ -151,7 +151,7 @@ export function LoadingDoseConfigurator({ weightKg, onSimulate }: LoadingDoseCon
             border: "none", cursor: "pointer", letterSpacing: "0.1em",
           }}
         >
-          SIMULATE {customDose} mg LOADING DOSE PK →
+          Estimate exposure after {customDose} mg loading dose
         </button>
       )}
 
@@ -226,7 +226,7 @@ export function LoadingDosePopover({ weightKg, onSimulate }: LoadingDoseConfigur
         className="border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
         style={{ borderColor: "#c6d6e6", background: open ? "#c6d6e6" : "#e6eef5", color: "#14232f", cursor: "pointer", ...FONT }}
       >
-        Loading dose {open ? "▴" : "▾"}
+        {open ? "Hide loading dose" : "Loading dose"}
       </button>
       {open && (
         <div
@@ -310,9 +310,9 @@ export default function DoseRecommendationCard({
   // render the safety state and DO NOT fall through to the standard
   // regimen card. Two refusal modes:
   //   - empiric_dosing_blocked: no safe fixed-interval regimen exists
-  //     for the patient (severe AKI, etc.) → pulse-then-level workflow
+  //     for the patient (severe AKI, etc.)  pulse-then-level workflow
   //   - adjustment_dosing_blocked: existing patient on too-aggressive
-  //     regimen, no safe adjustment exists → hold + recheck level
+  //     regimen, no safe adjustment exists  hold + recheck level
   if (empiricDosingBlocked) {
     return <EmpiricDosingBlockedCard data={empiricDosingBlocked} />;
   }

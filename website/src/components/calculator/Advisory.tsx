@@ -8,7 +8,7 @@ const GLYPH: Record<AdvisorySeverity, string> = {
   info: "i",
   caution: "!",
   warning: "!!",
-  success: "✓",
+  success: "",
 };
 
 const SR_LABEL: Record<AdvisorySeverity, string> = {
@@ -40,7 +40,7 @@ interface AdvisoryProps {
  * decision it affects.
  */
 export default function Advisory({ severity, title, summary, children, collapsible, action, role }: AdvisoryProps) {
-  const glyph = (
+  const glyph = severity === "success" ? null : (
     <span
       aria-hidden="true"
       className="inline-flex h-4 min-w-4 items-center justify-center px-1 text-[10px] font-black leading-none"

@@ -1,14 +1,14 @@
 /**
  * /transparent-dosing/cases — Literature cases page.
  *
- * Lists every PublishedCase, runs each through the engine when the page is
+ * Lists every PublishedCase, runs each through the calculator when the page is
  * built, and shows the result in one of three forms:
- *   - same-model reproduction (Colin 2019): engine vs published value with a
+ *   - same-model reproduction (Colin 2019): calculator vs published value with a
  *     pass/fail badge against the case's tolerance
- *   - cross-model reference: engine (Colin 2019) next to a value from a
+ *   - cross-model reference: calculator (Colin 2019) next to a value from a
  *     different published model or a cohort statistic; difference shown for
  *     context, never pass/fail, excluded from the summary statistics
- *   - reference band: published multi-model comparison, no engine run
+ *   - reference band: published multi-model comparison, no calculator run
  *
  * The same cases run in `npm test` (scripts/verify-cases.ts); a same-model
  * reproduction outside tolerance fails the suite.
@@ -25,7 +25,7 @@ export const metadata = {
   title: "Literature Reproducibility — Vancomyzer",
   description:
     "Vancomyzer's Colin 2019 equations checked against published values, plus published results from other models shown for context. " +
-    "These cases run in the automated test suite (npm test); a drift outside tolerance fails the suite.",
+    "These cases run in the automated checks; a difference outside the stated tolerance fails the check.",
 };
 
 const CROSS_MODEL_WORDING = "Different model — difference shown for context, not a pass/fail test.";
@@ -48,10 +48,10 @@ export default function CasesPage() {
         Literature Reproducibility
       </h1>
       <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 12, maxWidth: 720 }}>
-        Published vancomycin values run through Vancomyzer&apos;s engine. Cases that use the same model
-        as the engine ({COLIN_2019.shortName}) are pass/fail checks of the implementation. Cases from other
+        Published vancomycin values run through Vancomyzer&apos;s calculator. Cases that use the same model
+        as the calculator ({COLIN_2019.shortName}) are pass/fail checks of the implementation. Cases from other
         published models or patient cohorts are shown for context only. These cases run in the automated
-        test suite (npm test); a drift outside tolerance fails the suite.
+        checks; a difference outside the stated tolerance fails the check.
       </p>
       <p style={{ fontSize: 13, color: "var(--color-dim)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 720 }}>
         Vancomyzer has not yet been validated in real patients. Its equations are checked against published
@@ -69,7 +69,7 @@ function Breadcrumb() {
   return (
     <div style={{ display: "flex", gap: 12, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
       <Link href="/transparent-dosing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-        ← Transparent Dosing
+         Evidence
       </Link>
       <span style={{ color: "var(--color-border)" }}>·</span>
       <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Literature Reproducibility</span>
@@ -92,7 +92,7 @@ function EmptyState() {
       }}
     >
       <strong>No cases are registered yet.</strong> Each case will list the cited paper, the patient
-      inputs, the published value and the engine&apos;s output, with the difference shown in either
+      inputs, the published value and the calculator&apos;s output, with the difference shown in either
       direction.
     </div>
   );
@@ -108,16 +108,16 @@ const GROUPS: { kind: ComparisonKind; title: string; intro: string }[] = [
   {
     kind: "same_model_reproduction",
     title: `Same-model reproductions (${COLIN_2019.shortName}) · pass/fail`,
-    intro: `The published value comes from ${COLIN_2019.shortName}, the model the engine uses, so the engine should reproduce it within the stated tolerance.`,
+    intro: `The published value comes from ${COLIN_2019.shortName}, the model the calculator uses, so the calculator should reproduce it within the stated tolerance.`,
   },
   {
     kind: "cross_model_reference",
     title: "Cross-model references · context only",
-    intro: `The published value comes from a different model or summarizes a patient cohort. The engine's ${COLIN_2019.shortName} value is shown next to it; these cards never pass or fail.`,
+    intro: `The published value comes from a different model or summarizes a patient cohort. The calculator's ${COLIN_2019.shortName} value is shown next to it; these cards never pass or fail.`,
   },
   {
     kind: "reference_band",
-    title: "Published reference band · no engine run",
+    title: "Published reference band · no calculator run",
     intro: "Published results from a multi-model comparison, shown for context. Vancomyzer was not run on these patients.",
   },
 ];
@@ -135,7 +135,7 @@ function Body({ cases, results, summary }: BodyProps) {
               {g.title}
             </h2>
             <p style={{ fontSize: 12, color: "var(--color-dim)", margin: "0 0 12px", lineHeight: 1.55 }}>{g.intro}</p>
-            <div style={{ display: "grid", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 16 }}>
               {indices.map((i) => (
                 <CaseCard key={cases[i].id} caseDef={cases[i]} result={results[i]} />
               ))}
@@ -240,7 +240,7 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
           }}
         >
           <strong>Outside tolerance:</strong> {result.failures.join("; ")}. This case is shown so the page
-          reflects the engine&apos;s current behavior; the discrepancy needs investigation.
+          reflects the calculator&apos;s current behavior; the discrepancy needs investigation.
         </div>
       )}
 
@@ -253,7 +253,7 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
           rel="noopener noreferrer"
           style={{ fontSize: 11, color: "var(--color-primary)", textDecoration: "underline" }}
         >
-          {caseDef.source.citation} ↗
+          {caseDef.source.citation}
         </a>
         <span style={{ fontSize: 11, color: "var(--color-dim)" }}>
           DOI: {caseDef.source.doi}
@@ -277,7 +277,7 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
             textDecoration: "none",
           }}
         >
-          Run in calculator →
+          Run in calculator
         </Link>
       </footer>
     </article>
@@ -301,7 +301,7 @@ function SourceDetails({ caseDef }: { caseDef: PublishedCase }) {
 // Reference-band card — published multi-model AUC comparison.
 // Renders the per-model means as horizontal bars with optional SD
 // whiskers, highlighting the model Vancomyzer uses for dosing.
-// No engine call, no pass/fail.
+// No calculator call, no pass/fail.
 // ─────────────────────────────────────────────────────────────────────
 
 function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: ReferenceBand }) {
@@ -391,7 +391,7 @@ function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: Re
           rel="noopener noreferrer"
           style={{ fontSize: 11, color: "var(--color-primary)", textDecoration: "underline" }}
         >
-          {caseDef.source.citation} ↗
+          {caseDef.source.citation}
         </a>
         <span style={{ fontSize: 11, color: "var(--color-dim)" }}>
           DOI: {caseDef.source.doi}
@@ -466,7 +466,7 @@ function PassFailBadge({ pass, failures }: { pass: boolean; failures: string[] }
   if (pass) {
     return (
       <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#ecfdf5", color: "#047857", border: "1px solid #6ee7b7", borderRadius: 4 }}>
-        ✓ Within tolerance
+        Within tolerance
       </span>
     );
   }
@@ -580,7 +580,7 @@ function ReproductionTable({ caseDef, result }: { caseDef: PublishedCase; result
           <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
             <th style={thStyle}></th>
             <th style={thStyle}>Published</th>
-            <th style={thStyle}>Engine ({COLIN_2019.shortName})</th>
+            <th style={thStyle}>Vancomyzer ({COLIN_2019.shortName})</th>
             <th style={thStyle}>Difference</th>
             <th style={thStyle}>Tolerance</th>
           </tr>
@@ -594,7 +594,7 @@ function ReproductionTable({ caseDef, result }: { caseDef: PublishedCase; result
                 <td style={tdNumStyle}>{r.publishedText ?? r.published?.toFixed(r.digits) ?? "—"}</td>
                 <td style={tdNumStyle}>{r.engine?.toFixed(r.digits) ?? "—"}</td>
                 <td style={{ ...tdNumStyle, color: ok ? "#047857" : "#b91c1c", fontWeight: 600 }}>
-                  {signedPct(r.pct, 2)} {ok ? "✓" : "⚠"}
+                  {signedPct(r.pct, 2)} {ok ? "Within tolerance" : "Outside tolerance"}
                 </td>
                 <td style={tdNumStyle}>±{r.tol}%</td>
               </tr>
@@ -615,7 +615,7 @@ function CrossModelTable({ caseDef, result }: { caseDef: PublishedCase; result: 
           <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
             <th style={thStyle}></th>
             <th style={thStyle}>Published (different model or cohort)</th>
-            <th style={thStyle}>Engine ({COLIN_2019.shortName})</th>
+            <th style={thStyle}>Vancomyzer ({COLIN_2019.shortName})</th>
             <th style={thStyle}>Difference (context only)</th>
           </tr>
         </thead>
@@ -677,7 +677,7 @@ function Limitations() {
       </h2>
       <ul style={{ fontSize: 12, color: "var(--color-secondary)", lineHeight: 1.65, marginLeft: 18, marginTop: 0, marginBottom: 0 }}>
         <li>
-          These cases check the engine against published values; they are not clinical validation.
+          These cases check the calculator against published values; they are not clinical validation.
           Vancomyzer has not yet been validated in real patients. Its equations are checked against
           published values and synthetic test cases; external validation with patient data is planned.
         </li>
@@ -687,7 +687,7 @@ function Limitations() {
           implemented as published, not that doses are accurate for patients.
         </li>
         <li>
-          Cross-model references compare the engine ({COLIN_2019.shortName}) with a different published
+          Cross-model references compare the calculator ({COLIN_2019.shortName}) with a different published
           model or a cohort statistic. {CROSS_MODEL_WORDING} A difference does not show which model is more
           accurate for a given patient. Some of these cards use approximated or illustrative inputs; each
           card says which.
@@ -713,7 +713,7 @@ function Limitations() {
           individual patient. Every clinical decision remains the responsibility of the treating clinician.
         </li>
         <li>
-          These cases run in the automated test suite (npm test); a drift outside tolerance fails the suite.
+          These cases run in the automated checks; a difference outside the stated tolerance fails the check.
           A case outside tolerance is still shown on this page, with an amber badge.
         </li>
       </ul>

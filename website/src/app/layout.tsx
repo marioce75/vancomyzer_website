@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://vancomyzer.com"),
   title: "VANCOMYZER\u2122",
   description:
-    "Vancomycin dosing support with visible assumptions, review-critical limitations, and clinician-readable outputs.",
+    "Vancomycin dosing estimates for adults, with model assumptions, limitations and references.",
   icons: {
     icon: { url: "/favicon.svg", type: "image/svg+xml" },
     apple: "/favicon.svg",
@@ -42,7 +42,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen flex flex-col antialiased" suppressHydrationWarning>
+      <body className="theme-basic min-h-screen flex flex-col antialiased" suppressHydrationWarning>
         <Providers>
           <div className="flex-1">{children}</div>
           <RegulatoryFooter />

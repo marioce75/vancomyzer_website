@@ -44,7 +44,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
   // Dose count and clinician confirmation are separate decisions.
   const handleDosesGiven = (n: number) => {
     if (n === 1) {
-      // Pulse dose: auto-set interval to 12 (placeholder for PK engine) and default target AUC
+      // Pulse dose: auto-set interval to 12 (placeholder for PK model) and default target AUC
       update({
         doses_given: 1,
         steady_state_confirmed: false,

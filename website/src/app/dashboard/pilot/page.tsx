@@ -111,7 +111,7 @@ export default function PilotDashboardPage() {
                 <span style={{ fontSize: 10, fontWeight: 700, color: SLATE, letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
                   {phase.label}
                 </span>
-                {phase.done && <span style={{ color: GREEN, fontSize: 13 }}>✓</span>}
+                {phase.done && <span>Complete</span>}
                 {isActive && <span style={{ color: GREEN, fontSize: 13 }}>●</span>}
               </div>
               <div style={{ fontSize: 14, fontWeight: 600, color: NAVY }}>{phase.subtitle}</div>
@@ -229,7 +229,7 @@ export default function PilotDashboardPage() {
               ['Email support', true],
             ] as [string, boolean][]).map(([feature, included]) => (
               <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: SLATE }}>
-                <span style={{ color: included ? GREEN : '#94a3b8', fontWeight: 700 }}>{included ? '✓' : '→'}</span>
+                <span style={{ color: included ? GREEN : '#94a3b8', fontWeight: 700 }}>{included ? 'Included' : 'Optional'}</span>
                 <span>{feature}</span>
                 {!included && (
                   <span style={{ fontSize: 10, border: `1px solid ${GREEN}50`, color: GREEN, padding: '1px 6px' }}>Pro</span>
@@ -241,7 +241,7 @@ export default function PilotDashboardPage() {
       )}
 
       <div style={{ marginTop: 24 }}>
-        <Link href="/calculator" style={{ fontSize: 12, color: SLATE, textDecoration: 'none' }}>← Back to Calculator</Link>
+        <Link href="/calculator" style={{ fontSize: 12, color: SLATE, textDecoration: 'none' }}> Back to Calculator</Link>
       </div>
     </div>
   )

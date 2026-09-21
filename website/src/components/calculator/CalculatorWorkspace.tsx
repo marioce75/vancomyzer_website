@@ -73,9 +73,9 @@ function isBandUncertaintyLabel(value: unknown): value is BandUncertaintyLabel {
  * - The response now carries posterior_fit, so its uncertainty_label is used
  *   directly and widened for a weak or prior-only fit.
  * - The reconstruction below is the fallback for a response without it (a
- *   result restored from an older session snapshot): no posterior refinement →
+ *   result restored from an older session snapshot): no posterior refinement
  *   population_only; "multiple coherent levels" (fit_quality and uncertainty
- *   both "moderate") → moderate; any other fitted result → high. The engine
+ *   both "moderate")  moderate; any other fitted result  high. The engine
  *   never labels a fit "low", so the number of levels alone never narrows the
  *   band.
  * - Fit-quality warnings keep the band at "high" or wider.
@@ -289,9 +289,9 @@ export default function CalculatorWorkspace() {
         }));
         setRrt(false);
         // Mode selection:
-        //   - empiric / prior_at_regimen → empiric mode (engine picks regimen;
+        //   - empiric / prior_at_regimen  empiric mode (engine picks regimen;
         //     PK Parameters panel shows the prior's CL which is the matching point)
-        //   - existing with levels → existing-regimen mode at the appropriate level count
+        //   - existing with levels  existing-regimen mode at the appropriate level count
         if (c.workflow_type === "empiric" || c.workflow_type === "prior_at_regimen") {
           applyViewMode("empiric");
         } else if (c.regimen) {
@@ -526,11 +526,11 @@ export default function CalculatorWorkspace() {
           `\nVANCOMYZER PK VALIDATION\n========================\n` +
           `Trough (panel):     ${fmt(Number(panelTrough), 2)} mg/L\n` +
           `Trough (graph):     ${fmt(curveTrough, 2)} mg/L\n` +
-          `Match: ${troughMatch ? "✓ PASS" : "✗ FAIL (Δ=" + fmt(Math.abs(panelTrough - curveTrough), 2) + ")"}\n\n` +
+          `Match: ${troughMatch ? "PASS" : "✗ FAIL (Δ=" + fmt(Math.abs(panelTrough - curveTrough), 2) + ")"}\n\n` +
           `AUC24 (panel):      ${fmt(Number(panelAuc), 1)} mg·h/L\n` +
           `AUC24 (trapezoid):  ${fmt(trapAuc, 1)} mg·h/L\n` +
           `Δ: ${fmt(aucDelta, 1)} mg·h/L${aucMatch ? " — within tolerance" : " — EXCEEDS tolerance"}\n` +
-          `Match: ${aucMatch ? "✓ PASS" : "✗ FAIL"}\n\n` +
+          `Match: ${aucMatch ? "PASS" : "✗ FAIL"}\n\n` +
           `Model: ${modelDisplayName(data.pk_parameters?.pk_model_name)}\n` +
           `τ: ${data.recommended_interval_hours ?? "?"}h\n` +
           `Infusion: ${data.recommended_infusion_duration_hours ?? "?"}h`
@@ -565,7 +565,7 @@ export default function CalculatorWorkspace() {
       interval_hours: prev.interval_hours > 0 ? prev.interval_hours : 12,
       target_auc24: prev.target_auc24 ?? 450,
     }));
-    // Phase 1 → open Drug Levels section so the pharmacist can enter the level when drawn
+    // Phase 1  open Drug Levels section so the pharmacist can enter the level when drawn
     setActiveSection("levels");
   }, [bedboundDoseData]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -614,7 +614,7 @@ export default function CalculatorWorkspace() {
   const visibleResult = hasStaleResult ? null : result;
 
   // Single source of truth: the currently active frequency option.
-  // selectedFrequencyOption → user clicked a tab; recommendedOption → backend primary recommendation.
+  // selectedFrequencyOption  user clicked a tab; recommendedOption  backend primary recommendation.
   // Every output section must read from activeOption rather than visibleResult directly.
   // The engine's recommended candidate is the default selection on both paths
   // (on the initial-regimen path its curve is the response's own curve at a
@@ -626,7 +626,7 @@ export default function CalculatorWorkspace() {
   // loading dose alone over its first 24 h, so the row plots the engine's
   // single-dose curve to match (the top-level curve is the dose continued at a
   // placeholder interval the loading-dose form never asks for). Each
-  // candidate's curve is loading → that maintenance. Nothing is recomputed.
+  // candidate's curve is loading  that maintenance. Nothing is recomputed.
   const currentRegimenOption: FrequencyOption | null =
     viewCurrentRegimen && visibleResult?.recommendation_type === "existing_regimen"
       ? {
@@ -659,8 +659,8 @@ export default function CalculatorWorkspace() {
   const levelReady = levels.some((level) => level.value_mcg_ml > 0 && level.time_since_last_dose_hours >= 0);
 
   // Bedbound two-phase gating:
-  // Phase 1 — loading dose entered, level not yet drawn → Calculate hidden
-  // Phase 2 — level concentration + collection_time both present → Calculate visible
+  // Phase 1 — loading dose entered, level not yet drawn  Calculate hidden
+  // Phase 2 — level concentration + collection_time both present  Calculate visible
   const bedboundLevelComplete = !bedbound || (
     (levels[0]?.value_mcg_ml ?? 0) > 0 &&
     Boolean(levels[0]?.collection_time)
@@ -1032,8 +1032,8 @@ export default function CalculatorWorkspace() {
       <Advisory
         key="sampling"
         severity="info"
-        title={displayResult.calculation_details?.review_status.banner_title ?? "Prior-only maintenance suggestion"}
-        summary="Population prior only — no measured level used. Draw a level and re-run for an individualized Bayesian fit."
+        title={displayResult.calculation_details?.review_status.banner_title ?? "Estimate without measured levels"}
+        summary="Based on patient characteristics, without measured levels. Enter a measured vancomycin level to refine the estimate."
         collapsible
         action={
           <button
@@ -1042,7 +1042,7 @@ export default function CalculatorWorkspace() {
             className="rounded border px-2 py-0.5 text-[11px] font-semibold"
             style={{ borderColor: "#1f5e96", background: "#fff", color: "#14232f", cursor: "pointer" }}
           >
-            1-Level workflow →
+            Enter a measured level
           </button>
         }
       >
@@ -1138,8 +1138,8 @@ export default function CalculatorWorkspace() {
             </p>
             <p style={{ marginTop: 6 }}>
               The 2020 ASHP/IDSA/PIDS/SIDP consensus guideline recommends a target of
-              <strong> 400–600 mg·h/L</strong>. Below 400 → underdosed (risk of treatment failure
-              and resistance selection). Above 600 → significant nephrotoxicity risk, especially
+              <strong> 400–600 mg·h/L</strong>. Below 400  underdosed (risk of treatment failure
+              and resistance selection). Above 600  significant nephrotoxicity risk, especially
               if sustained beyond 48 hours. The trough number alone is no longer the recommended
               target — AUC integrates the entire dosing interval and is more clinically meaningful.
             </p>
@@ -1182,7 +1182,7 @@ export default function CalculatorWorkspace() {
                   documentation suite on Individual Pro and above — alongside Copy Note and Export PDF.
                 </p>
                 <Link href="/pricing" className="mt-1.5 inline-block text-xs font-semibold underline" style={{ color: "#1f5e96" }}>
-                  See pricing →
+                  See pricing
                 </Link>
               </div>
             }
@@ -1270,7 +1270,7 @@ export default function CalculatorWorkspace() {
                           {isPulse ? `Loading dose continued (${regimen.dose_mg} mg q${regimen.interval_hours}h)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`}
                         </button>
                         <button type="button" aria-pressed={showEngineRecommended} onClick={() => setShowEngineRecommended(true)}>
-                          Engine recommendation
+                          Suggested regimen
                         </button>
                       </div>
                     </div>
@@ -1399,8 +1399,8 @@ export default function CalculatorWorkspace() {
           </div>
           {displayResult && !resultObscured && (
             <div className="border-t px-2 py-1 text-[10.5px]" style={{ borderTopColor: "var(--color-border)", color: "var(--color-dim)" }}>
-              Safety guardrails: adult intermittent IV workflow only · not for pediatrics, dialysis-specific or continuous infusion ·{" "}
-              {displayResult.recommendation_type === "initial_regimen" ? "prior-only maintenance support; not patient-specific severity direction" : "requires interpretable same-interval timing and routine dose history"}.{" "}
+              Adults receiving intermittent IV vancomycin only · not for pediatrics, dialysis-specific or continuous infusion ·{" "}
+              {displayResult.recommendation_type === "initial_regimen" ? "estimates without levels do not account for illness severity" : "requires interpretable same-interval timing and routine dose history"}.{" "}
               <a href="/transparent-dosing" className="underline">Evidence</a>
             </div>
           )}
@@ -1504,7 +1504,7 @@ export default function CalculatorWorkspace() {
             href={`/transparent-dosing/cases#${loadedCase.id}`}
             style={{ marginLeft: "auto", color: "#14232f", textDecoration: "underline", fontWeight: 600 }}
           >
-            View case page →
+            View case page
           </a>
           <button
             type="button"

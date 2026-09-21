@@ -47,7 +47,7 @@ export default function NoteExportGate({ tier, onCopy, noteText: _noteText }: No
           minWidth: 110,
         }}
       >
-        {copied ? "✓ Copied!" : "Copy Note"}
+        {copied ? "Copied!" : "Copy Note"}
       </button>
 
       <UpgradeModal open={modalOpen} onClose={() => setModalOpen(false)} feature="export.note.copy" />

@@ -24,7 +24,7 @@ const DAILY_DOSE_MG = 2000;
 export const COLIN_2019_TYPICAL_ADULT: PublishedCase = {
   id: "colin-2019-typical-adult",
   what_it_tests:
-    `The engine's ${COLIN_2019.shortName} prior for the published typical adult (35 y, 70 kg, SCr 0.83 mg/dL) should match the published CL (4.10 L/h), V1 (42.9 L) and the AUC₂₄ that CL implies at 1000 mg every 12 h, each within 1%.`,
+    `The calculator's ${COLIN_2019.shortName} prior for the published typical adult (35 y, 70 kg, SCr 0.83 mg/dL) should match the published CL (4.10 L/h), V1 (42.9 L) and the AUC₂₄ that CL implies at 1000 mg every 12 h, each within 1%.`,
   source: {
     citation: COLIN_2019.citation,
     doi: COLIN_2019.doi,
@@ -62,7 +62,7 @@ export const COLIN_2019_TYPICAL_ADULT: PublishedCase = {
     extraction_method:
       "CL and V1 read from the published abstract. AUC₂₄ derived from the published CL: 2000 mg/day / 4.10 L/h = 487.8 mg·h/L.",
     tolerance_rationale:
-      "±1% on CL, V1 and AUC₂₄. The published values come from the same equations the engine implements, so the only expected difference is rounding of the published values (CL 4.10 L/h is rounded to about ±0.12%). A larger difference means the implementation changed and must be investigated.",
+      "±1% on CL, V1 and AUC₂₄. The published values come from the same equations the calculator implements, so the only expected difference is rounding of the published values (CL 4.10 L/h is rounded to about ±0.12%). A larger difference means the implementation changed and must be investigated.",
   },
   comparison_kind: "same_model_reproduction",
   tolerance: {
@@ -73,6 +73,6 @@ export const COLIN_2019_TYPICAL_ADULT: PublishedCase = {
     v1_pct: 1,
   },
   notes_for_page:
-    "Same model as the engine. The published values describe a model-typical individual, not a real patient, so this checks that the equations are implemented as published; it does not test clinical accuracy.",
+    "Same model as the calculator. The published values describe a model-typical individual, not a real patient, so this checks that the equations are implemented as published; it does not test clinical accuracy.",
   workflow_type: "prior_at_regimen",
 };

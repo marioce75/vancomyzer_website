@@ -47,7 +47,7 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
     ? posterior_fit?.uncertainty_label === "high"
       ? "Posterior-updated but high-uncertainty estimate"
       : "Posterior-updated estimate"
-    : "First-pass population estimate";
+    : "Initial population estimate";
 
   // A refusal must not also state a recommendation. When the safety layer blocks
   // maintenance dosing, recommended_dose is the sentinel "—" and the interval is

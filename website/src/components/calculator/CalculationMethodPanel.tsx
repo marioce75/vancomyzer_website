@@ -32,7 +32,7 @@ export default function CalculationMethodPanel({
       <dl className="vz-kv mb-2">
         <dt>Method</dt><dd>{details?.method ?? modeLabel(mode, levelCount)}</dd>
         <dt>Model</dt><dd>{modelShortName(pkModelName)} &middot; Adult intermittent IV &middot; two-compartment</dd>
-        <dt>Workflow</dt><dd>{details?.review_status.workflow_fit ?? modeLabel(mode, levelCount)}</dd>
+        <dt>Calculation type</dt><dd>{details?.review_status.workflow_fit ?? modeLabel(mode, levelCount)}</dd>
         <dt>Evidence</dt><dd>{details?.evidence_strength ?? "—"}</dd>
         <dt>Safety bounds</dt><dd>{infusionDurationAdjustedForSafety ? "Infusion rate limited to 10 mg/min (duration extended)" : "Standard (10 mg/min max, ≥60 min)"}</dd>
         <dt>Target</dt><dd>AUC₂₄ 400–600 mg·h/L (ASHP/IDSA/PIDS/SIDP 2020)</dd>
@@ -52,7 +52,7 @@ export default function CalculationMethodPanel({
               {assumptions.map((a, i) => (
                 <li key={i}>{a}</li>
               ))}
-              {assumptions.length === 0 && <li>Adult intermittent IV workflow only. Steady state assumed unless prior doses specified.</li>}
+              {assumptions.length === 0 && <li>For adults receiving intermittent IV vancomycin only. Steady state assumed unless prior doses specified.</li>}
             </ul>
           </div>
           <div>
@@ -60,11 +60,11 @@ export default function CalculationMethodPanel({
             <ul className="space-y-1.5">
               <li>
                 {COLIN_2019.citation}{" "}
-                <a href={`https://doi.org/${COLIN_2019.doi}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">DOI ↗</a>
+                <a href={`https://doi.org/${COLIN_2019.doi}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">DOI </a>
               </li>
               <li>
                 Rybak MJ et al. <em>Therapeutic monitoring of vancomycin.</em> AJHP. 2020;77(11):835–864.{" "}
-                <a href="https://doi.org/10.1093/ajhp/zxaa036" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">DOI ↗</a>
+                <a href="https://doi.org/10.1093/ajhp/zxaa036" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">DOI </a>
               </li>
               <li>
                 <Link href="/transparent-dosing" className="text-blue-600 hover:underline font-medium">View full references &amp; equations</Link>

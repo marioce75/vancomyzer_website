@@ -222,7 +222,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     ...FONT,
                   }}
                 >
-                  {label} →
+                  {label}
                 </Link>
               ))}
             </div>

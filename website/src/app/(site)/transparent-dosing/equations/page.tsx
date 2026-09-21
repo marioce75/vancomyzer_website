@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing/equations" },
   title: "Equations & Derivations — Vancomyzer™",
   description:
-    `Full mathematical derivations for Vancomyzer's two-compartment PK engine — the ${COLIN_2019.shortName} population model, two-compartment rate constants, single-dose and multi-dose superposition, steady-state AUC₂₄, and body-weight scaling. Open math; cite if useful.`,
+    `Full mathematical derivations for Vancomyzer's two-compartment PK model — the ${COLIN_2019.shortName} population model, two-compartment rate constants, single-dose and multi-dose superposition, steady-state AUC₂₄, and body-weight scaling. Open math; cite if useful.`,
   openGraph: {
     title: "Equations & Derivations — Vancomyzer™",
     description: "The math behind every Vancomyzer dose recommendation, in the open.",
@@ -92,7 +92,7 @@ export default function EquationsPage() {
             className="text-xs font-bold uppercase tracking-[0.18em]"
             style={{ color: "#1f5e96" }}
           >
-            ← Back to the manifesto
+             Back to Evidence
           </Link>
           <h1
             className="mt-6 text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl"
@@ -177,7 +177,7 @@ export default function EquationsPage() {
           <p className="mt-6 text-xs" style={{ color: "#64748b" }}>
             {COLIN_2019.citation}&nbsp;
             <a href={doiUrl(COLIN_2019.doi)} target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
-              doi:{COLIN_2019.doi} ↗
+              doi:{COLIN_2019.doi}
             </a>
           </p>
         </div>
@@ -219,8 +219,8 @@ A = (α − k21) / [V1 × (α − β)]
 B = (k21 − β) / [V1 × (α − β)]
 
 Half-lives:
-  t½α = ln(2) / α    ← distribution half-life (~0.5–4h)
-  t½β = ln(2) / β    ← terminal elimination half-life (~6–80h)`}</pre>
+  t½α = ln(2) / α     distribution half-life (~0.5–4h)
+  t½β = ln(2) / β     terminal elimination half-life (~6–80h)`}</pre>
         </div>
       </section>
 
@@ -374,12 +374,12 @@ two-compartment steady-state superposition formula
           <p className="mt-4 text-xs" style={{ color: "#64748b" }}>
             Janmahasatian S, et al. <em>Clin Pharmacokinet</em>. 2005;44(10):1051–1065.&nbsp;
             <a href="https://doi.org/10.2165/00003088-200544100-00004" target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
-              doi:10.2165/00003088-200544100-00004 ↗
+              doi:10.2165/00003088-200544100-00004
             </a>
             &nbsp;·&nbsp;
             Cockcroft DW, Gault MH. <em>Nephron</em>. 1976;16(1):31–41.&nbsp;
             <a href="https://pubmed.ncbi.nlm.nih.gov/1244564/" target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
-              PubMed ↗
+              PubMed
             </a>
           </p>
 
@@ -401,7 +401,7 @@ two-compartment steady-state superposition formula
                     rel="noopener noreferrer"
                     style={{ color: "#1f5e96" }}
                   >
-                    PubMed ↗
+                    PubMed
                   </a>
                 </>
               )}
@@ -467,14 +467,14 @@ Prior log-SDs (Vancomyzer settings, all adults):
             The therapeutic target of <strong>AUC₂₄ 400–600 mg·h/L</strong> (assuming MIC = 1 mg/L) follows
             the 2020 revised consensus guideline for serious MRSA infections. The guideline no longer recommends
             trough-only monitoring and recommends AUC-guided dosing, preferably with Bayesian estimation, citing data
-            associating AUC-guided dosing with less acute kidney injury than trough-guided dosing. The engine&rsquo;s
+            associating AUC-guided dosing with less acute kidney injury than trough-guided dosing. The calculator&rsquo;s
             recommendation search picks the dose × interval combination whose predicted steady-state AUC
             sits closest to the midpoint of this range.
           </p>
           <p className="mt-4 text-xs" style={{ color: "#64748b" }}>
             Rybak MJ et al. <em>Am J Health Syst Pharm</em>. 2020;77(11):835–864.&nbsp;
             <a href="https://doi.org/10.1093/ajhp/zxaa036" target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
-              doi:10.1093/ajhp/zxaa036 ↗
+              doi:10.1093/ajhp/zxaa036
             </a>
           </p>
         </div>
@@ -517,14 +517,14 @@ Prior log-SDs (Vancomyzer settings, all adults):
               className="cta-primary inline-block rounded-md px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition"
               style={{ background: "#1f5e96", color: "#ffffff", letterSpacing: "0.08em" }}
             >
-              ← Back to manifesto
+               Back to Evidence
             </Link>
             <Link
               href={isOpenAccess() ? "/calculator" : "/register"}
               className="cta-outline inline-block rounded-md border-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition"
               style={{ borderColor: "#cbd5e1", color: "#ffffff", letterSpacing: "0.08em" }}
             >
-              Try the calculator →
+              Try the calculator
             </Link>
           </div>
         </div>

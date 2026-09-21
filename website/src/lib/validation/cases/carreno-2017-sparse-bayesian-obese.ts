@@ -26,7 +26,7 @@ import type { PublishedCase } from "../types";
 export const CARRENO_2017_SPARSE_BAYESIAN_OBESE: PublishedCase = {
   id: "carreno-2017-sparse-bayesian-obese",
   what_it_tests:
-    `The engine's ${COLIN_2019.shortName} Bayesian AUC₂₄ from two illustrative levels, next to the range of full-data AUC₂₄ estimates (437–489 mg·h/L) that Carreno 2017 reported across four other population models in 12 obese adults.`,
+    `The calculator's ${COLIN_2019.shortName} Bayesian AUC₂₄ from two illustrative levels, next to the range of full-data AUC₂₄ estimates (437–489 mg·h/L) that Carreno 2017 reported across four other population models in 12 obese adults.`,
   source: {
     citation:
       "Carreno JJ, Lomaestro B, Tietjan J, Lodise TP. Pilot Study of a Bayesian Approach To Estimate Vancomycin Exposure in Obese Patients with Limited Pharmacokinetic Sampling. Antimicrob Agents Chemother. 2017;61(5):e02478-16",

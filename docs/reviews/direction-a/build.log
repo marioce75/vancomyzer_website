@@ -1,0 +1,180 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+
+   Creating an optimized production build ...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./src/app/(site)/register/page.tsx
+152:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/(site)/reset-password/page.tsx
+70:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/admin/dashboard/security/page.tsx
+157:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/callback/page.tsx
+125:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/launch/page.tsx
+122:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/layout.tsx
+36:9  Warning: Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+40:9  Warning: Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+./src/app/mfa-verify/page.tsx
+41:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/Footer.tsx
+15:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/calculator/CalculatorWorkspace.tsx
+555:6  Warning: React Hook useEffect has a missing dependency: 'hideCalculate'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/lib/db.ts
+299:1  Warning: Assign instance to a variable before exporting as module default  import/no-anonymous-default-export
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/101) ...
+   Generating static pages (25/101) 
+   Generating static pages (50/101) 
+   Generating static pages (75/101) 
+ ✓ Generating static pages (101/101)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                     Size     First Load JS
+┌ ○ /                                           5.66 kB         102 kB
+├ ○ /_not-found                                 876 B          88.2 kB
+├ ○ /about                                      178 B          87.5 kB
+├ ○ /admin                                      178 B          87.5 kB
+├ ○ /admin/dashboard                            1.34 kB        97.4 kB
+├ ○ /admin/dashboard/baa                        2 kB           89.4 kB
+├ ○ /admin/dashboard/calculations               5.08 kB        92.4 kB
+├ ○ /admin/dashboard/discounts                  2.61 kB          90 kB
+├ ○ /admin/dashboard/market-intelligence        4.88 kB         101 kB
+├ ○ /admin/dashboard/market-intelligence/files  3.52 kB        99.6 kB
+├ ○ /admin/dashboard/pilot-applications         2.54 kB        89.9 kB
+├ ○ /admin/dashboard/pilots                     1.49 kB        88.9 kB
+├ ○ /admin/dashboard/policy                     1.39 kB        88.8 kB
+├ ○ /admin/dashboard/research                   1.11 kB        97.2 kB
+├ ○ /admin/dashboard/security                   2.32 kB        89.7 kB
+├ ○ /admin/dashboard/system                     1.53 kB        88.9 kB
+├ ƒ /admin/dashboard/usage                      178 B          87.5 kB
+├ ○ /admin/dashboard/users                      8 kB           95.4 kB
+├ ƒ /api/admin                                  0 B                0 B
+├ ƒ /api/admin/baa/[id]/countersign             0 B                0 B
+├ ƒ /api/admin/baa/pending                      0 B                0 B
+├ ƒ /api/admin/calculations                     0 B                0 B
+├ ƒ /api/admin/dashboard/overview               0 B                0 B
+├ ƒ /api/admin/discounts/[id]                   0 B                0 B
+├ ƒ /api/admin/discounts/pending                0 B                0 B
+├ ƒ /api/admin/market-intelligence              0 B                0 B
+├ ƒ /api/admin/pilot-applications               0 B                0 B
+├ ƒ /api/admin/scraper                          0 B                0 B
+├ ƒ /api/admin/trials                           0 B                0 B
+├ ƒ /api/admin/users-v2/list                    0 B                0 B
+├ ƒ /api/admin/users-v2/segments                0 B                0 B
+├ ƒ /api/audit                                  0 B                0 B
+├ ƒ /api/auth/[...nextauth]                     0 B                0 B
+├ ƒ /api/auth/acknowledge                       0 B                0 B
+├ ƒ /api/auth/forgot-password                   0 B                0 B
+├ ƒ /api/auth/magic-link                        0 B                0 B
+├ ƒ /api/auth/magic-link/callback               0 B                0 B
+├ ƒ /api/auth/mfa/setup                         0 B                0 B
+├ ƒ /api/auth/mfa/verify                        0 B                0 B
+├ ƒ /api/auth/register                          0 B                0 B
+├ ƒ /api/auth/reset-password                    0 B                0 B
+├ ƒ /api/billing/baa/download                   0 B                0 B
+├ ƒ /api/billing/baa/executed-pdf               0 B                0 B
+├ ƒ /api/billing/baa/status                     0 B                0 B
+├ ƒ /api/billing/baa/upload                     0 B                0 B
+├ ƒ /api/billing/checkout                       0 B                0 B
+├ ƒ /api/billing/department-checkout            0 B                0 B
+├ ƒ /api/billing/department-portal              0 B                0 B
+├ ƒ /api/billing/department-upgrade             0 B                0 B
+├ ƒ /api/billing/portal                         0 B                0 B
+├ ƒ /api/billing/webhook                        0 B                0 B
+├ ƒ /api/bug-report                             0 B                0 B
+├ ƒ /api/calculate                              0 B                0 B
+├ ƒ /api/contact                                0 B                0 B
+├ ƒ /api/cron/trial-notifications               0 B                0 B
+├ ƒ /api/discounts/me                           0 B                0 B
+├ ƒ /api/fhir/patient                           0 B                0 B
+├ ƒ /api/fhir/token                             0 B                0 B
+├ ○ /api/health                                 0 B                0 B
+├ ƒ /api/history                                0 B                0 B
+├ ƒ /api/pilot-applications                     0 B                0 B
+├ ƒ /api/profile/categorization                 0 B                0 B
+├ ƒ /api/referrals/me                           0 B                0 B
+├ ƒ /api/research                               0 B                0 B
+├ ƒ /api/research/[id]                          0 B                0 B
+├ ƒ /api/research/[id]/dosing                   0 B                0 B
+├ ƒ /api/research/[id]/levels                   0 B                0 B
+├ ƒ /api/research/[id]/nephrotoxins             0 B                0 B
+├ ƒ /api/research/[id]/outcomes                 0 B                0 B
+├ ƒ /api/research/[id]/scr                      0 B                0 B
+├ ƒ /api/research/export                        0 B                0 B
+├ ƒ /api/settings                               0 B                0 B
+├ ƒ /api/subscription                           0 B                0 B
+├ ƒ /api/subscription/baa                       0 B                0 B
+├ ƒ /api/team/audit                             0 B                0 B
+├ ƒ /api/team/members                           0 B                0 B
+├ ƒ /api/team/members/[id]                      0 B                0 B
+├ ƒ /api/trial/generate-report                  0 B                0 B
+├ ƒ /api/trial/log-case                         0 B                0 B
+├ ƒ /api/trial/status                           0 B                0 B
+├ ○ /calculator                                 58.9 kB         169 kB
+├ ○ /callback                                   2.66 kB          90 kB
+├ ○ /compliance                                 1.62 kB         103 kB
+├ ○ /contact                                    2.5 kB         98.6 kB
+├ ○ /dashboard/pilot                            3.11 kB        99.2 kB
+├ ○ /disclaimer                                 178 B          87.5 kB
+├ ○ /faq                                        9.95 kB        97.3 kB
+├ ○ /launch                                     2.7 kB         90.1 kB
+├ ○ /login                                      2.55 kB         108 kB
+├ ○ /mfa-verify                                 1.39 kB        88.8 kB
+├ ○ /pricing                                    6.11 kB         102 kB
+├ ○ /privacy                                    178 B          87.5 kB
+├ ○ /register                                   6.57 kB         103 kB
+├ ○ /research                                   3.43 kB        99.5 kB
+├ ○ /research/enter                             4.41 kB         100 kB
+├ ○ /reset-password                             1.99 kB        98.1 kB
+├ ○ /robots.txt                                 0 B                0 B
+├ ○ /settings                                   5.95 kB         116 kB
+├ ○ /settings/billing                           3.51 kB         114 kB
+├ ○ /settings/history                           3.05 kB         114 kB
+├ ○ /sitemap.xml                                0 B                0 B
+├ ○ /team                                       7.21 kB         118 kB
+├ ○ /terms                                      178 B          87.5 kB
+├ ○ /transparent-dosing                         188 B          96.2 kB
+├ ○ /transparent-dosing/cases                   191 B          96.3 kB
+├ ○ /transparent-dosing/engine-crosscheck       188 B          96.2 kB
+├ ○ /transparent-dosing/equations               188 B          96.2 kB
+├ ○ /transparent-dosing/predictive-performance  188 B          96.2 kB
+├ ○ /upgrade                                    5.15 kB         101 kB
+└ ○ /upgrade/department                         178 B          87.5 kB
++ First Load JS shared by all                   87.4 kB
+  ├ chunks/2117-9298e206f9782455.js             31.7 kB
+  ├ chunks/fd9d1056-efee5043b92070b4.js         53.6 kB
+  └ other shared chunks (total)                 1.99 kB
+
+
+ƒ Middleware                                    48.2 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

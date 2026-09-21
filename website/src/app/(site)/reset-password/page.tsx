@@ -89,14 +89,14 @@ function ResetPasswordForm() {
               If an account with that email exists, you will receive a password reset link. Check your inbox (and spam folder).
             </p>
             <Link href="/login" style={{ display: "inline-block", marginTop: 20, fontSize: 13, color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}>
-              ← Back to Sign In
+               Back to Sign In
             </Link>
           </div>
         )}
 
         {success && (
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
+            <div style={{ fontSize: 40, marginBottom: 12 }}></div>
             <p style={{ fontSize: 14, color: "#047857", fontWeight: 600 }}>Password reset successfully!</p>
             <p style={{ fontSize: 13, color: "#4a5568", marginTop: 8 }}>You can now sign in with your new password.</p>
             <Link href="/login" style={{
@@ -130,7 +130,7 @@ function ResetPasswordForm() {
               {loading ? "Sending..." : "Send Reset Link"}
             </button>
             <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#546471" }}>
-              <Link href="/login" style={{ color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}>← Back to Sign In</Link>
+              <Link href="/login" style={{ color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}> Back to Sign In</Link>
             </p>
           </form>
         )}

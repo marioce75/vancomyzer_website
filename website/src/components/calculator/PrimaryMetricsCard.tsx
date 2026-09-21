@@ -8,7 +8,7 @@ interface PrimaryMetricsCardProps {
   /**
    * Band variant for the desktop cockpit: three tight metric cells with the
    * AUC target and attainment status inline, so the clinician reads
-   * dose → exposure → target in one horizontal sweep.
+   * dose  exposure  target in one horizontal sweep.
    */
   compact?: boolean;
   /** Caption above the metrics (e.g. "Steady-state PK — 1250 mg q12h"). */
@@ -31,11 +31,11 @@ function formatConc(value: number | null | undefined): string {
 }
 
 /** AUC₂₄ target attainment (2020 ASHP/IDSA/PIDS/SIDP consensus range). Display only. */
-function aucStatus(auc: number | null | undefined): { label: string; cls: string; glyph: string } | null {
+function aucStatus(auc: number | null | undefined): { label: string; cls: string } | null {
   if (auc == null || Number.isNaN(auc)) return null;
-  if (auc >= 400 && auc <= 600) return { label: "Within target", cls: "vz-chip--ok", glyph: "✓" };
-  if (auc > 600) return { label: "Above target", cls: "vz-chip--caution", glyph: "▲" };
-  return { label: "Below target", cls: "vz-chip--warn", glyph: "▼" };
+  if (auc >= 400 && auc <= 600) return { label: "Within target", cls: "vz-chip--ok" };
+  if (auc > 600) return { label: "Above target", cls: "vz-chip--caution" };
+  return { label: "Below target", cls: "vz-chip--warn" };
 }
 
 const Metric = ({ label, value, unit, compact, emphasis, sub }: { label: string; value: string; unit: string; compact?: boolean; emphasis?: boolean; sub?: React.ReactNode }) => (
@@ -88,7 +88,7 @@ export default function PrimaryMetricsCard({ auc24, peak, trough, compact = fals
             sub={
               <span className="flex flex-wrap items-center gap-1.5">
                 {status ? (
-                  <span className={`vz-chip ${status.cls}`}><span aria-hidden="true">{status.glyph}</span> {status.label}</span>
+                  <span className={`vz-chip ${status.cls}`}>{status.label}</span>
                 ) : ungraded ? (
                   <span className="vz-chip vz-chip--neutral">Single dose · first 24 h</span>
                 ) : (

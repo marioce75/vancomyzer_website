@@ -1,0 +1,21 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> vancomyzer-website@0.1.0 test:market-intel
+> node --import tsx src/lib/scraper/__tests__/analyst.test.ts && node --import tsx src/lib/scraper/__tests__/collection.test.ts
+
+[AI_ANALYST] Provider connection failure network
+AI analyst: evidence selection, citations, schema, model, credentials, provider errors, timeout, empty and truncated response checks passed.
+[FILES] Step 1: Saved 7 raw posts → 2026-09-21_12-20-10-757_raw_posts.json
+[FILES] Step 2: Saved analysis → 2026-09-21_12-20-10-757_analysis.json
+[FILES] Step 3: Updated latest_raw.json
+[FILES] Step 4: Updated latest_analysis.json
+[FILES] Step 5: Updated weekly digest → 2026-W39_weekly_digest.json
+[FILES] Step 6: Updated scraper_index.json
+[FILES] Save complete: 6 files written, 7 posts saved
+  - /tmp/market-intel-test-56NBtg/archives/raw/2026-09-21_12-20-10-757_raw_posts.json
+  - /tmp/market-intel-test-56NBtg/archives/analysis/2026-09-21_12-20-10-757_analysis.json
+  - /tmp/market-intel-test-56NBtg/archives/latest_raw.json
+  - /tmp/market-intel-test-56NBtg/archives/latest_analysis.json
+  - /tmp/market-intel-test-56NBtg/archives/weekly_digests/2026-W39_weekly_digest.json
+  - /tmp/market-intel-test-56NBtg/archives/scraper_index.json
+Collection/database: actual counts, deduplication, source failures, archives, updates, job locks, error persistence and path containment passed. 7 fixture records.

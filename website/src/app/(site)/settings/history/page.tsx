@@ -65,15 +65,15 @@ function HistoryUpgradeCard() {
       </p>
       <ul style={{ margin: "0 0 16px", padding: 0, listStyle: "none", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.7 }}>
         <li style={{ paddingLeft: 18, position: "relative" }}>
-          <span style={{ position: "absolute", left: 0, color: "#1f5e96", fontWeight: 700 }}>✓</span>
+
           Optional case IDs (do not enter patient identifiers)
         </li>
         <li style={{ paddingLeft: 18, position: "relative" }}>
-          <span style={{ position: "absolute", left: 0, color: "#1f5e96", fontWeight: 700 }}>✓</span>
-          Filter by workflow, date, case ID
+
+          Filter by calculation type, date, case ID
         </li>
         <li style={{ paddingLeft: 18, position: "relative" }}>
-          <span style={{ position: "absolute", left: 0, color: "#1f5e96", fontWeight: 700 }}>✓</span>
+
           90-day retention, automatically purged
         </li>
       </ul>
@@ -152,7 +152,7 @@ export default function HistoryPage() {
     <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 16px 80px" }}>
       <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
         <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-          ← Institutional Settings
+           Institutional Settings
         </Link>
         <span style={{ color: "var(--color-border)" }}>·</span>
         <Link href="/settings/billing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
@@ -313,7 +313,7 @@ export default function HistoryPage() {
                   cursor: offset === 0 ? "not-allowed" : "pointer",
                 }}
               >
-                ← Newer
+                 Newer
               </button>
               <span style={{ color: "var(--color-dim)" }}>
                 {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of {total}
@@ -331,7 +331,7 @@ export default function HistoryPage() {
                   cursor: offset + PAGE_SIZE >= total ? "not-allowed" : "pointer",
                 }}
               >
-                Older →
+                Older
               </button>
             </div>
           )}

@@ -144,7 +144,7 @@ export async function sendBaaExecutedEmail(ctx: BaaExecutedContext): Promise<voi
       subject: `Your Vancomyzer™ BAA is fully executed`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 560px;">
-          <h2 style="color: #047857; margin-bottom: 4px;">BAA Executed ✓</h2>
+          <h2 style="color: #047857; margin-bottom: 4px;">BAA Executed </h2>
           <p style="font-size: 13px; color: #2d3748; line-height: 1.55;">
             Hello ${escapeHtml(ctx.signerName)},
           </p>

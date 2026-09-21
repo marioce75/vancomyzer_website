@@ -205,7 +205,7 @@ function StatusBadge({ status }: { status: BaaStatus["status"] }) {
   const styles: Record<BaaStatus["status"], { bg: string; fg: string; border: string; label: string }> = {
     not_requested: { bg: "#fef3c7", fg: "#92400e", border: "#fcd34d", label: "Action required" },
     pending: { bg: "#dbeafe", fg: "#1e3a8a", border: "#93c5fd", label: "Awaiting countersign" },
-    active: { bg: "#ecfdf5", fg: "#047857", border: "#6ee7b7", label: "✓ Executed" },
+    active: { bg: "#ecfdf5", fg: "#047857", border: "#6ee7b7", label: "Executed" },
   };
   const s = styles[status];
   return (
@@ -262,7 +262,7 @@ function NotRequestedView({
               cursor: "pointer",
             }}
           >
-            Download BAA template (PDF) ↓
+            Download BAA template (PDF)
           </button>
         ) : (
           <div style={{ fontSize: 12, color: "#92400e", background: "#fffbeb", padding: "8px 10px", border: "1px solid #fcd34d", borderRadius: 4 }}>
@@ -442,7 +442,7 @@ function ActiveView({
             textDecoration: "none",
           }}
         >
-          Download executed BAA ↓
+          Download executed BAA
         </a>
       )}
     </div>

@@ -42,7 +42,7 @@ export default function TeachingNote({ label = "Why?", children }: TeachingNoteP
         }}
         aria-expanded={open}
       >
-        <span style={{ display: "inline-block", transform: open ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s" }}>▶</span>
+        {open ? "Hide" : "Show"}
         {label}
       </button>
       {open && (

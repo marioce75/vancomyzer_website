@@ -88,7 +88,7 @@ const CAPABILITIES: { title: string; body: string; source?: string }[] = [
   {
     title: "One model for all adults, with a high-BMI advisory",
     body:
-      `${COLIN_2019.shortName} is used throughout the supported adult workflow. At a BMI of ${HIGH_BMI_THRESHOLD_KG_M2} kg/m² or higher, an advisory notes that published evaluation at that size is limited, and fat-free mass and alternative creatinine-clearance estimates are shown for context only. They do not change the calculation.`,
+      `${COLIN_2019.shortName} is used throughout the supported adult population. At a BMI of ${HIGH_BMI_THRESHOLD_KG_M2} kg/m² or higher, an advisory notes that published evaluation at that size is limited, and fat-free mass and alternative creatinine-clearance estimates are shown for context only. They do not change the calculation.`,
     source: COLIN_2021_OBESE_EVALUATION.citation,
   },
   {
@@ -104,7 +104,7 @@ const EVIDENCE_STATUS: { item: string; covers: string; status: string; kind: "ok
   { item: "Population model", covers: `${COLIN_2019.shortName} two-compartment model; population-model equations and references (Bayesian fitting also uses numerical optimization)`, status: "Published", kind: "ok", href: "/transparent-dosing/equations" },
   { item: "Literature reproducibility", covers: "Published vancomycin cases run through the calculator; same-model reproductions are pass/fail", status: "Developer-run", kind: "ok", href: "/transparent-dosing/cases" },
   { item: "Predictive performance", covers: "Synthetic analysis (not real patients): predictions against simulated ICU patients from a different published model", status: "Developer-run", kind: "ok", href: "/transparent-dosing/predictive-performance" },
-  { item: "Engine cross-check", covers: "Synthetic analysis: individualized estimates compared with Tucuxi, a separately built program, against pre-set acceptance criteria", status: "Developer-run", kind: "ok", href: "/transparent-dosing/engine-crosscheck" },
+  { item: "Comparison with Tucuxi", covers: "Synthetic analysis: individualized estimates compared with Tucuxi, a separately built program, against pre-set acceptance criteria", status: "Developer-run", kind: "ok", href: "/transparent-dosing/engine-crosscheck" },
   { item: "Independent clinical validation", covers: "Study with patient data at a participating institution", status: "Pending", kind: "warn", href: "/transparent-dosing" },
   { item: "FDA review", covers: "Designed to meet non-device CDS criteria, FD&C §520(o)(1)(E); not reviewed by the FDA", status: "Not reviewed", kind: "warn", href: "/disclaimer" },
 ];
@@ -173,10 +173,8 @@ function H3({ children }: { children: React.ReactNode }) {
 }
 
 function Chip({ kind, children }: { kind: "ok" | "warn" | "crit"; children: React.ReactNode }) {
-  const glyph = kind === "ok" ? "✓" : kind === "warn" ? "!" : "✕";
   return (
     <span className={`vz-mchip vz-mchip--${kind}`}>
-      <span aria-hidden="true">{glyph}</span>
       {children}
     </span>
   );
@@ -192,7 +190,7 @@ export default function LandingPage() {
             Vancomycin dosing support for clinicians
           </span>
           <h1 className="vz-serif max-w-[22ch] text-[clamp(34px,4.6vw,56px)] leading-[1.08]" style={{ color: INK }}>
-            Vancomycin AUC calculator for adult patients, with the model in view.
+            Vancomycin AUC calculator for adult patients.
           </h1>
           <p className="mt-[22px] max-w-[60ch] text-xl leading-[1.5]" style={{ color: INK2 }}>
             Estimate a starting regimen or use measured levels to compare dosing options. Targets follow
@@ -208,7 +206,7 @@ export default function LandingPage() {
               Open the calculator
             </OpenCalculatorButton>
             <Link href="#how" className="vz-mbtn vz-mbtn--outline">
-              See how a result is built
+              How it works
             </Link>
           </div>
           <p className="mt-5 max-w-[70ch] text-[15px]" style={{ color: INK2 }}>{LAUNCH_LINE}</p>
@@ -216,7 +214,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── HOW A RESULT IS BUILT ──────────────────────────── */}
-      <Section id="how" label="How a result is built" note="One screen, read left to right.">
+      <Section id="how" label="How it works" note="Patient inputs, dosing estimates and model details.">
         <figure className="border bg-white p-2.5" style={{ borderColor: RULE, boxShadow: "0 1px 2px rgba(20,35,47,.06), 0 12px 32px -12px rgba(31,94,150,.25)" }}>
           <Image
             src="/images/calculator-result-fictional.png"
@@ -244,8 +242,7 @@ export default function LandingPage() {
           <div>
             <H3>2 · Recommendation</H3>
             <p className="mt-2" style={{ color: INK2 }}>
-              Dose, interval and a safe infusion duration, with AUC₂₄, peak and trough against the
-              400–600 mg·h/L target. Advisories sit under the decision, not above it.
+              Dose, interval and infusion duration. AUC₂₄ is compared with the 400–600 mg·h/L target; peak and trough are reported separately. Relevant cautions appear below the recommendation.
             </p>
           </div>
           <div>
@@ -406,7 +403,7 @@ export default function LandingPage() {
             className="mt-3 inline-block text-sm font-semibold underline underline-offset-2"
             style={{ color: ACTION }}
           >
-            Read the full medical disclaimer →
+            Read the full medical disclaimer
           </Link>
         </div>
       </Section>

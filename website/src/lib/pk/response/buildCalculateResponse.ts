@@ -119,11 +119,11 @@ export function buildCalculateResponse(
     frequency_options: enrichedFrequencyOptions,
     calculation_details: {
       method: engineOutput.used_posterior_refinement
-        ? "Adult prior model with bounded first-pass posterior refinement in a two-compartment intermittent steady-state workflow"
+        ? "Adult prior model with bounded initial posterior refinement in a two-compartment intermittent steady-state workflow"
         : "Adult prior model only in a two-compartment intermittent steady-state workflow",
       evidence_strength:
         engineOutput.level_count <= 0
-          ? "population prior only"
+          ? "patient characteristics only"
           : engineOutput.level_count === 1
             ? engineOutput.posterior_fit?.uncertainty_label === "high"
               ? "single level / high uncertainty"
@@ -133,10 +133,10 @@ export function buildCalculateResponse(
               : "multiple levels / bounded uncertainty",
       data_quality_summary:
         engineOutput.level_count <= 0
-          ? "No measured levels; workflow fit depends on population-prior assumptions only."
+          ? "No measured levels; model suitability depends on population-prior assumptions only."
           : engineOutput.level_count === 1
-            ? "Sparse single-level workflow fit; interpretable only when timing and dose history are clean."
-            : "Multi-level workflow fit with explicit chronology; review still depends on coherent same-interval timing.",
+            ? "Sparse single-level model suitability; interpretable only when timing and dose history are clean."
+            : "Multi-level model suitability with explicit chronology; review still depends on coherent same-interval timing.",
       review_status,
       key_inputs: [
         `SCr ${engineOutput.scr} mg/dL (${modelShortName(engineOutput.model_name)} renal covariate)`,

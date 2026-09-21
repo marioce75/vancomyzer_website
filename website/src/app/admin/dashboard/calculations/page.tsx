@@ -121,7 +121,7 @@ export default function AdminCalculationsPage() {
           />
         </div>
         <div>
-          <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase tracking-wide">Workflow</label>
+          <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase tracking-wide">Calculation type</label>
           <select
             value={workflowFilter}
             onChange={e => { setOffset(0); setWorkflowFilter(e.target.value); }}
@@ -220,7 +220,7 @@ export default function AdminCalculationsPage() {
             onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
             className="px-3 py-1.5 border border-slate-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100"
           >
-            ← Newer
+             Newer
           </button>
           <span>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of {total}</span>
           <button
@@ -229,7 +229,7 @@ export default function AdminCalculationsPage() {
             onClick={() => setOffset(offset + PAGE_SIZE)}
             className="px-3 py-1.5 border border-slate-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100"
           >
-            Older →
+            Older
           </button>
         </div>
       )}

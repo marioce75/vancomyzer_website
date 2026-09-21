@@ -9,7 +9,7 @@ interface InputSectionProps {
   completed: boolean;
   /** Optional right-side hint (e.g. "required"). */
   hint?: ReactNode;
-  /** When this matches `id`, the section scrolls into view (workflow hand-offs such as bedbound → levels). */
+  /** When this matches `id`, the section scrolls into view (workflow hand-offs such as bedbound  levels). */
   focusSection?: string;
   children: ReactNode;
 }
@@ -35,7 +35,7 @@ export default function InputSection({ id, title, completed, hint, focusSection,
         <span className="flex items-center gap-2">
           {hint}
           <span className={`vz-chip ${completed ? "vz-chip--ok" : "vz-chip--caution"}`}>
-            <span aria-hidden="true">{completed ? "✓" : "…"}</span> {completed ? "ready" : "needs input"}
+            {completed ? "ready" : "needs input"}
           </span>
         </span>
       </header>

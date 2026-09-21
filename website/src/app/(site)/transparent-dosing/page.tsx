@@ -7,7 +7,7 @@ import {
 
 export const metadata: Metadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing" },
-  title: "Transparent Dosing — Vancomyzer™",
+  title: "Evidence — Vancomyzer™",
   description:
     "Vancomyzer is a transparent Bayesian vancomycin dosing calculator: the model, the priors and an illustrative uncertainty band are shown in the open, with model equations and references available for review.",
   openGraph: {
@@ -91,14 +91,14 @@ export default function TransparentDosingPage() {
               className="cta-primary inline-block rounded-md px-6 py-3 text-center text-sm font-bold uppercase tracking-wider transition"
               style={{ background: "#1f5e96", color: "#ffffff", letterSpacing: "0.08em" }}
             >
-              Try Vancomyzer free →
+              Try Vancomyzer free
             </Link>
             <Link
               href="/faq"
               className="cta-outline inline-block rounded-md border-2 px-6 py-3 text-center text-sm font-bold uppercase tracking-wider transition"
               style={{ borderColor: "#cbd5e1", color: "#ffffff", letterSpacing: "0.08em" }}
             >
-              Read the methods →
+              Read the methods
             </Link>
           </div>
         </div>
@@ -193,19 +193,19 @@ export default function TransparentDosingPage() {
             {" = θ·CL  ×  (weight / 70)"}
             <span style={{ color: "#fbbf24" }}>{"^0.75"}</span>
             {"        "}
-            <span style={{ color: "#94a3b8" }}>{"← size (weight) scaling"}</span>
+            <span style={{ color: "#94a3b8" }}>{" size (weight) scaling"}</span>
             {"\n           ×  "}
             <span style={{ color: "#fbbf24" }}>F·maturation</span>
             {"             "}
-            <span style={{ color: "#94a3b8" }}>{"← ≈ 1.0 in adults"}</span>
+            <span style={{ color: "#94a3b8" }}>{" ≈ 1.0 in adults"}</span>
             {"\n           ×  "}
             <span style={{ color: "#fbbf24" }}>F·age-decline</span>
             {"            "}
-            <span style={{ color: "#94a3b8" }}>{"← 50% lower by age 61.6 yr"}</span>
+            <span style={{ color: "#94a3b8" }}>{" 50% lower by age 61.6 yr"}</span>
             {"\n           ×  "}
             <span style={{ color: "#fbbf24" }}>F·creatinine</span>
             {"             "}
-            <span style={{ color: "#94a3b8" }}>{"← serum creatinine effect"}</span>
+            <span style={{ color: "#94a3b8" }}>{" serum creatinine effect"}</span>
           </pre>
 
           <p className="mt-8 max-w-2xl text-base leading-relaxed" style={{ color: "#334155" }}>
@@ -247,7 +247,7 @@ export default function TransparentDosingPage() {
                 letterSpacing: "0.08em",
               }}
             >
-              ▶ Full derivations &amp; equations
+              Full derivations &amp; equations
             </Link>
             <Link
               href="/transparent-dosing/cases"
@@ -259,7 +259,7 @@ export default function TransparentDosingPage() {
                 letterSpacing: "0.08em",
               }}
             >
-              ▶ Literature reproducibility
+              Literature reproducibility
             </Link>
             <Link
               href="/transparent-dosing/predictive-performance"
@@ -271,7 +271,7 @@ export default function TransparentDosingPage() {
                 letterSpacing: "0.08em",
               }}
             >
-              ▶ Predictive performance
+              Predictive performance
             </Link>
             <Link
               href="/transparent-dosing/engine-crosscheck"
@@ -283,18 +283,18 @@ export default function TransparentDosingPage() {
                 letterSpacing: "0.08em",
               }}
             >
-              ▶ Engine cross-check
+              Comparison with Tucuxi
             </Link>
           </div>
           <p className="mt-3 text-xs" style={{ color: "#64748b" }}>
             Literature Reproducibility lists the published vancomycin cases we run through the
             calculator: the Colin 2019 cases are pass/fail reproductions of the same model, and
-            cases built on other published models are shown for context only, not as pass/fail tests. Predictive Performance and Engine Cross-Check are developer-run
+            cases built on other published models are shown for context only, not as pass/fail tests. Predictive Performance and Comparison with Tucuxi are developer-run
             synthetic analyses, not real-patient validation. Predictive Performance compares
             Vancomyzer against 200 synthetic ICU patients generated from a different published
-            model. Engine Cross-Check compares Vancomyzer against Tucuxi, a separately built
+            model. Comparison with Tucuxi compares Vancomyzer against Tucuxi, a separately built
             dosing program, when both are given the same priors — a reproducible run scored against
-            pre-set criteria (18 Sep 2026), with the earlier snapshot retained.
+            pre-set criteria (18 Sep 2026), with the earlier comparison retained.
           </p>
         </div>
       </section>
@@ -340,14 +340,14 @@ export default function TransparentDosingPage() {
                   className="mt-2 inline-block text-xs font-mono"
                   style={{ color: "#1f5e96" }}
                 >
-                  doi:{s.doi} ↗
+                  doi:{s.doi}
                 </a>
               </div>
             ))}
           </div>
 
           <p className="mt-10 max-w-2xl text-sm leading-relaxed" style={{ color: "#64748b" }}>
-            The {COLIN_2019.shortName} population model is used throughout the supported adult workflow.
+            The {COLIN_2019.shortName} population model is used throughout the supported adult population.
             Published evaluation at BMI 40 or more is limited (Colin 2021: 15 of 49 obese adults).
             Review measured levels and the stated assumptions before making a dosing decision.
           </p>
@@ -398,7 +398,7 @@ export default function TransparentDosingPage() {
               className="cta-primary inline-block rounded-md px-8 py-3 text-sm font-bold uppercase tracking-wider transition"
               style={{ background: "#1f5e96", color: "#ffffff", letterSpacing: "0.08em" }}
             >
-              Start free →
+              Start free
             </Link>
             <Link
               href="/pricing"
