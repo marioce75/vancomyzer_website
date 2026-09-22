@@ -43,7 +43,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
             </h1>
             <p className="font-medium leading-none whitespace-nowrap hidden xl:block" style={{ fontSize: "10px", letterSpacing: "2px", color: "var(--color-secondary)" }}>
                             <span style={{ fontSize: "11px", letterSpacing: "3px", color: "var(--color-dim)" }}>
-                BY{" "}
+                ENGINEERED BY{" "}
                 <button
                   type="button"
                   aria-label="Visit dosys.health"

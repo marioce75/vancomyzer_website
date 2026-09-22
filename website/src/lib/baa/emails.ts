@@ -72,7 +72,7 @@ export async function sendBaaSubmittedEmails(ctx: BaaSubmittedContext): Promise<
                 Review &amp; countersign
               </a>
             </p>
-            <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of Dōsys Health LLC</p>
+            <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys Health LLC</p>
           </div>
         `,
       });
@@ -111,7 +111,7 @@ export async function sendBaaSubmittedEmails(ctx: BaaSubmittedContext): Promise<
           <p style="margin-top: 24px; font-size: 12px; color: #4a5568;">
             If you did not initiate this submission, contact <a href="mailto:contact@dosys.health" style="color: #1e4d8c;">contact@dosys.health</a> immediately.
           </p>
-          <p style="margin-top: 16px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of Dōsys Health LLC</p>
+          <p style="margin-top: 16px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys Health LLC</p>
         </div>
       `,
     });
@@ -161,7 +161,7 @@ export async function sendBaaExecutedEmail(ctx: BaaExecutedContext): Promise<voi
               Open Team page
             </a>
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of Dōsys Health LLC</p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys Health LLC</p>
         </div>
       `,
       attachments: ctx.executedPdfBytes

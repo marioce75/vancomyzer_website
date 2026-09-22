@@ -24,7 +24,7 @@ export default function Footer() {
                   Vancomyzer™
                 </span>
                 <p className="text-[12px] leading-none mt-1" style={{ color: "var(--color-dim)" }}>
-                  A product of{" "}
+                  Engineered by{" "}
                   <a
                     href="https://dosys.health"
                     target="_blank"

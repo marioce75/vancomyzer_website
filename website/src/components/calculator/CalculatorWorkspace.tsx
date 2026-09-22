@@ -889,7 +889,7 @@ export default function CalculatorWorkspace() {
               </a>
             ))}
             <span className="text-[10px]" style={{ color: "var(--color-dim)" }}>
-              {"©"} 2026 Vancomyzer{"™"} {"·"} A product of{" "}
+              {"©"} 2026 Vancomyzer{"™"} {"·"} Engineered by{" "}
               <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>
                 D{"ō"}sys{"™"}
               </a>
