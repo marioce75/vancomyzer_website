@@ -4,6 +4,7 @@ import { insertPost, logRequest, getLatestSnapshot, insertSnapshot, getRunById, 
 import { REDDIT_SOURCES, PUBMED_SEARCHES, COMPETITOR_URLS, REGIONAL_SEARCHES } from "./sources";
 import { runAnalysis } from "./analysis";
 import { saveRunToFiles, type RawPost } from "./filePersistence";
+import { readLimitedText, ResponseTooLargeError } from "./limitedResponse";
 
 export interface SourceHealth { name: string; url: string; state: "ok" | "failed" | "blocked" | "skipped"; records: number; detail?: string }
 export function visibleText(html: string): string {
@@ -45,12 +46,12 @@ export async function runFullScrape(options: { analyze?: boolean; quick?: boolea
         if (entry.state === "blocked") blocked.add(host);
         return null;
       }
-      const body = await res.text();
+      const body = await readLimitedText(res);
       if (!body.trim()) { entry.detail = "Empty response"; return null; }
       entry.state = "ok";
       return { body, entry };
     } catch (error) {
-      entry.detail = error instanceof Error && error.name === "TimeoutError" ? "Request timed out" : "Network or DNS failure";
+      entry.detail = error instanceof ResponseTooLargeError ? error.message : error instanceof Error && error.name === "TimeoutError" ? "Request timed out" : "Network or DNS failure";
       logRequest(url, null, Date.now() - begun, entry.detail);
       return null;
     } finally { await pause(); }
