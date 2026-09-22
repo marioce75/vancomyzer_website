@@ -54,7 +54,7 @@ const TIERS: TierCard[] = [
   },
   {
     name: "Individual Pro",
-    audience: "Pharmacists, Physicians, NPs, PAs",
+    audience: "Pharmacists, physicians, NPs, PAs",
     price: {
       annual: { amount: "$49.99", suffix: "/year · billed annually" },
     },
@@ -121,13 +121,26 @@ export default function PricingClient() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-16">
+      {/* Header */}
+      <div className="mb-10">
+        <span className="mb-[14px] block text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#546471" }}>
+          Pricing
+        </span>
+        <h1 className="vz-serif text-[clamp(28px,3.4vw,40px)] leading-[1.08]" style={{ color: "#14232f" }}>
+          The core calculator is free. Accounts and site licenses are priced by use.
+        </h1>
+        <p className="mt-4 max-w-[62ch] text-lg leading-[1.5]" style={{ color: "#4a5a68" }}>
+          Plans for individual clinicians, pharmacy departments and health systems. Every plan uses the same calculation method.
+        </p>
+      </div>
+
       {/* Open-access launch banner — not rendered when OPEN_ACCESS is false. */}
       {OPEN_ACCESS && (
         <div
-          className="mx-auto mb-10 max-w-3xl rounded-lg border px-5 py-4 text-center"
-          style={{ borderColor: "#1f5e96", background: "rgba(31,94,150,0.08)" }}
+          className="mb-10 mt-2 max-w-[70ch] border-l-[3px] bg-white px-5 py-4"
+          style={{ borderColor: "#1f5e96", outline: "1px solid #cbd6e0" }}
         >
-          <p className="text-base font-semibold" style={{ color: "#1f5e96" }}>
+          <p className="text-base font-semibold" style={{ color: "#14232f" }}>
             The core Vancomyzer calculator is free, permanently.
           </p>
           <p className="mt-1 text-sm" style={{ color: "var(--color-secondary)" }}>
@@ -139,16 +152,6 @@ export default function PricingClient() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: "var(--color-primary)" }}>
-          Transparent Pricing for Transparent Math
-        </h1>
-        <p className="mt-3 text-base" style={{ color: "var(--color-secondary)" }}>
-          Plans for individual clinicians, pharmacy departments and health systems.
-        </p>
-      </div>
-
       {/* Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {DISPLAY_TIERS.map((tier) => {
@@ -157,13 +160,11 @@ export default function PricingClient() {
           return (
             <div
               key={tier.name}
-              className="relative flex flex-col rounded-lg border p-6"
+              className="relative flex flex-col border p-6"
               style={{
-                borderColor: isFeatured ? "#1f5e96" : "var(--color-border)",
-                background: "var(--color-bg)",
-                boxShadow: isFeatured
-                  ? "0 0 0 2px #1f5e96, 0 4px 24px rgba(31,94,150,0.12)"
-                  : "0 1px 3px rgba(0,0,0,0.06)",
+                borderColor: isFeatured ? "#1f5e96" : "#cbd6e0",
+                background: "#ffffff",
+                boxShadow: isFeatured ? "0 0 0 1px #1f5e96" : "none",
               }}
             >
               {tier.badge && (
@@ -175,7 +176,7 @@ export default function PricingClient() {
                 </span>
               )}
 
-              <h2 className="text-lg font-bold" style={{ color: "var(--color-primary)" }}>
+              <h2 className="vz-serif text-[24px]" style={{ color: "#14232f" }}>
                 {tier.name}
               </h2>
               <p className="mt-1 text-xs" style={{ color: "var(--color-secondary)" }}>
@@ -188,7 +189,7 @@ export default function PricingClient() {
               )}
 
               <div className="mt-5 mb-6">
-                <span className="block text-3xl font-extrabold leading-tight" style={{ color: "var(--color-foreground)" }}>
+                <span className="vz-serif block text-[34px] leading-tight" style={{ color: "#14232f", fontVariantNumeric: "tabular-nums" }}>
                   {cyclePrice.amount}
                 </span>
                 {cyclePrice.suffix && (
@@ -230,7 +231,7 @@ export default function PricingClient() {
                   el.style.color = baseStyle.color as string;
                   el.style.border = baseStyle.border as string;
                 };
-                const btnClass = "block rounded-md px-4 py-2.5 text-center text-sm font-semibold transition";
+                const btnClass = "block px-4 py-2.5 text-center text-sm font-semibold transition";
 
                 // Open-access launch only: a plain label, deliberately not a link
                 // or button (dashed border so it doesn't read as clickable).

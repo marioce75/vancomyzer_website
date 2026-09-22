@@ -96,11 +96,11 @@ export default function InstitutionalSettingsPage() {
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px 80px" }}>
       <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
         <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Institutional Settings</span>
-        <span style={{ color: "var(--color-border)" }}>·</span>
+        <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
         <Link href="/settings/billing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
           Billing &amp; Subscription
         </Link>
-        <span style={{ color: "var(--color-border)" }}>·</span>
+        <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
         <Link href="/settings/history" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
           Calculation History
         </Link>

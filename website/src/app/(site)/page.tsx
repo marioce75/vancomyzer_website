@@ -60,7 +60,7 @@ const LAUNCH_LINE = OPEN_ACCESS
   : "The core calculator is free for individual clinicians, permanently — create a free account or sign in to get started.";
 
 const FICTIONAL_CASE_CAPTION =
-  "Fictional case for illustration — synthetic inputs (58 y, 82 kg, 172 cm, SCr 1.1 mg/dL, no RRT). Not a patient. Screenshot of the current calculator, unaltered.";
+  "Fictional case for illustration — synthetic inputs (58 y, male, 82 kg, 172 cm, SCr 1.1 mg/dL, no RRT). Not a patient. Screenshot of the current calculator, unaltered.";
 
 const CAPABILITIES: { title: string; body: string; source?: string }[] = [
   {

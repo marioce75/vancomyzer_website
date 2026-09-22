@@ -1,11 +1,17 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { PageHeader, Record, INK, INK2 } from "@/components/site/Record";
 import {
   COLIN_2019,
   COLIN_2021_OBESE_EVALUATION,
   HIGH_BMI_THRESHOLD_KG_M2,
 } from "@/lib/pk/modelRegistry";
+
+export const metadata: Metadata = {
+  title: "FAQ — Vancomyzer™",
+  description: "Why Vancomyzer uses the Colin 2019 model, how it treats serum creatinine and body weight, and what has and has not been validated.",
+  alternates: { canonical: "https://vancomyzer.com/faq" },
+};
 
 /* ── FAQ Data ──────────────────────────────────────────────────── */
 
@@ -211,141 +217,40 @@ const FAQ_ITEMS: FaqItem[] = [
   },
 ];
 
-/* ── Accordion Item ────────────────────────────────────────────── */
+/* ── Item ──────────────────────────────────────────────────────── */
 
-function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
-  const [open, setOpen] = useState(false);
-
+function FaqEntry({ item, index }: { item: FaqItem; index: number }) {
   return (
-    <div
-      style={{
-        borderLeft: open ? "2px solid var(--color-primary)" : "2px solid transparent",
-        background: open ? "var(--color-card)" : "#f4f7fa",
-        transition: "background 0.15s, border-color 0.2s",
-      }}
-    >
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="w-full text-left"
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          gap: 12,
-          padding: "16px 20px",
-          cursor: "pointer",
-          background: "transparent",
-          border: "none",
-          transition: "background 0.15s",
-          fontFamily: "'Share Tech Mono', monospace",
-        }}
-        onMouseEnter={(e) => {
-          if (!open) (e.currentTarget as HTMLElement).style.background = "#dbeafe";
-        }}
-        onMouseLeave={(e) => {
-          if (!open) (e.currentTarget as HTMLElement).style.background = "transparent";
-        }}
-      >
-        <span
-          style={{
-            color: "var(--color-primary)",
-            fontSize: 14,
-            fontWeight: 700,
-            fontFamily: "'Share Tech Mono', monospace",
-            lineHeight: 1.5,
-          }}
-        >
-          {">"} Q{index + 1}: {item.question}
-        </span>
-        <span
-          style={{
-            color: "var(--color-dim)",
-            fontSize: 16,
-            flexShrink: 0,
-            transition: "transform 0.2s",
-            fontFamily: "'Share Tech Mono', monospace",
-          }}
-        >
-          {open ? "Hide" : "Show"}
-        </span>
-      </button>
-
-      <div
-        style={{
-          maxHeight: open ? 2000 : 0,
-          overflow: "hidden",
-          transition: "max-height 0.35s ease",
-        }}
-      >
-        <div style={{ padding: "0 20px 20px 20px" }}>
-          {item.answer.map((block, i) => {
-            if (typeof block === "object" && "formula" in block) {
-              return (
-                <pre
-                  key={i}
-                  style={{
-                    color: "var(--color-primary)",
-                    fontSize: 12,
-                    lineHeight: 1.6,
-                    fontFamily: "'Share Tech Mono', monospace",
-                    marginTop: 8,
-                    marginBottom: 4,
-                    padding: "10px 14px",
-                    borderLeft: "2px solid var(--color-border)",
-                    background: "var(--color-highlight)",
-                    whiteSpace: "pre-wrap",
-                    overflowX: "auto",
-                  }}
-                >
-                  {block.formula}
-                </pre>
-              );
-            }
+    <details id={`q${index + 1}`}>
+      <summary>
+        <span>{item.question}</span>
+      </summary>
+      <div className="vz-faq-body">
+        {item.answer.map((block, i) => {
+          if (typeof block === "object" && "formula" in block) {
             return (
-              <p
-                key={i}
-                style={{
-                  color: "var(--color-secondary)",
-                  fontSize: 13,
-                  lineHeight: 1.7,
-                  fontFamily: "'Share Tech Mono', monospace",
-                  marginTop: i === 0 ? 0 : 12,
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {block}
-              </p>
+              <pre key={i} className="vz-code" style={{ marginTop: 10 }}>
+                {block.formula}
+              </pre>
             );
-          })}
-
-          <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: "6px 14px" }}>
+          }
+          return (
+            <p key={i} className="max-w-[70ch] text-[15.5px] leading-[1.6]" style={{ color: INK2, marginTop: i === 0 ? 0 : 12, whiteSpace: "pre-line" }}>
+              {block}
+            </p>
+          );
+        })}
+        {item.refs.length > 0 && (
+          <ol className="vz-refs" style={{ listStyle: "decimal", paddingLeft: 20 }}>
             {item.refs.map((ref, i) => (
-              <a
-                key={i}
-                href={ref.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  fontSize: 11,
-                  color: "var(--color-primary)",
-                  textDecoration: "none",
-                  letterSpacing: "0.02em",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.textDecoration = "underline";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.textDecoration = "none";
-                }}
-              >
-                [REF{item.refs.length > 1 ? ` ${i + 1}` : ""}] {ref.label}
-              </a>
+              <li key={i}>
+                <a href={ref.url} target="_blank" rel="noopener noreferrer">{ref.label}</a>
+              </li>
             ))}
-          </div>
-        </div>
+          </ol>
+        )}
       </div>
-    </div>
+    </details>
   );
 }
 
@@ -353,119 +258,24 @@ function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
 
 export default function FAQPage() {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--color-bg)",
-        padding: "48px 16px 80px",
-      }}
-    >
-      <div style={{ maxWidth: 840, margin: "0 auto" }}>
-        {/* Header */}
-        <div style={{ marginBottom: 40 }}>
-          <h1
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              letterSpacing: "0.1em",
-              color: "var(--color-primary)",
-              fontFamily: "'Share Tech Mono', monospace",
-              textShadow: "0 0 10px var(--color-glow)",
-            }}
-          >
-            {">"} FAQ — METHODOLOGY & DESIGN DECISIONS
-          </h1>
-          <p
-            style={{
-              marginTop: 8,
-              fontSize: 13,
-              color: "var(--color-dim)",
-              fontFamily: "'Share Tech Mono', monospace",
-            }}
-          >
-            {">"} Why Vancomyzer is built the way it is
-          </p>
-        </div>
-
-        {/* Accordion list */}
-        <div
-          style={{
-            border: "1px solid var(--color-border)",
-            background: "var(--color-card)",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+    <div style={{ color: INK }}>
+      <PageHeader
+        kicker="Frequently asked questions"
+        title="Why Vancomyzer is built the way it is."
+        lede="The model, the renal covariate, body weight, and what has and has not been validated. Each answer cites its sources."
+        compact
+      />
+      <Record label="Questions" note={`${FAQ_ITEMS.length} answers. Open any question; the references are listed under each answer.`} last>
+        <div className="vz-faq">
           {FAQ_ITEMS.map((item, index) => (
-            <div
-              key={index}
-              style={{
-                borderTop: index === 0 ? "none" : "1px solid var(--color-border)",
-              }}
-            >
-              <AccordionItem item={item} index={index} />
-            </div>
+            <FaqEntry key={index} item={item} index={index} />
           ))}
         </div>
-
-        {/* Footer nav */}
-        <div
-          style={{
-            marginTop: 40,
-            paddingTop: 24,
-            borderTop: "1px solid var(--color-border)",
-            display: "flex",
-            gap: 20,
-          }}
-        >
-          <a
-            href="/calculator"
-            style={{
-              fontSize: 13,
-              color: "var(--color-card, #ffffff)",
-              textDecoration: "none",
-              border: "1px solid var(--color-primary)",
-              background: "var(--color-primary)",
-              padding: "10px 20px",
-              fontWeight: 600,
-              transition: "opacity 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = "0.85";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = "1";
-            }}
-          >
-            Open Calculator
-          </a>
-          <a
-            href="/transparent-dosing"
-            style={{
-              fontSize: 13,
-              color: "var(--color-secondary)",
-              textDecoration: "none",
-              border: "1px solid var(--color-border)",
-              background: "var(--color-card, #ffffff)",
-              padding: "10px 20px",
-              fontWeight: 500,
-              transition: "background 0.15s, border-color 0.15s, color 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #ffffff)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "var(--color-card, #ffffff)";
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
-            }}
-          >
-            References
-          </a>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/calculator" className="vz-mbtn vz-mbtn--primary">Open the calculator</Link>
+          <Link href="/transparent-dosing" className="vz-mbtn vz-mbtn--outline">Evidence and methods</Link>
         </div>
-      </div>
+      </Record>
     </div>
   );
 }

@@ -154,11 +154,11 @@ export default function HistoryPage() {
         <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
            Institutional Settings
         </Link>
-        <span style={{ color: "var(--color-border)" }}>·</span>
+        <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
         <Link href="/settings/billing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
           Billing
         </Link>
-        <span style={{ color: "var(--color-border)" }}>·</span>
+        <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
         <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>History</span>
       </div>
 

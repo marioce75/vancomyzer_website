@@ -54,10 +54,10 @@ export default function PredictivePerformancePage() {
   const vsTruth = computeMetrics(run.pairs_vs_truth);
 
   return (
-    <div style={{ maxWidth: 980, margin: "0 auto", padding: "32px 16px 80px" }}>
+    <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 16px 80px", color: "#14232f" }}>
       <Breadcrumb />
 
-      <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--color-primary)", marginBottom: 6, lineHeight: 1.2 }}>
+      <h1 className="vz-serif" style={{ fontSize: "clamp(28px, 3.4vw, 40px)", color: "#14232f", marginBottom: 12, lineHeight: 1.1 }}>
         Predictive Performance
       </h1>
       <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 760 }}>
@@ -91,7 +91,7 @@ function Breadcrumb() {
       <Link href="/transparent-dosing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
          Evidence
       </Link>
-      <span style={{ color: "var(--color-border)" }}>·</span>
+      <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
       <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Predictive Performance</span>
     </div>
   );
@@ -429,7 +429,7 @@ function NextStepsCard() {
   ];
   return (
     <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Validation plan</h2>
+      <h2 id="validation-plan" style={sectionTitleStyle}>Validation plan</h2>
       <div style={{ marginTop: 12 }}>
         {stages.map((s) => (
           <div key={s.title} style={{ padding: "12px 14px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 4, marginBottom: 8 }}>
@@ -448,19 +448,20 @@ function NextStepsCard() {
 // ─────────────────────────────────────────────────────────────────────
 
 const cardStyle: React.CSSProperties = {
-  padding: 18,
+  padding: "20px 22px",
   marginBottom: 20,
-  background: "var(--color-card)",
-  border: "1px solid var(--color-border)",
-  borderRadius: 6,
+  background: "#ffffff",
+  border: "1px solid #cbd6e0",
+  borderRadius: 0,
 };
 const sectionTitleStyle: React.CSSProperties = {
-  fontSize: 13,
-  fontWeight: 700,
-  color: "var(--color-primary)",
+  fontFamily: "'Newsreader', Georgia, serif",
+  fontSize: 22,
+  fontWeight: 500,
+  color: "#14232f",
   margin: 0,
-  letterSpacing: "0.04em",
-  textTransform: "uppercase",
+  letterSpacing: "-0.01em",
+  lineHeight: 1.25,
 };
 const cellStyle: React.CSSProperties = {
   padding: "8px 10px",

@@ -141,9 +141,9 @@ function BillingPageInner() {
         <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
            Institutional Settings
         </Link>
-        <span style={{ color: "var(--color-border)" }}>·</span>
+        <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
         <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Billing</span>
-        <span style={{ color: "var(--color-border)" }}>·</span>
+        <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
         <Link href="/settings/history" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
           Calculation History
         </Link>

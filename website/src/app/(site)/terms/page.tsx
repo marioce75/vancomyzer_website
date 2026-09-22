@@ -1,24 +1,25 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  title: "Terms of Use — Vancomyzer™",
+  description: "Subscriptions, permitted use, intellectual property and clinical responsibility.",
   alternates: { canonical: "https://vancomyzer.com/terms" },
 };
 
 import CanonicalDocCallout from "@/components/CanonicalDocCallout";
+import { PageHeader, Record, INK, INK2 } from "@/components/site/Record";
 import { LEGAL_LINKS } from "@/lib/legalLinks";
 
 export default function TermsPage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
-      <h1 className="text-3xl font-bold tracking-tight text-slate-900">Terms of Use</h1>
-      <p className="mt-2 text-sm text-slate-500">Last updated: September 21, 2026</p>
-
+    <div style={{ color: INK }}>
+      <PageHeader kicker="Legal" title="Terms of Use" compact lede={<span className="text-[15px]">Last updated: September 21, 2026</span>} />
+      <Record label="Summary" note="The linked document on dosys.health governs." last>
       <CanonicalDocCallout docName="Terms of Use" href={LEGAL_LINKS.terms} />
-
-      <div className="mt-8 space-y-8 text-slate-700">
+      <div className="vz-prose mt-8 max-w-[70ch] space-y-8" style={{ color: INK2 }}>
 
         <section>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Subscriptions, renewal and cancellation</h2>
+          <h2 className="vz-serif mb-2 text-[22px]" style={{ color: INK }}>Subscriptions, renewal and cancellation</h2>
           <p>Individual Pro is $49.99 per year, billed annually after a 14-day trial when you explicitly choose that subscription. It renews yearly until canceled. Verified discounts and their duration are shown at checkout. Free accounts and free pilots are never automatically converted to paid billing.</p>
           <p className="mt-3">Cancel online through Settings, then Billing, then Manage billing / cancel. Administrators of existing institutional subscriptions use Team, then Manage billing. Cancel before the trial ends to avoid a charge, or before the next renewal to stop that charge. Cancellation stops future renewal; access continues through the remaining paid period unless otherwise stated in your agreement.</p>
           <p className="mt-3">A confirmation email records your subscription and cancellation details. Renewal reminders include management links. We will provide required advance notice of accepted fee changes, including 7–30 days before a change takes effect where California law applies. The new public prices do not automatically change existing subscription agreements.</p>
@@ -26,14 +27,14 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Acceptance of Terms</h2>
+          <h2 className="vz-serif mb-2 text-[22px]" style={{ color: INK }}>Acceptance of Terms</h2>
           <p>
             By accessing or using Vancomyzer™, you agree to be bound by these Terms of Use and the Medical Disclaimer. If you do not agree, do not use this tool.
           </p>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Permitted Use</h2>
+          <h2 className="vz-serif mb-2 text-[22px]" style={{ color: INK }}>Permitted Use</h2>
           <p>
             Vancomyzer™ is licensed to qualified healthcare professionals, and to institutions that subscribe on their behalf, for internal clinical, educational, and quality-improvement use. Subject to these Terms and payment of any applicable fees, you are granted a limited, non-exclusive, non-transferable, non-sublicensable license to access and use the tool for that purpose. Using it in the course of your practice or employment, including at a for-profit institution, is permitted.
           </p>
@@ -49,41 +50,42 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Intellectual Property</h2>
+          <h2 className="vz-serif mb-2 text-[22px]" style={{ color: INK }}>Intellectual Property</h2>
           <p>
             All content, design, algorithms, and code comprising Vancomyzer™ are the exclusive intellectual property of their respective owners. All rights reserved. The Vancomyzer™ name and logo are trademarks. Unauthorized use of any intellectual property associated with this tool is prohibited.
           </p>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Clinical Responsibility</h2>
+          <h2 className="vz-serif mb-2 text-[22px]" style={{ color: INK }}>Clinical Responsibility</h2>
           <p>
             Users remain solely responsible for independent clinical review, institutional-policy alignment, and final treatment decisions. Do not rely on this tool as a substitute for professional judgment, local protocol, product labeling, or therapeutic drug monitoring.
           </p>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Limitation of Liability</h2>
+          <h2 className="vz-serif mb-2 text-[22px]" style={{ color: INK }}>Limitation of Liability</h2>
           <p className="uppercase font-semibold text-slate-800">
             TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE DEVELOPERS OF VANCOMYZER SHALL NOT BE LIABLE FOR ANY DAMAGES OF ANY KIND ARISING FROM USE OF THIS TOOL. SEE THE FULL MEDICAL DISCLAIMER FOR COMPLETE LIABILITY LANGUAGE.
           </p>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Modifications</h2>
+          <h2 className="vz-serif mb-2 text-[22px]" style={{ color: INK }}>Modifications</h2>
           <p>
             We may update these terms. Subscription changes remain subject to applicable notice and consent requirements; continued free use does not authorize paid billing.
           </p>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Governing Law</h2>
+          <h2 className="vz-serif mb-2 text-[22px]" style={{ color: INK }}>Governing Law</h2>
           <p>
             These terms shall be governed by and construed in accordance with applicable law. Any disputes shall be resolved in the jurisdiction where the developers are located.
           </p>
         </section>
 
       </div>
+      </Record>
     </div>
   );
 }

@@ -61,7 +61,7 @@ function ResetPasswordForm() {
     <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div style={{
         width: "100%", maxWidth: 420, background: "#ffffff",
-        border: "1px solid #cbd5e0", padding: 32,
+        border: "1px solid #cbd6e0", padding: 32,
         boxShadow: "0 4px 12px rgba(0,0,0,0.08)", borderRadius: 8,
       }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
@@ -69,7 +69,7 @@ function ResetPasswordForm() {
           <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 12px" }}>
             <img src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
           </a>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1f5e96", margin: 0 }}>
+          <h1 className="vz-serif" style={{ fontSize: 26, color: "#14232f", margin: 0 }}>
             {token ? "Set New Password" : "Forgot Password"}
           </h1>
         </div>

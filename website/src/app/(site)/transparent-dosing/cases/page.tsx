@@ -41,13 +41,13 @@ export default function CasesPage() {
   const summary = summarize(results);
 
   return (
-    <div style={{ maxWidth: 980, margin: "0 auto", padding: "32px 16px 80px" }}>
+    <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 16px 80px", color: "#14232f" }}>
       <Breadcrumb />
 
-      <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--color-primary)", marginBottom: 6, lineHeight: 1.2 }}>
+      <h1 className="vz-serif" style={{ fontSize: "clamp(28px, 3.4vw, 40px)", color: "#14232f", marginBottom: 12, lineHeight: 1.1 }}>
         Literature Reproducibility
       </h1>
-      <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 12, maxWidth: 720 }}>
+      <p style={{ fontSize: 17, color: "#4a5a68", lineHeight: 1.55, marginTop: 0, marginBottom: 12, maxWidth: "62ch" }}>
         Published vancomycin values run through Vancomyzer&apos;s calculator. Cases that use the same model
         as the calculator ({COLIN_2019.shortName}) are pass/fail checks of the implementation. Cases from other
         published models or patient cohorts are shown for context only. These cases run in the automated
@@ -71,7 +71,7 @@ function Breadcrumb() {
       <Link href="/transparent-dosing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
          Evidence
       </Link>
-      <span style={{ color: "var(--color-border)" }}>·</span>
+      <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
       <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Literature Reproducibility</span>
     </div>
   );
@@ -85,7 +85,7 @@ function EmptyState() {
         background: "#fffbeb",
         border: "1px solid #fcd34d",
         color: "#78350f",
-        borderRadius: 6,
+        borderRadius: 0,
         fontSize: 14,
         lineHeight: 1.55,
         marginBottom: 28,
@@ -131,7 +131,7 @@ function Body({ cases, results, summary }: BodyProps) {
         if (indices.length === 0) return null;
         return (
           <section key={g.kind} style={{ marginBottom: 28 }}>
-            <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 4px" }}>
+            <h2 className="vz-serif" style={{ fontSize: 22, color: "#14232f", margin: "0 0 4px", lineHeight: 1.25 }}>
               {g.title}
             </h2>
             <p style={{ fontSize: 12, color: "var(--color-dim)", margin: "0 0 12px", lineHeight: 1.55 }}>{g.intro}</p>
@@ -156,7 +156,7 @@ function SummaryScorecard({ summary }: { summary: CaseSummary }) {
         marginBottom: 24,
         background: allPassing ? "#ecfdf5" : "#fffbeb",
         border: `1px solid ${allPassing ? "#6ee7b7" : "#fcd34d"}`,
-        borderRadius: 6,
+        borderRadius: 0,
       }}
     >
       <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between" }}>
@@ -201,14 +201,14 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
       id={caseDef.id}
       style={{
         padding: "16px 20px",
-        background: "var(--color-card)",
+        background: "#ffffff",
         border: `1px solid ${isReproduction && !pass ? "#fcd34d" : "var(--color-border)"}`,
         borderLeft: `4px solid ${borderColor}`,
-        borderRadius: 6,
+        borderRadius: 0,
       }}
     >
       <header style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline", marginBottom: 6 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--color-primary)", margin: 0 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 600, color: "#14232f", margin: 0 }}>
           {caseDef.source.specific_reference}
         </h3>
         {isReproduction ? <PassFailBadge pass={pass} failures={result.failures} /> : <ContextBadge />}
@@ -320,14 +320,14 @@ function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: Re
       id={caseDef.id}
       style={{
         padding: "16px 20px",
-        background: "var(--color-card)",
+        background: "#ffffff",
         border: "1px solid var(--color-border)",
         borderLeft: "4px solid #6366f1",
-        borderRadius: 6,
+        borderRadius: 0,
       }}
     >
       <header style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline", marginBottom: 6 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--color-primary)", margin: 0 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 600, color: "#14232f", margin: 0 }}>
           {caseDef.source.specific_reference}
         </h3>
         <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#eef2ff", color: "#3730a3", border: "1px solid #c7d2fe", borderRadius: 4 }}>
@@ -506,14 +506,14 @@ function PatientRegimenLine({ caseDef }: { caseDef: PublishedCase }) {
         {p.height_cm && <> · {p.height_cm} cm</>}
         {r && (
           <>
-            <span style={{ margin: "0 8px", color: "var(--color-border)" }}>·</span>
+            <span aria-hidden="true" style={{ margin: "0 8px", color: "#546471" }}>·</span>
             <strong style={{ color: "var(--color-primary)" }}>Regimen:</strong>{" "}
             {r.dose_mg} mg every {r.interval_hours} h over {r.infusion_duration_hours} h
           </>
         )}
         {caseDef.levels.length > 0 && (
           <>
-            <span style={{ margin: "0 8px", color: "var(--color-border)" }}>·</span>
+            <span aria-hidden="true" style={{ margin: "0 8px", color: "#546471" }}>·</span>
             <strong style={{ color: "var(--color-primary)" }}>Levels (hours after the start of the dose):</strong>{" "}
             {caseDef.levels.map((l, i) => (
               <span key={i}>
@@ -669,10 +669,10 @@ function Limitations() {
         padding: "16px 20px",
         background: "var(--color-bg)",
         border: "1px solid var(--color-border)",
-        borderRadius: 6,
+        borderRadius: 0,
       }}
     >
-      <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", marginTop: 0, marginBottom: 10 }}>
+      <h2 className="vz-serif" style={{ fontSize: 22, color: "#14232f", marginTop: 0, marginBottom: 10, lineHeight: 1.25 }}>
         Limitations
       </h2>
       <ul style={{ fontSize: 12, color: "var(--color-secondary)", lineHeight: 1.65, marginLeft: 18, marginTop: 0, marginBottom: 0 }}>

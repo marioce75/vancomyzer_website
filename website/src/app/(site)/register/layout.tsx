@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign in — Vancomyzer™",
-  description: "Sign in to your Vancomyzer account.",
+  title: "Create an account — Vancomyzer™",
+  description: "Create a Vancomyzer account.",
   robots: { index: false, follow: true },
 };
 

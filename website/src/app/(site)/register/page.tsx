@@ -121,9 +121,9 @@ function RegisterPageInner() {
   if (success) {
     return (
       <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div style={{ maxWidth: 420, padding: 32, background: "#ffffff", border: "1px solid #cbd5e0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", borderRadius: 8, textAlign: "center" }}>
+        <div style={{ maxWidth: 420, padding: 32, background: "#ffffff", border: "1px solid #cbd6e0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", borderRadius: 8, textAlign: "center" }}>
           <div style={{ fontSize: 40, marginBottom: 16 }}></div>
-          <h1 style={{ fontSize: 18, fontWeight: 700, color: "#047857" }}>Account active — welcome to Vancomyzer</h1>
+          <h1 className="vz-serif" style={{ fontSize: 26, color: "#1e6b3e" }}>Account active — welcome to Vancomyzer</h1>
           <p style={{ fontSize: 13, color: "#4a5568", marginTop: 12, lineHeight: 1.6 }}>
             A welcome email is on its way to <strong>{email}</strong>. You can sign in right now and start using the calculator.
           </p>
@@ -143,7 +143,7 @@ function RegisterPageInner() {
     <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div style={{
         width: "100%", maxWidth: 480, background: "#ffffff",
-        border: "1px solid #cbd5e0", padding: 32,
+        border: "1px solid #cbd6e0", padding: 32,
         boxShadow: "0 4px 12px rgba(0,0,0,0.08)", borderRadius: 8,
       }}>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
@@ -151,7 +151,7 @@ function RegisterPageInner() {
           <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 12px" }}>
             <img src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
           </a>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1f5e96", margin: 0 }}>
+          <h1 className="vz-serif" style={{ fontSize: 26, color: "#14232f", margin: 0 }}>
             {step === 1 ? "Create an Account" : "Legal Agreements"}
           </h1>
           <p style={{ fontSize: 12, color: "#546471", marginTop: 4 }}>Step {step} of 2</p>
@@ -342,7 +342,7 @@ function RegisterPageInner() {
             </div>
 
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => setStep(1)} style={{ flex: 1, padding: 12, fontSize: 13, background: "#f7fafc", color: "#4a5568", border: "1px solid #cbd5e0", cursor: "pointer", borderRadius: 4 }}>
+              <button onClick={() => setStep(1)} style={{ flex: 1, padding: 12, fontSize: 13, background: "#f7fafc", color: "#4a5568", border: "1px solid #cbd6e0", cursor: "pointer", borderRadius: 4 }}>
                  Back
               </button>
               <button

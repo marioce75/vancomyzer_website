@@ -259,10 +259,16 @@ export default function TeamPage() {
   }
   if (!user) {
     return (
-      <div style={{ padding: 40, textAlign: "center" }}>
-        <p style={{ color: "var(--color-secondary)" }}>
-          Please <Link href="/login" style={{ color: "var(--color-primary)" }}>sign in</Link> to manage your team.
+      <div className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 md:py-16">
+        <span className="mb-[14px] block text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#546471" }}>Team</span>
+        <h1 className="vz-serif text-[clamp(28px,3.4vw,40px)] leading-[1.08]" style={{ color: "#14232f" }}>Sign in to manage your team.</h1>
+        <p className="mt-4 max-w-[60ch] text-lg" style={{ color: "#4a5a68" }}>
+          Team administration is available to Hospital Site administrators.
         </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/login" className="vz-mbtn vz-mbtn--primary">Sign in</Link>
+          <Link href="/pricing" className="vz-mbtn vz-mbtn--outline">Site licenses</Link>
+        </div>
       </div>
     );
   }
@@ -307,7 +313,7 @@ export default function TeamPage() {
         <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
            Settings
         </Link>
-        <span style={{ color: "var(--color-border)" }}>·</span>
+        <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
         <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Team Management</span>
       </div>
 

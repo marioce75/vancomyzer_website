@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://vancomyzer.com/pricing" },
   title: "Pricing — Vancomyzer™",
   description:
-    "Transparent pricing for transparent math. From individual pharmacists to health systems — Vancomyzer™ scales with your needs.",
+    "The core Vancomyzer calculator is free. Individual Pro and Hospital Site plans add account and site features; every plan uses the same calculation method.",
 };
 
 export default function PricingPage() {
