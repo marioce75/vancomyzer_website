@@ -379,8 +379,8 @@ export function summarizeDiagnostics(
 
   const reasonParts = [
     `${observation_count} level${observation_count === 1 ? "" : "s"} informed the bounded posterior MAP fit`,
-    `RMS error ${rmsError.toFixed(1)} mcg/mL`,
-    `mean absolute error ${meanAbsError.toFixed(1)} mcg/mL`,
+    `RMS error ${rmsError.toFixed(1)} mg/L`,
+    `mean absolute error ${meanAbsError.toFixed(1)} mg/L`,
     `mean relative error ${(meanRelativeError * 100).toFixed(0)}%`,
     `CL shift ${posteriorShiftCLPct.toFixed(0)}%`,
     `V1 shift ${posteriorShiftV1Pct.toFixed(0)}%`,

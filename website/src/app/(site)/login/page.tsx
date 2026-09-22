@@ -117,13 +117,13 @@ function LoginForm() {
         width: "100%",
         maxWidth: 420,
         background: "#ffffff",
-        border: "1px solid #cbd5e0",
+        border: "1px solid #cbd6e0",
         padding: 32,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-        borderRadius: 8,
+        boxShadow: "none",
+        borderRadius: 0,
       }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1f5e96", margin: 0 }}>
+          <h1 className="vz-serif" style={{ fontSize: 26, color: "#14232f", margin: 0 }}>
             Sign in to Vancomyzer
           </h1>
           <p style={{ fontSize: 13, color: "#546471", marginTop: 6 }}>

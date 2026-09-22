@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 
-// Account utility pages must be crawlable so search engines can read noindex.
 export const metadata: Metadata = {
+  title: "Reset password — Vancomyzer™",
+  description: "Request a password-reset link.",
   robots: { index: false, follow: true },
 };
 
-export default function AccountPageLayout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return children;
 }

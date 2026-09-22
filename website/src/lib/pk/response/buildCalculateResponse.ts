@@ -54,7 +54,7 @@ export function buildCalculateResponse(
     const optInterpretation = buildInterpretationSummary({
       engineOutput,
       recommendation: optInput.recommendation,
-    }) + ` Selected regimen steady-state projection (${opt.dose_mg} mg every ${opt.interval_hours} h): AUC24 ${opt.auc24} mg·h/L; peak ${opt.peak} mcg/mL; trough ${opt.trough} mcg/mL.`;
+    }) + ` Selected regimen steady-state projection (${opt.dose_mg} mg every ${opt.interval_hours} h): AUC24 ${opt.auc24} mg·h/L; peak ${opt.peak} mg/L; trough ${opt.trough} mg/L.`;
 
     // Per-option curve. For pulse-dose, plot loading→option-as-maintenance so
     // the chart updates coherently when the user clicks alternative regimens.
@@ -133,10 +133,10 @@ export function buildCalculateResponse(
               : "multiple levels / bounded uncertainty",
       data_quality_summary:
         engineOutput.level_count <= 0
-          ? "No measured levels; model suitability depends on population-prior assumptions only."
+          ? "No measured levels; the estimate rests on population assumptions only."
           : engineOutput.level_count === 1
-            ? "Sparse single-level model suitability; interpretable only when timing and dose history are clean."
-            : "Multi-level model suitability with explicit chronology; review still depends on coherent same-interval timing.",
+            ? "One measured level; interpretable only when timing and dose history are clean."
+            : "Multiple measured levels with explicit timing; review still depends on coherent same-interval timing.",
       review_status,
       key_inputs: [
         `SCr ${engineOutput.scr} mg/dL (${modelShortName(engineOutput.model_name)} renal covariate)`,

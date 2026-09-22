@@ -516,7 +516,7 @@ export default function DoseRecommendationCard({
               <strong>If confirmed:</strong>
               <ul style={{ margin: "4px 0 0 16px", padding: 0, listStyleType: "disc" }}>
                 <li>Obtain two vancomycin levels early (2–4h and 6–8h post-dose) to confirm individual PK parameters before proceeding</li>
-                <li>Consult Infectious Diseases and/or nephrology. Continuous infusion is outside this calculator&rsquo;s scope — it is not modelled or dosed here, so manage it per local protocol rather than from these numbers</li>
+                <li>Consult Infectious Diseases and/or nephrology. Continuous infusion is outside this calculator&rsquo;s scope — it is not modeled or dosed here, so manage it per local protocol rather than from these numbers</li>
               </ul>
             </div>
             <p style={{ margin: 0, fontSize: 10, fontStyle: "italic" }}>
@@ -606,7 +606,7 @@ function EmpiricDosingBlockedCard({
         </div>
         <div className="text-xs">
           Estimated CL: <strong>{fmt(data.estimated_cl_l_h, 2)} L/h</strong>. Draw a vancomycin level
-          after the pulse dose and switch to the <strong>1-Level</strong> tab above to compute
+          after the pulse dose and switch to the <strong>1 Level</strong> tab above to compute
           level-guided redose timing.
         </div>
       </div>

@@ -90,10 +90,10 @@ export const COLIN_2019 = {
     SCRstd: "SCRstd = exp(−1.228 + 0.672 × log10(PMA) + 6.27 × exp(−3.11 × PMA))",
   },
   renalCovariate:
-    `Serum creatinine is used directly (mg/dL) as the Colin 2019 renal covariate: FSCR = exp(−${P.thetaSCr} × (SCr − SCRstd)), where SCRstd is the age-standardised reference creatinine. Cockcroft-Gault does not enter this population prior; a separate post-fit safety policy can cap fitted clearance at twice estimated CrCl.`,
+    `Serum creatinine is used directly (mg/dL) as the Colin 2019 renal covariate: FSCR = exp(−${P.thetaSCr} × (SCr − SCRstd)), where SCRstd is the age-standardized reference creatinine. Cockcroft-Gault does not enter this population prior; after a fit to measured levels, the calculator caps fitted clearance at twice the estimated CrCl.`,
   /** Covariates in the published final model that Vancomyzer does not apply. */
   omittedCovariates: [
-    "Haematological malignancy (+29.4% CL in the published model): not captured as an input.",
+    "Hematological malignancy (+29.4% CL in the published model): not captured as an input.",
     "Heel-prick sampling (neonatal): not applicable to adult venous sampling.",
   ],
   /** Published variability, for documentation. The MAP fit's own prior SDs live in fitPosteriorParameters.ts. */

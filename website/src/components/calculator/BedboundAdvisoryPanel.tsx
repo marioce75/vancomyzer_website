@@ -102,7 +102,7 @@ export default function BedboundAdvisoryPanel({
     <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
       <div className="flex items-center gap-2">
         <span className="text-base">🛏</span>
-        <p className="text-sm font-semibold text-amber-900">Bedbound/Geriatric — Loading Dose Guidance</p>
+        <p className="text-sm font-semibold text-amber-900">Bedbound or frail older patient — loading dose guidance</p>
       </div>
 
       {/* SCr warning */}
@@ -229,7 +229,7 @@ export default function BedboundAdvisoryPanel({
           <p className="text-xs font-semibold text-emerald-800">
             Dosing History pre-filled: {doseGiven} mg over {infusionHours}h on {adminDate} at {adminTime}
           </p>
-          <p className="text-[11px] text-emerald-700 mt-0.5">Switch to &quot;1 Level&quot; mode and enter the drawn level below.</p>
+          <p className="text-[11px] text-emerald-700 mt-0.5">Switch to the 1 Level tab and enter the drawn level below.</p>
         </div>
       )}
     </div>

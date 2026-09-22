@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { PageHeader, Record, INK, INK2, INK3, RULE } from "@/components/site/Record";
 
 const channels = [
   {
@@ -24,7 +25,7 @@ const channels = [
     ),
     title: "Research & academic",
     email: "contact@dosys.health",
-    description: "Research partnership inquiries, NIH STTR collaboration, PK model discussion, publication co-authorship.",
+    description: "Research partnership inquiries, PK model discussion, publication co-authorship.",
   },
   {
     icon: (
@@ -34,7 +35,7 @@ const channels = [
       </svg>
     ),
     title: "Clinical support",
-    subtitle: "Response in < 1 business day",
+    subtitle: "Use the form below",
     description: "Questions about the calculator or interpreting its results.",
   },
 ];
@@ -80,39 +81,24 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
-      {/* Header */}
-      <p className="text-sm font-semibold uppercase tracking-widest text-[#1f5e96]">
-        Contact ·{" "}
-        <a
-          href="https://dosys.health"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline"
-        >
-          Dōsys LLC
-        </a>
-      </p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900">
-        Reach the team behind Vancomyzer™
-      </h1>
-      <p className="mt-4 text-gray-600 leading-7">
-        Built by an ICU pharmacist. Transparent about its evidence. Available to every hospital.
-      </p>
-      <p className="text-gray-600">
-        Choose the right channel for your inquiry below.
-      </p>
-
+    <div style={{ color: INK }}>
+      <PageHeader
+        kicker="Contact · Dōsys LLC"
+        title="Reach the team behind Vancomyzer™"
+        compact
+        lede="Questions about the calculator, its evidence, or a site license. Use the address that fits your question, or the form below."
+      />
+      <Record label="Addresses" note="Two mailboxes, one for each kind of question.">
       {/* Channel cards */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         {channels.map((ch) => (
           <div
             key={ch.title}
-            className="rounded-lg border border-gray-200 bg-white p-5 flex flex-col gap-3"
+            className="flex flex-col gap-3 border bg-white p-5" style={{ borderColor: RULE }}
           >
-            <span className="text-teal-500">{ch.icon}</span>
+            <span style={{ color: "#1f5e96" }}>{ch.icon}</span>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">{ch.title}</h3>
+              <h3 className="text-[15px] font-semibold" style={{ color: INK }}>{ch.title}</h3>
               {ch.email ? (
                 <a
                   href={`mailto:${ch.email}`}
@@ -124,27 +110,24 @@ export default function ContactPage() {
                 <p className="text-sm font-medium text-[#1f5e96]">{ch.subtitle}</p>
               ) : null}
             </div>
-            <p className="text-sm text-gray-500 leading-relaxed">{ch.description}</p>
+            <p className="text-sm leading-relaxed" style={{ color: INK2 }}>{ch.description}</p>
           </div>
         ))}
       </div>
+      </Record>
 
       {/* Inquiry form */}
-      <div className="mt-10 rounded-lg border border-gray-200 bg-white p-6 sm:p-8">
+      <Record label="Send an inquiry" note="All fields required. We reply by email." last>
+      <div className="border bg-white p-6 sm:p-8" style={{ borderColor: RULE }}>
         {success ? (
           <div className="text-center py-8">
-            <div className="text-3xl mb-3"></div>
-            <h2 className="text-lg font-semibold text-gray-900">Inquiry sent</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Thank you for reaching out. We will respond within 1 business day.
+            <h2 className="vz-serif text-[22px]" style={{ color: INK }}>Inquiry sent</h2>
+            <p className="mt-2 text-sm" style={{ color: INK2 }}>
+              Thank you. We will reply by email.
             </p>
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gray-900">Send an inquiry</h2>
-              <span className="text-xs text-gray-400">All fields required</span>
-            </div>
 
             {error && (
               <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -155,42 +138,47 @@ export default function ContactPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                  <label htmlFor="contact-name" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}>
                     Name
                   </label>
                   <input
+                    id="contact-name"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
                     placeholder="Full name"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96]"
+                    style={{ fontFamily: "inherit" }}
+                    className="w-full border border-[#cbd6e0] px-3 py-2.5 text-sm text-[#14232f] placeholder:text-[#546471] focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                  <label htmlFor="contact-email" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}>
                     Email
                   </label>
                   <input
+                    id="contact-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     placeholder="you@hospital.org"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96]"
+                    style={{ fontFamily: "inherit" }}
+                    className="w-full border border-[#cbd6e0] px-3 py-2.5 text-sm text-[#14232f] placeholder:text-[#546471] focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96]"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="contact-topic" className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                <label htmlFor="contact-topic" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}>
                   Topic
                 </label>
                 <select
                   id="contact-topic"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96] bg-white"
+                  style={{ fontFamily: "inherit" }}
+                    className="w-full border border-[#cbd6e0] px-3 py-2.5 text-sm text-[#14232f] focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96] bg-white"
                 >
                   {topics.map((t) => (
                     <option key={t.value} value={t.value}>{t.label}</option>
@@ -199,30 +187,32 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                <label htmlFor="contact-message" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}>
                   Message
                 </label>
                 <textarea
+                  id="contact-message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   required
                   rows={4}
                   placeholder="Tell us about your institution and what you're looking for..."
-                  className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96] resize-vertical"
+                  style={{ fontFamily: "inherit" }}
+                    className="w-full border border-[#cbd6e0] px-3 py-2.5 text-sm text-[#14232f] placeholder:text-[#546471] focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96] resize-vertical"
                 />
               </div>
 
-              <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
-                <p className="text-xs text-gray-400">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4" style={{ borderColor: "#e6eef5" }}>
+                <p className="text-xs" style={{ color: INK3 }}>
                   By submitting you agree to our{" "}
-                  <Link href="/privacy" className="underline hover:text-gray-600">
+                  <Link href="/privacy" className="underline" style={{ color: "#1f5e96" }}>
                     privacy policy
                   </Link>.
                 </p>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1f5e96] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="vz-mbtn vz-mbtn--primary disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading ? "Sending..." : "Submit inquiry"}
                 </button>
@@ -231,6 +221,7 @@ export default function ContactPage() {
           </>
         )}
       </div>
+      </Record>
     </div>
   );
 }

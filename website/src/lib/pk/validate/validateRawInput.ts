@@ -81,7 +81,7 @@ export function validateRawInput(
       const v = scope[key];
       if (v !== undefined && v !== null && (!Array.isArray(v) || v.length > 0))
         errors.administration_history =
-          "Administration history is not modelled: loading-to-maintenance changes, irregular, held or interrupted doses require another workflow. No result is returned for supplied unsupported history.";
+          "Administration history is not modeled: loading-to-maintenance changes, irregular, held or interrupted doses require another workflow. No result is returned for supplied unsupported history.";
     }
   }
   if (!Array.isArray(input.levels) || input.levels.length > 8)

@@ -1,57 +1,64 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { PageHeader, Record, Prose, INK } from "@/components/site/Record";
 
 export const metadata: Metadata = {
+  title: "About — Vancomyzer™",
+  description: "What Vancomyzer is for, how it is meant to be used, and who it is designed for.",
   alternates: { canonical: "https://vancomyzer.com/about" },
 };
 
-// Locked: practical not brand-heavy; CASE-001 and quick summary as support links; mission, philosophy, intended users
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
-      {/* 1. Page introduction */}
-      <section className="mb-16">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          About Vancomyzer™
-        </h1>
-        <p className="mt-4 text-gray-600">
-          Vancomyzer™ estimates vancomycin regimens for adults receiving intermittent intravenous therapy. Clinicians can review predicted exposure, model assumptions and published references.
-        </p>
-      </section>
+    <div style={{ color: INK }}>
+      <PageHeader
+        kicker="About"
+        title="Vancomyzer™"
+        compact
+        lede="Vancomyzer estimates vancomycin regimens for adults receiving intermittent intravenous therapy. Clinicians can review predicted exposure, model assumptions and published references."
+      />
 
-      {/* 2. Why Vancomyzer™ exists */}
-      <section className="mb-16">
-        <h2 className="text-xl font-semibold text-gray-900">
-          Why Vancomyzer™ exists
-        </h2>
-        <p className="mt-3 text-gray-600">
-          A dose estimate needs context: patient information, measured concentrations and the limits of the model. Vancomyzer presents these alongside regimen comparisons and a clinical note.
-        </p>
-      </section>
+      <Record label="Why it exists" note="A dose estimate needs its context.">
+        <Prose>
+          <p>
+            A dose estimate needs context: patient information, measured concentrations and the limits
+            of the model. Vancomyzer presents these alongside regimen comparisons and a clinical note.
+          </p>
+        </Prose>
+      </Record>
 
-      {/* 3. Product philosophy */}
-      <section className="mb-16">
-        <h2 className="text-xl font-semibold text-gray-900">
-          Product philosophy
-        </h2>
-        <ul className="mt-4 space-y-2 text-gray-600">
-          <li>Show the model and assumptions used</li>
-          <li>State where evidence or input data are limited</li>
-          <li>Keep dosing decisions with the treating clinician</li>
-          <li>Provide results that can be reviewed and documented</li>
-        </ul>
-      </section>
+      <Record label="How it is built" note="Four commitments, applied to every result.">
+        <Prose>
+          <ul>
+            <li>Show the model and assumptions used</li>
+            <li>State where evidence or input data are limited</li>
+            <li>Keep dosing decisions with the treating clinician</li>
+            <li>Provide results that can be reviewed and documented</li>
+          </ul>
+        </Prose>
+      </Record>
 
-      {/* 4. Intended users */}
-      <section className="mb-16">
-        <h2 className="text-xl font-semibold text-gray-900">
-          Intended users
-        </h2>
-        <p className="mt-3 text-gray-600">
-          The tool is designed for clinical pharmacists, antimicrobial
-          stewardship teams, hospital clinicians reviewing dosing options,
-          and learners exploring vancomycin dosing interpretation.
-        </p>
-      </section>
+      <Record label="Intended users" note="Qualified healthcare professionals and trainees.">
+        <Prose>
+          <p>
+            Clinical pharmacists, antimicrobial stewardship teams, hospital clinicians reviewing dosing
+            options, and learners exploring vancomycin dosing interpretation. It is not for patients or
+            caregivers.
+          </p>
+        </Prose>
+      </Record>
+
+      <Record label="Who makes it" note="Dōsys Health LLC." last>
+        <Prose>
+          <p>
+            Vancomyzer is a product of{" "}
+            <a href="https://dosys.health" target="_blank" rel="noopener noreferrer">Dōsys</a>, built by
+            an ICU clinical pharmacist. Questions and research inquiries go through the{" "}
+            <Link href="/contact">contact page</Link>; the evidence behind the calculator is on the{" "}
+            <Link href="/transparent-dosing">evidence page</Link>.
+          </p>
+        </Prose>
+      </Record>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export function buildExistingRegimenReviewStatus(
       banner_body:
         "This result depends mainly on prior-model assumptions rather than measured-level refinement.",
       next_actions: [
-        "Confirm the model suitabilitys an adult intermittent-infusion use case.",
+        "Confirm the model suits an adult intermittent-infusion case.",
         "Use measured levels when available for a more individualized fit.",
       ],
     };

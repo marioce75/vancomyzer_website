@@ -15,7 +15,7 @@ interface CalculationMethodPanelProps {
 
 function modeLabel(mode: CalculatorMode, levelCount: number) {
   if (mode === "initial_regimen") return "Empiric Population PK";
-  return levelCount >= 2 ? "2-Level Bayesian Posterior" : "1-Level Bayesian Posterior";
+  return levelCount >= 2 ? "2 Levels Bayesian posterior" : "1 Level Bayesian posterior";
 }
 
 export default function CalculationMethodPanel({

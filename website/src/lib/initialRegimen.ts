@@ -250,7 +250,7 @@ function buildOptionInterpretation(
     : "";
   return (
     `Initial regimen option: ${opt.dose_mg} mg every ${opt.interval_hours} hours infused over ${infDurationHours} hours. ` +
-    `Prior-based initial estimate: AUC24 ${opt.auc24} mg\u00b7h/L; peak ${opt.peak} mcg/mL; trough ${opt.trough} mcg/mL. ` +
+    `Prior-based initial estimate: AUC24 ${opt.auc24} mg\u00b7h/L; peak ${opt.peak} mg/L; trough ${opt.trough} mg/L. ` +
     `SCr ${ctx.scr} mg/dL (${ctx.modelLabel} renal covariate).` +
     ctx.arcNote + belowNote +
     ` If immediate severe-infection coverage is clinically necessary under local practice, a clinician may optionally consider an empiric loading-dose estimate around ${ctx.loadingDoseMg} mg (${ctx.loadingDoseBasis}) before maintenance dosing. ` +
@@ -468,7 +468,7 @@ export function computeInitialRegimen(
         `urinary creatinine clearance before acting on this. ` +
         `If confirmed, standard intermittent dosing may not achieve target AUC24 of 400\u2013600 mg\u00b7h/L; ` +
         `required TDD \u2248 ${Math.round(required_tdd).toLocaleString()} mg/day. ` +
-        `Continuous infusion is outside this calculator's scope \u2014 it is neither modelled nor dosed here, so manage it ` +
+        `Continuous infusion is outside this calculator's scope \u2014 it is neither modeled nor dosed here, so manage it ` +
         `per local protocol with Infectious Diseases or nephrology input rather than from these numbers. ` +
         `Obtain two vancomycin levels early (2\u20134h and 6\u20138h post-dose) to confirm individual PK.`,
     };
@@ -496,7 +496,7 @@ export function computeInitialRegimen(
 
   const interpretation_summary =
     `Initial regimen suggestion: ${recommended_dose} every ${choice.interval_hours} hours infused over ${safeInfusion.infusion_duration_hours} hours. ` +
-    `Prior-based initial estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
+    `Prior-based initial estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mg/L; trough ${trough} mg/L. ` +
     `SCr ${prior.scr} mg/dL (${modelLabel} renal covariate).` +
     arcNote + belowTargetNote +
     ` If immediate severe-infection coverage is clinically necessary under local practice, a clinician may optionally consider an empiric loading-dose estimate around ${loadingDose.suggested_dose_mg} mg (${loadingDose.basis}) before maintenance dosing. ` +
@@ -508,7 +508,7 @@ export function computeInitialRegimen(
 
   const assumptions = [
     renalCovariateDescription(prior.model_name),
-    `Adult prior model explicit in code: ${modelLabel} two-compartment population prior.`,
+    `Population model: ${modelLabel} two-compartment prior.`,
     "Initial regimen chosen from practical dose/interval candidates using the shared two-compartment steady-state PK model.",
     "AUC24 = (dose \u00d7 24/\u03c4) / CL at steady state \u2014 standard linear PK relationship.",
     "Infusion duration constrained to a minimum of 60 minutes and a maximum rate of 10 mg/min in line with FDA labeling and guideline-based safety framing.",
@@ -530,7 +530,7 @@ export function computeInitialRegimen(
 
   const quick_summary = [
     `Initial regimen: ${recommended_dose} every ${choice.interval_hours} hours infused over ${safeInfusion.infusion_duration_hours} hours`,
-    `Prior-based estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL`,
+    `Prior-based estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mg/L; trough ${trough} mg/L`,
     ...(auc_range_status !== "in_range" ? [`AUC24 STATUS: ${auc_range_status === "below_target" ? "BELOW TARGET" : "ABOVE TARGET"}`] : []),
     ...(safeInfusion.safety_note ? [safeInfusion.safety_note] : []),
     `SCr: ${prior.scr} mg/dL (${modelLabel} renal covariate). Loading-dose considerations are optional, generic empiric support only, and should be reviewed separately from the maintenance suggestion. Assumptions and limitations apply.`,
@@ -539,7 +539,7 @@ export function computeInitialRegimen(
   const clinical_note = [
     "Vancomycin initial regimen suggestion (no levels).",
     `Dose: ${recommended_dose}; Interval: every ${choice.interval_hours} hours; Infusion: ${safeInfusion.infusion_duration_hours} hours.`,
-    `Prior-based estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL.`,
+    `Prior-based estimate: AUC24 ${auc24} mg\u00b7h/L; peak ${peak} mg/L; trough ${trough} mg/L.`,
     ...(auc_range_status !== "in_range" ? [`** AUC24 ${auc_range_status === "below_target" ? "BELOW" : "ABOVE"} TARGET (400\u2013600 mg\u00b7h/L) **`] : []),
     ...(arc_advisory ? [`** POSSIBLE ARC: ${arc_advisory.crcl_indexed_ml_min_1_73 ?? arc_advisory.crcl_ml_min} mL/min${arc_advisory.crcl_indexed_ml_min_1_73 ? "/1.73 m²" : " absolute"} vs threshold ${ARC_THRESHOLD_ML_MIN_1_73}. Confirm with measured 8–24 h urinary CrCl before acting. **`] : []),
     ...(safeInfusion.safety_note ? [safeInfusion.safety_note] : []),
@@ -581,8 +581,8 @@ export function computeInitialRegimen(
     frequency_options: frequencyOptions,
     calculation_details: {
       method: "Adult prior model only in a two-compartment intermittent steady-state maintenance-selection workflow",
-      evidence_strength: "population prior only",
-      data_quality_summary: "No measured levels entered; model suitability depends on population-prior assumptions and patient-characteristic inputs only.",
+      evidence_strength: "patient characteristics only",
+      data_quality_summary: "No measured levels entered; the estimate rests on the population model and the patient characteristics only.",
       review_status,
       key_inputs: [
         `SCr ${prior.scr} mg/dL (${modelLabel} renal covariate)`,
@@ -640,17 +640,17 @@ function buildEmpiricRefusalResult(args: {
     `Estimated clearance is ${prior.CL.toFixed(2)} L/h (${modelLabel} prior with SCr ${prior.scr} mg/dL, ` +
     `age ${patient.age}, weight ${patient.weight_kg} kg) — every regimen in the q6/q8/q12/q24 search ` +
     `space at the 500 mg minimum dose would exceed the AUC₂₄ ceiling of ${MAX_AUC24_MG_H_L} mg·h/L ` +
-    `or the trough cap of ${MAX_TROUGH_MCG_ML} mcg/mL. ` +
+    `or the trough cap of ${MAX_TROUGH_MCG_ML} mg/L. ` +
     `Recommended action: give a single pulse dose of ${pulseMg} mg (${loadingDose.basis}) infused over ` +
     `${Math.max(1, Math.ceil((pulseMg / 10) / 60 * 4) / 4)} hours, then draw a vancomycin level and ` +
-    `switch to the single-level calculation for level-guided maintenance redosing.`;
+    `switch to the 1 Level tab for level-guided maintenance redosing.`;
 
   const interpretation_summary = safety_message;
 
   const assumptions = [
     `${modelLabel} two-compartment population prior used for clearance estimation.`,
     "Empiric search constrained to q6/q8/q12/q24 intervals with dose ≥ 500 mg per institutional safety floor.",
-    `No regimen in this search space simultaneously satisfies the AUC₂₄ ≤ ${MAX_AUC24_MG_H_L} mg·h/L ceiling, trough ≤ ${MAX_TROUGH_MCG_ML} mcg/mL cap, peak ≤ ${MAX_PEAK_MCG_ML} mcg/mL cap, and TDD safety cap for this patient.`,
+    `No regimen in this search space simultaneously satisfies the AUC₂₄ ≤ ${MAX_AUC24_MG_H_L} mg·h/L ceiling, trough ≤ ${MAX_TROUGH_MCG_ML} mg/L cap, peak ≤ ${MAX_PEAK_MCG_ML} mg/L cap, and TDD safety cap for this patient.`,
     "Pulse-dose-then-level is the standard workflow when fixed-interval empiric dosing is unsafe.",
   ];
 
@@ -658,20 +658,20 @@ function buildEmpiricRefusalResult(args: {
     "Empiric workflow is refused for this patient — the prior estimates severe renal impairment with prolonged elimination half-life.",
     "No fixed-interval regimen is emitted because the calculator cannot identify a candidate within the AUC and trough safety windows.",
     "Pulse-dose value shown is a weight-based estimate (15–20 mg/kg, capped at 3000 mg); confirm dosing against institutional protocol and patient-specific factors before administration.",
-    "After the pulse dose, draw a level (typically at 24–48 h depending on estimated half-life) and use the single-level calculation to compute level-guided redose timing.",
+    "After the pulse dose, draw a level (typically at 24–48 h depending on estimated half-life) and use the 1 Level tab to compute level-guided redose timing.",
   ];
 
   const quick_summary = [
     `Empiric dosing refused — estimated CL ${prior.CL.toFixed(2)} L/h.`,
-    `Recommended: pulse dose ${pulseMg} mg × 1, then draw level + switch to single-level calculation.`,
+    `Recommended: pulse dose ${pulseMg} mg × 1, then draw level + switch to the 1 Level tab.`,
     `SCr ${prior.scr} mg/dL; ${modelLabel} prior.`,
   ].join("\n");
 
   const clinical_note = [
     "Vancomycin: empiric fixed-interval dosing refused by calculator.",
     `Estimated CL ${prior.CL.toFixed(2)} L/h (${modelLabel} prior; SCr ${prior.scr} mg/dL, age ${patient.age}, weight ${patient.weight_kg} kg).`,
-    `No regimen in the q6/q8/q12/q24 search space at the 500 mg dose floor passes the AUC₂₄ ≤ ${MAX_AUC24_MG_H_L} mg·h/L, trough ≤ ${MAX_TROUGH_MCG_ML} mcg/mL, and peak ≤ ${MAX_PEAK_MCG_ML} mcg/mL safety filters.`,
-    `Recommended action: pulse dose ${pulseMg} mg × 1 (${loadingDose.basis}), then draw a vancomycin level and use the single-level calculation for level-guided redose timing.`,
+    `No regimen in the q6/q8/q12/q24 search space at the 500 mg dose floor passes the AUC₂₄ ≤ ${MAX_AUC24_MG_H_L} mg·h/L, trough ≤ ${MAX_TROUGH_MCG_ML} mg/L, and peak ≤ ${MAX_PEAK_MCG_ML} mg/L safety filters.`,
+    `Recommended action: pulse dose ${pulseMg} mg × 1 (${loadingDose.basis}), then draw a vancomycin level and use the 1 Level tab for level-guided redose timing.`,
     "** EMPIRIC FIXED-INTERVAL DOSING NOT RECOMMENDED — USE PULSE-THEN-LEVEL WORKFLOW **",
   ].join("\n");
 
@@ -682,11 +682,11 @@ function buildEmpiricRefusalResult(args: {
     workflow_fit: "single_level" as const,
     banner_title: "Empiric dosing refused — pulse-then-level required",
     banner_body:
-      "The estimated PK profile makes fixed-interval empiric dosing unsafe. Give a single pulse dose, draw a level, and use the single-level calculation to compute level-guided redose timing.",
+      "The estimated PK profile makes fixed-interval empiric dosing unsafe. Give a single pulse dose, draw a level, and use the 1 Level tab to compute level-guided redose timing.",
     next_actions: [
       `Give ${pulseMg} mg pulse dose × 1 (${loadingDose.basis}).`,
       "Draw a vancomycin level (timing per estimated half-life).",
-      "Switch to the single-level calculation and enter the measured level to compute level-guided redose timing.",
+      "Switch to the 1 Level tab and enter the measured level to compute level-guided redose timing.",
     ],
   };
 
@@ -707,7 +707,7 @@ function buildEmpiricRefusalResult(args: {
     frequency_options: [],
     calculation_details: {
       method: "Empiric search returned no safe candidate; pulse-then-level workflow recommended",
-      evidence_strength: "population prior only — empiric refusal",
+      evidence_strength: "patient characteristics only — regimen refused",
       data_quality_summary: "No fixed-interval regimen is emitted; the recommendation is a single pulse dose followed by a measured level.",
       review_status,
       key_inputs: [

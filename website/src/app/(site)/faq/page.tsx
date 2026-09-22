@@ -1,11 +1,17 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { PageHeader, Record, INK, INK2 } from "@/components/site/Record";
 import {
   COLIN_2019,
   COLIN_2021_OBESE_EVALUATION,
   HIGH_BMI_THRESHOLD_KG_M2,
 } from "@/lib/pk/modelRegistry";
+
+export const metadata: Metadata = {
+  title: "FAQ — Vancomyzer™",
+  description: "Why Vancomyzer uses the Colin 2019 model, how it treats serum creatinine and body weight, and what has and has not been validated.",
+  alternates: { canonical: "https://vancomyzer.com/faq" },
+};
 
 /* ── FAQ Data ──────────────────────────────────────────────────── */
 
@@ -55,7 +61,7 @@ const REF_COCKCROFT_GAULT: FaqRef = {
   url: "https://pubmed.ncbi.nlm.nih.gov/1244564/",
 };
 const REF_NKF_CG: FaqRef = {
-  label: "National Kidney Foundation. Cockcroft-Gault formula.",
+  label: "National Kidney Foundation. Cockcroft-Gault formula (professional resource, web page).",
   url: "https://www.kidney.org/professionals/gfr_calculatorCoc",
 };
 const REF_RYBAK_2020: FaqRef = {
@@ -87,7 +93,7 @@ const FAQ_ITEMS: FaqItem[] = [
     answer: [
       `Because ${COLIN.shortName} was built with serum creatinine itself as the renal covariate. SCr enters clearance directly:`,
       { formula: COLIN.equations.FSCR },
-      "SCRstd is an age-standardised reference creatinine. Substituting a Cockcroft-Gault CrCl would mean running a different model from the one that was published and evaluated.",
+      "SCRstd is an age-standardized reference creatinine. Substituting a Cockcroft-Gault CrCl would mean running a different model from the one that was published and evaluated.",
       "This is a property of the model, not evidence that one renal estimate is better for every patient. Cockcroft-Gault remains widely used for drug dosing, and all creatinine-based estimates share the same weakness when muscle mass is low (see “What about muscle mass?”).",
     ],
     refs: [REF_COLIN_2019, REF_COCKCROFT_GAULT],
@@ -96,8 +102,8 @@ const FAQ_ITEMS: FaqItem[] = [
     question: "What are the limitations of Cockcroft-Gault for vancomycin dosing?",
     answer: [
       "Cockcroft-Gault was published in 1976 to estimate creatinine clearance in adult men (derivation data from 249 patients). It was not developed to predict vancomycin pharmacokinetics.",
-      "Like other creatinine-based estimates, it can mislead when muscle mass is low (older, sarcopenic or bedbound patients), when renal function is changing, and in critical illness. In obesity, the result depends heavily on which body weight is entered. It was also derived before creatinine assays were standardised (see the next question).",
-      "For assessing chronic kidney disease, KDIGO and the National Kidney Foundation favour eGFR equations such as CKD-EPI. That guidance is about CKD assessment: Cockcroft-Gault remains widely used for drug dosing.",
+      "Like other creatinine-based estimates, it can mislead when muscle mass is low (older, sarcopenic or bedbound patients), when renal function is changing, and in critical illness. In obesity, the result depends heavily on which body weight is entered. It was also derived before creatinine assays were standardized (see the next question).",
+      "For assessing chronic kidney disease, KDIGO and the National Kidney Foundation favor eGFR equations such as CKD-EPI. That guidance is about CKD assessment: Cockcroft-Gault remains widely used for drug dosing.",
     ],
     refs: [REF_COCKCROFT_GAULT, REF_NKF_CG],
   },
@@ -108,7 +114,7 @@ const FAQ_ITEMS: FaqItem[] = [
       "Jaffe (alkaline picrate) method, first described in 1886: a colorimetric reaction that is less specific. Glucose, bilirubin, acetoacetate and some cephalosporins can interfere. In one single-analyser method comparison (Küme et al.; 230 serum samples), Jaffe results were higher than enzymatic results, especially at low creatinine concentrations.",
       "Enzymatic method: more specific, with fewer interferences, and it performed better at low creatinine concentrations in that comparison. Many laboratories now use enzymatic assays calibrated to isotope dilution mass spectrometry (IDMS) reference methods.",
       "How much the method matters varies. In an outpatient comparison (Schmidt 2015; 529 paired results), 5.5% of eGFR results fell on different sides of a clinical decision limit depending on the method, and the authors judged the risk from assay bias to be much smaller than the risk from biological variation.",
-      `Why it matters for dosing: Cockcroft-Gault was derived before creatinine measurement was standardised, and renal-function equations are not interchangeable. In a population PK study of 78 elderly patients (Glatard 2015), vancomycin models built on different renal-function equations gave different parameter and AUC estimates, and using an equation other than the one a model was built with could significantly alter predictive performance. Vancomyzer uses the ${COLIN.shortName} serum-creatinine covariate as published rather than substituting another renal estimate.`,
+      `Why it matters for dosing: Cockcroft-Gault was derived before creatinine measurement was standardized, and renal-function equations are not interchangeable. In a population PK study of 78 elderly patients (Glatard 2015), vancomycin models built on different renal-function equations gave different parameter and AUC estimates, and using an equation other than the one a model was built with could significantly alter predictive performance. Vancomyzer uses the ${COLIN.shortName} serum-creatinine covariate as published rather than substituting another renal estimate.`,
     ],
     refs: [
       { label: "Küme T, et al. Evaluation and comparison of Abbott Jaffe and enzymatic creatinine methods: could the old method meet the new requirements? J Clin Lab Anal. 2018;32(1):e22168.", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6816857/" },
@@ -120,8 +126,8 @@ const FAQ_ITEMS: FaqItem[] = [
     question: "What about muscle mass?",
     answer: [
       `Serum creatinine comes from muscle, so it reflects muscle mass as well as kidney function. In older, sarcopenic or bedbound patients, a low SCr can overstate renal function whichever equation is used: Cockcroft-Gault, CKD-EPI or the ${COLIN.shortName} SCr covariate. No creatinine-based equation corrects for this in an individual patient.`,
-      `${COLIN.shortName} includes age (through an age-standardised reference creatinine and an age-decline factor on clearance), but that describes the average effect of age, not an individual patient’s muscle mass. When the renal estimate is doubtful, measured vancomycin levels entered into the Bayesian fit let the estimate move away from the population prediction.`,
-      "Vancomyzer uses the SCr you enter and does not round low values up (the model input has a lower bound of 0.4 mg/dL). In a single-centre retrospective study of 245 patients aged 65 and older (Bukhari 2024), dosing with SCr rounded up to 1 mg/dL was less accurate than dosing with the actual SCr.",
+      `${COLIN.shortName} includes age (through an age-standardized reference creatinine and an age-decline factor on clearance), but that describes the average effect of age, not an individual patient’s muscle mass. When the renal estimate is doubtful, measured vancomycin levels entered into the Bayesian fit let the estimate move away from the population prediction.`,
+      "Vancomyzer uses the SCr you enter and does not round low values up (accepted range 0.1–10 mg/dL). In a single-center retrospective study of 245 patients aged 65 and older (Bukhari 2024), dosing with SCr rounded up to 1 mg/dL was less accurate than dosing with the actual SCr.",
       "The calculator shows an enhanced-monitoring advisory for patients older than 65 and, when the bedbound option is selected, a warning when SCr is below 0.7 mg/dL. Review any renal estimate you consider unreliable, and obtain levels early.",
     ],
     refs: [REF_COLIN_2019, REF_BUKHARI_2024],
@@ -129,7 +135,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: `What does ${COLIN.shortName} use instead of Cockcroft-Gault?`,
     answer: [
-      "Age, total body weight and serum creatinine, as direct covariates in a two-compartment model, with no intermediate CrCl calculation. FDecline describes the fall in clearance with age; FSCR describes the effect of serum creatinine relative to an age-standardised reference:",
+      "Age, total body weight and serum creatinine, as direct covariates in a two-compartment model, with no intermediate CrCl calculation. FDecline describes the fall in clearance with age; FSCR describes the effect of serum creatinine relative to an age-standardized reference:",
       { formula: [COLIN.equations.CL, COLIN.equations.FDecline, COLIN.equations.FSCR].join("\n") },
       `Source data: ${COLIN.sourcePopulation}`,
       `Covariates in the published final model that Vancomyzer does not apply:\n${bullets(COLIN.omittedCovariates)}`,
@@ -148,13 +154,13 @@ const FAQ_ITEMS: FaqItem[] = [
       "This requires height, which Cockcroft-Gault does not use, and IBW alone can underestimate dose requirements in obese patients.",
       "Adjusted body weight (AdjBW): IBW + 0.4 × (TBW − IBW). Some institutional protocols use it when actual body weight exceeds IBW by more than 30%.",
       "The practical problem: which weight to use varies between institutions, depends on a reliably documented height, and adds a manual step on top of the CrCl estimate. For obese adults, the 2020 ASHP/IDSA/PIDS/SIDP guideline suggests loading doses of 20–25 mg/kg actual body weight (maximum 3,000 mg), maintenance doses usually no higher than 4,500 mg/day, and early monitoring of levels.",
-      `How Vancomyzer handles body size: ${COLIN.shortName} uses total body weight directly for every adult at every BMI (CL and Q scale with (weight/70)^0.75; V1 and V2 with weight/70). No IBW, AdjBW or height is needed for the calculation, and no other model takes over at any BMI. Measured levels, when entered, individualise the estimate through the Bayesian fit.`,
+      `How Vancomyzer handles body size: ${COLIN.shortName} uses total body weight directly for every adult at every BMI (CL and Q scale with (weight/70)^0.75; V1 and V2 with weight/70). No IBW, AdjBW or height is needed for the calculation, and no other model takes over at any BMI. Measured levels, when entered, individualize the estimate through the Bayesian fit.`,
       `Height is still worth entering so BMI can be assessed. At ${BMI_40}, an advisory notes that published evaluation of ${COLIN.shortName} at that body size is limited and recommends early vancomycin levels; fat-free mass and alternative creatinine-clearance estimates are shown for information only and do not change the calculation.`,
     ],
     refs: [
       { label: "Pai MP, Paloucek FP. The origin of the “ideal” body weight equations (Devine formula). Ann Pharmacother. 2000;34(9):1066-1069.", url: "https://doi.org/10.1345/aph.19381" },
-      { label: "UC Davis Health. Adult IV vancomycin dosing guidelines (example institutional protocol).", url: "https://health.ucdavis.edu/media-resources/antibiotic-stewardship/documents/pdfs/guidelines/vanc_dosing.pdf" },
-      { label: "Actual body weight dosing of vancomycin in obese patients (retrospective study, 171 adults).", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3764551/" },
+      { label: "UC Davis Health. Adult IV vancomycin dosing guidelines (example institutional protocol, PDF).", url: "https://health.ucdavis.edu/media-resources/antibiotic-stewardship/documents/pdfs/guidelines/vanc_dosing.pdf" },
+      { label: "Retrospective study of actual-body-weight vancomycin dosing in 171 adults (PubMed Central PMC3764551).", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3764551/" },
       REF_RYBAK_2020,
       REF_JANMAHASATIAN_2005,
     ],
@@ -165,11 +171,11 @@ const FAQ_ITEMS: FaqItem[] = [
       `${VALIDATION_STATUS} The studies below evaluated the published ${COLIN.shortName} model, not Vancomyzer’s implementation of it.`,
       bullets([
         `Heus 2022 (three Belgian hospitals; 169 non-ICU general-ward patients on continuous-infusion vancomycin; 923 samples): ${COLIN.shortName} had the second-best predictive performance of 23 published models, after the Okada model. Vancomyzer models intermittent infusion, not continuous infusion.`,
-        `Aljutayli 2022 (McGill University Health Centre; single-centre retrospective data from 116 adults): transferability diagnostics suggested ${COLIN.shortName} and a model by Yamamoto et al. were the two of seven literature models best suited to the local data. The authors note that these diagnostics were not strong predictors of predictive performance.`,
+        `Aljutayli 2022 (McGill University Health Centre; single-center retrospective data from 116 adults): transferability diagnostics suggested ${COLIN.shortName} and a model by Yamamoto et al. were the two of seven literature models best suited to the local data. The authors note that these diagnostics were not strong predictors of predictive performance.`,
         COLIN_2021_NOTE,
         `Patanwala 2022 (188 critically ill adults; 466 AUC estimates): ${COLIN.shortName}, Goti 2018 and Thomson 2009 placed the AUC in the same category (below, within or above 400–600 mg·h/L) for 48% of estimates, so model choice can change dosing decisions in the ICU.`,
       ]),
-      "Results depend on the population, infusion method and sampling design, and none of these studies establishes accuracy for every patient. Use measured levels to individualise dosing.",
+      "Results depend on the population, infusion method and sampling design, and none of these studies establishes accuracy for every patient. Use measured levels to individualize dosing.",
     ],
     refs: [
       { label: "Heus A, et al. Model-informed precision dosing of vancomycin via continuous infusion: a clinical fit-for-purpose evaluation of published PK models. Int J Antimicrob Agents. 2022;59(5):106579.", url: "https://pubmed.ncbi.nlm.nih.gov/35341931/" },
@@ -183,7 +189,7 @@ const FAQ_ITEMS: FaqItem[] = [
     answer: [
       VALIDATION_STATUS,
       "Evidence to date is developer-run: reproduction of published literature cases, synthetic simulation, and a synthetic cross-check against Tucuxi. These checks test whether the equations are implemented as intended; they do not show how accurately Vancomyzer predicts levels in real patients.",
-      "The shaded band around the predicted curve on the concentration–time graph is a fixed ± percentage of the predicted concentration (wider when fit uncertainty is rated higher). It is not a statistical confidence or credible interval.",
+      "The shaded band around the predicted curve on the concentration–time graph is a percentage of the predicted concentration set by the fit-quality rating (±35% before any levels, wider when fit uncertainty is rated higher). It is not a statistical confidence or credible interval.",
       "Vancomyzer™ is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation.",
     ],
     refs: [
@@ -211,141 +217,40 @@ const FAQ_ITEMS: FaqItem[] = [
   },
 ];
 
-/* ── Accordion Item ────────────────────────────────────────────── */
+/* ── Item ──────────────────────────────────────────────────────── */
 
-function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
-  const [open, setOpen] = useState(false);
-
+function FaqEntry({ item, index }: { item: FaqItem; index: number }) {
   return (
-    <div
-      style={{
-        borderLeft: open ? "2px solid var(--color-primary)" : "2px solid transparent",
-        background: open ? "var(--color-card)" : "#f4f7fa",
-        transition: "background 0.15s, border-color 0.2s",
-      }}
-    >
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="w-full text-left"
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          gap: 12,
-          padding: "16px 20px",
-          cursor: "pointer",
-          background: "transparent",
-          border: "none",
-          transition: "background 0.15s",
-          fontFamily: "'Share Tech Mono', monospace",
-        }}
-        onMouseEnter={(e) => {
-          if (!open) (e.currentTarget as HTMLElement).style.background = "#dbeafe";
-        }}
-        onMouseLeave={(e) => {
-          if (!open) (e.currentTarget as HTMLElement).style.background = "transparent";
-        }}
-      >
-        <span
-          style={{
-            color: "var(--color-primary)",
-            fontSize: 14,
-            fontWeight: 700,
-            fontFamily: "'Share Tech Mono', monospace",
-            lineHeight: 1.5,
-          }}
-        >
-          {">"} Q{index + 1}: {item.question}
-        </span>
-        <span
-          style={{
-            color: "var(--color-dim)",
-            fontSize: 16,
-            flexShrink: 0,
-            transition: "transform 0.2s",
-            fontFamily: "'Share Tech Mono', monospace",
-          }}
-        >
-          {open ? "Hide" : "Show"}
-        </span>
-      </button>
-
-      <div
-        style={{
-          maxHeight: open ? 2000 : 0,
-          overflow: "hidden",
-          transition: "max-height 0.35s ease",
-        }}
-      >
-        <div style={{ padding: "0 20px 20px 20px" }}>
-          {item.answer.map((block, i) => {
-            if (typeof block === "object" && "formula" in block) {
-              return (
-                <pre
-                  key={i}
-                  style={{
-                    color: "var(--color-primary)",
-                    fontSize: 12,
-                    lineHeight: 1.6,
-                    fontFamily: "'Share Tech Mono', monospace",
-                    marginTop: 8,
-                    marginBottom: 4,
-                    padding: "10px 14px",
-                    borderLeft: "2px solid var(--color-border)",
-                    background: "var(--color-highlight)",
-                    whiteSpace: "pre-wrap",
-                    overflowX: "auto",
-                  }}
-                >
-                  {block.formula}
-                </pre>
-              );
-            }
+    <details id={`q${index + 1}`}>
+      <summary>
+        <span>{item.question}</span>
+      </summary>
+      <div className="vz-faq-body">
+        {item.answer.map((block, i) => {
+          if (typeof block === "object" && "formula" in block) {
             return (
-              <p
-                key={i}
-                style={{
-                  color: "var(--color-secondary)",
-                  fontSize: 13,
-                  lineHeight: 1.7,
-                  fontFamily: "'Share Tech Mono', monospace",
-                  marginTop: i === 0 ? 0 : 12,
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {block}
-              </p>
+              <pre key={i} className="vz-code" style={{ marginTop: 10 }}>
+                {block.formula}
+              </pre>
             );
-          })}
-
-          <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: "6px 14px" }}>
+          }
+          return (
+            <p key={i} className="max-w-[70ch] text-[15.5px] leading-[1.6]" style={{ color: INK2, marginTop: i === 0 ? 0 : 12, whiteSpace: "pre-line" }}>
+              {block}
+            </p>
+          );
+        })}
+        {item.refs.length > 0 && (
+          <ol className="vz-refs" style={{ listStyle: "decimal", paddingLeft: 20 }}>
             {item.refs.map((ref, i) => (
-              <a
-                key={i}
-                href={ref.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  fontSize: 11,
-                  color: "var(--color-primary)",
-                  textDecoration: "none",
-                  letterSpacing: "0.02em",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.textDecoration = "underline";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.textDecoration = "none";
-                }}
-              >
-                [REF{item.refs.length > 1 ? ` ${i + 1}` : ""}] {ref.label}
-              </a>
+              <li key={i}>
+                <a href={ref.url} target="_blank" rel="noopener noreferrer">{ref.label}</a>
+              </li>
             ))}
-          </div>
-        </div>
+          </ol>
+        )}
       </div>
-    </div>
+    </details>
   );
 }
 
@@ -353,119 +258,24 @@ function AccordionItem({ item, index }: { item: FaqItem; index: number }) {
 
 export default function FAQPage() {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--color-bg)",
-        padding: "48px 16px 80px",
-      }}
-    >
-      <div style={{ maxWidth: 840, margin: "0 auto" }}>
-        {/* Header */}
-        <div style={{ marginBottom: 40 }}>
-          <h1
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              letterSpacing: "0.1em",
-              color: "var(--color-primary)",
-              fontFamily: "'Share Tech Mono', monospace",
-              textShadow: "0 0 10px var(--color-glow)",
-            }}
-          >
-            {">"} FAQ — METHODOLOGY & DESIGN DECISIONS
-          </h1>
-          <p
-            style={{
-              marginTop: 8,
-              fontSize: 13,
-              color: "var(--color-dim)",
-              fontFamily: "'Share Tech Mono', monospace",
-            }}
-          >
-            {">"} Why Vancomyzer is built the way it is
-          </p>
-        </div>
-
-        {/* Accordion list */}
-        <div
-          style={{
-            border: "1px solid var(--color-border)",
-            background: "var(--color-card)",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+    <div style={{ color: INK }}>
+      <PageHeader
+        kicker="Frequently asked questions"
+        title="Why Vancomyzer is built the way it is."
+        lede="The model, the renal covariate, body weight, and what has and has not been validated. Each answer cites its sources."
+        compact
+      />
+      <Record label="Questions" note={`${FAQ_ITEMS.length} answers. Open any question; the references are listed under each answer.`} last>
+        <div className="vz-faq">
           {FAQ_ITEMS.map((item, index) => (
-            <div
-              key={index}
-              style={{
-                borderTop: index === 0 ? "none" : "1px solid var(--color-border)",
-              }}
-            >
-              <AccordionItem item={item} index={index} />
-            </div>
+            <FaqEntry key={index} item={item} index={index} />
           ))}
         </div>
-
-        {/* Footer nav */}
-        <div
-          style={{
-            marginTop: 40,
-            paddingTop: 24,
-            borderTop: "1px solid var(--color-border)",
-            display: "flex",
-            gap: 20,
-          }}
-        >
-          <a
-            href="/calculator"
-            style={{
-              fontSize: 13,
-              color: "var(--color-card, #ffffff)",
-              textDecoration: "none",
-              border: "1px solid var(--color-primary)",
-              background: "var(--color-primary)",
-              padding: "10px 20px",
-              fontWeight: 600,
-              transition: "opacity 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = "0.85";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = "1";
-            }}
-          >
-            Open Calculator
-          </a>
-          <a
-            href="/transparent-dosing"
-            style={{
-              fontSize: 13,
-              color: "var(--color-secondary)",
-              textDecoration: "none",
-              border: "1px solid var(--color-border)",
-              background: "var(--color-card, #ffffff)",
-              padding: "10px 20px",
-              fontWeight: 500,
-              transition: "background 0.15s, border-color 0.15s, color 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "var(--color-primary)";
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-primary)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-card, #ffffff)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "var(--color-card, #ffffff)";
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
-              (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
-            }}
-          >
-            References
-          </a>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/calculator" className="vz-mbtn vz-mbtn--primary">Open the calculator</Link>
+          <Link href="/transparent-dosing" className="vz-mbtn vz-mbtn--outline">Evidence and methods</Link>
         </div>
-      </div>
+      </Record>
     </div>
   );
 }

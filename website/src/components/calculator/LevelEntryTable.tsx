@@ -259,7 +259,7 @@ export default function LevelEntryTable({
 
             {/* 1. Vancomycin level concentration */}
             <div>
-              <Label>Vancomycin level concentration (mcg/mL)</Label>
+              <Label>Vancomycin level concentration (mg/L)</Label>
               <div className="flex">
                 <ClinicalNumberInput
                   inputMode="decimal"
@@ -272,7 +272,7 @@ export default function LevelEntryTable({
                     setParseErrors((prev) => ({ ...prev, [`value-${i}`]: parseError ?? "" }));
                     setLevelWarnings((prev) => {
                       const n = [...prev];
-                      n[i] = v !== null && v > 40 ? `Level ${v} mcg/mL is unusually high — please confirm this value is correct.` : "";
+                      n[i] = v !== null && v > 40 ? `Level ${v} mg/L is unusually high — please confirm this value is correct.` : "";
                       return n;
                     });
                   }}
@@ -280,7 +280,7 @@ export default function LevelEntryTable({
                   placeholder="e.g. 18.5"
                 />
                 <span className="flex items-center px-2.5 text-xs rounded-r h-9 shrink-0" style={{background: '#edf2f7', border: '1px solid #a0aec0', borderLeft: 'none', color: '#4a5568'}}>
-                  mcg/mL
+                  mg/L
                 </span>
               </div>
               {/* Validation errors only shown after a failed Calculate attempt (set via fieldErrors prop) */}

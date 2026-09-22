@@ -308,12 +308,12 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
       <div class="metric-card">
         <div class="metric-label">Peak</div>
         <div class="metric-value">${fmt(data.peak, 2)}</div>
-        <div class="metric-unit">mcg/mL</div>
+        <div class="metric-unit">mg/L</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Trough</div>
         <div class="metric-value">${fmt(data.trough, 2)}</div>
-        <div class="metric-unit">mcg/mL</div>
+        <div class="metric-unit">mg/L</div>
       </div>
     </div>
   </div>

@@ -21,7 +21,7 @@ export function buildLimitations(input: ExplanationInput): string[] {
   const isPulseDose = engineOutput.doses_given === 1;
 
   if (engineOutput.level_count === 1 && !usedRefinement) {
-    items.unshift("Single level limits precision; adjustment is a initial estimate.");
+    items.unshift("Single level limits precision; adjustment is an initial estimate.");
   }
   if (isPulseDose) {
     items.unshift("Bayesian estimate based on single pre-steady-state level — monitor and confirm with a follow-up level after additional doses.");

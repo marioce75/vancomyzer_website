@@ -99,8 +99,8 @@ export default function PrimaryMetricsCard({ auc24, peak, trough, compact = fals
             }
           />
           </div>
-          <Metric compact label="Peak" value={formatConc(peak)} unit="mcg/mL" />
-          <Metric compact label="Trough" value={formatConc(trough)} unit="mcg/mL" />
+          <Metric compact label="Peak" value={formatConc(peak)} unit="mg/L" />
+          <Metric compact label="Trough" value={formatConc(trough)} unit="mg/L" />
         </div>
       </div>
     );
@@ -108,8 +108,8 @@ export default function PrimaryMetricsCard({ auc24, peak, trough, compact = fals
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
       <Metric label="AUC24" value={formatAuc(auc24)} unit="mg·h/L" />
-      <Metric label="Peak" value={formatConc(peak)} unit="mcg/mL" />
-      <Metric label="Trough" value={formatConc(trough)} unit="mcg/mL" />
+      <Metric label="Peak" value={formatConc(peak)} unit="mg/L" />
+      <Metric label="Trough" value={formatConc(trough)} unit="mg/L" />
     </div>
   );
 }

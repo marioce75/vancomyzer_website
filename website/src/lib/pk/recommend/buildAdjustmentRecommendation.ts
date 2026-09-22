@@ -625,8 +625,8 @@ function buildAdjustmentRefusal(args: {
   const { CL, recommendedDoseCheck, recommendedInterval, predictedPeak, predictedTrough, predictedAuc24 } = args;
   // Name the cap that was exceeded so the clinician sees the actual reason.
   const exceeded: string[] = [];
-  if (predictedPeak > MAX_PEAK_MCG_ML) exceeded.push(`peak ${predictedPeak.toFixed(0)} > ${MAX_PEAK_MCG_ML} mcg/mL`);
-  if (predictedTrough > MAX_TROUGH_MCG_ML) exceeded.push(`trough ${predictedTrough.toFixed(0)} > ${MAX_TROUGH_MCG_ML} mcg/mL`);
+  if (predictedPeak > MAX_PEAK_MCG_ML) exceeded.push(`peak ${predictedPeak.toFixed(0)} > ${MAX_PEAK_MCG_ML} mg/L`);
+  if (predictedTrough > MAX_TROUGH_MCG_ML) exceeded.push(`trough ${predictedTrough.toFixed(0)} > ${MAX_TROUGH_MCG_ML} mg/L`);
   if (predictedAuc24 > MAX_AUC24_MG_H_L) exceeded.push(`AUC₂₄ ${predictedAuc24.toFixed(0)} > ${MAX_AUC24_MG_H_L} mg·h/L`);
 
   const safetyMessage =
@@ -635,8 +635,8 @@ function buildAdjustmentRefusal(args: {
     `conservative attempt (${recommendedDoseCheck} mg q${recommendedInterval}h) the ` +
     `predicted steady-state ${exceeded.join("; ")}. ` +
     `Recommended action: hold maintenance dosing, recheck a vancomycin level when ` +
-    `the trough falls below ${WARN_TROUGH_MCG_ML} mcg/mL, then redose using the ` +
-    `single-level calculation for level-guided pulse dosing.`;
+    `the trough falls below ${WARN_TROUGH_MCG_ML} mg/L, then redose using the ` +
+    `1 Level tab for level-guided pulse dosing.`;
 
   return {
     recommended_dose: "—",
@@ -644,8 +644,8 @@ function buildAdjustmentRefusal(args: {
     recommended_infusion_duration_hours: 0,
     frequency_options: [],
     adjustment_dosing_blocked: {
-      reason: `No regimen in the search grid satisfies peak ≤ ${MAX_PEAK_MCG_ML} mcg/mL, trough ≤ ${MAX_TROUGH_MCG_ML} mcg/mL, AND AUC₂₄ ≤ ${MAX_AUC24_MG_H_L} mg·h/L at estimated CL ${CL.toFixed(2)} L/h.`,
-      recommended_action: `Hold maintenance dosing; recheck level when trough < ${WARN_TROUGH_MCG_ML} mcg/mL; redose via single-level calculation.`,
+      reason: `No regimen in the search grid satisfies peak ≤ ${MAX_PEAK_MCG_ML} mg/L, trough ≤ ${MAX_TROUGH_MCG_ML} mg/L, AND AUC₂₄ ≤ ${MAX_AUC24_MG_H_L} mg·h/L at estimated CL ${CL.toFixed(2)} L/h.`,
+      recommended_action: `Hold maintenance dosing; recheck level when trough < ${WARN_TROUGH_MCG_ML} mg/L; redose via the 1 Level tab.`,
       safety_message: safetyMessage,
       estimated_cl_l_h: Math.round(CL * 100) / 100,
     },

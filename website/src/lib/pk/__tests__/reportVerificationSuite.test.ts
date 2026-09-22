@@ -365,7 +365,7 @@ function singleDoseAuc(pk: TwoCompartmentParameters, dose_mg: number, T_inf: num
 // Response-text helpers
 // ---------------------------------------------------------------------------
 
-const EXPOSURE_STATEMENT = /AUC24:?\s+(-?\d+(?:\.\d+)?)\s*mg.h\/L;\s*peak\s+(-?\d+(?:\.\d+)?)(?:\s*mcg\/mL)?;\s*trough\s+(-?\d+(?:\.\d+)?)/g;
+const EXPOSURE_STATEMENT = /AUC24:?\s+(-?\d+(?:\.\d+)?)\s*mg.h\/L;\s*peak\s+(-?\d+(?:\.\d+)?)(?:\s*(?:mcg\/mL|mg\/L))?;\s*trough\s+(-?\d+(?:\.\d+)?)/g;
 
 function expectExposureText(
   c: CheckContext,
@@ -391,7 +391,7 @@ function expectExposureText(
 
 const MODEL_LABEL_PATTERNS = [
   /\(([^()]+?) renal covariate\)/g,
-  /[Aa]dult prior model(?: explicit in code)?: ([^;.]+?) two-compartment/g,
+  /(?:[Aa]dult prior model(?: explicit in code)?|Population model): ([^;.]+?) two-compartment/g,
   /direct ([^()]+?) covariate/g,
   /using the ([^;.]+?) two-compartment adult population prior/g,
 ];

@@ -60,7 +60,7 @@ const LAUNCH_LINE = OPEN_ACCESS
   : "The core calculator is free for individual clinicians, permanently — create a free account or sign in to get started.";
 
 const FICTIONAL_CASE_CAPTION =
-  "Fictional case for illustration — synthetic inputs (58 y, 82 kg, 172 cm, SCr 1.1 mg/dL, no RRT). Not a patient. Screenshot of the current calculator, unaltered.";
+  "Fictional case for illustration — synthetic inputs (58 y, male, 82 kg, 172 cm, SCr 1.1 mg/dL, no RRT). Not a patient. Screenshot of the current calculator, unaltered.";
 
 const CAPABILITIES: { title: string; body: string; source?: string }[] = [
   {
@@ -88,7 +88,7 @@ const CAPABILITIES: { title: string; body: string; source?: string }[] = [
   {
     title: "One model for all adults, with a high-BMI advisory",
     body:
-      `${COLIN_2019.shortName} is used throughout the supported adult population. At a BMI of ${HIGH_BMI_THRESHOLD_KG_M2} kg/m² or higher, an advisory notes that published evaluation at that size is limited, and fat-free mass and alternative creatinine-clearance estimates are shown for context only. They do not change the calculation.`,
+      `${COLIN_2019.shortName} is used for every adult, at every body size. At a BMI of ${HIGH_BMI_THRESHOLD_KG_M2} kg/m² or higher, an advisory notes that published evaluation at that size is limited, and fat-free mass and alternative creatinine-clearance estimates are shown for context only. They do not change the calculation.`,
     source: COLIN_2021_OBESE_EVALUATION.citation,
   },
   {
@@ -359,7 +359,7 @@ export default function LandingPage() {
             </ul>
             <p className="mt-4 text-[15px] leading-relaxed" style={{ color: INK2 }}>
               Recommendations are withheld when renal replacement therapy is selected. Continuous
-              infusion and paediatric dosing use different models and are out of scope.
+              infusion and pediatric dosing use different models and are out of scope.
             </p>
           </div>
         </div>

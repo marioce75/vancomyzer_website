@@ -17,11 +17,11 @@ export default function CanonicalDocCallout({ docName, href }: CanonicalDocCallo
     <div
       role="region"
       aria-label="Canonical document notice"
-      className="mt-6 mb-8 px-4 py-3 border-l-4 rounded-r"
+      className="mt-6 mb-8 max-w-[70ch] border-l-[3px] bg-white px-4 py-3"
       style={{
-        borderLeftColor: "#0d9488",
-        background: "#f0fdfa",
-        color: "#115e59",
+        borderLeftColor: "#1f5e96",
+        outline: "1px solid #cbd6e0",
+        color: "#14232f",
       }}
     >
       <p className="text-sm leading-relaxed m-0">
@@ -30,7 +30,7 @@ export default function CanonicalDocCallout({ docName, href }: CanonicalDocCallo
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: "#0d9488", textDecoration: "underline", fontWeight: 600 }}
+            style={{ color: "#1f5e96", textDecoration: "underline", fontWeight: 600 }}
           >
             {href.replace(/^https?:\/\//, "")}
           </a>.
