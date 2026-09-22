@@ -106,7 +106,7 @@ export default function EquationsPage() {
           </p>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed" style={{ color: "#94a3b8" }}>
             Model names, citations and equations on this page use the same reference values as
-            the calculator (model version{" "}
+            the calculator (calculator version{" "}
             <span style={{ color: "#e2e8f0", fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
               {MODEL_MANIFEST_VERSION}
             </span>
@@ -122,7 +122,7 @@ export default function EquationsPage() {
             1. Population model — {COLIN_2019.shortName}
           </h2>
           <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#334155" }}>
-            Every adult is calculated with the {COLIN_2019.displayName}. Clearance is built from four covariate
+            Every adult is dosed with the {COLIN_2019.displayName}. Clearance is built from four covariate
             functions composed multiplicatively: allometric size scaling, sigmoidal maturation (effectively 1.0 for
             adults), an age-decline sigmoid, and a serum-creatinine exponential effect.
           </p>
@@ -334,8 +334,7 @@ two-compartment steady-state superposition formula
           </p>
           <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#334155" }}>
             At BMI {HIGH_BMI_THRESHOLD_KG_M2} kg/m² or more, the calculator adds an advisory because published
-            evaluation of this model at that body size is limited. The text comes from the same registry function the
-            calculator uses; for a patient weighing 130 kg with a height of 175 cm it reads:
+            evaluation of this model at that body size is limited. This is the advisory the calculator shows; for a patient weighing 130 kg with a height of 175 cm it reads:
           </p>
           {HIGH_BMI_EXAMPLE && (
             <blockquote
@@ -441,9 +440,9 @@ two-compartment steady-state superposition formula
         + ½·(ln(V2/V2_prior) / ω_V2)²
 
 Assay error model:
-  σᵢ = max(1.0 mcg/mL, 0.15 × max(Cᵢ_obs, Cᵢ_pred))
+  σᵢ = max(1.0 mg/L, 0.15 × max(Cᵢ_obs, Cᵢ_pred))
 
-Bounds: each posterior parameter clamped to [0.1×, 10×] of prior.
+Bounds: each fitted parameter is limited to between one-tenth and ten times its prior value.
 
 Prior log-SDs (Vancomyzer settings, all adults):
   ω_CL = 0.35    ω_V1 = 0.25    ω_Q = 0.50    ω_V2 = 0.50`}</pre>

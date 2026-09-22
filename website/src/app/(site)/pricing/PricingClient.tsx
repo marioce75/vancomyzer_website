@@ -68,7 +68,6 @@ const TIERS: TierCard[] = [
     ],
     cta: { label: "Start 14-Day Trial", href: "/settings/billing" },
     ctaSubLabel: "card required at signup · cancel anytime",
-    badge: "Individual plan",
   },
   {
     name: "Hospital Site",
@@ -108,10 +107,10 @@ const DISPLAY_TIERS: TierCard[] = OPEN_ACCESS
       if (tier.name === "Individual Pro") {
         return {
           ...tier,
-          cta: { label: "Free during launch", nonInteractive: true },
-          // Replaces "card required at signup". Only these three features are
-          // open during launch; calculation history still needs Individual Pro.
-          ctaSubLabel: "PDF export, note copy & interpretation · no account needed",
+          cta: { label: "Open Calculator", href: "/calculator" },
+          // Only these three features are open during launch; calculation
+          // history still needs Individual Pro.
+          ctaSubLabel: "PDF export, note copy & interpretation are free during launch · after launch, a 14-day trial, then $49.99/year",
         };
       }
       return tier;

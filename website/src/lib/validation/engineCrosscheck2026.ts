@@ -18,6 +18,7 @@ import vancomyzer from "./crosscheck/results/vancomyzer-2026-09-17.1-crosscheck-
 import tucuxi from "./crosscheck/results/tucuxi-49f6ebe6bcb3-crosscheck-seed42-n200.json";
 import compare from "./crosscheck/results/compare-vancomyzer-2026-09-17.1-crosscheck-seed42-n200-vs-tucuxi-49f6ebe6bcb3-crosscheck-seed42-n200.json";
 import attribution from "./crosscheck/results/attribution-vancomyzer-2026-09-17.1-crosscheck-seed42-n200-vs-tucuxi-49f6ebe6bcb3-crosscheck-seed42-n200.json";
+import vancomyzerCurrent from "./crosscheck/results/vancomyzer-2026-09-19.1-crosscheck-seed42-n200.json";
 
 export type ParamKey = "CL" | "V1" | "Q" | "V2";
 export const PARAM_ORDER_2026: ParamKey[] = ["CL", "V1", "Q", "V2"];
@@ -96,6 +97,26 @@ export const ATTRIBUTION_2026 = {
   }[],
 };
 
+/**
+ * The Vancomyzer side re-run on the current calculator version against the same
+ * fixture. Max relative difference of every posterior parameter and exposure
+ * versus the 2026-09-17.1 run; 0 means the later releases changed validation and
+ * diagnostics only, and the comparison applies to the current calculator.
+ */
+const VC = vancomyzerCurrent.results as unknown as ResultRow[];
+const vcById = new Map(VC.map((r) => [r.id, r]));
+export const RERUN_2026 = {
+  version: vancomyzerCurrent.engine_manifest as string,
+  maxRelDiffPct: 100 * Math.max(0, ...V.map((v) => {
+    const c = vcById.get(v.id);
+    if (!c || !c.fit.success) return Number.POSITIVE_INFINITY;
+    const ps = PARAM_ORDER_2026.map((k) => Math.abs(((c.posterior as Params)[k] - (v.posterior as Params)[k]) / (v.posterior as Params)[k]));
+    const es = (["auc24", "peak", "trough"] as const).map((k) => Math.abs((c.exposure_steady_state[k]! - v.exposure_steady_state[k]!) / v.exposure_steady_state[k]!));
+    return Math.max(...ps, ...es);
+  })),
+  allFitsSucceeded: VC.every((r) => r.fit.success) && VC.length === V.length,
+};
+
 export const CROSSCHECK_META_2026 = {
   n: paired.length,
   fixture: vancomyzer.fixture,
@@ -111,7 +132,7 @@ export const CROSSCHECK_META_2026 = {
   modelFileSha256: tucuxi.model_file_sha256,
   tucuxiErrorModel: tucuxi.error_model,
   priorLogSd: tucuxi.prior_log_sd as Params,
-  design: "15 mg/kg (rounded to the fixture dose) q12h, 1.5 h infusions, steady state; levels at 3.0 h and 11.5 h after the start of the dose",
+  design: "15 mg/kg, rounded to the nearest 250 mg, q12h, 1.5 h infusions, steady state; levels at 3.0 h and 11.5 h after the start of the dose",
   recordPath: "src/lib/validation/crosscheck/tucuxi/README.md",
   allFitsSucceeded: V.every((r) => r.fit.success) && T.every((r) => r.fit.success),
 } as const;

@@ -101,5 +101,5 @@ export const BAI_2025_REFERENCE = {
   source: "Bai G, et al. Predictive performance of Bayesian dosing software for vancomycin in intensive care unit patients. Ther Drug Monit. 2025;47(5):594–602, Table 3 (a posteriori).",
   doi: "10.1097/FTD.0000000000001310",
   cohort:
-    "Retrospective, single centre (Beijing). 139 adult ICU patients with 284 measured vancomycin concentrations, mostly troughs; patients on blood purification or ECMO were excluded. Predictions were compared with measured concentrations from routine clinical dosing and monitoring.",
+    "Retrospective, single center (Beijing). 139 adult ICU patients with 284 measured vancomycin concentrations, mostly troughs; patients on blood purification or ECMO were excluded. Predictions were compared with measured concentrations from routine clinical dosing and monitoring.",
 } as const;

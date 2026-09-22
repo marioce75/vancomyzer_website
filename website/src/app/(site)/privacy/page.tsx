@@ -11,7 +11,7 @@ export default function PrivacyPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <h1 className="text-3xl font-bold tracking-tight text-slate-900">Privacy Policy</h1>
-      <p className="mt-2 text-sm text-slate-500">Last updated: September 19, 2026</p>
+      <p className="mt-2 text-sm text-slate-500">Last updated: September 21, 2026</p>
 
       <CanonicalDocCallout docName="Privacy Policy" href={LEGAL_LINKS.privacy} />
 
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
             The dosing calculation is performed on our server, not in your browser. The clinical values you enter (such as age, weight, height, sex, serum creatinine, the current regimen, and measured levels with their timing) are sent over an encrypted connection (HTTPS) to our server, which calculates the result and returns it to your screen. This can happen automatically while you are still entering values. The calculator does not ask for patient names, medical record numbers, dates of birth or other identifiers, and you must not enter them.
           </p>
           <p className="mt-3">
-            Operational calculation logs contain request status, processing time and model version, without clinical inputs, results or account email. Fit diagnostics are returned with the result but are not written to security logs. If your plan includes calculation history, explicit calculations can still be stored with your account and optional case label for 90 days. Older releases recorded clinical values in operational logs and fit-diagnostic records; historical records and hosting backups remain subject to a separate retention review. These changes do not establish that old records have been deleted.
+            Our server logs record only that a calculation ran, how long it took and which calculator version answered; they do not contain the clinical values you entered, the results or your account email. Fit-quality details are shown to you with the result and are not stored. If your plan includes calculation history, calculations you choose to save are kept with your account and an optional case label for 90 days. Earlier releases did record clinical values in server logs and fit-quality records; those older records and hosting backups are under a separate retention review and have not yet been confirmed deleted.
 
           </p>
           <p className="mt-3">

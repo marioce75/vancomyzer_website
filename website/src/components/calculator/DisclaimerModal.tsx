@@ -78,7 +78,7 @@ D\u014Dsys\u2122 makes no representations or warranties regarding the accuracy, 
   },
   {
     heading: "COPYRIGHT LICENSE",
-    body: `D\u014Dsys\u2122 owns all copyright in the tool including its text, graphics, images, and other material. Your use of the tool does not transfer any ownership rights to you. Users are granted a limited, non-exclusive, non-transferable, non-sublicensable licence to use, display, or print the tool for lawful professional clinical, educational, and quality-improvement purposes, individually or under an institutional subscription, provided the tool is not modified, is not resold or operated as a service bureau, and all copyright notices are retained.`,
+    body: `D\u014Dsys\u2122 owns all copyright in the tool including its text, graphics, images, and other material. Your use of the tool does not transfer any ownership rights to you. Users are granted a limited, non-exclusive, non-transferable, non-sublicensable license to use, display, or print the tool for lawful professional clinical, educational, and quality-improvement purposes, individually or under an institutional subscription, provided the tool is not modified, is not resold or operated as a service bureau, and all copyright notices are retained.`,
   },
   {
     heading: "LIMITATION OF LIABILITY",

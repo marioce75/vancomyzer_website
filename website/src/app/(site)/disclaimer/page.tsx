@@ -11,7 +11,7 @@ export default function DisclaimerPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <h1 className="text-3xl font-bold tracking-tight text-slate-900">Medical Disclaimer</h1>
-      <p className="mt-2 text-sm text-slate-500">Last updated: September 2026</p>
+      <p className="mt-2 text-sm text-slate-500">Last updated: September 21, 2026</p>
 
       <CanonicalDocCallout docName="Medical Disclaimer" href={LEGAL_LINKS.disclaimer} />
 

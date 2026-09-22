@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 
 const PRINCIPLES = [
   { n: "01", title: "Population-model equations", body: `The ${COLIN_2019.shortName} covariate equations are shown next to the estimated pharmacokinetic parameters. Bayesian fitting also uses numerical optimization; it is not a calculation that can be reproduced by substituting inputs into one equation.` },
-  { n: "02", title: "Illustrative uncertainty band", body: "The shaded band around a predicted curve is a fixed percentage that varies with fit quality. It is not a statistical confidence, credible or prediction interval." },
+  { n: "02", title: "Illustrative uncertainty band", body: "The shaded band around a predicted curve is a percentage of the predicted concentration set by the fit-quality rating (±35% before any levels). It is not a statistical confidence, credible or prediction interval." },
   { n: "03", title: "Published starting model", body: `${COLIN_2019.citation} ${COLIN_2019.sourcePopulation} Published model evidence does not establish clinical validation of Vancomyzer.` },
   { n: "04", title: "Access and pricing", body: "The core calculator is free. Paid plans add account and team features. See the pricing page for current features and terms; all plans use the same calculation method." },
   { n: "05", title: "Fit to measured levels", body: "Bayesian estimates combine the population model with measured levels. The calculator shows measured-versus-predicted differences and flags a poor fit for clinical review." },
@@ -347,7 +347,7 @@ export default function TransparentDosingPage() {
           </div>
 
           <p className="mt-10 max-w-2xl text-sm leading-relaxed" style={{ color: "#64748b" }}>
-            The {COLIN_2019.shortName} population model is used throughout the supported adult population.
+            The {COLIN_2019.shortName} population model is used for every adult, at every body size.
             Published evaluation at BMI 40 or more is limited (Colin 2021: 15 of 49 obese adults).
             Review measured levels and the stated assumptions before making a dosing decision.
           </p>

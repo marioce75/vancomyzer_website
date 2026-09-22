@@ -468,7 +468,7 @@ export function computeInitialRegimen(
         `urinary creatinine clearance before acting on this. ` +
         `If confirmed, standard intermittent dosing may not achieve target AUC24 of 400\u2013600 mg\u00b7h/L; ` +
         `required TDD \u2248 ${Math.round(required_tdd).toLocaleString()} mg/day. ` +
-        `Continuous infusion is outside this calculator's scope \u2014 it is neither modelled nor dosed here, so manage it ` +
+        `Continuous infusion is outside this calculator's scope \u2014 it is neither modeled nor dosed here, so manage it ` +
         `per local protocol with Infectious Diseases or nephrology input rather than from these numbers. ` +
         `Obtain two vancomycin levels early (2\u20134h and 6\u20138h post-dose) to confirm individual PK.`,
     };

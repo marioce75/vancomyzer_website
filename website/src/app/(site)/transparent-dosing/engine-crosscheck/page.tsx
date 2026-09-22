@@ -34,7 +34,20 @@ import {
   ATTRIBUTION_2026,
   CROSSCHECK_META_2026,
   PARAM_ORDER_2026,
+  RERUN_2026,
 } from "@/lib/validation/engineCrosscheck2026";
+
+/** Signed percentage without a negative zero. */
+function signedPct(x: number, d = 2): string {
+  const v = Number(x.toFixed(d));
+  return `${v > 0 ? "+" : ""}${(Object.is(v, -0) ? 0 : v).toFixed(d)}%`;
+}
+/** Relative difference in plain words rather than scientific notation. */
+function relDiff(x: number): string {
+  if (x === 0) return "exact";
+  if (x < 1e-6) return "< 1 in a million";
+  return `${(100 * x).toFixed(4)}%`;
+}
 
 export const metadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing/engine-crosscheck" },
@@ -125,11 +138,14 @@ function RunNotice() {
       lineHeight: 1.55,
       marginBottom: 24,
     }}>
-      <strong>Reproducible run of {m.displayDate}, calculation version {m.engineManifest}.</strong> The synthetic
-      cohort (seed {m.seed}), the Tucuxi model file, the per-patient query generator, the raw result files and the
-      comparison script are committed to the repository (<a href={`https://github.com/marioce75/vancomyzer_website/blob/design/direction-a/website/${m.recordPath}`} style={{ textDecoration: "underline" }}>reproducibility instructions</a>), so the run can be repeated
+      <strong>Reproducible run of {m.displayDate}, calculator version {m.engineManifest}.</strong> The synthetic
+      cohort (random seed {m.seed}), the Tucuxi model file, the script that writes each patient&rsquo;s Tucuxi query, the raw result files and the
+      comparison script are committed to the repository (<a href={`https://github.com/marioce75/vancomyzer_website/blob/main/website/${m.recordPath}`} style={{ textDecoration: "underline" }}>reproducibility instructions</a>), so the run can be repeated
       by anyone with a Tucuxi build. Tucuxi itself is built from source and is not part of the site build, so the
-      figures below are read from that run&rsquo;s saved result files rather than recomputed on each visit.
+      figures below are read from that run&rsquo;s saved result files rather than recomputed on each visit.{" "}
+      {RERUN_2026.allFitsSucceeded && RERUN_2026.maxRelDiffPct === 0
+        ? <>The Vancomyzer side was re-run on the current calculator version ({RERUN_2026.version}) against the same cohort and reproduces the {m.engineManifest} estimates exactly, so the comparison applies to the calculator as it is today; the later releases changed input validation and diagnostics, not the model or the fit.</>
+        : <>The Vancomyzer side was re-run on calculator version {RERUN_2026.version}; the largest change in any estimate was {RERUN_2026.maxRelDiffPct.toFixed(3)}%.</>}
     </div>
   );
 }
@@ -157,11 +173,11 @@ function PriorGateCard() {
           </thead>
           <tbody>
             {PRIOR_VALIDATION_2026.map((r, i) => (
-              <tr key={r.check} style={{ borderBottom: i < PRIOR_VALIDATION_2026.length - 1 ? "1px solid var(--color-border)" : "none" }}>
-                <td style={{ ...cellStyle, color: "var(--color-primary)", fontWeight: 600 }}>{r.check}</td>
-                <td style={numCellStyle}>{r.tucuxi.toFixed(6)}</td>
-                <td style={numCellStyle}>{r.reference.toFixed(6)}</td>
-                <td style={numCellStyle}>{(Math.abs(r.tucuxi - r.reference) / r.reference).toExponential(1)}</td>
+              <tr key={r.check.replace("mg*h/L", "mg·h/L")} style={{ borderBottom: i < PRIOR_VALIDATION_2026.length - 1 ? "1px solid var(--color-border)" : "none" }}>
+                <td style={{ ...cellStyle, color: "var(--color-primary)", fontWeight: 600 }}>{r.check.replace("mg*h/L", "mg·h/L")}</td>
+                <td style={numCellStyle}>{r.tucuxi.toFixed(4)}</td>
+                <td style={numCellStyle}>{r.reference.toFixed(4)}</td>
+                <td style={numCellStyle}>{relDiff(Math.abs(r.tucuxi - r.reference) / r.reference)}</td>
                 <td style={{ ...cellStyle, color: r.ok ? "#047857" : "#b91c1c", fontWeight: 700 }}>{r.ok ? "pass" : "FAIL"}</td>
               </tr>
             ))}
@@ -215,7 +231,7 @@ function ResultCard2026() {
                 <tr key={k} style={{ borderBottom: i < PARAM_ORDER_2026.length - 1 ? "1px solid var(--color-border)" : "none" }}>
                   <td style={{ ...cellStyle, color: "var(--color-primary)", fontWeight: 600 }}>{PARAM_LABEL[k]}</td>
                   <td style={numCellStyle}>{row.median_abs_pct.toFixed(2)}%</td>
-                  <td style={numCellStyle}>{row.mean_signed_pct >= 0 ? "+" : ""}{row.mean_signed_pct.toFixed(2)}%</td>
+                  <td style={numCellStyle}>{signedPct(row.mean_signed_pct)}</td>
                   <td style={numCellStyle}>{row.p90_abs_pct.toFixed(2)}%</td>
                   <td style={numCellStyle}>{row.p95_abs_pct.toFixed(2)}%</td>
                   <td style={numCellStyle}>{row.max_abs_pct.toFixed(2)}%</td>
@@ -306,7 +322,7 @@ function AttributionCard() {
         model is <code>σ = √((0.15 × predicted)² + 1²)</code>. They are close when a level is near its
         prediction and diverge when a level is well above it. To test whether that explains the tail, every
         patient with a clearance difference of {ATTRIBUTION_2026.threshold_pct}% or more ({rows.length} of{" "}
-        {CROSSCHECK_META_2026.n}) was re-fitted by a third, independent estimator (numpy/scipy, sharing no code
+        {CROSSCHECK_META_2026.n}) was re-fitted by a third, independent estimator (written in Python, sharing no code
         with either program) under each error model in turn.
       </p>
       <div style={{ overflowX: "auto" }}>
@@ -328,10 +344,10 @@ function AttributionCard() {
                 <td style={{ ...cellStyle, fontFamily: "var(--font-mono, monospace)" }}>{r.id}</td>
                 <td style={numCellStyle}>{r.vancomyzer_CL.toFixed(3)}</td>
                 <td style={numCellStyle}>{r.tucuxi_CL.toFixed(3)}</td>
-                <td style={{ ...numCellStyle, fontWeight: 600, color: "var(--color-primary)" }}>{r.dCL_pct_vanco_vs_tucuxi >= 0 ? "+" : ""}{r.dCL_pct_vanco_vs_tucuxi.toFixed(2)}%</td>
-                <td style={numCellStyle}>{r.refit_vform_vs_vancomyzer_pct >= 0 ? "+" : ""}{r.refit_vform_vs_vancomyzer_pct.toFixed(2)}%</td>
-                <td style={numCellStyle}>{r.refit_tform_vs_tucuxi_pct >= 0 ? "+" : ""}{r.refit_tform_vs_tucuxi_pct.toFixed(2)}%</td>
-                <td style={numCellStyle}>{r.form_effect_pct >= 0 ? "+" : ""}{r.form_effect_pct.toFixed(2)}%</td>
+                <td style={{ ...numCellStyle, fontWeight: 600, color: "var(--color-primary)" }}>{signedPct(r.dCL_pct_vanco_vs_tucuxi)}</td>
+                <td style={numCellStyle}>{signedPct(r.refit_vform_vs_vancomyzer_pct)}</td>
+                <td style={numCellStyle}>{signedPct(r.refit_tform_vs_tucuxi_pct)}</td>
+                <td style={numCellStyle}>{signedPct(r.form_effect_pct)}</td>
               </tr>
             ))}
           </tbody>
@@ -340,7 +356,7 @@ function AttributionCard() {
       <p style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 12, marginBottom: 0, lineHeight: 1.6 }}>
         The independent refit reproduces each program to within {maxRefitErr.toFixed(2)}% under its own error
         model, and the error-model form alone accounts for the whole difference in every case (largest:{" "}
-        {worst.id}, {worst.dCL_pct_vanco_vs_tucuxi.toFixed(2)}%). No optimiser, convergence, boundary or
+        {worst.id}, {worst.dCL_pct_vanco_vs_tucuxi.toFixed(2)}%). No optimizer, convergence, boundary or
         model-integration difference was found. Unlike the {CROSSCHECK_META.displayDate} snapshot, no
         disagreement is left unexplained. Whether Vancomyzer&rsquo;s error model — which gives a little less weight
         to a level that comes back unexpectedly high — is the preferable choice is a clinical design question that
@@ -358,11 +374,11 @@ function MethodologyCard2026() {
       <h2 style={sectionTitleStyle}>Method</h2>
       <ol style={{ margin: "10px 0 0", paddingLeft: 18, fontSize: 13, lineHeight: 1.65, color: "var(--color-secondary)" }}>
         <li>
-          Generate {m.n} synthetic ICU patients (seed {m.seed}) with &ldquo;true&rdquo; parameters drawn from a
+          Generate {m.n} synthetic ICU patients (random seed {m.seed}) with &ldquo;true&rdquo; parameters drawn from a
           Goti 2018–based model; simulate two levels with assay error ({m.design}). The test data are available in the source repository.
         </li>
         <li>
-          Run Vancomyzer&rsquo;s calculator (calculation version {m.engineManifest}) on each patient: {COLIN_2019.shortName}{" "}
+          Run Vancomyzer&rsquo;s calculator (calculator version {m.engineManifest}) on each patient: {COLIN_2019.shortName}{" "}
           prior from the covariates, then the Bayesian fit on the two levels.
         </li>
         <li>
@@ -373,12 +389,12 @@ function MethodologyCard2026() {
           Bayesian fit.
         </li>
         <li>
-          Score the two sets of estimates with the published analysis against the criteria written
+          Score the two sets of estimates with the committed comparison script against the criteria written
           down on 17 Sep 2026, before the run; re-fit every tail case independently under both error models.
         </li>
       </ol>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 14, marginBottom: 0, lineHeight: 1.55 }}>
-        Comparator: {m.comparator}. The exact program version, test data, model definitions and analysis scripts are available in the <a href="https://github.com/marioce75/vancomyzer_website/tree/design/direction-a/website/src/lib/validation/crosscheck" style={{ textDecoration: "underline" }}>reproducibility materials</a>.
+        Comparator: {m.comparator}. The exact program version, test data, model definitions and analysis scripts are available in the <a href="https://github.com/marioce75/vancomyzer_website/tree/main/website/src/lib/validation/crosscheck" style={{ textDecoration: "underline" }}>reproducibility materials</a>.
       </p>
     </section>
   );
@@ -497,7 +513,7 @@ function ResultCard() {
                 <tr key={k} style={{ borderBottom: i < PARAM_ORDER.length - 1 ? "1px solid var(--color-border)" : "none" }}>
                   <td style={{ ...cellStyle, color: "var(--color-primary)", fontWeight: 600 }}>{PARAM_LABEL[k]}</td>
                   <td style={numCellStyle}>{row.median_abs.toFixed(2)}%</td>
-                  <td style={numCellStyle}>{row.mean_signed >= 0 ? "+" : ""}{row.mean_signed.toFixed(2)}%</td>
+                  <td style={numCellStyle}>{signedPct(row.mean_signed)}</td>
                   <td style={numCellStyle}>{row.p90_abs.toFixed(2)}%</td>
                   <td style={numCellStyle}>{row.p95_abs.toFixed(2)}%</td>
                   <td style={numCellStyle}>{row.max_abs.toFixed(2)}%</td>

@@ -24,7 +24,7 @@ const channels = [
     ),
     title: "Research & academic",
     email: "contact@dosys.health",
-    description: "Research partnership inquiries, NIH STTR collaboration, PK model discussion, publication co-authorship.",
+    description: "Research partnership inquiries, PK model discussion, publication co-authorship.",
   },
   {
     icon: (
@@ -34,7 +34,7 @@ const channels = [
       </svg>
     ),
     title: "Clinical support",
-    subtitle: "Response in < 1 business day",
+    subtitle: "Questions about the calculator or its results",
     description: "Questions about the calculator or interpreting its results.",
   },
 ];
@@ -97,10 +97,10 @@ export default function ContactPage() {
         Reach the team behind Vancomyzer™
       </h1>
       <p className="mt-4 text-gray-600 leading-7">
-        Built by an ICU pharmacist. Transparent about its evidence. Available to every hospital.
+        Questions about the calculator, its evidence, or a site license.
       </p>
       <p className="text-gray-600">
-        Choose the right channel for your inquiry below.
+        Use the address that fits your question, or the form below.
       </p>
 
       {/* Channel cards */}
@@ -136,7 +136,7 @@ export default function ContactPage() {
             <div className="text-3xl mb-3"></div>
             <h2 className="text-lg font-semibold text-gray-900">Inquiry sent</h2>
             <p className="mt-2 text-sm text-gray-600">
-              Thank you for reaching out. We will respond within 1 business day.
+              Thank you. We will reply by email.
             </p>
           </div>
         ) : (
