@@ -2,8 +2,18 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { readLimitedText, ResponseTooLargeError } from "../limitedResponse";
 
 async function main() {
+  assert.equal(await readLimitedText(new Response("Public source")), "Public source");
+  await assert.rejects(readLimitedText(new Response("too big", { headers: { "content-length": "2097153" } })), ResponseTooLargeError);
+  await assert.rejects(readLimitedText(new Response(new ReadableStream({
+    start(controller) {
+      controller.enqueue(new Uint8Array(1024 * 1024));
+      controller.enqueue(new Uint8Array(1024 * 1024 + 1));
+      controller.close();
+    },
+  }))), ResponseTooLargeError, "stream size is enforced even without a valid length header");
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "market-intel-test-"));
   process.chdir(dir);
   process.env.MARKET_INTEL_DIR = path.join(dir, "archives");
