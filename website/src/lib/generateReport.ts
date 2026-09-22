@@ -308,12 +308,12 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
       <div class="metric-card">
         <div class="metric-label">Peak</div>
         <div class="metric-value">${fmt(data.peak, 2)}</div>
-        <div class="metric-unit">mcg/mL</div>
+        <div class="metric-unit">mg/L</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Trough</div>
         <div class="metric-value">${fmt(data.trough, 2)}</div>
-        <div class="metric-unit">mcg/mL</div>
+        <div class="metric-unit">mg/L</div>
       </div>
     </div>
   </div>
@@ -378,7 +378,7 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
   </div>
 
   <div class="footer">
-    <span>\u00a9 ${new Date().getFullYear()} Vancomyzer\u2122 \u00b7 Engineered by <a href="https://dosys.health" style="color:inherit;text-decoration:underline">D\u014Dsys\u2122</a></span>
+    <span>\u00a9 ${new Date().getFullYear()} Vancomyzer\u2122 \u00b7 A product of <a href="https://dosys.health" style="color:inherit;text-decoration:underline">D\u014Dsys\u2122</a></span>
     <span>Generated: ${now} \u00b7 Model manifest ${MODEL_MANIFEST_VERSION}</span>
   </div>
 

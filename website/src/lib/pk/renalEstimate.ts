@@ -165,7 +165,9 @@ export function displayedCrCl(patient: {
         ? `ideal body weight ${Math.round(weight_used_kg)} kg`
         : canDeriveIbw
           ? `actual body weight ${Math.round(weight_used_kg)} kg`
-          : `actual body weight ${Math.round(weight_used_kg)} kg; height or sex not entered`;
+          : `actual body weight ${Math.round(weight_used_kg)} kg; ${
+              !(height_cm > 0) && !sexKnown ? "height and sex not entered" : !(height_cm > 0) ? "height not entered" : "sex not entered"
+            }`;
 
   const valuePhrase = sexKnown
     ? `Estimated CrCl ${Math.round(crcl_ml_min)} mL/min`

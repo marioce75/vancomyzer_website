@@ -412,7 +412,7 @@ export default function TransparentDosingPage() {
             Vancomyzer&trade; is a clinical decision-support tool for qualified healthcare
             professionals only. Not FDA-cleared or approved. Designed to meet the non-device
             clinical decision support criteria of FD&amp;C Act §520(o)(1)(E); not reviewed by
-            the FDA. Engineered by{" "}
+            the FDA. A product of{" "}
             <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
               Dōsys&trade;
             </a>

@@ -42,9 +42,8 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               VANCOMYZER{"\u2122"}
             </h1>
             <p className="font-medium leading-none whitespace-nowrap hidden xl:block" style={{ fontSize: "10px", letterSpacing: "2px", color: "var(--color-secondary)" }}>
-              BAYESIAN PK ·{" "}
-              <span style={{ fontSize: "11px", letterSpacing: "3px", color: "var(--color-dim)" }}>
-                ENGINEERED BY{" "}
+                            <span style={{ fontSize: "11px", letterSpacing: "3px", color: "var(--color-dim)" }}>
+                BY{" "}
                 <button
                   type="button"
                   aria-label="Visit dosys.health"

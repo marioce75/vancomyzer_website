@@ -80,8 +80,8 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
           <tr>
             <th scope="col">Regimen</th>
             <th scope="col" title="Predicted steady-state AUC₂₄ (mg·h/L)">AUC₂₄</th>
-            <th scope="col" title="Predicted peak (mcg/mL)">Peak</th>
-            <th scope="col" title="Predicted trough (mcg/mL)">Trough</th>
+            <th scope="col" title="Predicted peak (mg/L)">Peak</th>
+            <th scope="col" title="Predicted trough (mg/L)">Trough</th>
             <th scope="col">Target</th>
           </tr>
         </thead>

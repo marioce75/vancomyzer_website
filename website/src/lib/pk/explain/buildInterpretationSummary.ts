@@ -59,7 +59,7 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
   if (blocked) {
     return (
       `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. ` +
-      `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
+      `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L. ` +
       `Two-compartment model (SCr ${scr} mg/dL). ` +
       `${blocked.safety_message} ${blocked.recommended_action} ` +
       `Fit quality ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty ${posterior_fit?.uncertainty_label ?? "population_only"}. ` +
@@ -76,7 +76,7 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
   if (isPulseDose) {
     return (
       `Loading dose simulation: ${current_regimen_dose_mg} mg single dose. ` +
-      `${estimateType}: first-dose AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL (SCr ${scr} mg/dL). ` +
+      `${estimateType}: first-dose AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L (SCr ${scr} mg/dL). ` +
       `Suggested maintenance regimen: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${infusionDuration} h. ` +
       `Maintenance dose targets steady-state AUC24 400–600 mg·h/L.` +
       `${infusionSafetyNote} ` +
@@ -93,7 +93,7 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
 
   return (
     `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. ` +
-    `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL. ` +
+    `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L. ` +
     `Two-compartment model (SCr ${scr} mg/dL). ` +
     `Recommended adjustment: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${infusionDuration} h. ` +
     `${changeExplanation} ` +

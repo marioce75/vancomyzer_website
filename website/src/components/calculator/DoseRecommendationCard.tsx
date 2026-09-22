@@ -606,7 +606,7 @@ function EmpiricDosingBlockedCard({
         </div>
         <div className="text-xs">
           Estimated CL: <strong>{fmt(data.estimated_cl_l_h, 2)} L/h</strong>. Draw a vancomycin level
-          after the pulse dose and switch to the <strong>1-Level</strong> tab above to compute
+          after the pulse dose and switch to the <strong>1 Level</strong> tab above to compute
           level-guided redose timing.
         </div>
       </div>

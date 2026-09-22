@@ -148,7 +148,7 @@ export function runExistingRegimenPipeline(
       diag.posterior_predicted_at_levels[0],
     );
     fitQualityWarnings.push(
-      `Posterior fit cannot fully explain the measured level (predicted ${worst.predicted.toFixed(1)} mcg/mL vs observed ${worst.observed.toFixed(1)} mcg/mL — ${(worst.relative_error * 100).toFixed(0)}% error). Patient PK appears to differ substantially from the population prior. Recommend a confirmatory level before adjusting the dose.`,
+      `Posterior fit cannot fully explain the measured level (predicted ${worst.predicted.toFixed(1)} mg/L vs observed ${worst.observed.toFixed(1)} mg/L — ${(worst.relative_error * 100).toFixed(0)}% error). Patient PK appears to differ substantially from the population prior. Recommend a confirmatory level before adjusting the dose.`,
     );
   }
 

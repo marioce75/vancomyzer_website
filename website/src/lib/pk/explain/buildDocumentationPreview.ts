@@ -75,7 +75,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
       ];
 
   const quick_summary = [
-    `AUC24: ${auc24} mg·h/L; peak ${peak}; trough ${trough} mcg/mL (${estimateLabel})`,
+    `AUC24: ${auc24} mg·h/L; peak ${peak}; trough ${trough} mg/L (${estimateLabel})`,
     ...recommendationLines,
     ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
     ...(recommendation.infusion_duration_adjusted_for_safety && recommendation.infusion_safety_note ? [recommendation.infusion_safety_note] : []),
@@ -84,7 +84,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
 
   const clinical_note = [
     `Vancomycin existing regimen evaluation (${estimateLabel} estimate).`,
-    `AUC24: ${auc24} mg·h/L; peak ${peak} mcg/mL; trough ${trough} mcg/mL.`,
+    `AUC24: ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L.`,
     ...recommendationLines,
     ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
     // Must name the prior that actually ran — this line goes into the chart.

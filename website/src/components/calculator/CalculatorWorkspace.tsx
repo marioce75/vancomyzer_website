@@ -889,7 +889,7 @@ export default function CalculatorWorkspace() {
               </a>
             ))}
             <span className="text-[10px]" style={{ color: "var(--color-dim)" }}>
-              {"©"} 2026 Vancomyzer{"™"} {"·"} Engineered by{" "}
+              {"©"} 2026 Vancomyzer{"™"} {"·"} A product of{" "}
               <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>
                 D{"ō"}sys{"™"}
               </a>
@@ -973,7 +973,7 @@ export default function CalculatorWorkspace() {
         key="actual-history"
         severity="info"
         title={`Actual history — dose ${a.doses_given}:`}
-        summary={`modelled peak ${fmt(a.peak, 1)} / trough ${fmt(a.trough, 1)} mcg/mL; AUC over that interval ${a.auc_interval_n.toFixed(0)} mg·h/L (not a daily AUC)${ap ? `; ${(ap.fraction_of_steady_state * 100).toFixed(0)}% of steady state (t½ ${fmt(ap.terminal_half_life_hours, 1)} h)` : ""}. These history values describe the entered dosing history. The AUC₂₄/peak/trough above describe the selected regimen at steady state.`}
+        summary={`modelled peak ${fmt(a.peak, 1)} / trough ${fmt(a.trough, 1)} mg/L; AUC over that interval ${a.auc_interval_n.toFixed(0)} mg·h/L (not a daily AUC)${ap ? `; ${(ap.fraction_of_steady_state * 100).toFixed(0)}% of steady state (t½ ${fmt(ap.terminal_half_life_hours, 1)} h)` : ""}. These history values describe the entered dosing history. The AUC₂₄/peak/trough above describe the selected regimen at steady state.`}
         role="status"
       />,
     );
@@ -1050,7 +1050,7 @@ export default function CalculatorWorkspace() {
           <p className="m-0 mb-1">{displayResult.calculation_details.review_status.banner_body}</p>
         )}
         <ul className="list-disc pl-4">
-          <li><strong>Earliest meaningful:</strong> 1.5–6 h after dose 1 post-infusion end (sparse single-level workflow).</li>
+          <li><strong>Earliest meaningful:</strong> 1.5–6 h after dose 1 post-infusion end (single-level fit).</li>
           <li><strong>Highest AUC accuracy:</strong> peak + trough near dose 3–4 at steady state (ASHP/IDSA 2020).</li>
           <li>Target AUC₂₄ 400–600 mg·h/L within 48 h per ASHP/IDSA 2020.</li>
         </ul>
@@ -1232,7 +1232,7 @@ export default function CalculatorWorkspace() {
               {displayResult?.pk_parameters && (
                 <span className="hidden sm:inline">
                   <span className={`vz-chip ${displayResult.pk_parameters.used_posterior_refinement ? "vz-chip--ok" : "vz-chip--neutral"}`}>
-                    {displayResult.pk_parameters.used_posterior_refinement ? "Bayesian fit" : "Prior only"}
+                    {displayResult.pk_parameters.used_posterior_refinement ? "Fitted to levels" : "Before levels"}
                   </span>
                 </span>
               )}

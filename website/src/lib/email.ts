@@ -50,7 +50,7 @@ export async function sendRegistrationNotification(user: {
           <p style="margin-top: 16px; font-size: 13px; color: #4a5568;">
             Log in to the <a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/admin" style="color: #1e4d8c;">Admin Panel</a> to approve or reject.
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });
@@ -99,7 +99,7 @@ export async function sendDiscountDecisionEmail(args: {
           <p style="margin-top: 16px; font-size: 12px; color: #4a5568; line-height: 1.55;">
             The discount remains active for as long as you're in training. If your training status changes, please let us know at <a href="mailto:contact@dosys.health" style="color: #1e4d8c;">contact@dosys.health</a>.
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys Health LLC</p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of Dōsys Health LLC</p>
         </div>
       `
       : `
@@ -121,7 +121,7 @@ export async function sendDiscountDecisionEmail(args: {
               Re-apply on Settings
             </a>
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys Health LLC</p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of Dōsys Health LLC</p>
         </div>
       `;
 
@@ -186,7 +186,7 @@ export async function sendReferralConvertedEmail(args: {
               See your referrals
             </a>
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by Dōsys Health LLC</p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of Dōsys Health LLC</p>
         </div>
       `,
     });
@@ -249,7 +249,7 @@ export async function sendWelcomeEmail(user: {
             <li><a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/transparent-dosing/cases" style="color: #1e4d8c;">See our Literature Reproducibility tests</a></li>
             <li><a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/calculator" style="color: #1e4d8c;">Run your first calculation</a></li>
           </ul>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });
@@ -295,7 +295,7 @@ export async function sendApprovalNotification(user: {
               Sign In to Vancomyzer
             </a>
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });
@@ -347,7 +347,7 @@ export async function sendPasswordResetEmail(user: {
           <p style="margin-top: 8px; font-size: 11px; color: #a0aec0; word-break: break-all;">
             ${resetUrl}
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });
@@ -418,7 +418,7 @@ export async function sendPilotApplicationNotification(app: {
               Review in Admin Panel
             </a>
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });
@@ -490,7 +490,7 @@ export async function sendPilotWelcomeEmail(args: {
             Questions? Reply to this email — your message reaches the Dōsys™ pilot team directly.
           </p>
           <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">
-            Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
+            Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
           </p>
         </div>
       `,
@@ -552,7 +552,7 @@ export async function sendDepartmentWelcomeEmail(args: {
             <a href="https://vancomyzer.com/login">vancomyzer.com/login</a>.
           </p>
           <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">
-            Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
+            Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
           </p>
         </div>
       `,
@@ -593,7 +593,7 @@ export async function sendPilotDeclineEmail(args: {
             welcome to reapply down the road.
           </p>
           <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">
-            Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
+            Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
           </p>
         </div>
       `,
@@ -652,7 +652,7 @@ export async function sendBugReport(args: {
           <p style="margin-top: 14px; font-size: 11px; color: #718096;">
             Reply directly to this email — it will reach the reporter.
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });
@@ -689,7 +689,7 @@ export async function sendPilotRevokedEmail(args: {
             Please reach out to the Dōsys™ team if you'd like to discuss next steps.
           </p>
           <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">
-            Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
+            Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a>
           </p>
         </div>
       `,
@@ -728,7 +728,7 @@ export async function sendRejectionNotification(user: {
             Your Vancomyzer™ registration was not approved at this time.
             If you believe this is an error, please contact your administrator.
           </p>
-          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · Engineered by <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
+          <p style="margin-top: 24px; font-size: 10px; color: #a0aec0;">Vancomyzer™ · A product of <a href="https://dosys.health" style="color: inherit; text-decoration: underline;">Dōsys™</a></p>
         </div>
       `,
     });

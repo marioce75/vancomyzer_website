@@ -25,7 +25,7 @@ function testProducesNonZeroExposure(): void {
   );
   assert(
     result.calculation_details.method.includes("Adult prior model") &&
-      result.calculation_details.evidence_strength === "population prior only",
+      result.calculation_details.evidence_strength === "patient characteristics only",
     "Initial regimen should expose provenance details for method and evidence strength."
   );
   assert(
@@ -45,7 +45,7 @@ function testProducesNonZeroExposure(): void {
     "Initial regimen should expose key inputs and caution flags for UI transparency surfaces."
   );
   assert(
-    result.calculation_details.evidence_strength === "population prior only" &&
+    result.calculation_details.evidence_strength === "patient characteristics only" &&
       result.calculation_details.caution_flags.some((item) => item.includes("No posterior refinement") || item.includes("optional generic empiric support")),
     "Initial regimen transparency metadata should stay specific enough for UI evidence/caution labeling."
   );

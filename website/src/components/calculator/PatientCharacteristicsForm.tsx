@@ -266,10 +266,10 @@ export default function PatientCharacteristicsForm({
               <ellipse cx="12" cy="7.5" rx="2.5" ry="2" fill="none" stroke="var(--color-primary)" strokeWidth="1"/>
               <rect x="2" y="15" width="1.5" height="3" fill="var(--color-primary)"/>
               <rect x="16.5" y="15" width="1.5" height="3" fill="var(--color-primary)"/>
-            </svg> Bedbound/Geriatric Patient
+            </svg> Bedbound or frail older patient
           </span>
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${bedbound ? "bg-amber-300 text-amber-900" : "bg-slate-100 text-slate-400"}`}>
-            {bedbound ? "ON" : "OFF"}
+            {bedbound ? "Yes" : "No"}
           </span>
         </button>
         {bedbound && (
