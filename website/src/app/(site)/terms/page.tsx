@@ -80,7 +80,7 @@ export default function TermsPage() {
         <section>
           <h2 className="vz-serif mb-2 text-[22px]" style={{ color: INK }}>Governing Law</h2>
           <p>
-            These terms shall be governed by and construed in accordance with applicable law. Any disputes shall be resolved in the jurisdiction where the developers are located.
+            These terms are governed by the laws of the State of Texas, without regard to its conflict-of-law rules. Any dispute arising from these terms or from use of Vancomyzer™ shall be brought in the state or federal courts located in Hidalgo County, Texas, and you consent to the jurisdiction of those courts.
           </p>
         </section>
 
