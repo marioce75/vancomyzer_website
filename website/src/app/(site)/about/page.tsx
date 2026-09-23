@@ -48,14 +48,21 @@ export default function AboutPage() {
         </Prose>
       </Record>
 
-      <Record label="Who makes it" note="Dōsys Health LLC." last>
+      <Record label="Who makes it" note="Mario Cardenas, PharmD, MBA." last>
         <Prose>
           <p>
             Vancomyzer is a product of{" "}
-            <a href="https://dosys.health" target="_blank" rel="noopener noreferrer">Dōsys</a>, built by
-            an ICU clinical pharmacist. Questions and research inquiries go through the{" "}
+            <a href="https://dosys.health" target="_blank" rel="noopener noreferrer">Dōsys Health LLC</a>.
+            Mario Cardenas, PharmD, MBA, is an ICU clinical pharmacist and the company’s founder and CEO.
+            He leads product development. Questions and research inquiries go through the{" "}
             <Link href="/contact">contact page</Link>; the evidence behind the calculator is on the{" "}
             <Link href="/transparent-dosing">evidence page</Link>.
+          </p>
+          <p>
+            The published population model and developer-run checks are not independent clinical
+            validation of Vancomyzer. Independent evaluation with patient data is pending; the{" "}
+            <Link href="/transparent-dosing">evidence status</Link> explains what has been checked
+            and what remains to be evaluated.
           </p>
         </Prose>
       </Record>
