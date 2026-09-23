@@ -148,7 +148,7 @@ const FAQ_ITEMS: FaqItem[] = [
     answer: [
       "In traditional vancomycin dosing, determining the dose requires answering a question that has no single correct answer: which body weight do you use?",
       "Three options are used in clinical practice, each requiring its own calculation:",
-      "Total body weight (TBW): the patient’s actual weight. Simple, but TBW-based dosing can produce supratherapeutic levels in obese patients. In one retrospective study of 171 adults dosed on actual body weight, 48% of patients with BMI ≥ 35 had a supratherapeutic first trough (above 20 mg/L), compared with 12% at BMI 20–24.9.",
+      "Total body weight (TBW): the patient’s actual weight. Simple, but TBW-based dosing in traditional (non-model) protocols can produce supratherapeutic levels in obese patients.",
       "Ideal body weight (IBW), Devine formula: the weight a patient “should” be, based on height and sex.",
       { formula: "Males:   50 kg + 2.3 kg per inch over 60 inches\nFemales: 45.5 kg + 2.3 kg per inch over 60 inches" },
       "This requires height, which Cockcroft-Gault does not use, and IBW alone can underestimate dose requirements in obese patients.",
@@ -160,7 +160,6 @@ const FAQ_ITEMS: FaqItem[] = [
     refs: [
       { label: "Pai MP, Paloucek FP. The origin of the “ideal” body weight equations (Devine formula). Ann Pharmacother. 2000;34(9):1066-1069.", url: "https://doi.org/10.1345/aph.19381" },
       { label: "UC Davis Health. Adult IV vancomycin dosing guidelines (example institutional protocol, PDF).", url: "https://health.ucdavis.edu/media-resources/antibiotic-stewardship/documents/pdfs/guidelines/vanc_dosing.pdf" },
-      { label: "Retrospective study of actual-body-weight vancomycin dosing in 171 adults (PubMed Central PMC3764551).", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC3764551/" },
       REF_RYBAK_2020,
       REF_JANMAHASATIAN_2005,
     ],
