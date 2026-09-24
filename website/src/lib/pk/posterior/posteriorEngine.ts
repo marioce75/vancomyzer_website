@@ -205,12 +205,14 @@ export function runPosteriorEngine(
   const parameter_uncertainty: ParameterUncertaintyResult = posterior_cl_bound
     ? {
         method: "unavailable",
-        reason: "Clearance was moved to a physiological bound after the fit, so the fit's uncertainty no longer describes the plotted parameters.",
+        reason: "Clearance was adjusted to a physiological limit, so no reliable range can be estimated. Check the level's time and value.",
+        detail: "Clearance was moved to a physiological bound after the fit, so the fit's uncertainty no longer describes the plotted parameters.",
       }
     : clampHits.length > 0
       ? {
           method: "unavailable",
-          reason: `The fit reached a parameter limit (${clampHits.join(", ")}), so its uncertainty cannot be approximated at that point.`,
+          reason: "The fit reached a parameter limit, so no reliable range can be estimated. Check the level's time and value.",
+          detail: `The fit reached a parameter limit (${clampHits.join(", ")}), so its uncertainty cannot be approximated at that point.`,
         }
       : posteriorParameterUncertainty({
           // Same normalisation fitPosteriorParameters applies before optimising.

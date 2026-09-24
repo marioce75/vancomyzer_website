@@ -777,7 +777,7 @@ export default function ConcentrationTimeGraph({
           </span>
         )}
         {band_info?.method === "unavailable" && curveData.length > 1 && (
-          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} title={band_info.reason}>
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} title={band_info.detail ?? band_info.reason}>
             No uncertainty band: {band_info.reason}
           </span>
         )}
