@@ -117,7 +117,9 @@ export interface ExistingRegimenEngineOutput {
   current_regimen_infusion_hours?: number;
   doses_given?: number;
   target_auc24?: number;
-  curve: { time_hours: number; concentration: number }[];
+  curve: { time_hours: number; concentration: number; lower?: number; upper?: number }[];
+  /** Parameter uncertainty behind the curves' credible band (server-side; draws are not serialized). */
+  parameter_uncertainty?: import("./posterior/parameterUncertainty").ParameterUncertaintyResult;
   /** Alternate curve when in pulse-dose mode: the engine's auto-recommended
    *  maintenance regimen, plotted alongside the user-entered regimen so the
    *  UI can offer a toggle between them. */

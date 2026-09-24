@@ -8,6 +8,7 @@ import { assessSteadyStateApproach, resolveExposureHorizon, STEADY_STATE_HALF_LI
 import { computeSafeInfusionDurationHours } from "../recommend/infusionSafety";
 import type { ExistingRegimenEngineInput, ExistingRegimenEngineOutput } from "../types";
 import { modelShortName } from "../modelRegistry";
+import type { CredibleBandSpec } from "../steadyStateTwoCompartment";
 
 export function runExistingRegimenEngine(
   input: ExistingRegimenEngineInput
@@ -28,7 +29,13 @@ export function runExistingRegimenEngine(
     prior_V1,
     per_level_residuals,
     posterior_cl_bound,
+    parameter_uncertainty,
   } = posteriorResult;
+  // Credible band for every plotted curve of this result (null when unavailable).
+  const band: CredibleBandSpec | undefined =
+    parameter_uncertainty.method === "unavailable"
+      ? undefined
+      : { draws: parameter_uncertainty.draws, level: parameter_uncertainty.level };
   const { dose_mg, interval_hours, infusion_duration_hours, doses_given, target_auc24 } = regimen;
   const tau = interval_hours;
   const T_inf = Math.min(Math.max(0, infusion_duration_hours), tau);
@@ -60,7 +67,7 @@ export function runExistingRegimenEngine(
     // The loading dose on its own (no maintenance), over the first 48 h. This
     // is the profile the top-level single-dose AUC/peak/trough describe, so
     // the loading-dose row plots the same thing it reports.
-    loading_dose_curve = loadingDoseCurvePoints({ CL, V1, Q, V2 }, dose_mg, T_inf, 0, tau, T_inf)
+    loading_dose_curve = loadingDoseCurvePoints({ CL, V1, Q, V2 }, dose_mg, T_inf, 0, tau, T_inf, undefined, band)
       .filter((p) => p.time_hours <= 48);
 
     // PRIMARY curve = user's entered regimen continued forward (loading +
@@ -75,6 +82,8 @@ export function runExistingRegimenEngine(
       dose_mg,    // maintenance dose = loading dose (user is continuing the same regimen)
       tau,        // maintenance interval = user's interval
       T_inf,      // maintenance infusion = same as loading
+      undefined,
+      band,
     );
 
     // Engine's optimized maintenance recommendation, computed as a separate
@@ -102,9 +111,11 @@ export function runExistingRegimenEngine(
       { CL, V1, Q, V2 },
       dose_mg, T_inf,
       bestMaintDose, bestMaintTau, bestMaintTinf,
+      undefined,
+      band,
     );
   } else {
-    curve = curvePoints({ CL, V1, Q, V2, dose_mg, tau, T_inf });
+    curve = curvePoints({ CL, V1, Q, V2, dose_mg, tau, T_inf }, undefined, band);
     // For a pre-steady-state regimen the reported peak and trough are taken
     // from the Nth dosing interval, so the plotted curve has to stop there too.
     // Letting it run on to steady state made the graph disagree with the
@@ -224,5 +235,6 @@ export function runExistingRegimenEngine(
     target_auc24,
     fit_diagnostic,
     posterior_cl_bound,
+    parameter_uncertainty,
   };
 }

@@ -2,6 +2,11 @@ import { buildPriorParameters } from "./buildPriorParameters";
 import { crclOnTotalBodyWeight } from "../renalEstimate";
 import { normalizeObservations } from "./normalizeObservations";
 import { fitPosteriorParameters, objectiveComponents, summarizeDiagnostics, type FitPosteriorInput, type PerLevelResidual } from "./fitPosteriorParameters";
+import {
+  posteriorParameterUncertainty,
+  priorParameterUncertainty,
+  type ParameterUncertaintyResult,
+} from "./parameterUncertainty";
 import type {
   NormalizedPatient,
   NormalizedRegimen,
@@ -72,6 +77,12 @@ export interface PosteriorEngineResult {
    * the failure mode this bound exists to prevent.
    */
   posterior_cl_bound?: PosteriorClBound;
+  /**
+   * Uncertainty in (CL, V1, Q, V2) for the plotted credible band: posterior
+   * draws around the MAP optimum, the population prior when no fit was
+   * used, or "unavailable" with a reason (parameterUncertainty.ts).
+   */
+  parameter_uncertainty: ParameterUncertaintyResult;
 }
 
 export function runPosteriorEngine(
@@ -100,6 +111,9 @@ export function runPosteriorEngine(
       prior_Q: prior.Q,
       prior_V2: prior.V2,
       per_level_residuals: [],
+      parameter_uncertainty: priorParameterUncertainty(prior, {
+        CL: prior.omega_CL, V1: prior.omega_V1, Q: prior.omega_Q, V2: prior.omega_V2,
+      }),
     };
   }
 
@@ -140,6 +154,10 @@ export function runPosteriorEngine(
       prior_Q: prior.Q,
       prior_V2: prior.V2,
       per_level_residuals: fit.per_level_residuals,
+      // Outputs are the prior, so the band is the prior's.
+      parameter_uncertainty: priorParameterUncertainty(prior, {
+        CL: prior.omega_CL, V1: prior.omega_V1, Q: prior.omega_Q, V2: prior.omega_V2,
+      }),
     };
   }
 
@@ -179,7 +197,32 @@ export function runPosteriorEngine(
     residuals = components.perObservation.map(x => ({ observed: x.observed, predicted: x.predicted, relative_error: Math.abs(x.residual) / x.observed }));
   }
 
+  // The posterior band is built around the MAP optimum and its curvature. When
+  // the plotted parameters are not that optimum (optimizer clamp, or the
+  // clearance policy bound above) the band would describe a different point,
+  // so none is drawn and the reason is reported instead.
+  const clampHits = fit.diagnostics.boundary_hits ?? [];
+  const parameter_uncertainty: ParameterUncertaintyResult = posterior_cl_bound
+    ? {
+        method: "unavailable",
+        reason: "Clearance was moved to a physiological bound after the fit, so the fit's uncertainty no longer describes the plotted parameters.",
+      }
+    : clampHits.length > 0
+      ? {
+          method: "unavailable",
+          reason: `The fit reached a parameter limit (${clampHits.join(", ")}), so its uncertainty cannot be approximated at that point.`,
+        }
+      : posteriorParameterUncertainty({
+          // Same normalisation fitPosteriorParameters applies before optimising.
+          ...fitInput,
+          T_inf: Math.min(Math.max(0, fitInput.T_inf), fitInput.tau || 1),
+          observations: fitInput.observations.filter((obs) => obs.concentration > 0),
+        }, {
+          CL: fit.CL_posterior, V1: fit.V1_posterior, Q: fit.Q_posterior, V2: fit.V2_posterior,
+        });
+
   return {
+    parameter_uncertainty,
     CL: boundedCL,
     posterior_cl_bound,
     V1: fit.V1_posterior,

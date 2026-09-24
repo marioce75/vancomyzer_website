@@ -20,6 +20,86 @@ export interface ExposureResult {
 export interface CurvePoint {
   time_hours: number;
   concentration: number;
+  /** Lower edge of the credible band at this time (mg/L), when a band was requested. */
+  lower?: number;
+  /** Upper edge of the credible band at this time (mg/L), when a band was requested. */
+  upper?: number;
+}
+
+/**
+ * Request for a pointwise credible band on a plotted curve: parameter draws
+ * (posterior/parameterUncertainty.ts) and the central credible mass.
+ */
+export interface CredibleBandSpec {
+  draws: TwoCompartmentParameters[];
+  level: number;
+}
+
+interface DoseEvent {
+  time: number;
+  dose_mg: number;
+  T_inf: number;
+}
+
+/** Type-7 (linear-interpolated) quantile of an ascending-sorted array. */
+function sortedQuantile(sorted: Float64Array, q: number): number {
+  const pos = (sorted.length - 1) * q;
+  const lo = Math.floor(pos);
+  const hi = Math.ceil(pos);
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
+}
+
+/**
+ * Pointwise credible band: every parameter draw is simulated on the same dose
+ * schedule and time grid as the plotted curve, and each time point takes the
+ * central `level` quantiles across draws. Uses the same biexponential
+ * superposition as singleDoseConcentration, with constants precomputed per draw.
+ */
+function applyCredibleBand(points: CurvePoint[], schedule: DoseEvent[], band: CredibleBandSpec): CurvePoint[] {
+  const nDraws = band.draws.length;
+  const nTimes = points.length;
+  if (nDraws < 20 || nTimes === 0) return points;
+  const values = new Float64Array(nDraws * nTimes);
+  for (let d = 0; d < nDraws; d++) {
+    const { alpha, beta, A, B } = computeConstants(band.draws[d]);
+    const doseTerms = schedule.map((ev) => {
+      const R0 = ev.dose_mg / ev.T_inf;
+      return {
+        time: ev.time,
+        T_inf: ev.T_inf,
+        R0,
+        a: (R0 * A) / alpha,
+        b: (R0 * B) / beta,
+        aEnd: ((R0 * A) / alpha) * (1 - Math.exp(-alpha * ev.T_inf)),
+        bEnd: ((R0 * B) / beta) * (1 - Math.exp(-beta * ev.T_inf)),
+      };
+    });
+    for (let i = 0; i < nTimes; i++) {
+      const t = points[i].time_hours;
+      let c = 0;
+      for (const ev of doseTerms) {
+        const dt = t - ev.time;
+        if (dt < 0) break;
+        if (dt <= ev.T_inf) {
+          c += ev.a * (1 - Math.exp(-alpha * dt)) + ev.b * (1 - Math.exp(-beta * dt));
+        } else {
+          const post = dt - ev.T_inf;
+          c += ev.aEnd * Math.exp(-alpha * post) + ev.bEnd * Math.exp(-beta * post);
+        }
+      }
+      values[i * nDraws + d] = Number.isFinite(c) ? Math.max(0, c) : 0;
+    }
+  }
+  const qLo = (1 - band.level) / 2;
+  const qHi = 1 - qLo;
+  return points.map((p, i) => {
+    const column = values.subarray(i * nDraws, (i + 1) * nDraws).slice().sort();
+    return {
+      ...p,
+      lower: Math.round(sortedQuantile(column, qLo) * 100) / 100,
+      upper: Math.round(sortedQuantile(column, qHi) * 100) / 100,
+    };
+  });
 }
 
 /**
@@ -251,7 +331,7 @@ export function computeExposure(input: SteadyStateInput): ExposureResult {
  * The number of doses is chosen to cover at least 4 terminal half-lives (t½β),
  * ensuring near-steady-state is visible in the graph.
  */
-export function curvePoints(input: SteadyStateInput, step_hours: number = 0.5): CurvePoint[] {
+export function curvePoints(input: SteadyStateInput, step_hours: number = 0.5, band?: CredibleBandSpec): CurvePoint[] {
   const { tau } = input;
   const { beta } = computeConstants(input);
 
@@ -302,6 +382,14 @@ export function curvePoints(input: SteadyStateInput, step_hours: number = 0.5): 
     });
   }
 
+  if (band) {
+    const schedule: DoseEvent[] = Array.from({ length: n_doses }, (_, k) => ({
+      time: k * tau,
+      dose_mg: input.dose_mg,
+      T_inf: input.T_inf,
+    }));
+    return applyCredibleBand(points, schedule, band);
+  }
   return points;
 }
 
@@ -322,7 +410,8 @@ export function loadingDoseCurvePoints(
   maintDose_mg: number,
   maintTau: number,
   maintT_inf: number,
-  step_hours: number = 0.5
+  step_hours: number = 0.5,
+  band?: CredibleBandSpec,
 ): CurvePoint[] {
   const { beta } = computeConstants(params);
   const halfLifeBeta = 0.693 / beta;
@@ -392,6 +481,7 @@ export function loadingDoseCurvePoints(
     });
   }
 
+  if (band) return applyCredibleBand(points, doseSchedule, band);
   return points;
 }
 

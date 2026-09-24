@@ -5,6 +5,7 @@ import { buildDocumentationPreview } from "../explain/buildDocumentationPreview"
 import { buildInterpretationSummary } from "../explain/buildInterpretationSummary";
 import { curvePoints, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
 import { computeSafeInfusionDurationHours } from "../recommend/infusionSafety";
+import { summarizeParameterUncertainty } from "../posterior/parameterUncertainty";
 
 export interface ExistingRegimenExplainOutput {
   interpretation_summary: string;
@@ -28,6 +29,8 @@ export function buildCalculateResponse(
   // its own pre-computed concentration-time curve so clicking a tab swaps the
   // chart line without an extra round-trip.
   const isPulseDose = engineOutput.doses_given === 1;
+  const pu = engineOutput.parameter_uncertainty;
+  const band = pu && pu.method !== "unavailable" ? { draws: pu.draws, level: pu.level } : undefined;
   const enrichedFrequencyOptions = (recommendation.frequency_options ?? []).map((opt) => {
     const optInput: ExplanationInput = {
       engineOutput: {
@@ -72,13 +75,15 @@ export function buildCalculateResponse(
           engineOutput.current_regimen_dose_mg,                        // loading dose = what the patient actually got
           engineOutput.current_regimen_infusion_hours ?? optTinf,      // loading infusion
           opt.dose_mg, opt.interval_hours, optTinf,                    // option as maintenance
+          undefined,
+          band,
         )
       : curvePoints({
           ...params,
           dose_mg: opt.dose_mg,
           tau: opt.interval_hours,
           T_inf: Math.min(optTinf, opt.interval_hours),
-        });
+        }, undefined, band);
 
     return {
       ...opt,
@@ -157,10 +162,11 @@ export function buildCalculateResponse(
     curve_engine_recommended: engineOutput.curve_engine_recommended,
     loading_dose_curve: engineOutput.loading_dose_curve,
     fit_diagnostic: engineOutput.fit_diagnostic,
-    // The engine's own fit diagnostic, so the graph's uncertainty band can use
-    // uncertainty_label directly rather than reconstructing a width from other
-    // fields that happen to encode it.
+    // The engine's own fit diagnostic (fit quality and uncertainty label).
     posterior_fit: engineOutput.posterior_fit,
+    // What the band on each curve is: a Laplace-approximated posterior, the
+    // population prior, or unavailable (with the reason). Draws are not sent.
+    parameter_uncertainty: summarizeParameterUncertainty(engineOutput.parameter_uncertainty),
     // Explicit exposure-horizon semantics (exposureHorizon.ts). The top-level
     // auc24/peak/trough describe `exposure_horizon`; the steady-state
     // projection and the actual-history values are carried separately so no
