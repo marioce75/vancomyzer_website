@@ -87,7 +87,10 @@ export interface ParameterUncertainty {
 
 export interface ParameterUncertaintyUnavailable {
   method: "unavailable";
+  /** Plain-language reason shown on the graph legend. */
   reason: string;
+  /** Technical detail for the legend tooltip and audit. */
+  detail?: string;
 }
 
 export type ParameterUncertaintyResult = ParameterUncertainty | ParameterUncertaintyUnavailable;
@@ -95,7 +98,7 @@ export type ParameterUncertaintyResult = ParameterUncertainty | ParameterUncerta
 /** Client-safe summary (drops the draws). */
 export function summarizeParameterUncertainty(u: ParameterUncertaintyResult | undefined) {
   if (!u) return undefined;
-  if (u.method === "unavailable") return { method: u.method, reason: u.reason };
+  if (u.method === "unavailable") return { method: u.method, reason: u.reason, ...(u.detail ? { detail: u.detail } : {}) };
   const r = (x: number) => Math.round(x * 1e4) / 1e4;
   return {
     method: u.method,
@@ -230,7 +233,7 @@ function build(
   cov: number[][],
 ): ParameterUncertaintyResult {
   const L = cholesky(cov);
-  if (!L) return { method: "unavailable", reason: "The parameter covariance is not positive definite." };
+  if (!L) return { method: "unavailable", reason: "A reliable range could not be estimated for this result.", detail: "The parameter covariance is not positive definite." };
   const sd = cov.map((row, i) => Math.sqrt(row[i]));
   return {
     method,
@@ -332,7 +335,7 @@ function posteriorBySir(
   const d = x0.length;
   const propCov = laplaceCov.map((row) => row.map((v) => v * PROPOSAL_SCALE * PROPOSAL_SCALE));
   const Lp = cholesky(propCov);
-  if (!Lp) return { method: "unavailable", reason: "The parameter covariance is not positive definite." };
+  if (!Lp) return { method: "unavailable", reason: "A reliable range could not be estimated for this result.", detail: "The proposal covariance is not positive definite." };
   let logDetL = 0;
   for (let i = 0; i < d; i++) logDetL += Math.log(Lp[i][i]);
 
@@ -355,7 +358,7 @@ function posteriorBySir(
   }
   const maxLogW = Math.max(...logW);
   if (!Number.isFinite(maxLogW)) {
-    return { method: "unavailable", reason: "The posterior could not be evaluated around the fitted parameters." };
+    return { method: "unavailable", reason: "A reliable range could not be estimated for this result.", detail: "The posterior could not be evaluated around the fitted parameters." };
   }
   const w = logW.map((lw) => Math.exp(lw - maxLogW));
   const sumW = w.reduce((a, b) => a + b, 0);
@@ -363,7 +366,8 @@ function posteriorBySir(
   if (ess < MIN_EFFECTIVE_SAMPLE_SIZE) {
     return {
       method: "unavailable",
-      reason: `The posterior is too irregular for a reliable band (effective sample size ${Math.round(ess)}).`,
+      reason: "The measured level doesn't fit this model well enough to estimate a range. Check the level's time and value.",
+      detail: `Posterior too irregular for a reliable band: importance-sampling effective sample size ${Math.round(ess)} (minimum ${MIN_EFFECTIVE_SAMPLE_SIZE}).`,
     };
   }
 

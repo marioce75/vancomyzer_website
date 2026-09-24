@@ -17,7 +17,7 @@ export type ParameterUncertaintySummary =
       corr_CL_V1: number;
       effective_sample_size?: number;
     }
-  | { method: "unavailable"; reason: string };
+  | { method: "unavailable"; reason: string; detail?: string };
 
 /**
  * Types aligned with POST /api/calculate contract.
