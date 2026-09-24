@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 const REVIEW_POINTS = [
   { title: "Population-model equations", body: `The ${COLIN_2019.shortName} covariate equations are shown next to the estimated pharmacokinetic parameters. Bayesian fitting also uses numerical optimization; it is not a calculation that can be reproduced by substituting inputs into one equation.` },
   { title: "Fit to measured levels", body: "Bayesian estimates combine the population model with measured levels. The calculator shows measured-versus-predicted differences and flags a poor fit for clinical review." },
-  { title: "Illustrative uncertainty band", body: "The shaded band around a predicted curve is a percentage of the predicted concentration set by the fit-quality rating (±35% before any levels). It is not a statistical confidence, credible or prediction interval." },
+  { title: "90% credible band", body: "The shaded band is the 5th–95th percentile of concentrations simulated from 400 parameter sets drawn from the posterior (sampling-importance-resampling around the MAP fit), or from the population prior before any level. Parameter uncertainty only: assay error is excluded, so it is not a prediction interval for a new level. It is conditional on the calculator's prior variances and residual error model, and is model-based and not yet validated against measured patient levels." },
   { title: "Published starting model", body: `${COLIN_2019.citation} ${COLIN_2019.sourcePopulation} Published model evidence does not establish clinical validation of Vancomyzer.` },
   { title: "Scope", body: "Vancomyzer supports adults receiving intermittent intravenous vancomycin. Pediatric dosing, dialysis and continuous infusion are outside its scope. Independent clinical validation is pending." },
   { title: "Access", body: "The core calculator is free. Paid plans add account features. All plans use the same calculation method; see the pricing page for current terms." },
@@ -105,8 +105,8 @@ export default function TransparentDosingPage() {
             behind each estimate, and the core calculator is free for individual clinicians.
           </p>
           <p>
-            The {COLIN_2019.shortName} prior is documented with its primary citation. An illustrative
-            uncertainty band shows how much a fit can and cannot say. The Bayesian step is explained in
+            The {COLIN_2019.shortName} prior is documented with its primary citation. A model-based 90% credible
+            band (not yet validated against patient levels) shows how much a fit can and cannot say. The Bayesian step is explained in
             plain language inside the calculator (turn on <strong>Teaching mode</strong> in the
             calculator&rsquo;s settings).
           </p>

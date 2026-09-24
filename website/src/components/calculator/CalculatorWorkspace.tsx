@@ -52,53 +52,6 @@ const defaultLevel = { value_mcg_ml: 0, collection_time: "", time_since_last_dos
 
 type WorkspaceViewMode = "empiric" | "one_level" | "two_levels";
 
-type BandUncertaintyLabel = "population_only" | "low" | "moderate" | "high" | "very_high";
-
-/** Narrowest to widest, matching the fixed band widths in ConcentrationTimeGraph (10, 18, 28, 35, 40%). */
-const BAND_WIDTH_ORDER: readonly BandUncertaintyLabel[] = ["low", "moderate", "high", "population_only", "very_high"];
-
-function widerBandLabel(a: BandUncertaintyLabel, b: BandUncertaintyLabel): BandUncertaintyLabel {
-  return BAND_WIDTH_ORDER.indexOf(a) >= BAND_WIDTH_ORDER.indexOf(b) ? a : b;
-}
-
-function isBandUncertaintyLabel(value: unknown): value is BandUncertaintyLabel {
-  return typeof value === "string" && (BAND_WIDTH_ORDER as readonly string[]).includes(value);
-}
-
-/**
- * Uncertainty label for the illustrative band on the concentration-time graph.
- * Presentation only; the band is never narrower than the engine's own
- * posterior_fit.uncertainty_label.
- *
- * - The response now carries posterior_fit, so its uncertainty_label is used
- *   directly and widened for a weak or prior-only fit.
- * - The reconstruction below is the fallback for a response without it (a
- *   result restored from an older session snapshot): no posterior refinement
- *   population_only; "multiple coherent levels" (fit_quality and uncertainty
- *   both "moderate")  moderate; any other fitted result  high. The engine
- *   never labels a fit "low", so the number of levels alone never narrows the
- *   band.
- * - Fit-quality warnings keep the band at "high" or wider.
- */
-function deriveBandUncertaintyLabel(result: CalculateResponse): BandUncertaintyLabel {
-  const posteriorFit = (result as unknown as { posterior_fit?: { uncertainty_label?: unknown; fit_quality?: unknown } }).posterior_fit;
-  let label: BandUncertaintyLabel;
-  if (posteriorFit && isBandUncertaintyLabel(posteriorFit.uncertainty_label)) {
-    label = posteriorFit.uncertainty_label;
-    if (posteriorFit.fit_quality === "weak") label = widerBandLabel(label, "high");
-    if (posteriorFit.fit_quality === "prior_only" || posteriorFit.fit_quality === "not_applicable") {
-      label = widerBandLabel(label, "population_only");
-    }
-  } else if (!result.pk_parameters?.used_posterior_refinement) {
-    label = "population_only";
-  } else if (result.calculation_details?.evidence_strength === "multiple coherent levels") {
-    label = "moderate";
-  } else {
-    label = "high";
-  }
-  if ((result.fit_quality_warnings?.length ?? 0) > 0) label = widerBandLabel(label, "high");
-  return label;
-}
 
 function hasPatientCoreData(patient: typeof defaultPatient): boolean {
   return (
@@ -471,6 +424,9 @@ export default function CalculatorWorkspace() {
         // The engine's fit diagnostic, so the graph band uses the engine's own
         // uncertainty label rather than a reconstruction.
         posterior_fit: data.posterior_fit,
+        // What the curve's credible band is (Bayesian posterior, population
+        // prior, or unavailable with a reason). Curves carry lower/upper.
+        parameter_uncertainty: data.parameter_uncertainty,
         // Exposure of the regimen being recommended, distinct from auc24/peak/
         // trough, which on the adjustment path describe the current regimen.
         predicted_auc24: data.predicted_auc24,
@@ -1417,7 +1373,7 @@ export default function CalculatorWorkspace() {
               measured_levels={displayResult?.measured_levels ?? []}
               calculationDetails={displayResult?.calculation_details ?? null}
               pk_model_name={displayResult?.pk_parameters?.pk_model_name}
-              uncertainty_label={displayResult ? deriveBandUncertaintyLabel(displayResult) : undefined}
+              band_info={displayResult?.parameter_uncertainty}
             />
           </div>
         </section>

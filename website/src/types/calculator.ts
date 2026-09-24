@@ -1,3 +1,24 @@
+/** A plotted concentration point, with the credible band edges when the engine computed one. */
+export interface CurvePointWithBand {
+  time_hours: number;
+  concentration: number;
+  lower?: number;
+  upper?: number;
+}
+
+/** What the band on the plotted curves represents (draws are never sent). */
+export type ParameterUncertaintySummary =
+  | {
+      method: "posterior_sir" | "population_prior";
+      level: number;
+      n_draws: number;
+      seed: number;
+      log_sd: { CL: number; V1: number; Q: number; V2: number };
+      corr_CL_V1: number;
+      effective_sample_size?: number;
+    }
+  | { method: "unavailable"; reason: string };
+
 /**
  * Types aligned with POST /api/calculate contract.
  * Do not invent a different API contract.
@@ -80,7 +101,7 @@ export interface FrequencyOption {
   infusion_duration_hours: number;
   doses_given?: number;
   is_recommended: boolean;
-  curve?: { time_hours: number; concentration: number }[];
+  curve?: CurvePointWithBand[];
   interpretation_summary?: string;
   quick_summary?: string;
   clinical_note?: string;
@@ -128,9 +149,9 @@ export interface CalculateResponse {
   /** Alternate concentration-time curve when in pulse-dose mode — the
    *  engine's auto-recommended maintenance regimen. The primary `curve`
    *  reflects the user's entered regimen. */
-  curve_engine_recommended?: { time_hours: number; concentration: number }[];
+  curve_engine_recommended?: CurvePointWithBand[];
   /** Pulse-dose mode only: the loading dose alone over the first 48 h. */
-  loading_dose_curve?: { time_hours: number; concentration: number }[];
+  loading_dose_curve?: CurvePointWithBand[];
   /** Posterior fit diagnostic — prior/posterior values + per-level residuals. */
   fit_diagnostic?: {
     prior_CL: number;
@@ -142,10 +163,11 @@ export interface CalculateResponse {
     posterior_predicted_at_levels: { observed: number; predicted: number; relative_error: number }[];
     max_relative_error: number;
   };
+  /** What the credible band on the curves represents; see ParameterUncertaintySummary. */
+  parameter_uncertainty?: ParameterUncertaintySummary;
   /**
-   * The engine's own posterior fit diagnostic. Returned so the graph's
-   * uncertainty band can use `uncertainty_label` directly instead of inferring
-   * a width from whatever else happens to be on the response.
+   * The engine's own posterior fit diagnostic (fit quality and the qualitative
+   * uncertainty label). The graph band no longer uses it; see parameter_uncertainty.
    */
   posterior_fit?: {
     observation_count: number;
@@ -169,7 +191,7 @@ export interface CalculateResponse {
   interpretation_summary: string;
   assumptions: string[];
   limitations: string[];
-  curve: { time_hours: number; concentration: number }[];
+  curve: CurvePointWithBand[];
   measured_levels: { time_hours: number; concentration: number }[];
   calculation_details?: CalculationDetails;
   frequency_options?: FrequencyOption[];

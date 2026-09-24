@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import type { CalculationDetails } from "@/types/calculator";
+import type { CalculationDetails, ParameterUncertaintySummary } from "@/types/calculator";
 import { modelShortName } from "@/lib/pk/modelRegistry";
 import { fmt } from "@/lib/formatNumber";
 
@@ -10,6 +10,9 @@ import { fmt } from "@/lib/formatNumber";
 interface CurvePoint {
   time_hours: number;
   concentration: number;
+  /** Credible band edges (mg/L), present when the engine computed a band. */
+  lower?: number;
+  upper?: number;
 }
 
 interface ConcentrationTimeGraphProps {
@@ -17,10 +20,12 @@ interface ConcentrationTimeGraphProps {
   measured_levels?: CurvePoint[] | null;
   calculationDetails?: CalculationDetails | null;
   pk_model_name?: "colin_2019" | "vancomyzer_obesity";
-  /** Posterior fit uncertainty label — selects the width of the shaded
-   *  illustrative band drawn around the predicted curve. The band is a fixed
-   *  ± percentage, not a statistical confidence or prediction interval. */
-  uncertainty_label?: "population_only" | "low" | "moderate" | "high" | "very_high";
+  /**
+   * What the shaded band around the predicted curve is. The band itself comes
+   * from each curve point's `lower`/`upper`, computed by the engine by
+   * simulating parameter draws (lib/pk/posterior/parameterUncertainty.ts).
+   */
+  band_info?: ParameterUncertaintySummary;
   /**
    * Fill the parent panel's height (desktop cockpit) instead of the fixed
    * 280px canvas. The draw loop reads the canvas's rendered size every frame,
@@ -37,25 +42,33 @@ interface ConcentrationTimeGraphProps {
   comparison_label?: string | null;
 }
 
-/**
- * Illustrative ± band width as a fraction of the predicted concentration.
- *
- * NOT a statistical interval. Each qualitative uncertainty label maps to a
- * fixed ± percentage multiplier; nothing is computed from the posterior
- * covariance, and the band has no stated coverage. The factors were chosen
- * with clinical assay imprecision (~15% even for a perfect model) and the IIV
- * in the published priors in mind. Order, narrowest to widest: low 10%,
- * moderate 18%, high 28%, population_only 35%, very_high 40%.
- */
-function uncertaintyBandFactor(label: ConcentrationTimeGraphProps["uncertainty_label"]): number {
-  switch (label) {
-    case "low":             return 0.10;
-    case "moderate":        return 0.18;
-    case "high":            return 0.28;
-    case "very_high":       return 0.40;
-    case "population_only": return 0.35;
-    default:                return 0;
+/** True when the curve carries engine-computed band edges. */
+function curveHasBand(curve: CurvePoint[]): boolean {
+  return curve.length > 1 && curve.every((p) => Number.isFinite(p.lower) && Number.isFinite(p.upper));
+}
+
+/** Legend wording and hover text for the band. */
+function bandDescription(info: ParameterUncertaintySummary | undefined): { label: string; title: string } | null {
+  if (!info || info.method === "unavailable") return null;
+  const pct = Math.round(info.level * 100);
+  if (info.method === "posterior_sir") {
+    return {
+      label: `${pct}% credible band (model-based; not yet validated)`,
+      title:
+        `${pct}% credible band for the model-predicted concentration: ${info.n_draws} parameter sets drawn from the posterior ` +
+        `(sampling-importance-resampling around the MAP fit) and the ${(100 - pct) / 2}th–${100 - (100 - pct) / 2}th percentiles ` +
+        `taken at each time. Parameter uncertainty only: assay error is excluded, so it is not a prediction interval for a new ` +
+        `level. Conditional on this calculator's prior variances and residual error model. Model-based: its coverage has not yet ` +
+        `been checked against measured patient levels.`,
+    };
   }
+  return {
+    label: `${pct}% population range (model-based; not yet validated)`,
+    title:
+      `${pct}% range of concentrations across ${info.n_draws} parameter sets drawn from the population prior (no measured ` +
+      `level has narrowed it). Parameter uncertainty only; conditional on this calculator's prior variances. Model-based: ` +
+      `its coverage has not yet been checked against measured patient levels.`,
+  };
 }
 
 /* ── Constants ──────────────────────────────────────────────────── */
@@ -159,7 +172,7 @@ function drawGraph(
   zoom: number,
   mouse: { x: number; y: number } | null,
   animProgress: number,
-  bandFactor: number,
+  bandLevel: number,
   comparison: CurvePoint[] = [],
 ) {
   const ctx = canvas.getContext("2d");
@@ -328,23 +341,20 @@ function drawGraph(
   ctx.rect(PAD.left, PAD.top, gw, gh);
   ctx.clip();
 
-  // ─── Illustrative band (translucent shaded region around predicted curve) ───
-  // Width is a fixed ± percentage chosen from the uncertainty label (see
-  // uncertaintyBandFactor). It is not a statistical confidence or prediction
-  // interval.
-  if (bandFactor > 0 && curve.length > 1) {
+  // ─── Credible band (translucent region between the engine's lower/upper) ───
+  // Pointwise percentiles of concentrations simulated from parameter draws
+  // (lib/pk/posterior/parameterUncertainty.ts), not a fixed percentage.
+  if (bandLevel > 0 && curveHasBand(curve)) {
     const drawLen = Math.floor(curve.length * animProgress);
     if (drawLen > 1) {
       ctx.fillStyle = "rgba(30, 77, 140, 0.10)"; // navy, low alpha — readable on light bg
       ctx.beginPath();
-      // Upper edge: curve × (1 + bandFactor)
-      ctx.moveTo(toX(curve[0].time_hours), toY(curve[0].concentration * (1 + bandFactor)));
+      ctx.moveTo(toX(curve[0].time_hours), toY(curve[0].upper!));
       for (let i = 1; i < drawLen; i++) {
-        ctx.lineTo(toX(curve[i].time_hours), toY(curve[i].concentration * (1 + bandFactor)));
+        ctx.lineTo(toX(curve[i].time_hours), toY(curve[i].upper!));
       }
-      // Lower edge: curve × (1 - bandFactor), traversed in reverse
       for (let i = drawLen - 1; i >= 0; i--) {
-        ctx.lineTo(toX(curve[i].time_hours), toY(Math.max(0, curve[i].concentration * (1 - bandFactor))));
+        ctx.lineTo(toX(curve[i].time_hours), toY(Math.max(0, curve[i].lower!)));
       }
       ctx.closePath();
       ctx.fill();
@@ -518,6 +528,9 @@ function drawGraph(
       const tHover = fromX(mouse.x);
       // Interpolate concentration
       let cInterp = 0;
+      let loInterp: number | null = null;
+      let hiInterp: number | null = null;
+      const hasBand = bandLevel > 0 && curveHasBand(curve);
       for (let i = 1; i < curve.length; i++) {
         if (curve[i].time_hours >= tHover) {
           const t0 = curve[i - 1].time_hours;
@@ -526,19 +539,27 @@ function drawGraph(
           const c1 = curve[i].concentration;
           const frac = (tHover - t0) / (t1 - t0 || 1);
           cInterp = c0 + frac * (c1 - c0);
+          if (hasBand) {
+            loInterp = curve[i - 1].lower! + frac * (curve[i].lower! - curve[i - 1].lower!);
+            hiInterp = curve[i - 1].upper! + frac * (curve[i].upper! - curve[i - 1].upper!);
+          }
           break;
         }
       }
       const phase = phaseLabel(curve, tHover);
 
       // Tooltip box
+      const bandLine = loInterp !== null && hiInterp !== null
+        ? `${Math.round(bandLevel * 100)}% ${fmt(loInterp, 1)}–${fmt(hiInterp, 1)}`
+        : null;
+      const boxH = 36 + (bandLine ? 12 : 0) + (phase ? 12 : 0);
       const tx = mouse.x + 12;
       const ty = mouse.y - 50;
       ctx.fillStyle = bgColor;
-      ctx.fillRect(tx, ty, 130, phase ? 48 : 36);
+      ctx.fillRect(tx, ty, 130, boxH);
       ctx.strokeStyle = primary;
       ctx.lineWidth = 1;
-      ctx.strokeRect(tx, ty, 130, phase ? 48 : 36);
+      ctx.strokeRect(tx, ty, 130, boxH);
 
       ctx.font = `10px ${FONT}`;
       ctx.textAlign = "left";
@@ -546,10 +567,17 @@ function drawGraph(
       ctx.fillText(`T+${fmt(tHover, 1)}h`, tx + 6, ty + 14);
       ctx.fillStyle = primary;
       ctx.fillText(`C = ${fmt(cInterp, 1)} mg/L`, tx + 6, ty + 28);
+      let lineY = ty + 42;
+      if (bandLine) {
+        ctx.fillStyle = dim;
+        ctx.font = `9px ${FONT}`;
+        ctx.fillText(bandLine, tx + 6, lineY);
+        lineY += 12;
+      }
       if (phase) {
         ctx.fillStyle = dim;
         ctx.font = `9px ${FONT}`;
-        ctx.fillText(phase, tx + 6, ty + 42);
+        ctx.fillText(phase, tx + 6, lineY);
       }
 
       // Dot on curve at hover point
@@ -572,11 +600,12 @@ export default function ConcentrationTimeGraph({
   measured_levels,
   calculationDetails,
   pk_model_name,
-  uncertainty_label,
+  band_info,
   comparison_curve,
   comparison_label,
 }: ConcentrationTimeGraphProps) {
-  const bandFactor = uncertaintyBandFactor(uncertainty_label);
+  const band = bandDescription(band_info);
+  const bandLevel = band && band_info && band_info.method !== "unavailable" ? band_info.level : 0;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Zoom window persists for the session so recalculating keeps the view.
   const [zoom, setZoomState] = useState(96);
@@ -636,13 +665,13 @@ export default function ConcentrationTimeGraph({
       if (!running) return;
       const canvas = canvasRef.current;
       if (canvas) {
-        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandFactor, comparisonData);
+        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandLevel, comparisonData);
       }
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
     return () => { running = false; };
-  }, [curveData, measuredData, zoom, mouse, bandFactor, comparisonData]);
+  }, [curveData, measuredData, zoom, mouse, bandLevel, comparisonData]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -737,14 +766,19 @@ export default function ConcentrationTimeGraph({
             <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44"), borderTopWidth: 1.5 }} /> {comparison_label ?? "Reference"}
           </span>
         )}
-        {bandFactor > 0 && (
+        {band && curveHasBand(curveData) && (
           <span
             className="flex items-center gap-1 text-[10px]"
             style={{ color: getCSSColor("--color-dim", "#009933") }}
-            title={`Illustrative ±${(bandFactor * 100).toFixed(0)}% range for a "${uncertainty_label?.replace(/_/g, " ") ?? "unspecified"}" uncertainty label. A fixed percentage around the predicted curve, not a statistical confidence or prediction interval.`}
+            title={band.title}
           >
             <span className="inline-block w-3 h-3" style={{ background: "rgba(30, 77, 140, 0.10)", border: "1px solid rgba(30, 77, 140, 0.25)" }} />
-            Illustrative ±{(bandFactor * 100).toFixed(0)}% range (not a statistical confidence or prediction interval)
+            {band.label}
+          </span>
+        )}
+        {band_info?.method === "unavailable" && curveData.length > 1 && (
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} title={band_info.reason}>
+            No uncertainty band: {band_info.reason}
           </span>
         )}
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>

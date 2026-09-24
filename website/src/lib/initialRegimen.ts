@@ -8,7 +8,8 @@ import { buildPriorParameters } from "./pk/posterior/buildPriorParameters";
 import { buildEmpiricLoadingDose } from "./pk/recommend/buildEmpiricLoadingDose";
 import { simulateCandidateExposure } from "./pk/recommend/simulateCandidateExposure";
 import { computeSafeInfusionDurationHours } from "./pk/recommend/infusionSafety";
-import { curvePoints } from "./pk/steadyStateTwoCompartment";
+import { curvePoints, type CredibleBandSpec } from "./pk/steadyStateTwoCompartment";
+import { priorParameterUncertainty, summarizeParameterUncertainty } from "./pk/posterior/parameterUncertainty";
 import { buildInitialRegimenReviewStatus } from "./pk/response/buildReviewStatus";
 import { highBmiAdvisory, modelShortName, renalCovariateDescription } from "./pk/modelRegistry";
 import { DEFAULT_DOSE_POLICY, type DosePolicy } from "./pk/dosePolicy";
@@ -61,9 +62,10 @@ export interface InitialRegimenResult {
   interpretation_summary: string;
   assumptions: string[];
   limitations: string[];
-  curve: { time_hours: number; concentration: number }[];
+  curve: { time_hours: number; concentration: number; lower?: number; upper?: number }[];
   measured_levels: { time_hours: number; concentration: number }[];
   calculation_details: CalculationDetails;
+  parameter_uncertainty?: ReturnType<typeof summarizeParameterUncertainty>;
   frequency_options: FrequencyOption[];
   documentation_preview: {
     quick_summary: string;
@@ -263,6 +265,7 @@ function buildFrequencyOptions(
   recommended: { dose_mg: number; interval_hours: number },
   CL: number, V1: number, Q: number, V2: number,
   ctx: FrequencyOptionContext,
+  band?: CredibleBandSpec,
 ): FrequencyOption[] {
   const byInterval = new Map<number, typeof candidates>();
   for (const c of candidates) {
@@ -282,7 +285,8 @@ function buildFrequencyOptions(
     const T_inf = infusion.infusion_duration_hours;
     const optCurve = curvePoints(
       { CL, V1, Q, V2, dose_mg: pick.dose_mg, tau: interval, T_inf },
-      0.25
+      0.25,
+      band,
     );
     const auc24 = Math.round(pick.auc24 * 10) / 10;
     const peak = Math.round(pick.peak * 10) / 10;
@@ -403,6 +407,15 @@ export function computeInitialRegimen(
     });
   }
 
+  // No levels: the band is the population prior's spread (prior predictive).
+  const parameterUncertainty = priorParameterUncertainty(prior, {
+    CL: prior.omega_CL, V1: prior.omega_V1, Q: prior.omega_Q, V2: prior.omega_V2,
+  });
+  const band: CredibleBandSpec | undefined =
+    parameterUncertainty.method === "unavailable"
+      ? undefined
+      : { draws: parameterUncertainty.draws, level: parameterUncertainty.level };
+
   const safeInfusion = computeSafeInfusionDurationHours(choice.dose_mg);
   const curve = curvePoints(
     {
@@ -413,7 +426,9 @@ export function computeInitialRegimen(
       dose_mg: choice.dose_mg,
       tau: choice.interval_hours,
       T_inf: Math.min(safeInfusion.infusion_duration_hours, choice.interval_hours),
-    }
+    },
+    undefined,
+    band,
   );
 
   const recommended_dose = `${choice.dose_mg} mg`;
@@ -488,7 +503,7 @@ export function computeInitialRegimen(
     loadingDoseBasis: loadingDose.basis,
     arcNote,
   };
-  const frequencyOptions = buildFrequencyOptions(candidates, choice, prior.CL, prior.V1, prior.Q, prior.V2, freqCtx);
+  const frequencyOptions = buildFrequencyOptions(candidates, choice, prior.CL, prior.V1, prior.Q, prior.V2, freqCtx, band);
 
   const belowTargetNote = (!arc_advisory && auc_range_status === "below_target")
     ? ` NOTE: Best available regimen achieves AUC24 ${auc24} mg\u00b7h/L, which is below the target range of 400\u2013600. Clinical review is required.`
@@ -579,6 +594,7 @@ export function computeInitialRegimen(
     curve,
     measured_levels: [],
     frequency_options: frequencyOptions,
+    parameter_uncertainty: summarizeParameterUncertainty(parameterUncertainty),
     calculation_details: {
       method: "Adult prior model only in a two-compartment intermittent steady-state maintenance-selection workflow",
       evidence_strength: "patient characteristics only",
