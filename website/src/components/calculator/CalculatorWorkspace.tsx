@@ -310,7 +310,15 @@ export default function CalculatorWorkspace() {
     const validLevels = levels.filter(
       (l) => l.value_mcg_ml !== 0 || l.time_since_last_dose_hours !== 0 || (l.collection_time ?? "").trim() !== "",
     );
-    return { ...base, regimen, levels: validLevels };
+    // Loading-dose fields travel only with a multi-dose level workflow where
+    // "Loading dose" is selected (an unfilled 0 is sent so the server rejects
+    // it visibly); otherwise they are dropped so a stale entry cannot change the fit.
+    const hasLoading = (regimen.doses_given ?? 0) >= 2 && regimen.loading_dose_mg !== undefined;
+    const { loading_dose_mg, loading_infusion_duration_hours, loading_to_maintenance_hours, ...maintenance } = regimen;
+    const sentRegimen = hasLoading
+      ? { ...maintenance, loading_dose_mg, loading_infusion_duration_hours, ...(loading_to_maintenance_hours ? { loading_to_maintenance_hours } : {}) }
+      : maintenance;
+    return { ...base, regimen: sentRegimen, levels: validLevels };
   }, [mode, patient, rrt, regimen, levels, canSaveHistory]);
 
   const applyViewMode = useCallback((next: WorkspaceViewMode) => {

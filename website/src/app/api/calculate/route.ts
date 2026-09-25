@@ -131,7 +131,7 @@ function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mo
 function extractInputs(data: RequestBody, mode: Mode): {
   age: number; weight_kg: number; serum_creatinine_mg_dl: number;
   dose_mg?: number; interval_hours?: number; infusion_duration_hours?: number;
-  doses_given?: number; level_count: number;
+  doses_given?: number; loading_dose_mg?: number; level_count: number;
 } {
   const p = (data.patient ?? {}) as Record<string, unknown>;
   const r = (data.regimen ?? {}) as Record<string, unknown>;
@@ -146,6 +146,7 @@ function extractInputs(data: RequestBody, mode: Mode): {
       interval_hours: (r.interval_hours as number) ?? undefined,
       infusion_duration_hours: (r.infusion_duration_hours as number) ?? undefined,
       doses_given: (r.doses_given as number) ?? undefined,
+      ...(typeof r.loading_dose_mg === "number" ? { loading_dose_mg: r.loading_dose_mg } : {}),
     } : {}),
     level_count: levels.filter((l: unknown) => l && typeof l === "object" && (l as Record<string, unknown>).value_mcg_ml).length,
   };

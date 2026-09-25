@@ -20,6 +20,7 @@ export interface AuditEntry {
     interval_hours?: number;
     infusion_duration_hours?: number;
     doses_given?: number;
+    loading_dose_mg?: number;
     level_count: number;
   };
 

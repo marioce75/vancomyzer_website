@@ -45,11 +45,14 @@ export const STEADY_STATE_HALF_LIVES = 4;
 export interface HorizonRegimen {
   doses_given?: number;
   steady_state_confirmed?: boolean;
+  /** A loading dose means the doses were not all equal: always actual history. */
+  loading_dose_mg?: number;
 }
 
 export function resolveExposureHorizon(regimen: HorizonRegimen): ExposureHorizon {
   const n = regimen.doses_given;
   if (n === 1) return "single_dose";
+  if (n !== undefined && (regimen.loading_dose_mg ?? 0) > 0) return "actual_history";
   if (regimen.steady_state_confirmed === true) return "steady_state";
   if (n === undefined) return "steady_state";
   if (regimen.steady_state_confirmed === false) return "actual_history";

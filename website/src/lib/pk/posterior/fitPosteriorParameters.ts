@@ -6,6 +6,8 @@ import {
 import type { PosteriorFitDiagnostics } from "../types";
 import type { NormalizedObservation } from "./normalizeObservations";
 import type { ExposureHorizon } from "../exposureHorizon";
+import type { DoseEvent } from "../steadyStateTwoCompartment";
+import { concentrationFromHistory } from "../doseHistory";
 
 /**
  * Error model (application-specific; not the published residual model):
@@ -53,6 +55,12 @@ export interface FitPosteriorInput {
    * When omitted, falls back to the legacy dose-count rule (≥5 → steady state).
    */
   horizon?: ExposureHorizon;
+  /**
+   * Actual dose history (dose 1 = loading dose). When present under the
+   * actual-history horizon, each level is predicted from these doses instead of
+   * doses_given equal doses; time_since_last_dose is measured from the last one.
+   */
+  dose_history?: DoseEvent[];
   // Optional between-subject-variability overrides. No shipped model sets these
   // since the custom obesity branch was retired on 15 Sep 2026; kept so a future
   // model can widen or narrow the prior without changing this file.
@@ -123,6 +131,11 @@ export function predictConcentration(
 
   if (horizon === "steady_state" || doses_given === undefined) {
     return concentrationAtTime({ ...base, t: observation.time_in_interval });
+  }
+
+  if (input.dose_history && input.dose_history.length > 0) {
+    const last = input.dose_history[input.dose_history.length - 1];
+    return concentrationFromHistory(params, input.dose_history, last.time + observation.time_hours);
   }
 
   let total = 0;

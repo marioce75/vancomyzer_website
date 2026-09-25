@@ -494,6 +494,49 @@ check("production singleDoseAuc (trapezoid, step 0.02 h) vs analytic AUC at 1e-6
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+section("E. PRODUCTION loading-dose history (doseHistory.ts) vs oracle schedule — 1e-6 relative");
+// ═══════════════════════════════════════════════════════════════════════════
+import { buildDoseHistory, concentrationFromHistory, aucFromHistory, historyExposure } from "../../doseHistory";
+import { predictConcentration } from "../../posterior/fitPosteriorParameters";
+{
+  const rngE = mulberry32(90210);
+  const between = (a: number, b: number) => a + (b - a) * rngE();
+  for (let i = 0; i < 40; i++) {
+    const pE: OracleParams = { CL: between(0.5, 9), V1: between(20, 80), Q: between(1, 8), V2: between(20, 90) };
+    const tau = [8, 12, 24][i % 3];
+    const T = Math.round(between(0.5, 2) * 4) / 4;
+    const D = Math.round(between(500, 2000) / 250) * 250;
+    const LD = Math.round(between(1500, 3000) / 250) * 250;
+    const LT = Math.round(between(1, 3) * 4) / 4;
+    const gap = i % 4 === 0 ? Math.max(LT + 1, tau - 4) : tau;
+    const n = 2 + (i % 6);
+    const regimen = { dose_mg: D, interval_hours: tau, infusion_duration_hours: T, doses_given: n };
+    const events = buildDoseHistory(regimen, { dose_mg: LD, infusion_duration_hours: LT, hours_to_first_maintenance: gap });
+    const oracleSchedule = [{ time: 0, dose_mg: LD, T_inf: LT }, ...Array.from({ length: n - 1 }, (_, j) => ({ time: gap + j * tau, dose_mg: D, T_inf: T }))];
+    const tag = `CL ${pE.CL.toFixed(2)} V1 ${pE.V1.toFixed(1)} LD ${LD}/${LT}h gap ${gap} ${D} mg q${tau}h/${T}h n=${n}`;
+    const last = oracleSchedule[n - 1].time;
+    for (const t of [LT / 2, LT + 0.5, gap + T, last + T, last + tau * 0.9, last + tau]) {
+      compare("concentrationFromHistory", `${tag} t=${t.toFixed(2)}`, concentrationFromHistory(pE, events, t), scheduleC(pE, oracleSchedule, t));
+    }
+    compare("aucFromHistory[0,24]", tag, aucFromHistory(pE, events, 0, 24), scheduleAucWindow(pE, oracleSchedule, 0, 24));
+    const hx = historyExposure(pE, events, tau);
+    compare("historyExposure.auc_interval_n", tag, hx.auc_interval_n, scheduleAucWindow(pE, oracleSchedule, last, last + tau));
+    compare("historyExposure.trough", tag, hx.trough, scheduleC(pE, oracleSchedule, last + tau));
+    // The fit's prediction for a level 0.8·tau after the last dose.
+    const obsT = tau * 0.8;
+    const pred = predictConcentration(pE, {
+      priorCL: 1, priorV1: 1, priorQ: 1, priorV2: 1, dose_mg: D, tau, T_inf: T, observations: [], doses_given: n,
+      horizon: "actual_history", dose_history: events,
+    }, { time_hours: obsT, concentration: 1, time_in_interval: obsT });
+    compare("predictConcentration(dose_history)", tag, pred, scheduleC(pE, oracleSchedule, last + obsT));
+  }
+  check("loading-dose history: 40 random regimens match the oracle schedule at 1e-6", () => {
+    const s = discrepancies.filter((d) => /History|dose_history/.test(d.fn));
+    assert(s.length === 0, `${s.length} discrepancies`);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Report
 // ═══════════════════════════════════════════════════════════════════════════
 console.log(`\n${passed} passed, ${failed} failed`);
