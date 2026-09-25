@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { OPEN_ACCESS } from "@/lib/openAccess";
-import { COLIN_2019 } from "@/lib/pk/modelRegistry";
+import { COLIN_2019, MODEL_MANIFEST_VERSION } from "@/lib/pk/modelRegistry";
+import { RERUN_2026 } from "@/lib/validation/engineCrosscheck2026";
 import { PageHeader, Record, H3, Prose, Chip, Panel, INK, INK2, INK3, RULE } from "@/components/site/Record";
 
 export const metadata: Metadata = {
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
 // What to look at when reviewing a calculation. Unordered: these are not steps.
 const REVIEW_POINTS = [
   { title: "Population-model equations", body: `The ${COLIN_2019.shortName} covariate equations are shown next to the estimated pharmacokinetic parameters. Bayesian fitting also uses numerical optimization; it is not a calculation that can be reproduced by substituting inputs into one equation.` },
-  { title: "Fit to measured levels", body: "Bayesian estimates combine the population model with measured levels. The calculator shows measured-versus-predicted differences and flags a poor fit for clinical review." },
+  { title: "Fit to measured levels", body: "Bayesian estimates combine the population model with measured levels, fitted to the doses actually given, including a loading dose when one is entered. The calculator shows measured-versus-predicted differences and flags a poor fit for clinical review." },
   { title: "90% credible band", body: "The shaded band is the 5th–95th percentile of concentrations simulated from 400 parameter sets drawn from the posterior (sampling-importance-resampling around the MAP fit), or from the population prior before any level. Parameter uncertainty only: assay error is excluded, so it is not a prediction interval for a new level. It is conditional on the calculator's prior variances and residual error model, and is model-based and not yet validated against measured patient levels." },
   { title: "Published starting model", body: `${COLIN_2019.citation} ${COLIN_2019.sourcePopulation} Published model evidence does not establish clinical validation of Vancomyzer.` },
   { title: "Scope", body: "Vancomyzer supports adults receiving intermittent intravenous vancomycin. Pediatric dosing, dialysis and continuous infusion are outside its scope. Independent clinical validation is pending." },
@@ -66,7 +67,10 @@ const METHOD_PAGES = [
   { href: "/transparent-dosing/equations", title: "Equations and derivations", covers: "Every equation and constant the calculator uses, with the reference check for a typical adult.", status: "Published model", kind: "ok" as const },
   { href: "/transparent-dosing/cases", title: "Literature reproducibility", covers: "Published vancomycin cases run through the calculator. Same-model cases are pass/fail; cases from other models are context only.", status: "Developer-run", kind: "ok" as const },
   { href: "/transparent-dosing/predictive-performance", title: "Predictive performance", covers: "200 synthetic ICU patients from a different published model; one held-out concentration each. Not real patients.", status: "Developer-run", kind: "ok" as const },
-  { href: "/transparent-dosing/engine-crosscheck", title: "Comparison with Tucuxi", covers: "The same prior and the same simulated levels given to a separately built program, scored against pre-set criteria.", status: "Developer-run", kind: "ok" as const },
+  { href: "/transparent-dosing/engine-crosscheck", title: "Comparison with Tucuxi", covers: `The same prior and the same simulated levels given to a separately built program, scored against pre-set criteria.${RERUN_2026.version === MODEL_MANIFEST_VERSION && RERUN_2026.maxRelDiffPct === 0 ? " Reproduced exactly on the current calculator version." : ""}`, status: "Developer-run", kind: "ok" as const },
+  { href: "/transparent-dosing/software-checks#reference", title: "Independent reference calculation", covers: "Every concentration, AUC and dose-history formula recomputed by a separately written implementation, including 40 random loading-dose schedules; agreement within one part in a million.", status: "Developer-run", kind: "ok" as const },
+  { href: "/transparent-dosing/software-checks#loading-dose", title: "Loading-dose handling", covers: "Levels drawn after a loading dose are fitted to the doses actually given, removing the overestimate that comes from recording the load as a maintenance dose.", status: "Developer-run", kind: "ok" as const },
+  { href: "/transparent-dosing/software-checks#band", title: "Uncertainty band coverage", covers: "Synthetic patients: how often the true concentration falls inside the 90% band, under the calculator's assumptions and under the published model's variability.", status: "Not yet validated", kind: "warn" as const },
   { href: "/transparent-dosing/predictive-performance#validation-plan", title: "Independent clinical validation", covers: "Retrospective and prospective evaluation with patient data at a participating institution.", status: "Pending", kind: "warn" as const },
 ];
 

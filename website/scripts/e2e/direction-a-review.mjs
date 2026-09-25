@@ -109,7 +109,7 @@ try{
    await page.evaluate(()=>{localStorage.removeItem('vmz_disclaimer_acceptance');});
    await page.reload({waitUntil:'domcontentloaded'});await page.getByRole('dialog').waitFor();await page.getByRole('button',{name:'Exit',exact:true}).click();await page.waitForURL(base+'/');emit('gate-exit',{name,url:page.url()});
   }
-  for(const route of ['/','/about','/contact','/compliance','/upgrade/department','/launch','/admin','/mfa-verify','/faq','/pricing','/disclaimer','/privacy','/terms','/login','/register','/reset-password','/transparent-dosing','/transparent-dosing/cases','/transparent-dosing/equations','/transparent-dosing/predictive-performance','/transparent-dosing/engine-crosscheck']){
+  for(const route of ['/','/about','/contact','/compliance','/upgrade/department','/launch','/admin','/mfa-verify','/faq','/pricing','/disclaimer','/privacy','/terms','/login','/register','/reset-password','/transparent-dosing','/transparent-dosing/cases','/transparent-dosing/equations','/transparent-dosing/predictive-performance','/transparent-dosing/engine-crosscheck','/transparent-dosing/software-checks']){
    await page.setViewportSize({width:390,height:844});
    const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:60000});
    const text=await page.locator('body').innerText();

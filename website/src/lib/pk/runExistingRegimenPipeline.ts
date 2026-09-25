@@ -31,9 +31,11 @@ export interface ExistingRegimenPipelineInput {
     doses_given?: unknown;
     steady_state_confirmed?: unknown;
     target_auc24?: unknown;
-    /** Not modelled — see hasAdministrationHistory. Accepted only so the
-     *  request can be answered honestly rather than silently reinterpreted. */
+    /** Loading dose as dose 1 (doses_given ≥ 2); see doseHistory.ts. */
     loading_dose_mg?: unknown;
+    loading_infusion_duration_hours?: unknown;
+    loading_to_maintenance_hours?: unknown;
+    /** Not modelled — refused by validateRawInput rather than silently reinterpreted. */
     administration_history?: unknown;
     dose_history?: unknown;
   };

@@ -105,6 +105,7 @@ const EVIDENCE_STATUS: { item: string; covers: string; status: string; kind: "ok
   { item: "Literature reproducibility", covers: "Published vancomycin cases run through the calculator; same-model reproductions are pass/fail", status: "Developer-run", kind: "ok", href: "/transparent-dosing/cases" },
   { item: "Predictive performance", covers: "Synthetic analysis (not real patients): predictions against simulated ICU patients from a different published model", status: "Developer-run", kind: "ok", href: "/transparent-dosing/predictive-performance" },
   { item: "Comparison with Tucuxi", covers: "Synthetic analysis: individualized estimates compared with Tucuxi, a separately built program, against pre-set acceptance criteria", status: "Developer-run", kind: "ok", href: "/transparent-dosing/engine-crosscheck" },
+  { item: "Software checks", covers: "Independent reference calculation (including loading-dose schedules) and synthetic coverage of the 90% uncertainty band", status: "Developer-run", kind: "ok", href: "/transparent-dosing/software-checks" },
   { item: "Independent clinical validation", covers: "Study with patient data at a participating institution", status: "Pending", kind: "warn", href: "/transparent-dosing" },
   { item: "FDA review", covers: "Designed to meet non-device CDS criteria, FD&C §520(o)(1)(E); not reviewed by the FDA", status: "Not reviewed", kind: "warn", href: "/disclaimer" },
 ];

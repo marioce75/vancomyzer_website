@@ -6,7 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "", "/about", "/pricing", "/faq", "/contact", "/compliance",
     "/transparent-dosing", "/transparent-dosing/equations",
     "/transparent-dosing/cases", "/transparent-dosing/predictive-performance",
-    "/transparent-dosing/engine-crosscheck", "/privacy", "/terms", "/disclaimer",
+    "/transparent-dosing/engine-crosscheck", "/transparent-dosing/software-checks", "/privacy", "/terms", "/disclaimer",
   ];
   return paths.map((path) => ({ url: `https://vancomyzer.com${path}` }));
 }

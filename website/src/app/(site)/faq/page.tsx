@@ -187,13 +187,14 @@ const FAQ_ITEMS: FaqItem[] = [
     question: "Has Vancomyzer itself been validated in patients?",
     answer: [
       VALIDATION_STATUS,
-      "Evidence to date is developer-run: reproduction of published literature cases, synthetic simulation, and a synthetic cross-check against Tucuxi. These checks test whether the equations are implemented as intended; they do not show how accurately Vancomyzer predicts levels in real patients.",
+      "Evidence to date is developer-run: reproduction of published literature cases, synthetic simulation, a synthetic cross-check against Tucuxi, an independent reference calculation of the equations (including loading-dose schedules), and a synthetic check of the uncertainty band's coverage. These checks test whether the equations are implemented as intended; they do not show how accurately Vancomyzer predicts levels in real patients.",
       "The shaded band around the predicted curve on the concentration–time graph is a 90% credible band. The calculator draws 400 sets of PK parameters from the posterior (or, before any level, from the population prior), simulates each on the same regimen, and shades the 5th to 95th percentile at each time. It reflects parameter uncertainty only, so it is not a prediction interval for a new measured level (assay error is excluded), and it depends on the calculator's prior variances and residual error model. When the posterior cannot be estimated reliably, no band is drawn and the graph says why. The band is model-based and not yet validated: whether 90% of real patients' concentrations fall inside it has not been measured, and will be checked in the validation studies.",
       "Vancomyzer™ is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation.",
     ],
     refs: [
       { label: "Literature reproducibility cases", url: "/transparent-dosing/cases" },
       { label: "Comparison with Tucuxi (developer-run, synthetic)", url: "/transparent-dosing/engine-crosscheck" },
+      { label: "Software checks: reference calculation, loading dose, band coverage", url: "/transparent-dosing/software-checks" },
       { label: "Medical disclaimer", url: "/disclaimer" },
     ],
   },

@@ -1,6 +1,8 @@
 {
-  "generated": "2026-09-24",
+  "generated": "2026-09-25",
+  "engine_manifest": "2026-09-25.1",
   "seed_base": 20260924,
+  "n_per_cell": 500,
   "cells": [
     {
       "scenario": "app",
@@ -22,6 +24,26 @@
     },
     {
       "scenario": "app",
+      "design": "loading_dose",
+      "n_patients": 500,
+      "n_band": 494,
+      "n_unavailable": 6,
+      "n_rejected": 0,
+      "pooled_coverage": 0.9042,
+      "pooled_coverage_se": 0.0088,
+      "pooled_below": 0.0292,
+      "pooled_above": 0.0666,
+      "n_points": 35568,
+      "last_trough_coverage": 0.915,
+      "last_peak_coverage": 0.8846,
+      "median_rel_width_trough": 0.5537,
+      "patient_coverage_p10": 0.5972,
+      "unavailable_reasons": {
+        "The measured level doesn't fit this model well enough to estimate a range. Check the level's time and value.": 6
+      }
+    },
+    {
+      "scenario": "app",
       "design": "one_level",
       "n_patients": 500,
       "n_band": 492,
@@ -37,7 +59,7 @@
       "median_rel_width_trough": 0.5559,
       "patient_coverage_p10": 0.6583,
       "unavailable_reasons": {
-        "The posterior is too irregular for a reliable band .": 8
+        "The measured level doesn't fit this model well enough to estimate a range. Check the level's time and value.": 8
       }
     },
     {
@@ -114,6 +136,27 @@
     },
     {
       "scenario": "published",
+      "design": "loading_dose",
+      "n_patients": 500,
+      "n_band": 491,
+      "n_unavailable": 9,
+      "n_rejected": 0,
+      "pooled_coverage": 0.8924,
+      "pooled_coverage_se": 0.0098,
+      "pooled_below": 0.0291,
+      "pooled_above": 0.0785,
+      "n_points": 35352,
+      "last_trough_coverage": 0.8676,
+      "last_peak_coverage": 0.8615,
+      "median_rel_width_trough": 0.5614,
+      "patient_coverage_p10": 0.6111,
+      "unavailable_reasons": {
+        "The measured level doesn't fit this model well enough to estimate a range. Check the level's time and value.": 8,
+        "Clearance was adjusted to a physiological limit, so no reliable range can be estimated. Check the level's time and value.": 1
+      }
+    },
+    {
+      "scenario": "published",
       "design": "one_level",
       "n_patients": 500,
       "n_band": 495,
@@ -129,7 +172,7 @@
       "median_rel_width_trough": 0.5608,
       "patient_coverage_p10": 0.5167,
       "unavailable_reasons": {
-        "The posterior is too irregular for a reliable band .": 5
+        "The measured level doesn't fit this model well enough to estimate a range. Check the level's time and value.": 5
       }
     },
     {
