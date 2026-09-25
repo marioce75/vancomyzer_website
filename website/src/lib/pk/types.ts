@@ -24,6 +24,16 @@ export interface NormalizedRegimen {
    */
   steady_state_confirmed?: boolean;
   target_auc24?: number; // desired AUC₂₄ target for maintenance recommendation (pulse dose workflow)
+  /**
+   * Loading dose given as dose 1 (level workflows, doses_given ≥ 2). When set,
+   * the fit and the actual-history values use the real dose history
+   * (doseHistory.ts) and the horizon is actual history.
+   */
+  loading_dose_mg?: number;
+  /** Loading-dose infusion duration (h). Required with loading_dose_mg. */
+  loading_infusion_duration_hours?: number;
+  /** Hours from the start of the loading dose to the start of the first maintenance dose (default interval_hours). */
+  loading_to_maintenance_hours?: number;
 }
 
 export interface NormalizedLevel {
@@ -118,6 +128,8 @@ export interface ExistingRegimenEngineOutput {
   doses_given?: number;
   target_auc24?: number;
   curve: { time_hours: number; concentration: number; lower?: number; upper?: number }[];
+  /** Loading dose used as dose 1 in the fit (doseHistory.ts), when entered. */
+  loading_dose?: import("./doseHistory").LoadingDose;
   /** Parameter uncertainty behind the curves' credible band (server-side; draws are not serialized). */
   parameter_uncertainty?: import("./posterior/parameterUncertainty").ParameterUncertaintyResult;
   /** Alternate curve when in pulse-dose mode: the engine's auto-recommended

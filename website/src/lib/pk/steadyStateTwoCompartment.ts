@@ -35,7 +35,8 @@ export interface CredibleBandSpec {
   level: number;
 }
 
-interface DoseEvent {
+/** One administered dose: start time (h from dose 1), amount and infusion duration. */
+export interface DoseEvent {
   time: number;
   dose_mg: number;
   T_inf: number;
@@ -412,12 +413,14 @@ export function loadingDoseCurvePoints(
   maintT_inf: number,
   step_hours: number = 0.5,
   band?: CredibleBandSpec,
+  /** Start of the first maintenance dose, hours after the loading dose starts (default maintTau). */
+  firstMaintenanceHours?: number,
 ): CurvePoint[] {
   const { beta } = computeConstants(params);
   const halfLifeBeta = 0.693 / beta;
 
   // First maintenance dose starts after the loading dose interval
-  const firstMaintTime = maintTau;
+  const firstMaintTime = firstMaintenanceHours !== undefined && firstMaintenanceHours > 0 ? firstMaintenanceHours : maintTau;
   // Ensure enough doses to visibly approach steady state (≥5 half-lives, min 10
   // maintenance doses), bounded by MAX_CURVE_HORIZON_HOURS.
   const idealMaint = Math.max(10, Math.ceil((5 * halfLifeBeta) / maintTau) + 2);

@@ -72,16 +72,34 @@ export function validateRawInput(
     if (r.dose_unit !== undefined && r.dose_unit !== "mg")
       errors["regimen.dose_unit"] = "Dose must be supplied in mg.";
   }
+  // Loading dose (dose 1 differs from maintenance): supported in the level
+  // workflows as regimen.loading_dose_mg; see pk/doseHistory.ts.
+  if (object(input.regimen) && input.regimen.loading_dose_mg !== undefined && input.regimen.loading_dose_mg !== null) {
+    const r = input.regimen;
+    check(r, "loading_dose_mg", "regimen", 1, 5000);
+    check(r, "loading_infusion_duration_hours", "regimen", 0.1, 12);
+    check(r, "loading_to_maintenance_hours", "regimen", 0.5, 96, true);
+    if (typeof r.doses_given !== "number" || !Number.isInteger(r.doses_given) || r.doses_given < 2)
+      errors["regimen.doses_given"] =
+        "With a loading dose, enter the total number of doses given including the loading dose (at least 2). For a level after the loading dose alone, use the loading-dose workflow.";
+    if (
+      typeof r.loading_to_maintenance_hours === "number" &&
+      typeof r.loading_infusion_duration_hours === "number" &&
+      r.loading_to_maintenance_hours <= r.loading_infusion_duration_hours
+    )
+      errors["regimen.loading_to_maintenance_hours"] =
+        "The first maintenance dose must start after the loading-dose infusion ends.";
+  }
   for (const scope of [input, object(input.regimen) ? input.regimen : {}]) {
     for (const key of [
       "administration_history",
       "dose_history",
-      "loading_dose_mg",
+      ...(scope === input ? ["loading_dose_mg"] : []),
     ]) {
       const v = scope[key];
       if (v !== undefined && v !== null && (!Array.isArray(v) || v.length > 0))
         errors.administration_history =
-          "Administration history is not modeled: loading-to-maintenance changes, irregular, held or interrupted doses require another workflow. No result is returned for supplied unsupported history.";
+          "Administration history is not modeled beyond a single loading dose (regimen.loading_dose_mg): irregular, held, interrupted or changed maintenance doses require another workflow. No result is returned for supplied unsupported history.";
     }
   }
   if (!Array.isArray(input.levels) || input.levels.length > 8)

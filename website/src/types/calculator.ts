@@ -48,6 +48,11 @@ export interface CalculateRequestRegimen {
   /** Clinician confirmation of steady state (the "≥6 · steady state" control). false → actual-history horizon. */
   steady_state_confirmed?: boolean;
   target_auc24?: number; // desired AUC₂₄ target for maintenance recommendation (pulse dose workflow)
+  /** Dose 1 was a loading dose (level workflows, doses_given ≥ 2). */
+  loading_dose_mg?: number;
+  loading_infusion_duration_hours?: number;
+  /** Hours from the start of the loading dose to the start of the first maintenance dose (default: the interval). */
+  loading_to_maintenance_hours?: number;
 }
 
 export interface CalculateRequestLevel {

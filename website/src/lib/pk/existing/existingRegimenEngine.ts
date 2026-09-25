@@ -9,6 +9,7 @@ import { computeSafeInfusionDurationHours } from "../recommend/infusionSafety";
 import type { ExistingRegimenEngineInput, ExistingRegimenEngineOutput } from "../types";
 import { modelShortName } from "../modelRegistry";
 import type { CredibleBandSpec } from "../steadyStateTwoCompartment";
+import { buildDoseHistory, historyExposure, lastDoseStart, loadingDoseOf } from "../doseHistory";
 
 export function runExistingRegimenEngine(
   input: ExistingRegimenEngineInput
@@ -47,6 +48,11 @@ export function runExistingRegimenEngine(
   const exposure_horizon = resolveExposureHorizon(regimen);
   const isNonSteadyState = exposure_horizon === "actual_history";
   const isPulseDose = exposure_horizon === "single_dose";
+  // Loading dose as dose 1 (doses_given ≥ 2): the fit already used the real
+  // dose history; the plotted curve, the dose-N values and the level markers
+  // use the same schedule (doseHistory.ts).
+  const loading = loadingDoseOf(regimen);
+  const doseHistory = loading ? buildDoseHistory(regimen, loading) : undefined;
 
   // Canonical steady-state projection of the current regimen — the same
   // function, parameters and infusion duration every candidate row uses.
@@ -114,6 +120,17 @@ export function runExistingRegimenEngine(
       undefined,
       band,
     );
+  } else if (loading && doseHistory) {
+    curve = loadingDoseCurvePoints(
+      { CL, V1, Q, V2 },
+      loading.dose_mg, loading.infusion_duration_hours,
+      dose_mg, tau, T_inf,
+      undefined,
+      band,
+      loading.hours_to_first_maintenance,
+    );
+    const horizonHours = lastDoseStart(doseHistory) + tau;
+    curve = curve.filter((point) => point.time_hours <= horizonHours + 1e-9);
   } else {
     curve = curvePoints({ CL, V1, Q, V2, dose_mg, tau, T_inf }, undefined, band);
     // For a pre-steady-state regimen the reported peak and trough are taken
@@ -136,7 +153,9 @@ export function runExistingRegimenEngine(
   let trough = steadyStateExposure.trough;
   let actual_history_exposure: ExistingRegimenEngineOutput["actual_history_exposure"];
   if ((isNonSteadyState || isPulseDose) && doses_given !== undefined && doses_given > 0) {
-    const finite = finiteHistoryExposure({ CL, V1, Q, V2, dose_mg, tau, T_inf }, doses_given);
+    const finite = doseHistory
+      ? historyExposure({ CL, V1, Q, V2 }, doseHistory, tau)
+      : finiteHistoryExposure({ CL, V1, Q, V2, dose_mg, tau, T_inf }, doses_given);
     actual_history_exposure = {
       doses_given,
       peak: Math.round(finite.peak * 100) / 100,
@@ -163,19 +182,22 @@ export function runExistingRegimenEngine(
   // own modulo-tau wrapping, so the math is unchanged — this shift is purely
   // for chart-marker placement.
   const doseIndexForMarker = Math.max(1, doses_given ?? 1);
-  const doseShiftHours = (doseIndexForMarker - 1) * tau;
+  const doseShiftHours = doseHistory ? lastDoseStart(doseHistory) : (doseIndexForMarker - 1) * tau;
   const measured_levels = levels.map((l) => ({
     time_hours: doseShiftHours + l.time_since_last_dose_hours,
     concentration: l.value_mcg_ml,
   }));
 
-  const steadyStateNote = isPulseDose
+  const loadingNote = loading
+    ? ` Dose history: ${loading.dose_mg} mg loading dose over ${loading.infusion_duration_hours} h, first maintenance dose ${loading.hours_to_first_maintenance} h later; the level fit uses these actual doses.`
+    : "";
+  const steadyStateNote = (isPulseDose
     ? "Loading dose simulation (single dose). AUC₂₄ is the area under the first 24 hours of this one dose, not steady-state exposure."
     : isNonSteadyState
       ? `Actual-history analysis: the level was fitted after exactly ${doses_given} dose${doses_given === 1 ? "" : "s"}; exposure of the current regimen is reported as its steady-state projection, with dose-${doses_given} peak/trough shown separately.`
       : steady_state_warning
         ? "Steady state confirmed by the clinician (model approach check flagged — see warning)."
-        : "Steady state confirmed by the clinician.";
+        : "Steady state confirmed by the clinician.") + loadingNote;
 
   const priorMsg = `${modelShortName(model_name)} two-compartment adult population prior`;
 
@@ -236,5 +258,6 @@ export function runExistingRegimenEngine(
     fit_diagnostic,
     posterior_cl_bound,
     parameter_uncertainty,
+    loading_dose: loading,
   };
 }

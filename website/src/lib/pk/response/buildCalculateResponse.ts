@@ -172,6 +172,8 @@ export function buildCalculateResponse(
     // projection and the actual-history values are carried separately so no
     // consumer can pair finite-dose peak/trough with a steady-state daily AUC.
     exposure_horizon: engineOutput.exposure_horizon,
+    // Loading dose used as dose 1 in the level fit, echoed so the result shows what was modelled.
+    loading_dose: engineOutput.loading_dose,
     steady_state_exposure: engineOutput.steady_state_exposure,
     actual_history_exposure: engineOutput.actual_history_exposure,
     steady_state_approach: engineOutput.steady_state_approach,

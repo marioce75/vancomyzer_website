@@ -36,6 +36,8 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
   const isPulseDose = value.doses_given === 1;
   const [infusionWarning, setInfusionWarning] = useState("");
   const [parseErrors, setParseErrors] = useState<{ dose?: string; infusion?: string }>({});
+  const hasLoading = value.loading_dose_mg !== undefined;
+  const fe = (key: string) => fieldErrors[`regimen.${key}`] ?? fieldErrors[key];
 
   const update = (updates: Partial<CalculateRequestRegimen>) => {
     onChange({ ...value, ...updates });
@@ -48,6 +50,9 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
       update({
         doses_given: 1,
         steady_state_confirmed: false,
+        loading_dose_mg: undefined,
+        loading_infusion_duration_hours: undefined,
+        loading_to_maintenance_hours: undefined,
         interval_hours: value.interval_hours > 0 ? value.interval_hours : 12,
         target_auc24: value.target_auc24 ?? 450,
       });
@@ -182,13 +187,80 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
             </label>
           )}
           {(value.doses_given ?? 0) > 1 && (
+            <fieldset className="mt-2 rounded-md border border-slate-200 px-2.5 py-2">
+              <legend className="px-1 text-xs font-semibold text-slate-700">Dose 1</legend>
+              <div className="flex gap-1.5" role="radiogroup" aria-label="Was dose 1 a loading dose?">
+                {[
+                  { on: false, label: "Same as maintenance" },
+                  { on: true, label: "Loading dose" },
+                ].map((opt) => (
+                  <button
+                    key={opt.label}
+                    type="button"
+                    role="radio"
+                    aria-checked={hasLoading === opt.on}
+                    onClick={() =>
+                      opt.on
+                        ? update({ loading_dose_mg: value.loading_dose_mg ?? 0, loading_infusion_duration_hours: value.loading_infusion_duration_hours ?? 0 })
+                        : update({ loading_dose_mg: undefined, loading_infusion_duration_hours: undefined, loading_to_maintenance_hours: undefined })
+                    }
+                    className={`flex-1 rounded-md border py-1.5 text-xs font-semibold transition ${
+                      hasLoading === opt.on
+                        ? "border-blue-300 bg-blue-600 text-white shadow-sm"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              {hasLoading && (
+                <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
+                  <InputGroup label="Loading dose (mg)" error={fe("loading_dose_mg")}>
+                    <ClinicalNumberInput
+                      inputMode="decimal"
+                      rejectThousandsGrouping
+                      placeholder="e.g. 2000"
+                      value={value.loading_dose_mg || 0}
+                      onValueChange={(n) => update({ loading_dose_mg: n })}
+                      className={(invalidText) => inputClass(Boolean(fe("loading_dose_mg") || invalidText))}
+                    />
+                  </InputGroup>
+                  <InputGroup label="Loading infusion (hours)" error={fe("loading_infusion_duration_hours")}>
+                    <ClinicalNumberInput
+                      inputMode="decimal"
+                      placeholder="e.g. 2"
+                      value={value.loading_infusion_duration_hours || 0}
+                      onValueChange={(n) => update({ loading_infusion_duration_hours: n })}
+                      className={(invalidText) => inputClass(Boolean(fe("loading_infusion_duration_hours") || invalidText))}
+                    />
+                  </InputGroup>
+                  <div className="col-span-2">
+                    <InputGroup label="Hours from start of loading dose to first maintenance dose" error={fe("loading_to_maintenance_hours")}>
+                      <ClinicalNumberInput
+                        inputMode="decimal"
+                        placeholder={value.interval_hours ? `${value.interval_hours} (the interval)` : "e.g. 12"}
+                        value={value.loading_to_maintenance_hours || 0}
+                        onValueChange={(n) => update({ loading_to_maintenance_hours: n && n > 0 ? n : undefined })}
+                        className={(invalidText) => inputClass(Boolean(fe("loading_to_maintenance_hours") || invalidText))}
+                      />
+                    </InputGroup>
+                  </div>
+                  <p className="col-span-2 text-xs text-slate-500">
+                    The dose count includes the loading dose. The level is fitted to the actual doses (loading dose, then {value.dose_mg || "the"} mg maintenance doses), so a loading dose is not mistaken for slow clearance. Steady-state confirmation is not used when a loading dose is entered.
+                  </p>
+                </div>
+              )}
+            </fieldset>
+          )}
+          {(value.doses_given ?? 0) > 1 && (
             <label className="mt-2 flex items-start gap-2 text-xs text-slate-600">
               <input type="checkbox" checked={value.steady_state_confirmed === true}
                 onChange={(e) => update({ steady_state_confirmed: e.target.checked })} />
               <span>I have verified consistent dosing and sufficient time to reach steady state. Dose count alone does not establish steady state.</span>
             </label>
           )}
-          <p className="mt-1 text-xs text-slate-500">Without confirmation, the exact dose count is used. Finite-history samples must follow the same dose; changed or missed doses are unsupported.</p>
+          <p className="mt-1 text-xs text-slate-500">Without confirmation, the exact dose count is used. Levels must follow the last dose given. A loading dose as dose 1 is supported; changed, held or missed maintenance doses are not.</p>
           {fieldErrors.doses_given && <p className="text-xs text-red-600">{fieldErrors.doses_given}</p>}
 
         </div>

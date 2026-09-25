@@ -5,6 +5,8 @@
 
 import type { NormalizedLevel, NormalizedRegimen } from "../types";
 import { resolveExposureHorizon, type ExposureHorizon } from "../exposureHorizon";
+import { buildDoseHistory, loadingDoseOf } from "../doseHistory";
+import type { DoseEvent } from "../steadyStateTwoCompartment";
 
 export interface NormalizedObservation {
   time_hours: number;
@@ -27,6 +29,8 @@ export interface ObservationContext {
   doses_given?: number;
   /** Horizon decided once for the whole request (exposureHorizon.ts). */
   horizon: ExposureHorizon;
+  /** Actual dose history when dose 1 was a loading dose (doseHistory.ts). */
+  dose_history?: DoseEvent[];
 }
 
 export function normalizeObservations(
@@ -68,6 +72,12 @@ export function normalizeObservations(
   });
   return {
     observations,
-    context: { tau: effectiveTau, T_inf, doses_given: regimen.doses_given, horizon: resolveExposureHorizon(regimen) },
+    context: (() => {
+      const loading = loadingDoseOf(regimen);
+      return {
+        tau: effectiveTau, T_inf, doses_given: regimen.doses_given, horizon: resolveExposureHorizon(regimen),
+        ...(loading ? { dose_history: buildDoseHistory(regimen, loading) } : {}),
+      };
+    })(),
   };
 }
