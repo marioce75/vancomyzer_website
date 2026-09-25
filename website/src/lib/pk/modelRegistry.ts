@@ -16,6 +16,14 @@
  *     documentation only. They are NOT implemented by the engine.
  *
  * CHANGELOG
+ *  2026-09-25.1 No parameter change. (1) Loading dose as dose 1 in the level
+ *              workflows (doseHistory.ts): the MAP fit, dose-N exposure, curve
+ *              and level markers use the actual dose history; horizon is
+ *              actual history. Equal-dose results are unchanged. (2) The graph
+ *              band is a model-based 90% credible band from 400 posterior (or
+ *              prior) parameter draws (parameterUncertainty.ts), replacing the
+ *              fixed illustrative ±% band. Doses, AUCs, peaks and troughs for
+ *              equal-dose regimens are identical to 2026-09-19.1.
  *  2026-09-19.1 Study-readiness corrections: preserve late sample elapsed time;
  *              refuse cross-cycle finite-history and unsupported administration
  *              histories; distinguish duplicate sample chronology; recompute
@@ -41,7 +49,7 @@
  *                are unchanged.
  */
 
-export const MODEL_MANIFEST_VERSION = "2026-09-19.1";
+export const MODEL_MANIFEST_VERSION = "2026-09-25.1";
 
 /** Model ids that can appear in engine output or stored history rows. */
 export type PkModelId = "colin_2019" | "vancomyzer_obesity";

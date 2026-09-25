@@ -27,6 +27,9 @@
  *                 state not confirmed (the tl;dr article's worked example).
  *   peak_trough   Peak (1 h after the end of infusion) and trough (11.5 h) in
  *                 the same interval at true steady state, steady state confirmed.
+ *   loading_dose  25 mg/kg loading dose (max 3,000 mg) as dose 1, then the
+ *                 maintenance dose q12h; one level 11.5 h after dose 3, with
+ *                 the loading dose entered (pk/doseHistory.ts).
  *
  * Coverage is pointwise and pooled across every plotted time point (t > 0), and
  * also reported at the last plotted trough and peak. It says nothing about how
@@ -35,6 +38,8 @@
  * Usage:
  *   node --import tsx scripts/verify-band-coverage.ts --scenario app --design one_level --n 300
  *   node --import tsx scripts/verify-band-coverage.ts --report
+ * Results: src/lib/validation/bandCoverage/band-coverage-results.json (read by
+ * /transparent-dosing/software-checks). Re-run every cell after an engine change.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -46,13 +51,13 @@ import { buildPriorParameters } from "../src/lib/pk/posterior/buildPriorParamete
 import { normalizePatient } from "../src/lib/pk/normalize/normalizePatient";
 import { singleDoseConcentration, type TwoCompartmentParameters } from "../src/lib/pk/steadyStateTwoCompartment";
 import { PRIOR_LOG_CL_SD, PRIOR_LOG_V1_SD, PRIOR_LOG_Q_SD, PRIOR_LOG_V2_SD } from "../src/lib/pk/posterior/fitPosteriorParameters";
-import { COLIN_2019 } from "../src/lib/pk/modelRegistry";
+import { COLIN_2019, MODEL_MANIFEST_VERSION } from "../src/lib/pk/modelRegistry";
 
 type Scenario = "app" | "published" | "published_iiv" | "published_error";
-type Design = "empiric" | "one_level" | "peak_trough";
+type Design = "empiric" | "one_level" | "peak_trough" | "loading_dose";
 type Pt = { time_hours: number; concentration: number; lower?: number; upper?: number };
 
-const RESULTS_FILE = path.join(process.cwd(), "docs", "validation", "band-coverage-results.json");
+const RESULTS_FILE = path.join(process.cwd(), "src", "lib", "validation", "bandCoverage", "band-coverage-results.json");
 const TAU = 12;
 const SEED_BASE = 20260924;
 
@@ -82,6 +87,16 @@ function trueConc(p: TwoCompartmentParameters, dose_mg: number, tau: number, T_i
   return c;
 }
 
+/** True concentration on the plotted schedule: dose 1 (loading dose if any) at t = 0, then every tau. */
+function truthAt(p: TwoCompartmentParameters, sc: { dose: number; tau: number; T_inf: number; load?: { dose: number; T_inf: number } }, t: number): number {
+  let c = 0;
+  for (let k = 0; k * sc.tau <= t; k++) {
+    const first = k === 0 && sc.load;
+    c += singleDoseConcentration({ ...p, dose_mg: first ? sc.load!.dose : sc.dose, tau: sc.tau, T_inf: first ? sc.load!.T_inf : sc.T_inf }, t - k * sc.tau);
+  }
+  return c;
+}
+
 function empiricDose(weight: number) {
   const dose = Math.min(2000, Math.max(750, Math.round((15 * weight) / 250) * 250));
   const T_inf = dose <= 1000 ? 1 : dose <= 1500 ? 1.5 : 2;
@@ -96,7 +111,7 @@ interface CellResult {
 }
 
 function runCell(scenario: Scenario, design: Design, n: number): CellResult {
-  const rng = makeRng(SEED_BASE + ({ app: 0, published: 1000, published_iiv: 2000, published_error: 3000 } as const)[scenario] + ({ empiric: 0, one_level: 1, peak_trough: 2 } as const)[design]);
+  const rng = makeRng(SEED_BASE + ({ app: 0, published: 1000, published_iiv: 2000, published_error: 3000 } as const)[scenario] + ({ empiric: 0, one_level: 1, peak_trough: 2, loading_dose: 3 } as const)[design]);
   const sds = truthSds(scenario);
   let nBand = 0, nUnavail = 0, nRejected = 0, inside = 0, below = 0, above = 0, points = 0;
   let troughIn = 0, peakIn = 0;
@@ -118,7 +133,7 @@ function runCell(scenario: Scenario, design: Design, n: number): CellResult {
     };
 
     let res: Record<string, unknown>;
-    let schedule: { dose: number; tau: number; T_inf: number };
+    let schedule: { dose: number; tau: number; T_inf: number; load?: { dose: number; T_inf: number } };
     try {
       if (design === "empiric") {
         res = computeInitialRegimen(patientIn) as unknown as Record<string, unknown>;
@@ -135,6 +150,16 @@ function runCell(scenario: Scenario, design: Design, n: number): CellResult {
           levels: [{ value_mcg_ml: obs, collection_time: "", time_since_last_dose_hours: 11.5 }],
         }) as Record<string, unknown>;
         schedule = { dose, tau: TAU, T_inf };
+      } else if (design === "loading_dose") {
+        const load = Math.min(3000, Math.round((25 * patientIn.weight_kg) / 250) * 250);
+        const loadTinf = load <= 2000 ? 2 : 2.5;
+        schedule = { dose, tau: TAU, T_inf, load: { dose: load, T_inf: loadTinf } };
+        const obs = observe(truthAt(truth, schedule, 2 * TAU + 11.5), scenario, noise[0]);
+        res = runExistingRegimenPipeline({
+          patient: patientIn,
+          regimen: { dose_mg: dose, interval_hours: TAU, infusion_duration_hours: T_inf, doses_given: 3, steady_state_confirmed: false, loading_dose_mg: load, loading_infusion_duration_hours: loadTinf },
+          levels: [{ value_mcg_ml: obs, collection_time: "", time_since_last_dose_hours: 11.5 }],
+        }) as Record<string, unknown>;
       } else {
         const tPeak = T_inf + 1, tTrough = 11.5;
         const ss = (t: number) => trueConc(truth, dose, TAU, T_inf, 80 * TAU + t);
@@ -166,7 +191,7 @@ function runCell(scenario: Scenario, design: Design, n: number): CellResult {
     let pIn = 0, pN = 0;
     for (const p of curve) {
       if (p.time_hours <= 0) continue;
-      const c = trueConc(truth, schedule.dose, schedule.tau, schedule.T_inf, p.time_hours);
+      const c = truthAt(truth, schedule, p.time_hours);
       if (c < 0.01) continue;
       points++; pN++;
       if (c < p.lower!) below++; else if (c > p.upper!) above++; else { inside++; pIn++; }
@@ -178,8 +203,8 @@ function runCell(scenario: Scenario, design: Design, n: number): CellResult {
     const last = curve.filter((p) => p.time_hours > tEnd - schedule.tau + 1e-9);
     const troughPt = curve[curve.length - 1];
     const peakPt = last.reduce((a, b) => (b.concentration > a.concentration ? b : a), last[0]);
-    const cT = trueConc(truth, schedule.dose, schedule.tau, schedule.T_inf, troughPt.time_hours);
-    const cP = trueConc(truth, schedule.dose, schedule.tau, schedule.T_inf, peakPt.time_hours);
+    const cT = truthAt(truth, schedule, troughPt.time_hours);
+    const cP = truthAt(truth, schedule, peakPt.time_hours);
     if (cT >= troughPt.lower! && cT <= troughPt.upper!) troughIn++;
     if (cP >= peakPt.lower! && cP <= peakPt.upper!) peakIn++;
     widths.push((troughPt.upper! - troughPt.lower!) / Math.max(troughPt.concentration, 1e-6));
@@ -220,6 +245,6 @@ if (process.argv.includes("--report")) {
   cells.push(cell);
   cells.sort((a, b) => (a.scenario + a.design).localeCompare(b.scenario + b.design));
   fs.mkdirSync(path.dirname(RESULTS_FILE), { recursive: true });
-  fs.writeFileSync(RESULTS_FILE, JSON.stringify({ generated: new Date().toISOString().slice(0, 10), seed_base: SEED_BASE, cells }, null, 2) + "\n");
+  fs.writeFileSync(RESULTS_FILE, JSON.stringify({ generated: new Date().toISOString().slice(0, 10), engine_manifest: MODEL_MANIFEST_VERSION, seed_base: SEED_BASE, n_per_cell: cells[0]?.n_patients, cells }, null, 2) + "\n");
   console.log(JSON.stringify(cell), `${((Date.now() - t0) / 1000).toFixed(0)}s`);
 }

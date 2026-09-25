@@ -8,7 +8,8 @@
  *      scripts/pk-reference/fixtures.json (scipy expm reference).
  *   B. Literal reference values (must reproduce from the equations).
  *   C. Property tests on the oracle alone.
- *   D. PRODUCTION vs oracle — the only section that imports src/lib/pk code.
+ *   D. PRODUCTION vs oracle — imports src/lib/pk code.
+ *   E. PRODUCTION loading-dose history (doseHistory.ts) vs oracle schedules.
  *
  * Tolerances:
  *   REL = 1e-6 relative everywhere both sides are analytic / exact. Fixture

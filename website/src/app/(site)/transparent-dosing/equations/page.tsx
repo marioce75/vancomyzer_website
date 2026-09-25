@@ -262,6 +262,29 @@ Number of doses simulated:
 
 This ensures the graph spans enough time for concentrations
 to approach steady state.`}</pre>
+
+          <h3 className="mt-10 text-lg font-bold" style={{ color: "#14232f" }}>
+            Levels drawn before steady state, and loading doses
+          </h3>
+          <p className="mt-2 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
+            When steady state is not confirmed, a measured level is predicted from exactly the doses given, not from an
+            infinite dose train. When dose 1 was a loading dose, it enters the sum with its own amount and infusion
+            time, and the first maintenance dose starts at the entered gap (default: the dosing interval). Levels are
+            timed from the start of the last dose given.
+          </p>
+          <pre
+            className="mt-4 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
+            style={PRE_STYLE} tabIndex={0}
+          >{`Dose times (dose 1 = loading dose, N doses given):
+  t₁ = 0                         D₁ = loading dose,  T_inf,1 = loading infusion
+  t₂ = G                         D  = maintenance,   T_inf   = maintenance infusion
+  tⱼ = G + (j − 2)·τ             (G = gap to first maintenance dose; default τ)
+
+Predicted level drawn Δt after dose N started:
+  C(t_N + Δt) = Σⱼ C_single(Dⱼ, T_inf,j ; t_N + Δt − tⱼ)
+
+The steady-state projection of the maintenance regimen (section 5)
+does not depend on the loading dose.`}</pre>
         </div>
       </section>
 
@@ -416,6 +439,32 @@ Prior log-SDs (Vancomyzer settings, all adults):
             prior widths above are Vancomyzer settings, not the published {COLIN_2019.shortName} variability shown
             in section 1. When the residual exceeds 25% relative error, the calculator surfaces a
             Fit Quality Advisory and recommends a confirmatory level rather than overriding the prior.
+          </p>
+
+          <h3 className="mt-10 text-lg font-bold" style={{ color: "#14232f" }}>
+            The 90% credible band on the graph
+          </h3>
+          <p className="mt-2 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
+            The band is drawn from the same objective. With levels, 4,000 parameter sets are proposed around the MAP
+            estimate (a normal approximation from the curvature of the objective, widened 1.5×), each is weighted by
+            its posterior probability, and 400 are resampled. Without levels, 400 sets are drawn from the prior. Each
+            set is simulated on the plotted dose schedule, and the band is the 5th–95th percentile at each time. Draws
+            use a fixed seed, so the same inputs give the same band. It reflects parameter uncertainty only (assay
+            error is excluded) and depends on the prior widths and error model above. No band is drawn when the
+            posterior cannot be estimated reliably (effective sample size below 400) or when the plotted parameters
+            are not the fitted optimum.
+          </p>
+          <pre
+            className="mt-4 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
+            style={PRE_STYLE} tabIndex={0}
+          >{`Proposal:   x ~ N(x̂_MAP, (1.5)² · H⁻¹)     x = ln(CL, V1, Q, V2), H = Hessian of the objective
+Weight:     w ∝ exp(−objective(x)) / q(x)
+Resample:   400 draws, systematic resampling
+Band(t):    5th and 95th percentile of C(t) across the 400 draws`}</pre>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
+            How often the band contains the true concentration in synthetic patients is reported on the{" "}
+            <a href="/transparent-dosing/software-checks#band" style={{ textDecoration: "underline" }}>software checks</a> page.
+            It has not yet been checked against measured patient levels.
           </p>
         </div>
       </section>
