@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import CalculatorWalkthrough from "@/components/landing/CalculatorWalkthrough";
 import Link from "next/link";
 import OpenCalculatorButton from "@/components/landing/OpenCalculatorButton";
 import SyntheticExample from "@/components/landing/SyntheticExample";
@@ -27,8 +27,8 @@ import {
  * @/lib/pk/modelRegistry. Validation, regulatory and pricing wording follows
  * the approved wording bank from the 15 Sep 2026 review remediation. The
  * launch-period line follows OPEN_ACCESS so the page stays truthful when the
- * switch is turned off. The screenshot is the real calculator for a
- * labelled fictional case; it is never edited.
+ * switch is turned off. The tutorial is an approved animated walkthrough
+ * with fictional inputs, explicitly labelled as interface education.
  */
 
 export const metadata: Metadata = {
@@ -58,9 +58,6 @@ export const metadata: Metadata = {
 const LAUNCH_LINE = OPEN_ACCESS
   ? "The core calculator is free, permanently. During our launch period, PDF export, note copy and result interpretation are free too — no account needed."
   : "The core calculator is free for individual clinicians, permanently — create a free account or sign in to get started.";
-
-const FICTIONAL_CASE_CAPTION =
-  "Fictional case for illustration — synthetic inputs (58 y, male, 82 kg, 172 cm, SCr 1.1 mg/dL, no RRT). Not a patient. Screenshot of the current calculator, unaltered.";
 
 const CAPABILITIES: { title: string; body: string; source?: string }[] = [
   {
@@ -231,7 +228,7 @@ export default function LandingPage() {
               Open the calculator
             </OpenCalculatorButton>
             <Link href="#how" className="vz-mbtn vz-mbtn--outline">
-              How it works
+              Watch walkthrough · 1:14
             </Link>
           </div>
           <p className="mt-5 max-w-[70ch] text-[15px]" style={{ color: INK2 }}>{LAUNCH_LINE}</p>
@@ -240,21 +237,27 @@ export default function LandingPage() {
 
       {/* ── HOW A RESULT IS BUILT ──────────────────────────── */}
       <Section id="how" label="How it works" note="Patient inputs, dosing estimates and model details.">
-        <figure className="border bg-white p-2.5" style={{ borderColor: RULE, boxShadow: "0 1px 2px rgba(20,35,47,.06), 0 12px 32px -12px rgba(31,94,150,.25)" }}>
-          <Image
-            src="/images/calculator-result-fictional.png"
-            alt="Vancomyzer calculator result screen: patient inputs on the left, recommended regimen 750 mg every 12 h with AUC 521.5 in target, a concentration–time graph, candidate regimens and PK parameters."
-            width={1600}
-            height={1000}
-            sizes="(max-width: 1200px) 100vw, 960px"
-            className="block h-auto w-full border"
-            style={{ borderColor: RULE }}
-            priority
-          />
-          <figcaption className="px-1 pb-0.5 pt-2.5 text-[13px] leading-[1.45]" style={{ color: INK3 }}>
-            {FICTIONAL_CASE_CAPTION}
-          </figcaption>
-        </figure>
+        <H2>Your first Vancomyzer walkthrough</H2>
+        <p className="mb-6 mt-3 max-w-[70ch]" style={{ color: INK2 }}>
+          Explore Empiric mode with a fictional adult example. Follow the inputs, review the estimated
+          exposure, and find the calculation details.
+        </p>
+        <CalculatorWalkthrough />
+        <div className="mt-5 flex flex-col items-start justify-between gap-5 sm:flex-row">
+          <details className="min-w-0 flex-1 text-[15px]" style={{ color: INK2 }}>
+            <summary className="cursor-pointer py-2" style={{ color: ACTION }}>Read the transcript</summary>
+            <div className="mt-2 space-y-4">
+              <p>Here’s your first walkthrough of Vancomyzer. We’ll use a fictional adult example to explore Empiric mode, before any measured vancomycin levels are available.</p>
+              <p>Start with age and sex. Then enter weight in kilograms, height in centimeters, and serum creatinine in milligrams per deciliter. Confirm renal replacement therapy status, and review the frailty option. Check every input before selecting Calculate.</p>
+              <p>The result shows a suggested regimen and predicted exposure. These are model estimates, not measured patient values. Next, review the concentration curve. Change the time window to explore the predicted profile.</p>
+              <p>In Candidate Regimens, select a row to preview another dose and interval. Compare the predicted AUC, peak, and trough. Open the calculation details to review the method and assumptions, then inspect the note before copying or exporting it.</p>
+              <p>This demonstration is for learning the interface. Independent clinical validation is still pending. Use clinical judgment, institutional protocols, and therapeutic drug monitoring.</p>
+            </div>
+          </details>
+          <OpenCalculatorButton source="landing_walkthrough" className="vz-mbtn vz-mbtn--primary shrink-0">
+            Open the calculator
+          </OpenCalculatorButton>
+        </div>
         <div className="mt-8 grid gap-8 md:grid-cols-3">
           <div>
             <H3>1 · Patient</H3>
