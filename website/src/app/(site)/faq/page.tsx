@@ -8,7 +8,7 @@ import {
 } from "@/lib/pk/modelRegistry";
 
 export const metadata: Metadata = {
-  title: "FAQ — Vancomyzer™",
+  title: "Vancomyzer Calculator FAQ | Methods, Inputs & Limitations",
   description: "Why Vancomyzer uses the Colin 2019 model, how it treats serum creatinine and body weight, and what has and has not been validated.",
   alternates: { canonical: "https://vancomyzer.com/faq" },
 };

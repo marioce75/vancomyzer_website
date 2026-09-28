@@ -7,7 +7,7 @@ import { PageHeader, Record, H3, Prose, Chip, Panel, INK, INK2, INK3, RULE } fro
 
 export const metadata: Metadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing" },
-  title: "Evidence — Vancomyzer™",
+  title: "Vancomyzer Calculator: Evidence, Methods & Validation Status",
   description:
     "How Vancomyzer calculates a vancomycin regimen: the Colin 2019 population model, the Bayesian fit to measured levels, what has been checked, and what has not.",
   openGraph: {

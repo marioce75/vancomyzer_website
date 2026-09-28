@@ -32,12 +32,12 @@ import {
  */
 
 export const metadata: Metadata = {
-  title: "Vancomycin AUC Dosing Calculator — Free Bayesian Dosing Support | Vancomyzer™",
+  title: "Vancomyzer Calculator | Free Vancomycin AUC Dosing",
   description:
-    `Free Bayesian, AUC-guided vancomycin dosing calculator for pharmacists, physicians and other clinicians. Empiric dosing from patient characteristics, refinement with one or two measured levels, the ${COLIN_2019.shortName} population model for all adults with a high-BMI advisory, and AUC24 targets aligned with the 2020 ASHP/IDSA/PIDS/SIDP consensus guideline.`,
+    "Free vancomycin AUC dosing support for clinicians treating adults. Review dosing estimates, published methods and limitations. Independent validation is pending.",
   alternates: { canonical: "https://vancomyzer.com/" },
   openGraph: {
-    title: "Vancomyzer™ — Free Bayesian Vancomycin AUC Dosing Calculator",
+    title: "Vancomyzer Calculator | Free Vancomycin AUC Dosing",
     description:
       "AUC-guided vancomycin dosing support for clinicians: empiric regimens, refinement with one or two measured levels, with published methods and stated limitations.",
     type: "website",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Vancomyzer™ — Free Bayesian Vancomycin AUC Dosing Calculator",
+    title: "Vancomyzer Calculator | Free Vancomycin AUC Dosing",
     description:
       "AUC-guided vancomycin dosing support for pharmacists, physicians and other clinicians.",
   },
@@ -181,9 +181,33 @@ function Chip({ kind, children }: { kind: "ok" | "warn" | "crit"; children: Reac
   );
 }
 
+// Public identity only; clinical claims and ratings are intentionally omitted.
+const SITE_IDENTITY = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://vancomyzer.com/#website",
+      name: "Vancomyzer",
+      url: "https://vancomyzer.com/",
+      publisher: { "@id": "https://dosys.health/#organization" },
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://dosys.health/#organization",
+      name: "Dosys Health",
+      url: "https://dosys.health/",
+    },
+  ],
+};
+
 export default function LandingPage() {
   return (
     <div style={{ color: INK }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_IDENTITY).replace(/</g, "\\u003c") }}
+      />
       {/* ── HERO ───────────────────────────────────────────── */}
       <section className="mx-auto max-w-[1180px] px-4 sm:px-6" style={{ borderBottom: `1px solid ${RULE}` }}>
         <div className="py-14 md:pb-14 md:pt-[72px]">
@@ -191,7 +215,7 @@ export default function LandingPage() {
             Vancomycin dosing support for clinicians
           </span>
           <h1 className="vz-serif max-w-[22ch] text-[clamp(34px,4.6vw,56px)] leading-[1.08]" style={{ color: INK }}>
-            Vancomycin AUC calculator for adult patients.
+            Vancomyzer: vancomycin AUC calculator for adults.
           </h1>
           <p className="mt-[22px] max-w-[60ch] text-xl leading-[1.5]" style={{ color: INK2 }}>
             Estimate a starting regimen or use measured levels to compare dosing options. Targets follow
