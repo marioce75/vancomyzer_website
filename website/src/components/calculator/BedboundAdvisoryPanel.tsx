@@ -49,7 +49,6 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 
 export default function BedboundAdvisoryPanel({
   scrMgDl,
-  weightKg,
   onLoadingDoseChange,
 }: BedboundAdvisoryPanelProps) {
   const todayRef = useRef(todayYMD());
@@ -57,9 +56,6 @@ export default function BedboundAdvisoryPanel({
 
   const scrLow = scrMgDl != null && scrMgDl > 0 && scrMgDl < 0.7;
 
-  // 15–20 mg/kg for bedbound/geriatric loading dose
-  const loadingDoseLow = weightKg ? Math.round(15 * weightKg) : null;
-  const loadingDoseHigh = weightKg ? Math.min(Math.round(20 * weightKg), 2000) : null;
 
   // Infusion end time for level draw recommendation (shown once infusion duration entered)
   const [doseGiven, setDoseGiven] = useState<number>(0);
@@ -93,16 +89,16 @@ export default function BedboundAdvisoryPanel({
     setAdminTimeErr(!valid && formatted.length >= 4 ? "Enter valid 24h time (e.g. 1400)" : "");
   };
 
-  // Level draw recommendation: 2–4 h after infusion end
+  // Report entered infusion duration without prescribing a universal sampling time.
   const levelDrawNote = infusionHours > 0
-    ? `Draw level ${infusionHours + 2}–${infusionHours + 4} hours after infusion start (2–4 h post-infusion end).`
-    : "Enter infusion duration to see recommended level draw timing.";
+    ? `Entered infusion duration: ${infusionHours} hours. Record the actual collection time and use the sampling plan selected by your clinical team.`
+    : "Enter the actual infusion duration and collection time. Sampling depends on the monitoring method and clinical circumstances.";
 
   return (
     <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
       <div className="flex items-center gap-2">
         <span className="text-base">🛏</span>
-        <p className="text-sm font-semibold text-amber-900">Bedbound or frail older patient — loading dose guidance</p>
+        <p className="text-sm font-semibold text-amber-900">Bedbound or frail patient — dosing and monitoring review</p>
       </div>
 
       {/* SCr warning */}
@@ -112,22 +108,45 @@ export default function BedboundAdvisoryPanel({
           <p className="mt-1 text-xs text-red-700 leading-5">
             Low SCr in bedbound patients may reflect reduced muscle mass rather than preserved renal function, so
             the estimate may overstate clearance. Routinely rounding SCr up to a fixed value is not recommended: rounding
-            to 1 mg/dL reduced dose-prediction accuracy in a retrospective study of older adults (Bukhari 2024). Obtain an
-            early vancomycin level to individualize dosing. Cystatin C or a measured creatinine clearance can inform your
+            to 1 mg/dL reduced dose-prediction accuracy in a retrospective study of older adults (Bukhari 2024). Plan early
+            therapeutic drug monitoring to help individualize dosing. Cystatin C or a measured creatinine clearance can inform your
             clinical assessment but cannot be entered into the Colin 2019 model.
           </p>
         </div>
       )}
 
-      {/* Recommended loading dose */}
+      {/* Frailty alone does not establish a loading dose or dose cap. */}
       <div className="rounded-lg border border-amber-200 bg-white px-3 py-2.5">
-        <p className="text-xs font-semibold text-amber-900">Recommended Loading Dose</p>
+        <p className="text-xs font-semibold text-amber-900">Individualize the loading dose</p>
         <p className="mt-0.5 text-xs text-amber-800 leading-5">
-          <strong>15–20 mg/kg TBW</strong>, maximum <strong>2,000 mg</strong> for geriatric/bedbound patients.
-          {loadingDoseLow != null && loadingDoseHigh != null && (
-            <> Based on entered weight ({weightKg} kg): <strong>{loadingDoseLow}–{loadingDoseHigh} mg</strong>.</>
-          )}
+          Bedbound status or frailty alone does not establish a specific loading dose or a 2,000 mg maximum.
+          Review infection severity, actual body weight, fluid status, renal trajectory, prior doses and your institutional protocol.
+          Select maintenance dosing separately, with early therapeutic drug monitoring when indicated.
         </p>
+        <details className="mt-2 text-xs text-amber-800">
+          <summary className="cursor-pointer font-semibold">What the guideline supports</summary>
+          <p className="mt-2 leading-5">
+            For intermittent IV therapy in critically ill adults with suspected or documented serious MRSA infection,
+            the 2020 consensus guideline allows consideration of 20–35 mg/kg actual body weight, maximum 3,000 mg.
+            In adults with obesity and serious infection, it allows consideration of 20–25 mg/kg actual body weight,
+            maximum 3,000 mg. These are conditional recommendations, not a default dose for every frail patient.
+          </p>
+          <p className="mt-2 leading-5">
+            For Bayesian AUC assessment, the guideline prefers two concentrations, typically 1–2 hours after infusion
+            and at the end of the dosing interval. A single early post-load level is not a universally validated
+            sampling strategy for bedbound patients. Follow the selected method and local protocol.
+          </p>
+          <a className="mt-2 inline-block underline" href="https://academic.oup.com/jpids/article/9/3/281/5871024" target="_blank" rel="noopener noreferrer">
+            Read the 2020 ASHP/IDSA/PIDS/SIDP consensus guideline
+          </a>
+          <p className="mt-2 leading-5">
+            The small 2022 bedridden-patient study evaluated AUC prediction, not loading doses, and used a different model.
+            It does not validate a bedbound dose rule or Vancomyzer.
+          </p>
+          <a className="mt-2 inline-block underline" href="https://www.jstage.jst.go.jp/article/bpb/45/6/45_b22-00070/_html/-char/en" target="_blank" rel="noopener noreferrer">
+            Read Sonoda et al., 2022
+          </a>
+        </details>
       </div>
 
       {/* Loading dose entry form */}
@@ -208,10 +227,10 @@ export default function BedboundAdvisoryPanel({
 
       {/* Recommended level draw timing */}
       <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5">
-        <p className="text-xs font-semibold text-blue-900">Recommended Level Draw Timing</p>
+        <p className="text-xs font-semibold text-blue-900">Level collection and timing</p>
         <p className="mt-0.5 text-xs text-blue-800 leading-5">{levelDrawNote}</p>
         <p className="mt-1 text-[11px] text-blue-700">
-          After drawing the level, enter it in the <strong>Drug Levels</strong> section. The calculator will suggest a <strong>maintenance regimen</strong> — not another loading dose.
+          Enter measured concentrations and actual collection times in <strong>Drug Levels</strong>. Review whether the available history and levels support a maintenance estimate before using the result.
         </p>
       </div>
 
@@ -219,8 +238,8 @@ export default function BedboundAdvisoryPanel({
       <div className="rounded-lg border border-amber-200 bg-white px-3 py-2.5">
         <p className="text-xs font-semibold text-amber-900">Monitoring</p>
         <ul className="mt-1 text-xs text-amber-800 leading-5 list-disc pl-4 space-y-0.5">
-          <li>Recheck levels every <strong>24 hours</strong> (not standard 48–72h)</li>
-          <li><strong>Daily SCr</strong> monitoring — renal function instability is common</li>
+          <li>Individualize repeat levels to renal stability, exposure, clinical status and your institutional protocol.</li>
+          <li>Frequent or daily monitoring may be appropriate when renal function or hemodynamics are unstable; bedbound status alone does not set the schedule.</li>
         </ul>
       </div>
 
@@ -229,7 +248,7 @@ export default function BedboundAdvisoryPanel({
           <p className="text-xs font-semibold text-emerald-800">
             Dosing History pre-filled: {doseGiven} mg over {infusionHours}h on {adminDate} at {adminTime}
           </p>
-          <p className="text-[11px] text-emerald-700 mt-0.5">Switch to the 1 Level tab and enter the drawn level below.</p>
+          <p className="text-[11px] text-emerald-700 mt-0.5">Enter the measured level and its actual collection time below. A second appropriately timed level may be needed.</p>
         </div>
       )}
     </div>
