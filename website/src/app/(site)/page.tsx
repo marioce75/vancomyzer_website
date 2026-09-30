@@ -228,7 +228,7 @@ export default function LandingPage() {
               Open the calculator
             </OpenCalculatorButton>
             <Link href="#how" className="vz-mbtn vz-mbtn--outline">
-              Watch walkthrough · 1:14
+              Watch walkthrough · 2:55
             </Link>
           </div>
           <p className="mt-5 max-w-[70ch] text-[15px]" style={{ color: INK2 }}>{LAUNCH_LINE}</p>
@@ -239,19 +239,18 @@ export default function LandingPage() {
       <Section id="how" label="How it works" note="Patient inputs, dosing estimates and model details.">
         <H2>Your first Vancomyzer walkthrough</H2>
         <p className="mb-6 mt-3 max-w-[70ch]" style={{ color: INK2 }}>
-          Explore Empiric mode with a fictional adult example. Follow the inputs, review the estimated
-          exposure, and find the calculation details.
+          Learn how Bayesian estimation works, then follow a fictional adult example through the calculator.
+          Review patient inputs, loading doses when appropriate, estimated exposure, and calculation details.
         </p>
         <CalculatorWalkthrough />
         <div className="mt-5 flex flex-col items-start justify-between gap-5 sm:flex-row">
           <details className="min-w-0 flex-1 text-[15px]" style={{ color: INK2 }}>
-            <summary className="cursor-pointer py-2" style={{ color: ACTION }}>Read the transcript</summary>
+            <summary className="cursor-pointer py-2" style={{ color: ACTION }}>Read the tutorial summary</summary>
             <div className="mt-2 space-y-4">
-              <p>Here’s your first walkthrough of Vancomyzer. We’ll use a fictional adult example to explore Empiric mode, before any measured vancomycin levels are available.</p>
-              <p>Start with age and sex. Then enter weight in kilograms, height in centimeters, and serum creatinine in milligrams per deciliter. Confirm renal replacement therapy status, and review the frailty option. Check every input before selecting Calculate.</p>
-              <p>The result shows a suggested regimen and predicted exposure. These are model estimates, not measured patient values. Next, review the concentration curve. Change the time window to explore the predicted profile.</p>
-              <p>In Candidate Regimens, select a row to preview another dose and interval. Compare the predicted AUC, peak, and trough. Open the calculation details to review the method and assumptions, then inspect the note before copying or exporting it.</p>
-              <p>This demonstration is for learning the interface. Independent clinical validation is still pending. Use clinical judgment, institutional protocols, and therapeutic drug monitoring.</p>
+              <p>Welcome to the Vancomyzer tutorial. Learn about Bayesian estimation through a navigation app analogy, then explore the calculator using fictional patient inputs.</p>
+              <p>Review the patient information and dosing history before calculating. Before considering a loading dose, always check for recent doses given at this facility and at any other facility the patient visited.</p>
+              <p>When a loading dose is appropriate, review the recommended amount and infusion duration. The calculator uses a maximum infusion rate of 10 mg per minute and a minimum duration of 60 minutes. A 2000 mg dose therefore requires at least 200 minutes.</p>
+              <p>Review the estimated exposure and calculation details. Predictions are model estimates, not measured patient values. Use clinical judgment, institutional protocols, and therapeutic drug monitoring. Independent clinical validation is pending.</p>
             </div>
           </details>
           <OpenCalculatorButton source="landing_walkthrough" className="vz-mbtn vz-mbtn--primary shrink-0">
