@@ -70,7 +70,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
   const recommendationLines = blocked
     ? [`Maintenance dosing held — ${blocked.safety_message}`, blocked.recommended_action]
     : [
-        `Recommendation: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1} h`,
+        `Recommendation: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${Number(((recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1) * 60).toFixed(6))} minutes`,
         changeSummary,
       ];
 

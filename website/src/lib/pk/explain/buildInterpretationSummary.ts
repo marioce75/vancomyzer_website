@@ -77,7 +77,7 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
     return (
       `Loading dose simulation: ${current_regimen_dose_mg} mg single dose. ` +
       `${estimateType}: first-dose AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L (SCr ${scr} mg/dL). ` +
-      `Suggested maintenance regimen: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${infusionDuration} h. ` +
+      `Suggested maintenance regimen: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${Number((infusionDuration * 60).toFixed(6))} minutes. ` +
       `Maintenance dose targets steady-state AUC24 400–600 mg·h/L.` +
       `${infusionSafetyNote} ` +
       `${data_quality_note} Draw first level 1.5–6h post-loading-dose infusion end for early Bayesian estimation. Intended to support review, not replace clinician judgment.`
@@ -95,7 +95,7 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
     `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. ` +
     `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L. ` +
     `Two-compartment model (SCr ${scr} mg/dL). ` +
-    `Recommended adjustment: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${infusionDuration} h. ` +
+    `Recommended adjustment: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${Number((infusionDuration * 60).toFixed(6))} minutes. ` +
     `${changeExplanation} ` +
     `Fit quality ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty ${posterior_fit?.uncertainty_label ?? "population_only"}.` +
     `${infusionSafetyNote}${conservativeRecommendationNote}${sparseHighExposureNote} ${data_quality_note} Intended to support review, not replace clinician judgment.`

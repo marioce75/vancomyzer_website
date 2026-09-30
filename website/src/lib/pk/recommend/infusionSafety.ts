@@ -8,16 +8,16 @@ export interface SafeInfusionDurationResult {
   safety_note?: string;
 }
 
-function roundToQuarterHour(hours: number): number {
-  return Math.ceil(hours * 4) / 4;
+/** FDA labeling: no more than 10 mg/min, with a minimum of 60 minutes.
+ * Keep the exact duration; rounding to quarter hours makes displayed minutes
+ * and the duration used for exposure calculations disagree.
+ */
+export function computeSafeInfusionDurationMinutes(dose_mg: number): number {
+  return Math.max(60, dose_mg / VANCOMYCIN_MAX_INFUSION_RATE_MG_PER_MIN);
 }
 
 export function computeSafeInfusionDurationHours(dose_mg: number, requested_hours?: number | null): SafeInfusionDurationResult {
-  const derivedMinimumHours = Math.max(
-    VANCOMYCIN_MIN_INFUSION_DURATION_HOURS,
-    dose_mg / VANCOMYCIN_MAX_INFUSION_RATE_MG_PER_HOUR
-  );
-  const safeHours = roundToQuarterHour(derivedMinimumHours);
+  const safeHours = computeSafeInfusionDurationMinutes(dose_mg) / 60;
   const requested = requested_hours ?? 0;
   const adjusted = requested > 0 ? requested < safeHours : true;
 

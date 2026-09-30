@@ -67,8 +67,10 @@ check("approach: 6×12h vs t½≈20h → <4 half-lives, not adequate", approach.
   const rec = r.frequency_options.find((o: R) => o.dose_mg === 1000 && o.interval_hours === 12);
   check("recommended row exists for 1000 q12h", !!rec && rec.is_recommended);
   check("current row == recommended row (AUC)", rec.auc24 === r.auc24, `${rec.auc24} vs ${r.auc24}`);
-  check("current row == recommended row (peak)", Math.abs(rec.peak - r.peak) <= 0.1, `${rec.peak} vs ${r.peak}`);
-  check("current row == recommended row (trough)", Math.abs(rec.trough - r.trough) <= 0.1, `${rec.trough} vs ${r.trough}`);
+  // The recorded current infusion remains 105 min; the new recommendation is
+  // 100 min at 10 mg/min. AUC is unchanged but peak/trough need not be identical.
+  check("current recorded duration preserved", regimenSS.infusion_duration_hours === 1.75);
+  check("recommended duration uses exact minutes", Math.abs(rec.infusion_duration_hours * 60 - 100) < 1e-9);
   check("band predicted_* == recommended row", r.predicted_auc24 === rec.auc24 && r.predicted_peak === rec.peak && r.predicted_trough === rec.trough,
     `${r.predicted_auc24}/${r.predicted_peak}/${r.predicted_trough} vs ${rec.auc24}/${rec.peak}/${rec.trough}`);
   check("fit stays near prior: CL ≈ 4.1", near(r.pk_parameters.CL, 4.10, 0.01), String(r.pk_parameters.CL));

@@ -289,7 +289,7 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
     <div class="section-title">Recommended Regimen</div>
     <div class="dose-box">
       <span class="dose-primary">${escapeHtml(data.recommended_dose)} mg every ${data.recommended_interval_hours} h</span>
-      ${data.recommended_infusion_duration_hours ? `<div class="dose-detail">Infuse over ${data.recommended_infusion_duration_hours} hours</div>` : ""}
+      ${data.recommended_infusion_duration_hours ? `<div class="dose-detail">Infuse over ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes</div>` : ""}
       <div class="dose-detail" style="margin-top:6px">
         AUC\u2082\u2084: <strong>${fmt(data.auc24, 1)} mg\u00b7h/L</strong>
         ${data.auc24 >= 400 && data.auc24 <= 600 ? '<span class="range-badge">IN RANGE</span>' : ""}

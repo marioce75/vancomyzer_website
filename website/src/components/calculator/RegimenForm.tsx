@@ -117,15 +117,15 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
           </InputGroup>
         )}
 
-        <InputGroup label="Infusion Duration (hours)" error={fieldErrors.infusion_duration_hours ?? parseErrors.infusion}>
+        <InputGroup label="Infusion Duration (minutes)" error={fieldErrors.infusion_duration_hours ?? parseErrors.infusion}>
           <ClinicalNumberInput
             inputMode="decimal"
-            placeholder="e.g. 1"
-            value={value.infusion_duration_hours}
-            onValueChange={(n) => update({ infusion_duration_hours: n })}
+            placeholder="e.g. 100"
+            value={Number((value.infusion_duration_hours * 60).toFixed(6))}
+            onValueChange={(n) => update({ infusion_duration_hours: n / 60 })}
             onBlurValue={(v, _raw, parseError) => {
               setParseErrors((prev) => ({ ...prev, infusion: parseError ?? undefined }));
-              setInfusionWarning(v !== null && v > 4 ? "Infusion duration > 4 hours is unusually long — please verify." : "");
+              setInfusionWarning(v !== null && v > 240 ? "Infusion duration > 240 minutes is unusually long — please verify." : "");
             }}
             className={(invalidText) => inputClass(Boolean(fieldErrors.infusion_duration_hours || parseErrors.infusion || invalidText))}
           />
@@ -226,12 +226,12 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                       className={(invalidText) => inputClass(Boolean(fe("loading_dose_mg") || invalidText))}
                     />
                   </InputGroup>
-                  <InputGroup label="Loading infusion (hours)" error={fe("loading_infusion_duration_hours")}>
+                  <InputGroup label="Loading infusion (minutes)" error={fe("loading_infusion_duration_hours")}>
                     <ClinicalNumberInput
                       inputMode="decimal"
-                      placeholder="e.g. 2"
-                      value={value.loading_infusion_duration_hours || 0}
-                      onValueChange={(n) => update({ loading_infusion_duration_hours: n })}
+                      placeholder="e.g. 200"
+                      value={Number(((value.loading_infusion_duration_hours || 0) * 60).toFixed(6))}
+                      onValueChange={(n) => update({ loading_infusion_duration_hours: n / 60 })}
                       className={(invalidText) => inputClass(Boolean(fe("loading_infusion_duration_hours") || invalidText))}
                     />
                   </InputGroup>

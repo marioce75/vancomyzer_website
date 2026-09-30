@@ -25,7 +25,7 @@ for (const option of result.frequency_options) {
     auc24: option.auc24, peak: option.peak, trough: option.trough,
     interpretation_summary: text, clinical_note: option.clinical_note,
   });
-  assert.ok(html.includes(`Infuse over ${option.infusion_duration_hours} hours`));
+  assert.ok(html.includes(`Infuse over ${Number((option.infusion_duration_hours * 60).toFixed(6))} minutes`));
   assert.ok(html.includes(`AUC24 ${result.auc24} mg·h/L`));
   assert.ok(html.includes(`AUC24 ${option.auc24} mg·h/L`));
 }

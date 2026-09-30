@@ -497,7 +497,7 @@ export default function CalculatorWorkspace() {
           `Match: ${aucMatch ? "PASS" : "✗ FAIL"}\n\n` +
           `Model: ${modelDisplayName(data.pk_parameters?.pk_model_name)}\n` +
           `τ: ${data.recommended_interval_hours ?? "?"}h\n` +
-          `Infusion: ${data.recommended_infusion_duration_hours ?? "?"}h`
+          `Infusion: ${data.recommended_infusion_duration_hours != null ? Number((data.recommended_infusion_duration_hours * 60).toFixed(6)) : "?"} min`
         );
       }
     } finally {

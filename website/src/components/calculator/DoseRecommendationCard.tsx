@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { CalculationDetails, FrequencyOption, AucRangeStatus, ArcAdvisory } from "@/types/calculator";
 import { fmt } from "@/lib/formatNumber";
+import { computeSafeInfusionDurationMinutes } from "@/lib/pk/recommend/infusionSafety";
 
 interface DoseRecommendationCardProps {
   recommended_dose?: string | null;
@@ -88,8 +89,8 @@ export function LoadingDoseConfigurator({ weightKg, onSimulate }: LoadingDoseCon
   const [customDose, setCustomDose] = React.useState(defaultDose);
 
   // Auto-calculate infusion duration (≤10 mg/min, min 60 min)
-  const infusionMinutes = Math.max(60, Math.ceil(customDose / 10));
-  const infusionHours = Math.max(1, Math.ceil(infusionMinutes / 60 * 4) / 4);
+  const infusionMinutes = computeSafeInfusionDurationMinutes(customDose);
+  const infusionHours = infusionMinutes / 60;
   const rateExceeded = customDose / infusionMinutes > 10;
 
   // Update default dose when weight changes
@@ -135,7 +136,7 @@ export function LoadingDoseConfigurator({ weightKg, onSimulate }: LoadingDoseCon
 
       {/* Auto-calculated infusion */}
       <div className="flex items-center gap-3 mb-3" style={{ fontSize: 10, color: "var(--color-dim)", ...FONT }}>
-        <span>Infusion: <strong style={{ color: "var(--color-secondary)" }}>{infusionHours}h</strong> ({infusionMinutes} min)</span>
+        <span>Infusion: <strong style={{ color: "var(--color-secondary)" }}>{infusionMinutes} min</strong></span>
         <span>Rate: <strong style={{ color: rateExceeded ? "#dc2626" : "var(--color-secondary)" }}>{(customDose / (infusionMinutes / 60)).toFixed(0)} mg/h</strong></span>
         {rateExceeded && <span style={{ color: "#dc2626", fontWeight: 700 }}>⚠ Exceeds 10 mg/min</span>}
       </div>
@@ -335,7 +336,7 @@ export default function DoseRecommendationCard({
   const isSingleLoadingDose = Boolean(activeIsCurrent && isPulseDose);
   const range = displayAUC != null && !isSingleLoadingDose ? aucRangeLabel(displayAUC) : null;
 
-  const subline = `Infuse over ${displayInfusionHours} hour${displayInfusionHours === 1 ? "" : "s"}.`;
+  const subline = `Infuse over ${Number((displayInfusionHours * 60).toFixed(6))} minutes.`;
 
   return (
     <div className={isBand ? "flex flex-col gap-2" : "flex flex-col gap-3"}>

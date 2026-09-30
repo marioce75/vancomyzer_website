@@ -48,6 +48,6 @@ export function buildEmpiricLoadingDose(
   return {
     suggested_dose_mg: dose,
     infusion_duration_hours,
-    basis: `Guideline-aligned optional empiric loading-dose estimate using actual body weight at ${policy.loadingDoseMgPerKg} mg/kg, capped at ${policy.loadingDoseMaxMg} mg, infused over at least ${infusion_duration_hours} h to stay within the 10 mg/min maximum rate. This does not encode severity, indication, or local protocol.${perLocalProtocol}`,
+    basis: `Guideline-aligned optional empiric loading-dose estimate using actual body weight at ${policy.loadingDoseMgPerKg} mg/kg, capped at ${policy.loadingDoseMaxMg} mg, infused over at least ${Number((infusion_duration_hours * 60).toFixed(6))} minutes to stay within the 10 mg/min maximum rate. This does not encode severity, indication, or local protocol.${perLocalProtocol}`,
   };
 }
