@@ -1,11 +1,21 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { track } from "@/lib/analytics";
 
 /** The approved calculator tutorial, using fictional inputs. */
 export default function CalculatorWalkthrough() {
   const video = useRef<HTMLVideoElement>(null);
   const [started, setStarted] = useState(false);
+  const trackedPlay = useRef(false);
+
+  function recordPlayback() {
+    setStarted(true);
+    // Count real playback once per mounted tutorial, not clicks or resumes.
+    if (trackedPlay.current) return;
+    trackedPlay.current = true;
+    track("Tutorial Play", { tutorial: "calculator_walkthrough_v2" });
+  }
 
   async function play() {
     setStarted(true);
@@ -30,6 +40,7 @@ export default function CalculatorWalkthrough() {
           aria-label="Vancomyzer calculator tutorial with Bayesian estimation and loading dose guidance"
           aria-describedby="walkthrough-caption"
           onPlay={() => setStarted(true)}
+          onPlaying={recordPlayback}
         >
           <source src="/videos/vancomyzer-calculator-tutorial-v2.mp4" type="video/mp4" />
           Your browser does not support embedded video. Use the video link below.

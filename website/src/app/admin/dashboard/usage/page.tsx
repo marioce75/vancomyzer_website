@@ -68,7 +68,8 @@ const MEASURED: { label: string; event?: string }[] = [
   { label: "Calculator opens", event: "Open Calculator" },
   { label: "Disclaimer acceptances", event: "Disclaimer Accepted" },
   { label: "Disclaimer declines", event: "Disclaimer Declined" },
-  { label: "Calculations run", event: "Calculation Run" },
+  { label: "Completed manual calculations", event: "Calculation Run" },
+  { label: "Tutorial plays", event: "Tutorial Play" },
 ];
 
 function Code({ children }: { children: React.ReactNode }) {

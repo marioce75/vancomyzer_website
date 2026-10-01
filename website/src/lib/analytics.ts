@@ -16,7 +16,8 @@ export type AnalyticsEvent =
   | "Open Calculator"
   | "Disclaimer Accepted"
   | "Disclaimer Declined"
-  | "Calculation Run";
+  | "Calculation Run"
+  | "Tutorial Play";
 
 export type AnalyticsProps = Record<string, string | number | boolean>;
 
