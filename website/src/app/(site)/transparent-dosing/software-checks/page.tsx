@@ -203,30 +203,25 @@ export default function SoftwareChecksPage() {
           </p>
         </Prose>
 
-        <div className="mt-8"><H3>When patients match the calculator&rsquo;s assumptions</H3></div>
-        <Prose className="mt-2"><p>Tests the machinery. Every row should be close to 90%.</p></Prose>
+        <div className="mt-8"><H3>App-like simulation scenarios</H3></div>
+        <Prose className="mt-2"><p>Coverage in selected synthetic scenarios, conditional on a band being available.</p></Prose>
         <CoverageTable scenario="app" />
 
-        <div className="mt-8"><H3>When patients follow {COLIN_2019.shortName}&rsquo;s published variability</H3></div>
+        <div className="mt-8"><H3>Simplified sensitivity scenarios using selected published parameters</H3></div>
         <Prose className="mt-2">
           <p>
-            A stress test: the published between-patient variability (CV 27.9% CL, 27.3% V1, 97.9% V2) and 21.5%
-            residual error, while the calculator keeps its own settings.
+            This is not a complete reproduction of Colin 2019. The simulation fixes Q, omits the CL–V1 and Q–V2 random-effect coupling, and uses 21.5% proportional error without the published additive component. Historical results are retained under this narrower interpretation.
           </p>
         </Prose>
         <CoverageTable scenario="published" />
 
         <Prose className="mt-5">
           <p>
-            <strong>Reading.</strong> Under its own assumptions the band is calibrated. Before any level it is somewhat
-            wide if the published variability is right. With a peak and a trough it is too narrow, mainly because the
-            fit assumes a 15% assay error where the published model reports 21.5%
+            <strong>Reading.</strong> Coverage was near 90% in the selected app-like scenarios and lower in some simplified sensitivity scenarios. This does not establish clinical calibration or coverage under the full published model. The app-like observation generator and fitting error model are also not identical.
             {splitIiv && splitErr && (
-              <> (the error-model difference alone gives {pct(splitErr.pooled_coverage)}; the variability difference alone {pct(splitIiv.pooled_coverage)})</>
+              <> The separate error and variability sensitivity scenarios gave {pct(splitErr.pooled_coverage)} and {pct(splitIiv.pooled_coverage)}; their different seeds limit causal attribution.</>
             )}
-            . This is why the chart labels the band &ldquo;model-based; not yet validated&rdquo;. Only measured patient
-            levels can show which assumptions hold; coverage of a held-out level is a pre-specified endpoint of the
-            planned validation study.
+            {' '}These bands concern latent concentration, conditional on a band being available. A future measured-level evaluation needs a separately specified predictive interval including residual error. Independent review of that endpoint remains pending.
           </p>
         </Prose>
       </Record>

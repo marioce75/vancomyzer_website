@@ -48,8 +48,7 @@ export default function CasesPage() {
         Literature Reproducibility
       </h1>
       <p style={{ fontSize: 17, color: "#4a5a68", lineHeight: 1.55, marginTop: 0, marginBottom: 12, maxWidth: "62ch" }}>
-        Published vancomycin values run through Vancomyzer&apos;s calculator. Cases that use the same model
-        as the calculator ({COLIN_2019.shortName}) are pass/fail checks of the implementation. Cases from other
+        Published vancomycin values run through Vancomyzer&apos;s calculator. The two {COLIN_2019.shortName} cases are pass/fail checks of selected population predictions without measured levels, not tests of the full Bayesian model. Cases from other
         published models or patient cohorts are shown for context only. These cases run in the automated
         checks; a difference outside the stated tolerance fails the check.
       </p>
@@ -107,8 +106,8 @@ interface BodyProps {
 const GROUPS: { kind: ComparisonKind; title: string; intro: string }[] = [
   {
     kind: "same_model_reproduction",
-    title: `Same-model reproductions (${COLIN_2019.shortName}) · pass/fail`,
-    intro: `The published value comes from ${COLIN_2019.shortName}, the model the calculator uses, so the calculator should reproduce it within the stated tolerance.`,
+    title: `Population prediction checks (${COLIN_2019.shortName}) · pass/fail`,
+    intro: `These cases compare selected population values from ${COLIN_2019.shortName} with our implementation. Derived steady-state AUC is calculated from dose and clearance. Passing does not verify the random-effect structure or residual error model.`,
   },
   {
     kind: "cross_model_reference",
@@ -165,7 +164,7 @@ function SummaryScorecard({ summary }: { summary: CaseSummary }) {
             Summary
           </div>
           <div style={{ fontSize: 20, fontWeight: 700, color: allPassing ? "#047857" : "#92400e", marginTop: 4 }}>
-            {summary.passing} / {summary.reproduction_count} same-model reproductions within tolerance
+            {summary.passing} / {summary.reproduction_count} population prediction checks within tolerance
             {summary.failing > 0 && (
               <span style={{ fontSize: 14, fontWeight: 600, marginLeft: 10, color: "#92400e" }}>
                 · {summary.failing} outside tolerance
@@ -683,8 +682,7 @@ function Limitations() {
         </li>
         <li>
           Only the same-model reproductions ({COLIN_2019.shortName}) are pass/fail tests. They use
-          model-typical individuals rather than real patients, so they confirm that the equations are
-          implemented as published, not that doses are accurate for patients.
+          model-typical individuals without measured levels. They test selected population predictions and derived steady-state AUC, not the complete Bayesian random-effects structure, residual model, or clinical dosing accuracy.
         </li>
         <li>
           Cross-model references compare the calculator ({COLIN_2019.shortName}) with a different published

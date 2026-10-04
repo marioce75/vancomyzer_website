@@ -54,7 +54,7 @@ export const metadata = {
   title: "Comparison with Tucuxi — Vancomyzer",
   description:
     "A developer-run synthetic analysis (not real patients): Vancomyzer's Bayesian fitting compared with Tucuxi-core " +
-    "given the same Colin 2019 prior and the same simulated levels, against pre-set acceptance criteria (n=200, run 18 Sep 2026; " +
+    "using shared custom priors and different residual error models with the same simulated levels (n=200, run 18 Sep 2026; " +
     "earlier 30 May 2026 snapshot retained).",
 };
 
@@ -84,19 +84,26 @@ export default function EngineCrosscheckPage() {
       <p style={{ fontSize: 17, color: "#4a5a68", lineHeight: 1.55, marginTop: 0, marginBottom: 12, maxWidth: "62ch" }}>
         A developer-run synthetic analysis (not real patients). Vancomyzer&rsquo;s Bayesian fitting was compared
         with <strong>Tucuxi</strong>, an open-source model-informed precision dosing program developed by the
-        REDS institute at HEIG-VD, Switzerland. On {m.displayDate} both programs were given the same Colin 2019
-        prior, the same dosing history and the same two simulated levels for {m.n} synthetic patients, and the
+        REDS institute at HEIG-VD, Switzerland. On {m.displayDate} both programs were given the same Vancomyzer custom priors based on Colin population equations
+        and approximately equivalent steady-state dosing histories and the same two simulated levels for {m.n} synthetic patients, and the
         result was scored against acceptance criteria written down before the run. The median absolute difference
         between their clearance estimates was {a.CL.median_abs_pct.toFixed(2)}% (95th percentile{" "}
-        {a.CL.p95_abs_pct.toFixed(2)}%, maximum {a.CL.max_abs_pct.toFixed(2)}%), every fit succeeded, and every
-        difference above {ATTRIBUTION_2026.threshold_pct}% was traced to one documented design difference between
-        the two programs.
+        {a.CL.p95_abs_pct.toFixed(2)}%, maximum {a.CL.max_abs_pct.toFixed(2)}%), every fit succeeded, and separate refits supported the residual error model as the explanation for the selected clearance differences of at least {ATTRIBUTION_2026.threshold_pct}%, to the reported tolerance.
       </p>
       <p style={{ fontSize: 13, color: "var(--color-dim)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 760 }}>
         Vancomyzer has not yet been validated in real patients. Its equations are checked against published
         values and synthetic test cases; external validation with patient data is planned.
       </p>
 
+      <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 24 }}>
+        <strong>Scope clarified 3 October 2026.</strong> The numeric acceptance thresholds were met, but the
+        original requirement for identical residual error models was not met. This is an agreement and
+        sensitivity comparison, not an identical-objective test or full reproduction of Colin&rsquo;s Bayesian model.
+        The 60-dose approximation differs from infinite steady state by up to 0.014% at the sample times
+        using the archived Tucuxi posterior parameters. The model author has been contacted about an unresolved
+        clearance-normalization difference between our article and supplement reconstructions; neither
+        reconstruction is author-confirmed.
+      </p>
       <RunNotice />
       <PriorGateCard />
       <ResultCard2026 />
@@ -144,7 +151,7 @@ function RunNotice() {
       by anyone with a Tucuxi build. Tucuxi itself is built from source and is not part of the site build, so the
       figures below are read from that run&rsquo;s saved result files rather than recomputed on each visit.{" "}
       {RERUN_2026.allFitsSucceeded && RERUN_2026.maxRelDiffPct === 0
-        ? <>The Vancomyzer side was re-run on the current calculator version ({RERUN_2026.version}) against the same cohort and reproduces the {m.engineManifest} estimates exactly, so the comparison applies to the calculator as it is today; the later releases changed input validation and diagnostics, not the model or the fit.</>
+        ? <>The Vancomyzer side was re-run on the current calculator version ({RERUN_2026.version}) against the same cohort and reproduces the {m.engineManifest} estimates exactly, supporting agreement on this fixed two-level steady-state fixture. This does not establish equivalence across every calculator workflow.</>
         : <>The Vancomyzer side was re-run on calculator version {RERUN_2026.version}; the largest change in any estimate was {RERUN_2026.maxRelDiffPct.toFixed(3)}%.</>}
     </div>
   );
@@ -155,7 +162,7 @@ function PriorGateCard() {
     <section style={cardStyle}>
       <h2 style={sectionTitleStyle}>Gate: Tucuxi reproduces the reference patient before any fit</h2>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}>
-        The Colin 2019 covariate equations were written into a Tucuxi model file, which Tucuxi evaluates itself.
+        Vancomyzer supplied the Tucuxi model file, using its interpretation of Colin population equations and custom separate priors. Tucuxi evaluates these equations itself. This is not the complete published Colin Bayesian model or an author-approved model file.
         Before any posterior comparison, Tucuxi&rsquo;s <em>prior-only</em> prediction for the reference patient
         (35 y, 70 kg, SCr 0.83 mg/dL; 1000 mg q12h over 1.75 h) had to match the independent reference values;
         a mismatch would have stopped the run.
@@ -301,8 +308,7 @@ function AccuracyCard2026() {
       <p style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 12, marginBottom: 0, lineHeight: 1.6 }}>
         As in the earlier comparison, only <strong>clearance</strong> improves materially with a two-level fit
         ({a.CL.prior.toFixed(1)}% with the prior alone, {a.CL.vz.toFixed(1)}% for Vancomyzer,{" "}
-        {a.CL.tucuxi.toFixed(1)}% for Tucuxi). The synthetic truth comes from a different published model
-        (Goti 2018) than the prior, so this is a check that the fit moves toward the truth, not a claim about
+        {a.CL.tucuxi.toFixed(1)}% for Tucuxi). The synthetic truth comes from a developer-modified Goti-inspired generator rather than a faithful reproduction of the published Goti model, so this is a check that the fit moves toward the truth, not a claim about
         accuracy in patients.
       </p>
     </section>
@@ -355,10 +361,9 @@ function AttributionCard() {
       </div>
       <p style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 12, marginBottom: 0, lineHeight: 1.6 }}>
         The independent refit reproduces each program to within {maxRefitErr.toFixed(2)}% under its own error
-        model, and the error-model form alone accounts for the whole difference in every case (largest:{" "}
+        model for the selected CL tail cases, supporting error-model form as their explanation to that tolerance (largest:{" "}
         {worst.id}, {worst.dCL_pct_vanco_vs_tucuxi.toFixed(2)}%). No optimizer, convergence, boundary or
-        model-integration difference was found. Unlike the {CROSSCHECK_META.displayDate} snapshot, no
-        disagreement is left unexplained. Whether Vancomyzer&rsquo;s error model — which gives a little less weight
+        model-integration difference was found. This attribution covers the selected clearance tails, not every parameter or all possible cases. Whether Vancomyzer&rsquo;s error model — which gives a little less weight
         to a level that comes back unexpectedly high — is the preferable choice is a clinical design question that
         this analysis records rather than settles.
       </p>
@@ -375,7 +380,7 @@ function MethodologyCard2026() {
       <ol style={{ margin: "10px 0 0", paddingLeft: 18, fontSize: 13, lineHeight: 1.65, color: "var(--color-secondary)" }}>
         <li>
           Generate {m.n} synthetic ICU patients (random seed {m.seed}) with &ldquo;true&rdquo; parameters drawn from a
-          Goti 2018–based model; simulate two levels with assay error ({m.design}). The test data are available in the source repository.
+          developer-modified Goti-inspired model; simulate two levels with assay error ({m.design}). The test data are available in the source repository.
         </li>
         <li>
           Run Vancomyzer&rsquo;s calculator (calculator version {m.engineManifest}) on each patient: {COLIN_2019.shortName}{" "}
@@ -385,7 +390,7 @@ function MethodologyCard2026() {
           Use the Colin 2019 equations in Tucuxi with prior variability
           (log-scale SD: CL {sd.CL}, V₁ {sd.V1}, Q {sd.Q}, V₂ {sd.V2}) and Tucuxi&rsquo;s mixed residual error
           (1.0 mg/L additive, 15% proportional). Check its prior-only prediction against the reference patient
-          (table above). Then give Tucuxi the same dosing history and the same two levels per patient and run its
+          (table above). Then give Tucuxi a 60-dose history approximating steady state and the same two levels per patient and run its
           Bayesian fit.
         </li>
         <li>
@@ -404,11 +409,11 @@ function ScopeCard2026() {
   const limits = [
     {
       label: "Checks the fitting implementation, not clinical accuracy",
-      body: "Both programs used the same Colin 2019 prior (Tucuxi evaluating the equations from its own model file) and the same simulated data. Agreement shows that two independently written Bayesian estimators reach the same answer on the same problem. It does not show that Colin 2019 is the right model for any population, and it says nothing about accuracy in patients.",
+      body: "Both programs used Vancomyzer’s custom separate priors based on Colin population equations (Tucuxi evaluating a developer-authored model file) and the same simulated data. Agreement supports similar estimates on this fixture with shared custom priors and different residual error models. It does not establish complete Colin-model reproduction. It does not show that Colin 2019 is the right model for any population, and it says nothing about accuracy in patients.",
     },
     {
       label: "Error models differ by design",
-      body: "The two programs' residual error models are not identical in form, and this difference accounts for the entire tail of the distribution. The comparison therefore also functions as a sensitivity analysis of that choice: up to about 9% in clearance for individual synthetic patients whose level came back well above prediction.",
+      body: "The two programs' residual error models are not identical in form, and separate refits reproduce the selected 14 clearance tails to the reported tolerance. The comparison therefore also functions as a sensitivity analysis of that choice: up to about 9% in clearance for individual synthetic patients whose level came back well above prediction.",
     },
     {
       label: "Simulated patients only",

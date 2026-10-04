@@ -5,6 +5,21 @@ Independent MIPD engine used for the common-math cross-check in
 audit sandbox on 18 Sep 2026; nothing is fabricated and nothing was tuned
 after seeing results (criteria were fixed on 17 Sep 2026, before this run).
 
+## Scope clarification — 3 October 2026
+
+This uses a Vancomyzer-authored model file with separate custom log-normal
+priors, not the complete published Colin Bayesian model or an author-approved
+Tucuxi implementation. The residual models differ, so this is a numerical
+agreement and sensitivity comparison, not identical-objective equivalence.
+The historical numeric thresholds were met; the identical-error-model
+condition in the original acceptance scope was not met.
+
+The current 200-case replay agrees with the September 25 archive to about
+1.1e-13 in parameter values. This supports that fixture only. No new native
+Tucuxi execution was performed in the October audit. At the two sample times,
+60-dose versus infinite steady-state concentrations differ by at most 0.01375%
+using the archived Tucuxi posterior parameters.
+
 ## Comparator build
 
 | Item | Value |
@@ -47,9 +62,9 @@ a-priori request (`examples/ref-apriori.tqf` → `examples/ref-apriori.xml`):
 | SS trough, end of interval (mg/L) | 12.927926 | 12.927928 | 1e-7 |
 | SS AUC per 12 h (mg·h/L) | 243.760774 | 243.760841 | 3e-7 |
 
-So the model file, the covariate encoding and Tucuxi's integration of the
-two-compartment infusion model all agree with the independent oracle; any
-posterior difference is therefore estimator/error-model, not model.
+This gate supports agreement for one reference patient. It does not establish
+model fidelity over all covariates or prove that all posterior differences
+are due exclusively to the residual error model.
 
 ## Run
 
@@ -81,7 +96,7 @@ unit µg/L converted to mg/L). Examples: `examples/p1.*`, `examples/p101.*`.
 
 Excluded/failed: 0 of 200 (criterion ≤ 2 %). |Δ CL| > 10 %: none.
 Steady-state exposure on each engine's own posterior: AUC₂₄ median 0.85 %
-(P95 3.9 %, max 8.4 %), peak median 0.57 %, trough median 1.5 % (max 12.5 %,
+(P95 4.59 %, max 8.4 %), peak median 0.57 %, trough median 1.5 % (max 12.5 %,
 the trough being the most CL-sensitive quantity).
 
 ## Attribution of the tail (every case ≥ 3 %)
@@ -98,7 +113,7 @@ no code with either engine), once under each error-model form:
 | p103 … p3 (11 more) | 3.3–6.8 % | ≤ 0.01 % | ≤ 0.01 % | = Δ |
 
 Every tail case is reproduced to ≤ 0.01 % by the independent refit under the
-matching σ form, and the entire difference is the σ form. All 14 are
+matching σ form, supporting the σ form as the explanation for the selected CL tails to that tolerance. All 14 are
 `fit_quality: weak` cases where one observation is well above its prediction
 (e.g. p101: 89.1 observed vs 66.0 predicted), which is exactly where
 max(obs, pred) inflates Vancomyzer's σ relative to Tucuxi's pred-only √-form
@@ -110,8 +125,7 @@ model-integration difference was found. Full table:
 
 - Shows: given the same prior and data, Vancomyzer's MAP estimator agrees with
   an independently implemented MIPD engine to < 1 % (median) on CL and V1, and
-  the residual spread is fully explained by a documented, deliberate
-  error-model design choice.
+  the selected 14 CL tails are reproduced under each documented error-model form.
 - Does not show: clinical validity of Colin 2019 for any population, the
   correctness of either error model, or agreement with commercial products
   (DoseMeRx, InsightRX, PrecisePK remain **BLOCKED**, see
