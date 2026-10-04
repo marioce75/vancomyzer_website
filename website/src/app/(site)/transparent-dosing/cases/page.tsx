@@ -107,7 +107,7 @@ const GROUPS: { kind: ComparisonKind; title: string; intro: string }[] = [
   {
     kind: "same_model_reproduction",
     title: `Population prediction checks (${COLIN_2019.shortName}) · pass/fail`,
-    intro: `These cases compare selected population values from ${COLIN_2019.shortName} with our implementation. Derived steady-state AUC is calculated from dose and clearance. Passing does not verify the random-effect structure or residual error model.`,
+    intro: `These cases compare selected population values from ${COLIN_2019.shortName} with the calculator. Derived steady-state AUC is calculated from dose and clearance. Passing does not confirm how the model handles differences between patients or uncertainty in blood levels.`,
   },
   {
     kind: "cross_model_reference",

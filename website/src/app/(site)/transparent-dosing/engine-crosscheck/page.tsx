@@ -1,29 +1,7 @@
-/**
- * /transparent-dosing/engine-crosscheck — Comparison with Tucuxi (Vancomyzer vs Tucuxi).
- *
- * Two developer-run synthetic analyses (not real patients):
- *   - 18 Sep 2026: the reproducible run from src/lib/validation/crosscheck/
- *     (committed fixture, committed Tucuxi model file, pre-set acceptance
- *     criteria, every tail case attributed). Numbers come from the committed
- *     result files via engineCrosscheck2026.ts; nothing is retyped.
- *   - 30 May 2026: the earlier one-off snapshot (engine-crosscheck-report.json),
- *     kept below, labelled, because it was published and because it used the
- *     calculator before the 15 Sep 2026 model change.
- *
- * Scope (stated on the page): same prior, same data, independently
- * implemented MAP estimator — a common-math check. It does not validate the
- * Colin 2019 equations clinically or show accuracy in patients.
- */
+/** Current Tucuxi comparison; historical results remain in the analysis records. */
 
 import Link from "next/link";
-import {
-  CROSSCHECK,
-  CROSSCHECK_META,
-  PARAM_ORDER,
-  PARAM_LABEL,
-  auditCrosscheckCohort,
-  type Outlier,
-} from "@/lib/validation/engineCrosscheck";
+import { PARAM_LABEL } from "@/lib/validation/engineCrosscheck";
 import { COLIN_2019 } from "@/lib/pk/modelRegistry";
 import {
   AGREEMENT_2026,
@@ -53,9 +31,7 @@ export const metadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing/engine-crosscheck" },
   title: "Comparison with Tucuxi — Vancomyzer",
   description:
-    "A developer-run synthetic analysis (not real patients): Vancomyzer's Bayesian fitting compared with Tucuxi-core " +
-    "using shared custom priors and different residual error models with the same simulated levels (n=200, run 18 Sep 2026; " +
-    "earlier 30 May 2026 snapshot retained).",
+    "Vancomyzer and Tucuxi compared in 200 simulated patients, with results, methods and limitations. This comparison does not establish clinical accuracy.",
 };
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -64,14 +40,7 @@ function formatIsoDate(iso: string): string {
   return `${d} ${MONTHS[m - 1]} ${y}`;
 }
 
-function range(values: number[], digits: number): string {
-  const lo = Math.min(...values);
-  const hi = Math.max(...values);
-  return lo.toFixed(digits) === hi.toFixed(digits) ? lo.toFixed(digits) : `${lo.toFixed(digits)}–${hi.toFixed(digits)}`;
-}
-
 export default function EngineCrosscheckPage() {
-  const audit = auditCrosscheckCohort();
   const a = AGREEMENT_2026;
   const m = CROSSCHECK_META_2026;
   return (
@@ -82,13 +51,13 @@ export default function EngineCrosscheckPage() {
         Comparison with Tucuxi
       </h1>
       <p style={{ fontSize: 17, color: "#4a5a68", lineHeight: 1.55, marginTop: 0, marginBottom: 12, maxWidth: "62ch" }}>
-        A developer-run synthetic analysis (not real patients). Vancomyzer&rsquo;s Bayesian fitting was compared
-        with <strong>Tucuxi</strong>, an open-source model-informed precision dosing program developed by the
-        REDS institute at HEIG-VD, Switzerland. On {m.displayDate} both programs were given the same Vancomyzer custom priors based on Colin population equations
-        and approximately equivalent steady-state dosing histories and the same two simulated levels for {m.n} synthetic patients, and the
-        result was scored against acceptance criteria written down before the run. The median absolute difference
-        between their clearance estimates was {a.CL.median_abs_pct.toFixed(2)}% (95th percentile{" "}
-        {a.CL.p95_abs_pct.toFixed(2)}%, maximum {a.CL.max_abs_pct.toFixed(2)}%), every fit succeeded, and separate refits supported the residual error model as the explanation for the selected clearance differences of at least {ATTRIBUTION_2026.threshold_pct}%, to the reported tolerance.
+        The Vancomyzer team compared its calculator with <strong>Tucuxi</strong>, a dosing program
+        developed by the REDS institute at HEIG-VD, Switzerland. On {m.displayDate}, both programs
+        received the same starting estimates based on Colin&rsquo;s population equations, similar dosing
+        histories at steady state, and the same two blood levels for {m.n} simulated patients.
+        The median absolute difference in clearance estimates was {a.CL.median_abs_pct.toFixed(2)}%.
+        The 95th percentile was {a.CL.p95_abs_pct.toFixed(2)}%, and the largest difference was {a.CL.max_abs_pct.toFixed(2)}%.
+        Both programs completed all calculations.
       </p>
       <p style={{ fontSize: 13, color: "var(--color-dim)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 760 }}>
         Vancomyzer has not yet been validated in real patients. Its equations are checked against published
@@ -96,13 +65,13 @@ export default function EngineCrosscheckPage() {
       </p>
 
       <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 24 }}>
-        <strong>Scope clarified 3 October 2026.</strong> The numeric acceptance thresholds were met, but the
-        original requirement for identical residual error models was not met. This is an agreement and
-        sensitivity comparison, not an identical-objective test or full reproduction of Colin&rsquo;s Bayesian model.
-        The 60-dose approximation differs from infinite steady state by up to 0.014% at the sample times
-        using the archived Tucuxi posterior parameters. The model author has been contacted about an unresolved
-        clearance-normalization difference between our article and supplement reconstructions; neither
-        reconstruction is author-confirmed.
+        <strong>How to interpret this comparison.</strong> The numerical limits set before the comparison
+        were met. However, the programs handled uncertainty in blood levels differently, so their
+        calculations were not identical. This comparison does not reproduce the full Colin Bayesian model.
+        Tucuxi used 60 repeated doses to approximate steady state. At the sampling times, this differed
+        from the long-term steady-state calculation by no more than 0.014%, using Tucuxi&rsquo;s saved estimates.
+        A difference in how clearance is calculated from the article and its supplement remains unresolved;
+        neither interpretation has been confirmed by the model author.
       </p>
       <RunNotice />
       <PriorGateCard />
@@ -112,21 +81,6 @@ export default function EngineCrosscheckPage() {
       <MethodologyCard2026 />
       <ScopeCard2026 />
 
-      <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--color-primary)", margin: "40px 0 6px" }}>
-        Earlier comparison — {CROSSCHECK_META.displayDate}
-      </h2>
-      <p style={{ fontSize: 13, color: "var(--color-dim)", lineHeight: 1.55, marginTop: 0, marginBottom: 16, maxWidth: 760 }}>
-        The first comparison, run once with the calculator as it was on that date, before the 15 Sep 2026 model
-        change. It is kept here because it was published; it has been superseded by the reproducible run
-        above, whose analysis scripts, test data and model file are committed to the repository. The numbers below are
-        unchanged from the original publication.
-      </p>
-      <SnapshotNotice />
-      <ResultCard />
-      <AccuracyCard />
-      <OutlierCard audit={audit} />
-      <MethodologyCard />
-      <ScopeCard />
     </div>
   );
 }
@@ -145,14 +99,12 @@ function RunNotice() {
       lineHeight: 1.55,
       marginBottom: 24,
     }}>
-      <strong>Reproducible run of {m.displayDate}, calculator version {m.engineManifest}.</strong> The synthetic
-      cohort (random seed {m.seed}), the Tucuxi model file, the script that writes each patient&rsquo;s Tucuxi query, the raw result files and the
-      comparison script are committed to the repository (<a href={`https://github.com/marioce75/vancomyzer_website/blob/main/website/${m.recordPath}`} style={{ textDecoration: "underline" }}>reproducibility instructions</a>), so the run can be repeated
-      by anyone with a Tucuxi build. Tucuxi itself is built from source and is not part of the site build, so the
-      figures below are read from that run&rsquo;s saved result files rather than recomputed on each visit.{" "}
+      <strong>Comparison dated {m.displayDate}, calculator version {m.engineManifest}.</strong>{" "}
+      The test data, model settings, results and instructions are available for
+      <a href={`https://github.com/marioce75/vancomyzer_website/blob/main/website/${m.recordPath}`} style={{ textDecoration: "underline" }}> independent review</a>.{" "}
       {RERUN_2026.allFitsSucceeded && RERUN_2026.maxRelDiffPct === 0
-        ? <>The Vancomyzer side was re-run on the current calculator version ({RERUN_2026.version}) against the same cohort and reproduces the {m.engineManifest} estimates exactly, supporting agreement on this fixed two-level steady-state fixture. This does not establish equivalence across every calculator workflow.</>
-        : <>The Vancomyzer side was re-run on calculator version {RERUN_2026.version}; the largest change in any estimate was {RERUN_2026.maxRelDiffPct.toFixed(3)}%.</>}
+        ? <>Repeating the Vancomyzer calculations with version {RERUN_2026.version} gave the same estimates for these patients. This check covered two blood levels at steady state; it did not cover every calculator workflow.</>
+        : <>Repeating the Vancomyzer calculations with version {RERUN_2026.version} changed the estimates by at most {RERUN_2026.maxRelDiffPct.toFixed(3)}%.</>}
     </div>
   );
 }
@@ -160,12 +112,14 @@ function RunNotice() {
 function PriorGateCard() {
   return (
     <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Gate: Tucuxi reproduces the reference patient before any fit</h2>
+      <h2 style={sectionTitleStyle}>Check before using blood levels</h2>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}>
-        Vancomyzer supplied the Tucuxi model file, using its interpretation of Colin population equations and custom separate priors. Tucuxi evaluates these equations itself. This is not the complete published Colin Bayesian model or an author-approved model file.
-        Before any posterior comparison, Tucuxi&rsquo;s <em>prior-only</em> prediction for the reference patient
-        (35 y, 70 kg, SCr 0.83 mg/dL; 1000 mg q12h over 1.75 h) had to match the independent reference values;
-        a mismatch would have stopped the run.
+        The Vancomyzer team supplied Tucuxi with the equations and starting assumptions used in this
+        comparison. These were based on Colin&rsquo;s population equations, with separate assumptions
+        about variability. They were not the complete published Bayesian model or a model approved by its author.
+        Before adding blood levels, Tucuxi had to match independently calculated values for a reference
+        patient (35 years, 70 kg, serum creatinine 0.83 mg/dL; 1000 mg every 12 hours infused over 1.75 hours).
+        A mismatch would have stopped the comparison.
       </p>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
@@ -192,9 +146,8 @@ function PriorGateCard() {
         </table>
       </div>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 12, marginBottom: 0, lineHeight: 1.55 }}>
-        Reference values are the closed-form and matrix-exponential oracle values documented on the Literature
-        Reproducibility page. Unlike the {CROSSCHECK_META.displayDate} snapshot, the prior calculation itself was
-        therefore compared, not only the fit.
+        The independent reference calculations are described on the Literature Reproducibility page.
+        This check included the starting estimates before blood levels were added.
       </p>
     </section>
   );
@@ -205,11 +158,11 @@ function ResultCard2026() {
   const c = CRITERIA_2026;
   const e = EXPOSURE_AGREEMENT_2026;
   const criteria = [
-    { label: "Clearance median |Δ| ≤ 2%", value: `${s.CL.median_abs_pct.toFixed(2)}%`, met: c.CL_median_abs_pct_le_2 },
+    { label: "Clearance Median absolute difference ≤ 2%", value: `${s.CL.median_abs_pct.toFixed(2)}%`, met: c.CL_median_abs_pct_le_2 },
     { label: "Clearance 95th percentile |Δ| ≤ 10%", value: `${s.CL.p95_abs_pct.toFixed(2)}%`, met: c.CL_p95_abs_pct_le_10 },
-    { label: "Central volume median |Δ| ≤ 3%", value: `${s.V1.median_abs_pct.toFixed(2)}%`, met: c.V1_median_abs_pct_le_3 },
-    { label: "Failed or excluded fits ≤ 2% of cohort", value: `${c.excluded} of ${CROSSCHECK_META_2026.n}`, met: c.excluded_le_2pct },
-    { label: `Every |Δ CL| > 10% explained individually`, value: `${c.outliers_over_10pct} such cases`, met: c.outliers_over_10pct === 0 },
+    { label: "Central volume Median absolute difference ≤ 3%", value: `${s.V1.median_abs_pct.toFixed(2)}%`, met: c.V1_median_abs_pct_le_3 },
+    { label: "Failed or excluded calculations ≤ 2% of patients", value: `${c.excluded} of ${CROSSCHECK_META_2026.n}`, met: c.excluded_le_2pct },
+    { label: `Every clearance difference > 10% explained`, value: `${c.outliers_over_10pct} such cases`, met: c.outliers_over_10pct === 0 },
   ];
   return (
     <section style={cardStyle}>
@@ -224,11 +177,11 @@ function ResultCard2026() {
           <thead>
             <tr style={{ borderBottom: "1px solid var(--color-border)", textAlign: "left", color: "var(--color-dim)" }}>
               <th style={cellStyle}>Parameter</th>
-              <th style={numCellStyle}>median |Δ|</th>
-              <th style={numCellStyle}>mean signed Δ</th>
-              <th style={numCellStyle}>p90 |Δ|</th>
-              <th style={numCellStyle}>p95 |Δ|</th>
-              <th style={numCellStyle}>max |Δ|</th>
+              <th style={numCellStyle}>Median absolute difference</th>
+              <th style={numCellStyle}>Mean signed difference</th>
+              <th style={numCellStyle}>90th percentile</th>
+              <th style={numCellStyle}>95th percentile</th>
+              <th style={numCellStyle}>Largest difference</th>
             </tr>
           </thead>
           <tbody>
@@ -262,11 +215,11 @@ function ResultCard2026() {
         ))}
       </ul>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 12, marginBottom: 0, lineHeight: 1.55 }}>
-        Steady-state exposure computed from each program&rsquo;s own estimates: AUC₂₄ median |Δ|{" "}
+        Steady-state exposure computed from each program&rsquo;s own estimates: AUC₂₄ Median absolute difference{" "}
         {e.auc24.median_abs_pct.toFixed(2)}% (95th percentile {e.auc24.p95_abs_pct.toFixed(2)}%, maximum{" "}
         {e.auc24.max_abs_pct.toFixed(2)}%), peak {e.peak.median_abs_pct.toFixed(2)}%, trough{" "}
         {e.trough.median_abs_pct.toFixed(2)}% (maximum {e.trough.max_abs_pct.toFixed(2)}%; the trough is the
-        quantity most sensitive to clearance). Meeting these criteria means the two fitting implementations agree
+        quantity most sensitive to clearance). Meeting these criteria means the two programs agree
         on this synthetic cohort; it does not mean the programs are interchangeable in practice.
       </p>
     </section>
@@ -277,7 +230,7 @@ function AccuracyCard2026() {
   const a = ACCURACY_VS_TRUTH_2026;
   return (
     <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Error against the known synthetic truth</h2>
+      <h2 style={sectionTitleStyle}>Accuracy in simulated patients</h2>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}>
         Because the patients are simulated, their &ldquo;true&rdquo; parameters are known. Median absolute
         percentage error of each program&rsquo;s estimates against that truth, with the unfitted prior for
@@ -288,7 +241,7 @@ function AccuracyCard2026() {
           <thead>
             <tr style={{ borderBottom: "1px solid var(--color-border)", textAlign: "left", color: "var(--color-dim)" }}>
               <th style={cellStyle}>Parameter</th>
-              <th style={numCellStyle}>prior (no fit)</th>
+              <th style={numCellStyle}>Before blood levels</th>
               <th style={numCellStyle}>Vancomyzer</th>
               <th style={numCellStyle}>Tucuxi</th>
             </tr>
@@ -306,10 +259,9 @@ function AccuracyCard2026() {
         </table>
       </div>
       <p style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 12, marginBottom: 0, lineHeight: 1.6 }}>
-        As in the earlier comparison, only <strong>clearance</strong> improves materially with a two-level fit
+        In this comparison, only <strong>clearance</strong> improves materially with a two-level fit
         ({a.CL.prior.toFixed(1)}% with the prior alone, {a.CL.vz.toFixed(1)}% for Vancomyzer,{" "}
-        {a.CL.tucuxi.toFixed(1)}% for Tucuxi). The synthetic truth comes from a developer-modified Goti-inspired generator rather than a faithful reproduction of the published Goti model, so this is a check that the fit moves toward the truth, not a claim about
-        accuracy in patients.
+        {a.CL.tucuxi.toFixed(1)}% for Tucuxi). The simulated patient values come from a simulation adapted by the Vancomyzer team from Goti&rsquo;s work, rather than the complete published Goti model, so the results describe performance in a simulation, not accuracy in patients.
       </p>
     </section>
   );
@@ -323,13 +275,11 @@ function AttributionCard() {
     <section style={cardStyle}>
       <h2 style={sectionTitleStyle}>Largest disagreements — and why</h2>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}>
-        The two programs weight a measured level differently. Vancomyzer&rsquo;s assay-error model is{" "}
-        <code>σ = max(1, 0.15 × max(observed, predicted))</code>; Tucuxi&rsquo;s standard &ldquo;mixed&rdquo;
-        model is <code>σ = √((0.15 × predicted)² + 1²)</code>. They are close when a level is near its
-        prediction and diverge when a level is well above it. To test whether that explains the tail, every
-        patient with a clearance difference of {ATTRIBUTION_2026.threshold_pct}% or more ({rows.length} of{" "}
-        {CROSSCHECK_META_2026.n}) was re-fitted by a third, independent estimator (written in Python, sharing no code
-        with either program) under each error model in turn.
+        The programs give different weight to blood levels that are higher than predicted. Vancomyzer
+        allows more uncertainty around those levels, which can change the clearance estimate.
+        To investigate, the team repeated the calculations for all {rows.length} simulated patients with
+        a clearance difference of {ATTRIBUTION_2026.threshold_pct}% or more. A separately written
+        calculation used each program&rsquo;s approach to blood-level uncertainty in turn.
       </p>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
@@ -338,10 +288,10 @@ function AttributionCard() {
               <th style={cellStyle}>Patient</th>
               <th style={numCellStyle}>Vancomyzer CL</th>
               <th style={numCellStyle}>Tucuxi CL</th>
-              <th style={numCellStyle}>Δ</th>
-              <th style={numCellStyle}>refit, Vancomyzer σ vs Vancomyzer</th>
-              <th style={numCellStyle}>refit, Tucuxi σ vs Tucuxi</th>
-              <th style={numCellStyle}>σ form alone</th>
+              <th style={numCellStyle}>Difference</th>
+              <th style={numCellStyle}>Repeat calculation vs Vancomyzer</th>
+              <th style={numCellStyle}>Repeat calculation vs Tucuxi</th>
+              <th style={numCellStyle}>Effect of uncertainty assumptions</th>
             </tr>
           </thead>
           <tbody>
@@ -360,12 +310,12 @@ function AttributionCard() {
         </table>
       </div>
       <p style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 12, marginBottom: 0, lineHeight: 1.6 }}>
-        The independent refit reproduces each program to within {maxRefitErr.toFixed(2)}% under its own error
-        model for the selected CL tail cases, supporting error-model form as their explanation to that tolerance (largest:{" "}
-        {worst.id}, {worst.dCL_pct_vanco_vs_tucuxi.toFixed(2)}%). No optimizer, convergence, boundary or
-        model-integration difference was found. This attribution covers the selected clearance tails, not every parameter or all possible cases. Whether Vancomyzer&rsquo;s error model — which gives a little less weight
-        to a level that comes back unexpectedly high — is the preferable choice is a clinical design question that
-        this analysis records rather than settles.
+        The separate calculation matched each program&rsquo;s clearance estimate to within {maxRefitErr.toFixed(2)}%
+        when it used that program&rsquo;s uncertainty assumptions. This supports those assumptions as the
+        explanation for the differences in these {rows.length} cases. The largest difference was
+        {worst.dCL_pct_vanco_vs_tucuxi.toFixed(2)}% in case {worst.id}.
+        This finding applies to the selected clearance estimates. It does not establish which approach
+        is more accurate in real patients.
       </p>
     </section>
   );
@@ -379,12 +329,12 @@ function MethodologyCard2026() {
       <h2 style={sectionTitleStyle}>Method</h2>
       <ol style={{ margin: "10px 0 0", paddingLeft: 18, fontSize: 13, lineHeight: 1.65, color: "var(--color-secondary)" }}>
         <li>
-          Generate {m.n} synthetic ICU patients (random seed {m.seed}) with &ldquo;true&rdquo; parameters drawn from a
-          developer-modified Goti-inspired model; simulate two levels with assay error ({m.design}). The test data are available in the source repository.
+          Create {m.n} simulated ICU patients using a model adapted from Goti&rsquo;s work, then simulate
+          two blood levels with measurement error. The data and full settings are available in the linked methods.
         </li>
         <li>
           Run Vancomyzer&rsquo;s calculator (calculator version {m.engineManifest}) on each patient: {COLIN_2019.shortName}{" "}
-          prior from the covariates, then the Bayesian fit on the two levels.
+          starting estimates from patient characteristics, then update them using the two blood levels.
         </li>
         <li>
           Use the Colin 2019 equations in Tucuxi with prior variability
@@ -394,8 +344,8 @@ function MethodologyCard2026() {
           Bayesian fit.
         </li>
         <li>
-          Score the two sets of estimates with the committed comparison script against the criteria written
-          down on 17 Sep 2026, before the run; re-fit every tail case independently under both error models.
+          Compare the estimates against limits set on 17 Sep 2026, before the analysis. Repeat calculations
+          for clearance differences of 3% or more using each program&rsquo;s uncertainty assumptions.
         </li>
       </ol>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 14, marginBottom: 0, lineHeight: 1.55 }}>
@@ -408,12 +358,12 @@ function MethodologyCard2026() {
 function ScopeCard2026() {
   const limits = [
     {
-      label: "Checks the fitting implementation, not clinical accuracy",
-      body: "Both programs used Vancomyzer’s custom separate priors based on Colin population equations (Tucuxi evaluating a developer-authored model file) and the same simulated data. Agreement supports similar estimates on this fixture with shared custom priors and different residual error models. It does not establish complete Colin-model reproduction. It does not show that Colin 2019 is the right model for any population, and it says nothing about accuracy in patients.",
+      label: "What was compared",
+      body: "Both programs used starting estimates and variability assumptions supplied by Vancomyzer, based on Colin’s population equations. Their similar results apply to these simulated patients and shared assumptions. They do not confirm the full published Colin model or establish accuracy in patients.",
     },
     {
-      label: "Error models differ by design",
-      body: "The two programs' residual error models are not identical in form, and separate refits reproduce the selected 14 clearance tails to the reported tolerance. The comparison therefore also functions as a sensitivity analysis of that choice: up to about 9% in clearance for individual synthetic patients whose level came back well above prediction.",
+      label: "Blood-level uncertainty",
+      body: "The programs handle blood-level uncertainty differently. Repeating the calculations supported this as the explanation for the 14 clearance differences of 3% or more. Differences reached about 9% in simulated patients with levels well above prediction.",
     },
     {
       label: "Simulated patients only",
@@ -440,11 +390,10 @@ function ScopeCard2026() {
         ))}
       </ul>
       <p style={{ fontSize: 13, color: "var(--color-secondary)", marginTop: 14, marginBottom: 0, lineHeight: 1.6 }}>
-        <strong>What this shows:</strong> given the same prior and the same simulated data, Vancomyzer and Tucuxi
-        produce individual estimates that agree within the pre-set criteria for all {CROSSCHECK_META_2026.n}{" "}
-        synthetic patients, with every larger difference explained. <strong>What it does not show:</strong> that
-        the Colin 2019 equations are clinically correct, that either error model is the right one, or that
-        Vancomyzer is accurate in real patients.
+        The results met the numerical limits set for this group of {CROSSCHECK_META_2026.n} simulated patients.
+        The separate check of the largest clearance differences supported blood-level uncertainty assumptions
+        as their explanation. Clinical accuracy and the choice of uncertainty assumptions still need evaluation
+        with patient data.
       </p>
     </section>
   );
@@ -461,269 +410,6 @@ function Breadcrumb() {
     </div>
   );
 }
-
-function SnapshotNotice() {
-  return (
-    <div style={{
-      padding: "14px 18px",
-      background: "#eff6ff",
-      border: "1px solid #bfdbfe",
-      borderLeft: "3px solid #2563eb",
-      color: "#14232f",
-      borderRadius: 4,
-      fontSize: 13,
-      lineHeight: 1.55,
-      marginBottom: 24,
-    }}>
-      <strong>Results from {CROSSCHECK_META.displayDate}.</strong> The developer ran this comparison once,
-      with the {CROSSCHECK_META.engineVersion}. It has not been re-run since, and running Tucuxi requires a
-      separate local installation, so it is not part of the site build. The figures below are read directly
-      from that run&rsquo;s saved results.{" "}
-      This is an archived software-version comparison, not an evaluation of the current release.
-      Model settings and prior assumptions differ from the current implementation. These figures must
-      not be used to claim current-product accuracy or independent clinical validation.
-    </div>
-  );
-}
-
-function ResultCard() {
-  const s = CROSSCHECK.summary;
-  const medians = PARAM_ORDER.map((k) => s[k].median_abs);
-  const p95s = PARAM_ORDER.map((k) => s[k].p95_abs);
-  const maxes = PARAM_ORDER.map((k) => s[k].max_abs);
-  return (
-    <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Agreement between the two programs · n = {CROSSCHECK.n}</h2>
-      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}>
-        Relative difference between the two programs&rsquo; individual (posterior) estimates, as a percentage of
-        the mean of the two, per parameter. Both were given the <em>same</em> prior and the <em>same</em> two
-        simulated levels.
-      </p>
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ borderBottom: "1px solid var(--color-border)", textAlign: "left", color: "var(--color-dim)" }}>
-              <th style={cellStyle}>Parameter</th>
-              <th style={numCellStyle}>median |Δ|</th>
-              <th style={numCellStyle}>mean signed Δ</th>
-              <th style={numCellStyle}>p90 |Δ|</th>
-              <th style={numCellStyle}>p95 |Δ|</th>
-              <th style={numCellStyle}>max |Δ|</th>
-            </tr>
-          </thead>
-          <tbody>
-            {PARAM_ORDER.map((k, i) => {
-              const row = s[k];
-              return (
-                <tr key={k} style={{ borderBottom: i < PARAM_ORDER.length - 1 ? "1px solid var(--color-border)" : "none" }}>
-                  <td style={{ ...cellStyle, color: "var(--color-primary)", fontWeight: 600 }}>{PARAM_LABEL[k]}</td>
-                  <td style={numCellStyle}>{row.median_abs.toFixed(2)}%</td>
-                  <td style={numCellStyle}>{signedPct(row.mean_signed)}</td>
-                  <td style={numCellStyle}>{row.p90_abs.toFixed(2)}%</td>
-                  <td style={numCellStyle}>{row.p95_abs.toFixed(2)}%</td>
-                  <td style={numCellStyle}>{row.max_abs.toFixed(2)}%</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 12, marginBottom: 0, lineHeight: 1.55 }}>
-        Observed agreement: median absolute differences of {range(medians, 2)}% across the four parameters,
-        95th percentiles of {range(p95s, 2)}%, and maximum differences of {range(maxes, 2)}% (clearance:
-        median {s.CL.median_abs.toFixed(2)}%, 95th percentile {s.CL.p95_abs.toFixed(2)}%, maximum{" "}
-        {s.CL.max_abs.toFixed(2)}%; central volume: {s.V1.median_abs.toFixed(2)}%, {s.V1.p95_abs.toFixed(2)}%
-        and {s.V1.max_abs.toFixed(2)}%). No equivalence margins were set before the run, so these numbers describe
-        the agreement that was observed; they are not a test of whether the programs are interchangeable.
-      </p>
-    </section>
-  );
-}
-
-function AccuracyCard() {
-  const a = CROSSCHECK.accuracy_vs_truth;
-  const gaps = PARAM_ORDER.map((k) => Math.abs(a[k].vz - a[k].tucuxi));
-  return (
-    <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Error against the known synthetic truth</h2>
-      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}>
-        Because the patients are simulated, their &ldquo;true&rdquo; parameters are known. Median absolute
-        percentage error of each program&rsquo;s estimates against that truth, with the unfitted prior for
-        reference (lower is better).
-      </p>
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ borderBottom: "1px solid var(--color-border)", textAlign: "left", color: "var(--color-dim)" }}>
-              <th style={cellStyle}>Parameter</th>
-              <th style={numCellStyle}>prior (no fit)</th>
-              <th style={numCellStyle}>Vancomyzer</th>
-              <th style={numCellStyle}>Tucuxi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {PARAM_ORDER.map((k, i) => (
-              <tr key={k} style={{ borderBottom: i < PARAM_ORDER.length - 1 ? "1px solid var(--color-border)" : "none" }}>
-                <td style={{ ...cellStyle, color: "var(--color-primary)", fontWeight: 600 }}>{PARAM_LABEL[k]}</td>
-                <td style={{ ...numCellStyle, color: "var(--color-dim)" }}>{a[k].prior.toFixed(1)}%</td>
-                <td style={numCellStyle}>{a[k].vz.toFixed(1)}%</td>
-                <td style={numCellStyle}>{a[k].tucuxi.toFixed(1)}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 12, marginBottom: 0, lineHeight: 1.6 }}>
-        The two programs&rsquo; median errors differed by {range(gaps, 1)} percentage points per parameter. No
-        equivalence margins were prespecified. Only <strong>clearance</strong> improved materially with the
-        two-level fit ({a.CL.prior.toFixed(1)}% with the prior alone, {a.CL.vz.toFixed(1)}% for Vancomyzer and{" "}
-        {a.CL.tucuxi.toFixed(1)}% for Tucuxi). The inter-compartmental clearance and peripheral volume (Q, V₂)
-        barely moved: a steady-state peak and trough carry little information about them, so both programs
-        stayed near the shared prior. Similar errors are expected when two programs fit the same model to the
-        same data; this is synthetic truth, not accuracy in patients.
-      </p>
-    </section>
-  );
-}
-
-function OutlierCard({ audit }: { audit: ReturnType<typeof auditCrosscheckCohort> }) {
-  const highBmiIds = new Set(audit.cohort_matches_report ? audit.high_bmi.map((p) => p.id) : []);
-  const cl = CROSSCHECK.outliers.CL;
-  const v1 = CROSSCHECK.outliers.V1;
-  const listed = [...cl, ...v1];
-  const crcls = listed.map((o) => o.crcl);
-  const aboveArc = new Set(listed.filter((o) => o.crcl > 130).map((o) => o.id));
-  const highBmiListed = audit.high_bmi.filter((p) => listed.some((o) => o.id === p.id));
-  return (
-    <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Largest disagreements</h2>
-      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}>
-        The five largest differences recorded for clearance and central volume (patient id, creatinine clearance
-        in mL/min, difference).
-      </p>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
-        <OutlierMini title="Clearance (CL)" rows={cl} highBmiIds={highBmiIds} />
-        <OutlierMini title="Central volume (V₁)" rows={v1} highBmiIds={highBmiIds} />
-      </div>
-      <p style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 12, marginBottom: 0, lineHeight: 1.6 }}>
-        The largest disagreements are not confined to patients with augmented renal clearance. Creatinine
-        clearance for the patients listed ranges from {Math.min(...crcls).toFixed(0)} to{" "}
-        {Math.max(...crcls).toFixed(0)} mL/min, and {aboveArc.size} of the {new Set(listed.map((o) => o.id)).size}{" "}
-        patients listed are above 130 mL/min.
-        {audit.cohort_matches_report && highBmiListed.length > 0 && (
-          <>
-            {" "}Listed patients with a BMI of 40 or more:{" "}
-            {highBmiListed.map((p) => `${p.id} (BMI ${p.bmi.toFixed(1)})`).join(" and ")}. These cases belong to the archived software version. Differences in prior settings between
-            the compared implementations were not fully recorded, so attribution remains unresolved.
-          </>
-        )}
-        {" "}These individual disagreements have not been explained and should be investigated.
-      </p>
-    </section>
-  );
-}
-
-function OutlierMini({ title, rows, highBmiIds }: { title: string; rows: Outlier[]; highBmiIds: Set<string> }) {
-  return (
-    <div style={{ padding: "12px 14px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 4 }}>
-      <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-dim)" }}>{title}</p>
-      {rows.map((o) => (
-        <div key={o.id} style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 12, padding: "3px 0", fontFamily: "var(--font-mono, monospace)" }}>
-          <span style={{ color: "var(--color-secondary)" }}>
-            {o.id} · CrCl {o.crcl}{highBmiIds.has(o.id) ? " · BMI ≥ 40" : ""}
-          </span>
-          <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>{o.delta_pct >= 0 ? "+" : ""}{o.delta_pct.toFixed(1)}%</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function MethodologyCard() {
-  const sd = CROSSCHECK_META.documentedTucuxiPriorLogSd;
-  return (
-    <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Method</h2>
-      <ol style={{ margin: "10px 0 0", paddingLeft: 18, fontSize: 13, lineHeight: 1.65, color: "var(--color-secondary)" }}>
-        <li>
-          Generate {CROSSCHECK.n} synthetic ICU patients (seed {CROSSCHECK_META.seed}, the same generator as the
-          Predictive Performance page), with &ldquo;true&rdquo; parameters drawn from a Goti 2018–based model.
-        </li>
-        <li>
-          Simulate a steady-state peak and trough for each patient, with simulated residual error.
-        </li>
-        <li>
-          Compute per-patient priors using the archived software version, then run that version&rsquo;s Bayesian fit on
-          the two levels to estimate CL, V₁, Q and V₂.
-        </li>
-        <li>
-          Give Tucuxi a model file written by Vancomyzer ({CROSSCHECK_META.structuralModel}) containing
-          Vancomyzer&rsquo;s prior values for that patient, with prior variability (log-scale SD: CL {sd.CL}, V₁{" "}
-          {sd.V1}, Q {sd.Q}, V₂ {sd.V2}) and residual error ({CROSSCHECK_META.documentedTucuxiResidualError}) chosen
-          to approximate Vancomyzer&rsquo;s settings, plus the same dosing history and the same two levels. Run
-          Tucuxi&rsquo;s Bayesian fit.
-        </li>
-        <li>
-          Compare the two programs&rsquo; estimates parameter by parameter. The analysis checked that all{" "}
-          {CROSSCHECK.n} patients were present before summarizing.
-        </li>
-      </ol>
-      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 14, marginBottom: 0, lineHeight: 1.55 }}>
-        Comparator: {CROSSCHECK_META.comparator} ({CROSSCHECK_META.comparatorRepo}, commit{" "}
-        {CROSSCHECK_META.comparatorCommit}), an open-source dosing program developed by the REDS institute at
-        HEIG-VD, Switzerland. The one-off scripts used for the run, and the per-patient inputs, were not committed
-        to the repository.
-      </p>
-    </section>
-  );
-}
-
-function ScopeCard() {
-  const limits = [
-    {
-      label: "Checks the fitting implementation, not the Colin equations or clinical accuracy",
-      body: "Both programs were given the same priors and a Colin model file written by Vancomyzer (a Colin 2019 file that Tucuxi can load was not publicly available). Agreement therefore shows that the two programs fit the same model to the same data in a similar way. It does not independently confirm the Colin 2019 equations (those are checked against published values on the Literature Reproducibility page), and it says nothing about accuracy in patients.",
-    },
-    {
-      label: "Same starting estimate",
-      body: "Tucuxi was given Vancomyzer's starting estimate for each patient, so the prior calculation itself was not compared.",
-    },
-    {
-      label: "Simulated patients only",
-      body: "The patients and their levels are computer-generated. Real-patient performance has not been evaluated; the Predictive Performance analysis is also synthetic.",
-    },
-    {
-      label: "Two-level sampling",
-      body: "A steady-state peak and trough mainly inform clearance. Agreement on Q and V₂ largely reflects both programs staying near the shared starting estimate.",
-    },
-    {
-      label: "Run date and calculator version",
-      body: `Run once on ${CROSSCHECK_META.displayDate} with the ${CROSSCHECK_META.engineVersion}. It has not been repeated with the current calculator.`,
-    },
-  ];
-  return (
-    <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Scope &amp; limitations</h2>
-      <ul style={{ margin: "10px 0 0", padding: 0, listStyle: "none" }}>
-        {limits.map((l) => (
-          <li key={l.label} style={{ padding: "10px 12px", borderLeft: "3px solid #d97706", background: "#fffbeb", marginBottom: 8, borderRadius: 3 }}>
-            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "#92400e", textTransform: "uppercase", letterSpacing: "0.04em" }}>{l.label}</p>
-            <p style={{ margin: "4px 0 0", fontSize: 13, color: "#78350f", lineHeight: 1.55 }}>{l.body}</p>
-          </li>
-        ))}
-      </ul>
-      <p style={{ fontSize: 13, color: "var(--color-secondary)", marginTop: 14, marginBottom: 0, lineHeight: 1.6 }}>
-        <strong>What this shows:</strong> given the same priors, model file and simulated data, Tucuxi and
-        Vancomyzer produced similar individual estimates for most of the {CROSSCHECK.n} synthetic patients, with
-        some larger individual differences that have not been explained. <strong>What it does not show:</strong>{" "}
-        that the Colin 2019 equations are correct, that the two programs are interchangeable, or that Vancomyzer
-        is accurate in real patients.
-      </p>
-    </section>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────
 
 const cardStyle: React.CSSProperties = {
   padding: "20px 22px",

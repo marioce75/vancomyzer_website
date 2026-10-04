@@ -76,9 +76,9 @@ function RegisterPageInner() {
     e.preventDefault();
     setError("");
     if (password !== confirmPassword) { setError("Passwords do not match."); return; }
-    if (password.length < 8) { setError("Password min 8 characters."); return; }
+    if (password.length < 8) { setError("Use at least 8 characters for your password."); return; }
     if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
-      setError("Password must contain uppercase, lowercase, and number."); return;
+      setError("Include an uppercase letter, a lowercase letter and a number."); return;
     }
     if (!/^[a-zA-Z0-9_]+$/.test(username)) { setError("Username: letters, numbers, underscores only."); return; }
     if (!countryCode) { setError("Country selection required."); return; }
@@ -225,7 +225,7 @@ function RegisterPageInner() {
             </div>
             <div style={{ marginBottom: 12 }}>
               <label style={labelStyle}>Password *</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="Min 8 chars, upper+lower+number" style={inputStyle} />
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="At least 8 characters, with uppercase, lowercase and a number" style={inputStyle} />
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={labelStyle}>Confirm Password *</label>

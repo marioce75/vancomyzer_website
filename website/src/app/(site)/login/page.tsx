@@ -105,7 +105,7 @@ function LoginForm() {
         setMagicSent(true);
       }
     } catch {
-      setError("Network error. Try again.");
+      setError("Could not connect. Please try again.");
     } finally {
       setMagicSending(false);
     }

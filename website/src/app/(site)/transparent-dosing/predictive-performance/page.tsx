@@ -136,13 +136,12 @@ function DesignCard({ run }: { run: RunOutput }) {
       label: "Analysis",
       body: (
         <>
-          Developer-run synthetic analysis (not real patients). Recomputed from the source code each time
-          the site is built: random seed {run.seed}, n = {run.n_attempted}.
+          Analysis by the Vancomyzer team using {run.n_attempted} simulated patients, not patient records.
         </>
       ),
     },
     {
-      label: "Engine",
+      label: "Calculator",
       body: (
         <>
           Vancomyzer a posteriori (Bayesian) calculator with the {COLIN_2019.shortName} prior. Calculator version{" "}
@@ -166,7 +165,7 @@ function DesignCard({ run }: { run: RunOutput }) {
       ),
     },
     {
-      label: "Truth model",
+      label: "Simulation model",
       body: (
         <>
           Goti 2018–based model, different from Vancomyzer&rsquo;s prior: CL = {GOTI_2018_THETA.CL} ×
@@ -202,7 +201,7 @@ function DesignCard({ run }: { run: RunOutput }) {
       ),
     },
     {
-      label: "Endpoint",
+      label: "What was measured",
       body: (
         <>
           The concentration {d.heldout_sample_time_hours.toFixed(1)} h after the start of the same dose
@@ -225,7 +224,7 @@ function DesignCard({ run }: { run: RunOutput }) {
   ];
   return (
     <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>What was run</h2>
+      <h2 style={sectionTitleStyle}>How the comparison was done</h2>
       <dl style={{ margin: "12px 0 0", display: "grid", gap: 10 }}>
         {rows.map((r) => (
           <div key={r.label} style={{ display: "grid", gridTemplateColumns: "minmax(0, 150px) minmax(0, 1fr)", gap: 12, fontSize: 13, lineHeight: 1.6 }}>
@@ -241,15 +240,15 @@ function DesignCard({ run }: { run: RunOutput }) {
 function ResultsCard({ run, vsObservation, vsTruth }: { run: RunOutput; vsObservation: PerformanceMetrics; vsTruth: PerformanceMetrics }) {
   const t = PREDICTIVE_DESIGN.heldout_sample_time_hours.toFixed(1);
   const rows: { label: string; m: PerformanceMetrics }[] = [
-    { label: `Synthetic observation at ${t} h (truth + residual error)`, m: vsObservation },
-    { label: `Noise-free truth at ${t} h`, m: vsTruth },
+    { label: `Simulated blood test at ${t} h (including measurement error)`, m: vsObservation },
+    { label: `Simulated concentration at ${t} h (without measurement error)`, m: vsTruth },
   ];
   return (
     <section style={cardStyle}>
       <h2 style={sectionTitleStyle}>Results · developer-run synthetic analysis (not real patients)</h2>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}>
         Error of the calculator&rsquo;s prediction at the held-out time, one prediction per patient
-        (random seed {run.seed}, calculator version {MODEL_MANIFEST_VERSION}). Metric definitions are below.
+        (calculator version {MODEL_MANIFEST_VERSION}). Metric definitions are below.
       </p>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>

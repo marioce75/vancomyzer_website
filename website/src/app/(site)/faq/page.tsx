@@ -135,7 +135,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: `What does ${COLIN.shortName} use instead of Cockcroft-Gault?`,
     answer: [
-      "Age, total body weight and serum creatinine, as direct covariates in a two-compartment model, with no intermediate CrCl calculation. FDecline describes the fall in clearance with age; FSCR describes the effect of serum creatinine relative to an age-standardized reference:",
+      "Age, total body weight and serum creatinine are used directly in a two-compartment model, without first calculating creatinine clearance. FDecline describes the fall in clearance with age; FSCR describes the effect of serum creatinine relative to an age-standardized reference:",
       { formula: [COLIN.equations.CL, COLIN.equations.FDecline, COLIN.equations.FSCR].join("\n") },
       `Source data: ${COLIN.sourcePopulation}`,
       `Covariates in the published final model that Vancomyzer does not apply:\n${bullets(COLIN.omittedCovariates)}`,
@@ -167,7 +167,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: `How has ${COLIN.shortName} performed in independent evaluations?`,
     answer: [
-      `${VALIDATION_STATUS} The studies below evaluated the published ${COLIN.shortName} model, not Vancomyzer’s implementation of it.`,
+      `${VALIDATION_STATUS} The studies below evaluated the published ${COLIN.shortName} model, not Vancomyzer itself.`,
       bullets([
         `Heus 2022 (three Belgian hospitals; 169 non-ICU general-ward patients on continuous-infusion vancomycin; 923 samples): ${COLIN.shortName} had the second-best predictive performance of 23 published models, after the Okada model. Vancomyzer models intermittent infusion, not continuous infusion.`,
         `Aljutayli 2022 (McGill University Health Centre; single-center retrospective data from 116 adults): transferability diagnostics suggested ${COLIN.shortName} and a model by Yamamoto et al. were the two of seven literature models best suited to the local data. The authors note that these diagnostics were not strong predictors of predictive performance.`,
@@ -188,7 +188,7 @@ const FAQ_ITEMS: FaqItem[] = [
     answer: [
       VALIDATION_STATUS,
       "Evidence to date is developer-run: reproduction of published literature cases, synthetic simulation, a synthetic cross-check against Tucuxi, an independent reference calculation of the equations (including loading-dose schedules), and a synthetic check of the uncertainty band's coverage. These checks test whether the equations are implemented as intended; they do not show how accurately Vancomyzer predicts levels in real patients.",
-      "The shaded band around the predicted curve on the concentration–time graph is a 90% credible band. The calculator draws 400 sets of PK parameters from the posterior (or, before any level, from the population prior), simulates each on the same regimen, and shades the 5th to 95th percentile at each time. It reflects parameter uncertainty only, so it is not a prediction interval for a new measured level (assay error is excluded), and it depends on the calculator's prior variances and residual error model. When the posterior cannot be estimated reliably, no band is drawn and the graph says why. The band is model-based and not yet validated: whether 90% of real patients' concentrations fall inside it has not been measured, and will be checked in the validation studies.",
+      "The shaded area on the concentration–time graph is a 90% credible band. It shows the middle 90% of concentrations from 400 simulated sets of pharmacokinetic values, using the population estimates before blood levels are entered and updated estimates afterward. It reflects uncertainty in those model estimates but excludes measurement error, so it is not a range for predicting a future blood test result. The calculator explains when it cannot estimate a band reliably. The band’s reliability in patients has not yet been established.",
       "Vancomyzer™ is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation.",
     ],
     refs: [
@@ -262,7 +262,7 @@ export default function FAQPage() {
       <PageHeader
         kicker="Frequently asked questions"
         title="Why Vancomyzer is built the way it is."
-        lede="The model, the renal covariate, body weight, and what has and has not been validated. Each answer cites its sources."
+        lede="How the model uses kidney function and body weight, and what has and has not been validated. Each answer cites its sources."
         compact
       />
       <Record label="Questions" note={`${FAQ_ITEMS.length} answers. Open any question; the references are listed under each answer.`} last>

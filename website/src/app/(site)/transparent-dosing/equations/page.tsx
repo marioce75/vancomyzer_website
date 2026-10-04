@@ -116,9 +116,8 @@ export default function EquationsPage() {
             1. Population model — {COLIN_2019.shortName}
           </h2>
           <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            Every adult is dosed with the {COLIN_2019.displayName}. Clearance is built from four covariate
-            functions composed multiplicatively: allometric size scaling, sigmoidal maturation (effectively 1.0 for
-            adults), an age-decline sigmoid, and a serum-creatinine exponential effect.
+            Every adult is dosed with the {COLIN_2019.displayName}. Clearance combines four factors: body size, maturation (effectively 1.0 for adults),
+            age-related decline, and serum creatinine. The equations below show how these factors are multiplied.
           </p>
 
           <dl className="mt-4 max-w-3xl space-y-2 text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
@@ -135,7 +134,7 @@ export default function EquationsPage() {
               <dd className="inline">{COLIN_2019.vancomyzerScope}</dd>
             </div>
             <div>
-              <dt className="inline font-semibold" style={{ color: "#14232f" }}>Renal covariate: </dt>
+              <dt className="inline font-semibold" style={{ color: "#14232f" }}>Kidney-function input: </dt>
               <dd className="inline">{COLIN_2019.renalCovariate}</dd>
             </div>
           </dl>
@@ -148,7 +147,7 @@ export default function EquationsPage() {
           <div className="mt-6 grid gap-6 sm:grid-cols-2">
             <div>
               <h3 className="text-base font-semibold" style={{ color: "#14232f" }}>
-                Published covariates not applied
+                Published patient factors not used
               </h3>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
                 {COLIN_2019.omittedCovariates.map((covariate) => (
@@ -406,15 +405,14 @@ two-compartment steady-state superposition formula
       <section className="px-4 py-12 sm:px-6 md:py-14" style={{ borderBottom: "1px solid #cbd6e0" }}>
         <div className="mx-auto max-w-[1180px]">
           <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}>
-            7. MAP-Bayesian posterior fitting
+            7. Adjusting estimates with blood levels
           </h2>
           <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            Given measured levels, Vancomyzer fits the patient&rsquo;s individual PK using maximum a
-            posteriori (MAP) Bayesian estimation. It balances two things: how well the estimate fits the
-            patient&rsquo;s measured concentrations (under a normal assay-error model), against how far it
-            strays from the population priors (a log-normal prior on each PK parameter). The fit is
-            repeated from several starting points and the lowest-objective result is kept, which makes it less
-            likely that the optimizer stops at a poor local solution.
+            Vancomyzer uses Bayesian estimation to combine the population model with the patient&rsquo;s
+            measured blood levels. It considers both the agreement with those levels and how far the
+            estimates differ from the population starting values. It compares several possible solutions
+            to reduce the chance of settling on a poorer fit. The method is called maximum a posteriori
+            (MAP) estimation; the equation and assumptions are shown below.
           </p>
 
           <pre
@@ -437,7 +435,7 @@ Prior log-SDs (Vancomyzer settings, all adults):
           <p className="mt-4 text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
             With MAP estimation, a single observation is weighed against the prior rather than replacing it. The
             prior widths above are Vancomyzer settings, not the published {COLIN_2019.shortName} variability shown
-            in section 1. When the residual exceeds 25% relative error, the calculator surfaces a
+            in section 1. When the residual exceeds 25% relative error, the calculator displays a
             Fit Quality Advisory and recommends a confirmatory level rather than overriding the prior.
           </p>
 
@@ -445,14 +443,14 @@ Prior log-SDs (Vancomyzer settings, all adults):
             The 90% credible band on the graph
           </h3>
           <p className="mt-2 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            The band is drawn from the same objective. With levels, 4,000 parameter sets are proposed around the MAP
-            estimate (a normal approximation from the curvature of the objective, widened 1.5×), each is weighted by
-            its posterior probability, and 400 are resampled. Without levels, 400 sets are drawn from the prior. Each
-            set is simulated on the plotted dose schedule, and the band is the 5th–95th percentile at each time. Draws
-            use a fixed seed, so the same inputs give the same band. It reflects parameter uncertainty only (assay
-            error is excluded) and depends on the prior widths and error model above. No band is drawn when the
-            posterior cannot be estimated reliably (effective sample size below 400) or when the plotted parameters
-            are not the fitted optimum.
+            The band shows uncertainty in the estimated concentrations. With blood levels available,
+            the calculator considers 4,000 possible sets of pharmacokinetic values and selects 400 according
+            to how well they agree with both the levels and the starting assumptions. Before levels are
+            available, it uses 400 sets from the population assumptions. The middle 90% of the simulated
+            concentrations forms the band at each time. The same inputs give the same band.
+            Measurement error is excluded, so the band does not predict the range of a future blood test result.
+            No band is shown when the estimate is unreliable or when the displayed parameters differ from
+            the fitted values. The mathematical method is given below.
           </p>
           <pre
             className="mt-4 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"

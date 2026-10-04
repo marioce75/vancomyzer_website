@@ -27,11 +27,11 @@ export const metadata: Metadata = {
 const CHECKS_RUN_ON = "2026-09-25.1";
 
 const ORACLE_SECTIONS = [
-  { id: "A", what: "The reference implementation against matrix-exponential solutions computed separately in Python (SciPy), for single doses, dose trains and steady state.", n: "71 checks" },
+  { id: "A", what: "Two separate mathematical calculations compared for single doses, repeated doses and steady state.", n: "71 checks" },
   { id: "B", what: "Published reference values for a typical adult (35 y, 70 kg, SCr 0.83 mg/dL; 1,000 mg q12h over 1.75 h).", n: "6 checks" },
   { id: "C", what: "Mathematical properties the solution must satisfy, such as mass balance, superposition and the steady-state limit.", n: "171 checks" },
-  { id: "D", what: "The calculator's own code against the reference: the Colin 2019 prior, the reference regimen, every fixture case (including slow elimination, q18h/q36h and 0.5–4 h infusions), 20 random adult regimens and the analytic AUC.", n: "6 groups" },
-  { id: "E", what: "The loading-dose history against the reference: 40 random schedules (loading dose, infusion times, a shortened gap to the first maintenance dose, 2–7 doses), comparing concentrations, AUC, the dose-N trough and AUC, and the fit's predicted level.", n: "40 regimens" },
+  { id: "D", what: "The calculator against the reference calculation: starting estimates based on Colin 2019, the reference regimen, every test case (including slow elimination, q18h/q36h and 0.5–4 h infusions), 20 random adult regimens and the analytic AUC.", n: "6 groups" },
+  { id: "E", what: "The loading-dose history against the reference: 40 random schedules (loading dose, infusion times, a shortened gap to the first maintenance dose, 2–7 doses), comparing concentrations, AUC, the trough and AUC after the selected dose, and the fit's predicted level.", n: "40 regimens" },
 ];
 
 const LOADING_BIAS = [
@@ -120,13 +120,12 @@ export default function SoftwareChecksPage() {
       </PageHeader>
 
       {/* ── REFERENCE CALCULATION ─────────────────────────── */}
-      <Record id="reference" label="Independent reference calculation" note="Does the code compute what the equations say?">
+      <Record id="reference" label="Independent reference calculation" note="Do the calculations agree with a separate mathematical check?">
         <div className="mb-3"><Chip kind="ok">Developer-run · 255 passed, 0 failed</Chip></div>
         <Prose>
           <p>
-            A second implementation of the two-compartment equations was written from the differential equations,
-            without importing any calculator code. It is first checked against solutions computed separately in
-            Python, then the calculator&rsquo;s own functions are compared with it. Agreement must be within one part in
+            A separate calculation was developed from the two-compartment equations and checked with another
+            mathematical method. The calculator&rsquo;s results were then compared with that reference. Agreement must be within one part in
             a million wherever both sides are exact.
           </p>
         </Prose>
@@ -143,7 +142,7 @@ export default function SoftwareChecksPage() {
         <Prose className="mt-4">
           <p>
             Result on version {CHECKS_RUN_ON}: 255 checks passed and no value differed from the reference by more than
-            one part in a million. The same developer wrote both implementations, so a shared misreading of the
+            one part in a million. The same developer wrote both calculations, so a shared misreading of the
             model would not be caught; the <Link href="/transparent-dosing/engine-crosscheck" style={{ textDecoration: "underline" }}>comparison with Tucuxi</Link> uses
             a separately built program for that reason.
             {RERUN_2026.allFitsSucceeded && RERUN_2026.maxRelDiffPct === 0 && (
@@ -158,7 +157,7 @@ export default function SoftwareChecksPage() {
         <div className="mb-3"><Chip kind="ok">Developer-run · synthetic</Chip></div>
         <Prose>
           <p>
-            In the 1- and 2-level workflows, dose 1 can be entered as a loading dose with its own amount, infusion time
+            When using one or two blood levels, dose 1 can be entered as a loading dose with its own amount, infusion time
             and gap to the first maintenance dose. The fit to the measured levels then uses the doses actually given.
             If a loading dose is recorded as a maintenance dose instead, the extra drug is read as slow clearance and
             exposure is overestimated.
@@ -203,25 +202,25 @@ export default function SoftwareChecksPage() {
           </p>
         </Prose>
 
-        <div className="mt-8"><H3>App-like simulation scenarios</H3></div>
-        <Prose className="mt-2"><p>Coverage in selected synthetic scenarios, conditional on a band being available.</p></Prose>
+        <div className="mt-8"><H3>Simulations using the calculator’s assumptions</H3></div>
+        <Prose className="mt-2"><p>Results include only simulated cases in which the calculator displayed a band.</p></Prose>
         <CoverageTable scenario="app" />
 
-        <div className="mt-8"><H3>Simplified sensitivity scenarios using selected published parameters</H3></div>
+        <div className="mt-8"><H3>Simulations with selected published variability estimates</H3></div>
         <Prose className="mt-2">
           <p>
-            This is not a complete reproduction of Colin 2019. The simulation fixes Q, omits the CL–V1 and Q–V2 random-effect coupling, and uses 21.5% proportional error without the published additive component. Historical results are retained under this narrower interpretation.
+            These simulations do not reproduce the complete Colin 2019 model. They keep transfer clearance (Q) fixed, leave out the published relationships between variations in CL and V₁ and in Q and V₂, and include 21.5% proportional measurement error without the additional fixed measurement error. The tables retain the original results.
           </p>
         </Prose>
         <CoverageTable scenario="published" />
 
         <Prose className="mt-5">
           <p>
-            <strong>Reading.</strong> Coverage was near 90% in the selected app-like scenarios and lower in some simplified sensitivity scenarios. This does not establish clinical calibration or coverage under the full published model. The app-like observation generator and fitting error model are also not identical.
+            <strong>What the results mean.</strong> Coverage was near 90% in the selected simulations using the calculator’s assumptions and lower in some simulations with changed assumptions. This does not establish reliability in patients or under the full published model. The simulated measurement error also differs from the uncertainty assumptions used when fitting blood levels.
             {splitIiv && splitErr && (
-              <> The separate error and variability sensitivity scenarios gave {pct(splitErr.pooled_coverage)} and {pct(splitIiv.pooled_coverage)}; their different seeds limit causal attribution.</>
+              <> The separate error and variability sensitivity scenarios gave {pct(splitErr.pooled_coverage)} and {pct(splitIiv.pooled_coverage)}; they used different simulated patients, so the difference cannot be attributed to the changed assumptions alone.</>
             )}
-            {' '}These bands concern latent concentration, conditional on a band being available. A future measured-level evaluation needs a separately specified predictive interval including residual error. Independent review of that endpoint remains pending.
+            {' '}These bands describe the model’s estimated concentration without measurement error, and the results include only cases where a band was shown. Predicting a future blood test result would require a range that also includes measurement error. That evaluation still needs independent review.
           </p>
         </Prose>
       </Record>

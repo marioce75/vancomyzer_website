@@ -27,9 +27,9 @@ export const metadata: Metadata = {
 
 // What to look at when reviewing a calculation. Unordered: these are not steps.
 const REVIEW_POINTS = [
-  { title: "Population-model equations", body: `The ${COLIN_2019.shortName} covariate equations are shown next to the estimated pharmacokinetic parameters. Bayesian fitting also uses numerical optimization; it is not a calculation that can be reproduced by substituting inputs into one equation.` },
+  { title: "Population-model equations", body: `The ${COLIN_2019.shortName} equations describe how patient characteristics affect the starting estimates. The calculator then adjusts those estimates to measured blood levels. Reviewing that adjustment requires more than checking one equation.` },
   { title: "Fit to measured levels", body: "Bayesian estimates combine the population model with measured levels, fitted to the doses actually given, including a loading dose when one is entered. The calculator shows measured-versus-predicted differences and flags a poor fit for clinical review." },
-  { title: "90% credible band", body: "The shaded band is the 5th–95th percentile of concentrations simulated from 400 parameter sets drawn from the posterior (sampling-importance-resampling around the MAP fit), or from the population prior before any level. Parameter uncertainty only: assay error is excluded, so it is not a prediction interval for a new level. It is conditional on the calculator's prior variances and residual error model, and is model-based and not yet validated against measured patient levels." },
+  { title: "90% credible band", body: "The shaded band shows the middle 90% of concentrations from 400 simulated sets of pharmacokinetic values. It reflects uncertainty in the model estimates, updated with blood levels when available. It excludes measurement error, so it is not a range for predicting a future blood test result. Its reliability in patients has not been established." },
   { title: "Published starting model", body: `${COLIN_2019.citation} ${COLIN_2019.sourcePopulation} Published model evidence does not establish clinical validation of Vancomyzer.` },
   { title: "Scope", body: "Vancomyzer supports adults receiving intermittent intravenous vancomycin. Pediatric dosing, dialysis and continuous infusion are outside its scope. Independent clinical validation is pending." },
   { title: "Access", body: "The core calculator is free. Paid plans add account features. All plans use the same calculation method; see the pricing page for current terms." },
@@ -65,12 +65,12 @@ const SOURCES = [
 
 const METHOD_PAGES = [
   { href: "/transparent-dosing/equations", title: "Equations and derivations", covers: "Every equation and constant the calculator uses, with the reference check for a typical adult.", status: "Published model", kind: "ok" as const },
-  { href: "/transparent-dosing/cases", title: "Literature reproducibility", covers: "Published vancomycin cases run through the calculator. Same-model cases are pass/fail; cases from other models are context only.", status: "Developer-run", kind: "ok" as const },
-  { href: "/transparent-dosing/predictive-performance", title: "Predictive performance", covers: "200 synthetic ICU patients from a different published model; one held-out concentration each. Not real patients.", status: "Developer-run", kind: "ok" as const },
-  { href: "/transparent-dosing/engine-crosscheck", title: "Comparison with Tucuxi", covers: `The same prior and the same simulated levels given to a separately built program, scored against pre-set criteria.${RERUN_2026.version === MODEL_MANIFEST_VERSION && RERUN_2026.maxRelDiffPct === 0 ? " Reproduced exactly on the current calculator version." : ""}`, status: "Developer-run", kind: "ok" as const },
-  { href: "/transparent-dosing/software-checks#reference", title: "Independent reference calculation", covers: "Every concentration, AUC and dose-history formula recomputed by a separately written implementation, including 40 random loading-dose schedules; agreement within one part in a million.", status: "Developer-run", kind: "ok" as const },
+  { href: "/transparent-dosing/cases", title: "Literature reproducibility", covers: "Published vancomycin cases run through the calculator. Selected population predictions are pass/fail checks; cases from other models provide context.", status: "Developer-run", kind: "ok" as const },
+  { href: "/transparent-dosing/predictive-performance", title: "Predictive performance", covers: "200 simulated ICU patients using a model adapted from published research. Each prediction is checked against a concentration not used to calculate it.", status: "Developer-run", kind: "ok" as const },
+  { href: "/transparent-dosing/engine-crosscheck", title: "Comparison with Tucuxi", covers: `The same starting assumptions and simulated blood levels compared in two programs. Their approaches to blood-level uncertainty differ.${RERUN_2026.version === MODEL_MANIFEST_VERSION && RERUN_2026.maxRelDiffPct === 0 ? " Repeating the Vancomyzer calculations gave the same estimates for these cases." : ""}`, status: "Developer-run", kind: "ok" as const },
+  { href: "/transparent-dosing/software-checks#reference", title: "Independent reference calculation", covers: "Concentration, AUC and dose-history calculations compared with a separate mathematical calculation, including 40 random loading-dose schedules; agreement within one part in a million.", status: "Developer-run", kind: "ok" as const },
   { href: "/transparent-dosing/software-checks#loading-dose", title: "Loading-dose handling", covers: "Levels drawn after a loading dose are fitted to the doses actually given, removing the overestimate that comes from recording the load as a maintenance dose.", status: "Developer-run", kind: "ok" as const },
-  { href: "/transparent-dosing/software-checks#band", title: "Uncertainty band coverage", covers: "Synthetic patients: how often the true concentration falls inside the 90% band, under the calculator's assumptions and under the published model's variability.", status: "Not yet validated", kind: "warn" as const },
+  { href: "/transparent-dosing/software-checks#band", title: "Uncertainty band coverage", covers: "Synthetic patients: how often the true concentration falls inside the 90% band, under the calculator's assumptions and selected published variability estimates.", status: "Not yet validated", kind: "warn" as const },
   { href: "/transparent-dosing/predictive-performance#validation-plan", title: "Independent clinical validation", covers: "Retrospective and prospective evaluation with patient data at a participating institution.", status: "Pending", kind: "warn" as const },
 ];
 
@@ -134,7 +134,7 @@ export default function TransparentDosingPage() {
         <H3>Vancomycin clearance, {COLIN_2019.shortName}</H3>
         <Prose className="mt-3">
           <p>
-            Clearance is the product of a typical value and four covariate factors. Source: Clin
+            Clearance is the product of a typical value and four patient-related factors. Source: Clin
             Pharmacokinet. 2019;58(6):767-780, Table 3.
           </p>
         </Prose>

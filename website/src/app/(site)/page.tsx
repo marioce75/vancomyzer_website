@@ -98,10 +98,10 @@ const CAPABILITIES: { title: string; body: string; source?: string }[] = [
 // Evidence status: published model evidence and developer-run checks are kept
 // apart from the pending independent validation. Each row links to its page.
 const EVIDENCE_STATUS: { item: string; covers: string; status: string; kind: "ok" | "warn"; href: string }[] = [
-  { item: "Population model", covers: `${COLIN_2019.shortName} two-compartment model; population-model equations and references (Bayesian fitting also uses numerical optimization)`, status: "Published", kind: "ok", href: "/transparent-dosing/equations" },
-  { item: "Literature reproducibility", covers: "Published vancomycin cases run through the calculator; same-model reproductions are pass/fail", status: "Developer-run", kind: "ok", href: "/transparent-dosing/cases" },
-  { item: "Predictive performance", covers: "Synthetic analysis (not real patients): predictions against simulated ICU patients from a different published model", status: "Developer-run", kind: "ok", href: "/transparent-dosing/predictive-performance" },
-  { item: "Comparison with Tucuxi", covers: "Synthetic analysis: individualized estimates compared with Tucuxi, a separately built program, against pre-set acceptance criteria", status: "Developer-run", kind: "ok", href: "/transparent-dosing/engine-crosscheck" },
+  { item: "Population model", covers: `${COLIN_2019.shortName} two-compartment model; population equations and references, with the assumptions used to adjust estimates to measured levels`, status: "Published", kind: "ok", href: "/transparent-dosing/equations" },
+  { item: "Literature reproducibility", covers: "Selected published population values compared with calculator estimates", status: "Developer-run", kind: "ok", href: "/transparent-dosing/cases" },
+  { item: "Predictive performance", covers: "Predictions checked in simulated ICU patients using a model adapted from published research", status: "Developer-run", kind: "ok", href: "/transparent-dosing/predictive-performance" },
+  { item: "Comparison with Tucuxi", covers: "Estimates compared with Tucuxi in simulated patients, using limits set before the analysis", status: "Developer-run", kind: "ok", href: "/transparent-dosing/engine-crosscheck" },
   { item: "Software checks", covers: "Independent reference calculation (including loading-dose schedules) and synthetic coverage of the 90% uncertainty band", status: "Developer-run", kind: "ok", href: "/transparent-dosing/software-checks" },
   { item: "Independent clinical validation", covers: "Study with patient data at a participating institution", status: "Pending", kind: "warn", href: "/transparent-dosing" },
   { item: "FDA review", covers: "Designed to meet non-device CDS criteria, FD&C §520(o)(1)(E); not reviewed by the FDA", status: "Not reviewed", kind: "warn", href: "/disclaimer" },
@@ -263,7 +263,7 @@ export default function LandingPage() {
             <p className="mt-2" style={{ color: INK2 }}>
               Age, weight, height, serum creatinine and renal replacement status. Estimated creatinine
               clearance is shown for context; the dose is calculated from serum creatinine as the{" "}
-              {COLIN_2019.shortName} covariate.
+              {COLIN_2019.shortName} model input.
             </p>
           </div>
           <div>
@@ -273,7 +273,7 @@ export default function LandingPage() {
             </p>
           </div>
           <div>
-            <H3>3 · Alternatives and parameters</H3>
+            <H3>3 · Alternatives and calculation details</H3>
             <p className="mt-2" style={{ color: INK2 }}>
               Other regimens computed from the same parameters, the four PK parameters, the method, and
               a note you can copy into the chart.
@@ -321,7 +321,7 @@ export default function LandingPage() {
         <p className="mb-6 mt-2.5 max-w-[60ch] text-xl leading-[1.5]" style={{ color: INK2 }}>
           Method pages document the model equations, assumptions and sources. Vancomyzer has not yet
           been validated in real patients; published model evidence and developer-run checks are not
-          independent validation. This table keeps them apart, and every row links to the full record.
+          independent validation. Each row links to the methods, results and limitations.
         </p>
         <div className="overflow-x-auto" tabIndex={0} aria-label="Evidence status table; scrolls horizontally on small screens">
           <table className="vz-ledger">

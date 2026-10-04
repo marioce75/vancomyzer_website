@@ -142,7 +142,7 @@ function ResetPasswordForm() {
               <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>New Password</label>
               <input
                 type="password" value={password} onChange={e => setPassword(e.target.value)}
-                required placeholder="Min 8 chars, upper+lower+number" style={inputStyle}
+                required placeholder="At least 8 characters, with uppercase, lowercase and a number" style={inputStyle}
               />
             </div>
             <div style={{ marginBottom: 16 }}>

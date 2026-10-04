@@ -27,7 +27,7 @@ export default function AboutPage() {
         </Prose>
       </Record>
 
-      <Record label="How it is built" note="Four commitments, applied to every result.">
+      <Record label="What it provides" note="Model details, limitations and results for clinical review.">
         <Prose>
           <ul>
             <li>Show the model and assumptions used</li>

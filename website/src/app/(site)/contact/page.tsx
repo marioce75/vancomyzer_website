@@ -14,7 +14,7 @@ const channels = [
     ),
     title: "Hospital & institutional",
     email: "contact@vancomyzer.com",
-    description: "Pilot requests, BAA inquiries, pharmacy director demos, pricing for departments and health systems.",
+    description: "Pilot requests, business associate agreements, demonstrations, and pricing for departments and health systems.",
   },
   {
     icon: (
@@ -25,7 +25,7 @@ const channels = [
     ),
     title: "Research & academic",
     email: "contact@dosys.health",
-    description: "Research partnership inquiries, PK model discussion, publication co-authorship.",
+    description: "Questions about research collaboration and pharmacokinetic models.",
   },
   {
     icon: (

@@ -61,7 +61,7 @@ function HistoryUpgradeCard() {
       </div>
       <p style={{ fontSize: 14, color: "var(--color-secondary)", margin: "0 0 16px", lineHeight: 1.6 }}>
         Pro users get 90 days of de-identified calculation history with optional case IDs for tracking
-        — search, review, and re-export prior calcs without re-entering patient data.
+        — search, review, and export previous calculations again without re-entering patient data.
       </p>
       <ul style={{ margin: "0 0 16px", padding: 0, listStyle: "none", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.7 }}>
         <li style={{ paddingLeft: 18, position: "relative" }}>
