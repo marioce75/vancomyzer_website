@@ -87,9 +87,9 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           <span className="h-1.5 w-1.5 shrink-0 mx-blink" style={{ backgroundColor: "var(--color-primary)", display: "inline-block" }} aria-hidden="true" /><LocalizedText text="CLINICAL DECISION SUPPORT" /></span>
 
         {/* ── Mode switcher ──────────────────────────────── */}
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex min-w-0 flex-1 items-center justify-center">
           <LocalizedDiv
-            className="flex p-0.5"
+            className="flex min-w-0 p-0.5"
             role="tablist"
             aria-label="Calculation mode"
             style={{
@@ -108,7 +108,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 role="tab"
                 aria-selected={viewMode === value}
                 onClick={() => onViewModeChange(value)}
-                className="px-2 sm:px-3.5 py-1 text-[11px] sm:text-[13px] font-semibold whitespace-nowrap transition-all"
+                className="px-2 sm:px-3.5 py-1 text-[11px] sm:text-[13px] font-semibold whitespace-normal sm:whitespace-nowrap transition-all"
                 style={
                   viewMode === value
                     ? {
