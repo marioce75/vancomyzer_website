@@ -9043,7 +9043,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 699,
+      "line": 703,
       "surface": "child",
       "expression": "modelLabel && (\n          <span className=\"hidden md:contents\">\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{\"\\u00B7\"}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{modelLabel}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{\"\\u00B7\"}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}><LocalizedText text=\"Two-Compartment\" /></span>\n          </span>\n        )",
       "category": "structural JSX — descendants inventoried separately",
@@ -9055,7 +9055,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 701,
+      "line": 705,
       "surface": "child",
       "expression": "\"\\u00B7\"",
       "category": "literal spacing/symbol invariant",
@@ -9067,7 +9067,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 702,
+      "line": 706,
       "surface": "child",
       "expression": "modelLabel",
       "category": "source-traced citation/model/version",
@@ -9075,7 +9075,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 703,
+      "line": 707,
       "surface": "child",
       "expression": "\"\\u00B7\"",
       "category": "literal spacing/symbol invariant",
@@ -9087,7 +9087,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 707,
+      "line": 711,
       "surface": "child",
       "expression": "evidenceLabel && (\n          <span className=\"hidden md:contents\">\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{\"\\u00B7\"}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}><LocalizedText text={evidenceLabel} /></span>\n          </span>\n        )",
       "category": "structural JSX — descendants inventoried separately",
@@ -9099,7 +9099,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 709,
+      "line": 713,
       "surface": "child",
       "expression": "\"\\u00B7\"",
       "category": "literal spacing/symbol invariant",
@@ -9111,7 +9111,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 746,
+      "line": 750,
       "surface": "child",
       "expression": "z",
       "category": "typed numeric/boolean presentation",
@@ -9119,7 +9119,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 764,
+      "line": 768,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -9131,7 +9131,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 765,
+      "line": 769,
       "surface": "child",
       "expression": "comparisonData.length > 1 && (\n          <span className=\"flex items-center gap-1 text-[10px]\" style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }}>\n            <span className=\"inline-block w-4 h-0.5 border-t border-dashed\" style={{ borderColor: getCSSColor(\"--color-secondary\", \"#00cc44\"), borderTopWidth: 1.5 }} /> <LocalizedText text={comparison_label ?? \"Reference\"} />\n          </span>\n        )",
       "category": "structural JSX — descendants inventoried separately",
@@ -9139,7 +9139,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 770,
+      "line": 774,
       "surface": "child",
       "expression": "band && curveHasBand(curveData) && (\n          <LocalizedSpan\n            className=\"flex items-center gap-1 text-[10px]\"\n            style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }}\n            title={band.title}\n          >\n            <span className=\"inline-block w-3 h-3\" style={{ background: \"rgba(30, 77, 140, 0.10)\", border: \"1px solid rgba(30, 77, 140, 0.25)\" }} />\n            <LocalizedText text={band.label} />\n          </LocalizedSpan>\n        )",
       "category": "structural JSX — descendants inventoried separately",
@@ -9147,23 +9147,11 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 780,
+      "line": 784,
       "surface": "child",
       "expression": "band_info?.method === \"unavailable\" && curveData.length > 1 && (\n          <span className=\"flex items-center gap-1 text-[10px]\" style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }} title={band_info.detail ?? band_info.reason}><LocalizedText text=\"No uncertainty band:\" />{\" \"}<LocalizedText text={band_info.reason} />\n          </span>\n        )",
       "category": "structural JSX — descendants inventoried separately",
       "type": "false | Element"
-    },
-    {
-      "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 781,
-      "surface": "child",
-      "expression": "\" \"",
-      "category": "literal spacing/symbol invariant",
-      "type": "\" \"",
-      "finiteValues": [
-        " "
-      ],
-      "uncatalogued": []
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
@@ -9179,7 +9167,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 791,
+      "line": 789,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -9191,7 +9179,19 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 792,
+      "line": 795,
+      "surface": "child",
+      "expression": "\" \"",
+      "category": "literal spacing/symbol invariant",
+      "type": "\" \"",
+      "finiteValues": [
+        " "
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
+      "line": 796,
       "surface": "child",
       "expression": "measuredData.length > 0 && (\n          <span className=\"flex items-center gap-1 text-[10px]\" style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }}>\n            <span className=\"inline-block w-2 h-2\" style={{ background: \"#fff\", border: `1px solid ${getCSSColor(\"--color-primary\", \"#00ff41\")}` }} />{\" \"}<LocalizedText text=\"Measured\" /></span>\n        )",
       "category": "structural JSX — descendants inventoried separately",
@@ -9199,7 +9199,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 794,
+      "line": 798,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -14764,7 +14764,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 710,
+      "line": 714,
       "surface": "bound",
       "expression": "evidenceLabel",
       "category": "localized open text — runtime/source domain review",
@@ -14772,7 +14772,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 767,
+      "line": 771,
       "surface": "bound",
       "expression": "comparison_label ?? \"Reference\"",
       "category": "localized open text — runtime/source domain review",
@@ -14780,7 +14780,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 777,
+      "line": 781,
       "surface": "bound",
       "expression": "band.label",
       "category": "localized open text — runtime/source domain review",
@@ -14788,7 +14788,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 781,
+      "line": 785,
       "surface": "bound",
       "expression": "band_info.reason",
       "category": "localized open text — runtime/source domain review",

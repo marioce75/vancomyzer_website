@@ -474,5 +474,9 @@
   "Below target: AUC₂₄ {n1} mg·h/L (target 400–600)": {
     "es": "Por debajo del objetivo: AUC₂₄ {n1} mg·h/L (objetivo 400–600)",
     "fr": "En dessous de la cible : AUC₂₄ {n1} mg·h/L (cible 400–600)"
+  },
+  "TROUGH {n1}": {
+    "es": "VALLE {n1}",
+    "fr": "RÉSIDUELLE {n1}"
   }
 }

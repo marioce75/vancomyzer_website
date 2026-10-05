@@ -2689,7 +2689,7 @@
   },
   "TROUGH": {
     "es": "VALLE",
-    "fr": "CONCENTRATION RÉSIDUELLE"
+    "fr": "RÉSIDUELLE"
   },
   "INFUSION": {
     "es": "PERFUSIÓN",
@@ -2700,16 +2700,16 @@
     "fr": "DISTRIBUTION"
   },
   "TROUGH REF 10–20 mg/L · NOT THE DOSING TARGET (AUC 400–600)": {
-    "es": "REFERENCIA VALLE 10–20 mg/L · NO ES EL OBJETIVO POSOLÓGICO (AUC 400–600)",
-    "fr": "RÉFÉRENCE RÉSIDUELLE 10–20 mg/L · HORS CIBLE POSOLOGIQUE (AUC 400–600)"
+    "es": "REF. VALLE 10–20 mg/L · NO ES EL OBJETIVO (AUC 400–600)",
+    "fr": "RÉF. RÉSIDUELLE 10–20 mg/L · PAS LA CIBLE (AUC 400–600)"
   },
   "TROUGH REF 10–20 · NOT DOSING TARGET": {
-    "es": "REFERENCIA VALLE 10–20 · NO ES EL OBJETIVO POSOLÓGICO",
-    "fr": "RÉFÉRENCE RÉSIDUELLE 10–20 · HORS CIBLE POSOLOGIQUE"
+    "es": "REF. VALLE 10–20 · NO ES EL OBJETIVO",
+    "fr": "RÉF. RÉSIDUELLE 10–20 · PAS LA CIBLE"
   },
   "TROUGH REF 10–20": {
-    "es": "REFERENCIA VALLE 10–20",
-    "fr": "RÉFÉRENCE RÉSIDUELLE 10–20"
+    "es": "REF. VALLE 10–20",
+    "fr": "RÉF. RÉSIDUELLE 10–20"
   },
   "MIC 1 mg/L (assumed)": {
     "es": "CMI 1 mg/L (supuesta)",
@@ -2724,12 +2724,12 @@
     "fr": "CONCENTRATION (mg/L)"
   },
   "> AWAITING PATIENT DATA": {
-    "es": "> PENDIENTE DE DATOS DEL PACIENTE",
-    "fr": "> EN ATTENTE DES DONNÉES DU PATIENT"
+    "es": "> A LA ESPERA DE DATOS DEL PACIENTE",
+    "fr": "> EN ATTENTE DES DONNÉES PATIENT"
   },
   "Enter age, weight, SCr and dose to generate concentration profile": {
-    "es": "Introduzca edad, peso, creatinina sérica y dosis para generar el perfil de concentración",
-    "fr": "Saisissez l’âge, le poids, la créatinine sérique et la dose pour générer le profil de concentration"
+    "es": "Introduzca edad, peso, creatinina y dosis para generar el perfil",
+    "fr": "Saisissez âge, poids, créatinine et dose pour générer le profil"
   },
   "Reference": {
     "es": "Referencia",

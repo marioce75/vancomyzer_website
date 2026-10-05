@@ -11468,87 +11468,87 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 691,
+      "line": 695,
       "kind": "Accessible attribute",
       "text": "Concentration-time graph",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 698,
+      "line": 702,
       "text": "CONCENTRATION-TIME PROFILE",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 704,
+      "line": 708,
       "text": "Two-Compartment",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 710,
+      "line": 714,
       "text": "evidenceLabel",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 714,
+      "line": 718,
       "kind": "Accessible attribute",
       "text": "Time window",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 764,
+      "line": 768,
       "text": "Predicted",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 767,
+      "line": 771,
       "text": "comparison_label ?? \"Reference\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 777,
+      "line": 781,
       "text": "band.label",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 781,
+      "line": 785,
       "text": "No uncertainty band:",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 781,
+      "line": 785,
       "text": "band_info.reason",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 785,
+      "line": 789,
       "text": "Trough reference 10–20 mg/L (not the dosing target; target is AUC₂₄ 400–600)",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 789,
+      "line": 793,
       "text": "◆ Trough",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 791,
+      "line": 795,
       "text": "Peak",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 794,
+      "line": 798,
       "text": "Measured",
       "translated": true
     },
@@ -14348,7 +14348,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 787,
+      "line": 791,
       "kind": "Unbound JSX text",
       "text": "AUC₂₄"
     },
@@ -21055,86 +21055,79 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 699,
+      "line": 703,
       "tag": "div",
       "expression": "modelLabel && (\n          <span className=\"hidden md:contents\">\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{\"\\u00B7\"}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{modelLabel}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{\"\\u00B7\"}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}><LocalizedText text=\"Two-Compartment\" /></span>\n          </span>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 701,
+      "line": 705,
       "tag": "span",
       "expression": "\"\\u00B7\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 702,
+      "line": 706,
       "tag": "span",
       "expression": "modelLabel",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 703,
+      "line": 707,
       "tag": "span",
       "expression": "\"\\u00B7\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 707,
+      "line": 711,
       "tag": "div",
       "expression": "evidenceLabel && (\n          <span className=\"hidden md:contents\">\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{\"\\u00B7\"}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}><LocalizedText text={evidenceLabel} /></span>\n          </span>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 709,
+      "line": 713,
       "tag": "span",
       "expression": "\"\\u00B7\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 746,
+      "line": 750,
       "tag": "button",
       "expression": "z",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 764,
+      "line": 768,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 765,
+      "line": 769,
       "tag": "div",
       "expression": "comparisonData.length > 1 && (\n          <span className=\"flex items-center gap-1 text-[10px]\" style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }}>\n            <span className=\"inline-block w-4 h-0.5 border-t border-dashed\" style={{ borderColor: getCSSColor(\"--color-secondary\", \"#00cc44\"), borderTopWidth: 1.5 }} /> <LocalizedText text={comparison_label ?? \"Reference\"} />\n          </span>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 770,
+      "line": 774,
       "tag": "div",
       "expression": "band && curveHasBand(curveData) && (\n          <LocalizedSpan\n            className=\"flex items-center gap-1 text-[10px]\"\n            style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }}\n            title={band.title}\n          >\n            <span className=\"inline-block w-3 h-3\" style={{ background: \"rgba(30, 77, 140, 0.10)\", border: \"1px solid rgba(30, 77, 140, 0.25)\" }} />\n            <LocalizedText text={band.label} />\n          </LocalizedSpan>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 780,
+      "line": 784,
       "tag": "div",
       "expression": "band_info?.method === \"unavailable\" && curveData.length > 1 && (\n          <span className=\"flex items-center gap-1 text-[10px]\" style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }} title={band_info.detail ?? band_info.reason}><LocalizedText text=\"No uncertainty band:\" />{\" \"}<LocalizedText text={band_info.reason} />\n          </span>\n        )",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 781,
-      "tag": "span",
-      "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
@@ -21146,21 +21139,28 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 791,
+      "line": 789,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 792,
+      "line": 795,
+      "tag": "span",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
+      "line": 796,
       "tag": "div",
       "expression": "measuredData.length > 0 && (\n          <span className=\"flex items-center gap-1 text-[10px]\" style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }}>\n            <span className=\"inline-block w-2 h-2\" style={{ background: \"#fff\", border: `1px solid ${getCSSColor(\"--color-primary\", \"#00ff41\")}` }} />{\" \"}<LocalizedText text=\"Measured\" /></span>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 794,
+      "line": 798,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"

@@ -1,6 +1,7 @@
 "use client";
-import { LocalizedText } from "@/localization/LanguageProvider";
+import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
 
+import { translate, type Locale } from "@/localization/catalog";
 import { LocalizedDiv, LocalizedSpan } from "@/localization/LocalizedElements";
 
 
@@ -178,7 +179,9 @@ function drawGraph(
   animProgress: number,
   bandLevel: number,
   comparison: CurvePoint[] = [],
+  locale: Locale = "en",
 ) {
+  const label = (source: string) => translate(source, locale);
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -256,9 +259,9 @@ function drawGraph(
   ctx.textAlign = "right";
   ctx.fillText(
     fitCanvasLabel(ctx, [
-      "TROUGH REF 10–20 mg/L · NOT THE DOSING TARGET (AUC 400–600)",
-      "TROUGH REF 10–20 · NOT DOSING TARGET",
-      "TROUGH REF 10–20",
+      label("TROUGH REF 10–20 mg/L · NOT THE DOSING TARGET (AUC 400–600)"),
+      label("TROUGH REF 10–20 · NOT DOSING TARGET"),
+      label("TROUGH REF 10–20"),
     ], gw - 8),
     PAD.left + gw - 4,
     yTargetTop + 12,
@@ -274,7 +277,7 @@ function drawGraph(
   ctx.font = `9px ${FONT}`;
   ctx.fillStyle = "rgba(255,100,100,0.6)";
   ctx.textAlign = "right";
-  ctx.fillText("MIC 1 mg/L (assumed)", PAD.left + gw - 4, yMic - 3);
+  ctx.fillText(label("MIC 1 mg/L (assumed)"), PAD.left + gw - 4, yMic - 3);
 
   // ─── Trough reference lines ───
   ctx.setLineDash([5, 3]);
@@ -314,11 +317,11 @@ function drawGraph(
   ctx.font = `9px ${FONT}`;
   ctx.fillStyle = dim;
   ctx.textAlign = "center";
-  ctx.fillText("TIME (HOURS POST-DOSE)", PAD.left + gw / 2, h - 6);
+  ctx.fillText(label("TIME (HOURS POST-DOSE)"), PAD.left + gw / 2, h - 6);
   ctx.save();
   ctx.translate(12, PAD.top + gh / 2);
   ctx.rotate(-Math.PI / 2);
-  ctx.fillText("CONCENTRATION (mg/L)", 0, 0);
+  ctx.fillText(label("CONCENTRATION (mg/L)"), 0, 0);
   ctx.restore();
 
   // ─── Empty state text ───
@@ -327,13 +330,13 @@ function drawGraph(
     ctx.fillStyle = dim;
     ctx.textAlign = "center";
     ctx.fillText(
-      "> AWAITING PATIENT DATA",
+      label("> AWAITING PATIENT DATA"),
       PAD.left + gw / 2, PAD.top + gh / 2 - 8
     );
     ctx.font = `10px ${FONT}`;
     ctx.fillStyle = border;
     ctx.fillText(
-      "Enter age, weight, SCr and dose to generate concentration profile",
+      label("Enter age, weight, SCr and dose to generate concentration profile"),
       PAD.left + gw / 2, PAD.top + gh / 2 + 10
     );
     return;
@@ -511,7 +514,7 @@ function drawGraph(
       ctx.font = `8px ${FONT}`;
       ctx.fillStyle = "rgba(255,255,255,0.7)";
       ctx.textAlign = "right";
-      ctx.fillText(`TROUGH ${fmt(lastTrough.concentration, 2)}`, PAD.left + gw - 4, ty - 3);
+      ctx.fillText(label(`TROUGH ${fmt(lastTrough.concentration, 2)}`), PAD.left + gw - 4, ty - 3);
     }
   }
 
@@ -581,7 +584,7 @@ function drawGraph(
       if (phase) {
         ctx.fillStyle = dim;
         ctx.font = `9px ${FONT}`;
-        ctx.fillText(phase, tx + 6, lineY);
+        ctx.fillText(label(phase), tx + 6, lineY, 118);
       }
 
       // Dot on curve at hover point
@@ -608,6 +611,7 @@ export default function ConcentrationTimeGraph({
   comparison_curve,
   comparison_label,
 }: ConcentrationTimeGraphProps) {
+  const { locale } = useLanguage();
   const band = bandDescription(band_info);
   const bandLevel = band && band_info && band_info.method !== "unavailable" ? band_info.level : 0;
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -669,13 +673,13 @@ export default function ConcentrationTimeGraph({
       if (!running) return;
       const canvas = canvasRef.current;
       if (canvas) {
-        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandLevel, comparisonData);
+        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandLevel, comparisonData, locale);
       }
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
     return () => { running = false; };
-  }, [curveData, measuredData, zoom, mouse, bandLevel, comparisonData]);
+  }, [curveData, measuredData, zoom, mouse, bandLevel, comparisonData, locale]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
