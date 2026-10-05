@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -34,16 +36,16 @@ export default function ResearchPage() {
     })();
   }, []);
 
-  if (loading) return <div className="text-gray-500 text-center py-20">Loading research data...</div>;
+  if (loading) return <div className="text-gray-500 text-center py-20"><LocalizedText text={"Loading research data..."} /></div>;
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}>Research</h1>
-      <p className="text-sm text-gray-500 mb-6">Enrollment summary and research database access</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}><LocalizedText text="Research" /></h1>
+      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"Enrollment summary and research database access"} /></p>
 
       {error && (
         <div className="mb-4 px-4 py-2 text-sm rounded-md bg-amber-50 border border-amber-300 text-amber-800">
-          {error}
+          <LocalizedText text={error} />
         </div>
       )}
 
@@ -59,7 +61,7 @@ export default function ResearchPage() {
             { label: "Total Doses Recorded", value: summary.totalDoses, color: "text-gray-800" },
           ].map((card) => (
             <div key={card.label} className="bg-white border border-gray-200 rounded-lg p-5">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{card.label}</p>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1"><LocalizedText text={card.label} /></p>
               <span className={`text-2xl font-bold ${card.color}`}>{card.value}</span>
             </div>
           ))}
@@ -67,21 +69,17 @@ export default function ResearchPage() {
       )}
 
       {/* Links */}
-      <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3">Quick Links</h2>
+      <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3"><LocalizedText text={"Quick Links"} /></h2>
       <div className="flex flex-wrap gap-3">
         <Link
           href="/research"
           className="px-4 py-2 text-sm font-medium text-white rounded-md transition-colors hover:opacity-90"
           style={{ background: "#1e4d8c" }}
-        >
-          Full Research Dashboard
-        </Link>
+        ><LocalizedText text={"Full Research Dashboard"} /></Link>
         <Link
           href="/research/enter"
           className="px-4 py-2 text-sm font-medium text-white rounded-md bg-emerald-600 hover:bg-emerald-700 transition-colors"
-        >
-          Add New Patient
-        </Link>
+        ><LocalizedText text={"Add New Patient"} /></Link>
       </div>
     </div>
   );

@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedDiv, LocalizedSpan } from "@/localization/LocalizedElements";
+
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { CalculationDetails, ParameterUncertaintySummary } from "@/types/calculator";
@@ -684,32 +688,30 @@ export default function ConcentrationTimeGraph({
   const evidenceLabel = calculationDetails?.evidence_strength ?? "";
 
   return (
-    <div className={`flex flex-col gap-0 w-full ${fill ? "vz-graph-fill" : ""}`} aria-label="Concentration-time graph">
+    <LocalizedDiv className={`flex flex-col gap-0 w-full ${fill ? "vz-graph-fill" : ""}`} aria-label="Concentration-time graph">
       {/* Header line */}
       <div
         className="flex items-center justify-between gap-2 px-1 pb-1.5 shrink-0"
         style={{ fontFamily: FONT }}
       >
         <div className="flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap">
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: getCSSColor("--color-secondary", "#00cc44") }}>
-          CONCENTRATION-TIME PROFILE
-        </span>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: getCSSColor("--color-secondary", "#00cc44") }}><LocalizedText text="CONCENTRATION-TIME PROFILE" /></span>
         {modelLabel && (
           <span className="hidden md:contents">
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{modelLabel}</span>
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
-            <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>Two-Compartment</span>
+            <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}><LocalizedText text="Two-Compartment" /></span>
           </span>
         )}
         {evidenceLabel && (
           <span className="hidden md:contents">
             <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{"\u00B7"}</span>
-            <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}>{evidenceLabel}</span>
+            <span style={{ fontSize: 9, color: getCSSColor("--color-dim", "#009933") }}><LocalizedText text={evidenceLabel} /></span>
           </span>
         )}
         </div>
-        <div className="flex shrink-0 items-center gap-1" role="group" aria-label="Time window">
+        <LocalizedDiv className="flex shrink-0 items-center gap-1" role="group" aria-label="Time window">
         {[24, 48, 96, 168].map((z) => (
           <button
             key={z}
@@ -744,7 +746,7 @@ export default function ConcentrationTimeGraph({
             {z}H
           </button>
         ))}
-        </div>
+        </LocalizedDiv>
       </div>
 
       {/* Canvas */}
@@ -759,46 +761,39 @@ export default function ConcentrationTimeGraph({
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 px-1 pt-1.5 shrink-0" style={{ fontFamily: FONT }}>
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-          <span className="inline-block w-4 h-0.5" style={{ background: getCSSColor("--color-primary", "#00ff41") }} /> Predicted
-        </span>
+          <span className="inline-block w-4 h-0.5" style={{ background: getCSSColor("--color-primary", "#00ff41") }} />{" "}<LocalizedText text="Predicted" /></span>
         {comparisonData.length > 1 && (
           <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-            <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44"), borderTopWidth: 1.5 }} /> {comparison_label ?? "Reference"}
+            <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44"), borderTopWidth: 1.5 }} /> <LocalizedText text={comparison_label ?? "Reference"} />
           </span>
         )}
         {band && curveHasBand(curveData) && (
-          <span
+          <LocalizedSpan
             className="flex items-center gap-1 text-[10px]"
             style={{ color: getCSSColor("--color-dim", "#009933") }}
             title={band.title}
           >
             <span className="inline-block w-3 h-3" style={{ background: "rgba(30, 77, 140, 0.10)", border: "1px solid rgba(30, 77, 140, 0.25)" }} />
-            {band.label}
-          </span>
+            <LocalizedText text={band.label} />
+          </LocalizedSpan>
         )}
         {band_info?.method === "unavailable" && curveData.length > 1 && (
-          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} title={band_info.detail ?? band_info.reason}>
-            No uncertainty band: {band_info.reason}
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} title={band_info.detail ?? band_info.reason}><LocalizedText text="No uncertainty band:" />{" "}<LocalizedText text={band_info.reason} />
           </span>
         )}
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-          <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44") }} /> Trough reference 10–20 mg/L (not the dosing target; target is AUC₂₄ 400–600)
-        </span>
+          <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44") }} />{" "}<LocalizedText text="Trough reference 10–20 mg/L (not the dosing target; target is AUC₂₄ 400–600)" /></span>
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span className="inline-block w-3 h-3" style={{ background: "var(--color-primary-a08)", border: "1px solid var(--color-primary-a20)" }} /> AUC₂₄
         </span>
+        <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}><LocalizedText text="◆ Trough" /></span>
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-          ◆ Trough
-        </span>
-        <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-          <span style={{ color: getCSSColor("--color-primary", "#00ff41") }}>▲</span> Peak
-        </span>
+          <span style={{ color: getCSSColor("--color-primary", "#00ff41") }}>▲</span>{" "}<LocalizedText text="Peak" /></span>
         {measuredData.length > 0 && (
           <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-            <span className="inline-block w-2 h-2" style={{ background: "#fff", border: `1px solid ${getCSSColor("--color-primary", "#00ff41")}` }} /> Measured
-          </span>
+            <span className="inline-block w-2 h-2" style={{ background: "#fff", border: `1px solid ${getCSSColor("--color-primary", "#00ff41")}` }} />{" "}<LocalizedText text="Measured" /></span>
         )}
       </div>
-    </div>
+    </LocalizedDiv>
   );
 }

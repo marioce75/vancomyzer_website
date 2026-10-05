@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedDiv } from "@/localization/LocalizedElements";
+
 
 import React, { useState } from "react";
 import { CalculationDetails, FrequencyOption, AucRangeStatus, ArcAdvisory } from "@/types/calculator";
@@ -99,23 +103,18 @@ export function LoadingDoseConfigurator({ weightKg, onSimulate }: LoadingDoseCon
   return (
     <div style={{ padding: "12px 14px", background: "var(--color-bg)", border: "1px solid var(--color-border)", ...FONT }}>
       {/* Clinical context */}
-      <p style={{ fontSize: 10, color: "var(--color-dim)", margin: "0 0 10px", lineHeight: 1.6, ...FONT }}>
-        Consider when rapid therapeutic levels are needed — severe infections or critically ill patients.
-        ASHP/IDSA 2020: 25–30 mg/kg actual body weight, max 3,000 mg.
-      </p>
+      <p style={{ fontSize: 10, color: "var(--color-dim)", margin: "0 0 10px", lineHeight: 1.6, ...FONT }}><LocalizedText text="Consider when rapid therapeutic levels are needed — severe infections or critically ill patients. ASHP/IDSA 2020: 25–30 mg/kg actual body weight, max 3,000 mg." /></p>
 
       {/* Suggested range */}
       <div className="flex items-baseline gap-2 mb-3">
-        <span style={{ fontSize: 10, color: "var(--color-secondary)", ...FONT }}>Suggested range:</span>
+        <span style={{ fontSize: 10, color: "var(--color-secondary)", ...FONT }}><LocalizedText text="Suggested range:" /></span>
         <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-primary)", ...FONT }}>{loadLow}–{loadHigh} mg</span>
         <span style={{ fontSize: 9, color: "var(--color-dim)", ...FONT }}>(25–30 mg/kg × {wt} kg)</span>
       </div>
 
       {/* Editable dose */}
       <div className="mb-3">
-        <label htmlFor="vz-loading-dose" style={{ fontSize: 9, fontWeight: 600, color: "var(--color-secondary)", display: "block", marginBottom: 3, ...FONT }}>
-          LOADING DOSE (mg)
-        </label>
+        <label htmlFor="vz-loading-dose" style={{ fontSize: 9, fontWeight: 600, color: "var(--color-secondary)", display: "block", marginBottom: 3, ...FONT }}><LocalizedText text="LOADING DOSE (mg)" /></label>
         <select
           id="vz-loading-dose"
           value={customDose}
@@ -128,7 +127,7 @@ export function LoadingDoseConfigurator({ weightKg, onSimulate }: LoadingDoseCon
         >
           {[1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000].map(d => (
             <option key={d} value={d}>
-              {d} mg {d === defaultDose ? "(suggested)" : ""}
+              {d} mg <LocalizedText text={d === defaultDose ? "(suggested)" : ""} />
             </option>
           ))}
         </select>
@@ -136,9 +135,9 @@ export function LoadingDoseConfigurator({ weightKg, onSimulate }: LoadingDoseCon
 
       {/* Auto-calculated infusion */}
       <div className="flex items-center gap-3 mb-3" style={{ fontSize: 10, color: "var(--color-dim)", ...FONT }}>
-        <span>Infusion: <strong style={{ color: "var(--color-secondary)" }}>{infusionMinutes} min</strong></span>
-        <span>Rate: <strong style={{ color: rateExceeded ? "#dc2626" : "var(--color-secondary)" }}>{(customDose / (infusionMinutes / 60)).toFixed(0)} mg/h</strong></span>
-        {rateExceeded && <span style={{ color: "#dc2626", fontWeight: 700 }}>⚠ Exceeds 10 mg/min</span>}
+        <span><LocalizedText text="Infusion:" />{" "}<strong style={{ color: "var(--color-secondary)" }}>{infusionMinutes} min</strong></span>
+        <span><LocalizedText text="Rate:" />{" "}<strong style={{ color: rateExceeded ? "#dc2626" : "var(--color-secondary)" }}>{(customDose / (infusionMinutes / 60)).toFixed(0)} mg/h</strong></span>
+        {rateExceeded && <span style={{ color: "#dc2626", fontWeight: 700 }}><LocalizedText text="⚠ Exceeds 10 mg/min" /></span>}
       </div>
 
       {/* Simulate button */}
@@ -151,18 +150,12 @@ export function LoadingDoseConfigurator({ weightKg, onSimulate }: LoadingDoseCon
             background: "var(--color-primary)", color: "var(--color-card)",
             border: "none", cursor: "pointer", letterSpacing: "0.1em",
           }}
-        >
-          Estimate exposure after {customDose} mg loading dose
-        </button>
+        ><LocalizedText text="Estimate exposure after" />{" "}{customDose}{" "}<LocalizedText text="mg loading dose" /></button>
       )}
 
       {/* Guidance */}
       <div style={{ marginTop: 10, paddingTop: 8, borderTop: "1px solid var(--color-border)" }}>
-        <p style={{ fontSize: 9, color: "var(--color-dim)", lineHeight: 1.7, margin: 0, ...FONT }}>
-          After loading dose: draw first level 1.5–6h post-infusion end for early Bayesian estimation,
-          or peak + trough near dose 3–4 for highest accuracy.
-          Target AUC₂₄ 400–600 mg·h/L within 48h per ASHP/IDSA 2020.
-        </p>
+        <p style={{ fontSize: 9, color: "var(--color-dim)", lineHeight: 1.7, margin: 0, ...FONT }}><LocalizedText text="After loading dose: draw first level 1.5–6h post-infusion end for early Bayesian estimation, or peak + trough near dose 3–4 for highest accuracy. Target AUC₂₄ 400–600 mg·h/L within 48h per ASHP/IDSA 2020." /></p>
       </div>
     </div>
   );
@@ -193,9 +186,7 @@ function LoadingDoseGuidance({ weightKg, onSimulate }: LoadingDoseConfiguratorPr
         >
           <path d="M9 5l7 7-7 7" />
         </svg>
-        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-secondary)", letterSpacing: "0.08em", ...FONT }}>
-          LOADING DOSE CONFIGURATOR
-        </span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-secondary)", letterSpacing: "0.08em", ...FONT }}><LocalizedText text="LOADING DOSE CONFIGURATOR" /></span>
       </button>
       {expanded && <div style={{ marginTop: 8 }}><LoadingDoseConfigurator weightKg={weightKg} onSimulate={onSimulate} /></div>}
     </div>
@@ -227,17 +218,17 @@ export function LoadingDosePopover({ weightKg, onSimulate }: LoadingDoseConfigur
         className="border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
         style={{ borderColor: "#c6d6e6", background: open ? "#c6d6e6" : "#e6eef5", color: "#14232f", cursor: "pointer", ...FONT }}
       >
-        {open ? "Hide loading dose" : "Loading dose"}
+        <LocalizedText text={open ? "Hide loading dose" : "Loading dose"} />
       </button>
       {open && (
-        <div
+        <LocalizedDiv
           id="vz-loading-dose-popover"
           role="dialog"
           aria-label="Loading dose configurator"
           className="absolute right-0 z-30 mt-1 w-[min(360px,90vw)] shadow-md"
         >
           <LoadingDoseConfigurator weightKg={weightKg} onSimulate={(d, i, h) => { setOpen(false); onSimulate?.(d, i, h); }} />
-        </div>
+        </LocalizedDiv>
       )}
     </div>
   );
@@ -381,7 +372,7 @@ export default function DoseRecommendationCard({
                   className="mt-1 inline-flex border px-1.5 py-0.5 text-[10px] font-semibold leading-none"
                   style={{ ...r.badgeStyle }}
                 >
-                  {r.label}
+                  <LocalizedText text={r.label} />
                 </span>
               </button>
             );
@@ -393,9 +384,7 @@ export default function DoseRecommendationCard({
       {isPulseDose && loadingDoseMg && (
         <div className="px-4 py-2 rounded-lg border" style={{ borderColor: "#6ee7b7", background: "#ecfdf5" }}>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "#047857", ...FONT }}>
-              LOADING DOSE: {loadingDoseMg} mg (single dose)
-            </span>
+            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "#047857", ...FONT }}><LocalizedText text="LOADING DOSE:" />{" "}{loadingDoseMg}{" "}<LocalizedText text="mg (single dose)" /></span>
             {onUndoLoadingDose && (
               <button
                 type="button"
@@ -410,14 +399,10 @@ export default function DoseRecommendationCard({
                   (e.currentTarget as HTMLElement).style.background = "#fff1f2";
                   (e.currentTarget as HTMLElement).style.color = "#991b1b";
                 }}
-              >
-                UNDO
-              </button>
+              ><LocalizedText text="UNDO" /></button>
             )}
           </div>
-          <p className="mt-1 text-[10px]" style={{ color: "#065f46", margin: 0, ...FONT }}>
-            Graph shows the loading dose followed by the selected maintenance regimen. Suggested maintenance to follow:
-          </p>
+          <p className="mt-1 text-[10px]" style={{ color: "#065f46", margin: 0, ...FONT }}><LocalizedText text="Graph shows the loading dose followed by the selected maintenance regimen. Suggested maintenance to follow:" /></p>
         </div>
       )}
 
@@ -433,11 +418,11 @@ export default function DoseRecommendationCard({
             }}
           >
             <p className="vz-kicker" style={{ margin: "0 0 2px 0", ...FONT }}>
-              {activeIsCurrent
+              <LocalizedText text={activeIsCurrent
                 ? (isPulseDose ? "LOADING DOSE (SINGLE DOSE)" : "CURRENT REGIMEN (AS ENTERED)")
                 : isPulseDose
                   ? (active?.is_recommended || !active ? "SUGGESTED MAINTENANCE REGIMEN" : "SELECTED MAINTENANCE ALTERNATIVE")
-                  : active?.is_recommended || !active ? "RECOMMENDED REGIMEN" : "SELECTED ALTERNATIVE"}
+                  : active?.is_recommended || !active ? "RECOMMENDED REGIMEN" : "SELECTED ALTERNATIVE"} />
             </p>
             <div className="flex flex-wrap items-baseline gap-x-1.5">
               <span
@@ -451,7 +436,7 @@ export default function DoseRecommendationCard({
                 <span className="text-lg font-semibold mx-1" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>× 1</span>
               ) : (
                 <>
-                  <span className="text-sm font-medium mx-1" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>every</span>
+                  <span className="text-sm font-medium mx-1" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}><LocalizedText text="every" /></span>
                   <span
                     className={`${isBand ? "text-[34px] leading-none" : "text-4xl"} font-extrabold tabular-nums mx-glow`}
                     style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace", textShadow: "0 0 12px var(--color-glow-strong)" }}
@@ -461,7 +446,7 @@ export default function DoseRecommendationCard({
                   <span className="text-lg font-semibold" style={{ color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}>h</span>
                 </>
               )}
-              <span className="ml-2 text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>{subline}</span>
+              <span className="ml-2 text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}><LocalizedText text={subline} /></span>
             </div>
             {!isBand && displayAUC != null && range && (
               <div className="mt-2 flex items-center gap-2">
@@ -469,7 +454,7 @@ export default function DoseRecommendationCard({
                 <span className="tabular-nums text-sm font-bold" style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}>{displayAUC}</span>
                 <span className="text-xs" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>mg·h/L</span>
                 <span className="inline-flex border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider" style={{ ...range.badgeStyle }}>
-                  {range.label}
+                  <LocalizedText text={range.label} />
                 </span>
               </div>
             )}
@@ -483,9 +468,7 @@ export default function DoseRecommendationCard({
               onClick={onApplyRecommendation}
               className="px-3 py-1.5 text-xs font-semibold transition"
               style={{ border: "1px solid var(--color-primary-a40)", background: "var(--color-primary-a05)", color: "var(--color-secondary)", fontFamily: "'Share Tech Mono', monospace" }}
-            >
-              APPLY RECOMMENDED
-            </button>
+            ><LocalizedText text="APPLY RECOMMENDED" /></button>
           </div>
         )}
       </div>
@@ -493,38 +476,29 @@ export default function DoseRecommendationCard({
       {/* ARC Advisory — critical patient safety warning */}
       {arc_advisory?.detected && (
         <div className="rounded-lg border-2 px-4 py-3" style={{ borderColor: "#dc2626", background: "#fef2f2" }}>
-          <p className="text-sm font-bold" style={{ color: "#991b1b", margin: 0 }}>
-            ⚠ POSSIBLE AUGMENTED RENAL CLEARANCE
-          </p>
+          <p className="text-sm font-bold" style={{ color: "#991b1b", margin: 0 }}><LocalizedText text="⚠ POSSIBLE AUGMENTED RENAL CLEARANCE" /></p>
           <div className="mt-2 space-y-1.5 text-xs" style={{ color: "#7f1d1d" }}>
             <div className="flex flex-wrap gap-x-4 gap-y-1">
               {arc_advisory.crcl_indexed_ml_min_1_73 != null ? (
-                <span><strong>Estimated CrCl:</strong> {arc_advisory.crcl_indexed_ml_min_1_73} mL/min/1.73 m² (threshold 130)</span>
+                <span><strong><LocalizedText text="Estimated CrCl:" /></strong> {arc_advisory.crcl_indexed_ml_min_1_73}{" "}<LocalizedText text="mL/min/1.73 m² (threshold 130)" /></span>
               ) : (
-                <span><strong>Estimated CrCl:</strong> {arc_advisory.crcl_ml_min} mL/min absolute — height not entered, so it could not be indexed</span>
+                <span><strong><LocalizedText text="Estimated CrCl:" /></strong> {arc_advisory.crcl_ml_min}{" "}<LocalizedText text="mL/min absolute — height not entered, so it could not be indexed" /></span>
               )}
               <span><strong>CL:</strong> {arc_advisory.cl_l_h} L/h</span>
-              <span><strong>Required TDD:</strong> ~{arc_advisory.required_tdd_mg?.toLocaleString()} mg/day</span>
+              <span><strong><LocalizedText text="Required TDD:" /></strong> ~{arc_advisory.required_tdd_mg?.toLocaleString()} mg/day</span>
             </div>
-            <p style={{ margin: 0, lineHeight: 1.6 }}>
-              Estimating equations detect augmented renal clearance poorly. Confirm with a measured 8–24 hour
-              urinary creatinine clearance before acting on this.
-              {auc_range_status === "below_target"
+            <p style={{ margin: 0, lineHeight: 1.6 }}><LocalizedText text="Estimating equations detect augmented renal clearance poorly. Confirm with a measured 8–24 hour urinary creatinine clearance before acting on this." /><LocalizedText text={auc_range_status === "below_target"
                 ? " The best available intermittent regimen for this patient is already below the 400–600 mg·h/L target."
-                : ""}
+                : ""} />
             </p>
             <div style={{ margin: 0, lineHeight: 1.6 }}>
-              <strong>If confirmed:</strong>
+              <strong><LocalizedText text="If confirmed:" /></strong>
               <ul style={{ margin: "4px 0 0 16px", padding: 0, listStyleType: "disc" }}>
-                <li>Obtain two vancomycin levels early (2–4h and 6–8h post-dose) to confirm individual PK parameters before proceeding</li>
-                <li>Consult Infectious Diseases and/or nephrology. Continuous infusion is outside this calculator&rsquo;s scope — it is not modeled or dosed here, so manage it per local protocol rather than from these numbers</li>
+                <li><LocalizedText text="Obtain two vancomycin levels early (2–4h and 6–8h post-dose) to confirm individual PK parameters before proceeding" /></li>
+                <li><LocalizedText text="Consult Infectious Diseases and/or nephrology. Continuous infusion is outside this calculator’s scope — it is not modeled or dosed here, so manage it per local protocol rather than from these numbers" /></li>
               </ul>
             </div>
-            <p style={{ margin: 0, fontSize: 10, fontStyle: "italic" }}>
-              Threshold and definition: Udy 2013 (Crit Care 17:R35); Barletta 2017 (J Trauma Acute Care Surg
-              82:665–71); Cucci 2023 (Pharmacotherapy 43:1131–8). The 2020 ASHP/IDSA/SIDP vancomycin guideline
-              does not define an adult ARC threshold.
-            </p>
+            <p style={{ margin: 0, fontSize: 10, fontStyle: "italic" }}><LocalizedText text="Threshold and definition: Udy 2013 (Crit Care 17:R35); Barletta 2017 (J Trauma Acute Care Surg 82:665–71); Cucci 2023 (Pharmacotherapy 43:1131–8). The 2020 ASHP/IDSA/SIDP vancomycin guideline does not define an adult ARC threshold." /></p>
           </div>
         </div>
       )}
@@ -532,20 +506,16 @@ export default function DoseRecommendationCard({
       {/* Below-target warning (non-ARC) */}
       {!arc_advisory?.detected && auc_range_status === "below_target" && (predicted_auc24 ?? rawAuc24) != null && (
         <div className="rounded-lg border px-4 py-3" style={{ borderColor: "#fca5a5", background: "#fff1f2" }}>
-          <p className="text-sm font-bold" style={{ color: "#991b1b", margin: 0 }}>
-            AUC₂₄ BELOW TARGET
-          </p>
-          <p className="mt-1 text-xs" style={{ color: "#7f1d1d", margin: 0 }}>
-            The recommended regimen is predicted to achieve AUC₂₄ of {predicted_auc24 ?? rawAuc24} mg·h/L, which is below the target range of 400–600 mg·h/L. Clinical review is required — consider more frequent dosing, higher doses, or continuous infusion.
-          </p>
+          <p className="text-sm font-bold" style={{ color: "#991b1b", margin: 0 }}><LocalizedText text="AUC₂₄ BELOW TARGET" /></p>
+          <p className="mt-1 text-xs" style={{ color: "#7f1d1d", margin: 0 }}><LocalizedText text="The recommended regimen is predicted to achieve AUC₂₄ of" />{" "}{predicted_auc24 ?? rawAuc24}{" "}<LocalizedText text="mg·h/L, which is below the target range of 400–600 mg·h/L. Clinical review is required — consider more frequent dosing, higher doses, or continuous infusion." /></p>
         </div>
       )}
 
       {infusion_safety_note && (
         <div className="rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
-          <strong>Note:</strong> {infusion_safety_note}{" "}
+          <strong><LocalizedText text="Note:" /></strong> <LocalizedText text={infusion_safety_note} />{" "}
           <span style={{ fontSize: 10 }}>
-            [<a href="https://www.accessdata.fda.gov/drugsatfda_docs/label/2017/050671s023lbl.pdf" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline" style={{ color: "inherit" }}>FDA Label</a>{" · "}
+            [<a href="https://www.accessdata.fda.gov/drugsatfda_docs/label/2017/050671s023lbl.pdf" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline" style={{ color: "inherit" }}><LocalizedText text="FDA Label" /></a>{" · "}
             <a href="https://pubmed.ncbi.nlm.nih.gov/32191793/" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline" style={{ color: "inherit" }}>ASHP/IDSA 2020</a>]
           </span>
         </div>
@@ -558,8 +528,8 @@ export default function DoseRecommendationCard({
 
       {!isBand && calculationDetails?.review_status?.banner_body && (
         <div className="text-xs leading-5 pt-2" style={{ color: "var(--color-dim)", borderTop: "1px solid var(--color-border)", fontFamily: "'Share Tech Mono', monospace" }}>
-          <p style={{ margin: 0 }}>{calculationDetails.review_status.banner_body}</p>
-          <p style={{ margin: "4px 0 0 0" }}>Draw first level 1.5–6h post-infusion end (dose 1 acceptable) or peak + trough near dose 3–4 for highest AUC accuracy — target AUC₂₄ 400–600 mg·h/L within 48h per ASHP/IDSA 2020.</p>
+          <p style={{ margin: 0 }}><LocalizedText text={calculationDetails.review_status.banner_body} /></p>
+          <p style={{ margin: "4px 0 0 0" }}><LocalizedText text="Draw first level 1.5–6h post-infusion end (dose 1 acceptable) or peak + trough near dose 3–4 for highest AUC accuracy — target AUC₂₄ 400–600 mg·h/L within 48h per ASHP/IDSA 2020." /></p>
         </div>
       )}
     </div>
@@ -587,35 +557,23 @@ function EmpiricDosingBlockedCard({
       }}
     >
       <div className="mb-2 flex items-baseline gap-2">
-        <span className="text-base font-bold uppercase tracking-wider" style={{ color: "#991b1b" }}>
-          ⚠ Empiric dosing refused
-        </span>
-        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#991b1b" }}>
-          Pulse-then-level required
-        </span>
+        <span className="text-base font-bold uppercase tracking-wider" style={{ color: "#991b1b" }}><LocalizedText text="⚠ Empiric dosing refused" /></span>
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#991b1b" }}><LocalizedText text="Pulse-then-level required" /></span>
       </div>
       <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#7f1d1d" }}>
-        {data.safety_message}
+        <LocalizedText text={data.safety_message} />
       </p>
       <div
         className="mb-3 grid gap-2 border p-3 text-[13px]"
         style={{ background: "#ffffff", borderColor: "#fca5a5", color: "#7f1d1d" }}
       >
-        <div className="font-bold uppercase tracking-wider text-xs">Recommended pulse dose</div>
+        <div className="font-bold uppercase tracking-wider text-xs"><LocalizedText text="Recommended pulse dose" /></div>
         <div className="text-xl font-bold" style={FONT}>
-          {data.recommended_pulse_dose_mg.toLocaleString()} mg <span className="text-sm font-normal">× 1 (single dose)</span>
+          {data.recommended_pulse_dose_mg.toLocaleString()} mg <span className="text-sm font-normal"><LocalizedText text="× 1 (single dose)" /></span>
         </div>
-        <div className="text-xs">
-          Estimated CL: <strong>{fmt(data.estimated_cl_l_h, 2)} L/h</strong>. Draw a vancomycin level
-          after the pulse dose and switch to the <strong>1 Level</strong> tab above to compute
-          level-guided redose timing.
-        </div>
+        <div className="text-xs"><LocalizedText text="Estimated CL:" />{" "}<strong>{fmt(data.estimated_cl_l_h, 2)} L/h</strong><LocalizedText text=". Draw a vancomycin level after the pulse dose and switch to the" />{" "}<strong><LocalizedText text="1 Level" /></strong>{" "}<LocalizedText text="tab above to compute level-guided redose timing." /></div>
       </div>
-      <p className="text-[11px]" style={{ color: "#7f1d1d" }}>
-        This is decision-support output only. The pulse-dose value is a weight-based estimate
-        (15–20 mg/kg, capped at 3000 mg); confirm against institutional protocol and
-        patient-specific factors before administration.
-      </p>
+      <p className="text-[11px]" style={{ color: "#7f1d1d" }}><LocalizedText text="This is decision-support output only. The pulse-dose value is a weight-based estimate (15–20 mg/kg, capped at 3000 mg); confirm against institutional protocol and patient-specific factors before administration." /></p>
     </div>
   );
 }
@@ -644,34 +602,24 @@ function AdjustmentDosingBlockedCard({
       }}
     >
       <div className="mb-2 flex items-baseline gap-2">
-        <span className="text-base font-bold uppercase tracking-wider" style={{ color: "#991b1b" }}>
-          ⚠ No safe adjustment exists
-        </span>
-        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#991b1b" }}>
-          Hold &amp; recheck
-        </span>
+        <span className="text-base font-bold uppercase tracking-wider" style={{ color: "#991b1b" }}><LocalizedText text="⚠ No safe adjustment exists" /></span>
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#991b1b" }}><LocalizedText text="Hold & recheck" /></span>
       </div>
       <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#7f1d1d" }}>
-        {data.safety_message}
+        <LocalizedText text={data.safety_message} />
       </p>
       <div
         className="mb-3 grid gap-2 border p-3 text-[13px]"
         style={{ background: "#ffffff", borderColor: "#fca5a5", color: "#7f1d1d" }}
       >
-        <div className="font-bold uppercase tracking-wider text-xs">Recommended action</div>
+        <div className="font-bold uppercase tracking-wider text-xs"><LocalizedText text="Recommended action" /></div>
         <div className="text-[13px] font-semibold" style={FONT}>
-          {data.recommended_action}
+          <LocalizedText text={data.recommended_action} />
         </div>
-        <div className="text-xs">
-          Estimated CL: <strong>{fmt(data.estimated_cl_l_h, 2)} L/h</strong>.
+        <div className="text-xs"><LocalizedText text="Estimated CL:" />{" "}<strong>{fmt(data.estimated_cl_l_h, 2)} L/h</strong>.
         </div>
       </div>
-      <p className="text-[11px]" style={{ color: "#7f1d1d" }}>
-        This is decision-support output only. Holding maintenance dosing is the
-        calculator&apos;s safety recommendation when no acceptable dose-down or interval-extension
-        exists in its search grid; clinical context (infection severity, hemodynamics,
-        institutional protocol) remains the clinician&apos;s judgment.
-      </p>
+      <p className="text-[11px]" style={{ color: "#7f1d1d" }}><LocalizedText text="This is decision-support output only. Holding maintenance dosing is the calculator's safety recommendation when no acceptable dose-down or interval-extension exists in its search grid; clinical context (infection severity, hemodynamics, institutional protocol) remains the clinician's judgment." /></p>
     </div>
   );
 }

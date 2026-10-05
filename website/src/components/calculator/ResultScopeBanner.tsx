@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 interface ResultScopeBannerProps {
   recommendation_type?: "initial_regimen" | "existing_regimen" | null;
@@ -13,20 +15,18 @@ export default function ResultScopeBanner({
     <section className="border-l-4 border-amber-500 bg-amber-50 px-3 py-2">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-amber-950">Use limitations</h2>
+          <h2 className="text-sm font-semibold text-amber-950"><LocalizedText text="Use limitations" /></h2>
           <ul className="mt-1 space-y-1 text-xs text-amber-900">
-            <li>For adults receiving intermittent IV vancomycin only.</li>
-            <li>Not for pediatrics, dialysis-specific, or continuous infusion.</li>
+            <li><LocalizedText text="For adults receiving intermittent IV vancomycin only." /></li>
+            <li><LocalizedText text="Not for pediatrics, dialysis-specific, or continuous infusion." /></li>
             {isInitial ? (
-              <li>Prior-only maintenance support; not patient-specific severity direction.</li>
+              <li><LocalizedText text="Prior-only maintenance support; not patient-specific severity direction." /></li>
             ) : (
-              <li>Requires interpretable same-interval timing and routine dose history.</li>
+              <li><LocalizedText text="Requires interpretable same-interval timing and routine dose history." /></li>
             )}
           </ul>
         </div>
-        <a href="/transparent-dosing" className="text-xs font-medium text-amber-950 underline hover:no-underline">
-          Evidence
-        </a>
+        <a href="/transparent-dosing" className="text-xs font-medium text-amber-950 underline hover:no-underline"><LocalizedText text="Evidence" /></a>
       </div>
     </section>
   );

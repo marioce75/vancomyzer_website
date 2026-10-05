@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 /**
  * Superadmin BAA queue — institutions whose signed BAA is awaiting
@@ -93,23 +95,19 @@ export default function BaaQueuePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}>BAA Queue</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        Institutions awaiting Dōsys Health LLC countersign on their submitted Business Associate Agreement.
-      </p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}><LocalizedText text={"BAA Queue"} /></h1>
+      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"Institutions awaiting Dōsys Health LLC countersign on their submitted Business Associate Agreement."} /></p>
 
-      {loading && <div className="text-gray-500 text-center py-12">Loading…</div>}
+      {loading && <div className="text-gray-500 text-center py-12"><LocalizedText text={"Loading…"} /></div>}
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 text-red-800 text-sm p-3 mb-4">
-          {error}
+          <LocalizedText text={error} />
         </div>
       )}
 
       {!loading && !error && rows && rows.length === 0 && (
-        <div className="rounded-md border border-dashed border-gray-300 text-gray-500 text-sm text-center py-10">
-          No BAAs awaiting countersign. 🎉
-        </div>
+        <div className="rounded-md border border-dashed border-gray-300 text-gray-500 text-sm text-center py-10"><LocalizedText text={"No BAAs awaiting countersign. 🎉"} /></div>
       )}
 
       {!loading && !error && rows && rows.length > 0 && (
@@ -147,23 +145,20 @@ function PendingCard({
       <div className="flex items-baseline justify-between gap-3 flex-wrap mb-3">
         <div>
           <h3 className="text-base font-bold" style={{ color: "#1e4d8c" }}>{row.institution_name}</h3>
-          <p className="text-xs text-gray-500">
-            Plan: <span className="font-semibold">{row.plan_tier}</span> · Billing: {row.billing_email}
+          <p className="text-xs text-gray-500"><LocalizedText text={"Plan:"} />{" "}<span className="font-semibold">{row.plan_tier}</span>{" "}<LocalizedText text={"· Billing:"} />{" "}{row.billing_email}
           </p>
         </div>
-        <span className="inline-block rounded bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800">
-          Awaiting countersign
-        </span>
+        <span className="inline-block rounded bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800"><LocalizedText text={"Awaiting countersign"} /></span>
       </div>
 
       <dl className="grid grid-cols-[160px_1fr] gap-x-3 gap-y-1 text-xs text-gray-700 mb-4">
-        <dt className="text-gray-500">Signer</dt>
+        <dt className="text-gray-500"><LocalizedText text={"Signer"} /></dt>
         <dd>{row.signer_name ?? "—"} <span className="text-gray-500">· {row.signer_title ?? "—"}</span></dd>
-        <dt className="text-gray-500">Signer email</dt>
+        <dt className="text-gray-500"><LocalizedText text={"Signer email"} /></dt>
         <dd>{row.signer_email ?? "—"}</dd>
-        <dt className="text-gray-500">Template version</dt>
+        <dt className="text-gray-500"><LocalizedText text={"Template version"} /></dt>
         <dd>{row.template_version ?? "—"}</dd>
-        <dt className="text-gray-500">Submitted</dt>
+        <dt className="text-gray-500"><LocalizedText text={"Submitted"} /></dt>
         <dd>{fmtDate(row.submitted_at)}</dd>
       </dl>
 
@@ -172,16 +167,12 @@ function PendingCard({
           href={`/api/admin/baa/${row.id}/countersign`}
           className="inline-block rounded border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
           download
-        >
-          Download customer-signed PDF
-        </a>
-        <span className="text-xs text-gray-500">
-          Countersign it externally, then upload the fully-executed PDF below.
-        </span>
+        ><LocalizedText text={"Download customer-signed PDF"} /></a>
+        <span className="text-xs text-gray-500"><LocalizedText text={"Countersign it externally, then upload the fully-executed PDF below."} /></span>
       </div>
 
       <div className="rounded border border-gray-200 bg-gray-50 p-3">
-        <div className="text-xs font-semibold text-gray-700 mb-2">Upload countersigned PDF</div>
+        <div className="text-xs font-semibold text-gray-700 mb-2"><LocalizedText text={"Upload countersigned PDF"} /></div>
         <div className="flex flex-wrap items-center gap-3">
           <input
             type="file"
@@ -197,11 +188,11 @@ function PendingCard({
             className="rounded px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
             style={{ background: uploading || !file ? "#94a3b8" : "#1e4d8c" }}
           >
-            {uploading ? "Uploading…" : "Countersign & notify customer"}
+            <LocalizedText text={uploading ? "Uploading…" : "Countersign & notify customer"} />
           </button>
         </div>
         {msg && (
-          <p className={`mt-2 text-xs ${msg.type === "ok" ? "text-green-700" : "text-red-700"}`}>{msg.text}</p>
+          <p className={`mt-2 text-xs ${msg.type === "ok" ? "text-green-700" : "text-red-700"}`}><LocalizedText text={msg.text} /></p>
         )}
       </div>
     </div>

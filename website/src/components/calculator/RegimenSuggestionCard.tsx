@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import type {
   CalculateRequestPatient,
@@ -41,13 +43,11 @@ export default function RegimenSuggestionCard({ mode, patient, onApply, statMode
 
   return (
     <details className="border border-slate-200 bg-slate-50 px-3 py-2">
-      <summary className="cursor-pointer list-none text-sm font-medium text-slate-900">
-        Optional regimen scaffold
-      </summary>
-      {!statMode && <p className="mt-1 text-xs text-slate-500">Heuristic only. Confirm with full calculation.</p>}
+      <summary className="cursor-pointer list-none text-sm font-medium text-slate-900"><LocalizedText text="Optional regimen scaffold" /></summary>
+      {!statMode && <p className="mt-1 text-xs text-slate-500"><LocalizedText text="Heuristic only. Confirm with full calculation." /></p>}
       <div className="mt-2">
         <button type="button" onClick={() => onApply(suggestion)} className="w-full border border-slate-200 bg-white px-3 py-2 text-left text-sm hover:bg-slate-50">
-          {suggestion.dose_mg} mg q{suggestion.interval_hours}h · infusion {suggestion.infusion_duration_hours} h
+          {suggestion.dose_mg} mg q{suggestion.interval_hours}<LocalizedText text="h · infusion" />{" "}{suggestion.infusion_duration_hours} h
         </button>
       </div>
     </details>

@@ -1,3 +1,7 @@
+
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedDiv } from "@/localization/LocalizedElements";
 import React, { useState } from "react";
 import { CalculateRequestPatient } from "@/types/calculator";
 import { COLIN_2019, computeBmi, HIGH_BMI_THRESHOLD_KG_M2, highBmiAdvisory } from "@/lib/pk/modelRegistry";
@@ -47,7 +51,7 @@ const FormRow = ({ children }: { children: React.ReactNode }) => (
 
 const InputGroup = ({ label, children }: { label: string, children: React.ReactNode }) => (
   <div>
-    <Label>{label}</Label>
+    <Label><LocalizedText text={label} /></Label>
     {children}
   </div>
 );
@@ -88,7 +92,7 @@ export default function PatientCharacteristicsForm({
             className={(invalidText) => inputClass(Boolean(fieldErrors["patient.age"] || blurErrors.age || invalidText))}
             placeholder="e.g. 65"
           />
-          {(blurErrors.age) && <p className="mt-1 text-xs text-red-600">{blurErrors.age}</p>}
+          {(blurErrors.age) && <p className="mt-1 text-xs text-red-600"><LocalizedText text={blurErrors.age} /></p>}
         </InputGroup>
         <InputGroup label="Sex">
           <select
@@ -96,9 +100,9 @@ export default function PatientCharacteristicsForm({
             onChange={(e) => update("sex", e.target.value)}
             className={inputClass(false)}
           >
-            <option value="">— Select —</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value=""><LocalizedText text="— Select —" /></option>
+            <option value="male"><LocalizedText text="Male" /></option>
+            <option value="female"><LocalizedText text="Female" /></option>
           </select>
         </InputGroup>
       </FormRow>
@@ -118,7 +122,7 @@ export default function PatientCharacteristicsForm({
             className={(invalidText) => inputClass(Boolean(fieldErrors["patient.weight_kg"] || blurErrors.weight || invalidText))}
             placeholder="e.g. 75.5"
           />
-          {blurErrors.weight && <p className="mt-1 text-xs text-red-600">{blurErrors.weight}</p>}
+          {blurErrors.weight && <p className="mt-1 text-xs text-red-600"><LocalizedText text={blurErrors.weight} /></p>}
         </InputGroup>
         <InputGroup label="Height (cm)">
           <ClinicalNumberInput
@@ -131,12 +135,12 @@ export default function PatientCharacteristicsForm({
             className={(invalidText) => inputClass(Boolean(fieldErrors["patient.height_cm"] || blurErrors.height || invalidText))}
             placeholder="e.g. 170"
           />
-          {blurErrors.height && <p className="mt-1 text-xs text-red-600">{blurErrors.height}</p>}
+          {blurErrors.height && <p className="mt-1 text-xs text-red-600"><LocalizedText text={blurErrors.height} /></p>}
         </InputGroup>
       </FormRow>
 
       {/* Renal function */}
-      <p className="vz-kicker pt-1" style={{ borderTop: "1px solid var(--color-border)", paddingTop: 6 }}>Renal function</p>
+      <p className="vz-kicker pt-1" style={{ borderTop: "1px solid var(--color-border)", paddingTop: 6 }}><LocalizedText text="Renal function" /></p>
       <FormRow>
         <InputGroup label="Serum Creatinine (mg/dL)">
           {/* Parsed with parseClinicalNumber: "1,2" is 1.2, never 1. Unparseable
@@ -168,13 +172,13 @@ export default function PatientCharacteristicsForm({
             placeholder="e.g. 1.1"
           />
           <p className="mt-0.5 text-[10px] text-slate-500">µmol/L ÷ 88.4</p>
-          {blurErrors.scr && <p className="mt-1 text-xs text-red-600">{blurErrors.scr}</p>}
-          {!blurErrors.scr && blurWarnings.scr && <p className="mt-1 text-xs text-amber-700">⚠ {blurWarnings.scr}</p>}
+          {blurErrors.scr && <p className="mt-1 text-xs text-red-600"><LocalizedText text={blurErrors.scr} /></p>}
+          {!blurErrors.scr && blurWarnings.scr && <p className="mt-1 text-xs text-amber-700">⚠ <LocalizedText text={blurWarnings.scr} /></p>}
         </InputGroup>
         {/* Renal Replacement Therapy guard — required before the engine runs */}
         <div>
-          <Label>Renal replacement therapy</Label>
-          <div className="vz-seg w-full" role="group" aria-label="Renal replacement therapy">
+          <Label><LocalizedText text="Renal replacement therapy" /></Label>
+          <LocalizedDiv className="vz-seg w-full" role="group" aria-label="Renal replacement therapy">
             {([false, true] as const).map((val) => (
               <button
                 key={String(val)}
@@ -184,27 +188,25 @@ export default function PatientCharacteristicsForm({
                 className="flex-1"
                 style={rrt === val && val ? { background: "#b91c1c", color: "#fff" } : undefined}
               >
-                {val ? "Yes" : "No"}
+                <LocalizedText text={val ? "Yes" : "No"} />
               </button>
             ))}
-          </div>
+          </LocalizedDiv>
         </div>
       </FormRow>
       <p className={`-mt-1 text-[10px] ${rrt === null ? "text-amber-700 font-semibold" : "text-slate-500"}`}>
-        {rrt === null ? "RRT (CRRT, HD or PD) — required before the calculator can run." : "CRRT, hemodialysis or peritoneal dialysis."}
+        <LocalizedText text={rrt === null ? "RRT (CRRT, HD or PD) — required before the calculator can run." : "CRRT, hemodialysis or peritoneal dialysis."} />
       </p>
       {estimatedCrCl && (
         <div className="-mt-1 flex flex-wrap items-baseline gap-x-2 text-xs" style={{ color: "var(--color-secondary)" }} role="status">
-          <span className="font-semibold">Est. CrCl {estimatedCrCl.value} mL/min</span>
-          <span className="text-[10px] text-slate-500">{estimatedCrCl.note} · population prior uses SCr; a separate fitted-clearance limit uses CrCl</span>
+          <span className="font-semibold"><LocalizedText text="Est. CrCl" />{" "}{estimatedCrCl.value} mL/min</span>
+          <span className="text-[10px] text-slate-500"><LocalizedText text={estimatedCrCl.note} />{" "}<LocalizedText text="· population prior uses SCr; a separate fitted-clearance limit uses CrCl" /></span>
         </div>
       )}
       {rrt === true && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2" role="alert">
-          <p className="text-xs font-semibold text-red-800">⚠ Calculator blocked</p>
-          <p className="mt-0.5 text-xs text-red-700 leading-5">
-            The {COLIN_2019.shortName} model is not validated for patients on renal replacement therapy (CRRT, HD, PD). Use a specialist RRT-specific dosing protocol or consult pharmacy.
-          </p>
+          <p className="text-xs font-semibold text-red-800"><LocalizedText text="⚠ Calculator blocked" /></p>
+          <p className="mt-0.5 text-xs text-red-700 leading-5"><LocalizedText text={`The ${COLIN_2019.shortName} model is not validated for patients on renal replacement therapy (CRRT, HD, PD). Use a specialist RRT-specific dosing protocol or consult pharmacy.`} /></p>
         </div>
       )}
 
@@ -219,10 +221,10 @@ export default function PatientCharacteristicsForm({
         return (
           <>
             <div className="flex items-center gap-2 text-xs" style={{ color: isHighBmi ? "#92400e" : "var(--color-secondary)" }}>
-              <span style={{ fontWeight: 600 }}>BMI: {fmt(bmi, 1)} kg/m²</span>
+              <span style={{ fontWeight: 600 }}><LocalizedText text="BMI:" />{" "}{fmt(bmi, 1)} kg/m²</span>
             </div>
             {unitsImplausible && (
-              <p className="text-xs text-amber-700 font-medium" role="status">⚠ Check units — weight in kg, height in cm</p>
+              <p className="text-xs text-amber-700 font-medium" role="status"><LocalizedText text="⚠ Check units — weight in kg, height in cm" /></p>
             )}
             {isHighBmi && (
               <ObesityAdvisoryPanel
@@ -240,7 +242,7 @@ export default function PatientCharacteristicsForm({
       {value.weight_kg > 0 && !(value.height_cm > 0) && (() => {
         // No height: BMI cannot be assessed. The registry flags this for heavier patients.
         const advisory = highBmiAdvisory({ weight_kg: value.weight_kg, height_cm: null });
-        return advisory ? <p className="text-xs text-amber-700">⚠ {advisory}</p> : null;
+        return advisory ? <p className="text-xs text-amber-700">⚠ <LocalizedText text={advisory} /></p> : null;
       })()}
 
       {/* Bedbound/Geriatric toggle */}
@@ -266,10 +268,9 @@ export default function PatientCharacteristicsForm({
               <ellipse cx="12" cy="7.5" rx="2.5" ry="2" fill="none" stroke="var(--color-primary)" strokeWidth="1"/>
               <rect x="2" y="15" width="1.5" height="3" fill="var(--color-primary)"/>
               <rect x="16.5" y="15" width="1.5" height="3" fill="var(--color-primary)"/>
-            </svg> Bedbound or frail older patient
-          </span>
+            </svg>{" "}<LocalizedText text="Bedbound or frail older patient" /></span>
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${bedbound ? "bg-amber-300 text-amber-900" : "bg-slate-100 text-slate-400"}`}>
-            {bedbound ? "Yes" : "No"}
+            <LocalizedText text={bedbound ? "Yes" : "No"} />
           </span>
         </button>
         {bedbound && (

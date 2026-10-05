@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedA, LocalizedImg } from "@/localization/LocalizedElements";
+
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -118,15 +122,14 @@ function LaunchContent() {
         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 16px" }}>
-          <img src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
-        </a>
+        <LocalizedA href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 16px" }}>
+          <LocalizedImg src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
+        </LocalizedA>
         <h1 style={{ fontSize: 18, fontWeight: 700, color: "var(--color-primary)", marginBottom: 8 }}>
-          VANCOMYZER{"\u2122"} SMART Launch
-        </h1>
+          VANCOMYZER{"\u2122"}{" "}<LocalizedText text={"SMART Launch"} /></h1>
         {error ? (
           <div style={{ padding: 12, background: "#fff5f5", border: "1px solid #fca5a5", color: "#991b1b", fontSize: 13, textAlign: "left" }}>
-            {error}
+            <LocalizedText text={error} />
           </div>
         ) : (
           <div>
@@ -137,7 +140,7 @@ function LaunchContent() {
               borderRadius: "50%",
               animation: "spin 1s linear infinite",
             }} />
-            <p style={{ fontSize: 13, color: "var(--color-secondary)" }}>{status}</p>
+            <p style={{ fontSize: 13, color: "var(--color-secondary)" }}><LocalizedText text={status} /></p>
           </div>
         )}
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -148,7 +151,7 @@ function LaunchContent() {
 
 export default function LaunchPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>Loading...</div>}>
+    <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}><LocalizedText text="Loading..." /></div>}>
       <LaunchContent />
     </Suspense>
   );

@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
@@ -418,7 +420,7 @@ export default function ResearchEntryForm() {
 
   const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
     <div>
-      <label style={labelStyle}>{label}</label>
+      <label style={labelStyle}><LocalizedText text={label} /></label>
       {children}
     </div>
   );
@@ -430,39 +432,28 @@ export default function ResearchEntryForm() {
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 16px 80px", fontFamily: "system-ui, -apple-system, sans-serif" }}>
       {/* Header */}
-      <Link href="/research" style={{ fontSize: 13, color: NAVY, textDecoration: "none", fontWeight: 600 }}>
-         Back to Dashboard
-      </Link>
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: NAVY, margin: "12px 0 4px" }}>New Research Record</h1>
-      <p style={{ fontSize: 13, color: GRAY, marginBottom: 24 }}>
-        Enter de-identified patient data. No name, MRN, or DOB.
-      </p>
+      <Link href="/research" style={{ fontSize: 13, color: NAVY, textDecoration: "none", fontWeight: 600 }}><LocalizedText text={"Back to Dashboard"} /></Link>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: NAVY, margin: "12px 0 4px" }}><LocalizedText text={"New Research Record"} /></h1>
+      <p style={{ fontSize: 13, color: GRAY, marginBottom: 24 }}><LocalizedText text={"Enter de-identified patient data. No name, MRN, or DOB."} /></p>
 
       {/* Success result */}
       {result && (
         <div style={{ ...card, background: "#ecfdf5", border: `1px solid #6ee7b7` }}>
-          <h2 style={{ ...sectionTitle, color: GREEN }}>Record Created Successfully</h2>
-          <div style={{ fontSize: 20, fontWeight: 700, color: NAVY, marginBottom: 8 }}>
-            Study ID: {result.study_id}
+          <h2 style={{ ...sectionTitle, color: GREEN }}><LocalizedText text={"Record Created Successfully"} /></h2>
+          <div style={{ fontSize: 20, fontWeight: 700, color: NAVY, marginBottom: 8 }}><LocalizedText text={"Study ID:"} />{" "}{result.study_id}
           </div>
-          <div style={{ fontSize: 13, marginBottom: 4 }}>
-            Eligibility:{" "}
+          <div style={{ fontSize: 13, marginBottom: 4 }}><LocalizedText text={"Eligibility:"} />{" "}
             <span style={{ fontWeight: 700, color: result.eligible ? GREEN : RED }}>
-              {result.eligible ? "ELIGIBLE" : "EXCLUDED"}
+              <LocalizedText text={result.eligible ? "ELIGIBLE" : "EXCLUDED"} />
             </span>
           </div>
           {result.exclusion_reasons.length > 0 && (
-            <div style={{ fontSize: 12, color: GRAY }}>
-              Reasons: {result.exclusion_reasons.join(", ")}
+            <div style={{ fontSize: 12, color: GRAY }}><LocalizedText text={"Reasons:"} />{" "}{result.exclusion_reasons.map((reason, i) => <span key={i}>{i > 0 ? ", " : ""}<LocalizedText text={reason} /></span>)}
             </div>
           )}
           <div style={{ marginTop: 12, display: "flex", gap: 10 }}>
-            <Link href="/research" style={{ ...addBtn, textDecoration: "none", display: "inline-block" }}>
-              Back to Dashboard
-            </Link>
-            <button style={addBtn} onClick={() => { setResult(null); window.scrollTo(0, 0); }}>
-              Enter Another Record
-            </button>
+            <Link href="/research" style={{ ...addBtn, textDecoration: "none", display: "inline-block" }}><LocalizedText text={"Back to Dashboard"} /></Link>
+            <button style={addBtn} onClick={() => { setResult(null); window.scrollTo(0, 0); }}><LocalizedText text={"Enter Another Record"} /></button>
           </div>
         </div>
       )}
@@ -470,7 +461,7 @@ export default function ResearchEntryForm() {
       {/* Error */}
       {error && (
         <div style={{ padding: "10px 14px", marginBottom: 16, background: "#fef2f2", border: `1px solid #fca5a5`, color: RED, fontSize: 13, borderRadius: 4 }}>
-          {error}
+          <LocalizedText text={error} />
         </div>
       )}
 
@@ -478,22 +469,22 @@ export default function ResearchEntryForm() {
         <>
           {/* ---- Section 1: Demographics ---- */}
           <div style={card}>
-            <h2 style={sectionTitle}>Demographics</h2>
+            <h2 style={sectionTitle}><LocalizedText text={"Demographics"} /></h2>
             <FieldGrid>
               <Field label="Age (years)">
                 <input type="number" min={18} value={age} onChange={(e) => setAge(e.target.value)} style={inputStyle} />
               </Field>
               <Field label="Sex">
                 <select value={sex} onChange={(e) => setSex(e.target.value)} style={selectStyle}>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  <option value="male"><LocalizedText text="Male" /></option>
+                  <option value="female"><LocalizedText text="Female" /></option>
                 </select>
               </Field>
               <Field label="Ethnicity">
                 <select value={ethnicity} onChange={(e) => setEthnicity(e.target.value)} style={selectStyle}>
-                  <option value="Hispanic">Hispanic</option>
-                  <option value="Non-Hispanic">Non-Hispanic</option>
-                  <option value="unknown">Unknown</option>
+                  <option value="Hispanic"><LocalizedText text={"Hispanic"} /></option>
+                  <option value="Non-Hispanic"><LocalizedText text={"Non-Hispanic"} /></option>
+                  <option value="unknown"><LocalizedText text={"Unknown"} /></option>
                 </select>
               </Field>
             </FieldGrid>
@@ -518,7 +509,7 @@ export default function ResearchEntryForm() {
               <Field label="Indication">
                 <select value={indication} onChange={(e) => setIndication(e.target.value)} style={selectStyle}>
                   {INDICATIONS.map((ind) => (
-                    <option key={ind} value={ind}>{ind}</option>
+                    <option key={ind} value={ind}><LocalizedText text={ind} /></option>
                   ))}
                 </select>
               </Field>
@@ -528,11 +519,11 @@ export default function ResearchEntryForm() {
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap", marginBottom: 16 }}>
               <label style={toggleRow}>
                 <input type="checkbox" checked={icuAdmission} onChange={(e) => setIcuAdmission(e.target.checked)} />
-                <span style={{ fontSize: 12 }}>ICU Admission</span>
+                <span style={{ fontSize: 12 }}><LocalizedText text={"ICU Admission"} /></span>
               </label>
               <label style={toggleRow}>
                 <input type="checkbox" checked={bedbound} onChange={(e) => setBedbound(e.target.checked)} />
-                <span style={{ fontSize: 12 }}>Bedbound</span>
+                <span style={{ fontSize: 12 }}><LocalizedText text={"Bedbound"} /></span>
               </label>
               <label style={toggleRow}>
                 <input type="checkbox" checked={rrt} onChange={(e) => setRrt(e.target.checked)} />
@@ -541,7 +532,7 @@ export default function ResearchEntryForm() {
             </div>
 
             {/* Computed fields */}
-            <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 6 }}>Calculated Fields</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 6 }}><LocalizedText text={"Calculated Fields"} /></div>
             <FieldGrid cols={5}>
               <Field label="BMI (kg/m2)">
                 <input readOnly value={computed.bmi ? computed.bmi.toFixed(1) : "---"} style={readOnlyStyle} />
@@ -563,7 +554,7 @@ export default function ResearchEntryForm() {
 
           {/* ---- Section 2: Dosing History ---- */}
           <div style={card}>
-            <h2 style={sectionTitle}>Dosing History</h2>
+            <h2 style={sectionTitle}><LocalizedText text={"Dosing History"} /></h2>
             {doses.map((dose, i) => (
               <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 8, flexWrap: "wrap" }}>
                 <Field label="Dose (mg)">
@@ -595,18 +586,16 @@ export default function ResearchEntryForm() {
                   <span style={{ fontSize: 11 }}>LD</span>
                 </label>
                 {doses.length > 1 && (
-                  <button style={{ ...removeBtn, marginBottom: 8 }} onClick={() => removeDose(i)}>
-                    Remove
-                  </button>
+                  <button style={{ ...removeBtn, marginBottom: 8 }} onClick={() => removeDose(i)}><LocalizedText text={"Remove"} /></button>
                 )}
               </div>
             ))}
-            <button style={addBtn} onClick={addDose}>+ Add Dose</button>
+            <button style={addBtn} onClick={addDose}><LocalizedText text={"+ Add Dose"} /></button>
           </div>
 
           {/* ---- Section 3: Observed Levels ---- */}
           <div style={card}>
-            <h2 style={sectionTitle}>Observed Levels</h2>
+            <h2 style={sectionTitle}><LocalizedText text={"Observed Levels"} /></h2>
             {levels.map((lvl, i) => {
               const flags = levelFlags[i];
               return (
@@ -618,31 +607,25 @@ export default function ResearchEntryForm() {
                     <input type="number" min={0} step="0.1" value={lvl.time_hours} onChange={(e) => updateLevel(i, "time_hours", e.target.value)} style={{ ...inputStyle, width: 140 }} />
                   </Field>
                   {flags?.during_infusion && (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: RED, paddingBottom: 10 }}>
-                      DURING INFUSION
-                    </span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: RED, paddingBottom: 10 }}><LocalizedText text={"DURING INFUSION"} /></span>
                   )}
                   {flags?.in_distribution && (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: AMBER, paddingBottom: 10 }}>
-                      DISTRIBUTION PHASE
-                    </span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: AMBER, paddingBottom: 10 }}><LocalizedText text={"DISTRIBUTION PHASE"} /></span>
                   )}
                   {levels.length > 1 && (
-                    <button style={{ ...removeBtn, marginBottom: 8 }} onClick={() => removeLevel(i)}>
-                      Remove
-                    </button>
+                    <button style={{ ...removeBtn, marginBottom: 8 }} onClick={() => removeLevel(i)}><LocalizedText text={"Remove"} /></button>
                   )}
                 </div>
               );
             })}
-            <button style={addBtn} onClick={addLevel}>+ Add Level</button>
+            <button style={addBtn} onClick={addLevel}><LocalizedText text={"+ Add Level"} /></button>
           </div>
 
           {/* ---- Section 4: SCr Trajectory ---- */}
           <div style={card}>
-            <h2 style={sectionTitle}>SCr Trajectory</h2>
+            <h2 style={sectionTitle}><LocalizedText text={"SCr Trajectory"} /></h2>
             {scrPoints.length === 0 && (
-              <div style={{ fontSize: 12, color: GRAY, marginBottom: 8 }}>No additional SCr values added.</div>
+              <div style={{ fontSize: 12, color: GRAY, marginBottom: 8 }}><LocalizedText text={"No additional SCr values added."} /></div>
             )}
             {scrPoints.map((s, i) => (
               <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 8 }}>
@@ -652,15 +635,15 @@ export default function ResearchEntryForm() {
                 <Field label="Time from 1st Dose (h)">
                   <input type="number" min={0} step="0.1" value={s.time_hours} onChange={(e) => updateScr(i, "time_hours", e.target.value)} style={{ ...inputStyle, width: 140 }} />
                 </Field>
-                <button style={{ ...removeBtn, marginBottom: 8 }} onClick={() => removeScr(i)}>Remove</button>
+                <button style={{ ...removeBtn, marginBottom: 8 }} onClick={() => removeScr(i)}><LocalizedText text={"Remove"} /></button>
               </div>
             ))}
-            <button style={addBtn} onClick={addScr}>+ Add SCr</button>
+            <button style={addBtn} onClick={addScr}><LocalizedText text={"+ Add SCr"} /></button>
           </div>
 
           {/* ---- Section 5: Concomitant Nephrotoxins ---- */}
           <div style={card}>
-            <h2 style={sectionTitle}>Concomitant Nephrotoxins</h2>
+            <h2 style={sectionTitle}><LocalizedText text={"Concomitant Nephrotoxins"} /></h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 4, marginBottom: 12 }}>
               {NEPHROTOXINS.map((drug) => (
                 <label key={drug} style={{ ...toggleRow, marginBottom: 0 }}>
@@ -671,36 +654,36 @@ export default function ResearchEntryForm() {
                       setSelectedNephrotoxins({ ...selectedNephrotoxins, [drug]: e.target.checked })
                     }
                   />
-                  <span style={{ fontSize: 12 }}>{drug}</span>
+                  <span style={{ fontSize: 12 }}><LocalizedText text={drug} /></span>
                 </label>
               ))}
             </div>
             <label style={toggleRow}>
               <input type="checkbox" checked={vasopressorUse} onChange={(e) => setVasopressorUse(e.target.checked)} />
-              <span style={{ fontSize: 12, fontWeight: 600 }}>Vasopressor Use</span>
+              <span style={{ fontSize: 12, fontWeight: 600 }}><LocalizedText text={"Vasopressor Use"} /></span>
             </label>
           </div>
 
           {/* ---- Section 6: Clinical Outcomes (optional) ---- */}
           <div style={card}>
-            <h2 style={sectionTitle}>Clinical Outcomes (optional)</h2>
+            <h2 style={sectionTitle}><LocalizedText text={"Clinical Outcomes (optional)"} /></h2>
             <FieldGrid>
               <Field label="Hospital LOS (days)">
                 <input type="number" min={0} value={hospitalLos} onChange={(e) => setHospitalLos(e.target.value)} style={inputStyle} />
               </Field>
               <Field label="Microbiological Outcome">
                 <select value={microOutcome} onChange={(e) => setMicroOutcome(e.target.value)} style={selectStyle}>
-                  <option value="">-- Select --</option>
-                  <option value="Eradicated">Eradicated</option>
-                  <option value="Persistent">Persistent</option>
-                  <option value="Unknown">Unknown</option>
+                  <option value=""><LocalizedText text={"-- Select --"} /></option>
+                  <option value="Eradicated"><LocalizedText text={"Eradicated"} /></option>
+                  <option value="Persistent"><LocalizedText text={"Persistent"} /></option>
+                  <option value="Unknown"><LocalizedText text={"Unknown"} /></option>
                 </select>
               </Field>
               <div />
             </FieldGrid>
             <label style={toggleRow}>
               <input type="checkbox" checked={vancDiscontinued} onChange={(e) => setVancDiscontinued(e.target.checked)} />
-              <span style={{ fontSize: 12 }}>Vancomycin Discontinued Early</span>
+              <span style={{ fontSize: 12 }}><LocalizedText text={"Vancomycin Discontinued Early"} /></span>
             </label>
             {vancDiscontinued && (
               <Field label="Discontinuation Reason">
@@ -712,7 +695,7 @@ export default function ResearchEntryForm() {
           {/* ---- Submit ---- */}
           <div style={{ textAlign: "center", marginTop: 8 }}>
             <button style={{ ...submitBtn, opacity: submitting ? 0.6 : 1 }} disabled={submitting} onClick={handleSubmit}>
-              {submitting ? "Submitting..." : "Submit Research Record"}
+              <LocalizedText text={submitting ? "Submitting..." : "Submit Research Record"} />
             </button>
           </div>
         </>

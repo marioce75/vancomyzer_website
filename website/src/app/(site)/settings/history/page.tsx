@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedInput } from "@/localization/LocalizedElements";
+
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -56,26 +60,12 @@ function HistoryUpgradeCard() {
       border: "2px solid var(--color-primary)",
       borderRadius: 6,
     }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>
-        Calculation history is a Pro feature
-      </div>
-      <p style={{ fontSize: 14, color: "var(--color-secondary)", margin: "0 0 16px", lineHeight: 1.6 }}>
-        Pro users get 90 days of de-identified calculation history with optional case IDs for tracking
-        — search, review, and export previous calculations again without re-entering patient data.
-      </p>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}><LocalizedText text={"Calculation history is a Pro feature"} /></div>
+      <p style={{ fontSize: 14, color: "var(--color-secondary)", margin: "0 0 16px", lineHeight: 1.6 }}><LocalizedText text={"Pro users get 90 days of de-identified calculation history with optional case IDs for tracking — search, review, and export previous calculations again without re-entering patient data."} /></p>
       <ul style={{ margin: "0 0 16px", padding: 0, listStyle: "none", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.7 }}>
-        <li style={{ paddingLeft: 18, position: "relative" }}>
-
-          Optional case IDs (do not enter patient identifiers)
-        </li>
-        <li style={{ paddingLeft: 18, position: "relative" }}>
-
-          Filter by calculation type, date, case ID
-        </li>
-        <li style={{ paddingLeft: 18, position: "relative" }}>
-
-          90-day retention, automatically purged
-        </li>
+        <li style={{ paddingLeft: 18, position: "relative" }}><LocalizedText text={"Optional case IDs (do not enter patient identifiers)"} /></li>
+        <li style={{ paddingLeft: 18, position: "relative" }}><LocalizedText text={"Filter by calculation type, date, case ID"} /></li>
+        <li style={{ paddingLeft: 18, position: "relative" }}><LocalizedText text={"90-day retention, automatically purged"} /></li>
       </ul>
       <Link
         href="/settings/billing"
@@ -89,9 +79,7 @@ function HistoryUpgradeCard() {
           borderRadius: 4,
           textDecoration: "none",
         }}
-      >
-        Start 14-Day Trial
-      </Link>
+      ><LocalizedText text={"Start 14-Day Trial"} /></Link>
     </div>
   );
 }
@@ -136,14 +124,12 @@ export default function HistoryPage() {
   }, [user, allowed, offset, workflowFilter, caseIdFilter]);
 
   if (authLoading) {
-    return <div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}>Loading...</div>;
+    return <div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}><LocalizedText text="Loading..." /></div>;
   }
   if (!user) {
     return (
       <div style={{ padding: 40, textAlign: "center" }}>
-        <p style={{ color: "var(--color-secondary)" }}>
-          Please <Link href="/login" style={{ color: "var(--color-primary)" }}>sign in</Link> to view your calculation history.
-        </p>
+        <p style={{ color: "var(--color-secondary)" }}><LocalizedText text={"Please"} />{" "}<Link href="/login" style={{ color: "var(--color-primary)" }}><LocalizedText text="sign in" /></Link>{" "}<LocalizedText text={"to view your calculation history."} /></p>
       </div>
     );
   }
@@ -151,23 +137,15 @@ export default function HistoryPage() {
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 16px 80px" }}>
       <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
-        <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-           Institutional Settings
-        </Link>
+        <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text="Institutional Settings" /></Link>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-        <Link href="/settings/billing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-          Billing
-        </Link>
+        <Link href="/settings/billing" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text={"Billing"} /></Link>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-        <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>History</span>
+        <span style={{ color: "var(--color-primary)", fontWeight: 600 }}><LocalizedText text={"History"} /></span>
       </div>
 
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}>
-        Calculation History
-      </h1>
-      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 24 }}>
-        90-day de-identified record of your Vancomyzer&trade; calculations. No patient identifiers stored.
-      </p>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}><LocalizedText text="Calculation History" /></h1>
+      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 24 }}><LocalizedText text={"90-day de-identified record of your Vancomyzer™ calculations. No patient identifiers stored."} /></p>
 
       {!allowed ? (
         <HistoryUpgradeCard />
@@ -176,9 +154,7 @@ export default function HistoryPage() {
           {/* Filters */}
           <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
             <div>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--color-secondary)", marginBottom: 4 }}>
-                Workflow
-              </label>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--color-secondary)", marginBottom: 4 }}><LocalizedText text={"Workflow"} /></label>
               <select
                 value={workflowFilter}
                 onChange={e => { setOffset(0); setWorkflowFilter(e.target.value); }}
@@ -188,16 +164,14 @@ export default function HistoryPage() {
                   borderRadius: 4,
                 }}
               >
-                <option value="">All</option>
-                <option value="empiric">Initial regimen</option>
-                <option value="existing">Adjustment</option>
+                <option value=""><LocalizedText text="All" /></option>
+                <option value="empiric"><LocalizedText text={"Initial regimen"} /></option>
+                <option value="existing"><LocalizedText text={"Adjustment"} /></option>
               </select>
             </div>
             <div style={{ flex: 1, minWidth: 200 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--color-secondary)", marginBottom: 4 }}>
-                Case ID search
-              </label>
-              <input
+              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--color-secondary)", marginBottom: 4 }}><LocalizedText text={"Case ID search"} /></label>
+              <LocalizedInput
                 type="text"
                 value={caseIdFilter}
                 onChange={e => { setOffset(0); setCaseIdFilter(e.target.value); }}
@@ -210,7 +184,7 @@ export default function HistoryPage() {
               />
             </div>
             <div style={{ alignSelf: "flex-end", fontSize: 12, color: "var(--color-dim)" }}>
-              {total} {total === 1 ? "entry" : "entries"}
+              {total} <LocalizedText text={total === 1 ? "entry" : "entries"} />
             </div>
           </div>
 
@@ -219,20 +193,18 @@ export default function HistoryPage() {
               padding: "10px 14px", marginBottom: 16,
               background: "#fff5f5", border: "1px solid #fca5a5", color: "#991b1b", fontSize: 13, borderRadius: 4,
             }}>
-              {error}
+              <LocalizedText text={error} />
             </div>
           )}
 
           {/* Table */}
           {loading && rows.length === 0 ? (
-            <div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}>Loading history...</div>
+            <div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}><LocalizedText text={"Loading history..."} /></div>
           ) : rows.length === 0 ? (
             <div style={{
               padding: 32, textAlign: "center", color: "var(--color-dim)", fontSize: 13,
               border: "1px dashed var(--color-border)", borderRadius: 6,
-            }}>
-              No calculations yet. New calculations will appear here.
-            </div>
+            }}><LocalizedText text={"No calculations yet. New calculations will appear here."} /></div>
           ) : (
             <div style={{ overflowX: "auto", border: "1px solid var(--color-border)", borderRadius: 6, background: "var(--color-card)" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
@@ -243,7 +215,7 @@ export default function HistoryPage() {
                         padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700,
                         color: "var(--color-secondary)", letterSpacing: "0.06em", textTransform: "uppercase",
                       }}>
-                        {h}
+                        <LocalizedText text={h} />
                       </th>
                     ))}
                   </tr>
@@ -281,13 +253,9 @@ export default function HistoryPage() {
                       </td>
                       <td style={{ padding: "10px 12px" }}>
                         {row.auc_in_range ? (
-                          <span style={{ display: "inline-block", padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#ecfdf5", color: "#047857", border: "1px solid #6ee7b7", borderRadius: 4 }}>
-                            In
-                          </span>
+                          <span style={{ display: "inline-block", padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#ecfdf5", color: "#047857", border: "1px solid #6ee7b7", borderRadius: 4 }}><LocalizedText text={"In"} /></span>
                         ) : (
-                          <span style={{ display: "inline-block", padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#fef3c7", color: "#92400e", border: "1px solid #fcd34d", borderRadius: 4 }}>
-                            Out
-                          </span>
+                          <span style={{ display: "inline-block", padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#fef3c7", color: "#92400e", border: "1px solid #fcd34d", borderRadius: 4 }}><LocalizedText text={"Out"} /></span>
                         )}
                       </td>
                     </tr>
@@ -312,11 +280,9 @@ export default function HistoryPage() {
                   borderRadius: 4,
                   cursor: offset === 0 ? "not-allowed" : "pointer",
                 }}
-              >
-                 Newer
-              </button>
+              ><LocalizedText text={"Newer"} /></button>
               <span style={{ color: "var(--color-dim)" }}>
-                {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of {total}
+                {offset + 1}–{Math.min(offset + PAGE_SIZE, total)}{" "}<LocalizedText text="of" />{" "}{total}
               </span>
               <button
                 type="button"
@@ -330,9 +296,7 @@ export default function HistoryPage() {
                   borderRadius: 4,
                   cursor: offset + PAGE_SIZE >= total ? "not-allowed" : "pointer",
                 }}
-              >
-                Older
-              </button>
+              ><LocalizedText text={"Older"} /></button>
             </div>
           )}
         </>

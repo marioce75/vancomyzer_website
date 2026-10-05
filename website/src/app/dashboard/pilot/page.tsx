@@ -1,4 +1,6 @@
 'use client'
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -34,12 +36,12 @@ export default function PilotDashboardPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--color-bg, #0f1923)' }}>
-      <span style={{ color: GREEN, fontFamily: 'monospace', fontSize: 13 }}>Loading pilot data…</span>
+      <span style={{ color: GREEN, fontFamily: 'monospace', fontSize: 13 }}><LocalizedText text={"Loading pilot data…"} /></span>
     </div>
   )
 
   if (!status) return (
-    <div className="p-8 text-center" style={{ color: SLATE }}>No trial data found.</div>
+    <div className="p-8 text-center" style={{ color: SLATE }}><LocalizedText text={"No trial data found."} /></div>
   )
 
   const { daysElapsed, daysRemaining, currentPhase, stats, reportReady, isExpired, isConverted } = status
@@ -66,9 +68,9 @@ export default function PilotDashboardPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: NAVY, margin: 0 }}>Your 90-Day Pilot</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: NAVY, margin: 0 }}><LocalizedText text={"Your 90-Day Pilot"} /></h1>
           <p style={{ fontSize: 13, color: SLATE, marginTop: 4 }}>
-            {isExpired ? 'Your pilot has ended.' : isConverted ? 'You are an active subscriber.' : `Day ${daysElapsed} of 90 · ${daysRemaining} days remaining`}
+            <LocalizedText text={isExpired ? 'Your pilot has ended.' : isConverted ? 'You are an active subscriber.' : `Day ${daysElapsed} of 90 · ${daysRemaining} days remaining`} />
           </p>
         </div>
         <span style={{
@@ -77,7 +79,7 @@ export default function PilotDashboardPage() {
           color: isExpired ? '#ef4444' : GREEN,
           letterSpacing: '0.06em',
         }}>
-          {isConverted ? 'SUBSCRIBED' : isExpired ? 'EXPIRED' : `PHASE ${currentPhase.split('_')[1]} ACTIVE`}
+          <LocalizedText text={isConverted ? 'SUBSCRIBED' : isExpired ? 'EXPIRED' : `PHASE ${currentPhase.split('_')[1]} ACTIVE`} />
         </span>
       </div>
 
@@ -88,10 +90,10 @@ export default function PilotDashboardPage() {
             <div style={{ height: '100%', width: `${progressPct}%`, background: GREEN, transition: 'width 0.6s ease' }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: SLATE, marginTop: 6 }}>
-            <span>Day 1 — Start</span>
-            <span>Day 14 — Phase 2</span>
-            <span>Day 75 — Report</span>
-            <span>Day 90 — End</span>
+            <span><LocalizedText text={"Day 1 — Start"} /></span>
+            <span><LocalizedText text={"Day 14 — Phase 2"} /></span>
+            <span><LocalizedText text={"Day 75 — Report"} /></span>
+            <span><LocalizedText text={"Day 90 — End"} /></span>
           </div>
         </div>
       )}
@@ -109,13 +111,13 @@ export default function PilotDashboardPage() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                 <span style={{ fontSize: 10, fontWeight: 700, color: SLATE, letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
-                  {phase.label}
+                  <LocalizedText text={phase.label} />
                 </span>
-                {phase.done && <span>Complete</span>}
+                {phase.done && <span><LocalizedText text={"Complete"} /></span>}
                 {isActive && <span style={{ color: GREEN, fontSize: 13 }}>●</span>}
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: NAVY }}>{phase.subtitle}</div>
-              <div style={{ fontSize: 11, color: SLATE, marginTop: 2 }}>Days {phase.days}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: NAVY }}><LocalizedText text={phase.subtitle} /></div>
+              <div style={{ fontSize: 11, color: SLATE, marginTop: 2 }}><LocalizedText text={"Days"} />{" "}{phase.days}</div>
             </div>
           )
         })}
@@ -130,37 +132,24 @@ export default function PilotDashboardPage() {
       }}>
         {currentPhase === 'PHASE_1' && !isExpired && (
           <>
-            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}>Phase 1 — Familiarization (Days 1–14)</div>
-            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}>
-              Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet.
-              Every case you calculate is being logged automatically. Focus on learning where the calculator
-              adds value for your most complex patients — obesity, renal dysfunction, ICU cases.
-            </p>
+            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={"Phase 1 — Familiarization (Days 1–14)"} /></div>
+            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Every case you calculate is being logged automatically. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases."} /></p>
           </>
         )}
         {currentPhase === 'PHASE_2' && !isExpired && (
           <>
-            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}>Phase 2 — Active Use (Days 15–75)</div>
-            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}>
-              Use Vancomyzer as your primary dosing support tool. Your case data is accumulating.
-              At day 75, a personalized summary report will be generated showing your AUC attainment rate,
-              case volume and key insights from your logged cases — a document you can share with your
-              pharmacy director to make the case for an institutional subscription.
-            </p>
+            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={"Phase 2 — Active Use (Days 15–75)"} /></div>
+            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Use Vancomyzer as your primary dosing support tool. Your case data is accumulating. At day 75, a personalized summary report will be generated showing your AUC attainment rate, case volume and key insights from your logged cases — a document you can share with your pharmacy director to make the case for an institutional subscription."} /></p>
           </>
         )}
         {(currentPhase === 'PHASE_3' || isExpired) && !isConverted && (
           <>
-            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}>Phase 3 — Value Review (Days 76–90)</div>
-            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}>
-              Your pilot data is complete. Generate your personalized summary report below and share it
-              with your pharmacy director or P&T committee. Subscribe before day 90 to retain your full
-              case log and continue without interruption.
-            </p>
+            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={"Phase 3 — Value Review (Days 76–90)"} /></div>
+            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Your pilot data is complete. Generate your personalized summary report below and share it with your pharmacy director or P&T committee. Subscribe before day 90 to retain your full case log and continue without interruption."} /></p>
           </>
         )}
         {isConverted && (
-          <p style={{ fontSize: 13, color: GREEN, margin: 0 }}>You are an active subscriber. Your case history is fully preserved.</p>
+          <p style={{ fontSize: 13, color: GREEN, margin: 0 }}><LocalizedText text={"You are an active subscriber. Your case history is fully preserved."} /></p>
         )}
       </div>
 
@@ -169,8 +158,8 @@ export default function PilotDashboardPage() {
         {statCards.map(card => (
           <div key={card.label} style={{ border: '1px solid #e2e8f0', padding: '18px 16px', background: '#fff' }}>
             <div style={{ fontSize: 24, fontWeight: 700, color: GREEN, fontFamily: 'monospace', marginBottom: 4 }}>{card.value}</div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: NAVY }}>{card.label}</div>
-            <div style={{ fontSize: 11, color: SLATE, marginTop: 2 }}>{card.sub}</div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: NAVY }}><LocalizedText text={card.label} /></div>
+            <div style={{ fontSize: 11, color: SLATE, marginTop: 2 }}><LocalizedText text={card.sub} /></div>
           </div>
         ))}
       </div>
@@ -188,7 +177,7 @@ export default function PilotDashboardPage() {
               opacity: reportLoading ? 0.7 : 1,
             }}
           >
-            {reportLoading ? 'Generating…' : (reportUrl || existingReport) ? 'Re-generate Report' : 'Generate My Pilot Report'}
+            <LocalizedText text={reportLoading ? 'Generating…' : (reportUrl || existingReport) ? 'Re-generate Report' : 'Generate My Pilot Report'} />
           </button>
         )}
         {(reportUrl || existingReport) && (
@@ -199,9 +188,7 @@ export default function PilotDashboardPage() {
               background: 'transparent', color: GREEN, border: `1px solid ${GREEN}`,
               padding: '10px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
             }}
-          >
-            Download Report PDF
-          </button>
+          ><LocalizedText text={"Download Report PDF"} /></button>
         )}
         {(isExpired || currentPhase === 'PHASE_3') && !isConverted && (
           <a
@@ -211,16 +198,14 @@ export default function PilotDashboardPage() {
               border: 'none', padding: '10px 20px', fontSize: 13, fontWeight: 700,
               cursor: 'pointer', textDecoration: 'none',
             }}
-          >
-            Subscribe — $49.99/year
-          </a>
+          ><LocalizedText text={"Subscribe — $49.99/year"} /></a>
         )}
       </div>
 
       {/* Feature comparison */}
       {!isConverted && (
         <div style={{ border: '1px dashed #cbd5e1', padding: '20px 24px' }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: NAVY, marginBottom: 12 }}>What is included after the pilot</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: NAVY, marginBottom: 12 }}><LocalizedText text={"What is included after the pilot"} /></div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 32px' }}>
             {([
               ['Calculation history (90-day retention)', true],
@@ -229,8 +214,8 @@ export default function PilotDashboardPage() {
               ['Email support', true],
             ] as [string, boolean][]).map(([feature, included]) => (
               <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: SLATE }}>
-                <span style={{ color: included ? GREEN : '#94a3b8', fontWeight: 700 }}>{included ? 'Included' : 'Optional'}</span>
-                <span>{feature}</span>
+                <span style={{ color: included ? GREEN : '#94a3b8', fontWeight: 700 }}><LocalizedText text={included ? 'Included' : 'Optional'} /></span>
+                <span><LocalizedText text={feature} /></span>
                 {!included && (
                   <span style={{ fontSize: 10, border: `1px solid ${GREEN}50`, color: GREEN, padding: '1px 6px' }}>Pro</span>
                 )}
@@ -241,7 +226,7 @@ export default function PilotDashboardPage() {
       )}
 
       <div style={{ marginTop: 24 }}>
-        <Link href="/calculator" style={{ fontSize: 12, color: SLATE, textDecoration: 'none' }}> Back to Calculator</Link>
+        <Link href="/calculator" style={{ fontSize: 12, color: SLATE, textDecoration: 'none' }}>{" "}<LocalizedText text={"Back to Calculator"} /></Link>
       </div>
     </div>
   )

@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedButton, LocalizedTextarea } from "@/localization/LocalizedElements";
+
 
 import { useEffect, useCallback, useState } from "react";
 import Link from "next/link";
@@ -154,10 +158,8 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               textShadow: "0 0 10px var(--color-glow-strong)",
               ...FONT,
             }}
-          >
-            CLINICAL SETTINGS
-          </h2>
-          <button
+          ><LocalizedText text="CLINICAL SETTINGS" /></h2>
+          <LocalizedButton
             type="button"
             onClick={onClose}
             aria-label="Close settings"
@@ -185,7 +187,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             }}
           >
             ✕
-          </button>
+          </LocalizedButton>
         </div>
 
         {/* ── Body ──────────────────────────────────────────────── */}
@@ -196,7 +198,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               signed in get a single sign-in link instead of four links that
               would each bounce them to the login page. */}
           <section>
-            <SectionLabel>ACCOUNT</SectionLabel>
+            <SectionLabel><LocalizedText text="ACCOUNT" /></SectionLabel>
             <div className="flex flex-col gap-1.5" style={{ marginTop: 10 }}>
               {(user
                 ? [
@@ -222,7 +224,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     ...FONT,
                   }}
                 >
-                  {label}
+                  <LocalizedText text={label} />
                 </Link>
               ))}
             </div>
@@ -230,7 +232,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
 
           {/* ── 2. FONT SIZE ──────────────────────────────────── */}
           <section>
-            <SectionLabel>FONT SIZE</SectionLabel>
+            <SectionLabel><LocalizedText text="FONT SIZE" /></SectionLabel>
             <div className="flex gap-0" style={{ marginTop: 10 }}>
               {FONT_SIZES.map((fs) => {
                 const active = settings.fontSize === fs.value;
@@ -251,7 +253,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                       ...FONT,
                     }}
                   >
-                    {fs.label}
+                    <LocalizedText text={fs.label} />
                   </button>
                 );
               })}
@@ -260,7 +262,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
 
           {/* ── 3. DISPLAY SLIDERS ────────────────────────────── */}
           <section>
-            <SectionLabel>DISPLAY</SectionLabel>
+            <SectionLabel><LocalizedText text="DISPLAY" /></SectionLabel>
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 16 }}>
               {SLIDERS.map((slider) => {
                 const value = settings[slider.key] as number;
@@ -269,7 +271,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                   <div key={slider.key}>
                     <div className="flex items-center justify-between" style={{ marginBottom: 6 }}>
                       <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
-                        {slider.label}
+                        <LocalizedText text={slider.label} />
                       </span>
                       <span
                         style={{
@@ -303,7 +305,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
 
           {/* ── 4. EFFECTS ────────────────────────────────────── */}
           <section>
-            <SectionLabel>EFFECTS</SectionLabel>
+            <SectionLabel><LocalizedText text="EFFECTS" /></SectionLabel>
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 10 }}>
               {TOGGLES.map((toggle) => {
                 const on = settings[toggle.key] as boolean;
@@ -313,7 +315,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     className="flex items-center justify-between"
                   >
                     <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
-                      {toggle.label}
+                      <LocalizedText text={toggle.label} />
                     </span>
                     <button
                       type="button"
@@ -354,15 +356,11 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
 
           {/* ── 4b. TEACHING MODE ──────────────────────────── */}
           <section>
-            <SectionLabel>TEACHING MODE</SectionLabel>
+            <SectionLabel><LocalizedText text="TEACHING MODE" /></SectionLabel>
             <div className="flex items-center justify-between" style={{ marginTop: 10 }}>
               <div style={{ flex: 1, paddingRight: 12 }}>
-                <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
-                  Show inline &ldquo;Why&rdquo; explanations
-                </span>
-                <p style={{ fontSize: 10, color: "var(--color-dim)", marginTop: 2, lineHeight: 1.4, ...FONT }}>
-                  Adds expandable PK-concept notes next to AUC, dose recommendation, and Bayesian fit results.
-                </p>
+                <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}><LocalizedText text="Show inline “Why” explanations" /></span>
+                <p style={{ fontSize: 10, color: "var(--color-dim)", marginTop: 2, lineHeight: 1.4, ...FONT }}><LocalizedText text="Adds expandable PK-concept notes next to AUC, dose recommendation, and Bayesian fit results." /></p>
               </div>
               <button
                 type="button"
@@ -399,7 +397,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
 
           {/* ── 5. LIVE PREVIEW ────────────────────────────── */}
           <section>
-            <SectionLabel>PREVIEW</SectionLabel>
+            <SectionLabel><LocalizedText text="PREVIEW" /></SectionLabel>
             <div
               style={{
                 marginTop: 10,
@@ -419,21 +417,17 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                       </span>
                       <span style={{ fontSize: 11, color: "#546471", fontFamily: "Inter, system-ui, sans-serif" }}>mg·h/L</span>
                     </div>
-              <p style={{ fontSize: 10, color: "#276749", fontWeight: 600, marginTop: 4, fontFamily: "Inter, system-ui, sans-serif" }}>
-                WITHIN TARGET RANGE
-              </p>
+              <p style={{ fontSize: 10, color: "#276749", fontWeight: 600, marginTop: 4, fontFamily: "Inter, system-ui, sans-serif" }}><LocalizedText text="WITHIN TARGET RANGE" /></p>
             </div>
           </section>
 
           {/* ── 6. REPORT A BUG ─────────────────────────────── */}
           <section>
-            <SectionLabel>REPORT A BUG</SectionLabel>
+            <SectionLabel><LocalizedText text="REPORT A BUG" /></SectionLabel>
             {user ? (
             <>
-            <p style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 6, lineHeight: 1.5, ...FONT }}>
-              Describe what happened. Your name, email, current page, and browser are attached automatically so the team can reply.
-            </p>
-            <textarea
+            <p style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 6, lineHeight: 1.5, ...FONT }}><LocalizedText text="Describe what happened. Your name, email, current page, and browser are attached automatically so the team can reply." /></p>
+            <LocalizedTextarea
               value={bugDescription}
               onChange={(e) => {
                 setBugDescription(e.target.value);
@@ -480,7 +474,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                   ...FONT,
                 }}
               >
-                {bugStatus === "sending" ? "SENDING…" : "SEND REPORT"}
+                <LocalizedText text={bugStatus === "sending" ? "SENDING…" : "SEND REPORT"} />
               </button>
             </div>
             {bugMessage && (
@@ -492,20 +486,14 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                   ...FONT,
                 }}
               >
-                {bugMessage}
+                <LocalizedText text={bugMessage} />
               </p>
             )}
             </>
             ) : (
-              <p style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 6, lineHeight: 1.6, ...FONT }}>
-                Reports sent from here include your account details so our team can reply. Please{" "}
-                <Link href="/login" onClick={onClose} style={{ color: "var(--color-primary)", textDecoration: "underline" }}>
-                  sign in
-                </Link>{" "}
-                first, or reach us any time through the{" "}
-                <Link href="/contact" onClick={onClose} style={{ color: "var(--color-primary)", textDecoration: "underline" }}>
-                  Contact page
-                </Link>
+              <p style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 6, lineHeight: 1.6, ...FONT }}><LocalizedText text="Reports sent from here include your account details so our team can reply. Please" />{" "}
+                <Link href="/login" onClick={onClose} style={{ color: "var(--color-primary)", textDecoration: "underline" }}><LocalizedText text="sign in" /></Link>{" "}<LocalizedText text="first, or reach us any time through the" />{" "}
+                <Link href="/contact" onClick={onClose} style={{ color: "var(--color-primary)", textDecoration: "underline" }}><LocalizedText text="Contact page" /></Link>
                 .
               </p>
             )}
@@ -538,9 +526,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
                 (e.currentTarget as HTMLElement).style.boxShadow = "none";
               }}
-            >
-              [ RESET TO DEFAULTS ]
-            </button>
+            ><LocalizedText text="[ RESET TO DEFAULTS ]" /></button>
           </section>
         </div>
       </div>

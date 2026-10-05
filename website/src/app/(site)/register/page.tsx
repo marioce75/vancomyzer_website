@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedA, LocalizedImg, LocalizedInput } from "@/localization/LocalizedElements";
+
+import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
+
 
 import { Suspense, useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,13 +14,15 @@ import { COUNTRIES, INSTITUTION_TYPES, PRACTICE_SETTINGS } from "@/lib/userCateg
 // keeps the page client-rendered with a graceful loading fallback.
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#a0aec0" }}>Loading…</div>}>
+    <Suspense fallback={<div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#a0aec0" }}><LocalizedText text={"Loading…"} /></div>}>
       <RegisterPageInner />
     </Suspense>
   );
 }
 
 function RegisterPageInner() {
+  const { locale, t } = useLanguage();
+  const countryNames = new Intl.DisplayNames([locale === "es" ? "es-ES" : locale === "fr" ? "fr-FR" : "en"], { type: "region" });
   const router = useRouter();
   const searchParams = useSearchParams();
   const [step, setStep] = useState(1);
@@ -123,17 +129,13 @@ function RegisterPageInner() {
       <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ maxWidth: 420, padding: 32, background: "#ffffff", border: "1px solid #cbd6e0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", borderRadius: 8, textAlign: "center" }}>
           <div style={{ fontSize: 40, marginBottom: 16 }}></div>
-          <h1 className="vz-serif" style={{ fontSize: 26, color: "#1e6b3e" }}>Account active — welcome to Vancomyzer</h1>
-          <p style={{ fontSize: 13, color: "#4a5568", marginTop: 12, lineHeight: 1.6 }}>
-            A welcome email is on its way to <strong>{email}</strong>. You can sign in right now and start using the calculator.
-          </p>
+          <h1 className="vz-serif" style={{ fontSize: 26, color: "#1e6b3e" }}><LocalizedText text={"Account active — welcome to Vancomyzer"} /></h1>
+          <p style={{ fontSize: 13, color: "#4a5568", marginTop: 12, lineHeight: 1.6 }}><LocalizedText text={"A welcome email is on its way to"} />{" "}<strong>{email}</strong><LocalizedText text={". You can sign in right now and start using the calculator."} /></p>
           <Link href="/login" style={{
             display: "inline-block", marginTop: 20, padding: "10px 20px",
             background: "#1f5e96", color: "#fff", fontSize: 13, fontWeight: 600,
             textDecoration: "none", borderRadius: 4,
-          }}>
-            Sign in now
-          </Link>
+          }}><LocalizedText text={"Sign in now"} /></Link>
         </div>
       </div>
     );
@@ -148,18 +150,18 @@ function RegisterPageInner() {
       }}>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 12px" }}>
-            <img src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
-          </a>
+          <LocalizedA href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 12px" }}>
+            <LocalizedImg src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
+          </LocalizedA>
           <h1 className="vz-serif" style={{ fontSize: 26, color: "#14232f", margin: 0 }}>
-            {step === 1 ? "Create an Account" : "Legal Agreements"}
+            <LocalizedText text={step === 1 ? "Create an Account" : "Legal Agreements"} />
           </h1>
-          <p style={{ fontSize: 12, color: "#546471", marginTop: 4 }}>Step {step} of 2</p>
+          <p style={{ fontSize: 12, color: "#546471", marginTop: 4 }}><LocalizedText text={"Step"} />{" "}{step}{" "}<LocalizedText text={"of 2"} /></p>
         </div>
 
         {error && (
           <div style={{ padding: "10px 14px", marginBottom: 16, background: "#fff5f5", border: "1px solid #fca5a5", color: "#991b1b", fontSize: 13, borderRadius: 4 }}>
-            {error}
+            <LocalizedText text={error} />
           </div>
         )}
 
@@ -170,84 +172,79 @@ function RegisterPageInner() {
             color: "#047857", fontSize: 12, borderRadius: 4,
             lineHeight: 1.55,
           }}>
-            🎁 <strong>Referred by a colleague.</strong> When you subscribe to Pro, your referrer earns 1 month free — and you get full Pro access via the 14-day trial.
-          </div>
+            🎁 <strong><LocalizedText text={"Referred by a colleague."} /></strong>{" "}<LocalizedText text={"When you subscribe to Pro, your referrer earns 1 month free — and you get full Pro access via the 14-day trial."} /></div>
         )}
 
         {step === 1 && (
           <form onSubmit={handleStep1}>
             <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>Full Legal Name *</label>
-              <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required placeholder="Dr. Jane Smith" style={inputStyle} />
+              <label style={labelStyle}><LocalizedText text={"Full Legal Name *"} /></label>
+              <LocalizedInput type="text" value={fullName} onChange={e => setFullName(e.target.value)} required placeholder="Dr. Jane Smith" style={inputStyle} />
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>Professional Credentials *</label>
-              <input type="text" value={credentials} onChange={e => setCredentials(e.target.value)} required placeholder="PharmD, MD, RPh" style={inputStyle} />
+              <label style={labelStyle}><LocalizedText text={"Professional Credentials *"} /></label>
+              <LocalizedInput type="text" value={credentials} onChange={e => setCredentials(e.target.value)} required placeholder="PharmD, MD, RPh" style={inputStyle} />
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>Institution / Hospital <span style={{ color: "#a0aec0", fontWeight: 400 }}>(optional)</span></label>
-              <input type="text" value={institution} onChange={e => setInstitution(e.target.value)} placeholder="City Hospital" style={inputStyle} />
+              <label style={labelStyle}><LocalizedText text={"Institution / Hospital"} />{" "}<span style={{ color: "#a0aec0", fontWeight: 400 }}><LocalizedText text={"(optional)"} /></span></label>
+              <LocalizedInput type="text" value={institution} onChange={e => setInstitution(e.target.value)} placeholder="City Hospital" style={inputStyle} />
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>Country *</label>
+              <label style={labelStyle}><LocalizedText text={"Country *"} /></label>
               <select value={countryCode} onChange={e => setCountryCode(e.target.value)} required style={inputStyle}>
-                <option value="">— Select country —</option>
+                <option value=""><LocalizedText text={"— Select country —"} /></option>
                 {COUNTRIES.map(c => (
-                  <option key={c.code} value={c.code}>{c.name}</option>
+                  <option key={c.code} value={c.code}>{locale === "en" ? c.name : c.code === "OTHER" ? t(c.name) : countryNames.of(c.code) ?? c.name}</option>
                 ))}
               </select>
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>Institution type *</label>
+              <label style={labelStyle}><LocalizedText text={"Institution type *"} /></label>
               <select value={institutionType} onChange={e => setInstitutionType(e.target.value)} required style={inputStyle}>
-                <option value="">— Select institution type —</option>
+                <option value=""><LocalizedText text={"— Select institution type —"} /></option>
                 {INSTITUTION_TYPES.map(t => (
-                  <option key={t.code} value={t.code}>{t.name}</option>
+                  <option key={t.code} value={t.code}><LocalizedText text={t.name} /></option>
                 ))}
               </select>
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>Practice setting *</label>
+              <label style={labelStyle}><LocalizedText text={"Practice setting *"} /></label>
               <select value={practiceSetting} onChange={e => setPracticeSetting(e.target.value)} required style={inputStyle}>
-                <option value="">— Select practice setting —</option>
+                <option value=""><LocalizedText text={"— Select practice setting —"} /></option>
                 {PRACTICE_SETTINGS.map(s => (
-                  <option key={s.code} value={s.code}>{s.name}</option>
+                  <option key={s.code} value={s.code}><LocalizedText text={s.name} /></option>
                 ))}
               </select>
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>Email *</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="pharmacist@hospital.org" style={inputStyle} />
+              <label style={labelStyle}><LocalizedText text={"Email *"} /></label>
+              <LocalizedInput type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="pharmacist@hospital.org" style={inputStyle} />
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>Username *</label>
-              <input type="text" value={username} onChange={e => setUsername(e.target.value)} required placeholder="jsmith" style={inputStyle} />
+              <label style={labelStyle}><LocalizedText text={"Username *"} /></label>
+              <LocalizedInput type="text" value={username} onChange={e => setUsername(e.target.value)} required placeholder="jsmith" style={inputStyle} />
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>Password *</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="At least 8 characters, with uppercase, lowercase and a number" style={inputStyle} />
+              <label style={labelStyle}><LocalizedText text={"Password *"} /></label>
+              <LocalizedInput type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="At least 8 characters, with uppercase, lowercase and a number" style={inputStyle} />
             </div>
             <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>Confirm Password *</label>
-              <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder="Re-enter password" style={inputStyle} />
+              <label style={labelStyle}><LocalizedText text={"Confirm Password *"} /></label>
+              <LocalizedInput type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder="Re-enter password" style={inputStyle} />
             </div>
-            <button type="submit" style={{ width: "100%", padding: 12, fontSize: 14, fontWeight: 600, background: "#1f5e96", color: "#fff", border: "none", cursor: "pointer", borderRadius: 4 }}>
-              Continue to Agreements
-            </button>
+            <button type="submit" style={{ width: "100%", padding: 12, fontSize: 14, fontWeight: 600, background: "#1f5e96", color: "#fff", border: "none", cursor: "pointer", borderRadius: 4 }}><LocalizedText text={"Continue to Agreements"} /></button>
           </form>
         )}
 
         {step === 2 && (
           <div>
-            <p style={{ fontSize: 12, color: "#4a5568", marginBottom: 8 }}>
-              Please read both documents below. Scroll each to the bottom to enable the agreement checkboxes.
-            </p>
+            <p style={{ fontSize: 12, color: "#4a5568", marginBottom: 8 }}><LocalizedText text={"Please read both documents below. Scroll each to the bottom to enable the agreement checkboxes."} /></p>
 
             {/* Medical Disclaimer scroll */}
             <div style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: "#14232f" }}>1. Medical Disclaimer</span>
-                {disclaimerScrolled && <span style={{ fontSize: 10, color: "#047857", fontWeight: 600 }}>Read</span>}
+                <span style={{ fontSize: 11, fontWeight: 600, color: "#14232f" }}><LocalizedText text={"1. Medical Disclaimer"} /></span>
+                {disclaimerScrolled && <span style={{ fontSize: 10, color: "#047857", fontWeight: 600 }}><LocalizedText text={"Read"} /></span>}
               </div>
               <div
                 ref={disclaimerRef}
@@ -258,28 +255,26 @@ function RegisterPageInner() {
                   color: "#2d3748", lineHeight: 1.6, borderRadius: 4,
                 }}
               >
-                <h3 style={{ fontSize: 12, fontWeight: 700, color: "#14232f", marginBottom: 8 }}>VANCOMYZER™ MEDICAL DISCLAIMER</h3>
-                <p><strong>For Healthcare Professionals Only</strong></p>
-                <p>Vancomyzer™ is intended solely for use by qualified healthcare professionals, including licensed physicians, pharmacists, and other clinicians with appropriate training in vancomycin pharmacokinetics and therapeutic drug monitoring. This tool is not intended for use by patients, caregivers, or non-clinical personnel.</p>
-                <p><strong>Not Medical Advice</strong></p>
-                <p>Vancomyzer™ provides clinical decision-support information for clinician review only. Nothing on this site constitutes medical advice, a prescription, a diagnosis, or a treatment recommendation. All dosing outputs are model-based review aids generated from pharmacokinetic calculations. They must be independently reviewed and validated by a licensed clinician before any clinical application.</p>
-                <p><strong>Regulatory Status</strong></p>
-                <p>Vancomyzer™ is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation.</p>
-                <p><strong>Scope</strong></p>
-                <p>This tool is scoped to adult intermittent intravenous vancomycin only. Vancomyzer™ has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. It is not designed for pediatric patients, continuous infusion, renal replacement therapy, or conditions outside the stated assumptions.</p>
-                <p><strong>Limitation of Liability</strong></p>
-                <p>THIS TOOL IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT SHALL THE DEVELOPERS BE LIABLE FOR ANY DAMAGES ARISING OUT OF THE USE OF THIS TOOL.</p>
-                <p style={{ marginTop: 12, padding: 8, background: "#e2e8f0", textAlign: "center", fontWeight: 600, fontSize: 10, color: "#4a5568" }}>
-                  — END OF DISCLAIMER —
-                </p>
+                <h3 style={{ fontSize: 12, fontWeight: 700, color: "#14232f", marginBottom: 8 }}><LocalizedText text={"VANCOMYZER™ MEDICAL DISCLAIMER"} /></h3>
+                <p><strong><LocalizedText text="For Healthcare Professionals Only" /></strong></p>
+                <p><LocalizedText text={"Vancomyzer™ is intended solely for use by qualified healthcare professionals, including licensed physicians, pharmacists, and other clinicians with appropriate training in vancomycin pharmacokinetics and therapeutic drug monitoring. This tool is not intended for use by patients, caregivers, or non-clinical personnel."} /></p>
+                <p><strong><LocalizedText text="Not Medical Advice" /></strong></p>
+                <p><LocalizedText text={"Vancomyzer™ provides clinical decision-support information for clinician review only. Nothing on this site constitutes medical advice, a prescription, a diagnosis, or a treatment recommendation. All dosing outputs are model-based review aids generated from pharmacokinetic calculations. They must be independently reviewed and validated by a licensed clinician before any clinical application."} /></p>
+                <p><strong><LocalizedText text="Regulatory Status" /></strong></p>
+                <p><LocalizedText text="Vancomyzer™ is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation." /></p>
+                <p><strong><LocalizedText text="Scope" /></strong></p>
+                <p><LocalizedText text={"This tool is scoped to adult intermittent intravenous vancomycin only. Vancomyzer™ has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. It is not designed for pediatric patients, continuous infusion, renal replacement therapy, or conditions outside the stated assumptions."} /></p>
+                <p><strong><LocalizedText text="Limitation of Liability" /></strong></p>
+                <p><LocalizedText text={"THIS TOOL IS PROVIDED \"AS IS\" AND \"AS AVAILABLE\" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT SHALL THE DEVELOPERS BE LIABLE FOR ANY DAMAGES ARISING OUT OF THE USE OF THIS TOOL."} /></p>
+                <p style={{ marginTop: 12, padding: 8, background: "#e2e8f0", textAlign: "center", fontWeight: 600, fontSize: 10, color: "#4a5568" }}><LocalizedText text={"— END OF DISCLAIMER —"} /></p>
               </div>
             </div>
 
             {/* Terms of Use scroll */}
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: "#14232f" }}>2. Terms of Use</span>
-                {termsScrolled && <span style={{ fontSize: 10, color: "#047857", fontWeight: 600 }}>Read</span>}
+                <span style={{ fontSize: 11, fontWeight: 600, color: "#14232f" }}><LocalizedText text={"2. Terms of Use"} /></span>
+                {termsScrolled && <span style={{ fontSize: 10, color: "#047857", fontWeight: 600 }}><LocalizedText text={"Read"} /></span>}
               </div>
               <div
                 ref={termsRef}
@@ -290,34 +285,32 @@ function RegisterPageInner() {
                   color: "#2d3748", lineHeight: 1.6, borderRadius: 4,
                 }}
               >
-                <h3 style={{ fontSize: 12, fontWeight: 700, color: "#14232f", marginBottom: 8 }}>VANCOMYZER™ TERMS OF USE</h3>
-                <p style={{ fontSize: 10, color: "#546471", marginBottom: 8 }}>Last updated: September 18, 2026</p>
-                <p><strong>Acceptance of Terms</strong></p>
-                <p>By accessing or using Vancomyzer™, you agree to be bound by these Terms of Use and the Medical Disclaimer. If you do not agree, do not use this tool.</p>
-                <p><strong>Permitted Use</strong></p>
-                <p>Vancomyzer™ is licensed to qualified healthcare professionals, and to institutions that subscribe on their behalf, for internal clinical, educational, and quality-improvement use. Subject to these Terms and payment of any applicable fees, you are granted a limited, non-exclusive, non-transferable, non-sublicensable license to access and use the tool for that purpose. Using it in the course of your practice or employment, including at a for-profit institution, is permitted.</p>
-                <p>You may not:</p>
+                <h3 style={{ fontSize: 12, fontWeight: 700, color: "#14232f", marginBottom: 8 }}><LocalizedText text={"VANCOMYZER™ TERMS OF USE"} /></h3>
+                <p style={{ fontSize: 10, color: "#546471", marginBottom: 8 }}><LocalizedText text={"Last updated: September 18, 2026"} /></p>
+                <p><strong><LocalizedText text="Acceptance of Terms" /></strong></p>
+                <p><LocalizedText text="By accessing or using Vancomyzer™, you agree to be bound by these Terms of Use and the Medical Disclaimer. If you do not agree, do not use this tool." /></p>
+                <p><strong><LocalizedText text="Permitted Use" /></strong></p>
+                <p><LocalizedText text="Vancomyzer™ is licensed to qualified healthcare professionals, and to institutions that subscribe on their behalf, for internal clinical, educational, and quality-improvement use. Subject to these Terms and payment of any applicable fees, you are granted a limited, non-exclusive, non-transferable, non-sublicensable license to access and use the tool for that purpose. Using it in the course of your practice or employment, including at a for-profit institution, is permitted." /></p>
+                <p><LocalizedText text="You may not:" /></p>
                 <ul style={{ paddingLeft: 20, margin: "4px 0" }}>
-                  <li>Resell, rent, sublicense, white-label, or otherwise make the tool available to anyone who is not an authorized user under your own subscription</li>
-                  <li>Operate the tool as a service bureau or application service provider, or offer dosing services to third parties as a standalone product built on it</li>
-                  <li>Modify, copy, reproduce, distribute, or create derivative works from this tool without prior written consent</li>
-                  <li>Remove or alter any copyright, trademark, or legal notices</li>
-                  <li>Reverse-engineer or attempt to extract proprietary algorithms or model parameters</li>
-                  <li>Access the tool in order to design or develop a competing product</li>
+                  <li><LocalizedText text="Resell, rent, sublicense, white-label, or otherwise make the tool available to anyone who is not an authorized user under your own subscription" /></li>
+                  <li><LocalizedText text="Operate the tool as a service bureau or application service provider, or offer dosing services to third parties as a standalone product built on it" /></li>
+                  <li><LocalizedText text="Modify, copy, reproduce, distribute, or create derivative works from this tool without prior written consent" /></li>
+                  <li><LocalizedText text="Remove or alter any copyright, trademark, or legal notices" /></li>
+                  <li><LocalizedText text="Reverse-engineer or attempt to extract proprietary algorithms or model parameters" /></li>
+                  <li><LocalizedText text="Access the tool in order to design or develop a competing product" /></li>
                 </ul>
-                <p><strong>Intellectual Property</strong></p>
-                <p>All content, design, algorithms, and code comprising Vancomyzer™ are the exclusive intellectual property of their respective owners. All rights reserved. The Vancomyzer™ name and logo are trademarks. Unauthorized use of any intellectual property associated with this tool is prohibited.</p>
-                <p><strong>Clinical Responsibility</strong></p>
-                <p>Users remain solely responsible for independent clinical review, institutional-policy alignment, and final treatment decisions. Do not rely on this tool as a substitute for professional judgment, local protocol, product labeling, or therapeutic drug monitoring.</p>
-                <p><strong>Limitation of Liability</strong></p>
-                <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE DEVELOPERS OF VANCOMYZER SHALL NOT BE LIABLE FOR ANY DAMAGES OF ANY KIND ARISING FROM USE OF THIS TOOL. SEE THE FULL MEDICAL DISCLAIMER FOR COMPLETE LIABILITY LANGUAGE.</p>
-                <p><strong>Modifications</strong></p>
-                <p>These terms may be updated at any time without prior notice. Continued use of the tool after changes constitutes acceptance of the revised terms.</p>
-                <p><strong>Governing Law</strong></p>
-                <p>These terms shall be governed by and construed in accordance with applicable law. Any disputes shall be resolved in the jurisdiction where the developers are located.</p>
-                <p style={{ marginTop: 12, padding: 8, background: "#e2e8f0", textAlign: "center", fontWeight: 600, fontSize: 10, color: "#4a5568" }}>
-                  — END OF TERMS —
-                </p>
+                <p><strong><LocalizedText text="Intellectual Property" /></strong></p>
+                <p><LocalizedText text="All content, design, algorithms, and code comprising Vancomyzer™ are the exclusive intellectual property of their respective owners. All rights reserved. The Vancomyzer™ name and logo are trademarks. Unauthorized use of any intellectual property associated with this tool is prohibited." /></p>
+                <p><strong><LocalizedText text="Clinical Responsibility" /></strong></p>
+                <p><LocalizedText text="Users remain solely responsible for independent clinical review, institutional-policy alignment, and final treatment decisions. Do not rely on this tool as a substitute for professional judgment, local protocol, product labeling, or therapeutic drug monitoring." /></p>
+                <p><strong><LocalizedText text="Limitation of Liability" /></strong></p>
+                <p><LocalizedText text="TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE DEVELOPERS OF VANCOMYZER SHALL NOT BE LIABLE FOR ANY DAMAGES OF ANY KIND ARISING FROM USE OF THIS TOOL. SEE THE FULL MEDICAL DISCLAIMER FOR COMPLETE LIABILITY LANGUAGE." /></p>
+                <p><strong><LocalizedText text="Modifications" /></strong></p>
+                <p><LocalizedText text={"These terms may be updated at any time without prior notice. Continued use of the tool after changes constitutes acceptance of the revised terms."} /></p>
+                <p><strong><LocalizedText text="Governing Law" /></strong></p>
+                <p><LocalizedText text={"These terms shall be governed by and construed in accordance with applicable law. Any disputes shall be resolved in the jurisdiction where the developers are located."} /></p>
+                <p style={{ marginTop: 12, padding: 8, background: "#e2e8f0", textAlign: "center", fontWeight: 600, fontSize: 10, color: "#4a5568" }}><LocalizedText text={"— END OF TERMS —"} /></p>
               </div>
             </div>
 
@@ -336,15 +329,13 @@ function RegisterPageInner() {
                     disabled={!bothScrolled}
                     style={{ marginTop: 2, accentColor: "#1f5e96" }}
                   />
-                  <span>{item.label}</span>
+                  <span><LocalizedText text={item.label} /></span>
                 </label>
               ))}
             </div>
 
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => setStep(1)} style={{ flex: 1, padding: 12, fontSize: 13, background: "#f7fafc", color: "#4a5568", border: "1px solid #cbd6e0", cursor: "pointer", borderRadius: 4 }}>
-                 Back
-              </button>
+              <button onClick={() => setStep(1)} style={{ flex: 1, padding: 12, fontSize: 13, background: "#f7fafc", color: "#4a5568", border: "1px solid #cbd6e0", cursor: "pointer", borderRadius: 4 }}><LocalizedText text={"Back"} /></button>
               <button
                 onClick={handleSubmit}
                 disabled={!allAgreed || loading}
@@ -356,14 +347,13 @@ function RegisterPageInner() {
                   borderRadius: 4,
                 }}
               >
-                {loading ? "Registering..." : "Create Account"}
+                <LocalizedText text={loading ? "Registering..." : "Create Account"} />
               </button>
             </div>
           </div>
         )}
 
-        <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#546471" }}>
-          Already have an account? <Link href="/login" style={{ color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}>Sign In</Link>
+        <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#546471" }}><LocalizedText text={"Already have an account?"} />{" "}<Link href="/login" style={{ color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}><LocalizedText text="Sign In" /></Link>
         </p>
       </div>
     </div>

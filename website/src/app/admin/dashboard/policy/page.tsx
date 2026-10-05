@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 const policies = [
   { id: "POL-001", title: "Information Security Policy", owner: "CISO", effective: "2025-01-15", review: "2026-01-15", status: "Current" },
@@ -35,8 +37,8 @@ function statusBadge(status: string) {
 export default function PolicyPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}>Policy Management</h1>
-      <p className="text-sm text-gray-500 mb-6">Security policy library and compliance controls (SOC 2 Type I in progress, target Q4 2026)</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}><LocalizedText text={"Policy Management"} /></h1>
+      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"Security policy library and compliance controls (SOC 2 Type I in progress, target Q4 2026)"} /></p>
 
       {/* Policies table */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-8">
@@ -45,24 +47,24 @@ export default function PolicyPage() {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>ID</th>
-                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>Policy Title</th>
-                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>Owner</th>
-                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>Effective Date</th>
-                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>Review Date</th>
-                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>Status</th>
+                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}><LocalizedText text={"Policy Title"} /></th>
+                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}><LocalizedText text={"Owner"} /></th>
+                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}><LocalizedText text={"Effective Date"} /></th>
+                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}><LocalizedText text={"Review Date"} /></th>
+                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}><LocalizedText text="Status" /></th>
               </tr>
             </thead>
             <tbody>
               {policies.map((p) => (
                 <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="px-3 py-2 font-mono text-gray-700">{p.id}</td>
-                  <td className="px-3 py-2 font-semibold text-gray-800">{p.title}</td>
-                  <td className="px-3 py-2 text-gray-600">{p.owner}</td>
+                  <td className="px-3 py-2 font-semibold text-gray-800"><LocalizedText text={p.title} /></td>
+                  <td className="px-3 py-2 text-gray-600"><LocalizedText text={p.owner} /></td>
                   <td className="px-3 py-2 text-gray-500">{p.effective}</td>
                   <td className="px-3 py-2 text-gray-500">{p.review}</td>
                   <td className="px-3 py-2">
                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${statusBadge(p.status)}`}>
-                      {p.status}
+                      <LocalizedText text={p.status} />
                     </span>
                   </td>
                 </tr>
@@ -74,7 +76,7 @@ export default function PolicyPage() {
 
       {/* Compliance Checklist */}
       <div className="bg-white border border-gray-200 rounded-lg p-5">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3">Compliance Controls Checklist</h2>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3"><LocalizedText text={"Compliance Controls Checklist"} /></h2>
         <div className="space-y-2">
           {complianceChecklist.map((item) => (
             <div key={item.control} className="flex items-center gap-3 text-sm">
@@ -87,9 +89,9 @@ export default function PolicyPage() {
                   &#x2717;
                 </span>
               )}
-              <span className={item.enabled ? "text-gray-800" : "text-gray-500"}>{item.control}</span>
+              <span className={item.enabled ? "text-gray-800" : "text-gray-500"}><LocalizedText text={item.control} /></span>
               {!item.enabled && (
-                <span className="text-[10px] text-red-500 font-medium">NOT IMPLEMENTED</span>
+                <span className="text-[10px] text-red-500 font-medium"><LocalizedText text={"NOT IMPLEMENTED"} /></span>
               )}
             </div>
           ))}

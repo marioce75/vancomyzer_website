@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedButton } from "@/localization/LocalizedElements";
+
 
 import { useState } from "react";
 import Link from "next/link";
@@ -36,8 +40,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <>
       <div>
         <Link href="/calculator" className="block px-5 pt-6 pb-2 hover:opacity-80 transition-opacity">
-          <span className="text-white font-bold text-lg tracking-tight">Vancomyzer</span>
-          <span className="text-blue-200 text-xs ml-1">Admin</span>
+          <span className="text-white font-bold text-lg tracking-tight"><LocalizedText text="Vancomyzer" /></span>
+          <span className="text-blue-200 text-xs ml-1"><LocalizedText text={"Admin"} /></span>
         </Link>
         {username && (
           <div className="px-5 pb-4">
@@ -57,21 +61,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               }`}
             >
               <span className="text-base">{item.icon}</span>
-              {item.label}
+              <LocalizedText text={item.label} />
             </Link>
           ))}
         </nav>
       </div>
       <div className="px-3 pb-5 flex flex-col gap-2">
-        <Link href="/calculator" className="text-white hover:text-blue-100 text-xs font-medium px-3 py-1.5 transition-colors hover:bg-white/10 rounded">
-           Back to Calculator
-        </Link>
+        <Link href="/calculator" className="text-white hover:text-blue-100 text-xs font-medium px-3 py-1.5 transition-colors hover:bg-white/10 rounded"><LocalizedText text={"Back to Calculator"} /></Link>
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
           className="text-left text-white hover:text-blue-100 text-xs font-medium px-3 py-1.5 transition-colors hover:bg-white/10 rounded"
-        >
-          Logout
-        </button>
+        ><LocalizedText text={"Logout"} /></button>
       </div>
     </>
   );
@@ -81,8 +81,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Mobile header with hamburger */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3"
         style={{ background: "#1e4d8c" }}>
-        <span className="text-white font-bold text-base tracking-tight">Vancomyzer Admin</span>
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-white p-1" aria-label="Toggle menu">
+        <span className="text-white font-bold text-base tracking-tight"><LocalizedText text={"Vancomyzer Admin"} /></span>
+        <LocalizedButton onClick={() => setSidebarOpen(!sidebarOpen)} className="text-white p-1" aria-label="Toggle menu">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             {sidebarOpen ? (
               <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
@@ -90,7 +90,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <><line x1="3" y1="7" x2="21" y2="7" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="17" x2="21" y2="17" /></>
             )}
           </svg>
-        </button>
+        </LocalizedButton>
       </div>
 
       {/* Mobile sidebar overlay */}

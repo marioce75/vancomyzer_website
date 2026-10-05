@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText, LocalizedGeneratedText } from "@/localization/LanguageProvider";
+
 
 import type { ReactNode } from "react";
 
@@ -51,9 +53,9 @@ export default function Advisory({ severity, title, summary, children, collapsib
   );
   const head = (
     <>
-      <span className="sr-only">{SR_LABEL[severity]}: </span>
-      <span className="font-bold">{title}</span>
-      {summary && <span className="ml-1.5">{summary}</span>}
+      <span className="sr-only"><LocalizedText text={SR_LABEL[severity]} />: </span>
+      <span className="font-bold"><LocalizedText text={title} /></span>
+      {summary && <span className="ml-1.5">{typeof summary === "string" ? <LocalizedGeneratedText text={summary} /> : summary}</span>}
     </>
   );
 
@@ -63,10 +65,10 @@ export default function Advisory({ severity, title, summary, children, collapsib
         <summary className="vz-advisory-row">
           {glyph}
           <span className="min-w-0">
-            {head}
-            <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wider underline opacity-80">details</span>
+            <LocalizedText text={head} />
+            <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wider underline opacity-80"><LocalizedText text="details" /></span>
           </span>
-          <span className="shrink-0" onClick={(e) => e.stopPropagation()}>{action}</span>
+          <span className="shrink-0" onClick={(e) => e.stopPropagation()}><LocalizedText text={action} /></span>
         </summary>
         <div className="mt-1 pl-6 text-[11.5px] leading-5">{children}</div>
       </details>
@@ -78,10 +80,10 @@ export default function Advisory({ severity, title, summary, children, collapsib
       <div className="vz-advisory-row">
         {glyph}
         <div className="min-w-0">
-          {head}
+          <LocalizedText text={head} />
           {children && <div className="mt-0.5 text-[11.5px] leading-5">{children}</div>}
         </div>
-        <div className="shrink-0">{action}</div>
+        <div className="shrink-0"><LocalizedText text={action} /></div>
       </div>
     </div>
   );

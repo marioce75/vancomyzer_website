@@ -1,4 +1,9 @@
 "use client";
+import { LocalizedCountry } from "@/localization/LocalizedCountry";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedDiv, LocalizedButton } from "@/localization/LocalizedElements";
+
 
 /**
  * Backfill prompt for users who signed up before the structured
@@ -108,7 +113,7 @@ export default function ProfileCompletionPrompt() {
   if (authLoading || !user || dismissed || needsCompletion !== true) return null;
 
   return (
-    <div
+    <LocalizedDiv
       role="region"
       aria-label="Complete your profile"
       style={{
@@ -123,9 +128,7 @@ export default function ProfileCompletionPrompt() {
           <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
             <span style={{ fontSize: 14 }}>👋</span>
             <span style={{ flex: 1, minWidth: 200 }}>
-              <strong>Complete your profile</strong> — tell us your country, institution type, and
-              practice setting so we can serve your context better. Takes 10 seconds.
-            </span>
+              <strong><LocalizedText text="Complete your profile" /></strong>{" "}<LocalizedText text={"— tell us your country, institution type, and practice setting so we can serve your context better. Takes 10 seconds."} /></span>
             <button
               type="button"
               onClick={() => setExpanded(true)}
@@ -139,10 +142,8 @@ export default function ProfileCompletionPrompt() {
                 borderRadius: 4,
                 cursor: "pointer",
               }}
-            >
-              Complete now
-            </button>
-            <button
+            ><LocalizedText text={"Complete now"} /></button>
+            <LocalizedButton
               type="button"
               onClick={handleDismiss}
               aria-label="Dismiss for this session"
@@ -155,32 +156,30 @@ export default function ProfileCompletionPrompt() {
                 borderRadius: 4,
                 cursor: "pointer",
               }}
-            >
-              Later
-            </button>
+            ><LocalizedText text="Later" /></LocalizedButton>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto", gap: 10, alignItems: "end" }}>
               <div>
-                <label style={labelStyle}>Country</label>
+                <label style={labelStyle}><LocalizedText text={"Country"} /></label>
                 <select value={countryCode} onChange={e => setCountryCode(e.target.value)} required style={selectStyle}>
-                  <option value="">— Select —</option>
-                  {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                  <option value=""><LocalizedText text="— Select —" /></option>
+                  {COUNTRIES.map(c => <option key={c.code} value={c.code}><LocalizedCountry code={c.code} name={c.name} /></option>)}
                 </select>
               </div>
               <div>
-                <label style={labelStyle}>Institution type</label>
+                <label style={labelStyle}><LocalizedText text={"Institution type"} /></label>
                 <select value={institutionType} onChange={e => setInstitutionType(e.target.value)} required style={selectStyle}>
-                  <option value="">— Select —</option>
-                  {INSTITUTION_TYPES.map(t => <option key={t.code} value={t.code}>{t.name}</option>)}
+                  <option value=""><LocalizedText text="— Select —" /></option>
+                  {INSTITUTION_TYPES.map(t => <option key={t.code} value={t.code}><LocalizedText text={t.name} /></option>)}
                 </select>
               </div>
               <div>
-                <label style={labelStyle}>Practice setting</label>
+                <label style={labelStyle}><LocalizedText text={"Practice setting"} /></label>
                 <select value={practiceSetting} onChange={e => setPracticeSetting(e.target.value)} required style={selectStyle}>
-                  <option value="">— Select —</option>
-                  {PRACTICE_SETTINGS.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
+                  <option value=""><LocalizedText text="— Select —" /></option>
+                  {PRACTICE_SETTINGS.map(s => <option key={s.code} value={s.code}><LocalizedText text={s.name} /></option>)}
                 </select>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
@@ -198,7 +197,7 @@ export default function ProfileCompletionPrompt() {
                     cursor: submitting ? "wait" : "pointer",
                   }}
                 >
-                  {submitting ? "Saving…" : "Save"}
+                  <LocalizedText text={submitting ? "Saving…" : "Save"} />
                 </button>
                 <button
                   type="button"
@@ -212,20 +211,18 @@ export default function ProfileCompletionPrompt() {
                     borderRadius: 4,
                     cursor: "pointer",
                   }}
-                >
-                  Later
-                </button>
+                ><LocalizedText text="Later" /></button>
               </div>
             </div>
             {msg && (
               <p style={{ marginTop: 6, marginBottom: 0, fontSize: 11, color: msg.type === "ok" ? "#047857" : "#b91c1c" }}>
-                {msg.text}
+                <LocalizedText text={msg.text} />
               </p>
             )}
           </form>
         )}
       </div>
-    </div>
+    </LocalizedDiv>
   );
 }
 

@@ -1,3 +1,7 @@
+
+import { LocalizedA, LocalizedImg } from "@/localization/LocalizedElements";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
 import Link from "next/link";
 import { LEGAL_LINKS } from "@/lib/legalLinks";
 
@@ -11,38 +15,30 @@ export default function Footer() {
           <div className="max-w-xl">
             <div className="flex items-center gap-3 mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health">
-                <img
+              <LocalizedA href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health">
+                <LocalizedImg
                   src="/logo-signal.svg"
                   alt="Dōsys™"
                   width={120}
                   height={36}
                 />
-              </a>
+              </LocalizedA>
               <div>
-                <span className="text-sm font-semibold uppercase" style={{ color: "var(--color-primary)", letterSpacing: "0.12em" }}>
-                  Vancomyzer™
-                </span>
-                <p className="text-[12px] leading-none mt-1" style={{ color: "var(--color-dim)" }}>
-                  Engineered by{" "}
+                <span className="text-sm font-semibold uppercase" style={{ color: "var(--color-primary)", letterSpacing: "0.12em" }}><LocalizedText text="Vancomyzer™" /></span>
+                <p className="text-[12px] leading-none mt-1" style={{ color: "var(--color-dim)" }}><LocalizedText text="Engineered by" />{" "}
                   <a
                     href="https://dosys.health"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-semibold tracking-wide hover:underline"
                     style={{ color: "inherit" }}
-                  >
-                    Dōsys&trade;
-                  </a>
+                  ><LocalizedText text="Dōsys™" /></a>
                 </p>
               </div>
             </div>
-            <p className="text-sm leading-6" style={{ color: "var(--color-secondary)" }}>
-              For use by qualified healthcare professionals only. Vancomyzer™ is a clinical decision-support tool and does not constitute medical advice. All dosing recommendations must be independently reviewed and validated by a licensed clinician prior to patient administration. Not a substitute for professional judgment, institutional protocols, or therapeutic drug monitoring.
-            </p>
-            <p className="mt-4 text-xs" style={{ color: "var(--color-dim)" }}>
-              © 2026 Vancomyzer™. All Rights Reserved. &nbsp;·&nbsp;{" "}
-              <Link href="/disclaimer" className="underline" style={{ color: "var(--color-secondary)" }}>Full Medical Disclaimer</Link>
+            <p className="text-sm leading-6" style={{ color: "var(--color-secondary)" }}><LocalizedText text="For use by qualified healthcare professionals only. Vancomyzer™ is a clinical decision-support tool and does not constitute medical advice. All dosing recommendations must be independently reviewed and validated by a licensed clinician prior to patient administration. Not a substitute for professional judgment, institutional protocols, or therapeutic drug monitoring." /></p>
+            <p className="mt-4 text-xs" style={{ color: "var(--color-dim)" }}><LocalizedText text={"© 2026 Vancomyzer™. All Rights Reserved.  · "} />{" "}
+              <Link href="/disclaimer" className="underline" style={{ color: "var(--color-secondary)" }}><LocalizedText text="Full Medical Disclaimer" /></Link>
             </p>
           </div>
 
@@ -64,7 +60,7 @@ export default function Footer() {
                   className="transition"
                   style={{ color: "var(--color-secondary)" }}
                 >
-                  {label}
+                  <LocalizedText text={label} />
                 </Link>
               ))}
             </nav>
@@ -74,9 +70,7 @@ export default function Footer() {
               <span
                 className="text-[10px] font-bold uppercase tracking-[0.18em]"
                 style={{ color: "var(--color-dim)" }}
-              >
-                Legal · dosys.health
-              </span>
+              ><LocalizedText text="Legal · dosys.health" /></span>
               {[
                 { href: LEGAL_LINKS.disclaimer, label: "Medical Disclaimer" },
                 { href: LEGAL_LINKS.privacy, label: "Privacy Policy" },
@@ -91,7 +85,7 @@ export default function Footer() {
                   className="transition"
                   style={{ color: "var(--color-secondary)" }}
                 >
-                  {label}
+                  <LocalizedText text={label} />
                 </a>
               ))}
             </nav>

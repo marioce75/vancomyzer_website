@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedA, LocalizedImg, LocalizedInput } from "@/localization/LocalizedElements";
+
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -66,17 +70,17 @@ function ResetPasswordForm() {
       }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 12px" }}>
-            <img src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
-          </a>
+          <LocalizedA href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" style={{ display: "block", width: 160, margin: "0 auto 12px" }}>
+            <LocalizedImg src="/logo-signal.svg" alt="Dōsys™" width={160} height={48} style={{ display: "block" }} />
+          </LocalizedA>
           <h1 className="vz-serif" style={{ fontSize: 26, color: "#14232f", margin: 0 }}>
-            {token ? "Set New Password" : "Forgot Password"}
+            <LocalizedText text={token ? "Set New Password" : "Forgot Password"} />
           </h1>
         </div>
 
         {error && (
           <div style={{ padding: "10px 14px", marginBottom: 16, background: "#fff5f5", border: "1px solid #fca5a5", color: "#991b1b", fontSize: 13, borderRadius: 4 }}>
-            {error}
+            <LocalizedText text={error} />
           </div>
         )}
 
@@ -84,40 +88,32 @@ function ResetPasswordForm() {
         {emailSent && (
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>✉️</div>
-            <p style={{ fontSize: 14, color: "#047857", fontWeight: 600 }}>Reset link sent!</p>
-            <p style={{ fontSize: 13, color: "#4a5568", marginTop: 8, lineHeight: 1.6 }}>
-              If an account with that email exists, you will receive a password reset link. Check your inbox (and spam folder).
-            </p>
-            <Link href="/login" style={{ display: "inline-block", marginTop: 20, fontSize: 13, color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}>
-               Back to Sign In
-            </Link>
+            <p style={{ fontSize: 14, color: "#047857", fontWeight: 600 }}><LocalizedText text="Reset link sent!" /></p>
+            <p style={{ fontSize: 13, color: "#4a5568", marginTop: 8, lineHeight: 1.6 }}><LocalizedText text="If an account with that email exists, you will receive a password reset link. Check your inbox (and spam folder)." /></p>
+            <Link href="/login" style={{ display: "inline-block", marginTop: 20, fontSize: 13, color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}><LocalizedText text="Back to Sign In" /></Link>
           </div>
         )}
 
         {success && (
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}></div>
-            <p style={{ fontSize: 14, color: "#047857", fontWeight: 600 }}>Password reset successfully!</p>
-            <p style={{ fontSize: 13, color: "#4a5568", marginTop: 8 }}>You can now sign in with your new password.</p>
+            <p style={{ fontSize: 14, color: "#047857", fontWeight: 600 }}><LocalizedText text="Password reset successfully!" /></p>
+            <p style={{ fontSize: 13, color: "#4a5568", marginTop: 8 }}><LocalizedText text="You can now sign in with your new password." /></p>
             <Link href="/login" style={{
               display: "inline-block", marginTop: 16, padding: "10px 24px",
               background: "#1f5e96", color: "#ffffff", textDecoration: "none",
               fontWeight: 600, fontSize: 14, borderRadius: 4,
-            }}>
-              Sign In
-            </Link>
+            }}><LocalizedText text="Sign In" /></Link>
           </div>
         )}
 
         {/* Forgot password form — request email */}
         {!token && !emailSent && (
           <form onSubmit={handleForgotPassword}>
-            <p style={{ fontSize: 13, color: "#4a5568", marginBottom: 16, lineHeight: 1.5 }}>
-              Enter the email address associated with your account. We&apos;ll send you a link to reset your password.
-            </p>
+            <p style={{ fontSize: 13, color: "#4a5568", marginBottom: 16, lineHeight: 1.5 }}><LocalizedText text="Enter the email address associated with your account. We'll send you a link to reset your password." /></p>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>Email</label>
-              <input
+              <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}><LocalizedText text="Email" /></label>
+              <LocalizedInput
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
                 required placeholder="pharmacist@hospital.org" style={inputStyle}
               />
@@ -127,10 +123,10 @@ function ResetPasswordForm() {
               background: "#1f5e96", color: "#ffffff", border: "none",
               cursor: loading ? "wait" : "pointer", opacity: loading ? 0.7 : 1, borderRadius: 4,
             }}>
-              {loading ? "Sending..." : "Send Reset Link"}
+              <LocalizedText text={loading ? "Sending..." : "Send Reset Link"} />
             </button>
             <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#546471" }}>
-              <Link href="/login" style={{ color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}> Back to Sign In</Link>
+              <Link href="/login" style={{ color: "#1f5e96", fontWeight: 600, textDecoration: "none" }}>{" "}<LocalizedText text="Back to Sign In" /></Link>
             </p>
           </form>
         )}
@@ -139,15 +135,15 @@ function ResetPasswordForm() {
         {token && !success && (
           <form onSubmit={handleResetPassword}>
             <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>New Password</label>
-              <input
+              <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}><LocalizedText text="New Password" /></label>
+              <LocalizedInput
                 type="password" value={password} onChange={e => setPassword(e.target.value)}
                 required placeholder="At least 8 characters, with uppercase, lowercase and a number" style={inputStyle}
               />
             </div>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>Confirm New Password</label>
-              <input
+              <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}><LocalizedText text="Confirm New Password" /></label>
+              <LocalizedInput
                 type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                 required placeholder="Re-enter password" style={inputStyle}
               />
@@ -157,7 +153,7 @@ function ResetPasswordForm() {
               background: "#1f5e96", color: "#ffffff", border: "none",
               cursor: loading ? "wait" : "pointer", opacity: loading ? 0.7 : 1, borderRadius: 4,
             }}>
-              {loading ? "Resetting..." : "Reset Password"}
+              <LocalizedText text={loading ? "Resetting..." : "Reset Password"} />
             </button>
           </form>
         )}

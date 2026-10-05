@@ -1,4 +1,6 @@
 'use client'
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -63,23 +65,21 @@ export default function UpgradePage() {
 
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: GREEN, marginBottom: 8 }}>
-          VANCOMYZER™
-        </div>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: GREEN, marginBottom: 8 }}><LocalizedText text="VANCOMYZER™" /></div>
         <h1 style={{ fontSize: 28, fontWeight: 700, color: NAVY, margin: '0 0 12px' }}>
-          {isConverted ? 'You\'re already subscribed.' : 'Continue without interruption.'}
+          <LocalizedText text={isConverted ? 'You\'re already subscribed.' : 'Continue without interruption.'} />
         </h1>
         <p style={{ fontSize: 15, color: SLATE, lineHeight: 1.6, maxWidth: 480, margin: '0 auto' }}>
-          {isConverted
+          <LocalizedText text={isConverted
             ? 'Your case history is preserved and all Pro features are active.'
-            : 'Subscribe before your pilot ends to retain your full case history and use Pro features.'}
+            : 'Subscribe before your pilot ends to retain your full case history and use Pro features.'} />
         </p>
       </div>
 
       {/* Pilot stats summary */}
       {stats && stats.totalCases > 0 && (
         <div style={{ background: '#f0fdf9', border: `1px solid ${GREEN}40`, padding: '20px 24px', marginBottom: 36 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: NAVY, letterSpacing: '0.08em', marginBottom: 12 }}>YOUR PILOT IN NUMBERS</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: NAVY, letterSpacing: '0.08em', marginBottom: 12 }}><LocalizedText text={"YOUR PILOT IN NUMBERS"} /></div>
           <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' as const }}>
             {[
               { label: 'Cases', value: stats.totalCases, sub: null as string | null },
@@ -88,7 +88,7 @@ export default function UpgradePage() {
             ].map(s => (
               <div key={s.label}>
                 <div style={{ fontSize: 22, fontWeight: 700, color: GREEN, fontFamily: 'monospace' }}>{s.value}</div>
-                <div style={{ fontSize: 11, color: SLATE, marginTop: 2 }}>{s.label}</div>{s.sub && <div style={{ fontSize: 9, color: SLATE, opacity: 0.7, marginTop: 1 }}>{s.sub}</div>}
+                <div style={{ fontSize: 11, color: SLATE, marginTop: 2 }}><LocalizedText text={s.label} /></div>{s.sub && <div style={{ fontSize: 9, color: SLATE, opacity: 0.7, marginTop: 1 }}><LocalizedText text={s.sub} /></div>}
               </div>
             ))}
           </div>
@@ -113,21 +113,15 @@ export default function UpgradePage() {
                   background: plan === p ? GREEN : '#fff',
                   color: plan === p ? NAVY : SLATE,
                 }}
-              >
-                $49.99 / year
-                {p === 'annual' && (
-                  <span style={{ display: 'block', fontSize: 10, fontWeight: 400, marginTop: 2 }}>
-                    billed annually · cancel online
-                  </span>
+              ><LocalizedText text={"$49.99 / year"} />{p === 'annual' && (
+                  <span style={{ display: 'block', fontSize: 10, fontWeight: 400, marginTop: 2 }}><LocalizedText text={"billed annually · cancel online"} /></span>
                 )}
               </button>
             ))}
           </div>
 
           <label style={{ display: 'block', marginBottom: 20, fontSize: 14 }}>
-            <input type="checkbox" checked={renewalConsent} onChange={e => setRenewalConsent(e.target.checked)} />{' '}
-            I agree to automatic renewal: after the 14-day trial, $49.99 is charged yearly until I cancel online in Billing. Any verified discount is shown before payment. Cancel before the trial ends to avoid a charge; otherwise cancel before renewal to stop the next charge.
-          </label>
+            <input type="checkbox" checked={renewalConsent} onChange={e => setRenewalConsent(e.target.checked)} />{' '}<LocalizedText text={"I agree to automatic renewal: after the 14-day trial, $49.99 is charged yearly until I cancel online in Billing. Any verified discount is shown before payment. Cancel before the trial ends to avoid a charge; otherwise cancel before renewal to stop the next charge."} /></label>
           {/* CTA */}
           <div style={{ textAlign: 'center', marginBottom: 36 }}>
             <button
@@ -142,13 +136,11 @@ export default function UpgradePage() {
                 letterSpacing: '0.04em',
               }}
             >
-              {loading ? 'Redirecting to Checkout…' : 'Start 14-day trial — then $49.99/year'}
+              <LocalizedText text={loading ? 'Redirecting to Checkout…' : 'Start 14-day trial — then $49.99/year'} />
             </button>
-            <div style={{ fontSize: 11, color: SLATE, marginTop: 8 }}>
-              Secure checkout via Stripe · Cancel anytime
-            </div>
+            <div style={{ fontSize: 11, color: SLATE, marginTop: 8 }}><LocalizedText text={"Secure checkout via Stripe · Cancel anytime"} /></div>
             {error && (
-              <div style={{ fontSize: 12, color: '#ef4444', marginTop: 8 }}>{error}</div>
+              <div style={{ fontSize: 12, color: '#ef4444', marginTop: 8 }}><LocalizedText text={error} /></div>
             )}
           </div>
         </>
@@ -157,7 +149,7 @@ export default function UpgradePage() {
       {/* Feature comparison table */}
       <div style={{ border: '1px solid #e2e8f0', overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 80px', background: NAVY, padding: '10px 20px' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.08em' }}>FEATURE</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.08em' }}><LocalizedText text={"FEATURE"} /></div>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textAlign: 'center' as const }}>Free</div>
           <div style={{ fontSize: 11, fontWeight: 700, color: GREEN, textAlign: 'center' as const }}>Pro</div>
         </div>
@@ -171,25 +163,21 @@ export default function UpgradePage() {
               borderBottom: '1px solid #f1f5f9',
             }}
           >
-            <div style={{ fontSize: 13, color: NAVY }}>{f.label}</div>
+            <div style={{ fontSize: 13, color: NAVY }}><LocalizedText text={f.label} /></div>
             <div style={{ textAlign: 'center' as const, fontSize: 14, color: f.free ? GREEN : '#cbd5e1' }}>
-              {f.free ? 'Included' : 'Not included'}
+              <LocalizedText text={f.free ? 'Included' : 'Not included'} />
             </div>
             <div style={{ textAlign: 'center' as const, fontSize: 14, color: f.pro ? GREEN : '#cbd5e1' }}>
-              {f.pro ? 'Included' : 'Not included'}
+              <LocalizedText text={f.pro ? 'Included' : 'Not included'} />
             </div>
           </div>
         ))}
       </div>
 
       <div style={{ marginTop: 28, textAlign: 'center' as const }}>
-        <Link href="/calculator" style={{ fontSize: 12, color: SLATE, textDecoration: 'none' }}>
-           Back to Calculator
-        </Link>
+        <Link href="/calculator" style={{ fontSize: 12, color: SLATE, textDecoration: 'none' }}><LocalizedText text={"Back to Calculator"} /></Link>
         {' · '}
-        <Link href="/pricing" style={{ fontSize: 12, color: SLATE, textDecoration: 'none' }}>
-          View all plans
-        </Link>
+        <Link href="/pricing" style={{ fontSize: 12, color: SLATE, textDecoration: 'none' }}><LocalizedText text={"View all plans"} /></Link>
       </div>
     </div>
   )

@@ -1,3 +1,7 @@
+
+import { LocalizedDiv } from "@/localization/LocalizedElements";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
 /**
  * Regulatory disclaimer strip — rendered on every screen of the app.
  *
@@ -10,7 +14,7 @@
  */
 export default function RegulatoryFooter() {
   return (
-    <div
+    <LocalizedDiv
       role="contentinfo"
       className="vz-regulatory-footer"
       aria-label="Regulatory disclaimer"
@@ -24,11 +28,6 @@ export default function RegulatoryFooter() {
         color: "var(--color-dim)",
         fontFamily: "'Share Tech Mono', monospace",
       }}
-    >
-      Vancomyzer&trade; is a clinical decision-support tool for qualified healthcare
-      professionals only. Not FDA-cleared or approved. Designed to meet the non-device
-      clinical decision support criteria of FD&amp;C Act §520(o)(1)(E); not reviewed by
-      the FDA.
-    </div>
+    ><LocalizedText text="Vancomyzer™ is a clinical decision-support tool for qualified healthcare professionals only. Not FDA-cleared or approved. Designed to meet the non-device clinical decision support criteria of FD&C Act §520(o)(1)(E); not reviewed by the FDA." /></LocalizedDiv>
   );
 }

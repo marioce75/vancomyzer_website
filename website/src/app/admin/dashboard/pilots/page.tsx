@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useEffect, useState } from "react";
 
@@ -48,8 +50,8 @@ export default function PilotsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}>Active Pilots</h1>
-      <p className="text-sm text-gray-500 mb-6">90-day free trial tracking and conversion status</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}><LocalizedText text={"Active Pilots"} /></h1>
+      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"90-day free trial tracking and conversion status"} /></p>
 
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4 mb-8">
@@ -59,23 +61,23 @@ export default function PilotsPage() {
           { label: "Total Cases Logged", value: totalCases },
         ].map(card => (
           <div key={card.label} className="bg-white border border-gray-200 rounded-lg p-5">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{card.label}</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1"><LocalizedText text={card.label} /></p>
             <span className="text-2xl font-bold" style={{ color: "#1e4d8c" }}>{card.value}</span>
           </div>
         ))}
       </div>
 
       {loading ? (
-        <div className="text-gray-400 text-sm py-12 text-center">Loading pilot data…</div>
+        <div className="text-gray-400 text-sm py-12 text-center"><LocalizedText text={"Loading pilot data…"} /></div>
       ) : pilots.length === 0 ? (
-        <div className="text-gray-400 text-sm py-12 text-center">No pilot trials found.</div>
+        <div className="text-gray-400 text-sm py-12 text-center"><LocalizedText text={"No pilot trials found."} /></div>
       ) : (
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 {["User", "Started", "Day", "Phase", "Status", "Cases", "AUC Attainment", "Obesity", "Report", "Converted"].map(h => (
-                  <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                  <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><LocalizedText text={h} /></th>
                 ))}
               </tr>
             </thead>
@@ -90,10 +92,10 @@ export default function PilotsPage() {
                     </td>
                     <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{new Date(p.startedAt).toLocaleDateString()}</td>
                     <td className="px-4 py-3 font-mono text-gray-700">{p.daysElapsed}</td>
-                    <td className="px-4 py-3 text-gray-600">{PHASE_LABELS[p.phase] ?? p.phase}</td>
+                    <td className="px-4 py-3 text-gray-600"><LocalizedText text={PHASE_LABELS[p.phase] ?? p.phase} /></td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: sc.bg, color: sc.text }}>
-                        {p.status}
+                        <LocalizedText text={p.status} />
                       </span>
                     </td>
                     <td className="px-4 py-3 font-mono text-gray-700">{p.totalCases}</td>
@@ -103,9 +105,7 @@ export default function PilotsPage() {
                     <td className="px-4 py-3 font-mono text-gray-700">{p.obesityActivations}</td>
                     <td className="px-4 py-3">
                       {p.reportGenerated && p.reportUrl ? (
-                        <a href={p.reportUrl} target="_blank" rel="noopener" className="text-blue-600 hover:underline text-xs">
-                          View PDF
-                        </a>
+                        <a href={p.reportUrl} target="_blank" rel="noopener" className="text-blue-600 hover:underline text-xs"><LocalizedText text={"View PDF"} /></a>
                       ) : (
                         <span className="text-gray-400 text-xs">—</span>
                       )}

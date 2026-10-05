@@ -1,3 +1,7 @@
+
+import { LocalizedText } from "@/localization/LanguageProvider";
+import { localizeMetadata } from "@/localization/metadata";
+import { requestLocale } from "@/localization/server";
 /**
  * /transparent-dosing/software-checks — developer-run checks of the
  * calculator's arithmetic (independent reference calculation), its loading-dose
@@ -16,7 +20,7 @@ import { RERUN_2026 } from "@/lib/validation/engineCrosscheck2026";
 import coverage from "@/lib/validation/bandCoverage/band-coverage-results.json";
 import { PageHeader, Record, H3, Prose, Chip, INK, INK2, INK3 } from "@/components/site/Record";
 
-export const metadata: Metadata = {
+const englishMetadata: Metadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing/software-checks" },
   title: "Software checks — Vancomyzer™",
   description:
@@ -67,19 +71,19 @@ function CoverageTable({ scenario }: { scenario: string }) {
       <table className="vz-ledger">
         <thead>
           <tr>
-            <th scope="col">Levels entered</th>
-            <th scope="col">Band shown</th>
-            <th scope="col">Coverage (target 90%)</th>
-            <th scope="col">Below / above band</th>
-            <th scope="col">At last trough</th>
-            <th scope="col">At last peak</th>
+            <th scope="col"><LocalizedText text="Levels entered" /></th>
+            <th scope="col"><LocalizedText text="Band shown" /></th>
+            <th scope="col"><LocalizedText text="Coverage (target 90%)" /></th>
+            <th scope="col"><LocalizedText text="Below / above band" /></th>
+            <th scope="col"><LocalizedText text="At last trough" /></th>
+            <th scope="col"><LocalizedText text="At last peak" /></th>
           </tr>
         </thead>
         <tbody>
           {coverageRows(scenario).map((c) => (
             <tr key={c.design}>
-              <td>{DESIGN_LABEL[c.design] ?? c.design}</td>
-              <td className="whitespace-nowrap" style={{ color: INK2 }}>{c.n_band} of {c.n_patients}</td>
+              <td><LocalizedText text={DESIGN_LABEL[c.design] ?? c.design} /></td>
+              <td className="whitespace-nowrap" style={{ color: INK2 }}>{c.n_band}{" "}<LocalizedText text="of" />{" "}{c.n_patients}</td>
               <td><strong>{pct(c.pooled_coverage)}</strong> <span style={{ color: INK3 }}>(±{(1.96 * c.pooled_coverage_se * 100).toFixed(1)})</span></td>
               <td style={{ color: INK2 }}>{pct(c.pooled_below)} / {pct(c.pooled_above)}</td>
               <td style={{ color: INK2 }}>{pct(c.last_trough_coverage)}</td>
@@ -103,50 +107,35 @@ export default function SoftwareChecksPage() {
         kicker="Evidence and methods"
         title="Software checks"
         lede={
-          <>
-            Three developer-run checks: the calculator&rsquo;s arithmetic against an independently written reference
-            calculation, its handling of a loading dose, and how often its 90% band contains the true concentration
-            in synthetic patients. They test whether the software does what it describes. They do not show how
-            accurately it predicts levels in real patients.
-          </>
+          <><LocalizedText text="Three developer-run checks: the calculator’s arithmetic against an independently written reference calculation, its handling of a loading dose, and how often its 90% band contains the true concentration in synthetic patients. They test whether the software does what it describes. They do not show how accurately it predicts levels in real patients." /></>
         }
       >
-        <p className="mt-4 text-[14px]" style={{ color: INK3 }}>
-          Calculator version <code>{MODEL_MANIFEST_VERSION}</code>.{" "}
-          {versionsMatch
+        <p className="mt-4 text-[14px]" style={{ color: INK3 }}><LocalizedText text="Calculator version" />{" "}<code>{MODEL_MANIFEST_VERSION}</code>.{" "}
+          <LocalizedText text={versionsMatch
             ? "All results on this page were run on this version."
-            : `Results were run on version ${CHECKS_RUN_ON} (reference calculation) and ${coverage.engine_manifest} (band coverage); re-run pending.`}
+            : `Results were run on version ${CHECKS_RUN_ON} (reference calculation) and ${coverage.engine_manifest} (band coverage); re-run pending.`} />
         </p>
       </PageHeader>
 
       {/* ── REFERENCE CALCULATION ─────────────────────────── */}
       <Record id="reference" label="Independent reference calculation" note="Do the calculations agree with a separate mathematical check?">
-        <div className="mb-3"><Chip kind="ok">Developer-run · 255 passed, 0 failed</Chip></div>
+        <div className="mb-3"><Chip kind="ok"><LocalizedText text="Developer-run · 255 passed, 0 failed" /></Chip></div>
         <Prose>
-          <p>
-            A separate calculation was developed from the two-compartment equations and checked with another
-            mathematical method. The calculator&rsquo;s results were then compared with that reference. Agreement must be within one part in
-            a million wherever both sides are exact.
-          </p>
+          <p><LocalizedText text="A separate calculation was developed from the two-compartment equations and checked with another mathematical method. The calculator’s results were then compared with that reference. Agreement must be within one part in a million wherever both sides are exact." /></p>
         </Prose>
         <div className="mt-4 overflow-x-auto">
           <table className="vz-ledger">
-            <thead><tr><th scope="col">Section</th><th scope="col">What is compared</th><th scope="col">Size</th></tr></thead>
+            <thead><tr><th scope="col"><LocalizedText text="Section" /></th><th scope="col"><LocalizedText text="What is compared" /></th><th scope="col"><LocalizedText text="Size" /></th></tr></thead>
             <tbody>
               {ORACLE_SECTIONS.map((s) => (
-                <tr key={s.id}><td className="whitespace-nowrap font-semibold">{s.id}</td><td style={{ color: INK2 }}>{s.what}</td><td className="whitespace-nowrap" style={{ color: INK2 }}>{s.n}</td></tr>
+                <tr key={s.id}><td className="whitespace-nowrap font-semibold">{s.id}</td><td style={{ color: INK2 }}><LocalizedText text={s.what} /></td><td className="whitespace-nowrap" style={{ color: INK2 }}><LocalizedText text={s.n} /></td></tr>
               ))}
             </tbody>
           </table>
         </div>
         <Prose className="mt-4">
-          <p>
-            Result on version {CHECKS_RUN_ON}: 255 checks passed and no value differed from the reference by more than
-            one part in a million. The same developer wrote both calculations, so a shared misreading of the
-            model would not be caught; the <Link href="/transparent-dosing/engine-crosscheck" style={{ textDecoration: "underline" }}>comparison with Tucuxi</Link> uses
-            a separately built program for that reason.
-            {RERUN_2026.allFitsSucceeded && RERUN_2026.maxRelDiffPct === 0 && (
-              <> Its Vancomyzer side was re-run on version {RERUN_2026.version} and reproduces the published comparison exactly.</>
+          <p><LocalizedText text="Result on version" />{" "}{CHECKS_RUN_ON}<LocalizedText text=": 255 checks passed and no value differed from the reference by more than one part in a million. The same developer wrote both calculations, so a shared misreading of the model would not be caught; the" />{" "}<Link href="/transparent-dosing/engine-crosscheck" style={{ textDecoration: "underline" }}><LocalizedText text="comparison with Tucuxi" /></Link>{" "}<LocalizedText text="uses a separately built program for that reason." />{RERUN_2026.allFitsSucceeded && RERUN_2026.maxRelDiffPct === 0 && (
+              <>{" "}<LocalizedText text="Its Vancomyzer side was re-run on version" />{" "}{RERUN_2026.version}{" "}<LocalizedText text="and reproduces the published comparison exactly." /></>
             )}
           </p>
         </Prose>
@@ -154,88 +143,67 @@ export default function SoftwareChecksPage() {
 
       {/* ── LOADING DOSE ──────────────────────────────────── */}
       <Record id="loading-dose" label="Loading-dose handling" note="Levels drawn after a loading dose.">
-        <div className="mb-3"><Chip kind="ok">Developer-run · synthetic</Chip></div>
+        <div className="mb-3"><Chip kind="ok"><LocalizedText text="Developer-run · synthetic" /></Chip></div>
         <Prose>
-          <p>
-            When using one or two blood levels, dose 1 can be entered as a loading dose with its own amount, infusion time
-            and gap to the first maintenance dose. The fit to the measured levels then uses the doses actually given.
-            If a loading dose is recorded as a maintenance dose instead, the extra drug is read as slow clearance and
-            exposure is overestimated.
-          </p>
-          <p>
-            Example: a 60-year-old, 80 kg adult (SCr 1.0 mg/dL) on 1,000 mg every 12 h over 2 h, with one trough
-            11.5 h after the stated dose. Error in the calculated steady-state AUC₂₄ against the true value:
-          </p>
+          <p><LocalizedText text="When using one or two blood levels, dose 1 can be entered as a loading dose with its own amount, infusion time and gap to the first maintenance dose. The fit to the measured levels then uses the doses actually given. If a loading dose is recorded as a maintenance dose instead, the extra drug is read as slow clearance and exposure is overestimated." /></p>
+          <p><LocalizedText text="Example: a 60-year-old, 80 kg adult (SCr 1.0 mg/dL) on 1,000 mg every 12 h over 2 h, with one trough 11.5 h after the stated dose. Error in the calculated steady-state AUC₂₄ against the true value:" /></p>
         </Prose>
         <div className="mt-4 overflow-x-auto">
           <table className="vz-ledger">
-            <thead><tr><th scope="col">Loading dose</th><th scope="col">Level after</th><th scope="col">Loading dose not entered</th><th scope="col">Loading dose entered</th></tr></thead>
+            <thead><tr><th scope="col"><LocalizedText text="Loading dose" /></th><th scope="col"><LocalizedText text="Level after" /></th><th scope="col"><LocalizedText text="Loading dose not entered" /></th><th scope="col"><LocalizedText text="Loading dose entered" /></th></tr></thead>
             <tbody>
               {LOADING_BIAS.map((r, i) => (
-                <tr key={i}><td>{r.load}</td><td style={{ color: INK2 }}>{r.after}</td><td style={{ color: "#a32d2d" }}>{r.ignored}</td><td><strong>{r.entered}</strong></td></tr>
+                <tr key={i}><td>{r.load}</td><td style={{ color: INK2 }}><LocalizedText text={r.after} /></td><td style={{ color: "#a32d2d" }}>{r.ignored}</td><td><strong>{r.entered}</strong></td></tr>
               ))}
             </tbody>
           </table>
         </div>
         <Prose className="mt-4">
-          <p>
-            This patient matches the population model exactly, so entering the loading dose recovers the true value.
-            In patients who differ from the model, one level still leaves the estimate pulled toward the population
-            model; the automated tests check that entering the loading dose gives the same accuracy as for the same
-            patient without one, and that leaving it out adds a consistent overestimate. A loading dose equal to the
-            maintenance dose reproduces the equal-dose result exactly. Held, missed or changed maintenance doses are
-            still refused rather than guessed.
-          </p>
+          <p><LocalizedText text="This patient matches the population model exactly, so entering the loading dose recovers the true value. In patients who differ from the model, one level still leaves the estimate pulled toward the population model; the automated tests check that entering the loading dose gives the same accuracy as for the same patient without one, and that leaving it out adds a consistent overestimate. A loading dose equal to the maintenance dose reproduces the equal-dose result exactly. Held, missed or changed maintenance doses are still refused rather than guessed." /></p>
         </Prose>
       </Record>
 
       {/* ── BAND COVERAGE ─────────────────────────────────── */}
       <Record id="band" label="Uncertainty band coverage" note="Does the 90% band contain the truth 90% of the time?">
-        <div className="mb-3"><Chip kind="warn">Developer-run · synthetic · not yet validated in patients</Chip></div>
+        <div className="mb-3"><Chip kind="warn"><LocalizedText text="Developer-run · synthetic · not yet validated in patients" /></Chip></div>
         <Prose>
           <p>
-            {coverage.n_per_cell} synthetic adults per row, each given a true set of PK parameters. Levels were simulated
-            from that truth with assay error and entered into the calculator the way a clinician would. Coverage is the
-            share of plotted time points at which the true concentration lies inside the band (± 95% interval,
-            accounting for repeated points in the same patient). Run on version {coverage.engine_manifest},{" "}
+            {coverage.n_per_cell}{" "}<LocalizedText text="synthetic adults per row, each given a true set of PK parameters. Levels were simulated from that truth with assay error and entered into the calculator the way a clinician would. Coverage is the share of plotted time points at which the true concentration lies inside the band (± 95% interval, accounting for repeated points in the same patient). Run on version" />{" "}{coverage.engine_manifest},{" "}
             {coverage.generated}.
           </p>
         </Prose>
 
-        <div className="mt-8"><H3>Simulations using the calculator’s assumptions</H3></div>
-        <Prose className="mt-2"><p>Results include only simulated cases in which the calculator displayed a band.</p></Prose>
+        <div className="mt-8"><H3><LocalizedText text="Simulations using the calculator’s assumptions" /></H3></div>
+        <Prose className="mt-2"><p><LocalizedText text="Results include only simulated cases in which the calculator displayed a band." /></p></Prose>
         <CoverageTable scenario="app" />
 
-        <div className="mt-8"><H3>Simulations with selected published variability estimates</H3></div>
+        <div className="mt-8"><H3><LocalizedText text="Simulations with selected published variability estimates" /></H3></div>
         <Prose className="mt-2">
-          <p>
-            These simulations do not reproduce the complete Colin 2019 model. They keep transfer clearance (Q) fixed, leave out the published relationships between variations in CL and V₁ and in Q and V₂, and include 21.5% proportional measurement error without the additional fixed measurement error. The tables retain the original results.
-          </p>
+          <p><LocalizedText text="These simulations do not reproduce the complete Colin 2019 model. They keep transfer clearance (Q) fixed, leave out the published relationships between variations in CL and V₁ and in Q and V₂, and include 21.5% proportional measurement error without the additional fixed measurement error. The tables retain the original results." /></p>
         </Prose>
         <CoverageTable scenario="published" />
 
         <Prose className="mt-5">
           <p>
-            <strong>What the results mean.</strong> Coverage was near 90% in the selected simulations using the calculator’s assumptions and lower in some simulations with changed assumptions. This does not establish reliability in patients or under the full published model. The simulated measurement error also differs from the uncertainty assumptions used when fitting blood levels.
-            {splitIiv && splitErr && (
-              <> The separate error and variability sensitivity scenarios gave {pct(splitErr.pooled_coverage)} and {pct(splitIiv.pooled_coverage)}; they used different simulated patients, so the difference cannot be attributed to the changed assumptions alone.</>
+            <strong><LocalizedText text="What the results mean." /></strong>{" "}<LocalizedText text="Coverage was near 90% in the selected simulations using the calculator’s assumptions and lower in some simulations with changed assumptions. This does not establish reliability in patients or under the full published model. The simulated measurement error also differs from the uncertainty assumptions used when fitting blood levels." />{splitIiv && splitErr && (
+              <>{" "}<LocalizedText text="The separate error and variability sensitivity scenarios gave" />{" "}{pct(splitErr.pooled_coverage)}{" "}<LocalizedText text="and" />{" "}{pct(splitIiv.pooled_coverage)}<LocalizedText text="; they used different simulated patients, so the difference cannot be attributed to the changed assumptions alone." /></>
             )}
-            {' '}These bands describe the model’s estimated concentration without measurement error, and the results include only cases where a band was shown. Predicting a future blood test result would require a range that also includes measurement error. That evaluation still needs independent review.
-          </p>
+            {' '}<LocalizedText text="These bands describe the model’s estimated concentration without measurement error, and the results include only cases where a band was shown. Predicting a future blood test result would require a range that also includes measurement error. That evaluation still needs independent review." /></p>
         </Prose>
       </Record>
 
       {/* ── LIMITS ───────────────────────────────────────── */}
       <Record label="What these checks do not show" note="Read with the evidence page.">
         <Prose>
-          <p>
-            All three are written and run by the developer. None uses patient data, and none shows that{" "}
-            {COLIN_2019.shortName} describes a particular population. See{" "}
-            <Link href="/transparent-dosing" style={{ textDecoration: "underline" }}>Evidence and methods</Link> for the
-            full list of checks and the pending independent clinical validation.
-          </p>
+          <p><LocalizedText text="All three are written and run by the developer. None uses patient data, and none shows that" />{" "}
+            {COLIN_2019.shortName}{" "}<LocalizedText text="describes a particular population. See" />{" "}
+            <Link href="/transparent-dosing" style={{ textDecoration: "underline" }}><LocalizedText text="Evidence and methods" /></Link>{" "}<LocalizedText text="for the full list of checks and the pending independent clinical validation." /></p>
         </Prose>
       </Record>
     </div>
   );
+}
+
+export async function generateMetadata() {
+  return localizeMetadata(englishMetadata, await requestLocale());
 }

@@ -1,4 +1,9 @@
 "use client";
+import { useCountryLabel } from "@/localization/LocalizedCountry";
+import { LocalizedInput, LocalizedButton } from "@/localization/LocalizedElements";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 /**
  * User Management dashboard — redesign (v2026.05).
@@ -95,6 +100,7 @@ const DEFAULT_FILTER: FilterShape = {
 };
 
 export default function UsersPage() {
+  const countryLabel = useCountryLabel();
   const [filter, setFilter] = useState<FilterShape>(DEFAULT_FILTER);
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [list, setList] = useState<ListResponse | null>(null);
@@ -197,7 +203,7 @@ export default function UsersPage() {
     const chips: Array<{ label: string; onRemove: () => void }> = [];
     if (filter.status) chips.push({ label: `Status: ${filter.status}`, onRemove: () => updateFilter({ status: "" }) });
     if (filter.tier) chips.push({ label: `Tier: ${tierLabel(filter.tier)}`, onRemove: () => updateFilter({ tier: "" }) });
-    if (filter.country) chips.push({ label: `Country: ${getCountryName(filter.country)}`, onRemove: () => updateFilter({ country: "" }) });
+    if (filter.country) chips.push({ label: `Country: ${countryLabel(filter.country, getCountryName(filter.country))}`, onRemove: () => updateFilter({ country: "" }) });
     if (filter.institution_type) chips.push({ label: `Type: ${getInstitutionTypeName(filter.institution_type)}`, onRemove: () => updateFilter({ institution_type: "" }) });
     if (filter.institutional_account_id != null) {
       const org = segments?.top_institutional_accounts.find((o) => o.id === filter.institutional_account_id);
@@ -211,8 +217,8 @@ export default function UsersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}>User Management</h1>
-      <p className="text-sm text-gray-500 mb-4">Search, segment, and act on user accounts.</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}><LocalizedText text={"User Management"} /></h1>
+      <p className="text-sm text-gray-500 mb-4"><LocalizedText text={"Search, segment, and act on user accounts."} /></p>
 
       <DashboardWidgets segments={segments} loading={loadingSegments} />
 
@@ -226,7 +232,7 @@ export default function UsersPage() {
 
         <div className="min-w-0">
           <div className="bg-white border border-gray-200 rounded p-3 mb-3">
-            <input
+            <LocalizedInput
               type="search"
               placeholder="Search name, email, username, institution…"
               value={filter.search}
@@ -235,7 +241,7 @@ export default function UsersPage() {
             />
             {activeFilterChips.length > 0 && (
               <div className="mt-2 flex gap-1.5 flex-wrap items-center">
-                <span className="text-xs text-gray-500">Active filters:</span>
+                <span className="text-xs text-gray-500"><LocalizedText text={"Active filters:"} /></span>
                 {activeFilterChips.map((chip, i) => (
                   <button
                     key={i}
@@ -243,23 +249,21 @@ export default function UsersPage() {
                     onClick={chip.onRemove}
                     className="text-xs px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 rounded hover:bg-blue-100"
                   >
-                    {chip.label} ×
+                    <LocalizedText text={chip.label} /> ×
                   </button>
                 ))}
                 <button
                   type="button"
                   onClick={clearFilters}
                   className="text-xs text-gray-500 hover:text-gray-700 underline ml-1"
-                >
-                  Clear all
-                </button>
+                ><LocalizedText text={"Clear all"} /></button>
               </div>
             )}
           </div>
 
           {actionMsg && (
             <div className={`mb-3 px-3 py-2 text-xs rounded ${actionMsg.type === "ok" ? "bg-green-50 text-green-800 border border-green-200" : "bg-red-50 text-red-800 border border-red-200"}`}>
-              {actionMsg.text}
+              <LocalizedText text={actionMsg.text} />
             </div>
           )}
 
@@ -299,8 +303,9 @@ export default function UsersPage() {
 // ─── Dashboard widgets ──────────────────────────────────────────────
 
 function DashboardWidgets({ segments, loading }: { segments: SegmentCounts | null; loading: boolean }) {
+  const countryLabel = useCountryLabel();
   if (loading || !segments) {
-    return <div className="text-sm text-gray-400">Loading widgets…</div>;
+    return <div className="text-sm text-gray-400"><LocalizedText text={"Loading widgets…"} /></div>;
   }
   const topCountry = segments.by_country[0];
   const topOrg = segments.top_institutional_accounts.find((o) => o.count > 0);
@@ -314,12 +319,12 @@ function DashboardWidgets({ segments, loading }: { segments: SegmentCounts | nul
       <Widget label="New today" primary={segments.growth.new_24h.toLocaleString()} secondary={`${segments.growth.new_30d.toLocaleString()} in 30d`} />
       <Widget
         label="Tier mix"
-        primary={`${freePct}% free`}
+        primary={<LocalizedText text={`${freePct}% free`} />}
         secondary={tierMix.filter((t) => t.key !== "free").map((t) => `${t.count} ${tierLabel(t.key)}`).join(" · ") || "no paid yet"}
       />
       <Widget
         label="Top country"
-        primary={topCountry ? getCountryName(topCountry.key) : "—"}
+        primary={topCountry ? countryLabel(topCountry.key, getCountryName(topCountry.key)) : "—"}
         secondary={topCountry ? `${topCountry.count} user${topCountry.count === 1 ? "" : "s"}` : "no data yet"}
       />
       <Widget
@@ -331,12 +336,12 @@ function DashboardWidgets({ segments, loading }: { segments: SegmentCounts | nul
   );
 }
 
-function Widget({ label, primary, secondary }: { label: string; primary: string; secondary: string }) {
+function Widget({ label, primary, secondary }: { label: string; primary: React.ReactNode; secondary: string }) {
   return (
     <div className="bg-white border border-gray-200 rounded p-3">
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">{label}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500"><LocalizedText text={label} /></div>
       <div className="text-lg font-bold mt-0.5 truncate" style={{ color: "#1e4d8c" }}>{primary}</div>
-      <div className="text-[11px] text-gray-500 mt-0.5 truncate">{secondary}</div>
+      <div className="text-[11px] text-gray-500 mt-0.5 truncate"><LocalizedText text={secondary} /></div>
     </div>
   );
 }
@@ -351,6 +356,7 @@ function Sidebar({
   updateFilter: (patch: Partial<FilterShape>) => void;
   clearFilters: () => void;
 }) {
+  const countryLabel = useCountryLabel();
   return (
     <aside className="space-y-3 text-sm">
       <div className="bg-white border border-gray-200 rounded">
@@ -358,8 +364,7 @@ function Sidebar({
           type="button"
           onClick={clearFilters}
           className={`w-full px-3 py-2 text-left text-xs font-semibold ${!hasActiveFilter(filter) ? "bg-blue-50 text-blue-800" : "text-gray-600 hover:bg-gray-50"}`}
-        >
-          All users {segments && <span className="text-gray-400 float-right">{segments.total}</span>}
+        ><LocalizedText text={"All users"} />{" "}{segments && <span className="text-gray-400 float-right">{segments.total}</span>}
         </button>
       </div>
 
@@ -379,7 +384,7 @@ function Sidebar({
 
       <SidebarGroup
         title="Top countries"
-        items={(segments?.by_country ?? []).slice(0, 10).map((c) => ({ key: c.key, label: getCountryName(c.key), count: c.count }))}
+        items={(segments?.by_country ?? []).slice(0, 10).map((c) => ({ key: c.key, label: countryLabel(c.key, getCountryName(c.key)), count: c.count }))}
         activeKey={filter.country}
         onSelect={(key) => updateFilter({ country: filter.country === key ? "" : key })}
       />
@@ -393,9 +398,7 @@ function Sidebar({
 
       {(segments?.top_institutional_accounts.filter((o) => o.count > 0).length ?? 0) > 0 && (
         <div className="bg-white border border-gray-200 rounded">
-          <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 border-b border-gray-100">
-            Top organizations
-          </div>
+          <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 border-b border-gray-100"><LocalizedText text={"Top organizations"} /></div>
           <div className="divide-y divide-gray-100">
             {segments!.top_institutional_accounts.filter((o) => o.count > 0).map((org) => {
               const active = filter.institutional_account_id === org.id;
@@ -416,7 +419,7 @@ function Sidebar({
       )}
 
       <div className="bg-white border border-gray-200 rounded">
-        <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 border-b border-gray-100">Health</div>
+        <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 border-b border-gray-100"><LocalizedText text={"Health"} /></div>
         <div className="divide-y divide-gray-100">
           <SidebarItem label="Inactive >90 days" count={segments?.health.inactive_90d ?? 0} active={filter.inactive_days === 90} onSelect={() => updateFilter({ inactive_days: filter.inactive_days === 90 ? null : 90 })} />
           <SidebarItem label="MFA off" count={segments?.health.mfa_off ?? 0} active={filter.mfa_off} onSelect={() => updateFilter({ mfa_off: !filter.mfa_off })} />
@@ -439,7 +442,7 @@ function SidebarGroup({
   if (items.length === 0) return null;
   return (
     <div className="bg-white border border-gray-200 rounded">
-      <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 border-b border-gray-100">{title}</div>
+      <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 border-b border-gray-100"><LocalizedText text={title} /></div>
       <div className="divide-y divide-gray-100">
         {items.map((item) => {
           const active = activeKey === item.key;
@@ -450,7 +453,7 @@ function SidebarGroup({
               onClick={() => onSelect(item.key)}
               className={`w-full px-3 py-1.5 text-xs text-left flex justify-between items-center ${active ? "bg-blue-50 text-blue-800 font-semibold" : "text-gray-700 hover:bg-gray-50"}`}
             >
-              <span className="truncate pr-2">{item.label}</span>
+              <span className="truncate pr-2"><LocalizedText text={item.label} /></span>
               <span className={active ? "text-blue-700" : "text-gray-400"}>{item.count}</span>
             </button>
           );
@@ -476,7 +479,7 @@ function SidebarItem({
       disabled={disabled}
       className={`w-full px-3 py-1.5 text-xs text-left flex justify-between items-center ${active ? "bg-blue-50 text-blue-800 font-semibold" : disabled ? "text-gray-500 cursor-default" : "text-gray-700 hover:bg-gray-50"}`}
     >
-      <span>{label}</span>
+      <span><LocalizedText text={label} /></span>
       <span className={active ? "text-blue-700" : "text-gray-400"}>{count}</span>
     </button>
   );
@@ -500,10 +503,10 @@ function UserTable({
   selectedId: number | null;
   onAction: (userId: number, action: string, extra?: Record<string, unknown>) => void;
 }) {
-  if (loading && !list) return <div className="bg-white border border-gray-200 rounded p-8 text-center text-sm text-gray-500">Loading…</div>;
-  if (error) return <div className="bg-red-50 border border-red-200 rounded p-4 text-sm text-red-800">{error}</div>;
+  if (loading && !list) return <div className="bg-white border border-gray-200 rounded p-8 text-center text-sm text-gray-500"><LocalizedText text={"Loading…"} /></div>;
+  if (error) return <div className="bg-red-50 border border-red-200 rounded p-4 text-sm text-red-800"><LocalizedText text={error} /></div>;
   if (!list || list.users.length === 0) {
-    return <div className="bg-white border border-gray-200 rounded p-8 text-center text-sm text-gray-500">No users match these filters.</div>;
+    return <div className="bg-white border border-gray-200 rounded p-8 text-center text-sm text-gray-500"><LocalizedText text={"No users match these filters."} /></div>;
   }
   return (
     <div className="bg-white border border-gray-200 rounded overflow-hidden">
@@ -513,10 +516,10 @@ function UserTable({
             <tr>
               <ColumnHeader label="Name" sortKey="name_asc" currentSort={sort} onSort={onSortChange} />
               <ColumnHeader label="Email" sortKey="email_asc" currentSort={sort} onSort={onSortChange} />
-              <th className="px-3 py-2 text-left font-semibold text-gray-500">Tier</th>
-              <th className="px-3 py-2 text-left font-semibold text-gray-500">Country</th>
-              <th className="px-3 py-2 text-left font-semibold text-gray-500">Type</th>
-              <th className="px-3 py-2 text-left font-semibold text-gray-500">Status</th>
+              <th className="px-3 py-2 text-left font-semibold text-gray-500"><LocalizedText text={"Tier"} /></th>
+              <th className="px-3 py-2 text-left font-semibold text-gray-500"><LocalizedText text={"Country"} /></th>
+              <th className="px-3 py-2 text-left font-semibold text-gray-500"><LocalizedText text={"Type"} /></th>
+              <th className="px-3 py-2 text-left font-semibold text-gray-500"><LocalizedText text="Status" /></th>
               <ColumnHeader label="Last login" sortKey="last_login_desc" currentSort={sort} onSort={onSortChange} />
               <ColumnHeader label="Joined" sortKey="created_desc" currentSort={sort} onSort={onSortChange} />
               <th className="px-3 py-2"></th>
@@ -535,9 +538,7 @@ function UserTable({
           </tbody>
         </table>
       </div>
-      <div className="px-3 py-2 text-[11px] text-gray-500 border-t border-gray-100 bg-gray-50">
-        Showing {list.users.length} of {list.total.toLocaleString()} users
-      </div>
+      <div className="px-3 py-2 text-[11px] text-gray-500 border-t border-gray-100 bg-gray-50"><LocalizedText text={"Showing"} />{" "}{list.users.length}{" "}<LocalizedText text="of" />{" "}{list.total.toLocaleString()}{" "}<LocalizedText text={"users"} /></div>
     </div>
   );
 }
@@ -551,8 +552,8 @@ function ColumnHeader({ label, sortKey, currentSort, onSort }: { label: string; 
         onClick={() => onSort(sortKey)}
         className={`flex items-center gap-1 ${active ? "text-blue-700" : "text-gray-500 hover:text-gray-700"}`}
       >
-        {label}
-        {active && <span className="text-xs">Sorted</span>}
+        <LocalizedText text={label} />
+        {active && <span className="text-xs"><LocalizedText text={"Sorted"} /></span>}
       </button>
     </th>
   );
@@ -566,6 +567,7 @@ function UserRowComp({
   onSelect: (user: UserRow) => void;
   onAction: (userId: number, action: string, extra?: Record<string, unknown>) => void;
 }) {
+  const countryLabel = useCountryLabel();
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <tr
@@ -577,22 +579,22 @@ function UserRowComp({
         <div className="text-[10px] text-gray-500">@{user.username} · {user.credentials}</div>
       </td>
       <td className="px-3 py-2 text-gray-700">{user.email}</td>
-      <td className="px-3 py-2"><TierBadge tier={user.complimentary_pro?.active && user.subscription_tier === "free" ? "individual_pro" : user.subscription_tier} />{user.complimentary_pro?.active && <span className="ml-1 text-xs text-teal-800">Complimentary</span>}</td>
-      <td className="px-3 py-2 text-gray-700">{user.country_code ? getCountryName(user.country_code) : <span className="text-gray-400">—</span>}</td>
+      <td className="px-3 py-2"><TierBadge tier={user.complimentary_pro?.active && user.subscription_tier === "free" ? "individual_pro" : user.subscription_tier} />{user.complimentary_pro?.active && <span className="ml-1 text-xs text-teal-800"><LocalizedText text={"Complimentary"} /></span>}</td>
+      <td className="px-3 py-2 text-gray-700">{user.country_code ? countryLabel(user.country_code, getCountryName(user.country_code)) : <span className="text-gray-400">—</span>}</td>
       <td className="px-3 py-2 text-gray-700 truncate" style={{ maxWidth: 140 }}>{user.institution_type ? getInstitutionTypeName(user.institution_type) : <span className="text-gray-400">—</span>}</td>
       <td className="px-3 py-2"><StatusBadge status={user.status} role={user.role} locked={Boolean(user.locked_until && new Date(user.locked_until) > new Date())} /></td>
       <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{fmtDateShort(user.last_login)}</td>
       <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{fmtDateShort(user.created_at)}</td>
       <td className="px-3 py-2 text-right" onClick={(e) => e.stopPropagation()}>
         <div className="relative inline-block">
-          <button
+          <LocalizedButton
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
             className="px-2 py-1 text-gray-500 hover:bg-gray-100 rounded"
             aria-label="Actions menu"
           >
             ⋯
-          </button>
+          </LocalizedButton>
           {menuOpen && (
             <ActionMenu
               user={user}
@@ -668,7 +670,7 @@ function ActionItem({ label, onClick, danger }: { label: string; onClick: () => 
       onClick={onClick}
       className={`block w-full text-left px-3 py-1.5 hover:bg-gray-100 ${danger ? "text-red-700 hover:bg-red-50" : "text-gray-700"}`}
     >
-      {label}
+      <LocalizedText text={label} />
     </button>
   );
 }
@@ -680,6 +682,7 @@ function UserDetailDrawer({
   onClose: () => void;
   onAction: (userId: number, action: string, extra?: Record<string, unknown>) => void;
 }) {
+  const countryLabel = useCountryLabel();
   return (
     <>
       <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
@@ -694,14 +697,14 @@ function UserDetailDrawer({
             <h2 className="text-base font-bold" style={{ color: "#1e4d8c" }}>{user.full_name}</h2>
             <p className="text-xs text-gray-500 mt-0.5">@{user.username} · {user.credentials}</p>
           </div>
-          <button
+          <LocalizedButton
             type="button"
             onClick={onClose}
             aria-label="Close"
             className="text-gray-400 hover:text-gray-700 text-lg px-2"
           >
             ×
-          </button>
+          </LocalizedButton>
         </header>
 
         <div className="px-5 py-4 space-y-4">
@@ -717,7 +720,7 @@ function UserDetailDrawer({
 
           <DetailSection title="Profile">
             <DetailRow k="Institution" v={user.institution ?? "—"} />
-            <DetailRow k="Country" v={user.country_code ? getCountryName(user.country_code) : "—"} />
+            <DetailRow k="Country" v={user.country_code ? countryLabel(user.country_code, getCountryName(user.country_code)) : "—"} />
             <DetailRow k="Institution type" v={user.institution_type ? getInstitutionTypeName(user.institution_type) : "—"} />
             <DetailRow k="Practice setting" v={user.practice_setting ? getPracticeSettingName(user.practice_setting) : "—"} />
             {user.institutional_account_id != null && (
@@ -781,7 +784,7 @@ function UserDetailDrawer({
 function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">{title}</h3>
+      <h3 className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5"><LocalizedText text={title} /></h3>
       <div className="space-y-1 text-xs">{children}</div>
     </div>
   );
@@ -790,7 +793,7 @@ function DetailSection({ title, children }: { title: string; children: React.Rea
 function DetailRow({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="grid grid-cols-[110px_1fr] gap-2">
-      <div className="text-gray-500">{k}</div>
+      <div className="text-gray-500"><LocalizedText text={k} /></div>
       <div className="text-gray-900 break-words">{v}</div>
     </div>
   );
@@ -803,7 +806,7 @@ function DrawerActionBtn({ label, onClick, danger }: { label: string; onClick: (
       onClick={onClick}
       className={`px-3 py-2 text-xs font-semibold rounded border ${danger ? "border-red-200 text-red-700 hover:bg-red-50" : "border-gray-200 text-gray-700 hover:bg-gray-50"}`}
     >
-      {label}
+      <LocalizedText text={label} />
     </button>
   );
 }
@@ -820,24 +823,20 @@ function Pagination({
 }) {
   return (
     <div className="mt-3 flex items-center justify-between text-xs text-gray-600">
-      <span>Page {page} of {totalPages} · {total.toLocaleString()} total</span>
+      <span><LocalizedText text="Page" />{" "}{page}{" "}<LocalizedText text="of" />{" "}{totalPages} · {total.toLocaleString()}{" "}<LocalizedText text={"total"} /></span>
       <div className="flex gap-1">
         <button
           type="button"
           disabled={page <= 1}
           onClick={() => onChange(page - 1)}
           className="px-2 py-1 border border-gray-200 rounded disabled:opacity-40 hover:bg-gray-50"
-        >
-           Prev
-        </button>
+        ><LocalizedText text={"Prev"} /></button>
         <button
           type="button"
           disabled={page >= totalPages}
           onClick={() => onChange(page + 1)}
           className="px-2 py-1 border border-gray-200 rounded disabled:opacity-40 hover:bg-gray-50"
-        >
-          Next
-        </button>
+        ><LocalizedText text="Next" /></button>
       </div>
     </div>
   );
@@ -846,12 +845,12 @@ function Pagination({
 // ─── Badges + formatters ────────────────────────────────────────────
 
 function StatusBadge({ status, role, locked }: { status: string; role: string; locked: boolean }) {
-  if (locked) return <Badge color="red">Locked</Badge>;
-  if (role === "admin") return <Badge color="purple">Superadmin</Badge>;
-  if (status === "active") return <Badge color="green">Active</Badge>;
-  if (status === "pending") return <Badge color="amber">Pending</Badge>;
-  if (status === "disabled") return <Badge color="gray">Disabled</Badge>;
-  return <Badge color="gray">{status}</Badge>;
+  if (locked) return <Badge color="red"><LocalizedText text={"Locked"} /></Badge>;
+  if (role === "admin") return <Badge color="purple"><LocalizedText text={"Superadmin"} /></Badge>;
+  if (status === "active") return <Badge color="green"><LocalizedText text={"Active"} /></Badge>;
+  if (status === "pending") return <Badge color="amber"><LocalizedText text="Pending" /></Badge>;
+  if (status === "disabled") return <Badge color="gray"><LocalizedText text={"Disabled"} /></Badge>;
+  return <Badge color="gray"><LocalizedText text={status} /></Badge>;
 }
 
 function TierBadge({ tier }: { tier: string }) {
@@ -920,14 +919,14 @@ function ComplimentaryProForm({ user, onAction }: { user: UserRow; onAction: (id
     if (!confirm(`Grant complimentary Pro to ${user.email}${expiry ? ` until ${expiry} at 00:00 UTC` : " with no expiration"}? Existing subscription charges will continue unless separately canceled.`)) return;
     onAction(user.id, "grant_complimentary_pro", { reason, expiresAt: expiry ? `${expiry}T00:00:00.000Z` : null });
   }}>
-    <p>{grant?.active ? `Active · ${grant.expiresAt ? `ends ${new Date(grant.expiresAt).toUTCString()}` : "no expiration"}` : "No active complimentary grant"}</p>
-    {grant?.reason && <p>Recorded reason: {grant.reason}</p>}
-    <p>Includes Individual Pro features. No card or automatic paid renewal. Existing paid subscriptions are billed separately and are not canceled by this grant.</p>
-    <label className="block">Reason<input required maxLength={500} value={reason} onChange={e => setReason(e.target.value)} className="block w-full border p-2" /></label>
-    <label className="block">Expires at start of date (UTC), optional<input type="date" value={expiry} onChange={e => setExpiry(e.target.value)} className="block w-full border p-2" /></label>
-    <button type="submit" className="rounded border border-teal-700 px-3 py-2 font-semibold">Grant complimentary Pro</button>
+    <p><LocalizedText text={grant?.active ? `Active · ${grant.expiresAt ? `ends ${new Date(grant.expiresAt).toUTCString()}` : "no expiration"}` : "No active complimentary grant"} /></p>
+    {grant?.reason && <p><LocalizedText text={"Recorded reason:"} />{" "}{grant.reason}</p>}
+    <p><LocalizedText text={"Includes Individual Pro features. No card or automatic paid renewal. Existing paid subscriptions are billed separately and are not canceled by this grant."} /></p>
+    <label className="block"><LocalizedText text={"Reason"} /><input required maxLength={500} value={reason} onChange={e => setReason(e.target.value)} className="block w-full border p-2" /></label>
+    <label className="block"><LocalizedText text={"Expires at start of date (UTC), optional"} /><input type="date" value={expiry} onChange={e => setExpiry(e.target.value)} className="block w-full border p-2" /></label>
+    <button type="submit" className="rounded border border-teal-700 px-3 py-2 font-semibold"><LocalizedText text={"Grant complimentary Pro"} /></button>
     {grant?.active && <button type="button" className="ml-2 underline" onClick={() => {
       if (confirm(`Revoke complimentary Pro for ${user.email}? Paid access, if any, remains unchanged.`)) onAction(user.id, "revoke_complimentary_pro");
-    }}>Revoke grant</button>}
+    }}><LocalizedText text={"Revoke grant"} /></button>}
   </form>;
 }

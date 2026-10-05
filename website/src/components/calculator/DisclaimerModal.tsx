@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
+
 
 import { Fragment, useEffect, useCallback } from "react";
 import { COLIN_2019 } from "@/lib/pk/modelRegistry";
@@ -95,6 +97,7 @@ D\u014Dsys\u2122 makes no representations or warranties regarding the accuracy, 
 ];
 
 export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps) {
+  const { t } = useLanguage();
   const handleEscape = useCallback(
     (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); },
     [onClose],
@@ -160,8 +163,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
               ...FONT,
             }}
           >
-            VANCOMYZER{"\u2122"} LEGAL DISCLAIMER
-          </h2>
+            VANCOMYZER{"\u2122"}{" "}<LocalizedText text="LEGAL DISCLAIMER" /></h2>
           <button
             type="button"
             onClick={onClose}
@@ -176,9 +178,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
               borderRadius: 4,
               ...FONT,
             }}
-          >
-            [ CLOSE ]
-          </button>
+          ><LocalizedText text="[ CLOSE ]" /></button>
         </div>
 
         {/* Scrollable content */}
@@ -195,7 +195,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
                   ...FONT,
                 }}
               >
-                {section.heading}
+                <LocalizedText text={section.heading} />
               </h3>
               <p
                 style={{
@@ -207,7 +207,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
                   ...FONT,
                 }}
               >
-                {linkifyDosys(section.body)}
+                {linkifyDosys(t(section.body))}
               </p>
             </div>
           ))}
@@ -221,7 +221,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
               ...FONT,
             }}
           >
-            {DISCLAIMER_COPYRIGHT}
+            <LocalizedText text={DISCLAIMER_COPYRIGHT} />
           </p>
         </div>
       </div>

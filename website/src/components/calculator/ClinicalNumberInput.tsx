@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "@/localization/LanguageProvider";
 import { useEffect, useState, type InputHTMLAttributes } from "react";
 import { parseClinicalNumber } from "@/lib/parseClinicalNumber";
 
@@ -69,6 +70,7 @@ export default function ClinicalNumberInput({
   autoComplete = "off",
   ...rest
 }: ClinicalNumberInputProps) {
+  const { t } = useLanguage();
   const [raw, setRaw] = useState<string>(() => (value ? String(value) : ""));
 
   // Follow changes made outside this field (reset, pre-fill, loaded case)
@@ -89,6 +91,9 @@ export default function ClinicalNumberInput({
   return (
     <input
       {...rest}
+      placeholder={rest.placeholder ? t(rest.placeholder) : undefined}
+      title={rest.title ? t(rest.title) : undefined}
+      aria-label={rest["aria-label"] ? t(rest["aria-label"]) : undefined}
       type="text"
       inputMode={inputMode}
       autoComplete={autoComplete}

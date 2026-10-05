@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 /**
  * Pricing presentation page (Free, Individual Pro, Hospital Site).
@@ -123,15 +125,9 @@ export default function PricingClient() {
     <main className="mx-auto max-w-7xl px-4 py-16">
       {/* Header */}
       <div className="mb-10">
-        <span className="mb-[14px] block text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#546471" }}>
-          Pricing
-        </span>
-        <h1 className="vz-serif text-[clamp(28px,3.4vw,40px)] leading-[1.08]" style={{ color: "#14232f" }}>
-          The core calculator is free. Accounts and site licenses are priced by use.
-        </h1>
-        <p className="mt-4 max-w-[62ch] text-lg leading-[1.5]" style={{ color: "#4a5a68" }}>
-          Plans for individual clinicians, pharmacy departments and health systems. Every plan uses the same calculation method.
-        </p>
+        <span className="mb-[14px] block text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#546471" }}><LocalizedText text="Pricing" /></span>
+        <h1 className="vz-serif text-[clamp(28px,3.4vw,40px)] leading-[1.08]" style={{ color: "#14232f" }}><LocalizedText text={"The core calculator is free. Accounts and site licenses are priced by use."} /></h1>
+        <p className="mt-4 max-w-[62ch] text-lg leading-[1.5]" style={{ color: "#4a5a68" }}><LocalizedText text={"Plans for individual clinicians, pharmacy departments and health systems. Every plan uses the same calculation method."} /></p>
       </div>
 
       {/* Open-access launch banner — not rendered when OPEN_ACCESS is false. */}
@@ -140,15 +136,8 @@ export default function PricingClient() {
           className="mb-10 mt-2 max-w-[70ch] border-l-[3px] bg-white px-5 py-4"
           style={{ borderColor: "#1f5e96", outline: "1px solid #cbd6e0" }}
         >
-          <p className="text-base font-semibold" style={{ color: "#14232f" }}>
-            The core Vancomyzer calculator is free, permanently.
-          </p>
-          <p className="mt-1 text-sm" style={{ color: "var(--color-secondary)" }}>
-            During the launch period, PDF export, clinical-note copy and &ldquo;why this result&rdquo;
-            interpretation are also free for everyone, with no account needed. After the launch period
-            they return to Individual Pro. Calculation history requires Individual Pro; team administration
-            and institutional features require a separate scope review. Free users are never automatically enrolled in paid billing.
-          </p>
+          <p className="text-base font-semibold" style={{ color: "#14232f" }}><LocalizedText text={"The core Vancomyzer calculator is free, permanently."} /></p>
+          <p className="mt-1 text-sm" style={{ color: "var(--color-secondary)" }}><LocalizedText text={"During the launch period, PDF export, clinical-note copy and “why this result” interpretation are also free for everyone, with no account needed. After the launch period they return to Individual Pro. Calculation history requires Individual Pro; team administration and institutional features require a separate scope review. Free users are never automatically enrolled in paid billing."} /></p>
         </div>
       )}
 
@@ -172,19 +161,19 @@ export default function PricingClient() {
                   className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold text-white whitespace-nowrap"
                   style={{ background: "#1f5e96" }}
                 >
-                  {tier.badge}
+                  <LocalizedText text={tier.badge} />
                 </span>
               )}
 
               <h2 className="vz-serif text-[24px]" style={{ color: "#14232f" }}>
-                {tier.name}
+                <LocalizedText text={tier.name} />
               </h2>
               <p className="mt-1 text-xs" style={{ color: "var(--color-secondary)" }}>
-                {tier.audience}
+                <LocalizedText text={tier.audience} />
               </p>
               {tier.scope && (
                 <p className="mt-0.5 text-xs italic" style={{ color: "var(--color-secondary)" }}>
-                  {tier.scope}
+                  <LocalizedText text={tier.scope} />
                 </p>
               )}
 
@@ -194,7 +183,7 @@ export default function PricingClient() {
                 </span>
                 {cyclePrice.suffix && (
                   <span className="mt-1 block text-xs" style={{ color: "var(--color-secondary)" }}>
-                    {cyclePrice.suffix}
+                    <LocalizedText text={cyclePrice.suffix} />
                   </span>
                 )}
               </div>
@@ -203,7 +192,7 @@ export default function PricingClient() {
                 {tier.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm" style={{ color: "var(--color-foreground)" }}>
 
-                    {f}
+                    <LocalizedText text={f} />
                   </li>
                 ))}
               </ul>
@@ -246,7 +235,7 @@ export default function PricingClient() {
                         cursor: "default",
                       }}
                     >
-                      {tier.cta.label}
+                      <LocalizedText text={tier.cta.label} />
                     </span>
                   );
                 }
@@ -268,7 +257,7 @@ export default function PricingClient() {
                     onMouseEnter={onEnter}
                     onMouseLeave={onLeave}
                   >
-                    {tier.cta.label}
+                    <LocalizedText text={tier.cta.label} />
                   </a>
                 ) : (
                   <Link
@@ -279,7 +268,7 @@ export default function PricingClient() {
                     onMouseLeave={onLeave}
                     onClick={trackOpenCalculator}
                   >
-                    {tier.cta.label}
+                    <LocalizedText text={tier.cta.label} />
                   </Link>
                 );
               })()}
@@ -291,7 +280,7 @@ export default function PricingClient() {
                 className="mt-2 min-h-[18px] text-center text-[11px]"
                 style={{ color: "var(--color-secondary)" }}
               >
-                {tier.ctaSubLabel ?? ""}
+                <LocalizedText text={tier.ctaSubLabel ?? ""} />
               </p>
             </div>
           );

@@ -1,0 +1,46 @@
+{
+  "notice": "Source-reference inventory of current raster/prerecorded media, not an assertion that every embedded pixel or spoken word has been reviewed. No media replacement generated.",
+  "assets": [
+    {
+      "asset": "/videos/vancomyzer-calculator-tutorial-v2.mp4",
+      "routes": [
+        "/"
+      ],
+      "source": [
+        "src/components/landing/CalculatorWalkthrough.tsx",
+        "src/app/(site)/page.tsx"
+      ],
+      "status": "Existing English narrated/screen-recorded tutorial; translated surrounding caption and controls",
+      "option": "Owner-reviewed Spanish/French transcript, caption tracks and narration; re-record interface in each language only after calculator QA/consent. Do not synthesize evidence or change the fictional dosing values."
+    },
+    {
+      "asset": "/images/calculator-result-fictional.png",
+      "routes": [
+        "/"
+      ],
+      "source": [
+        "src/components/landing/CalculatorWalkthrough.tsx"
+      ],
+      "status": "English video poster screenshot",
+      "option": "Replace by language-specific still from a verified matching synthetic recording; keep English original."
+    },
+    {
+      "asset": "/videos/vancomyzer-empiric-walkthrough.mp4",
+      "routes": [],
+      "source": [
+        "public/videos"
+      ],
+      "status": "Present asset, no reference found in current src tree",
+      "option": "Retain unused original; localize only if owner chooses to expose it again."
+    },
+    {
+      "asset": "/vancomyzer-logo.jpg",
+      "routes": [],
+      "source": [
+        "public"
+      ],
+      "status": "Brand asset, no reference found in current src tree",
+      "option": "Retain brand artwork; no language replacement needed."
+    }
+  ]
+}

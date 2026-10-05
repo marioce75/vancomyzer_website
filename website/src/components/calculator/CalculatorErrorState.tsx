@@ -1,3 +1,5 @@
+
+import { LocalizedText } from "@/localization/LanguageProvider";
 interface CalculatorErrorStateProps {
   message: string;
   details?: string[];
@@ -33,48 +35,45 @@ export default function CalculatorErrorState({
 
   return (
     <div className="border p-4" style={{ borderColor: "rgba(255,51,51,0.5)", background: "var(--color-card)" }}>
-      <p className="text-sm font-semibold" style={{ color: "#ff3333", ...monoStyle }}>
-        ERROR: {message}
+      <p className="text-sm font-semibold" style={{ color: "#ff3333", ...monoStyle }}><LocalizedText text="ERROR:" />{" "}<LocalizedText text={message} />
       </p>
 
       {details && details.length > 0 && (
         <ul className="mt-2 list-none space-y-1 pl-4 text-sm" style={{ color: "#ff6666", ...monoStyle }}>
           {details.map((d, i) => (
-            <li key={i}><span style={{ color: "#ff3333" }}>- </span>{d}</li>
+            <li key={i}><span style={{ color: "#ff3333" }}>- </span><LocalizedText text={d} /></li>
           ))}
         </ul>
       )}
 
       {(recoveryGuidance?.length || fallbackText) && (
         <div className="mt-3 border p-3" style={{ borderColor: "rgba(255,170,0,0.4)", background: "rgba(255,170,0,0.06)" }}>
-          <p className="text-sm font-medium" style={{ color: "#ffaa00", ...monoStyle }}>NEXT STEP</p>
+          <p className="text-sm font-medium" style={{ color: "#ffaa00", ...monoStyle }}><LocalizedText text="NEXT STEP" /></p>
           {recoveryGuidance && recoveryGuidance.length > 0 && (
             <ul className="mt-1 list-none space-y-1 pl-4 text-sm" style={{ color: "#cc8800", ...monoStyle }}>
               {recoveryGuidance.map((item, i) => (
-                <li key={i}><span style={{ color: "#ffaa00" }}>- </span>{item}</li>
+                <li key={i}><span style={{ color: "#ffaa00" }}>- </span><LocalizedText text={item} /></li>
               ))}
             </ul>
           )}
-          {fallbackText && <p className="mt-2 text-sm" style={{ color: "#cc8800", ...monoStyle }}>{fallbackText}</p>}
+          {fallbackText && <p className="mt-2 text-sm" style={{ color: "#cc8800", ...monoStyle }}><LocalizedText text={fallbackText} /></p>}
           {fallbackWorkflow === "initial_regimen" && onSwitchToInitialRegimen && (
             <button
               type="button"
               onClick={onSwitchToInitialRegimen}
               className="mt-3 inline-flex items-center border px-3 py-2 text-sm font-medium transition"
               style={{ borderColor: "rgba(255,170,0,0.5)", background: "rgba(255,170,0,0.08)", color: "#ffaa00", ...monoStyle }}
-            >
-              SWITCH TO INITIAL REGIMEN
-            </button>
+            ><LocalizedText text="SWITCH TO INITIAL REGIMEN" /></button>
           )}
         </div>
       )}
 
       {limitations && limitations.length > 0 && (
         <details className="mt-3 text-sm" style={{ color: "#cc8800", ...monoStyle }}>
-          <summary className="cursor-pointer font-medium" style={{ color: "#ffaa00" }}>LIMITATIONS</summary>
+          <summary className="cursor-pointer font-medium" style={{ color: "#ffaa00" }}><LocalizedText text="LIMITATIONS" /></summary>
           <ul className="mt-2 list-none space-y-1 pl-4">
             {limitations.map((l, i) => (
-              <li key={i}><span style={{ color: "#ffaa00" }}>- </span>{l}</li>
+              <li key={i}><span style={{ color: "#ffaa00" }}>- </span><LocalizedText text={l} /></li>
             ))}
           </ul>
         </details>

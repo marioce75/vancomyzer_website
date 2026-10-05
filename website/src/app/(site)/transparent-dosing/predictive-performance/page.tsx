@@ -1,3 +1,7 @@
+import { localizeMetadata } from "@/localization/metadata";
+import { requestLocale } from "@/localization/server";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
 /**
  * /transparent-dosing/predictive-performance — Predictive Performance page.
  *
@@ -39,7 +43,7 @@ import {
 } from "@/lib/validation/predictive/goti2018";
 import { COLIN_2019, MODEL_MANIFEST_VERSION } from "@/lib/pk/modelRegistry";
 
-export const metadata = {
+const englishMetadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing/predictive-performance" },
   title: "Predictive Performance — Vancomyzer",
   description:
@@ -57,16 +61,8 @@ export default function PredictivePerformancePage() {
     <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 16px 80px", color: "#14232f" }}>
       <Breadcrumb />
 
-      <h1 className="vz-serif" style={{ fontSize: "clamp(28px, 3.4vw, 40px)", color: "#14232f", marginBottom: 12, lineHeight: 1.1 }}>
-        Predictive Performance
-      </h1>
-      <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 760 }}>
-        A developer-run synthetic analysis (not real patients). For each of {run.n_attempted} simulated
-        ICU patients, Vancomyzer&rsquo;s Bayesian model is fitted to two simulated vancomycin levels
-        and then predicts a third concentration that was not used in the fit. The simulated
-        patients&rsquo; &ldquo;true&rdquo; pharmacokinetics come from a different model than the one
-        Vancomyzer uses.
-      </p>
+      <h1 className="vz-serif" style={{ fontSize: "clamp(28px, 3.4vw, 40px)", color: "#14232f", marginBottom: 12, lineHeight: 1.1 }}><LocalizedText text="Predictive Performance" /></h1>
+      <p style={{ fontSize: 15, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 760 }}><LocalizedText text="A developer-run synthetic analysis (not real patients). For each of" />{" "}{run.n_attempted}{" "}<LocalizedText text="simulated ICU patients, Vancomyzer’s Bayesian model is fitted to two simulated vancomycin levels and then predicts a third concentration that was not used in the fit. The simulated patients’ “true” pharmacokinetics come from a different model than the one Vancomyzer uses." /></p>
 
       <StatusNotice />
 
@@ -88,11 +84,9 @@ export default function PredictivePerformancePage() {
 function Breadcrumb() {
   return (
     <div style={{ display: "flex", gap: 12, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
-      <Link href="/transparent-dosing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-         Evidence
-      </Link>
+      <Link href="/transparent-dosing" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text="Evidence" /></Link>
       <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Predictive Performance</span>
+      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}><LocalizedText text="Predictive Performance" /></span>
     </div>
   );
 }
@@ -110,11 +104,7 @@ function StatusNotice() {
       lineHeight: 1.55,
       marginBottom: 24,
     }}>
-      <strong>Vancomyzer has not yet been validated in real patients.</strong> Its equations are
-      checked against published values and synthetic test cases; external validation with patient
-      data is planned. The results below come from a developer-run synthetic analysis (not real
-      patients). They do not show how Vancomyzer performs in patients.
-    </div>
+      <strong><LocalizedText text="Vancomyzer has not yet been validated in real patients." /></strong>{" "}<LocalizedText text="Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. The results below come from a developer-run synthetic analysis (not real patients). They do not show how Vancomyzer performs in patients." /></div>
   );
 }
 
@@ -135,16 +125,13 @@ function DesignCard({ run }: { run: RunOutput }) {
     {
       label: "Analysis",
       body: (
-        <>
-          Analysis by the Vancomyzer team using {run.n_attempted} simulated patients, not patient records.
-        </>
+        <><LocalizedText text="Analysis by the Vancomyzer team using" />{" "}{run.n_attempted}<LocalizedText text="simulated patients, not patient records." /></>
       ),
     },
     {
       label: "Calculator",
       body: (
-        <>
-          Vancomyzer a posteriori (Bayesian) calculator with the {COLIN_2019.shortName} prior. Calculator version{" "}
+        <><LocalizedText text="Vancomyzer a posteriori (Bayesian) calculator with the" />{" "}{COLIN_2019.shortName}<LocalizedText text="prior. Calculator version" />{" "}
           <code>{MODEL_MANIFEST_VERSION}</code>.
         </>
       ),
@@ -153,83 +140,58 @@ function DesignCard({ run }: { run: RunOutput }) {
       label: "Synthetic population",
       body: (
         <>
-          {run.n_attempted} adults (age {Math.round(c.age_range[0])}–{Math.round(c.age_range[1])} years,
-          {" "}{c.n_male} male). Age, sex, weight and serum creatinine are drawn from distributions calibrated
-          to summary statistics of the Bai et al. 2025 ICU cohort (median weight{" "}
-          {c.median_weight_kg.toFixed(1)} kg, median serum creatinine {c.median_scr_mg_dl.toFixed(2)} mg/dL);
-          height uses developer-chosen values.
-          No dialysis, CRRT or ECMO. Augmented renal clearance is not excluded: Cockcroft–Gault CrCl is
-          capped at {c.crcl_cap_ml_min} mL/min, {c.n_crcl_above_130} patients are above 130 mL/min and
-          {" "}{c.n_crcl_at_cap} of them are at the cap. {c.n_bmi_40_or_more} patients have a BMI of 40 or more.
-        </>
+          {run.n_attempted}<LocalizedText text="adults (age" />{" "}{Math.round(c.age_range[0])}–{Math.round(c.age_range[1])}<LocalizedText text="years," />{" "}{c.n_male}<LocalizedText text="male). Age, sex, weight and serum creatinine are drawn from distributions calibrated to summary statistics of the Bai et al. 2025 ICU cohort (median weight" />{" "}
+          {c.median_weight_kg.toFixed(1)}<LocalizedText text="kg, median serum creatinine" />{" "}{c.median_scr_mg_dl.toFixed(2)}<LocalizedText text="mg/dL); height uses developer-chosen values. No dialysis, CRRT or ECMO. Augmented renal clearance is not excluded: Cockcroft–Gault CrCl is capped at" />{" "}{c.crcl_cap_ml_min} mL/min, {c.n_crcl_above_130}<LocalizedText text="patients are above 130 mL/min and" />{" "}{c.n_crcl_at_cap}<LocalizedText text="of them are at the cap." />{" "}{c.n_bmi_40_or_more}<LocalizedText text="patients have a BMI of 40 or more." /></>
       ),
     },
     {
       label: "Simulation model",
       body: (
-        <>
-          Goti 2018–based model, different from Vancomyzer&rsquo;s prior: CL = {GOTI_2018_THETA.CL} ×
+        <><LocalizedText text="Goti 2018–based model, different from Vancomyzer’s prior: CL =" />{" "}{GOTI_2018_THETA.CL} ×
           (CrCl/120)<sup>0.8</sup> × (WT/70)<sup>0.75</sup> L/h, V<sub>1</sub> = {GOTI_2018_THETA.V1} × WT/70 L,
-          Q = {GOTI_2018_THETA.Q} × (WT/70)<sup>0.75</sup> L/h, V<sub>2</sub> = {GOTI_2018_THETA.V2} × WT/70 L,
-          with log-normal between-subject variability (ω<sub>CL</sub> = {GOTI_2018_OMEGA.CL},
+          Q = {GOTI_2018_THETA.Q} × (WT/70)<sup>0.75</sup> L/h, V<sub>2</sub> = {GOTI_2018_THETA.V2}<LocalizedText text="× WT/70 L, with log-normal between-subject variability (ω" /><sub>CL</sub> = {GOTI_2018_OMEGA.CL},
           ω<sub>V1</sub> = {GOTI_2018_OMEGA.V1}, ω<sub>Q</sub> = {GOTI_2018_OMEGA.Q},
-          ω<sub>V2</sub> = {GOTI_2018_OMEGA.V2}). The weight terms and the variability values are developer
-          choices, not Goti 2018 estimates.
-        </>
+          ω<sub>V2</sub> = {GOTI_2018_OMEGA.V2}<LocalizedText text="). The weight terms and the variability values are developer choices, not Goti 2018 estimates." /></>
       ),
     },
     {
       label: "Regimen",
       body: (
         <>
-          {d.dose_mg_per_kg} mg/kg every {d.interval_hours} h, {d.dose_rounding}, infused over{" "}
-          {d.infusion_hours} h. No dose changes.
-        </>
+          {d.dose_mg_per_kg}<LocalizedText text="mg/kg every" />{" "}{d.interval_hours} h, {d.dose_rounding}<LocalizedText text=", infused over" />{" "}
+          {d.infusion_hours}<LocalizedText text="h. No dose changes." /></>
       ),
     },
     {
       label: "Fitted samples",
       body: (
-        <>
-          Two levels in the dosing interval of dose {d.sampled_dose_number}: {tPeak.toFixed(1)} h after the start
-          of the dose ({(tPeak - d.infusion_hours).toFixed(1)} h after the end of the infusion) and{" "}
-          {tTrough.toFixed(1)} h ({(d.interval_hours - tTrough).toFixed(1)} h before the next dose). Each has
-          simulated residual error ({(GOTI_2018_RESIDUAL.proportional * 100).toFixed(0)}% proportional +{" "}
-          {GOTI_2018_RESIDUAL.additive_mg_l.toFixed(1)} mg/L additive). The simulation and the fit both use
-          steady-state equations.
-        </>
+        <><LocalizedText text="Two levels in the dosing interval of dose" />{" "}{d.sampled_dose_number}: {tPeak.toFixed(1)}<LocalizedText text="h after the start of the dose (" />{(tPeak - d.infusion_hours).toFixed(1)}<LocalizedText text="h after the end of the infusion) and" />{" "}
+          {tTrough.toFixed(1)} h ({(d.interval_hours - tTrough).toFixed(1)}<LocalizedText text="h before the next dose). Each has simulated residual error (" />{(GOTI_2018_RESIDUAL.proportional * 100).toFixed(0)}<LocalizedText text="% proportional +" />{" "}
+          {GOTI_2018_RESIDUAL.additive_mg_l.toFixed(1)}<LocalizedText text="mg/L additive). The simulation and the fit both use steady-state equations." /></>
       ),
     },
     {
       label: "What was measured",
       body: (
-        <>
-          The concentration {d.heldout_sample_time_hours.toFixed(1)} h after the start of the same dose
-          ({d.heldout_hours_after_infusion_end.toFixed(1)} h after the end of the infusion), predicted from
-          the fitted calculator. This time is not used in the fit. The prediction is compared with (a) a synthetic
-          observation at that time (truth plus residual error) and (b) the noise-free truth, reported
-          separately.
-        </>
+        <><LocalizedText text="The concentration" />{" "}{d.heldout_sample_time_hours.toFixed(1)}<LocalizedText text="h after the start of the same dose (" />{d.heldout_hours_after_infusion_end.toFixed(1)}<LocalizedText text="h after the end of the infusion), predicted from the fitted calculator. This time is not used in the fit. The prediction is compared with (a) a synthetic observation at that time (truth plus residual error) and (b) the noise-free truth, reported separately." /></>
       ),
     },
     {
       label: "Fits",
       body: (
         <>
-          {run.n_fit_succeeded} of {run.n_attempted} posterior fits succeeded; the metrics use the successful
-          fits.
-        </>
+          {run.n_fit_succeeded}<LocalizedText text="of" />{" "}{run.n_attempted}<LocalizedText text="posterior fits succeeded; the metrics use the successful fits." /></>
       ),
     },
   ];
   return (
     <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>How the comparison was done</h2>
+      <h2 style={sectionTitleStyle}><LocalizedText text="How the comparison was done" /></h2>
       <dl style={{ margin: "12px 0 0", display: "grid", gap: 10 }}>
         {rows.map((r) => (
           <div key={r.label} style={{ display: "grid", gridTemplateColumns: "minmax(0, 150px) minmax(0, 1fr)", gap: 12, fontSize: 13, lineHeight: 1.6 }}>
-            <dt style={{ margin: 0, fontWeight: 700, color: "var(--color-primary)" }}>{r.label}</dt>
-            <dd style={{ margin: 0, color: "var(--color-secondary)" }}>{r.body}</dd>
+            <dt style={{ margin: 0, fontWeight: 700, color: "var(--color-primary)" }}><LocalizedText text={r.label} /></dt>
+            <dd style={{ margin: 0, color: "var(--color-secondary)" }}><LocalizedText text={r.body} /></dd>
           </div>
         ))}
       </dl>
@@ -245,19 +207,16 @@ function ResultsCard({ run, vsObservation, vsTruth }: { run: RunOutput; vsObserv
   ];
   return (
     <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Results · developer-run synthetic analysis (not real patients)</h2>
-      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}>
-        Error of the calculator&rsquo;s prediction at the held-out time, one prediction per patient
-        (calculator version {MODEL_MANIFEST_VERSION}). Metric definitions are below.
-      </p>
+      <h2 style={sectionTitleStyle}><LocalizedText text="Results · developer-run synthetic analysis (not real patients)" /></h2>
+      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 12, lineHeight: 1.55 }}><LocalizedText text="Error of the calculator’s prediction at the held-out time, one prediction per patient (calculator version" />{" "}{MODEL_MANIFEST_VERSION}<LocalizedText text="). Metric definitions are below." /></p>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--color-border)", textAlign: "left", color: "var(--color-dim)" }}>
-              <th style={cellStyle}>Prediction compared with</th>
+              <th style={cellStyle}><LocalizedText text="Prediction compared with" /></th>
               <th style={numCellStyle}>n</th>
-              <th style={numCellStyle}>Bias (mg/L)</th>
-              <th style={numCellStyle}>rBias (%)</th>
+              <th style={numCellStyle}><LocalizedText text="Bias (mg/L)" /></th>
+              <th style={numCellStyle}><LocalizedText text="rBias (%)" /></th>
               <th style={numCellStyle}>RMSE (mg/L)</th>
               <th style={numCellStyle}>rRMSE (%)</th>
             </tr>
@@ -265,7 +224,7 @@ function ResultsCard({ run, vsObservation, vsTruth }: { run: RunOutput; vsObserv
           <tbody>
             {rows.map((r, i) => (
               <tr key={r.label} style={{ borderBottom: i < rows.length - 1 ? "1px solid var(--color-border)" : "none" }}>
-                <td style={{ ...cellStyle, color: "var(--color-primary)", fontWeight: 600 }}>{r.label}</td>
+                <td style={{ ...cellStyle, color: "var(--color-primary)", fontWeight: 600 }}><LocalizedText text={r.label} /></td>
                 <td style={numCellStyle}>{r.m.n}</td>
                 <td style={numCellStyle}>{fmtSigned(r.m.bias_mg_l)}</td>
                 <td style={numCellStyle}>{fmtSigned(r.m.rbias_pct)}</td>
@@ -276,13 +235,7 @@ function ResultsCard({ run, vsObservation, vsTruth }: { run: RunOutput; vsObserv
           </tbody>
         </table>
       </div>
-      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 12, marginBottom: 0, lineHeight: 1.55 }}>
-        Error against the synthetic observation includes the residual error added to that observation, so it
-        is larger than error against the noise-free truth; relative errors are inflated most when the
-        observed concentration is low. No acceptance threshold was prespecified for this analysis. Each
-        patient contributes one held-out concentration from one steady-state interval, which is a narrow
-        test (see Limitations).
-      </p>
+      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 12, marginBottom: 0, lineHeight: 1.55 }}><LocalizedText text="Error against the synthetic observation includes the residual error added to that observation, so it is larger than error against the noise-free truth; relative errors are inflated most when the observed concentration is low. No acceptance threshold was prespecified for this analysis. Each patient contributes one held-out concentration from one steady-state interval, which is a narrow test (see Limitations)." /></p>
     </section>
   );
 }
@@ -290,29 +243,23 @@ function ResultsCard({ run, vsObservation, vsTruth }: { run: RunOutput; vsObserv
 function DefinitionsCard() {
   return (
     <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Metric definitions</h2>
+      <h2 style={sectionTitleStyle}><LocalizedText text="Metric definitions" /></h2>
       <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 6, marginBottom: 10, lineHeight: 1.55 }}>
-        C<sub>pred</sub> is the calculator&rsquo;s predicted concentration and C<sub>ref</sub> is the value it is
-        compared with (the synthetic observation or the noise-free truth). Means are taken over patients.
-      </p>
+        C<sub>pred</sub>{" "}<LocalizedText text="is the calculator’s predicted concentration and C" /><sub>ref</sub>{" "}<LocalizedText text="is the value it is compared with (the synthetic observation or the noise-free truth). Means are taken over patients." /></p>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
           <tbody>
             {METRIC_DEFINITIONS.map((m, i) => (
               <tr key={m.key} style={{ borderBottom: i < METRIC_DEFINITIONS.length - 1 ? "1px solid var(--color-border)" : "none" }}>
-                <td style={{ ...cellStyle, fontWeight: 700, color: "var(--color-primary)", whiteSpace: "nowrap" }}>{m.label}</td>
+                <td style={{ ...cellStyle, fontWeight: 700, color: "var(--color-primary)", whiteSpace: "nowrap" }}><LocalizedText text={m.label} /></td>
                 <td style={{ ...cellStyle, fontFamily: "var(--font-mono, monospace)", whiteSpace: "nowrap" }}>{m.formula}</td>
-                <td style={{ ...cellStyle, color: "var(--color-secondary)" }}>{m.note}</td>
+                <td style={{ ...cellStyle, color: "var(--color-secondary)" }}><LocalizedText text={m.note} /></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 12, marginBottom: 0, lineHeight: 1.55 }}>
-        Bias and precision as measures of predictive performance follow Sheiner and Beal (J Pharmacokinet
-        Biopharm. 1981;9:503–512). Some later studies treat an rBias within ±20% as acceptable; that threshold
-        is a convention, not a criterion set by Sheiner and Beal, and it was not prespecified here.
-      </p>
+      <p style={{ fontSize: 12, color: "var(--color-dim)", marginTop: 12, marginBottom: 0, lineHeight: 1.55 }}><LocalizedText text="Bias and precision as measures of predictive performance follow Sheiner and Beal (J Pharmacokinet Biopharm. 1981;9:503–512). Some later studies treat an rBias within ±20% as acceptable; that threshold is a convention, not a criterion set by Sheiner and Beal, and it was not prespecified here." /></p>
     </section>
   );
 }
@@ -320,23 +267,18 @@ function DefinitionsCard() {
 function PublishedContextCard() {
   return (
     <section style={{ ...cardStyle, background: "var(--color-bg)", borderStyle: "dashed" }}>
-      <h2 style={sectionTitleStyle}>Published real-patient study · context only, not comparable</h2>
+      <h2 style={sectionTitleStyle}><LocalizedText text="Published real-patient study · context only, not comparable" /></h2>
       <p style={{ fontSize: 13, color: "var(--color-secondary)", marginTop: 8, marginBottom: 10, lineHeight: 1.6 }}>
-        <strong>These numbers cannot be compared with the synthetic results above.</strong> Bai et al. evaluated
-        three Bayesian dosing programs in real ICU patients. The cohort, sampling, dosing and definition of
-        the true value (measured concentrations) all differ from the synthetic analysis, and Vancomyzer was
-        not part of the study. {BAI_2025_REFERENCE.cohort}
+        <strong><LocalizedText text="These numbers cannot be compared with the synthetic results above." /></strong>{" "}<LocalizedText text="Bai et al. evaluated three Bayesian dosing programs in real ICU patients. The cohort, sampling, dosing and definition of the true value (measured concentrations) all differ from the synthetic analysis, and Vancomyzer was not part of the study." />{" "}<LocalizedText text={BAI_2025_REFERENCE.cohort} />
       </p>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
-          <caption style={{ captionSide: "top", textAlign: "left", fontSize: 11, color: "var(--color-dim)", paddingBottom: 6 }}>
-            Bai et al. 2025, Table 3, a posteriori predictions in real ICU patients
-          </caption>
+          <caption style={{ captionSide: "top", textAlign: "left", fontSize: 11, color: "var(--color-dim)", paddingBottom: 6 }}><LocalizedText text="Bai et al. 2025, Table 3, a posteriori predictions in real ICU patients" /></caption>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--color-border)", textAlign: "left", color: "var(--color-dim)" }}>
-              <th style={cellStyle}>Program (model)</th>
-              <th style={numCellStyle}>Bias (mg/L)</th>
-              <th style={numCellStyle}>rBias (%)</th>
+              <th style={cellStyle}><LocalizedText text="Program (model)" /></th>
+              <th style={numCellStyle}><LocalizedText text="Bias (mg/L)" /></th>
+              <th style={numCellStyle}><LocalizedText text="rBias (%)" /></th>
               <th style={numCellStyle}>RMSE (mg/L)</th>
               <th style={numCellStyle}>rRMSE (%)</th>
             </tr>
@@ -354,8 +296,7 @@ function PublishedContextCard() {
           </tbody>
         </table>
       </div>
-      <p style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 10, marginBottom: 0, lineHeight: 1.55 }}>
-        Source: {BAI_2025_REFERENCE.source}{" "}
+      <p style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 10, marginBottom: 0, lineHeight: 1.55 }}><LocalizedText text="Source:" />{" "}{BAI_2025_REFERENCE.source}{" "}
         <a href={`https://doi.org/${BAI_2025_REFERENCE.doi}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-primary)" }}>
           doi:{BAI_2025_REFERENCE.doi}
         </a>
@@ -395,12 +336,12 @@ function LimitationsCard({ run }: { run: RunOutput }) {
   ];
   return (
     <section style={cardStyle}>
-      <h2 style={sectionTitleStyle}>Limitations</h2>
+      <h2 style={sectionTitleStyle}><LocalizedText text="Limitations" /></h2>
       <ul style={{ margin: "10px 0 0", padding: 0, listStyle: "none" }}>
         {limits.map((l) => (
           <li key={l.label} style={{ padding: "10px 12px", borderLeft: "3px solid #dc2626", background: "#fef2f2", marginBottom: 8, borderRadius: 3 }}>
-            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "#991b1b", textTransform: "uppercase", letterSpacing: "0.04em" }}>{l.label}</p>
-            <p style={{ margin: "4px 0 0", fontSize: 13, color: "#7f1d1d", lineHeight: 1.55 }}>{l.body}</p>
+            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "#991b1b", textTransform: "uppercase", letterSpacing: "0.04em" }}><LocalizedText text={l.label} /></p>
+            <p style={{ margin: "4px 0 0", fontSize: 13, color: "#7f1d1d", lineHeight: 1.55 }}><LocalizedText text={l.body} /></p>
           </li>
         ))}
       </ul>
@@ -428,15 +369,15 @@ function NextStepsCard() {
   ];
   return (
     <section style={cardStyle}>
-      <h2 id="validation-plan" style={sectionTitleStyle}>Validation plan</h2>
+      <h2 id="validation-plan" style={sectionTitleStyle}><LocalizedText text="Validation plan" /></h2>
       <div style={{ marginTop: 12 }}>
         {stages.map((s) => (
           <div key={s.title} style={{ padding: "12px 14px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 4, marginBottom: 8 }}>
             <p style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-dim)" }}>
-              {s.status}
+              <LocalizedText text={s.status} />
             </p>
-            <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: "var(--color-primary)" }}>{s.title}</p>
-            <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.55 }}>{s.body}</p>
+            <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: "var(--color-primary)" }}><LocalizedText text={s.title} /></p>
+            <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.55 }}><LocalizedText text={s.body} /></p>
           </div>
         ))}
       </div>
@@ -473,3 +414,7 @@ const numCellStyle: React.CSSProperties = {
   whiteSpace: "nowrap",
   textAlign: "right",
 };
+
+export async function generateMetadata() {
+  return localizeMetadata(englishMetadata, await requestLocale());
+}

@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
+
+import { LocalizedDiv } from "@/localization/LocalizedElements";
+
 
 /**
  * DisclaimerGate — blocks the calculator until the visitor accepts the legal
@@ -30,6 +34,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { LanguageSwitcher } from "@/localization/LanguageProvider";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
@@ -414,6 +419,7 @@ function DisclaimerAcceptanceDialog({ onAccept }: { onAccept: () => void }) {
 
   // Portal to <body>: #app-root can carry a CSS filter (brightness setting),
   // which would otherwise break position:fixed for the overlay.
+  const { t } = useLanguage();
   return createPortal(
     <div
       className="vmz-gate"
@@ -434,17 +440,13 @@ function DisclaimerAcceptanceDialog({ onAccept }: { onAccept: () => void }) {
         tabIndex={-1}
       >
         <div className="vmz-gate-head">
-          <p className="vmz-gate-eyebrow">Before you begin</p>
-          <h2 id={titleId} className="vmz-gate-title">
-            Vancomyzer{"™"} Legal Disclaimer
-          </h2>
-          <p id={introId} className="vmz-gate-intro">
-            Please read the terms below. You must accept them before using the dosing calculator.
-            This browser will remember your acceptance for up to 30 days.
-          </p>
+          <LanguageSwitcher />
+          <p className="vmz-gate-eyebrow"><LocalizedText text="Before you begin" /></p>
+          <h2 id={titleId} className="vmz-gate-title"><LocalizedText text="Vancomyzer" />{"™ "}<LocalizedText text="Legal Disclaimer" /></h2>
+          <p id={introId} className="vmz-gate-intro"><LocalizedText text="Please read the terms below. You must accept them before using the dosing calculator. This browser will remember your acceptance for up to 30 days." /></p>
         </div>
 
-        <div
+        <LocalizedDiv
           ref={legalTextRef}
           className="vmz-gate-body"
           role="region"
@@ -454,12 +456,12 @@ function DisclaimerAcceptanceDialog({ onAccept }: { onAccept: () => void }) {
         >
           {SECTIONS.map((section) => (
             <section key={section.heading} className="vmz-gate-section">
-              <h3 className="vmz-gate-section-title">{section.heading}</h3>
-              <p className="vmz-gate-section-text">{linkifyDosys(section.body)}</p>
+              <h3 className="vmz-gate-section-title"><LocalizedText text={section.heading} /></h3>
+              <p className="vmz-gate-section-text">{linkifyDosys(t(section.body))}</p>
             </section>
           ))}
-          <p className="vmz-gate-copyright">{DISCLAIMER_COPYRIGHT}</p>
-        </div>
+          <p className="vmz-gate-copyright"><LocalizedText text={DISCLAIMER_COPYRIGHT} /></p>
+        </LocalizedDiv>
 
         <div className="vmz-gate-foot">
           <label className={agreed ? "vmz-gate-consent vmz-gate-consent-checked" : "vmz-gate-consent"}>
@@ -470,24 +472,18 @@ function DisclaimerAcceptanceDialog({ onAccept }: { onAccept: () => void }) {
               onChange={(event) => setAgreed(event.target.checked)}
               aria-required="true"
             />
-            <span>{ATTESTATION_TEXT}</span>
+            <span><LocalizedText text={ATTESTATION_TEXT} /></span>
           </label>
           <div className="vmz-gate-actions">
-            <p id={hintId} className="vmz-gate-hint" hidden={agreed} aria-live="polite">
-              Tick the box above to enable &ldquo;Accept and continue&rdquo;.
-            </p>
-            <button type="button" className="vmz-gate-btn vmz-gate-btn-secondary" onClick={handleExit}>
-              Exit
-            </button>
+            <p id={hintId} className="vmz-gate-hint" hidden={agreed} aria-live="polite"><LocalizedText text="Tick the box above to enable “Accept and continue”." /></p>
+            <button type="button" className="vmz-gate-btn vmz-gate-btn-secondary" onClick={handleExit}><LocalizedText text="Exit" /></button>
             <button
               type="button"
               className="vmz-gate-btn vmz-gate-btn-primary"
               onClick={onAccept}
               disabled={!agreed}
               aria-describedby={agreed ? undefined : hintId}
-            >
-              Accept and continue
-            </button>
+            ><LocalizedText text="Accept and continue" /></button>
           </div>
         </div>
       </div>

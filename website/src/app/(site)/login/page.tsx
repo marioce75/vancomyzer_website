@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedInput } from "@/localization/LocalizedElements";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useEffect, useRef } from "react";
 import { signIn } from "next-auth/react";
@@ -123,12 +127,8 @@ function LoginForm() {
         borderRadius: 0,
       }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <h1 className="vz-serif" style={{ fontSize: 26, color: "#14232f", margin: 0 }}>
-            Sign in to Vancomyzer
-          </h1>
-          <p style={{ fontSize: 13, color: "#546471", marginTop: 6 }}>
-            Clinical decision support for vancomycin dosing
-          </p>
+          <h1 className="vz-serif" style={{ fontSize: 26, color: "#14232f", margin: 0 }}><LocalizedText text="Sign in to Vancomyzer" /></h1>
+          <p style={{ fontSize: 13, color: "#546471", marginTop: 6 }}><LocalizedText text="Clinical decision support for vancomycin dosing" /></p>
         </div>
 
         {error && (
@@ -136,15 +136,13 @@ function LoginForm() {
             padding: "10px 14px", marginBottom: 16,
             background: "#fff5f5", border: "1px solid #fca5a5", color: "#991b1b", fontSize: 13, borderRadius: 4,
           }}>
-            {error}
+            <LocalizedText text={error} />
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 16 }}>
-            <label htmlFor="login-username" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>
-              Username or Email
-            </label>
+            <label htmlFor="login-username" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}><LocalizedText text="Username or Email" /></label>
             <input
               id="login-username"
               type="text"
@@ -161,9 +159,7 @@ function LoginForm() {
           </div>
 
           <div style={{ marginBottom: 20 }}>
-            <label htmlFor="login-password" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>
-              Password
-            </label>
+            <label htmlFor="login-password" style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}><LocalizedText text="Password" /></label>
             <div style={{ position: "relative" }}>
               <input
               id="login-password"
@@ -186,7 +182,7 @@ function LoginForm() {
                   background: "none", border: "none", color: "#546471", cursor: "pointer", fontSize: 12,
                 }}
               >
-                {showPassword ? "HIDE" : "SHOW"}
+                <LocalizedText text={showPassword ? "HIDE" : "SHOW"} />
               </button>
             </div>
           </div>
@@ -201,7 +197,7 @@ function LoginForm() {
               borderRadius: 4,
             }}
           >
-            {loading ? "Signing in..." : "Sign In"}
+            <LocalizedText text={loading ? "Signing in..." : "Sign In"} />
           </button>
         </form>
 
@@ -210,7 +206,7 @@ function LoginForm() {
           <span style={{
             position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",
             background: "#ffffff", padding: "0 12px", fontSize: 11, color: "#546471", letterSpacing: "0.05em",
-          }}>OR</span>
+          }}><LocalizedText text="OR" /></span>
         </div>
 
         {magicSent ? (
@@ -219,14 +215,11 @@ function LoginForm() {
             background: "#ecfdf5", border: "1px solid #6ee7b7", color: "#065f46", fontSize: 13, borderRadius: 4,
             lineHeight: 1.5,
           }}>
-            <strong>Check your email.</strong> If an account exists for that email, a sign-in link has been sent. The link expires in 15 minutes.
-          </div>
+            <strong><LocalizedText text="Check your email." /></strong>{" "}<LocalizedText text="If an account exists for that email, a sign-in link has been sent. The link expires in 15 minutes." /></div>
         ) : showMagic ? (
           <form onSubmit={handleMagicSubmit}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}>
-              Email address
-            </label>
-            <input
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#4a5568", marginBottom: 4 }}><LocalizedText text="Email address" /></label>
+            <LocalizedInput
               type="email"
               value={magicEmail}
               onChange={e => setMagicEmail(e.target.value)}
@@ -249,7 +242,7 @@ function LoginForm() {
                 borderRadius: 4,
               }}
             >
-              {magicSending ? "Sending link..." : "Email me a sign-in link"}
+              <LocalizedText text={magicSending ? "Sending link..." : "Email me a sign-in link"} />
             </button>
           </form>
         ) : (
@@ -261,21 +254,14 @@ function LoginForm() {
               background: "#ffffff", color: "#1f5e96", border: "1px solid #1f5e96",
               cursor: "pointer", borderRadius: 4,
             }}
-          >
-            Sign in with email link instead
-          </button>
+          ><LocalizedText text="Sign in with email link instead" /></button>
         )}
 
         <p style={{ textAlign: "center", marginTop: 16, fontSize: 13 }}>
-          <Link href="/reset-password" style={{ color: "#546471", textDecoration: "none" }}>
-            Forgot password?
-          </Link>
+          <Link href="/reset-password" style={{ color: "#546471", textDecoration: "none" }}><LocalizedText text="Forgot password?" /></Link>
         </p>
-        <p style={{ textAlign: "center", marginTop: 8, fontSize: 13, color: "#546471" }}>
-          Don&apos;t have an account?{" "}
-          <Link href="/register" style={{ color: "#1f5e96", textDecoration: "none", fontWeight: 600 }}>
-            Register
-          </Link>
+        <p style={{ textAlign: "center", marginTop: 8, fontSize: 13, color: "#546471" }}><LocalizedText text="Don't have an account?" />{" "}
+          <Link href="/register" style={{ color: "#1f5e96", textDecoration: "none", fontWeight: 600 }}><LocalizedText text="Register" /></Link>
         </p>
       </div>
     </div>

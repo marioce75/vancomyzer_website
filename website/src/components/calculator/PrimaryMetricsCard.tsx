@@ -1,3 +1,5 @@
+
+import { LocalizedText } from "@/localization/LanguageProvider";
 import React from "react";
 import { fmt } from "@/lib/formatNumber";
 
@@ -50,7 +52,7 @@ const Metric = ({ label, value, unit, compact, emphasis, sub }: { label: string;
       className={`${compact ? "text-[10px]" : "text-[10px]"} font-semibold uppercase tracking-[0.16em] block`}
       style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
     >
-      {label}
+      <LocalizedText text={label} />
     </span>
     <div className={`${compact ? "mt-0.5" : "mt-1"} flex items-baseline gap-1`}>
       <span
@@ -65,7 +67,7 @@ const Metric = ({ label, value, unit, compact, emphasis, sub }: { label: string;
       </span>
       <span className="text-[11px]" style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}>{unit}</span>
     </div>
-    {sub && <div className="mt-1">{sub}</div>}
+    {sub && <div className="mt-1"><LocalizedText text={sub} /></div>}
   </div>
 );
 
@@ -75,7 +77,7 @@ export default function PrimaryMetricsCard({ auc24, peak, trough, compact = fals
     return (
       <div className="flex min-w-0 flex-col gap-1">
         {caption && (
-          <p className="vz-kicker m-0 truncate" style={{ fontFamily: "'Share Tech Mono', monospace" }}>{caption}</p>
+          <p className="vz-kicker m-0 truncate" style={{ fontFamily: "'Share Tech Mono', monospace" }}><LocalizedText text={caption} /></p>
         )}
         <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
           <div className="col-span-2 sm:col-span-1">
@@ -88,13 +90,13 @@ export default function PrimaryMetricsCard({ auc24, peak, trough, compact = fals
             sub={
               <span className="flex flex-wrap items-center gap-1.5">
                 {status ? (
-                  <span className={`vz-chip ${status.cls}`}>{status.label}</span>
+                  <span className={`vz-chip ${status.cls}`}><LocalizedText text={status.label} /></span>
                 ) : ungraded ? (
-                  <span className="vz-chip vz-chip--neutral">Single dose · first 24 h</span>
+                  <span className="vz-chip vz-chip--neutral"><LocalizedText text="Single dose · first 24 h" /></span>
                 ) : (
-                  <span className="vz-chip vz-chip--neutral">Target 400–600</span>
+                  <span className="vz-chip vz-chip--neutral"><LocalizedText text="Target 400–600" /></span>
                 )}
-                {status && <span className="text-[10px]" style={{ color: "var(--color-dim)" }}>target 400–600</span>}
+                {status && <span className="text-[10px]" style={{ color: "var(--color-dim)" }}><LocalizedText text="target 400–600" /></span>}
               </span>
             }
           />

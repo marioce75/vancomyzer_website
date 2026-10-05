@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
+
 
 import { useEffect, useState, type ReactNode } from "react";
 
@@ -24,6 +26,7 @@ interface ResultDetailTabsProps {
  * primary recommendation.
  */
 export default function ResultDetailTabs({ tabs, defaultTab, ariaLabel = "Result details", storageKey }: ResultDetailTabsProps) {
+  const { t: translateLabel } = useLanguage();
   const [active, setActiveState] = useState<string>(defaultTab ?? tabs[0]?.id ?? "");
   useEffect(() => {
     if (!storageKey) return;
@@ -53,7 +56,7 @@ export default function ResultDetailTabs({ tabs, defaultTab, ariaLabel = "Result
 
   return (
     <div className="flex min-h-0 flex-col">
-      <div className="vz-tabs shrink-0" role="tablist" aria-label={ariaLabel} onKeyDown={onKeyDown}>
+      <div className="vz-tabs shrink-0" role="tablist" aria-label={translateLabel(ariaLabel)} onKeyDown={onKeyDown}>
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -66,7 +69,7 @@ export default function ResultDetailTabs({ tabs, defaultTab, ariaLabel = "Result
             tabIndex={t.id === current.id ? 0 : -1}
             onClick={() => setActive(t.id)}
           >
-            {t.label}
+            <LocalizedText text={t.label} />
           </button>
         ))}
       </div>

@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useEffect } from "react";
 
@@ -46,28 +48,28 @@ export default function SystemPage() {
     return `${d}d ${h}h ${m}m`;
   };
 
-  if (loading) return <div className="text-gray-500 text-center py-20">Loading system info...</div>;
+  if (loading) return <div className="text-gray-500 text-center py-20"><LocalizedText text={"Loading system info..."} /></div>;
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}>System Configuration</h1>
-      <p className="text-sm text-gray-500 mb-6">Environment, health, and deployment information</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}><LocalizedText text={"System Configuration"} /></h1>
+      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"Environment, health, and deployment information"} /></p>
 
       {/* Health check */}
       <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3">Health Check</h2>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3"><LocalizedText text={"Health Check"} /></h2>
         {health ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <p className="text-xs text-gray-500">Status</p>
+              <p className="text-xs text-gray-500"><LocalizedText text="Status" /></p>
               <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${
                 health.status === "ok" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
               }`}>
-                {health.status === "ok" ? "Healthy" : "Degraded"}
+                <LocalizedText text={health.status === "ok" ? "Healthy" : "Degraded"} />
               </span>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Database</p>
+              <p className="text-xs text-gray-500"><LocalizedText text={"Database"} /></p>
               <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${
                 health.db === "connected" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
               }`}>
@@ -75,33 +77,33 @@ export default function SystemPage() {
               </span>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Uptime</p>
+              <p className="text-xs text-gray-500"><LocalizedText text={"Uptime"} /></p>
               <p className="text-sm font-semibold text-gray-800 mt-1">{formatUptime(health.uptime_seconds)}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Last Check</p>
+              <p className="text-xs text-gray-500"><LocalizedText text={"Last Check"} /></p>
               <p className="text-sm text-gray-800 mt-1">{new Date(health.timestamp).toLocaleString()}</p>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-red-600">Health check unavailable.</p>
+          <p className="text-sm text-red-600"><LocalizedText text={"Health check unavailable."} /></p>
         )}
       </div>
 
       {/* App version */}
       <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3">Application</h2>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3"><LocalizedText text={"Application"} /></h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <p className="text-xs text-gray-500">Version</p>
+            <p className="text-xs text-gray-500"><LocalizedText text={"Version"} /></p>
             <p className="text-sm font-semibold text-gray-800 mt-1">{health?.version ?? "0.1.0"}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Framework</p>
+            <p className="text-xs text-gray-500"><LocalizedText text={"Framework"} /></p>
             <p className="text-sm text-gray-800 mt-1">Next.js 14 (App Router)</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Runtime</p>
+            <p className="text-xs text-gray-500"><LocalizedText text={"Runtime"} /></p>
             <p className="text-sm text-gray-800 mt-1">Node.js</p>
           </div>
         </div>
@@ -109,16 +111,14 @@ export default function SystemPage() {
 
       {/* Environment variables */}
       <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3">Environment Variables</h2>
-        <p className="text-xs text-gray-400 mb-3">Key names only. Values are not exposed for security.</p>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3"><LocalizedText text={"Environment Variables"} /></h2>
+        <p className="text-xs text-gray-400 mb-3"><LocalizedText text={"Key names only. Values are not exposed for security."} /></p>
         <div className="space-y-1.5">
           {REQUIRED_ENV_VARS.map((varName) => (
             <div key={varName} className="flex items-center gap-3 text-sm">
               <span className="font-mono text-xs text-gray-700 w-52">{varName}</span>
               {/* Server-side status unknown from client; show as "Required" indicator */}
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-500">
-                REQUIRED
-              </span>
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-500"><LocalizedText text={"REQUIRED"} /></span>
             </div>
           ))}
         </div>
@@ -126,7 +126,7 @@ export default function SystemPage() {
 
       {/* External links */}
       <div className="bg-white border border-gray-200 rounded-lg p-5">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3">External Links</h2>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3"><LocalizedText text={"External Links"} /></h2>
         <div className="flex flex-wrap gap-3">
           <a
             href="https://dashboard.render.com"
@@ -134,17 +134,13 @@ export default function SystemPage() {
             rel="noopener noreferrer"
             className="px-4 py-2 text-sm font-medium text-white rounded-md transition-colors hover:opacity-90"
             style={{ background: "#1e4d8c" }}
-          >
-            Render Dashboard
-          </a>
+          ><LocalizedText text={"Render Dashboard"} /></a>
           <a
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"
-          >
-            GitHub Repository
-          </a>
+          ><LocalizedText text={"GitHub Repository"} /></a>
         </div>
       </div>
     </div>

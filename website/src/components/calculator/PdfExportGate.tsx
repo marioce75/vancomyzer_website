@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useCallback } from "react";
 import { hasFeature } from "@/lib/tiers";
@@ -38,9 +40,7 @@ export default function PdfExportGate({ tier, onExport }: PdfExportGateProps) {
           (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
           (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
         }}
-      >
-        EXPORT PDF
-      </button>
+      ><LocalizedText text="EXPORT PDF" /></button>
 
       <UpgradeModal open={modalOpen} onClose={() => setModalOpen(false)} feature="export.pdf" />
     </div>

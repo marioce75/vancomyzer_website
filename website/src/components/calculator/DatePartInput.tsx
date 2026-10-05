@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedButton, LocalizedInput } from "@/localization/LocalizedElements";
+
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
@@ -91,7 +95,7 @@ function CalendarPopup({ selectedDate, anchorEl, onSelect, onClose }: CalendarPo
     >
       {/* Month navigation */}
       <div className="flex items-center justify-between mb-3">
-        <button
+        <LocalizedButton
           type="button"
           onClick={prevMonth}
           className="h-7 w-7 flex items-center justify-center rounded-lg transition font-bold text-base"
@@ -99,11 +103,11 @@ function CalendarPopup({ selectedDate, anchorEl, onSelect, onClose }: CalendarPo
           aria-label="Previous month"
         >
           ‹
-        </button>
+        </LocalizedButton>
         <span className="text-sm font-semibold" style={{color: 'var(--text-primary)'}}>
-          {MONTH_NAMES[viewMonth]} {viewYear}
+          <LocalizedText text={MONTH_NAMES[viewMonth]} /> {viewYear}
         </span>
-        <button
+        <LocalizedButton
           type="button"
           onClick={nextMonth}
           className="h-7 w-7 flex items-center justify-center rounded-lg transition font-bold text-base"
@@ -111,14 +115,14 @@ function CalendarPopup({ selectedDate, anchorEl, onSelect, onClose }: CalendarPo
           aria-label="Next month"
         >
           ›
-        </button>
+        </LocalizedButton>
       </div>
 
       {/* Day-of-week headers */}
       <div className="grid grid-cols-7 mb-1">
         {DAY_LABELS.map(d => (
           <span key={d} className="h-6 flex items-center justify-center text-[10px] font-semibold" style={{color: 'var(--text-muted)'}}>
-            {d}
+            <LocalizedText text={d} />
           </span>
         ))}
       </div>
@@ -158,9 +162,7 @@ function CalendarPopup({ selectedDate, anchorEl, onSelect, onClose }: CalendarPo
           onClick={() => { onSelect(today); onClose(); }}
           className="w-full text-xs font-semibold text-center py-0.5 transition"
           style={{color: 'var(--teal-light)'}}
-        >
-          Today
-        </button>
+        ><LocalizedText text="Today" /></button>
       </div>
     </div>,
     document.body
@@ -226,7 +228,7 @@ export default function DatePartInput({ value, onChange, hasError }: DatePartInp
 
   return (
     <div className="flex items-center gap-0.5">
-      <input
+      <LocalizedInput
         ref={mmRef}
         type="text"
         inputMode="numeric"
@@ -238,7 +240,7 @@ export default function DatePartInput({ value, onChange, hasError }: DatePartInp
         aria-label="Month"
       />
       <span className="text-[11px] select-none shrink-0" style={{color: 'var(--text-muted)'}}>/</span>
-      <input
+      <LocalizedInput
         ref={ddRef}
         type="text"
         inputMode="numeric"
@@ -251,7 +253,7 @@ export default function DatePartInput({ value, onChange, hasError }: DatePartInp
         aria-label="Day"
       />
       <span className="text-[11px] select-none shrink-0" style={{color: 'var(--text-muted)'}}>/</span>
-      <input
+      <LocalizedInput
         ref={yyyyRef}
         type="text"
         inputMode="numeric"
@@ -264,7 +266,7 @@ export default function DatePartInput({ value, onChange, hasError }: DatePartInp
         aria-label="Year"
       />
       {/* Calendar icon — opens the custom popup */}
-      <button
+      <LocalizedButton
         ref={calBtnRef}
         type="button"
         tabIndex={-1}
@@ -280,7 +282,7 @@ export default function DatePartInput({ value, onChange, hasError }: DatePartInp
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
           <path fillRule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clipRule="evenodd" />
         </svg>
-      </button>
+      </LocalizedButton>
       {isCalendarOpen && calBtnRef.current && (
         <CalendarPopup
           selectedDate={value}

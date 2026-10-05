@@ -1,3 +1,5 @@
+
+import { LocalizedText } from "@/localization/LanguageProvider";
 export default function CalculatorLoadingState() {
   return (
     <div
@@ -8,15 +10,12 @@ export default function CalculatorLoadingState() {
         className="text-lg font-bold tracking-[0.2em] uppercase"
         style={{ color: "var(--color-primary)", fontFamily: "'Share Tech Mono', monospace" }}
       >
-        {">"} RUNNING PK MODEL
-        <span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span>
+        {">"}{" "}<LocalizedText text="RUNNING PK MODEL" /><span className="mx-blink" style={{ color: "var(--color-primary)" }}>_</span>
       </p>
       <p
         className="mt-3 text-sm tracking-[0.12em]"
         style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace" }}
-      >
-        calculating exposure metrics and regimen guidance
-      </p>
+      ><LocalizedText text="calculating exposure metrics and regimen guidance" /></p>
     </div>
   );
 }

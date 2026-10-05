@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
 
 /**
  * "Open Calculator" call to action for public pages.
@@ -36,7 +37,7 @@ export default function OpenCalculatorButton({
       style={style}
       onClick={() => track("Open Calculator", { source })}
     >
-      {children ?? "Open Calculator"}
+      {children ?? <LocalizedText text="Open Calculator" />}
     </Link>
   );
 }

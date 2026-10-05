@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedInput } from "@/localization/LocalizedElements";
+
 
 import { useEffect, useState, useCallback, Fragment } from "react";
 
@@ -135,7 +139,7 @@ export default function BaaCard({ institutionName, fallbackSignerEmail, onStatus
   if (loading) {
     return (
       <section style={cardWrap}>
-        <div style={{ padding: 20, color: "var(--color-dim)", fontSize: 13 }}>Loading BAA status…</div>
+        <div style={{ padding: 20, color: "var(--color-dim)", fontSize: 13 }}><LocalizedText text={"Loading BAA status…"} /></div>
       </section>
     );
   }
@@ -144,7 +148,7 @@ export default function BaaCard({ institutionName, fallbackSignerEmail, onStatus
     return (
       <section style={cardWrap}>
         <div style={{ padding: 16, color: "#991b1b", background: "#fff5f5", border: "1px solid #fca5a5", borderRadius: 4, fontSize: 13 }}>
-          {loadError}
+          <LocalizedText text={loadError} />
         </div>
       </section>
     );
@@ -155,9 +159,7 @@ export default function BaaCard({ institutionName, fallbackSignerEmail, onStatus
   return (
     <section style={cardWrap}>
       <header style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
-        <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}>
-          Business Associate Agreement
-        </h2>
+        <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", margin: 0 }}><LocalizedText text={"Business Associate Agreement"} /></h2>
         <StatusBadge status={status.status} />
       </header>
 
@@ -210,7 +212,7 @@ function StatusBadge({ status }: { status: BaaStatus["status"] }) {
   const s = styles[status];
   return (
     <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: s.bg, color: s.fg, border: `1px solid ${s.border}`, borderRadius: 4 }}>
-      {s.label}
+      <LocalizedText text={s.label} />
     </span>
   );
 }
@@ -239,14 +241,10 @@ function NotRequestedView({
 }) {
   return (
     <div>
-      <p style={{ fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0 }}>
-        Your team can use Vancomyzer freely without a BAA — the calculator does not persist patient identifiers.
-        A signed BAA is required only when your institution&apos;s legal or compliance team requires one on file
-        before any PHI may be entered into a third-party SaaS tool.
-      </p>
+      <p style={{ fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0 }}><LocalizedText text={"Your team can use Vancomyzer freely without a BAA — the calculator does not persist patient identifiers. A signed BAA is required only when your institution's legal or compliance team requires one on file before any PHI may be entered into a third-party SaaS tool."} /></p>
 
       <div style={{ marginTop: 14, marginBottom: 14, padding: "12px 14px", background: "#f7fafc", border: "1px solid var(--color-border)", borderRadius: 4 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-primary)", marginBottom: 6 }}>Step 1 — Download our BAA template</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-primary)", marginBottom: 6 }}><LocalizedText text={"Step 1 — Download our BAA template"} /></div>
         {downloadAvailable ? (
           <button
             type="button"
@@ -261,30 +259,18 @@ function NotRequestedView({
               borderRadius: 4,
               cursor: "pointer",
             }}
-          >
-            Download BAA template (PDF)
-          </button>
+          ><LocalizedText text={"Download BAA template (PDF)"} /></button>
         ) : (
-          <div style={{ fontSize: 12, color: "#92400e", background: "#fffbeb", padding: "8px 10px", border: "1px solid #fcd34d", borderRadius: 4 }}>
-            The self-serve BAA template is under attorney review and not yet available for download.
-            Please email <a href="mailto:contact@dosys.health" style={{ color: "var(--color-primary)" }}>contact@dosys.health</a>{" "}
-            to receive the BAA manually while we finalize the self-serve flow.
-          </div>
+          <div style={{ fontSize: 12, color: "#92400e", background: "#fffbeb", padding: "8px 10px", border: "1px solid #fcd34d", borderRadius: 4 }}><LocalizedText text={"The self-serve BAA template is under attorney review and not yet available for download. Please email"} />{" "}<a href="mailto:contact@dosys.health" style={{ color: "var(--color-primary)" }}>contact@dosys.health</a>{" "}<LocalizedText text={"to receive the BAA manually while we finalize the self-serve flow."} /></div>
         )}
         {!templateApproved && downloadAvailable && (
-          <div style={{ marginTop: 8, fontSize: 11, color: "#92400e" }}>
-            (Superadmin preview — template is DRAFT, not approved for customer signing.)
-          </div>
+          <div style={{ marginTop: 8, fontSize: 11, color: "#92400e" }}><LocalizedText text={"(Superadmin preview — template is DRAFT, not approved for customer signing.)"} /></div>
         )}
       </div>
 
       <div style={{ marginBottom: 14, padding: "12px 14px", background: "#f7fafc", border: "1px solid var(--color-border)", borderRadius: 4 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}>Step 2 — Sign and return</div>
-        <p style={{ fontSize: 12, color: "var(--color-secondary)", margin: 0, lineHeight: 1.55 }}>
-          Have an authorized officer of your institution sign the BAA (DocuSign, wet-ink + scan, or your preferred
-          tool). Upload the signed PDF below. Dōsys Health LLC will countersign within one business day and email
-          you the fully-executed copy.
-        </p>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}><LocalizedText text={"Step 2 — Sign and return"} /></div>
+        <p style={{ fontSize: 12, color: "var(--color-secondary)", margin: 0, lineHeight: 1.55 }}><LocalizedText text={"Have an authorized officer of your institution sign the BAA (DocuSign, wet-ink + scan, or your preferred tool). Upload the signed PDF below. Dōsys Health LLC will countersign within one business day and email you the fully-executed copy."} /></p>
       </div>
 
       <UploadForm {...uploadProps} disabled={!downloadAvailable} />
@@ -297,11 +283,11 @@ function UploadForm(props: UploadFormProps & { disabled: boolean }) {
     file, setFile, uploading, uploadMsg, onSubmit, disabled } = props;
   return (
     <form onSubmit={onSubmit} style={{ padding: "14px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 4 }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-primary)", marginBottom: 10 }}>Step 3 — Upload your signed BAA</div>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-primary)", marginBottom: 10 }}><LocalizedText text={"Step 3 — Upload your signed BAA"} /></div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <div>
-          <label style={labelStyle}>Signer full name *</label>
-          <input
+          <label style={labelStyle}><LocalizedText text={"Signer full name *"} /></label>
+          <LocalizedInput
             type="text"
             value={signerName}
             onChange={(e) => setSignerName(e.target.value)}
@@ -312,8 +298,8 @@ function UploadForm(props: UploadFormProps & { disabled: boolean }) {
           />
         </div>
         <div>
-          <label style={labelStyle}>Signer title *</label>
-          <input
+          <label style={labelStyle}><LocalizedText text={"Signer title *"} /></label>
+          <LocalizedInput
             type="text"
             value={signerTitle}
             onChange={(e) => setSignerTitle(e.target.value)}
@@ -324,8 +310,8 @@ function UploadForm(props: UploadFormProps & { disabled: boolean }) {
           />
         </div>
         <div style={{ gridColumn: "1 / -1" }}>
-          <label style={labelStyle}>Signer email (optional — receives the executed copy)</label>
-          <input
+          <label style={labelStyle}><LocalizedText text={"Signer email (optional — receives the executed copy)"} /></label>
+          <LocalizedInput
             type="email"
             value={signerEmail}
             onChange={(e) => setSignerEmail(e.target.value)}
@@ -335,7 +321,7 @@ function UploadForm(props: UploadFormProps & { disabled: boolean }) {
           />
         </div>
         <div style={{ gridColumn: "1 / -1" }}>
-          <label style={labelStyle}>Signed BAA PDF *</label>
+          <label style={labelStyle}><LocalizedText text={"Signed BAA PDF *"} /></label>
           <input
             type="file"
             accept="application/pdf,.pdf"
@@ -345,8 +331,7 @@ function UploadForm(props: UploadFormProps & { disabled: boolean }) {
             style={{ fontSize: 12 }}
           />
           {file && (
-            <div style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 4 }}>
-              Selected: {file.name} ({Math.round(file.size / 1024)} KB)
+            <div style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 4 }}><LocalizedText text={"Selected:"} />{" "}{file.name} ({Math.round(file.size / 1024)} KB)
             </div>
           )}
         </div>
@@ -366,11 +351,11 @@ function UploadForm(props: UploadFormProps & { disabled: boolean }) {
             cursor: disabled || uploading || !file ? "not-allowed" : "pointer",
           }}
         >
-          {uploading ? "Uploading…" : "Submit signed BAA"}
+          <LocalizedText text={uploading ? "Uploading…" : "Submit signed BAA"} />
         </button>
         {uploadMsg && (
           <span style={{ fontSize: 12, color: uploadMsg.type === "ok" ? "#047857" : "#b91c1c", lineHeight: 1.5 }}>
-            {uploadMsg.text}
+            <LocalizedText text={uploadMsg.text} />
           </span>
         )}
       </div>
@@ -387,10 +372,7 @@ function PendingView({
 }) {
   return (
     <div>
-      <p style={{ fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0 }}>
-        Your signed BAA was received on <strong>{fmtDate(submittedAt)}</strong>. Dōsys Health LLC will countersign
-        within one business day and email the fully-executed copy to your signer. No further action required from you.
-      </p>
+      <p style={{ fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0 }}><LocalizedText text={"Your signed BAA was received on"} />{" "}<strong>{fmtDate(submittedAt)}</strong><LocalizedText text={". Dōsys Health LLC will countersign within one business day and email the fully-executed copy to your signer. No further action required from you."} /></p>
       <KeyValueGrid
         items={[
           ["Signer", signer ? `${signer.name} · ${signer.title}` : "—"],
@@ -413,9 +395,7 @@ function ActiveView({
 }) {
   return (
     <div>
-      <p style={{ fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0 }}>
-        Your BAA with Dōsys Health LLC is fully executed as of <strong>{fmtDate(executedAt)}</strong>. A copy was
-        emailed to your signer. {executedPdfAvailable ? "You can also download the executed PDF below." : ""}
+      <p style={{ fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.55, marginTop: 0 }}><LocalizedText text={"Your BAA with Dōsys Health LLC is fully executed as of"} />{" "}<strong>{fmtDate(executedAt)}</strong><LocalizedText text={". A copy was emailed to your signer."} />{" "}<LocalizedText text={executedPdfAvailable ? "You can also download the executed PDF below." : ""} />
       </p>
       <KeyValueGrid
         items={[
@@ -441,9 +421,7 @@ function ActiveView({
             borderRadius: 4,
             textDecoration: "none",
           }}
-        >
-          Download executed BAA
-        </a>
+        ><LocalizedText text={"Download executed BAA"} /></a>
       )}
     </div>
   );
@@ -454,7 +432,7 @@ function KeyValueGrid({ items }: { items: [string, string][] }) {
     <dl style={{ display: "grid", gridTemplateColumns: "160px 1fr", gap: "6px 12px", fontSize: 12, marginTop: 12, marginBottom: 0 }}>
       {items.map(([k, v]) => (
         <Fragment key={k}>
-          <dt style={{ color: "var(--color-dim)", margin: 0 }}>{k}</dt>
+          <dt style={{ color: "var(--color-dim)", margin: 0 }}><LocalizedText text={k} /></dt>
           <dd style={{ color: "var(--color-primary)", margin: 0 }}>{v}</dd>
         </Fragment>
       ))}

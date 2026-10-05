@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedButton } from "@/localization/LocalizedElements";
+
 
 /**
  * Upgrade modal shown when a Free user attempts a Pro+ feature.
@@ -131,7 +135,7 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
           position: "relative",
         }}
       >
-        <button
+        <LocalizedButton
           type="button"
           onClick={onClose}
           aria-label="Close"
@@ -149,18 +153,17 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
           }}
         >
           ×
-        </button>
+        </LocalizedButton>
 
-        <div style={{ fontSize: 11, fontWeight: 700, color: "#0d9488", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>
-          Upgrade to {upgradeTier.name}
+        <div style={{ fontSize: 11, fontWeight: 700, color: "#0d9488", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}><LocalizedText text={"Upgrade to"} />{" "}{upgradeTier.name}
         </div>
 
         <h2 id="upgrade-modal-title" style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 700, color: "#0f172a" }}>
-          {headline}
+          <LocalizedText text={headline} />
         </h2>
 
         <p style={{ margin: "0 0 16px", fontSize: 14, color: "#475569", lineHeight: 1.55 }}>
-          {body}
+          <LocalizedText text={body} />
         </p>
 
         <div style={{
@@ -171,10 +174,10 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
           marginBottom: 20,
         }}>
           <div style={{ fontSize: 12, fontWeight: 600, color: "#0f172a", marginBottom: 4 }}>
-            {upgradeTier.priceLabel}
+            <LocalizedText text={upgradeTier.priceLabel} />
           </div>
           <div style={{ fontSize: 11, color: "#64748b" }}>
-            {upgradeTier.audience}
+            <LocalizedText text={upgradeTier.audience} />
           </div>
         </div>
 
@@ -192,9 +195,7 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
               borderRadius: 4,
               cursor: "pointer",
             }}
-          >
-            No thanks
-          </button>
+          ><LocalizedText text={"No thanks"} /></button>
           {primaryExternal ? (
             <a
               href={primaryHref}
@@ -212,7 +213,7 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
                 textDecoration: "none",
               }}
             >
-              {primaryLabel}
+              <LocalizedText text={primaryLabel} />
             </a>
           ) : (
             <Link
@@ -229,7 +230,7 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
                 textDecoration: "none",
               }}
             >
-              {primaryLabel}
+              <LocalizedText text={primaryLabel} />
             </Link>
           )}
         </div>

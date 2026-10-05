@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -63,13 +65,13 @@ export default function InstitutionalSettingsPage() {
   }, [settings]);
 
   if (authLoading || settingsLoading) {
-    return <div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}>Loading...</div>;
+    return <div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}><LocalizedText text="Loading..." /></div>;
   }
 
   if (!user) {
     return (
       <div style={{ padding: 40, textAlign: "center" }}>
-        <p style={{ color: "var(--color-secondary)" }}>Please <Link href="/login" style={{ color: "var(--color-primary)" }}>sign in</Link> to configure settings.</p>
+        <p style={{ color: "var(--color-secondary)" }}><LocalizedText text={"Please"} />{" "}<Link href="/login" style={{ color: "var(--color-primary)" }}><LocalizedText text="sign in" /></Link>{" "}<LocalizedText text={"to configure settings."} /></p>
       </div>
     );
   }
@@ -95,31 +97,21 @@ export default function InstitutionalSettingsPage() {
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px 80px" }}>
       <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
-        <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Institutional Settings</span>
+        <span style={{ color: "var(--color-primary)", fontWeight: 600 }}><LocalizedText text="Institutional Settings" /></span>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-        <Link href="/settings/billing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-          Billing &amp; Subscription
-        </Link>
+        <Link href="/settings/billing" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text="Billing & Subscription" /></Link>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-        <Link href="/settings/history" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-          Calculation History
-        </Link>
+        <Link href="/settings/history" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text="Calculation History" /></Link>
       </div>
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}>
-        Institutional Settings
-      </h1>
-      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 16 }}>
-        Clinical defaults for {institution || "your institution"}. Changes apply to all users at this institution.
-      </p>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}><LocalizedText text="Institutional Settings" /></h1>
+      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 16 }}><LocalizedText text={"Clinical defaults for"} />{" "}{institution || <LocalizedText text="your institution" />}<LocalizedText text={". Changes apply to all users at this institution."} /></p>
 
       {/* Student / resident discount — auto-verified school emails OR manual application */}
       <DiscountStatusCard />
       {/* Referral program — earn 1 month free Pro per Pro conversion */}
       <ReferralCard />
       {!user.institution && (
-        <div style={{ padding: "10px 14px", marginBottom: 20, background: "#fffbeb", border: "1px solid #fcd34d", color: "#92400e", fontSize: 13 }}>
-          No institution set in your profile. Settings will be saved as personal defaults. To share settings across your team, add your institution name during registration.
-        </div>
+        <div style={{ padding: "10px 14px", marginBottom: 20, background: "#fffbeb", border: "1px solid #fcd34d", color: "#92400e", fontSize: 13 }}><LocalizedText text={"No institution set in your profile. Settings will be saved as personal defaults. To share settings across your team, add your institution name during registration."} /></div>
       )}
 
       {message && (
@@ -131,7 +123,7 @@ export default function InstitutionalSettingsPage() {
           color: message.type === "success" ? "#047857" : "#991b1b",
           fontSize: 13,
         }}>
-          {message.text}
+          <LocalizedText text={message.text} />
         </div>
       )}
 
@@ -147,7 +139,7 @@ export default function InstitutionalSettingsPage() {
             paddingBottom: 6,
             borderBottom: "1px solid var(--color-border)",
           }}>
-            {section}
+            <LocalizedText text={section} />
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {FIELDS.filter(f => f.section === section).map(field => {
@@ -156,10 +148,10 @@ export default function InstitutionalSettingsPage() {
                 <div key={field.key} className="flex items-center justify-between gap-4" style={{ minHeight: 36 }}>
                   <div style={{ flex: 1 }}>
                     <label style={{ fontSize: 13, fontWeight: 500, color: "var(--color-secondary)" }}>
-                      {field.label}
+                      <LocalizedText text={field.label} />
                     </label>
                     {field.description && (
-                      <p style={{ fontSize: 11, color: "var(--color-dim)", margin: "2px 0 0" }}>{field.description}</p>
+                      <p style={{ fontSize: 11, color: "var(--color-dim)", margin: "2px 0 0" }}><LocalizedText text={field.description} /></p>
                     )}
                   </div>
                   <div className="flex items-center gap-2" style={{ flexShrink: 0 }}>
@@ -254,7 +246,7 @@ export default function InstitutionalSettingsPage() {
             opacity: saving ? 0.7 : 1,
           }}
         >
-          {saving ? "Saving..." : "Save Settings"}
+          <LocalizedText text={saving ? "Saving..." : "Save Settings"} />
         </button>
         <button
           type="button"
@@ -268,9 +260,7 @@ export default function InstitutionalSettingsPage() {
             border: "1px solid var(--color-border)",
             cursor: "pointer",
           }}
-        >
-          Reset
-        </button>
+        ><LocalizedText text={"Reset"} /></button>
       </div>
     </div>
   );

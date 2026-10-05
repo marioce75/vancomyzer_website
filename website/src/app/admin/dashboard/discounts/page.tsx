@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedTextarea } from "@/localization/LocalizedElements";
+
 
 /**
  * Superadmin discount queue — pending student/resident applications
@@ -101,24 +105,19 @@ export default function DiscountQueuePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}>Discount Queue</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        Student / resident discount applications awaiting verification.
-        Auto-verified school-email signups (.edu, .ac.*, etc.) skip this queue.
-      </p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}><LocalizedText text={"Discount Queue"} /></h1>
+      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"Student / resident discount applications awaiting verification. Auto-verified school-email signups (.edu, .ac.*, etc.) skip this queue."} /></p>
 
-      {loading && <div className="text-gray-500 text-center py-12">Loading…</div>}
+      {loading && <div className="text-gray-500 text-center py-12"><LocalizedText text={"Loading…"} /></div>}
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 text-red-800 text-sm p-3 mb-4">
-          {error}
+          <LocalizedText text={error} />
         </div>
       )}
 
       {!loading && !error && rows && rows.length === 0 && (
-        <div className="rounded-md border border-dashed border-gray-300 text-gray-500 text-sm text-center py-10">
-          No pending discount applications. 🎉
-        </div>
+        <div className="rounded-md border border-dashed border-gray-300 text-gray-500 text-sm text-center py-10"><LocalizedText text={"No pending discount applications. 🎉"} /></div>
       )}
 
       {!loading && !error && rows && rows.length > 0 && (
@@ -159,28 +158,25 @@ function PendingCard({
             {row.full_name || row.username}{" "}
             <span className="text-xs font-medium text-gray-500">({row.email})</span>
           </h3>
-          <p className="text-xs text-gray-500">
-            Type: <span className="font-semibold capitalize">{row.discount_type}</span> · Submitted {fmtDate(row.created_at)}
+          <p className="text-xs text-gray-500"><LocalizedText text={"Type:"} />{" "}<span className="font-semibold capitalize">{row.discount_type}</span>{" "}<LocalizedText text={"· Submitted"} />{" "}{fmtDate(row.created_at)}
           </p>
         </div>
-        <span className="inline-block rounded bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
-          Pending review
-        </span>
+        <span className="inline-block rounded bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800"><LocalizedText text={"Pending review"} /></span>
       </div>
 
       {app && (
         <dl className="grid grid-cols-[170px_1fr] gap-x-3 gap-y-1 text-xs text-gray-700 mb-4">
-          <dt className="text-gray-500">Institution</dt>
+          <dt className="text-gray-500"><LocalizedText text={"Institution"} /></dt>
           <dd>{app.institution_name ?? "—"}</dd>
-          <dt className="text-gray-500">Program</dt>
+          <dt className="text-gray-500"><LocalizedText text={"Program"} /></dt>
           <dd>{app.program_name ?? "—"}</dd>
-          <dt className="text-gray-500">Supervisor</dt>
+          <dt className="text-gray-500"><LocalizedText text={"Supervisor"} /></dt>
           <dd>{app.supervisor_name ?? "—"} <span className="text-gray-500">· {app.supervisor_email ?? "—"}</span></dd>
-          <dt className="text-gray-500">Expected completion</dt>
+          <dt className="text-gray-500"><LocalizedText text={"Expected completion"} /></dt>
           <dd>{app.expected_completion ?? "—"}</dd>
           {app.notes && (
             <>
-              <dt className="text-gray-500">Notes</dt>
+              <dt className="text-gray-500"><LocalizedText text="Notes" /></dt>
               <dd className="whitespace-pre-wrap">{app.notes}</dd>
             </>
           )}
@@ -195,35 +191,27 @@ function PendingCard({
             onClick={() => setMode("approve")}
             className="rounded px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
             style={{ background: "#047857" }}
-          >
-            Approve
-          </button>
+          ><LocalizedText text={"Approve"} /></button>
           <button
             type="button"
             disabled={deciding}
             onClick={() => setMode("deny")}
             className="rounded border px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
             style={{ borderColor: "#dc2626", color: "#dc2626" }}
-          >
-            ✗ Deny
-          </button>
+          ><LocalizedText text={"✗ Deny"} /></button>
           {app?.supervisor_email && (
             <a
               href={`mailto:${app.supervisor_email}?subject=Verifying%20${row.full_name || row.username}%27s%20training%20status%20%E2%80%94%20Vancomyzer%20discount&body=Hi%20${encodeURIComponent(app.supervisor_name ?? "")},%0A%0AWe%27re%20reviewing%20a%20discount%20application%20from%20${encodeURIComponent(row.full_name || row.username)}%20(${encodeURIComponent(row.email)})%20who%20listed%20you%20as%20their%20supervisor.%20Could%20you%20confirm%20they%27re%20currently%20in%20training%20at%20${encodeURIComponent(app.institution_name ?? "")}%3F%0A%0AThanks,%0AVancomyzer`}
               className="text-xs text-blue-700 hover:underline ml-2"
-            >
-              Email supervisor
-            </a>
+            ><LocalizedText text={"Email supervisor"} /></a>
           )}
         </div>
       )}
 
       {mode === "approve" && (
         <div className="rounded border border-emerald-200 bg-emerald-50 p-3">
-          <div className="text-xs font-semibold text-emerald-900 mb-2">Approve discount</div>
-          <label className="block text-xs text-gray-700 mb-1">
-            Expires at (optional, ISO date — defaults to no expiry)
-          </label>
+          <div className="text-xs font-semibold text-emerald-900 mb-2"><LocalizedText text={"Approve discount"} /></div>
+          <label className="block text-xs text-gray-700 mb-1"><LocalizedText text={"Expires at (optional, ISO date — defaults to no expiry)"} /></label>
           <input
             type="date"
             value={expiresAt}
@@ -238,25 +226,23 @@ function PendingCard({
               className="rounded px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
               style={{ background: "#047857" }}
             >
-              {deciding ? "Approving…" : "Confirm approve"}
+              <LocalizedText text={deciding ? "Approving…" : "Confirm approve"} />
             </button>
             <button
               type="button"
               disabled={deciding}
               onClick={() => setMode(null)}
               className="rounded border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700"
-            >
-              Cancel
-            </button>
+            ><LocalizedText text={"Cancel"} /></button>
           </div>
         </div>
       )}
 
       {mode === "deny" && (
         <div className="rounded border border-red-200 bg-red-50 p-3">
-          <div className="text-xs font-semibold text-red-900 mb-2">Deny discount</div>
-          <label className="block text-xs text-gray-700 mb-1">Reason (emailed to applicant)</label>
-          <textarea
+          <div className="text-xs font-semibold text-red-900 mb-2"><LocalizedText text={"Deny discount"} /></div>
+          <label className="block text-xs text-gray-700 mb-1"><LocalizedText text={"Reason (emailed to applicant)"} /></label>
+          <LocalizedTextarea
             value={denyReason}
             onChange={(e) => setDenyReason(e.target.value)}
             rows={2}
@@ -271,22 +257,20 @@ function PendingCard({
               className="rounded px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
               style={{ background: "#dc2626" }}
             >
-              {deciding ? "Denying…" : "Confirm deny"}
+              <LocalizedText text={deciding ? "Denying…" : "Confirm deny"} />
             </button>
             <button
               type="button"
               disabled={deciding}
               onClick={() => setMode(null)}
               className="rounded border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700"
-            >
-              Cancel
-            </button>
+            ><LocalizedText text={"Cancel"} /></button>
           </div>
         </div>
       )}
 
       {msg && (
-        <p className={`mt-2 text-xs ${msg.type === "ok" ? "text-green-700" : "text-red-700"}`}>{msg.text}</p>
+        <p className={`mt-2 text-xs ${msg.type === "ok" ? "text-green-700" : "text-red-700"}`}><LocalizedText text={msg.text} /></p>
       )}
     </div>
   );

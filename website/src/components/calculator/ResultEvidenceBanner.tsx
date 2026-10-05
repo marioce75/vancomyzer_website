@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import type { CalculationDetails } from "@/types/calculator";
 
@@ -45,34 +47,30 @@ export default function ResultEvidenceBanner({
   return (
     <section className={`rounded-lg border p-4 ${tone.wrap}`}>
       <h2 className={`text-lg font-semibold ${tone.title}`}>
-        {details.review_status.banner_title}
+        <LocalizedText text={details.review_status.banner_title} />
       </h2>
       <p className={`mt-2 text-sm ${tone.body}`}>
-        {details.review_status.banner_body}
+        <LocalizedText text={details.review_status.banner_body} />
       </p>
 
       {primaryAction && (
         <div className={`mt-3 rounded-md border p-3 ${tone.actionWrap}`}>
-          <p className={`text-sm font-medium ${tone.actionLabel}`}>Recommended next step</p>
-          <p className={`mt-1 text-sm ${tone.body}`}>{primaryAction}</p>
+          <p className={`text-sm font-medium ${tone.actionLabel}`}><LocalizedText text="Recommended next step" /></p>
+          <p className={`mt-1 text-sm ${tone.body}`}><LocalizedText text={primaryAction} /></p>
         </div>
       )}
 
       {remainingActions.length > 0 && (
         <ul className={`mt-3 list-disc space-y-1 pl-5 text-sm ${tone.body}`}>
           {remainingActions.map((item, index) => (
-            <li key={index}>{item}</li>
+            <li key={index}><LocalizedText text={item} /></li>
           ))}
         </ul>
       )}
 
       <div className="mt-3 flex flex-wrap gap-3 text-sm">
-        <a href="/faq" className={`font-medium underline hover:no-underline ${tone.title}`}>
-          FAQ
-        </a>
-        <a href="/transparent-dosing" className={`font-medium underline hover:no-underline ${tone.title}`}>
-          References
-        </a>
+        <a href="/faq" className={`font-medium underline hover:no-underline ${tone.title}`}><LocalizedText text="FAQ" /></a>
+        <a href="/transparent-dosing" className={`font-medium underline hover:no-underline ${tone.title}`}><LocalizedText text="References" /></a>
       </div>
     </section>
   );

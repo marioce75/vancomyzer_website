@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 /**
  * Teaching Mode inline expandable note.
@@ -42,8 +44,8 @@ export default function TeachingNote({ label = "Why?", children }: TeachingNoteP
         }}
         aria-expanded={open}
       >
-        {open ? "Hide" : "Show"}
-        {label}
+        <LocalizedText text={open ? "Hide" : "Show"} />
+        <LocalizedText text={label} />
       </button>
       {open && (
         <div

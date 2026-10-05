@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/localization/LanguageProvider";
 import type { ReactNode } from "react";
 
 /**
@@ -32,18 +33,18 @@ export function PageHeader({
       <div className={compact ? "py-10 md:py-12" : "py-12 md:pb-14 md:pt-[64px]"}>
         {kicker && (
           <span className="mb-[14px] block text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: INK3 }}>
-            {kicker}
+            <LocalizedText text={kicker} />
           </span>
         )}
         <h1
           className={`vz-serif max-w-[24ch] leading-[1.08] ${compact ? "text-[clamp(28px,3.4vw,40px)]" : "text-[clamp(32px,4vw,48px)]"}`}
           style={{ color: INK }}
         >
-          {title}
+          <LocalizedText text={title} />
         </h1>
         {lede && (
           <p className="mt-[18px] max-w-[62ch] text-lg leading-[1.5]" style={{ color: INK2 }}>
-            {lede}
+            <LocalizedText text={lede} />
           </p>
         )}
         {children}
@@ -73,11 +74,11 @@ export function Record({
       <div className={`vz-record ${tight ? "py-8 md:py-10" : "py-10 md:py-14"}`}>
         <div>
           <span className="block text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: INK3 }}>
-            {label}
+            <LocalizedText text={label} />
           </span>
           {note && (
             <span className="mt-2 block text-[13px] leading-[1.45]" style={{ color: INK3 }}>
-              {note}
+              <LocalizedText text={note} />
             </span>
           )}
         </div>

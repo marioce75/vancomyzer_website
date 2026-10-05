@@ -1,3 +1,7 @@
+
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedInput, LocalizedDiv } from "@/localization/LocalizedElements";
 import React, { useState } from "react";
 import { CalculateRequestRegimen } from "@/types/calculator";
 import { parseClinicalNumber } from "@/lib/parseClinicalNumber";
@@ -24,9 +28,9 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 
 const InputGroup = ({ label, children, error }: { label: string, children: React.ReactNode, error?: string }) => (
   <div>
-    <Label>{label}</Label>
+    <Label><LocalizedText text={label} /></Label>
     {children}
-    {error && <span className="block mt-1 text-xs text-red-600">{error}</span>}
+    {error && <span className="block mt-1 text-xs text-red-600"><LocalizedText text={error} /></span>}
   </div>
 );
 
@@ -95,7 +99,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                 </button>
               ))}
             </div>
-            <p className="text-[10px] text-slate-400 mt-1">ASHP/IDSA target range 400–600 mg·h/L. Highlighted option will be closest match.</p>
+            <p className="text-[10px] text-slate-400 mt-1"><LocalizedText text="ASHP/IDSA target range 400–600 mg·h/L. Highlighted option will be closest match." /></p>
           </InputGroup>
         ) : (
           <InputGroup label="Interval (hours)" error={fieldErrors.interval_hours}>
@@ -104,7 +108,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
               onChange={(e) => update({ interval_hours: parseClinicalNumber(e.target.value) ?? 0 })}
               className={inputClass(Boolean(fieldErrors.interval_hours))}
             >
-              <option value="" disabled>Select...</option>
+              <option value="" disabled><LocalizedText text="Select..." /></option>
               <option value={6}>6</option>
               <option value={8}>8</option>
               <option value={12}>12</option>
@@ -130,13 +134,11 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
             className={(invalidText) => inputClass(Boolean(fieldErrors.infusion_duration_hours || parseErrors.infusion || invalidText))}
           />
         </InputGroup>
-        {infusionWarning && <p className="text-xs text-amber-700 mt-1">⚠ {infusionWarning}</p>}
+        {infusionWarning && <p className="text-xs text-amber-700 mt-1">⚠ <LocalizedText text={infusionWarning} /></p>}
 
         {/* Full-width doses given selector */}
         <div className="col-span-2">
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
-            Doses given before levels drawn
-          </label>
+          <label className="block text-xs font-semibold text-slate-700 mb-1"><LocalizedText text="Doses given before levels drawn" /></label>
           <div className="flex flex-wrap gap-1.5">
             {[1, 2, 3, 4, 5].map((n) => (
               <button
@@ -160,36 +162,30 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                   ? "border-blue-300 bg-blue-600 text-white shadow-sm"
                   : "border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50"
               }`}
-            >
-              6 or more
-            </button>
+            ><LocalizedText text="6 or more" /></button>
           </div>
           {isPulseDose && (
             <div className="mt-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5">
               <p className="text-xs text-blue-800">
-                <strong>Pulse / single-dose Bayesian:</strong> One dose given. The calculator will use Bayesian estimation to estimate your patient&apos;s individual CL and V from this level and project a maintenance regimen to hit your AUC₂₄ target. No steady-state assumed.
-              </p>
+                <strong><LocalizedText text="Pulse / single-dose Bayesian:" /></strong>{" "}<LocalizedText text="One dose given. The calculator will use Bayesian estimation to estimate your patient's individual CL and V from this level and project a maintenance regimen to hit your AUC₂₄ target. No steady-state assumed." /></p>
             </div>
           )}
           {(value.doses_given ?? 0) > 1 && (value.doses_given ?? 0) < 5 && (
             <div className="mt-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5">
               <p className="text-xs text-amber-800">
-                <strong>Actual history:</strong> with {value.doses_given} doses the level is fitted by superposing exactly {value.doses_given} doses; exposure at dose {value.doses_given} is reported separately from the steady-state projection.
-              </p>
+                <strong><LocalizedText text="Actual history:" /></strong>{" "}<LocalizedText text="with" />{" "}{value.doses_given}{" "}<LocalizedText text="doses the level is fitted by superposing exactly" />{" "}{value.doses_given}{" "}<LocalizedText text="doses; exposure at dose" />{" "}{value.doses_given}{" "}<LocalizedText text="is reported separately from the steady-state projection." /></p>
             </div>
           )}
           {(value.doses_given ?? 0) >= 6 && (
-            <label className="mt-2 block text-xs text-slate-600">
-              Exact number of doses given
-              <input aria-label="Exact number of doses given" type="number" min={6} max={1000} step={1}
+            <label className="mt-2 block text-xs text-slate-600"><LocalizedText text="Exact number of doses given" /><LocalizedInput aria-label="Exact number of doses given" type="number" min={6} max={1000} step={1}
                 className={inputClass(Boolean(fieldErrors.doses_given))} value={value.doses_given ?? 6}
                 onChange={(e) => update({ doses_given: Number(e.target.value), steady_state_confirmed: false })} />
             </label>
           )}
           {(value.doses_given ?? 0) > 1 && (
             <fieldset className="mt-2 rounded-md border border-slate-200 px-2.5 py-2">
-              <legend className="px-1 text-xs font-semibold text-slate-700">Dose 1</legend>
-              <div className="flex gap-1.5" role="radiogroup" aria-label="Was dose 1 a loading dose?">
+              <legend className="px-1 text-xs font-semibold text-slate-700"><LocalizedText text="Dose 1" /></legend>
+              <LocalizedDiv className="flex gap-1.5" role="radiogroup" aria-label="Was dose 1 a loading dose?">
                 {[
                   { on: false, label: "Same as maintenance" },
                   { on: true, label: "Loading dose" },
@@ -210,10 +206,10 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                         : "border-slate-200 bg-white text-slate-700 hover:border-blue-200 hover:bg-blue-50"
                     }`}
                   >
-                    {opt.label}
+                    <LocalizedText text={opt.label} />
                   </button>
                 ))}
-              </div>
+              </LocalizedDiv>
               {hasLoading && (
                 <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
                   <InputGroup label="Loading dose (mg)" error={fe("loading_dose_mg")}>
@@ -246,9 +242,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                       />
                     </InputGroup>
                   </div>
-                  <p className="col-span-2 text-xs text-slate-500">
-                    The dose count includes the loading dose. The level is fitted to the actual doses (loading dose, then {value.dose_mg || "the"} mg maintenance doses), so a loading dose is not mistaken for slow clearance. Steady-state confirmation is not used when a loading dose is entered.
-                  </p>
+                  <p className="col-span-2 text-xs text-slate-500"><LocalizedText text="The dose count includes the loading dose. The level is fitted to the actual doses (loading dose, then" />{" "}{value.dose_mg || <LocalizedText text="the" />}{" "}<LocalizedText text="mg maintenance doses), so a loading dose is not mistaken for slow clearance. Steady-state confirmation is not used when a loading dose is entered." /></p>
                 </div>
               )}
             </fieldset>
@@ -257,11 +251,11 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
             <label className="mt-2 flex items-start gap-2 text-xs text-slate-600">
               <input type="checkbox" checked={value.steady_state_confirmed === true}
                 onChange={(e) => update({ steady_state_confirmed: e.target.checked })} />
-              <span>I have verified consistent dosing and sufficient time to reach steady state. Dose count alone does not establish steady state.</span>
+              <span><LocalizedText text="I have verified consistent dosing and sufficient time to reach steady state. Dose count alone does not establish steady state." /></span>
             </label>
           )}
-          <p className="mt-1 text-xs text-slate-500">Without confirmation, the exact dose count is used. Levels must follow the last dose given. A loading dose as dose 1 is supported; changed, held or missed maintenance doses are not.</p>
-          {fieldErrors.doses_given && <p className="text-xs text-red-600">{fieldErrors.doses_given}</p>}
+          <p className="mt-1 text-xs text-slate-500"><LocalizedText text="Without confirmation, the exact dose count is used. Levels must follow the last dose given. A loading dose as dose 1 is supported; changed, held or missed maintenance doses are not." /></p>
+          {fieldErrors.doses_given && <p className="text-xs text-red-600"><LocalizedText text={fieldErrors.doses_given} /></p>}
 
         </div>
       </div>

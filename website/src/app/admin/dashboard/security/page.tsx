@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedImg, LocalizedInput } from "@/localization/LocalizedElements";
+
 
 import { useState, useEffect } from "react";
 
@@ -109,19 +113,19 @@ export default function SecurityPage() {
     URL.revokeObjectURL(url);
   };
 
-  if (loading) return <div className="text-gray-500 text-center py-20">Loading security data...</div>;
+  if (loading) return <div className="text-gray-500 text-center py-20"><LocalizedText text={"Loading security data..."} /></div>;
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}>Security</h1>
-      <p className="text-sm text-gray-500 mb-6">Audit log, MFA management, and account security</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}><LocalizedText text={"Security"} /></h1>
+      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"Audit log, MFA management, and account security"} /></p>
 
       {/* MFA Management */}
       <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3">MFA Status</h2>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3"><LocalizedText text={"MFA Status"} /></h2>
         <div className="flex flex-wrap gap-3 mb-4">
           {mfaUsers.length === 0 ? (
-            <p className="text-xs text-gray-400">No admin users found.</p>
+            <p className="text-xs text-gray-400"><LocalizedText text={"No admin users found."} /></p>
           ) : (
             mfaUsers.map((u) => (
               <div key={u.id} className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-md text-xs">
@@ -130,9 +134,9 @@ export default function SecurityPage() {
                   u.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-700"
                 }`}>{u.role}</span>
                 {u.mfa_enabled ? (
-                  <span className="bg-green-100 text-green-800 px-1.5 py-0.5 rounded text-[10px] font-semibold">MFA ON</span>
+                  <span className="bg-green-100 text-green-800 px-1.5 py-0.5 rounded text-[10px] font-semibold"><LocalizedText text={"MFA ON"} /></span>
                 ) : (
-                  <span className="bg-red-100 text-red-800 px-1.5 py-0.5 rounded text-[10px] font-semibold">MFA OFF</span>
+                  <span className="bg-red-100 text-red-800 px-1.5 py-0.5 rounded text-[10px] font-semibold"><LocalizedText text={"MFA OFF"} /></span>
                 )}
               </div>
             ))
@@ -143,20 +147,18 @@ export default function SecurityPage() {
           onClick={handleMfaSetup}
           className="px-4 py-2 text-sm font-medium text-white rounded-md transition-colors hover:opacity-90"
           style={{ background: "#1e4d8c" }}
-        >
-          Setup MFA for My Account
-        </button>
+        ><LocalizedText text={"Setup MFA for My Account"} /></button>
 
         {mfaMessage && (
-          <p className="mt-2 text-xs text-amber-700">{mfaMessage}</p>
+          <p className="mt-2 text-xs text-amber-700"><LocalizedText text={mfaMessage} /></p>
         )}
 
         {showMfaSetup && qrCode && (
           <div className="mt-4 p-4 border border-gray-200 rounded-md bg-gray-50 max-w-sm">
-            <p className="text-xs text-gray-600 mb-2">Scan this QR code with your authenticator app:</p>
-            <img src={qrCode} alt="MFA QR Code" className="mb-3 border border-gray-300 rounded" />
+            <p className="text-xs text-gray-600 mb-2"><LocalizedText text={"Scan this QR code with your authenticator app:"} /></p>
+            <LocalizedImg src={qrCode} alt="MFA QR Code" className="mb-3 border border-gray-300 rounded" />
             <div className="flex gap-2">
-              <input
+              <LocalizedInput
                 type="text"
                 value={mfaToken}
                 onChange={(e) => setMfaToken(e.target.value)}
@@ -167,9 +169,7 @@ export default function SecurityPage() {
               <button
                 onClick={handleMfaVerify}
                 className="px-3 py-1.5 text-sm font-medium text-white bg-green-700 rounded hover:bg-green-800"
-              >
-                Verify
-              </button>
+              ><LocalizedText text={"Verify"} /></button>
             </div>
           </div>
         )}
@@ -178,7 +178,7 @@ export default function SecurityPage() {
       {/* Audit Log */}
       <div className="bg-white border border-gray-200 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500">Security Audit Log</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500"><LocalizedText text={"Security Audit Log"} /></h2>
           <div className="flex gap-2">
             <select
               value={filterAction}
@@ -186,15 +186,13 @@ export default function SecurityPage() {
               className="px-2 py-1 text-xs border border-gray-300 rounded"
             >
               {actionTypes.map((a) => (
-                <option key={a} value={a}>{a === "all" ? "All Actions" : a}</option>
+                <option key={a} value={a}><LocalizedText text={a === "all" ? "All Actions" : a} /></option>
               ))}
             </select>
             <button
               onClick={downloadCsv}
               className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200"
-            >
-              Download CSV
-            </button>
+            ><LocalizedText text={"Download CSV"} /></button>
           </div>
         </div>
 
@@ -202,17 +200,17 @@ export default function SecurityPage() {
           <table className="w-full text-xs">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>Timestamp</th>
-                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>Action</th>
-                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>Username</th>
+                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}><LocalizedText text={"Timestamp"} /></th>
+                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}><LocalizedText text={"Action"} /></th>
+                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}><LocalizedText text={"Username"} /></th>
                 <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>IP</th>
-                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}>Severity</th>
+                <th className="px-3 py-2 text-left font-semibold" style={{ color: "#1e4d8c" }}><LocalizedText text={"Severity"} /></th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-3 py-6 text-center text-gray-400">No events found.</td>
+                  <td colSpan={5} className="px-3 py-6 text-center text-gray-400"><LocalizedText text={"No events found."} /></td>
                 </tr>
               ) : (
                 filtered.slice(0, 100).map((e) => (
@@ -233,7 +231,7 @@ export default function SecurityPage() {
           </table>
         </div>
         {filtered.length > 100 && (
-          <p className="text-xs text-gray-400 mt-2">Showing first 100 of {filtered.length} events.</p>
+          <p className="text-xs text-gray-400 mt-2"><LocalizedText text={"Showing first 100 of"} />{" "}{filtered.length}{" "}<LocalizedText text={"events."} /></p>
         )}
       </div>
     </div>

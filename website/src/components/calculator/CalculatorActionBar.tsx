@@ -1,3 +1,7 @@
+
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedLabel, LocalizedInput, LocalizedButton } from "@/localization/LocalizedElements";
 import React from "react";
 
 interface CalculatorActionBarProps {
@@ -28,15 +32,13 @@ export default function CalculatorActionBar({
     <div className="flex flex-col items-stretch gap-1.5">
       {showCaseId && (
         <div className="flex w-full max-w-md items-center gap-2">
-          <label
+          <LocalizedLabel
             htmlFor="case-id-input"
             className="text-[10px] uppercase tracking-[0.16em] shrink-0"
             style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em" }}
             title="Optional clinician-supplied tracking string. Saved to your calculation history. Do not enter PHI."
-          >
-            case id
-          </label>
-          <input
+          ><LocalizedText text="case id" /></LocalizedLabel>
+          <LocalizedInput
             id="case-id-input"
             type="text"
             value={caseId ?? ""}
@@ -75,9 +77,7 @@ export default function CalculatorActionBar({
             (e.currentTarget as HTMLButtonElement).style.color = "var(--color-secondary)";
             (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
           }}
-        >
-          RESET
-        </button>
+        ><LocalizedText text="RESET" /></button>
 
         {hideCalculate ? (
           /* Phase 1 locked state — waiting for level */
@@ -92,12 +92,10 @@ export default function CalculatorActionBar({
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 shrink-0">
               <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
-            </svg>
-            Enter a measured level
-          </div>
+            </svg><LocalizedText text="Enter a measured level" /></div>
         ) : (
           /* Primary clinical action — Matrix green */
-          <button
+          <LocalizedButton
             type="button"
             onClick={onCalculate}
             disabled={disabled}
@@ -123,8 +121,8 @@ export default function CalculatorActionBar({
                 _
               </span>
             )}
-            {loading ? "CALCULATING_" : "CALCULATE"}
-          </button>
+            <LocalizedText text={loading ? "CALCULATING_" : "CALCULATE"} />
+          </LocalizedButton>
         )}
       </div>
       </div>

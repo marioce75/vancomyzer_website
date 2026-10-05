@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedImg } from "@/localization/LocalizedElements";
+
+import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
+
 
 import { useState } from "react";
 import Link from "next/link";
@@ -17,6 +21,7 @@ const CALCULATOR_BUTTON_CLASS =
   "items-center justify-center rounded-[3px] bg-[#1f5e96] font-semibold text-white whitespace-nowrap transition hover:bg-[#184b78] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#b45309]";
 
 export default function Header() {
+  const { t } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, loading } = useAuth();
   // Offer "Sign in" only once the session check has finished and found
@@ -33,13 +38,12 @@ export default function Header() {
     >
       <nav className="mx-auto flex max-w-[1180px] items-center justify-between gap-3 sm:gap-6 px-4 sm:px-6 py-3.5">
         <div className="flex items-center gap-2 sm:gap-3">
-          <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health" className="shrink-0">
+          <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label={t("Visit dosys.health")} className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-signal.svg" alt="Dōsys™" width={96} height={28} className="shrink-0 sm:w-[124px] sm:h-9" />
+            <LocalizedImg src="/logo-signal.svg" alt="Dōsys™" width={96} height={28} className="shrink-0 sm:w-[124px] sm:h-9" />
           </a>
           <Link href="/" className="whitespace-nowrap" style={{ textDecoration: "none" }}>
-            <span className="font-semibold text-[13px] sm:text-[14px] uppercase" style={{ letterSpacing: "0.14em", color: "var(--color-secondary)" }}>
-              Vancomyzer<sup className="text-[7px] sm:text-[8px] font-semibold ml-0.5 align-super">{"™"}</sup>
+            <span className="font-semibold text-[13px] sm:text-[14px] uppercase" style={{ letterSpacing: "0.14em", color: "var(--color-secondary)" }}><LocalizedText text="Vancomyzer" /><sup className="text-[7px] sm:text-[8px] font-semibold ml-0.5 align-super">{"™"}</sup>
             </span>
           </Link>
           {/* Badge moved from lg to xl so the added Sign in + Calculator
@@ -51,9 +55,7 @@ export default function Header() {
               background: "var(--color-card)",
               color: "var(--color-secondary)",
             }}
-          >
-            clinician review support
-          </span>
+          ><LocalizedText text="clinician review support" /></span>
         </div>
 
         <div className="flex items-center gap-3 lg:gap-6">
@@ -64,7 +66,7 @@ export default function Header() {
             {navItems.map(({ href, label }) => (
               <li key={href}>
                 <Link href={href} className="border-b-2 border-transparent py-1 text-[15px] font-medium transition hover:border-[var(--color-border)] hover:text-[var(--color-primary)]" style={{ color: "var(--color-secondary)" }}>
-                  {label}
+                  <LocalizedText text={label} />
                 </Link>
               </li>
             ))}
@@ -75,16 +77,12 @@ export default function Header() {
               href="/login"
               className="hidden whitespace-nowrap text-sm font-medium transition lg:inline"
               style={{ color: "var(--color-secondary)" }}
-            >
-              Sign in
-            </a>
+            ><LocalizedText text="Sign in" /></a>
           )}
 
           {/* Primary action — in the bar from 640px up; phones get it at the
               top of the menu (the bar has no room beside the brand at 320px). */}
-          <Link href="/calculator" className={`hidden px-4 py-2 text-sm sm:inline-flex ${CALCULATOR_BUTTON_CLASS}`}>
-            Calculator
-          </Link>
+          <Link href="/calculator" className={`hidden px-4 py-2 text-sm sm:inline-flex ${CALCULATOR_BUTTON_CLASS}`}><LocalizedText text="Calculator" /></Link>
 
           {/* Mobile / tablet hamburger */}
           <button
@@ -92,7 +90,7 @@ export default function Header() {
             onClick={() => setMobileOpen(!mobileOpen)}
             className="lg:hidden p-2 -mr-2"
             style={{ color: "var(--color-secondary)" }}
-            aria-label="Toggle menu"
+            aria-label={t("Toggle menu")}
             aria-controls={mobileOpen ? "site-mobile-menu" : undefined}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -113,9 +111,7 @@ export default function Header() {
             href="/calculator"
             onClick={() => setMobileOpen(false)}
             className={`mb-2 flex w-full px-3 py-2.5 text-sm ${CALCULATOR_BUTTON_CLASS}`}
-          >
-            Open Calculator
-          </Link>
+          ><LocalizedText text={"Open Calculator"} /></Link>
           {navItems.map(({ href, label }) => (
             <Link
               key={href}
@@ -124,7 +120,7 @@ export default function Header() {
               className="block py-2.5 px-3 text-sm font-medium rounded transition"
               style={{ color: "var(--color-secondary)" }}
             >
-              {label}
+              <LocalizedText text={label} />
             </Link>
           ))}
           {showSignIn && (
@@ -133,9 +129,7 @@ export default function Header() {
               onClick={() => setMobileOpen(false)}
               className="block py-2.5 px-3 text-sm font-semibold rounded transition"
               style={{ color: "var(--color-primary)", borderTop: "1px solid var(--color-border)" }}
-            >
-              Sign in
-            </a>
+            ><LocalizedText text="Sign in" /></a>
           )}
         </div>
       )}

@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
@@ -128,7 +130,7 @@ export default function MarketIntelligenceFilesPage() {
     return entries.find(e => e.filename === rawFilename)?.path ?? null;
   };
 
-  if (loading) return <div className="p-8 text-gray-500">Loading file index...</div>;
+  if (loading) return <div className="p-8 text-gray-500"><LocalizedText text={"Loading file index..."} /></div>;
 
   // Parse analysis fields safely
   const painPoints = (analysis?.top_pain_points || []) as { text: string; count: number }[];
@@ -139,19 +141,17 @@ export default function MarketIntelligenceFilesPage() {
 
   return (
     <div className="space-y-6">
-      {loadError && <p role="alert" className="text-red-700">{loadError}</p>}
+      {loadError && <p role="alert" className="text-red-700"><LocalizedText text={loadError} /></p>}
       {/* Header + Tab Navigation */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Market Intelligence — Files</h1>
-          <p className="text-sm text-gray-500">Browse, retrieve, and export all historical scrape data</p>
+          <h1 className="text-xl font-bold text-slate-900"><LocalizedText text={"Market Intelligence — Files"} /></h1>
+          <p className="text-sm text-gray-500"><LocalizedText text={"Browse, retrieve, and export all historical scrape data"} /></p>
         </div>
         <button
           onClick={runImport}
           className="px-3 py-1.5 text-xs font-semibold text-gray-700 border border-gray-300 rounded hover:bg-gray-50"
-        >
-          Import Historical Data
-        </button>
+        ><LocalizedText text={"Import Historical Data"} /></button>
       </div>
 
       {/* Tab bar */}
@@ -159,17 +159,13 @@ export default function MarketIntelligenceFilesPage() {
         <Link
           href="/admin/dashboard/market-intelligence"
           className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
-        >
-          Dashboard
-        </Link>
-        <span className="px-4 py-2 text-sm font-medium text-teal-700 border-b-2 border-teal-600">
-          Files
-        </span>
+        ><LocalizedText text="Dashboard" /></Link>
+        <span className="px-4 py-2 text-sm font-medium text-teal-700 border-b-2 border-teal-600"><LocalizedText text={"Files"} /></span>
       </div>
 
       {importResult && (
         <div className={`px-4 py-3 rounded-lg text-sm ${importResult.includes("fail") ? "bg-red-50 text-red-800 border border-red-200" : "bg-green-50 text-green-800 border border-green-200"}`}>
-          {importResult}
+          <LocalizedText text={importResult} />
         </div>
       )}
 
@@ -177,9 +173,9 @@ export default function MarketIntelligenceFilesPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left Panel — Run List */}
         <div className={`${card} lg:col-span-3 max-h-[600px] overflow-y-auto`}>
-          <h2 className={heading}>Scrape Runs</h2>
+          <h2 className={heading}><LocalizedText text={"Scrape Runs"} /></h2>
           {analysisEntries.length === 0 ? (
-            <p className="text-sm text-gray-400">No runs yet.</p>
+            <p className="text-sm text-gray-400"><LocalizedText text={"No runs yet."} /></p>
           ) : (
             <div className="space-y-1">
               {analysisEntries.map(entry => {
@@ -197,7 +193,7 @@ export default function MarketIntelligenceFilesPage() {
                   >
                     <div className="font-semibold">{d.toLocaleDateString()}</div>
                     <div className="text-xs text-gray-500">
-                      {d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} &middot; {entry.post_count} posts &middot; {formatBytes(entry.file_size_bytes)}
+                      {d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} &middot; {entry.post_count}{" "}<LocalizedText text={"posts ·"} />{" "}{formatBytes(entry.file_size_bytes)}
                     </div>
                   </button>
                 );
@@ -208,25 +204,25 @@ export default function MarketIntelligenceFilesPage() {
 
         {/* Center Panel — Analysis Viewer */}
         <div className={`${card} lg:col-span-6 max-h-[600px] overflow-y-auto`}>
-          <h2 className={heading}>Analysis</h2>
+          <h2 className={heading}><LocalizedText text={"Analysis"} /></h2>
           {!selectedEntry ? (
-            <p className="text-sm text-gray-400">Select a run from the left panel to view its analysis.</p>
+            <p className="text-sm text-gray-400"><LocalizedText text={"Select a run from the left panel to view its analysis."} /></p>
           ) : analysisLoading ? (
-            <p className="text-sm text-gray-500">Loading analysis...</p>
+            <p className="text-sm text-gray-500"><LocalizedText text={"Loading analysis..."} /></p>
           ) : !analysis ? (
-            <p className="text-sm text-gray-400">No analysis data available.</p>
+            <p className="text-sm text-gray-400"><LocalizedText text={"No analysis data available."} /></p>
           ) : (
             <div className="space-y-4">
               {/* Run metadata */}
               <div className="p-3 bg-gray-50 rounded text-xs text-gray-600">
-                <div>Run #{analysis.run_id as number} &middot; {analysis.status as string}</div>
-                <div>{analysis.total_posts_scraped as number} total posts &middot; {analysis.new_posts_this_run as number} new &middot; {((analysis.run_duration_seconds as number) || 0).toFixed(1)}s</div>
+                <div><LocalizedText text={"Run #"} />{analysis.run_id as number} &middot; <LocalizedText text={analysis.status as string} /></div>
+                <div>{analysis.total_posts_scraped as number}{" "}<LocalizedText text={"total posts ·"} />{" "}{analysis.new_posts_this_run as number}{" "}<LocalizedText text={"new ·"} />{" "}{((analysis.run_duration_seconds as number) || 0).toFixed(1)}s</div>
               </div>
 
               {/* Pain Points */}
               {painPoints.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Pain Points</p>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2"><LocalizedText text={"Pain Points"} /></p>
                   <div className="space-y-1.5">
                     {painPoints.map((p, i) => (
                       <div key={i} className="flex items-center justify-between text-sm">
@@ -246,7 +242,7 @@ export default function MarketIntelligenceFilesPage() {
               {/* Drug Mentions */}
               {Object.keys(drugMentions).length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Drug Mentions</p>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2"><LocalizedText text={"Drug Mentions"} /></p>
                   <div className="space-y-1">
                     {Object.entries(drugMentions).filter(([, c]) => c > 0).map(([drug, count]) => (
                       <div key={drug} className="flex items-center justify-between text-sm">
@@ -261,13 +257,13 @@ export default function MarketIntelligenceFilesPage() {
               {/* Competitor Intelligence */}
               {Object.keys(competitorMentions).length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Competitors</p>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2"><LocalizedText text={"Competitors"} /></p>
                   <div className="space-y-2">
                     {Object.entries(competitorMentions).filter(([, d]) => d.count > 0).map(([name, d]) => (
                       <div key={name} className="border-b border-gray-100 pb-1">
                         <div className="flex items-center justify-between">
                           <span className="font-semibold text-sm text-gray-900">{name}</span>
-                          <span className="text-xs text-gray-500">{d.count} mentions</span>
+                          <span className="text-xs text-gray-500">{d.count}{" "}<LocalizedText text={"mentions"} /></span>
                         </div>
                         <div className="flex gap-2 text-xs">
                           <span className="text-green-600">+{d.positive}</span>
@@ -283,7 +279,7 @@ export default function MarketIntelligenceFilesPage() {
               {/* Country Mentions */}
               {Object.keys(geoSignals).length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Country Mentions</p>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2"><LocalizedText text={"Country Mentions"} /></p>
                   <div className="space-y-1">
                     {Object.entries(geoSignals).sort((a, b) => b[1] - a[1]).map(([region, count]) => (
                       <div key={region} className="flex items-center justify-between text-sm">
@@ -298,7 +294,7 @@ export default function MarketIntelligenceFilesPage() {
               {/* Top Posts */}
               {topPosts.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Source Records</p>
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2"><LocalizedText text={"Source Records"} /></p>
                   <div className="space-y-1.5">
                     {topPosts.map((p, i) => (
                       <div key={i} className="flex items-center justify-between text-sm border-b border-gray-100 pb-1">
@@ -317,9 +313,9 @@ export default function MarketIntelligenceFilesPage() {
 
         {/* Right Panel — Downloads */}
         <div className={`${card} lg:col-span-3`}>
-          <h2 className={heading}>Downloads</h2>
+          <h2 className={heading}><LocalizedText text={"Downloads"} /></h2>
           {!selectedEntry ? (
-            <p className="text-sm text-gray-400">Select a run to see download options.</p>
+            <p className="text-sm text-gray-400"><LocalizedText text={"Select a run to see download options."} /></p>
           ) : (
             <div className="space-y-3">
               <div className="space-y-2">
@@ -330,15 +326,11 @@ export default function MarketIntelligenceFilesPage() {
                     else alert("Raw posts file not found for this run.");
                   }}
                   className="w-full px-3 py-2 text-xs font-semibold text-left border border-gray-300 rounded hover:bg-gray-50"
-                >
-                  Download Raw Posts (JSON)
-                </button>
+                ><LocalizedText text={"Download Raw Posts (JSON)"} /></button>
                 <button
                   onClick={() => downloadFile(selectedEntry.path)}
                   className="w-full px-3 py-2 text-xs font-semibold text-left border border-gray-300 rounded hover:bg-gray-50"
-                >
-                  Download Analysis (JSON)
-                </button>
+                ><LocalizedText text={"Download Analysis (JSON)"} /></button>
                 <button
                   onClick={() => {
                     const rawPath = findRawPath(selectedEntry);
@@ -346,20 +338,16 @@ export default function MarketIntelligenceFilesPage() {
                     else alert("Raw posts file not found for this run.");
                   }}
                   className="w-full px-3 py-2 text-xs font-semibold text-left border border-gray-300 rounded hover:bg-gray-50"
-                >
-                  Download Posts (CSV)
-                </button>
+                ><LocalizedText text={"Download Posts (CSV)"} /></button>
                 <button
                   onClick={() => downloadCsv("painpoints_csv", selectedEntry.path)}
                   className="w-full px-3 py-2 text-xs font-semibold text-left border border-gray-300 rounded hover:bg-gray-50"
-                >
-                  Download Pain Points (CSV)
-                </button>
+                ><LocalizedText text={"Download Pain Points (CSV)"} /></button>
               </div>
 
               {/* File path info */}
               <div className="mt-4 p-3 bg-gray-50 rounded">
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">File Path</p>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1"><LocalizedText text={"File Path"} /></p>
                 <p className="text-xs text-gray-600 font-mono break-all">{miDir}/{selectedEntry.path}</p>
               </div>
             </div>
@@ -369,13 +357,11 @@ export default function MarketIntelligenceFilesPage() {
 
       {/* Date Range Report */}
       <div className={card}>
-        <h2 className={heading}>Custom Date Range Export</h2>
-        <p className="text-xs text-gray-500 mb-3">
-          Generate an aggregated analysis across all runs within a date range. Use this for quarterly business reviews or custom reporting periods.
-        </p>
+        <h2 className={heading}><LocalizedText text={"Custom Date Range Export"} /></h2>
+        <p className="text-xs text-gray-500 mb-3"><LocalizedText text={"Generate an aggregated analysis across all runs within a date range. Use this for quarterly business reviews or custom reporting periods."} /></p>
         <div className="flex flex-wrap items-end gap-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Start Date</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1"><LocalizedText text={"Start Date"} /></label>
             <input
               type="date"
               value={rangeStart}
@@ -384,7 +370,7 @@ export default function MarketIntelligenceFilesPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">End Date</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1"><LocalizedText text={"End Date"} /></label>
             <input
               type="date"
               value={rangeEnd}
@@ -397,7 +383,7 @@ export default function MarketIntelligenceFilesPage() {
             disabled={generatingReport}
             className="px-4 py-1.5 text-sm font-semibold text-white bg-teal-600 rounded hover:bg-teal-700 disabled:opacity-50"
           >
-            {generatingReport ? "Generating..." : "Generate Range Report"}
+            <LocalizedText text={generatingReport ? "Generating..." : "Generate Range Report"} />
           </button>
         </div>
       </div>

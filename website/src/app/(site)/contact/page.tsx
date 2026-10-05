@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedInput, LocalizedTextarea } from "@/localization/LocalizedElements";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState } from "react";
 import Link from "next/link";
@@ -98,7 +102,7 @@ export default function ContactPage() {
           >
             <span style={{ color: "#1f5e96" }}>{ch.icon}</span>
             <div>
-              <h3 className="text-[15px] font-semibold" style={{ color: INK }}>{ch.title}</h3>
+              <h3 className="text-[15px] font-semibold" style={{ color: INK }}><LocalizedText text={ch.title} /></h3>
               {ch.email ? (
                 <a
                   href={`mailto:${ch.email}`}
@@ -107,10 +111,10 @@ export default function ContactPage() {
                   {ch.email}
                 </a>
               ) : ch.subtitle ? (
-                <p className="text-sm font-medium text-[#1f5e96]">{ch.subtitle}</p>
+                <p className="text-sm font-medium text-[#1f5e96]"><LocalizedText text={ch.subtitle} /></p>
               ) : null}
             </div>
-            <p className="text-sm leading-relaxed" style={{ color: INK2 }}>{ch.description}</p>
+            <p className="text-sm leading-relaxed" style={{ color: INK2 }}><LocalizedText text={ch.description} /></p>
           </div>
         ))}
       </div>
@@ -121,27 +125,23 @@ export default function ContactPage() {
       <div className="border bg-white p-6 sm:p-8" style={{ borderColor: RULE }}>
         {success ? (
           <div className="text-center py-8">
-            <h2 className="vz-serif text-[22px]" style={{ color: INK }}>Inquiry sent</h2>
-            <p className="mt-2 text-sm" style={{ color: INK2 }}>
-              Thank you. We will reply by email.
-            </p>
+            <h2 className="vz-serif text-[22px]" style={{ color: INK }}><LocalizedText text="Inquiry sent" /></h2>
+            <p className="mt-2 text-sm" style={{ color: INK2 }}><LocalizedText text="Thank you. We will reply by email." /></p>
           </div>
         ) : (
           <>
 
             {error && (
               <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-                {error}
+                <LocalizedText text={error} />
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="contact-name" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}>
-                    Name
-                  </label>
-                  <input
+                  <label htmlFor="contact-name" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}><LocalizedText text="Name" /></label>
+                  <LocalizedInput
                     id="contact-name"
                     type="text"
                     value={name}
@@ -153,10 +153,8 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="contact-email" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}>
-                    Email
-                  </label>
-                  <input
+                  <label htmlFor="contact-email" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}><LocalizedText text="Email" /></label>
+                  <LocalizedInput
                     id="contact-email"
                     type="email"
                     value={email}
@@ -170,9 +168,7 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label htmlFor="contact-topic" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}>
-                  Topic
-                </label>
+                <label htmlFor="contact-topic" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}><LocalizedText text="Topic" /></label>
                 <select
                   id="contact-topic"
                   value={topic}
@@ -181,16 +177,14 @@ export default function ContactPage() {
                     className="w-full border border-[#cbd6e0] px-3 py-2.5 text-sm text-[#14232f] focus:border-[#1f5e96] focus:outline-none focus:ring-1 focus:ring-[#1f5e96] bg-white"
                 >
                   {topics.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
+                    <option key={t.value} value={t.value}><LocalizedText text={t.label} /></option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label htmlFor="contact-message" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}>
-                  Message
-                </label>
-                <textarea
+                <label htmlFor="contact-message" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}><LocalizedText text="Message" /></label>
+                <LocalizedTextarea
                   id="contact-message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -203,18 +197,15 @@ export default function ContactPage() {
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4" style={{ borderColor: "#e6eef5" }}>
-                <p className="text-xs" style={{ color: INK3 }}>
-                  By submitting you agree to our{" "}
-                  <Link href="/privacy" className="underline" style={{ color: "#1f5e96" }}>
-                    privacy policy
-                  </Link>.
+                <p className="text-xs" style={{ color: INK3 }}><LocalizedText text="By submitting you agree to our" />{" "}
+                  <Link href="/privacy" className="underline" style={{ color: "#1f5e96" }}><LocalizedText text="privacy policy" /></Link>.
                 </p>
                 <button
                   type="submit"
                   disabled={loading}
                   className="vz-mbtn vz-mbtn--primary disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {loading ? "Sending..." : "Submit inquiry"}
+                  <LocalizedText text={loading ? "Sending..." : "Submit inquiry"} />
                 </button>
               </div>
             </form>

@@ -1,3 +1,6 @@
+import { LocalizedSvg } from "@/localization/LocalizedElements";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
 /**
  * Decorative concentration–time illustration for the landing hero.
  *
@@ -49,23 +52,17 @@ export default function AucCurveIllustration() {
         }}
       >
         <div className="mb-3 flex items-center justify-between gap-3">
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "#1f5e96" }}>
-            AUC-guided dosing
-          </span>
-          <span className="text-[10px] uppercase tracking-[0.14em]" style={{ color: "#64748b" }}>
-            Illustration
-          </span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "#1f5e96" }}><LocalizedText text={"AUC-guided dosing"} /></span>
+          <span className="text-[10px] uppercase tracking-[0.14em]" style={{ color: "#64748b" }}><LocalizedText text={"Illustration"} /></span>
         </div>
 
-        <svg
+        <LocalizedSvg
           viewBox="0 0 480 250"
           role="img"
           aria-labelledby="vz-auc-illustration-title"
           className="block h-auto w-full"
         >
-          <title id="vz-auc-illustration-title">
-            Illustration of vancomycin concentration over time with repeated doses, the area under the curve over one 24-hour window shaded, and two measured levels marked
-          </title>
+          <title id="vz-auc-illustration-title"><LocalizedText text="Illustration of vancomycin concentration over time with repeated doses, the area under the curve over one 24-hour window shaded, and two measured levels marked" /></title>
 
           {[72, 122, 172].map((y) => (
             <line key={y} x1={44} x2={464} y1={y} y2={y} stroke="#1e293b" strokeWidth={1} />
@@ -97,7 +94,7 @@ export default function AucCurveIllustration() {
             <g key={l.label}>
               <circle cx={l.x} cy={l.y} r={5.5} fill="#0f172a" stroke="#fbbf24" strokeWidth={2.5} />
               <text x={l.lx} y={l.ly} fontSize={11} fontWeight={600} fill="#fbbf24" textAnchor={l.anchor}>
-                {l.label}
+                <LocalizedText text={l.label} />
               </text>
             </g>
           ))}
@@ -105,20 +102,14 @@ export default function AucCurveIllustration() {
           <text x={305} y={202} fontSize={13} fontWeight={700} fill="#5eead4" textAnchor="middle">
             AUC₂₄
           </text>
-          <text x={14} y={114} fontSize={11} fill="#94a3b8" textAnchor="middle" transform="rotate(-90 14 114)">
-            Concentration
-          </text>
-          <text x={44} y={242} fontSize={11} fill="#94a3b8">
-            Time · ▲ dose
-          </text>
-          <text x={359} y={242} fontSize={11} fill="#94a3b8" textAnchor="middle">
-            24-hour window
-          </text>
-        </svg>
+          <text x={14} y={114} fontSize={11} fill="#94a3b8" textAnchor="middle" transform="rotate(-90 14 114)"><LocalizedText text={"Concentration"} /></text>
+          <text x={44} y={242} fontSize={11} fill="#94a3b8"><LocalizedText text={"Time · ▲ dose"} /></text>
+          <text x={359} y={242} fontSize={11} fill="#94a3b8" textAnchor="middle"><LocalizedText text={"24-hour window"} /></text>
+        </LocalizedSvg>
 
         <div className="mt-3 space-y-1 text-xs leading-relaxed" style={{ color: "#94a3b8" }}>
-          <span className="block">Shaded area: AUC₂₄, the area under the concentration–time curve over 24 hours.</span>
-          <span className="block">Amber points: measured levels used to individualize the estimate.</span>
+          <span className="block"><LocalizedText text={"Shaded area: AUC₂₄, the area under the concentration–time curve over 24 hours."} /></span>
+          <span className="block"><LocalizedText text={"Amber points: measured levels used to individualize the estimate."} /></span>
         </div>
       </div>
     </figure>

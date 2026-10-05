@@ -1,3 +1,6 @@
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedDiv } from "@/localization/LocalizedElements";
 /**
  * Canonical legal-document callout.
  *
@@ -14,7 +17,7 @@ interface CanonicalDocCalloutProps {
 
 export default function CanonicalDocCallout({ docName, href }: CanonicalDocCalloutProps) {
   return (
-    <div
+    <LocalizedDiv
       role="region"
       aria-label="Canonical document notice"
       className="mt-6 mb-8 max-w-[70ch] border-l-[3px] bg-white px-4 py-3"
@@ -25,7 +28,7 @@ export default function CanonicalDocCallout({ docName, href }: CanonicalDocCallo
       }}
     >
       <p className="text-sm leading-relaxed m-0">
-        <strong>The authoritative {docName} for Vancomyzer&trade; is maintained at{" "}
+        <strong><LocalizedText text={"The authoritative"} />{" "}<LocalizedText text={docName} />{" "}<LocalizedText text={"for Vancomyzer™ is maintained at"} />{" "}
           <a
             href={href}
             target="_blank"
@@ -34,9 +37,7 @@ export default function CanonicalDocCallout({ docName, href }: CanonicalDocCallo
           >
             {href.replace(/^https?:\/\//, "")}
           </a>.
-        </strong>{" "}
-        The summary below is provided for reference; the linked document governs in case of any conflict.
-      </p>
-    </div>
+        </strong>{" "}<LocalizedText text={"The summary below is provided for reference; the linked document governs in case of any conflict."} /></p>
+    </LocalizedDiv>
   );
 }

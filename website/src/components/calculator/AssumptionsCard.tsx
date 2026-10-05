@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import type { CalculationDetails } from "@/types/calculator";
 
@@ -43,32 +45,30 @@ export default function AssumptionsCard({
 
   return (
     <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-950">Assumptions</h2>
-      {note && <div className={`mt-3 rounded-xl border p-3 text-sm ${note.className}`}>{note.text}</div>}
+      <h2 className="text-lg font-semibold text-slate-950"><LocalizedText text="Assumptions" /></h2>
+      {note && <div className={`mt-3 rounded-xl border p-3 text-sm ${note.className}`}><LocalizedText text={note.text} /></div>}
       <div className="mt-4">
         {list.length > 0 ? (
           <>
             {first && (
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Most important assumption</p>
-                <p className="mt-2 text-sm text-slate-700">{first}</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500"><LocalizedText text="Most important assumption" /></p>
+                <p className="mt-2 text-sm text-slate-700"><LocalizedText text={first} /></p>
               </div>
             )}
             {rest.length > 0 && (
               <details className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <summary className="cursor-pointer text-sm font-medium text-slate-900">
-                  Show all assumptions
-                </summary>
+                <summary className="cursor-pointer text-sm font-medium text-slate-900"><LocalizedText text="Show all assumptions" /></summary>
                 <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-700">
                   {rest.map((item, i) => (
-                    <li key={i}>{item}</li>
+                    <li key={i}><LocalizedText text={item} /></li>
                   ))}
                 </ul>
               </details>
             )}
           </>
         ) : (
-          <p className="text-sm text-slate-500">Run a calculation to see assumptions.</p>
+          <p className="text-sm text-slate-500"><LocalizedText text="Run a calculation to see assumptions." /></p>
         )}
       </div>
     </section>

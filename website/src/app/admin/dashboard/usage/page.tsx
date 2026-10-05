@@ -1,3 +1,7 @@
+
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedIframe } from "@/localization/LocalizedElements";
 /**
  * Admin  Usage: the privacy-first analytics dashboard (Plausible or Umami).
  *
@@ -81,18 +85,16 @@ export default function UsagePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: BRAND }}>Usage</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        Visitors, countries and calculator activity, counted without cookies. Patient values and dosing results are never sent.
-      </p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: BRAND }}><LocalizedText text={"Usage"} /></h1>
+      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"Visitors, countries and calculator activity, counted without cookies. Patient values and dosing results are never sent."} /></p>
 
       <div className="bg-white border border-gray-200 rounded-lg p-5 mb-4">
         <dl className="grid grid-cols-[160px_1fr] gap-x-3 gap-y-1 text-xs text-gray-700">
-          <dt className="text-gray-500">Visitor counting</dt>
+          <dt className="text-gray-500"><LocalizedText text={"Visitor counting"} /></dt>
           <dd>{countingStatus()}</dd>
-          <dt className="text-gray-500">Dashboard link</dt>
+          <dt className="text-gray-500"><LocalizedText text={"Dashboard link"} /></dt>
           <dd>
-            {dashboard.status === "ready" ? "Set" : dashboard.status === "invalid" ? "Saved, but not a valid web address" : "Not set"}
+            <LocalizedText text={dashboard.status === "ready" ? "Set" : dashboard.status === "invalid" ? "Saved, but not a valid web address" : "Not set"} />
           </dd>
         </dl>
       </div>
@@ -100,20 +102,16 @@ export default function UsagePage() {
       {dashboard.status === "ready" ? (
         <div className="bg-white border border-gray-200 rounded-lg p-5 mb-4">
           <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
-            <p className="text-xs text-gray-500">
-              If the dashboard does not appear below, open it in a new tab. Password-protected shared links cannot be shown inside this page.
-            </p>
+            <p className="text-xs text-gray-500"><LocalizedText text={"If the dashboard does not appear below, open it in a new tab. Password-protected shared links cannot be shown inside this page."} /></p>
             <a
               href={dashboard.openHref}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block rounded px-3 py-1.5 text-xs font-semibold text-white"
               style={{ background: BRAND }}
-            >
-              Open full dashboard
-            </a>
+            ><LocalizedText text={"Open full dashboard"} /></a>
           </div>
-          <iframe
+          <LocalizedIframe
             src={dashboard.embedSrc}
             title="Usage dashboard"
             loading="lazy"
@@ -124,9 +122,7 @@ export default function UsagePage() {
       ) : (
         <>
           {dashboard.status === "invalid" && (
-            <div className="rounded-md border border-red-200 bg-red-50 text-red-800 text-sm p-3 mb-4">
-              The dashboard link saved as <Code>ANALYTICS_DASHBOARD_URL</Code> is not a valid web address. It should start with https://.
-            </div>
+            <div className="rounded-md border border-red-200 bg-red-50 text-red-800 text-sm p-3 mb-4"><LocalizedText text={"The dashboard link saved as"} />{" "}<Code>ANALYTICS_DASHBOARD_URL</Code>{" "}<LocalizedText text={"is not a valid web address. It should start with https://."} /></div>
           )}
           <SetupSteps />
         </>
@@ -140,37 +136,21 @@ export default function UsagePage() {
 function SetupSteps() {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-5 mb-4">
-      <h2 className="text-base font-bold mb-3" style={{ color: BRAND }}>Set up usage reporting</h2>
+      <h2 className="text-base font-bold mb-3" style={{ color: BRAND }}><LocalizedText text={"Set up usage reporting"} /></h2>
       <ol className="list-decimal pl-5 space-y-2 text-sm text-gray-700">
-        <li>
-          Create an account with <strong>Plausible</strong> (plausible.io) or <strong>Umami</strong> (umami.is). Both count visitors without cookies.
+        <li><LocalizedText text={"Create an account with"} />{" "}<strong>Plausible</strong>{" "}<LocalizedText text={"(plausible.io) or"} />{" "}<strong>Umami</strong>{" "}<LocalizedText text={"(umami.is). Both count visitors without cookies."} /></li>
+        <li><LocalizedText text={"Add"} />{" "}<strong>vancomyzer.com</strong>{" "}<LocalizedText text={"as a website in that account."} /></li>
+        <li><LocalizedText text={"Plausible only: under"} />{" "}<em><LocalizedText text={"Goals"} /></em><LocalizedText text={", add a custom event goal for each event name listed below, spelled exactly as shown. Umami lists these events on its own."} /></li>
+        <li><LocalizedText text={"Create a shared link to the dashboard. In Plausible: site settings, then"} />{" "}<em><LocalizedText text={"Visibility"} /></em><LocalizedText text={", then"} />{" "}<em><LocalizedText text={"Shared links"} /></em><LocalizedText text={". Leave the password blank. In Umami: edit the website, then"} />{" "}<em><LocalizedText text={"Share URL"} /></em>.
         </li>
-        <li>
-          Add <strong>vancomyzer.com</strong> as a website in that account.
-        </li>
-        <li>
-          Plausible only: under <em>Goals</em>, add a custom event goal for each event name listed below, spelled exactly as shown. Umami lists these events on its own.
-        </li>
-        <li>
-          Create a shared link to the dashboard. In Plausible: site settings, then <em>Visibility</em>, then <em>Shared links</em>. Leave the password blank. In Umami: edit the website, then <em>Share URL</em>.
-        </li>
-        <li>
-          In your hosting service&apos;s environment settings, add:
-          <ul className="list-disc pl-5 mt-1 space-y-1">
+        <li><LocalizedText text={"In your hosting service's environment settings, add:"} /><ul className="list-disc pl-5 mt-1 space-y-1">
+            <li><LocalizedText text={"For Plausible:"} />{" "}<Code>NEXT_PUBLIC_PLAUSIBLE_DOMAIN</Code>{" "}<LocalizedText text={"set to"} />{" "}<Code>vancomyzer.com</Code><LocalizedText text={". If Plausible's installation page shows an address starting with"} />{" "}<Code>https://plausible.io/js/pa-</Code><LocalizedText text={", also add"} />{" "}<Code>NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC</Code>{" "}<LocalizedText text={"set to that address. This is recommended: with it, admin and research pages are left out and patient values that can appear in calculator page addresses are removed before anything is sent."} /></li>
+            <li><LocalizedText text={"For Umami:"} />{" "}<Code>NEXT_PUBLIC_UMAMI_WEBSITE_ID</Code>{" "}<LocalizedText text={"set to the website ID shown in Umami."} /></li>
             <li>
-              For Plausible: <Code>NEXT_PUBLIC_PLAUSIBLE_DOMAIN</Code> set to <Code>vancomyzer.com</Code>. If Plausible&apos;s installation page shows an address starting with <Code>https://plausible.io/js/pa-</Code>, also add <Code>NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC</Code> set to that address. This is recommended: with it, admin and research pages are left out and patient values that can appear in calculator page addresses are removed before anything is sent.
-            </li>
-            <li>
-              For Umami: <Code>NEXT_PUBLIC_UMAMI_WEBSITE_ID</Code> set to the website ID shown in Umami.
-            </li>
-            <li>
-              <Code>ANALYTICS_DASHBOARD_URL</Code> set to the shared link from step 4.
-            </li>
+              <Code>ANALYTICS_DASHBOARD_URL</Code>{" "}<LocalizedText text={"set to the shared link from step 4."} /></li>
           </ul>
         </li>
-        <li>
-          Save the settings and republish the site. Visitor counting starts once the site has been republished.
-        </li>
+        <li><LocalizedText text={"Save the settings and republish the site. Visitor counting starts once the site has been republished."} /></li>
       </ol>
     </div>
   );
@@ -179,23 +159,21 @@ function SetupSteps() {
 function MeasuredCard() {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-5">
-      <h2 className="text-base font-bold mb-1" style={{ color: BRAND }}>What gets measured</h2>
-      <p className="text-xs text-gray-500 mb-3">
-        No cookies are used. Names, email addresses, patient values and dosing results are never sent, and reports are not linked to any account.
-      </p>
+      <h2 className="text-base font-bold mb-1" style={{ color: BRAND }}><LocalizedText text={"What gets measured"} /></h2>
+      <p className="text-xs text-gray-500 mb-3"><LocalizedText text={"No cookies are used. Names, email addresses, patient values and dosing results are never sent, and reports are not linked to any account."} /></p>
       <div className="overflow-x-auto">
         <table className="w-full text-xs text-gray-700">
           <thead>
             <tr className="text-left text-gray-500">
-              <th className="py-1 pr-3 font-medium">Measure</th>
-              <th className="py-1 font-medium">Event name in the dashboard</th>
+              <th className="py-1 pr-3 font-medium"><LocalizedText text={"Measure"} /></th>
+              <th className="py-1 font-medium"><LocalizedText text={"Event name in the dashboard"} /></th>
             </tr>
           </thead>
           <tbody>
             {MEASURED.map((m) => (
               <tr key={m.label} className="border-t border-gray-100">
-                <td className="py-1.5 pr-3">{m.label}</td>
-                <td className="py-1.5">{m.event ? <Code>{m.event}</Code> : <span className="text-gray-400">Standard report</span>}</td>
+                <td className="py-1.5 pr-3"><LocalizedText text={m.label} /></td>
+                <td className="py-1.5">{m.event ? <Code>{m.event}</Code> : <span className="text-gray-400"><LocalizedText text={"Standard report"} /></span>}</td>
               </tr>
             ))}
           </tbody>

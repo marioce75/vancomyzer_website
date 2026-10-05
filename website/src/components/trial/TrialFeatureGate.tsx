@@ -1,4 +1,6 @@
 'use client'
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useTrialStatus } from '@/hooks/useTrialStatus'
 
@@ -31,9 +33,7 @@ export function TrialFeatureGate({ feature, children }: Props) {
             cursor: 'pointer',
           }}
           onClick={() => { window.location.href = '/upgrade' }}
-        >
-          🔒 Available with subscription
-        </button>
+        ><LocalizedText text={"🔒 Available with subscription"} /></button>
       </div>
     </div>
   )

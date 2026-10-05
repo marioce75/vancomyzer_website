@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { hasFeature } from "@/lib/tiers";
@@ -47,7 +49,7 @@ export default function NoteExportGate({ tier, onCopy, noteText: _noteText }: No
           minWidth: 110,
         }}
       >
-        {copied ? "Copied!" : "Copy Note"}
+        <LocalizedText text={copied ? "Copied!" : "Copy Note"} />
       </button>
 
       <UpgradeModal open={modalOpen} onClose={() => setModalOpen(false)} feature="export.note.copy" />

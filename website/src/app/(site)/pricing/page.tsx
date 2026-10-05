@@ -1,7 +1,9 @@
+import { localizeMetadata } from "@/localization/metadata";
+import { requestLocale } from "@/localization/server";
 import type { Metadata } from "next";
 import PricingClient from "./PricingClient";
 
-export const metadata: Metadata = {
+const englishMetadata: Metadata = {
   alternates: { canonical: "https://vancomyzer.com/pricing" },
   title: "Pricing — Vancomyzer™",
   description:
@@ -10,4 +12,8 @@ export const metadata: Metadata = {
 
 export default function PricingPage() {
   return <PricingClient />;
+}
+
+export async function generateMetadata() {
+  return localizeMetadata(englishMetadata, await requestLocale());
 }

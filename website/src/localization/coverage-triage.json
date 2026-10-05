@@ -1,0 +1,980 @@
+{
+  "notice": "Triage of AST candidates, not complete translation coverage. Dynamic expressions, API messages and generated reports remain separate review surfaces. Classification does not remove candidates or assert coverage.",
+  "counts": {
+    "verified citation/brand invariant": 31,
+    "numeric/unit invariant": 22,
+    "verified identifier/brand/citation/unit": 29,
+    "verified formula/unit invariant": 30,
+    "verified shared-component binding": 9
+  },
+  "candidates": [
+    {
+      "file": "src/app/(site)/transparent-dosing/cases/page.tsx",
+      "line": 238,
+      "kind": "Unbound JSX text",
+      "text": "DOI:",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/cases/page.tsx",
+      "line": 368,
+      "kind": "Unbound JSX text",
+      "text": "DOI:",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/cases/page.tsx",
+      "line": 470,
+      "kind": "Unbound JSX text",
+      "text": "kg · SCr",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/cases/page.tsx",
+      "line": 470,
+      "kind": "Unbound JSX text",
+      "text": "mg/dL",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/cases/page.tsx",
+      "line": 471,
+      "kind": "Unbound JSX text",
+      "text": "cm",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/cases/page.tsx",
+      "line": 548,
+      "kind": "Unbound JSX text",
+      "text": "Vancomyzer (",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/cases/page.tsx",
+      "line": 583,
+      "kind": "Unbound JSX text",
+      "text": "Vancomyzer (",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/engine-crosscheck/page.tsx",
+      "line": 55,
+      "kind": "Unbound JSX text",
+      "text": "Tucuxi",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/engine-crosscheck/page.tsx",
+      "line": 104,
+      "kind": "Unbound JSX text",
+      "text": "Tucuxi",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/engine-crosscheck/page.tsx",
+      "line": 204,
+      "kind": "Unbound JSX text",
+      "text": "Tucuxi",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 305,
+      "kind": "Unbound JSX text",
+      "text": "Janmahasatian S, et al.",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 305,
+      "kind": "Unbound JSX text",
+      "text": "Clin Pharmacokinet",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 309,
+      "kind": "Unbound JSX text",
+      "text": " ·  Cockcroft DW, Gault MH.",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 310,
+      "kind": "Unbound JSX text",
+      "text": "Nephron",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 312,
+      "kind": "Unbound JSX text",
+      "text": "PubMed",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 332,
+      "kind": "Unbound JSX text",
+      "text": "PubMed",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 384,
+      "kind": "Unbound JSX text",
+      "text": "AUC₂₄ 400–600 mg·h/L",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 386,
+      "kind": "Unbound JSX text",
+      "text": "Rybak MJ et al.",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 386,
+      "kind": "Unbound JSX text",
+      "text": "Am J Health Syst Pharm",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 400,
+      "kind": "Unbound JSX text",
+      "text": "Rowland M, Tozer TN.",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 400,
+      "kind": "Unbound JSX text",
+      "text": "Clinical Pharmacokinetics and Pharmacodynamics: Concepts and Applications.",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 400,
+      "kind": "Unbound JSX text",
+      "text": "4th ed. Lippincott Williams & Wilkins; 2011.",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 403,
+      "kind": "Unbound JSX text",
+      "text": "Gibaldi M, Perrier D.",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 403,
+      "kind": "Unbound JSX text",
+      "text": "Pharmacokinetics.",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/equations/page.tsx",
+      "line": 403,
+      "kind": "Unbound JSX text",
+      "text": "2nd ed. Marcel Dekker; 1982.",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 144,
+      "kind": "Unbound JSX text",
+      "text": "mL/min,",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 150,
+      "kind": "Unbound JSX text",
+      "text": "× (CrCl/120)",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 151,
+      "kind": "Unbound JSX text",
+      "text": "× (WT/70)",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 151,
+      "kind": "Unbound JSX text",
+      "text": "× WT/70 L, Q =",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 152,
+      "kind": "Unbound JSX text",
+      "text": "× (WT/70)",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 220,
+      "kind": "Unbound JSX text",
+      "text": "RMSE (mg/L)",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 221,
+      "kind": "Unbound JSX text",
+      "text": "rRMSE (%)",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 248,
+      "kind": "Unbound JSX text",
+      "text": "pred",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 248,
+      "kind": "Unbound JSX text",
+      "text": "ref",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 282,
+      "kind": "Unbound JSX text",
+      "text": "RMSE (mg/L)",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/(site)/transparent-dosing/predictive-performance/page.tsx",
+      "line": 283,
+      "kind": "Unbound JSX text",
+      "text": "rRMSE (%)",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/app/admin/dashboard/calculations/page.tsx",
+      "line": 99,
+      "kind": "Unbound JSX text",
+      "text": "/team",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/policy/page.tsx",
+      "line": 49,
+      "kind": "Unbound JSX text",
+      "text": "ID",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/security/page.tsx",
+      "line": 206,
+      "kind": "Unbound JSX text",
+      "text": "IP",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/system/page.tsx",
+      "line": 103,
+      "kind": "Unbound JSX text",
+      "text": "Next.js 14 (App Router)",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/system/page.tsx",
+      "line": 107,
+      "kind": "Unbound JSX text",
+      "text": "Node.js",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/usage/page.tsx",
+      "line": 125,
+      "kind": "Unbound JSX text",
+      "text": "ANALYTICS_DASHBOARD_URL",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/usage/page.tsx",
+      "line": 141,
+      "kind": "Unbound JSX text",
+      "text": "Plausible",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/usage/page.tsx",
+      "line": 141,
+      "kind": "Unbound JSX text",
+      "text": "Umami",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/usage/page.tsx",
+      "line": 147,
+      "kind": "Unbound JSX text",
+      "text": "NEXT_PUBLIC_PLAUSIBLE_DOMAIN",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/usage/page.tsx",
+      "line": 147,
+      "kind": "Unbound JSX text",
+      "text": "https://plausible.io/js/pa-",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/usage/page.tsx",
+      "line": 147,
+      "kind": "Unbound JSX text",
+      "text": "NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/usage/page.tsx",
+      "line": 148,
+      "kind": "Unbound JSX text",
+      "text": "NEXT_PUBLIC_UMAMI_WEBSITE_ID",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/usage/page.tsx",
+      "line": 150,
+      "kind": "Unbound JSX text",
+      "text": "ANALYTICS_DASHBOARD_URL",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/admin/dashboard/users/page.tsx",
+      "line": 372,
+      "kind": "Unbound Accessible attribute",
+      "text": "By tier",
+      "classification": "verified shared-component binding",
+      "reason": "SidebarGroup/DetailSection title is rendered by LocalizedText; AST attribute heuristic does not follow this local helper."
+    },
+    {
+      "file": "src/app/admin/dashboard/users/page.tsx",
+      "line": 379,
+      "kind": "Unbound Accessible attribute",
+      "text": "By status",
+      "classification": "verified shared-component binding",
+      "reason": "SidebarGroup/DetailSection title is rendered by LocalizedText; AST attribute heuristic does not follow this local helper."
+    },
+    {
+      "file": "src/app/admin/dashboard/users/page.tsx",
+      "line": 386,
+      "kind": "Unbound Accessible attribute",
+      "text": "Top countries",
+      "classification": "verified shared-component binding",
+      "reason": "SidebarGroup/DetailSection title is rendered by LocalizedText; AST attribute heuristic does not follow this local helper."
+    },
+    {
+      "file": "src/app/admin/dashboard/users/page.tsx",
+      "line": 393,
+      "kind": "Unbound Accessible attribute",
+      "text": "Institution type",
+      "classification": "verified shared-component binding",
+      "reason": "SidebarGroup/DetailSection title is rendered by LocalizedText; AST attribute heuristic does not follow this local helper."
+    },
+    {
+      "file": "src/app/admin/dashboard/users/page.tsx",
+      "line": 711,
+      "kind": "Unbound Accessible attribute",
+      "text": "Account",
+      "classification": "verified shared-component binding",
+      "reason": "SidebarGroup/DetailSection title is rendered by LocalizedText; AST attribute heuristic does not follow this local helper."
+    },
+    {
+      "file": "src/app/admin/dashboard/users/page.tsx",
+      "line": 721,
+      "kind": "Unbound Accessible attribute",
+      "text": "Profile",
+      "classification": "verified shared-component binding",
+      "reason": "SidebarGroup/DetailSection title is rendered by LocalizedText; AST attribute heuristic does not follow this local helper."
+    },
+    {
+      "file": "src/app/admin/dashboard/users/page.tsx",
+      "line": 731,
+      "kind": "Unbound Accessible attribute",
+      "text": "Security",
+      "classification": "verified shared-component binding",
+      "reason": "SidebarGroup/DetailSection title is rendered by LocalizedText; AST attribute heuristic does not follow this local helper."
+    },
+    {
+      "file": "src/app/admin/dashboard/users/page.tsx",
+      "line": 739,
+      "kind": "Unbound Accessible attribute",
+      "text": "Complimentary Pro",
+      "classification": "verified shared-component binding",
+      "reason": "SidebarGroup/DetailSection title is rendered by LocalizedText; AST attribute heuristic does not follow this local helper."
+    },
+    {
+      "file": "src/app/admin/dashboard/users/page.tsx",
+      "line": 742,
+      "kind": "Unbound Accessible attribute",
+      "text": "Actions",
+      "classification": "verified shared-component binding",
+      "reason": "SidebarGroup/DetailSection title is rendered by LocalizedText; AST attribute heuristic does not follow this local helper."
+    },
+    {
+      "file": "src/app/dashboard/pilot/page.tsx",
+      "line": 220,
+      "kind": "Unbound JSX text",
+      "text": "Pro",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/launch/page.tsx",
+      "line": 129,
+      "kind": "Unbound JSX text",
+      "text": "VANCOMYZER",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/app/mfa-verify/page.tsx",
+      "line": 62,
+      "kind": "Unbound Accessible attribute",
+      "text": "000000",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/app/research/enter/page.tsx",
+      "line": 530,
+      "kind": "Unbound JSX text",
+      "text": "RRT",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/research/enter/page.tsx",
+      "line": 586,
+      "kind": "Unbound JSX text",
+      "text": "LD",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/research/page.tsx",
+      "line": 389,
+      "kind": "Unbound JSX text",
+      "text": "MPE (%)",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/research/page.tsx",
+      "line": 390,
+      "kind": "Unbound JSX text",
+      "text": "RMSE",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/research/page.tsx",
+      "line": 391,
+      "kind": "Unbound JSX text",
+      "text": "nRMSE",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/research/page.tsx",
+      "line": 428,
+      "kind": "Unbound JSX text",
+      "text": "BMI",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/research/page.tsx",
+      "line": 429,
+      "kind": "Unbound JSX text",
+      "text": "CrCl",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/upgrade/page.tsx",
+      "line": 153,
+      "kind": "Unbound JSX text",
+      "text": "Free",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/app/upgrade/page.tsx",
+      "line": 154,
+      "kind": "Unbound JSX text",
+      "text": "Pro",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/components/calculator/CalculationMethodPanel.tsx",
+      "line": 40,
+      "kind": "Unbound JSX text",
+      "text": "AUC₂₄ 400–600 mg·h/L (ASHP/IDSA/PIDS/SIDP 2020)",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/CalculationMethodPanel.tsx",
+      "line": 63,
+      "kind": "Unbound JSX text",
+      "text": "DOI",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/components/calculator/CalculationMethodPanel.tsx",
+      "line": 66,
+      "kind": "Unbound JSX text",
+      "text": "Rybak MJ et al.",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/components/calculator/CalculationMethodPanel.tsx",
+      "line": 66,
+      "kind": "Unbound JSX text",
+      "text": "AJHP. 2020;77(11):835–864.",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/components/calculator/CalculationMethodPanel.tsx",
+      "line": 67,
+      "kind": "Unbound JSX text",
+      "text": "DOI",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/components/calculator/CalculatorHeader.tsx",
+      "line": 42,
+      "kind": "Unbound JSX text",
+      "text": "VZ",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/components/calculator/CalculatorHeader.tsx",
+      "line": 48,
+      "kind": "Unbound JSX text",
+      "text": "VANCOMYZER",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/components/calculator/CalculatorHeader.tsx",
+      "line": 70,
+      "kind": "Unbound JSX text",
+      "text": "sys",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 854,
+      "kind": "Unbound JSX text",
+      "text": "2026 Vancomyzer",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 856,
+      "kind": "Unbound JSX text",
+      "text": "sys",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1087,
+      "kind": "Unbound JSX text",
+      "text": "AUC₂₄",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1088,
+      "kind": "Unbound JSX text",
+      "text": "400–600 mg·h/L",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1262,
+      "kind": "Unbound JSX text",
+      "text": "mg",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
+      "line": 787,
+      "kind": "Unbound JSX text",
+      "text": "AUC₂₄",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/DisclaimerModal.tsx",
+      "line": 166,
+      "kind": "Unbound JSX text",
+      "text": "VANCOMYZER",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 111,
+      "kind": "Unbound JSX text",
+      "text": "mg",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 112,
+      "kind": "Unbound JSX text",
+      "text": "(25–30 mg/kg ×",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 112,
+      "kind": "Unbound JSX text",
+      "text": "kg)",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 130,
+      "kind": "Unbound JSX text",
+      "text": "mg",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 138,
+      "kind": "Unbound JSX text",
+      "text": "min",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 139,
+      "kind": "Unbound JSX text",
+      "text": "mg/h",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 366,
+      "kind": "Unbound JSX text",
+      "text": "mg",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 434,
+      "kind": "Unbound JSX text",
+      "text": "mg",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 453,
+      "kind": "Unbound JSX text",
+      "text": "AUC24",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 487,
+      "kind": "Unbound JSX text",
+      "text": "CL:",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 488,
+      "kind": "Unbound JSX text",
+      "text": "mg/day",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 519,
+      "kind": "Unbound JSX text",
+      "text": "ASHP/IDSA 2020",
+      "classification": "verified citation/brand invariant",
+      "reason": "Inspected scientific citation, publication title, identifier or brand wordmark; original spelling retained."
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 572,
+      "kind": "Unbound JSX text",
+      "text": "mg",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/LevelEntryTable.tsx",
+      "line": 287,
+      "kind": "Unbound JSX text",
+      "text": "mg/L",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/ObesityAdvisoryPanel.tsx",
+      "line": 71,
+      "kind": "Unbound JSX text",
+      "text": "kg/m²)",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/ObesityAdvisoryPanel.tsx",
+      "line": 84,
+      "kind": "Unbound JSX text",
+      "text": "kg",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/ObesityAdvisoryPanel.tsx",
+      "line": 85,
+      "kind": "Unbound JSX text",
+      "text": "(Janmahasatian 2005:",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    },
+    {
+      "file": "src/components/calculator/ObesityAdvisoryPanel.tsx",
+      "line": 90,
+      "kind": "Unbound JSX text",
+      "text": "kg):",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/ObesityAdvisoryPanel.tsx",
+      "line": 90,
+      "kind": "Unbound JSX text",
+      "text": "mL/min",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/ObesityAdvisoryPanel.tsx",
+      "line": 93,
+      "kind": "Unbound JSX text",
+      "text": "kg = IBW + 0.4×(TBW−IBW)):",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/ObesityAdvisoryPanel.tsx",
+      "line": 93,
+      "kind": "Unbound JSX text",
+      "text": "mL/min",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/ObesityAdvisoryPanel.tsx",
+      "line": 96,
+      "kind": "Unbound JSX text",
+      "text": "kg):",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/ObesityAdvisoryPanel.tsx",
+      "line": 96,
+      "kind": "Unbound JSX text",
+      "text": "mL/min",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/PKParametersMath.tsx",
+      "line": 184,
+      "kind": "Unbound JSX text",
+      "text": "mg/dL.",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/PatientCharacteristicsForm.tsx",
+      "line": 174,
+      "kind": "Unbound JSX text",
+      "text": "µmol/L ÷ 88.4",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/PatientCharacteristicsForm.tsx",
+      "line": 202,
+      "kind": "Unbound JSX text",
+      "text": "mL/min",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/PatientCharacteristicsForm.tsx",
+      "line": 224,
+      "kind": "Unbound JSX text",
+      "text": "kg/m²",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/RegimenComparisonTable.tsx",
+      "line": 86,
+      "kind": "Unbound JSX text",
+      "text": "AUC₂₄",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/calculator/RegimenComparisonTable.tsx",
+      "line": 127,
+      "kind": "Unbound JSX text",
+      "text": "mg q",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/RegimenSuggestionCard.tsx",
+      "line": 50,
+      "kind": "Unbound JSX text",
+      "text": "mg q",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/calculator/SettingsPanel.tsx",
+      "line": 413,
+      "kind": "Unbound JSX text",
+      "text": "AUC",
+      "classification": "verified formula/unit invariant",
+      "reason": "Inspected displayed scientific symbol, formula fragment or unit; retain exact original numerical expression."
+    },
+    {
+      "file": "src/components/landing/AucCurveIllustration.tsx",
+      "line": 103,
+      "kind": "Unbound JSX text",
+      "text": "AUC₂₄",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/landing/SyntheticExample.tsx",
+      "line": 14,
+      "kind": "Unbound JSX text",
+      "text": "AUC₂₄",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/landing/SyntheticExample.tsx",
+      "line": 14,
+      "kind": "Unbound JSX text",
+      "text": "mg/L",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/landing/SyntheticExample.tsx",
+      "line": 14,
+      "kind": "Unbound JSX text",
+      "text": "mg/L",
+      "classification": "numeric/unit invariant",
+      "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/team/BaaCard.tsx",
+      "line": 334,
+      "kind": "Unbound JSX text",
+      "text": "KB)",
+      "classification": "verified identifier/brand/citation/unit",
+      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
+    }
+  ]
+}

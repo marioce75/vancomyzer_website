@@ -20,7 +20,10 @@
     "test:horizon": "node --import tsx src/lib/pk/__tests__/exposureHorizon.regression.test.ts",
     "test:study-readiness": "node --import tsx src/lib/pk/__tests__/studyReadiness.test.ts && node --import tsx scripts/research/cli.test.ts",
     "typecheck:research": "tsc -p tsconfig.research.json",
-    "test:market-intel": "node --import tsx src/lib/scraper/__tests__/analyst.test.ts && node --import tsx src/lib/scraper/__tests__/collection.test.ts"
+    "test:market-intel": "node --import tsx src/lib/scraper/__tests__/analyst.test.ts && node --import tsx src/lib/scraper/__tests__/collection.test.ts",
+    "test:localization": "node --import tsx --test src/localization/*.test.ts",
+    "audit:localization": "node src/localization/coverage.mjs",
+    "audit:localization:dynamic": "node src/localization/dynamic-review.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

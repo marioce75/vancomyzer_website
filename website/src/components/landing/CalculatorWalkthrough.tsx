@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedVideo, LocalizedButton } from "@/localization/LocalizedElements";
+
 
 import { useRef, useState } from "react";
 import { track } from "@/lib/analytics";
@@ -30,7 +34,7 @@ export default function CalculatorWalkthrough() {
   return (
     <figure>
       <div className="relative aspect-video overflow-hidden rounded-md border bg-white shadow-sm" style={{ borderColor: "#cbd6e0" }}>
-        <video
+        <LocalizedVideo
           ref={video}
           className="block h-full w-full object-contain"
           controls={started}
@@ -42,11 +46,9 @@ export default function CalculatorWalkthrough() {
           onPlay={() => setStarted(true)}
           onPlaying={recordPlayback}
         >
-          <source src="/videos/vancomyzer-calculator-tutorial-v2.mp4" type="video/mp4" />
-          Your browser does not support embedded video. Use the video link below.
-        </video>
+          <source src="/videos/vancomyzer-calculator-tutorial-v2.mp4" type="video/mp4" /><LocalizedText text={"Your browser does not support embedded video. Use the video link below."} /></LocalizedVideo>
         {!started && (
-          <button
+          <LocalizedButton
             type="button"
             onClick={play}
             className="absolute inset-0 flex w-full flex-col items-center justify-center gap-3 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-[-4px] focus-visible:outline-[#1f5e96]"
@@ -56,14 +58,12 @@ export default function CalculatorWalkthrough() {
             <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-white shadow-lg sm:h-[72px] sm:w-[72px]" style={{ background: "#1f5e96" }} aria-hidden="true">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 4v16l13-8z" /></svg>
             </span>
-            <span className="text-sm font-semibold sm:text-base">Watch the walkthrough</span>
+            <span className="text-sm font-semibold sm:text-base"><LocalizedText text={"Watch the walkthrough"} /></span>
             <span className="absolute bottom-3 right-3 rounded px-2 py-0.5 text-sm" style={{ background: "#14232f" }}>2:55</span>
-          </button>
+          </LocalizedButton>
         )}
       </div>
-      <figcaption id="walkthrough-caption" className="mt-3 text-[13px] leading-[1.5]" style={{ color: "#546471" }}>
-        Calculator walkthrough using fictional inputs, including Bayesian estimation and loading dose guidance. For learning the interface. Independent clinical validation is pending.
-        {started && <> <a className="underline" href="/videos/vancomyzer-calculator-tutorial-v2.mp4">Open video directly</a>.</>}
+      <figcaption id="walkthrough-caption" className="mt-3 text-[13px] leading-[1.5]" style={{ color: "#546471" }}><LocalizedText text={"Calculator walkthrough using fictional inputs, including Bayesian estimation and loading dose guidance. For learning the interface. Independent clinical validation is pending."} />{started && <> <a className="underline" href="/videos/vancomyzer-calculator-tutorial-v2.mp4"><LocalizedText text={"Open video directly"} /></a>.</>}
       </figcaption>
     </figure>
   );

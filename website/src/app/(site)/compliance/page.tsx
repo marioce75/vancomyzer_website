@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useSession } from "next-auth/react";
@@ -42,7 +44,7 @@ export default function CompliancePage() {
   if (status === "loading" || authLoading) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-16 text-center">
-        <p style={{ color: "var(--color-secondary)" }}>Loading...</p>
+        <p style={{ color: "var(--color-secondary)" }}><LocalizedText text="Loading..." /></p>
       </main>
     );
   }
@@ -56,14 +58,8 @@ export default function CompliancePage() {
       <h1
         className="text-2xl font-bold tracking-tight"
         style={{ color: "var(--color-primary)" }}
-      >
-        SOC 2 Compliance Documentation
-      </h1>
-      <p className="mt-2 text-sm" style={{ color: "var(--color-secondary)" }}>
-        Available to Hospital plan subscribers. Vancomyzer&rsquo;s SOC 2 Type I audit is in
-        progress, with a target completion of Q4 2026. The policy documents below are in
-        preparation and are not yet available for download.
-      </p>
+      ><LocalizedText text="SOC 2 Compliance Documentation" /></h1>
+      <p className="mt-2 text-sm" style={{ color: "var(--color-secondary)" }}><LocalizedText text="Available to Hospital plan subscribers. Vancomyzer’s SOC 2 Type I audit is in progress, with a target completion of Q4 2026. The policy documents below are in preparation and are not yet available for download." /></p>
 
       <div className="mt-8 space-y-4">
         {documents.map((doc) => (
@@ -80,13 +76,13 @@ export default function CompliancePage() {
                 className="text-sm font-semibold"
                 style={{ color: "var(--color-foreground)" }}
               >
-                {doc.title}
+                <LocalizedText text={doc.title} />
               </h2>
               <p
                 className="mt-1 text-xs leading-relaxed"
                 style={{ color: "var(--color-secondary)" }}
               >
-                {doc.description}
+                <LocalizedText text={doc.description} />
               </p>
             </div>
             <span
@@ -96,9 +92,7 @@ export default function CompliancePage() {
                 color: "var(--color-secondary)",
                 background: "transparent",
               }}
-            >
-              Documentation in preparation
-            </span>
+            ><LocalizedText text="Documentation in preparation" /></span>
           </div>
         ))}
       </div>
@@ -110,20 +104,14 @@ export default function CompliancePage() {
         <h2
           className="text-sm font-semibold"
           style={{ color: "var(--color-foreground)" }}
-        >
-          Platform Information
-        </h2>
+        ><LocalizedText text="Platform Information" /></h2>
         <dl className="mt-3 space-y-2 text-xs" style={{ color: "var(--color-secondary)" }}>
           <div className="flex gap-2">
-            <dt className="font-medium" style={{ color: "var(--color-foreground)" }}>
-              Application Version:
-            </dt>
+            <dt className="font-medium" style={{ color: "var(--color-foreground)" }}><LocalizedText text="Application Version:" /></dt>
             <dd>0.1.0</dd>
           </div>
           <div className="flex gap-2">
-            <dt className="font-medium" style={{ color: "var(--color-foreground)" }}>
-              SOC 2 Type I Target:
-            </dt>
+            <dt className="font-medium" style={{ color: "var(--color-foreground)" }}><LocalizedText text="SOC 2 Type I Target:" /></dt>
             <dd>Q4 2026</dd>
           </div>
         </dl>
@@ -136,17 +124,13 @@ export default function CompliancePage() {
         <h2
           className="text-sm font-semibold"
           style={{ color: "var(--color-foreground)" }}
-        >
-          Security controls in place today
-        </h2>
+        ><LocalizedText text="Security controls in place today" /></h2>
         <ul className="mt-3 space-y-1.5 text-xs leading-relaxed" style={{ color: "var(--color-secondary)" }}>
-          <li>HTTPS is enforced for all traffic in transit.</li>
-          <li>Administrator accounts can enable TOTP multi-factor authentication; once enabled, it is required to access admin pages.</li>
-          <li>Calculations and administrative actions are audit-logged.</li>
+          <li><LocalizedText text="HTTPS is enforced for all traffic in transit." /></li>
+          <li><LocalizedText text="Administrator accounts can enable TOTP multi-factor authentication; once enabled, it is required to access admin pages." /></li>
+          <li><LocalizedText text="Calculations and administrative actions are audit-logged." /></li>
         </ul>
-        <p className="mt-3 text-xs leading-relaxed" style={{ color: "var(--color-secondary)" }}>
-          Business Associate Agreement: available after legal review — not yet available.
-        </p>
+        <p className="mt-3 text-xs leading-relaxed" style={{ color: "var(--color-secondary)" }}><LocalizedText text="Business Associate Agreement: available after legal review — not yet available." /></p>
       </div>
     </main>
   );

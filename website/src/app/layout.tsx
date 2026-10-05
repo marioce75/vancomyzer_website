@@ -1,3 +1,8 @@
+import { localizeMetadata } from "@/localization/metadata";
+import { requestLocale } from "@/localization/server";
+import { cookies } from "next/headers";
+import { LanguageProvider, LanguageSwitcher } from "@/localization/LanguageProvider";
+import { localeCookie, parseLocale } from "@/localization/catalog";
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./Providers";
@@ -12,7 +17,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export const metadata: Metadata = {
+const englishMetadata: Metadata = {
   metadataBase: new URL("https://vancomyzer.com"),
   title: "VANCOMYZER\u2122",
   description:
@@ -23,13 +28,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = parseLocale((await cookies()).get(localeCookie)?.value);
   return (
-    <html lang="en">
+    <html lang={locale === "es" ? "es-ES" : locale === "fr" ? "fr-FR" : "en"}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -43,13 +49,20 @@ export default function RootLayout({
         />
       </head>
       <body className="theme-basic min-h-screen flex flex-col antialiased" suppressHydrationWarning>
+        <LanguageProvider initialLocale={locale}>
+        <LanguageSwitcher />
         <Providers>
           <div className="flex-1">{children}</div>
           <RegulatoryFooter />
         </Providers>
+        </LanguageProvider>
         {/* Cookie-free usage analytics; renders nothing unless a provider is configured. */}
         <Analytics />
       </body>
     </html>
   );
+}
+
+export async function generateMetadata() {
+  return localizeMetadata(englishMetadata, await requestLocale());
 }

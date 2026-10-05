@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import type { CalculationDetails } from "@/types/calculator";
 
@@ -23,15 +25,15 @@ export default function DataFitReviewabilityPanel({ details }: DataFitReviewabil
     <section className={`rounded-md border px-3 py-2 ${toneFor(details.review_status.level)}`}>
       <div className="grid gap-2 md:grid-cols-[1.1fr_0.9fr] md:items-start">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em]">Review status</p>
-          <p className="mt-1 text-sm font-semibold">{details.review_status.banner_title}</p>
-          <p className="mt-1 text-sm">{details.review_status.banner_body}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em]"><LocalizedText text="Review status" /></p>
+          <p className="mt-1 text-sm font-semibold"><LocalizedText text={details.review_status.banner_title} /></p>
+          <p className="mt-1 text-sm"><LocalizedText text={details.review_status.banner_body} /></p>
         </div>
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em]">Verify before acting</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em]"><LocalizedText text="Verify before acting" /></p>
           <ul className="mt-1 space-y-1 text-sm">
             {details.review_status.next_actions.slice(0, 3).map((item, index) => (
-              <li key={index}>• {item}</li>
+              <li key={index}>• <LocalizedText text={item} /></li>
             ))}
           </ul>
         </div>

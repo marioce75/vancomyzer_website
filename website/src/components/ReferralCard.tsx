@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 /**
  * Referral card — shown on /settings. Renders the user's referral link
@@ -62,7 +64,7 @@ export default function ReferralCard() {
   };
 
   if (loading) {
-    return <div style={cardStyle}><span style={{ color: "var(--color-dim)", fontSize: 13 }}>Loading referrals…</span></div>;
+    return <div style={cardStyle}><span style={{ color: "var(--color-dim)", fontSize: 13 }}><LocalizedText text={"Loading referrals…"} /></span></div>;
   }
   if (error || !data) {
     return null;
@@ -73,12 +75,8 @@ export default function ReferralCard() {
   return (
     <section style={cardStyle}>
       <header style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
-        <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--color-primary)", margin: 0, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-          Invite a colleague — get 1 month free
-        </h2>
-        <span style={{ fontSize: 11, color: "var(--color-dim)" }}>
-          Earn one free month every time a referred colleague subscribes to Pro.
-        </span>
+        <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--color-primary)", margin: 0, letterSpacing: "0.04em", textTransform: "uppercase" }}><LocalizedText text={"Invite a colleague — get 1 month free"} /></h2>
+        <span style={{ fontSize: 11, color: "var(--color-dim)" }}><LocalizedText text={"Earn one free month every time a referred colleague subscribes to Pro."} /></span>
       </header>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
@@ -114,7 +112,7 @@ export default function ReferralCard() {
             minWidth: 110,
           }}
         >
-          {copied ? "Copied!" : "Copy link"}
+          <LocalizedText text={copied ? "Copied!" : "Copy link"} />
         </button>
       </div>
 
@@ -125,9 +123,7 @@ export default function ReferralCard() {
         <Stat label="Earned" value={`$${earned}`} highlight={data.stats.credits_total_cents > 0} />
       </div>
 
-      <p style={{ fontSize: 11, color: "var(--color-dim)", margin: 0, lineHeight: 1.55 }}>
-        Share your link with colleagues. When they subscribe to Pro, a $9.99 referral credit is applied to your next Stripe invoice automatically. If you&apos;re still on Free, the credit is held until your first paid subscription.
-      </p>
+      <p style={{ fontSize: 11, color: "var(--color-dim)", margin: 0, lineHeight: 1.55 }}><LocalizedText text={"Share your link with colleagues. When they subscribe to Pro, a $9.99 referral credit is applied to your next Stripe invoice automatically. If you're still on Free, the credit is held until your first paid subscription."} /></p>
     </section>
   );
 }
@@ -136,7 +132,7 @@ function Stat({ label, value, highlight }: { label: string; value: string; highl
   return (
     <div style={{ padding: "8px 12px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 4 }}>
       <div style={{ fontSize: 10, color: "var(--color-dim)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-        {label}
+        <LocalizedText text={label} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 700, color: highlight ? "#047857" : "var(--color-primary)", marginTop: 2 }}>
         {value}

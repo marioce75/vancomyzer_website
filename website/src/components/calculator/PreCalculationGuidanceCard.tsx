@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import type { CalculatorMode } from "@/types/calculator";
 
@@ -15,20 +17,20 @@ export default function PreCalculationGuidanceCard({
     <section className="mb-4 rounded-2xl border border-blue-200 bg-blue-50 p-3">
       <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <p className="text-sm font-medium text-blue-950">
-          {isInitial
+          <LocalizedText text={isInitial
             ? "Estimate a maintenance regimen from patient characteristics."
-            : "Use only interpretable current-interval regimen and level timing."}
+            : "Use only interpretable current-interval regimen and level timing."} />
         </p>
         <details className="text-sm text-blue-900">
-          <summary className="cursor-pointer font-medium">More guidance</summary>
+          <summary className="cursor-pointer font-medium"><LocalizedText text="More guidance" /></summary>
           <div className="mt-2 space-y-1 leading-6">
-            <p>Not for pediatric, dialysis-specific, or continuous-infusion use.</p>
+            <p><LocalizedText text="Not for pediatric, dialysis-specific, or continuous-infusion use." /></p>
             <p>
-              {isInitial
+              <LocalizedText text={isInitial
                 ? "Treat as prior-based support rather than high-certainty individualized dosing."
-                : "Avoid levels drawn during infusion or immediately after infusion completion."}
+                : "Avoid levels drawn during infusion or immediately after infusion completion."} />
             </p>
-            <p>Unstable renal function, poor chronology, or sparse/mistimed levels require extra caution.</p>
+            <p><LocalizedText text="Unstable renal function, poor chronology, or sparse/mistimed levels require extra caution." /></p>
           </div>
         </details>
       </div>

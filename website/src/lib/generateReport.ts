@@ -18,6 +18,8 @@
  * lib/watermark.ts utility — gated by tier, no behavior duplication.
  */
 
+import { type Locale, translate } from "@/localization/catalog";
+import { localizeReportMarkup } from "@/localization/reportMarkup";
 import { buildExportWatermark } from "./watermark";
 import {
   COLIN_2019,
@@ -109,7 +111,7 @@ function formatDate(): string {
   });
 }
 
-export function generateReportHTML(data: ReportData, tier: string = "free"): string {
+export function generateReportHTML(data: ReportData, tier: string = "free", locale: Locale = "en"): string {
   const now = formatDate();
   const modeLabel = data.mode === "initial_regimen" ? "Initial Regimen (Prior-Based)" : "Existing Regimen (Bayesian)";
   const posteriorLabel = data.pk_parameters?.used_posterior_refinement ? "Posterior-updated" : "Patient characteristics only";
@@ -129,7 +131,7 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
   const assumptionsList = (data.assumptions ?? []).map(a => `<li>${escapeHtml(a)}</li>`).join("");
   const limitationsList = (data.limitations ?? []).map(l => `<li>${escapeHtml(l)}</li>`).join("");
 
-  return `<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -269,8 +271,8 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
     </div>
     <div class="meta">
       <div>${now}</div>
-      ${data.pharmacist_name ? `<div>Pharmacist: ${escapeHtml(data.pharmacist_name)}</div>` : ""}
-      ${data.institution ? `<div>${escapeHtml(data.institution)}</div>` : ""}
+      ${data.pharmacist_name ? `<div>Pharmacist: <span data-localization="preserve">${escapeHtml(data.pharmacist_name)}</span></div>` : ""}
+      ${data.institution ? `<div><span data-localization="preserve">${escapeHtml(data.institution)}</span></div>` : ""}
       <div>${escapeHtml(modelDisplayName(data.pk_model_name))}</div>
     </div>
   </div>
@@ -386,17 +388,18 @@ export function generateReportHTML(data: ReportData, tier: string = "free"): str
   ${watermark.bannerHtml}
 </body>
 </html>`;
+  return localizeReportMarkup(html, locale);
 }
 
 /**
  * Open a print dialog with the report HTML.
  * The pharmacist can then save as PDF or print to paper.
  */
-export function printReport(data: ReportData, tier: string = "free") {
-  const html = generateReportHTML(data, tier);
+export function printReport(data: ReportData, tier: string = "free", locale: Locale = "en") {
+  const html = generateReportHTML(data, tier, locale);
   const win = window.open("", "_blank", "width=800,height=1100");
   if (!win) {
-    alert("Please allow popups to generate the PDF report.");
+    alert(translate("Please allow popups to generate the PDF report.", locale));
     return;
   }
   win.document.write(html);

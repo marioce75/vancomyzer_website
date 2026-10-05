@@ -1,3 +1,7 @@
+import { localizeMetadata } from "@/localization/metadata";
+import { requestLocale } from "@/localization/server";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
 /**
  * /transparent-dosing/cases — Literature cases page.
  *
@@ -20,7 +24,7 @@ import { runAllCases, summarize, type CaseSummary } from "@/lib/validation/runCa
 import type { PublishedCase, CaseResult, ReferenceBand, ComparisonKind } from "@/lib/validation/types";
 import { COLIN_2019 } from "@/lib/pk/modelRegistry";
 
-export const metadata = {
+const englishMetadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing/cases" },
   title: "Literature Reproducibility — Vancomyzer",
   description:
@@ -44,18 +48,9 @@ export default function CasesPage() {
     <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 16px 80px", color: "#14232f" }}>
       <Breadcrumb />
 
-      <h1 className="vz-serif" style={{ fontSize: "clamp(28px, 3.4vw, 40px)", color: "#14232f", marginBottom: 12, lineHeight: 1.1 }}>
-        Literature Reproducibility
-      </h1>
-      <p style={{ fontSize: 17, color: "#4a5a68", lineHeight: 1.55, marginTop: 0, marginBottom: 12, maxWidth: "62ch" }}>
-        Published vancomycin values run through Vancomyzer&apos;s calculator. The two {COLIN_2019.shortName} cases are pass/fail checks of selected population predictions without measured levels, not tests of the full Bayesian model. Cases from other
-        published models or patient cohorts are shown for context only. These cases run in the automated
-        checks; a difference outside the stated tolerance fails the check.
-      </p>
-      <p style={{ fontSize: 13, color: "var(--color-dim)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 720 }}>
-        Vancomyzer has not yet been validated in real patients. Its equations are checked against published
-        values and synthetic test cases; external validation with patient data is planned.
-      </p>
+      <h1 className="vz-serif" style={{ fontSize: "clamp(28px, 3.4vw, 40px)", color: "#14232f", marginBottom: 12, lineHeight: 1.1 }}><LocalizedText text="Literature Reproducibility" /></h1>
+      <p style={{ fontSize: 17, color: "#4a5a68", lineHeight: 1.55, marginTop: 0, marginBottom: 12, maxWidth: "62ch" }}><LocalizedText text={`Published vancomycin values run through Vancomyzer's calculator. The two ${COLIN_2019.shortName} cases are pass/fail checks of selected population predictions without measured levels, not tests of the full Bayesian model. Cases from other published models or patient cohorts are shown for context only. These cases run in the automated checks; a difference outside the stated tolerance fails the check.`} /></p>
+      <p style={{ fontSize: 13, color: "var(--color-dim)", lineHeight: 1.55, marginTop: 0, marginBottom: 24, maxWidth: 720 }}><LocalizedText text="Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned." /></p>
 
       {CASES.length === 0 ? <EmptyState /> : <Body cases={CASES} results={results} summary={summary} />}
 
@@ -67,11 +62,9 @@ export default function CasesPage() {
 function Breadcrumb() {
   return (
     <div style={{ display: "flex", gap: 12, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
-      <Link href="/transparent-dosing" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-         Evidence
-      </Link>
+      <Link href="/transparent-dosing" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text="Evidence" /></Link>
       <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Literature Reproducibility</span>
+      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}><LocalizedText text="Literature Reproducibility" /></span>
     </div>
   );
 }
@@ -90,10 +83,7 @@ function EmptyState() {
         marginBottom: 28,
       }}
     >
-      <strong>No cases are registered yet.</strong> Each case will list the cited paper, the patient
-      inputs, the published value and the calculator&apos;s output, with the difference shown in either
-      direction.
-    </div>
+      <strong><LocalizedText text="No cases are registered yet." /></strong>{" "}<LocalizedText text="Each case will list the cited paper, the patient inputs, the published value and the calculator's output, with the difference shown in either direction." /></div>
   );
 }
 
@@ -131,9 +121,9 @@ function Body({ cases, results, summary }: BodyProps) {
         return (
           <section key={g.kind} style={{ marginBottom: 28 }}>
             <h2 className="vz-serif" style={{ fontSize: 22, color: "#14232f", margin: "0 0 4px", lineHeight: 1.25 }}>
-              {g.title}
+              <LocalizedText text={g.title} />
             </h2>
-            <p style={{ fontSize: 12, color: "var(--color-dim)", margin: "0 0 12px", lineHeight: 1.55 }}>{g.intro}</p>
+            <p style={{ fontSize: 12, color: "var(--color-dim)", margin: "0 0 12px", lineHeight: 1.55 }}><LocalizedText text={g.intro} /></p>
             <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 16 }}>
               {indices.map((i) => (
                 <CaseCard key={cases[i].id} caseDef={cases[i]} result={results[i]} />
@@ -160,27 +150,19 @@ function SummaryScorecard({ summary }: { summary: CaseSummary }) {
     >
       <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between" }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-dim)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-            Summary
-          </div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-dim)", letterSpacing: "0.08em", textTransform: "uppercase" }}><LocalizedText text="Summary" /></div>
           <div style={{ fontSize: 20, fontWeight: 700, color: allPassing ? "#047857" : "#92400e", marginTop: 4 }}>
-            {summary.passing} / {summary.reproduction_count} population prediction checks within tolerance
-            {summary.failing > 0 && (
+            {summary.passing} / {summary.reproduction_count}{" "}<LocalizedText text="population prediction checks within tolerance" />{summary.failing > 0 && (
               <span style={{ fontSize: 14, fontWeight: 600, marginLeft: 10, color: "#92400e" }}>
-                · {summary.failing} outside tolerance
-              </span>
+                · {summary.failing}{" "}<LocalizedText text="outside tolerance" /></span>
             )}
           </div>
-          <div style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 4 }}>
-            Not pass/fail: {summary.cross_model_reference_count} cross-model reference
-            {summary.cross_model_reference_count === 1 ? "" : "s"} and {summary.reference_band_count} reference band
-            {summary.reference_band_count === 1 ? "" : "s"}, excluded from these statistics.
-          </div>
+          <div style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 4 }}><LocalizedText text="Not pass/fail:" />{" "}<LocalizedText text={`${summary.cross_model_reference_count} cross-model reference${summary.cross_model_reference_count === 1 ? "" : "s"}`} />{" "}<LocalizedText text="and" />{" "}<LocalizedText text={`${summary.reference_band_count} reference band${summary.reference_band_count === 1 ? "" : "s"}`} /><LocalizedText text=", excluded from these statistics." /></div>
         </div>
         <dl style={{ display: "grid", gridTemplateColumns: "auto auto", gap: "4px 16px", margin: 0, fontSize: 12, color: "var(--color-secondary)" }}>
-          <dt style={{ margin: 0 }}>Largest |AUC₂₄ difference|</dt>
+          <dt style={{ margin: 0 }}><LocalizedText text="Largest |AUC₂₄ difference|" /></dt>
           <dd style={{ margin: 0, fontWeight: 600 }}>{summary.max_abs_auc_pct == null ? "—" : `${summary.max_abs_auc_pct.toFixed(2)}%`}</dd>
-          <dt style={{ margin: 0 }}>Largest |CL difference|</dt>
+          <dt style={{ margin: 0 }}><LocalizedText text="Largest |CL difference|" /></dt>
           <dd style={{ margin: 0, fontWeight: 600 }}>{summary.max_abs_clearance_pct == null ? "—" : `${summary.max_abs_clearance_pct.toFixed(2)}%`}</dd>
         </dl>
       </div>
@@ -208,18 +190,18 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
     >
       <header style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline", marginBottom: 6 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, color: "#14232f", margin: 0 }}>
-          {caseDef.source.specific_reference}
+          <LocalizedText text={caseDef.source.specific_reference} />
         </h3>
         {isReproduction ? <PassFailBadge pass={pass} failures={result.failures} /> : <ContextBadge />}
       </header>
       {!isReproduction && (
-        <p style={{ fontSize: 12, fontWeight: 600, color: "#334155", margin: "0 0 6px 0" }}>{CROSS_MODEL_WORDING}</p>
+        <p style={{ fontSize: 12, fontWeight: 600, color: "#334155", margin: "0 0 6px 0" }}><LocalizedText text={CROSS_MODEL_WORDING} /></p>
       )}
       <p style={{ fontSize: 12, color: "var(--color-secondary)", margin: "0 0 6px 0" }}>
-        <strong>{isReproduction ? "What it tests:" : "What it shows:"}</strong> {caseDef.what_it_tests}
+        <strong><LocalizedText text={isReproduction ? "What it tests:" : "What it shows:"} /></strong> <LocalizedText text={caseDef.what_it_tests} />
       </p>
       <p style={{ fontSize: 12, color: "var(--color-dim)", margin: "0 0 12px 0", lineHeight: 1.55 }}>
-        {caseDef.notes_for_page}
+        <LocalizedText text={caseDef.notes_for_page} />
       </p>
 
       <PatientRegimenLine caseDef={caseDef} />
@@ -238,9 +220,7 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
             color: "#78350f",
           }}
         >
-          <strong>Outside tolerance:</strong> {result.failures.join("; ")}. This case is shown so the page
-          reflects the calculator&apos;s current behavior; the discrepancy needs investigation.
-        </div>
+          <strong><LocalizedText text="Outside tolerance:" /></strong> {result.failures.join("; ")}<LocalizedText text=". This case is shown so the page reflects the calculator's current behavior; the discrepancy needs investigation." /></div>
       )}
 
       <SourceDetails caseDef={caseDef} />
@@ -258,9 +238,7 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
           DOI: {caseDef.source.doi}
         </span>
         {!caseDef.source.verified && (
-          <span style={{ fontSize: 11, color: "#92400e", background: "#fef3c7", padding: "1px 8px", borderRadius: 3 }}>
-            secondary source
-          </span>
+          <span style={{ fontSize: 11, color: "#92400e", background: "#fef3c7", padding: "1px 8px", borderRadius: 3 }}><LocalizedText text="secondary source" /></span>
         )}
         <Link
           href={`/calculator?case=${caseDef.id}`}
@@ -275,9 +253,7 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
             borderRadius: 4,
             textDecoration: "none",
           }}
-        >
-          Run in calculator
-        </Link>
+        ><LocalizedText text="Run in calculator" /></Link>
       </footer>
     </article>
   );
@@ -286,11 +262,11 @@ function CaseCard({ caseDef, result }: { caseDef: PublishedCase; result: CaseRes
 function SourceDetails({ caseDef }: { caseDef: PublishedCase }) {
   return (
     <details style={{ marginTop: 10, fontSize: 12, color: "var(--color-secondary)" }}>
-      <summary style={{ cursor: "pointer", color: "var(--color-dim)" }}>How the published value was obtained</summary>
+      <summary style={{ cursor: "pointer", color: "var(--color-dim)" }}><LocalizedText text="How the published value was obtained" /></summary>
       <div style={{ marginTop: 6, lineHeight: 1.55 }}>
-        <p style={{ margin: "0 0 4px" }}><strong>Extraction:</strong> {caseDef.published.extraction_method}</p>
-        <p style={{ margin: "0 0 4px" }}><strong>Verification:</strong> {caseDef.source.verification_note}</p>
-        <p style={{ margin: 0 }}><strong>Tolerance:</strong> {caseDef.published.tolerance_rationale}</p>
+        <p style={{ margin: "0 0 4px" }}><strong><LocalizedText text="Extraction:" /></strong> <LocalizedText text={caseDef.published.extraction_method} /></p>
+        <p style={{ margin: "0 0 4px" }}><strong><LocalizedText text="Verification:" /></strong> <LocalizedText text={caseDef.source.verification_note} /></p>
+        <p style={{ margin: 0 }}><strong><LocalizedText text="Tolerance:" /></strong> <LocalizedText text={caseDef.published.tolerance_rationale} /></p>
       </div>
     </details>
   );
@@ -327,27 +303,23 @@ function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: Re
     >
       <header style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline", marginBottom: 6 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, color: "#14232f", margin: 0 }}>
-          {caseDef.source.specific_reference}
+          <LocalizedText text={caseDef.source.specific_reference} />
         </h3>
-        <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#eef2ff", color: "#3730a3", border: "1px solid #c7d2fe", borderRadius: 4 }}>
-          ◇ Reference band · not pass/fail
-        </span>
+        <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#eef2ff", color: "#3730a3", border: "1px solid #c7d2fe", borderRadius: 4 }}><LocalizedText text="◇ Reference band · not pass/fail" /></span>
       </header>
       <p style={{ fontSize: 12, color: "var(--color-secondary)", margin: "0 0 6px 0" }}>
-        <strong>What it shows:</strong> {caseDef.what_it_tests}
+        <strong><LocalizedText text="What it shows:" /></strong> <LocalizedText text={caseDef.what_it_tests} />
       </p>
       <p style={{ fontSize: 12, color: "var(--color-dim)", margin: "0 0 10px 0", lineHeight: 1.55 }}>
-        {caseDef.notes_for_page}
+        <LocalizedText text={caseDef.notes_for_page} />
       </p>
 
       <div style={{ fontSize: 11, color: "var(--color-dim)", lineHeight: 1.55, padding: "8px 10px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 4, marginBottom: 12 }}>
-        <strong style={{ color: "var(--color-primary)" }}>Cohort:</strong> {band.cohort_description}
+        <strong style={{ color: "var(--color-primary)" }}><LocalizedText text="Cohort:" /></strong> <LocalizedText text={band.cohort_description} />
       </div>
 
       <div style={{ marginBottom: 12, overflowX: "auto" }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-dim)", marginBottom: 8, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-          Published cohort-mean AUC₂₄ (mg·h/L) per population model
-        </div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-dim)", marginBottom: 8, letterSpacing: "0.04em", textTransform: "uppercase" }}><LocalizedText text="Published cohort-mean AUC₂₄ (mg·h/L) per population model" /></div>
         <div style={{ display: "grid", gridTemplateColumns: "minmax(110px, 200px) minmax(80px, 1fr) 90px", gap: 8, alignItems: "center", fontSize: 12 }}>
           {band.platforms.map((p) => {
             const barWidthPct = ((p.mean_auc24_mg_h_l - xMin) / xRange) * 100;
@@ -380,7 +352,7 @@ function ReferenceBandCard({ caseDef, band }: { caseDef: PublishedCase; band: Re
       </div>
 
       <div style={{ fontSize: 12, color: "var(--color-secondary)", padding: "10px 12px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 4, marginBottom: 10, lineHeight: 1.55 }}>
-        <strong style={{ color: "var(--color-primary)" }}>How this relates to Vancomyzer:</strong> {band.our_position}
+        <strong style={{ color: "var(--color-primary)" }}><LocalizedText text="How this relates to Vancomyzer:" /></strong> <LocalizedText text={band.our_position} />
       </div>
 
       <footer style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
@@ -419,7 +391,7 @@ function PlatformRow({
         {name}
         {notes && (
           <div style={{ fontSize: 10, color: highlight ? "#3730a3" : "var(--color-dim)", fontWeight: 500, marginTop: 1 }}>
-            {notes}
+            <LocalizedText text={notes} />
           </div>
         )}
       </div>
@@ -464,26 +436,20 @@ function PlatformRow({
 function PassFailBadge({ pass, failures }: { pass: boolean; failures: string[] }) {
   if (pass) {
     return (
-      <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#ecfdf5", color: "#047857", border: "1px solid #6ee7b7", borderRadius: 4 }}>
-        Within tolerance
-      </span>
+      <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#ecfdf5", color: "#047857", border: "1px solid #6ee7b7", borderRadius: 4 }}><LocalizedText text="Within tolerance" /></span>
     );
   }
   return (
     <span
       title={failures.join("; ")}
       style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#fef3c7", color: "#92400e", border: "1px solid #fcd34d", borderRadius: 4 }}
-    >
-      ⚠ Outside tolerance
-    </span>
+    ><LocalizedText text="⚠ Outside tolerance" /></span>
   );
 }
 
 function ContextBadge() {
   return (
-    <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#f1f5f9", color: "#334155", border: "1px solid #cbd5e1", borderRadius: 4 }}>
-      Different model · context only
-    </span>
+    <span style={{ display: "inline-block", padding: "2px 10px", fontSize: 11, fontWeight: 600, background: "#f1f5f9", color: "#334155", border: "1px solid #cbd5e1", borderRadius: 4 }}><LocalizedText text="Different model · context only" /></span>
   );
 }
 
@@ -500,31 +466,31 @@ function PatientRegimenLine({ caseDef }: { caseDef: PublishedCase }) {
   return (
     <div style={{ fontSize: 12, color: "var(--color-secondary)", marginBottom: 10, lineHeight: 1.55 }}>
       <div>
-        <strong style={{ color: "var(--color-primary)" }}>Patient:</strong>{" "}
-        {p.age_years} y {p.sex} · {p.weight_kg} kg · SCr {p.serum_creatinine_mg_dl} mg/dL
+        <strong style={{ color: "var(--color-primary)" }}><LocalizedText text="Patient:" /></strong>{" "}
+        {p.age_years} y <LocalizedText text={p.sex} /> · {p.weight_kg} kg · SCr {p.serum_creatinine_mg_dl} mg/dL
         {p.height_cm && <> · {p.height_cm} cm</>}
         {r && (
           <>
             <span aria-hidden="true" style={{ margin: "0 8px", color: "#546471" }}>·</span>
-            <strong style={{ color: "var(--color-primary)" }}>Regimen:</strong>{" "}
-            {r.dose_mg} mg every {r.interval_hours} h over {r.infusion_duration_hours} h
+            <strong style={{ color: "var(--color-primary)" }}><LocalizedText text="Regimen:" /></strong>{" "}
+            {r.dose_mg}<LocalizedText text="mg every" />{" "}{r.interval_hours}<LocalizedText text="h over" />{" "}{r.infusion_duration_hours} h
           </>
         )}
         {caseDef.levels.length > 0 && (
           <>
             <span aria-hidden="true" style={{ margin: "0 8px", color: "#546471" }}>·</span>
-            <strong style={{ color: "var(--color-primary)" }}>Levels (hours after the start of the dose):</strong>{" "}
+            <strong style={{ color: "var(--color-primary)" }}><LocalizedText text="Levels (hours after the start of the dose):" /></strong>{" "}
             {caseDef.levels.map((l, i) => (
               <span key={i}>
                 {i > 0 && ", "}
-                {l.value_mcg_ml} mg/L at {l.time_since_last_dose_hours} h
+                {l.value_mcg_ml}{" "}<LocalizedText text="mg/L at" />{" "}{l.time_since_last_dose_hours} h
               </span>
             ))}
           </>
         )}
       </div>
       <div style={{ fontSize: 11, color: "var(--color-dim)", marginTop: 4 }}>
-        <strong>{INPUTS_LABEL[p.inputs_status]}.</strong> {p.notes}
+        <strong><LocalizedText text={INPUTS_LABEL[p.inputs_status]} />.</strong> <LocalizedText text={p.notes} />
       </div>
     </div>
   );
@@ -578,10 +544,10 @@ function ReproductionTable({ caseDef, result }: { caseDef: PublishedCase; result
         <thead>
           <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
             <th style={thStyle}></th>
-            <th style={thStyle}>Published</th>
+            <th style={thStyle}><LocalizedText text="Published" /></th>
             <th style={thStyle}>Vancomyzer ({COLIN_2019.shortName})</th>
-            <th style={thStyle}>Difference</th>
-            <th style={thStyle}>Tolerance</th>
+            <th style={thStyle}><LocalizedText text="Difference" /></th>
+            <th style={thStyle}><LocalizedText text="Tolerance" /></th>
           </tr>
         </thead>
         <tbody>
@@ -589,11 +555,11 @@ function ReproductionTable({ caseDef, result }: { caseDef: PublishedCase; result
             const ok = r.pct != null && r.tol != null && Math.abs(r.pct) <= r.tol;
             return (
               <tr key={r.label} style={{ borderBottom: "1px solid var(--color-border)" }}>
-                <td style={tdLabelStyle}>{r.label}</td>
+                <td style={tdLabelStyle}><LocalizedText text={r.label} /></td>
                 <td style={tdNumStyle}>{r.publishedText ?? r.published?.toFixed(r.digits) ?? "—"}</td>
                 <td style={tdNumStyle}>{r.engine?.toFixed(r.digits) ?? "—"}</td>
                 <td style={{ ...tdNumStyle, color: ok ? "#047857" : "#b91c1c", fontWeight: 600 }}>
-                  {signedPct(r.pct, 2)} {ok ? "Within tolerance" : "Outside tolerance"}
+                  {signedPct(r.pct, 2)} <LocalizedText text={ok ? "Within tolerance" : "Outside tolerance"} />
                 </td>
                 <td style={tdNumStyle}>±{r.tol}%</td>
               </tr>
@@ -613,15 +579,15 @@ function CrossModelTable({ caseDef, result }: { caseDef: PublishedCase; result: 
         <thead>
           <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
             <th style={thStyle}></th>
-            <th style={thStyle}>Published (different model or cohort)</th>
+            <th style={thStyle}><LocalizedText text="Published (different model or cohort)" /></th>
             <th style={thStyle}>Vancomyzer ({COLIN_2019.shortName})</th>
-            <th style={thStyle}>Difference (context only)</th>
+            <th style={thStyle}><LocalizedText text="Difference (context only)" /></th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
             <tr key={r.label} style={{ borderBottom: "1px solid var(--color-border)" }}>
-              <td style={tdLabelStyle}>{r.label}</td>
+              <td style={tdLabelStyle}><LocalizedText text={r.label} /></td>
               <td style={tdNumStyle}>{r.publishedText ?? r.published?.toFixed(r.digits) ?? "—"}</td>
               <td style={tdNumStyle}>{r.engine?.toFixed(r.digits) ?? "—"}</td>
               <td style={{ ...tdNumStyle, color: "var(--color-secondary)" }}>{signedPct(r.pct, 1)}</td>
@@ -630,8 +596,7 @@ function CrossModelTable({ caseDef, result }: { caseDef: PublishedCase; result: 
         </tbody>
       </table>
       {caseDef.published.auc24_range && (
-        <p style={{ fontSize: 11, color: "var(--color-dim)", margin: "6px 0 0", lineHeight: 1.5 }}>
-          AUC₂₄ values in parentheses: {caseDef.published.auc24_range.description}.
+        <p style={{ fontSize: 11, color: "var(--color-dim)", margin: "6px 0 0", lineHeight: 1.5 }}><LocalizedText text="AUC₂₄ values in parentheses:" />{" "}<LocalizedText text={caseDef.published.auc24_range.description} />.
         </p>
       )}
     </div>
@@ -671,50 +636,23 @@ function Limitations() {
         borderRadius: 0,
       }}
     >
-      <h2 className="vz-serif" style={{ fontSize: 22, color: "#14232f", marginTop: 0, marginBottom: 10, lineHeight: 1.25 }}>
-        Limitations
-      </h2>
+      <h2 className="vz-serif" style={{ fontSize: 22, color: "#14232f", marginTop: 0, marginBottom: 10, lineHeight: 1.25 }}><LocalizedText text="Limitations" /></h2>
       <ul style={{ fontSize: 12, color: "var(--color-secondary)", lineHeight: 1.65, marginLeft: 18, marginTop: 0, marginBottom: 0 }}>
+        <li><LocalizedText text="These cases check the calculator against published values; they are not clinical validation. Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned." /></li>
+        <li><LocalizedText text="Only the same-model reproductions (" />{COLIN_2019.shortName}<LocalizedText text=") are pass/fail tests. They use model-typical individuals without measured levels. They test selected population predictions and derived steady-state AUC, not the complete Bayesian random-effects structure, residual model, or clinical dosing accuracy." /></li>
+        <li><LocalizedText text="Cross-model references compare the calculator (" />{COLIN_2019.shortName}<LocalizedText text=") with a different published model or a cohort statistic." />{" "}<LocalizedText text={CROSS_MODEL_WORDING} />{" "}<LocalizedText text="A difference does not show which model is more accurate for a given patient. Some of these cards use approximated or illustrative inputs; each card says which." /></li>
         <li>
-          These cases check the calculator against published values; they are not clinical validation.
-          Vancomyzer has not yet been validated in real patients. Its equations are checked against
-          published values and synthetic test cases; external validation with patient data is planned.
-        </li>
+          <strong><LocalizedText text="No pediatric, dialysis or post-transplant cases." /></strong>{" "}<LocalizedText text="These are outside Vancomyzer's scope (adults not on renal replacement therapy)." /></li>
         <li>
-          Only the same-model reproductions ({COLIN_2019.shortName}) are pass/fail tests. They use
-          model-typical individuals without measured levels. They test selected population predictions and derived steady-state AUC, not the complete Bayesian random-effects structure, residual model, or clinical dosing accuracy.
-        </li>
-        <li>
-          Cross-model references compare the calculator ({COLIN_2019.shortName}) with a different published
-          model or a cohort statistic. {CROSS_MODEL_WORDING} A difference does not show which model is more
-          accurate for a given patient. Some of these cards use approximated or illustrative inputs; each
-          card says which.
-        </li>
-        <li>
-          <strong>No pediatric, dialysis or post-transplant cases.</strong> These are outside
-          Vancomyzer&apos;s scope (adults not on renal replacement therapy).
-        </li>
-        <li>
-          <strong>Sources considered but not added as cases:</strong>
-          {" "}Rybak/ASHP 2020 (narrative recommendations only, no worked patient example to reproduce);
-          {" "}Pai 2014 (aggregate results across the cohort, no per-patient demographics with AUC);
-          {" "}Turner 2018 (aggregate medians and interquartile ranges per program across 19 ICU patients;
-          not yet added as a reference band);
-          {" "}Neely 2014 cohort trough (the comparison was circular: the fitted level was the value being
-          compared);
-          {" "}Shingde 2020 single-sample Bayesian (the candidate &quot;published AUC&quot; was derived
-          rather than read from the paper, so the comparison would have been circular).
-          {" "}Patanwala 2022 is shown above as a reference band.
-        </li>
-        <li>
-          A &quot;within tolerance&quot; result does not mean a recommendation is correct for any
-          individual patient. Every clinical decision remains the responsibility of the treating clinician.
-        </li>
-        <li>
-          These cases run in the automated checks; a difference outside the stated tolerance fails the check.
-          A case outside tolerance is still shown on this page, with an amber badge.
-        </li>
+          <strong><LocalizedText text="Sources considered but not added as cases:" /></strong>
+          {" "}<LocalizedText text="Rybak/ASHP 2020 (narrative recommendations only, no worked patient example to reproduce);" />{" "}<LocalizedText text="Pai 2014 (aggregate results across the cohort, no per-patient demographics with AUC);" />{" "}<LocalizedText text="Turner 2018 (aggregate medians and interquartile ranges per program across 19 ICU patients; not yet added as a reference band);" />{" "}<LocalizedText text="Neely 2014 cohort trough (the comparison was circular: the fitted level was the value being compared);" />{" "}<LocalizedText text={"Shingde 2020 single-sample Bayesian (the candidate \"published AUC\" was derived rather than read from the paper, so the comparison would have been circular)."} />{" "}<LocalizedText text="Patanwala 2022 is shown above as a reference band." /></li>
+        <li><LocalizedText text={"A \"within tolerance\" result does not mean a recommendation is correct for any individual patient. Every clinical decision remains the responsibility of the treating clinician."} /></li>
+        <li><LocalizedText text="These cases run in the automated checks; a difference outside the stated tolerance fails the check. A case outside tolerance is still shown on this page, with an amber badge." /></li>
       </ul>
     </section>
   );
+}
+
+export async function generateMetadata() {
+  return localizeMetadata(englishMetadata, await requestLocale());
 }

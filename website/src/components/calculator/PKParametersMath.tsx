@@ -1,4 +1,9 @@
 "use client";
+import { LocalizedEquation } from "@/localization/LocalizedEquation";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedSection } from "@/localization/LocalizedElements";
+
 
 import {
   COLIN_2019,
@@ -135,50 +140,48 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
   const equationStyle = { fontSize: 12, lineHeight: 1.6, overflowWrap: "anywhere" as const, color: "var(--color-secondary)" };
 
   return (
-    <section aria-label="Pharmacokinetic estimates" style={{ minWidth: 0 }}>
-      <h3 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 4px", color: "var(--color-primary)" }}>Pharmacokinetic estimates</h3>
-      <p style={{ fontSize: 12, lineHeight: 1.5, margin: "0 0 12px", color: "var(--color-secondary)" }}>
-        Model: {modelHeaderLabel}. {params.used_posterior_refinement ? "Estimates updated using measured vancomycin levels." : "Estimates based on patient information, without measured-level adjustment."}
+    <LocalizedSection aria-label="Pharmacokinetic estimates" style={{ minWidth: 0 }}>
+      <h3 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 4px", color: "var(--color-primary)" }}><LocalizedText text="Pharmacokinetic estimates" /></h3>
+      <p style={{ fontSize: 12, lineHeight: 1.5, margin: "0 0 12px", color: "var(--color-secondary)" }}><LocalizedText text="Model:" />{" "}<LocalizedText text={modelHeaderLabel} />. <LocalizedText text={params.used_posterior_refinement ? "Estimates updated using measured vancomycin levels." : "Estimates based on patient information, without measured-level adjustment."} />
       </p>
       {isRetiredModel && (
         <p style={{ fontSize: 13, padding: 8, color: "#92400e", background: "#fffbeb" }}>
-          <strong>Saved historical calculation.</strong> Recalculate using the current calculator before reviewing a dosing decision.
-        </p>
+          <strong><LocalizedText text="Saved historical calculation." /></strong>{" "}<LocalizedText text="Recalculate using the current calculator before reviewing a dosing decision." /></p>
       )}
       <dl style={{ margin: 0 }}>
         {PARAM_LABELS.map(row => (
           <div key={row.key} style={{ borderTop: "1px solid var(--color-border)", padding: "10px 0" }}>
             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
-              <dt style={{ fontSize: 13, fontWeight: 600, color: "var(--color-secondary)" }}>{row.label} <span style={{ fontWeight: 400 }}>({row.key})</span></dt>
+              <dt style={{ fontSize: 13, fontWeight: 600, color: "var(--color-secondary)" }}><LocalizedText text={row.label} /> <span style={{ fontWeight: 400 }}>({row.key})</span></dt>
               <dd style={{ margin: 0, whiteSpace: "nowrap", fontSize: 16, fontWeight: 700, fontVariantNumeric: "tabular-nums", color: "var(--color-primary)" }}>
                 {fmt(params[row.key], 1)} <span style={{ fontSize: 12, fontWeight: 400, color: "var(--color-secondary)" }}>{row.unit}</span>
               </dd>
             </div>
-            <p style={{ fontSize: 12, lineHeight: 1.5, color: "var(--color-dim)", margin: "3px 0 0" }}>{row.description}</p>
+            <p style={{ fontSize: 12, lineHeight: 1.5, color: "var(--color-dim)", margin: "3px 0 0" }}><LocalizedText text={row.description} /></p>
           </div>
         ))}
       </dl>
-      <p style={{ fontSize: 12, lineHeight: 1.5, margin: "4px 0 12px", color: "var(--color-dim)" }}>These are model estimates. The volumes are not measurements of body-fluid volume.</p>
+      <p style={{ fontSize: 12, lineHeight: 1.5, margin: "4px 0 12px", color: "var(--color-dim)" }}><LocalizedText text="These are model estimates. The volumes are not measurements of body-fluid volume." /></p>
       {!isRetiredModel && (
         <details style={{ border: "1px solid var(--color-border)", borderRadius: 6, padding: "8px 10px", marginBottom: 12 }}>
-          <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 600, color: "var(--color-primary)" }}>Equations and calculation details</summary>
-          <p style={{ fontSize: 12, lineHeight: 1.5, color: "var(--color-secondary)" }}>The equations give the starting population estimates.{params.used_posterior_refinement ? " The results above also include adjustment using measured levels, so they may differ from these starting values." : ""}</p>
+          <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 600, color: "var(--color-primary)" }}><LocalizedText text="Equations and calculation details" /></summary>
+          <p style={{ fontSize: 12, lineHeight: 1.5, color: "var(--color-secondary)" }}><LocalizedText text="The equations give the starting population estimates." /><LocalizedText text={params.used_posterior_refinement ? " The results above also include adjustment using measured levels, so they may differ from these starting values." : ""} /></p>
           {rows.map(row => (
             <section key={row.key} style={{ borderTop: "1px solid var(--color-border)", padding: "10px 0" }}>
-              <h4 style={{ fontSize: 13, margin: "0 0 6px", color: "var(--color-primary)" }}>{PARAM_LABELS.find(p => p.key === row.key)?.label} ({row.key})</h4>
+              <h4 style={{ fontSize: 13, margin: "0 0 6px", color: "var(--color-primary)" }}><LocalizedText text={PARAM_LABELS.find(p => p.key === row.key)?.label} /> ({row.key})</h4>
               <div style={equationStyle}>
-                <p style={{ margin: "0 0 6px" }}>{row.equation}</p>
-                <p style={{ margin: "0 0 6px" }}>{row.substitute(params)} = {fmt(row.prior(params), 1)} {row.unit} (starting estimate)</p>
+                <p style={{ margin: "0 0 6px" }}><LocalizedEquation text={row.equation} /></p>
+                <p style={{ margin: "0 0 6px" }}>{row.substitute(params)} = {fmt(row.prior(params), 1)} {row.unit}{" "}<LocalizedText text="(starting estimate)" /></p>
                 {row.key === "CL" && (
                   <details style={{ marginTop: 8 }}>
-                    <summary style={{ cursor: "pointer" }}>Age and creatinine factors</summary>
+                    <summary style={{ cursor: "pointer" }}><LocalizedText text="Age and creatinine factors" /></summary>
                     <div style={{ paddingTop: 6 }}>
-                      <p>{COLIN_2019.equations.PMA} = {fmt(covariates.PMA_yr, 2)}</p>
-                      <p>{COLIN_2019.equations.FMat} = {f3(covariates.FMat)}</p>
-                      <p>{COLIN_2019.equations.FDecline} = {f3(covariates.FDecline)}</p>
-                      <p>{COLIN_2019.equations.SCRstd} = {f3(covariates.SCRstd)}</p>
-                      <p>{COLIN_2019.equations.FSCR} = {f3(covariates.FSCR)}</p>
-                      <p>For this model calculation, serum creatinine below {MIN_SCR_MG_DL} mg/dL is set to {MIN_SCR_MG_DL} mg/dL.</p>
+                      <p><LocalizedEquation text={COLIN_2019.equations.PMA} /> = {fmt(covariates.PMA_yr, 2)}</p>
+                      <p><LocalizedEquation text={COLIN_2019.equations.FMat} /> = {f3(covariates.FMat)}</p>
+                      <p><LocalizedEquation text={COLIN_2019.equations.FDecline} /> = {f3(covariates.FDecline)}</p>
+                      <p><LocalizedEquation text={COLIN_2019.equations.SCRstd} /> = {f3(covariates.SCRstd)}</p>
+                      <p><LocalizedEquation text={COLIN_2019.equations.FSCR} /> = {f3(covariates.FSCR)}</p>
+                      <p><LocalizedText text="For this model calculation, serum creatinine below" />{" "}{MIN_SCR_MG_DL}{" "}<LocalizedText text="mg/dL is set to" />{" "}{MIN_SCR_MG_DL} mg/dL.</p>
                     </div>
                   </details>
                 )}
@@ -190,9 +193,9 @@ export default function PKParametersMath({ params }: PKParametersMathProps) {
       {!isRetiredModel && (
         <p style={{ fontSize: 12, lineHeight: 1.5, margin: 0, color: "var(--color-dim)" }}>
           {COLIN_2019.citation}{" "}
-          <a href={`https://doi.org/${COLIN_2019.doi}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-primary)", textDecoration: "underline" }}>Read the model study</a>
+          <a href={`https://doi.org/${COLIN_2019.doi}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-primary)", textDecoration: "underline" }}><LocalizedText text="Read the model study" /></a>
         </p>
       )}
-    </section>
+    </LocalizedSection>
   );
 }

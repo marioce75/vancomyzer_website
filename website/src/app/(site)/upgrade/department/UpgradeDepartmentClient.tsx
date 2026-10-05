@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedInput } from "@/localization/LocalizedElements";
+
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
@@ -66,27 +70,17 @@ export default function UpgradeDepartmentClient() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-16">
       <div className="mb-10 text-center">
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#1f5e96" }}>
-          Department · self-serve
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: "var(--color-primary)" }}>
-          Set up Vancomyzer for your team
-        </h1>
-        <p className="mt-3 text-base" style={{ color: "var(--color-secondary)" }}>
-          14-day free trial · card required at signup · not charged until the trial ends · cancel anytime
-        </p>
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#1f5e96" }}><LocalizedText text={"Department · self-serve"} /></p>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: "var(--color-primary)" }}><LocalizedText text={"Set up Vancomyzer for your team"} /></h1>
+        <p className="mt-3 text-base" style={{ color: "var(--color-secondary)" }}><LocalizedText text={"14-day free trial · card required at signup · not charged until the trial ends · cancel anytime"} /></p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8 rounded-lg border p-8" style={{ borderColor: "var(--color-border)", background: "var(--color-bg)" }}>
         {/* Institution name */}
         <div>
-          <label htmlFor="institution-name" className="block text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
-            Institution name
-          </label>
-          <p className="mt-1 text-xs" style={{ color: "var(--color-secondary)" }}>
-            How your hospital, department, or group should appear on receipts and the admin panel.
-          </p>
-          <input
+          <label htmlFor="institution-name" className="block text-sm font-semibold" style={{ color: "var(--color-primary)" }}><LocalizedText text={"Institution name"} /></label>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-secondary)" }}><LocalizedText text={"How your hospital, department, or group should appear on receipts and the admin panel."} /></p>
+          <LocalizedInput
             id="institution-name"
             type="text"
             value={institutionName}
@@ -101,14 +95,10 @@ export default function UpgradeDepartmentClient() {
 
         {/* Seat picker */}
         <div>
-          <label className="block text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
-            Team size
-          </label>
-          <p className="mt-1 text-xs" style={{ color: "var(--color-secondary)" }}>
-            Two flat plans. Pick how many clinicians will use Vancomyzer.
-          </p>
+          <label className="block text-sm font-semibold" style={{ color: "var(--color-primary)" }}><LocalizedText text={"Team size"} /></label>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-secondary)" }}><LocalizedText text={"Two flat plans. Pick how many clinicians will use Vancomyzer."} /></p>
           <div className="mt-3 flex items-center gap-4">
-            <input
+            <LocalizedInput
               type="range"
               min={MIN_SEATS}
               max={MAX_SEATS}
@@ -119,24 +109,20 @@ export default function UpgradeDepartmentClient() {
               aria-label="Number of seats"
             />
             <span className="w-16 text-right text-base font-semibold" style={{ color: "var(--color-primary)" }}>
-              {seats} seats
-            </span>
+              {seats}{" "}<LocalizedText text={"seats"} /></span>
           </div>
         </div>
 
         {/* Live pricing summary */}
         <div className="rounded-md border-l-4 px-5 py-4" style={{ borderColor: "#1f5e96", background: "rgba(31,94,150,0.05)" }}>
           <div className="flex items-baseline justify-between">
-            <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
-              Department · {pricing.label}
+            <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}><LocalizedText text={"Department ·"} />{" "}<LocalizedText text={pricing.label} />
             </span>
             <span className="text-2xl font-extrabold" style={{ color: "var(--color-primary)" }}>
-              ${pricing.amount}<span className="ml-1 text-sm font-medium" style={{ color: "var(--color-secondary)" }}>/mo</span>
+              ${pricing.amount}<span className="ml-1 text-sm font-medium" style={{ color: "var(--color-secondary)" }}><LocalizedText text={"/mo"} /></span>
             </span>
           </div>
-          <p className="mt-2 text-xs" style={{ color: "var(--color-secondary)" }}>
-            First charge on <strong>{trialEnd}</strong> ({TRIAL_DAYS} days from today). Cancel before then for $0.
-          </p>
+          <p className="mt-2 text-xs" style={{ color: "var(--color-secondary)" }}><LocalizedText text={"First charge on"} />{" "}<strong>{trialEnd}</strong> ({TRIAL_DAYS}{" "}<LocalizedText text={"days from today). Cancel before then for $0."} /></p>
         </div>
 
         {/* What's included */}
@@ -151,7 +137,7 @@ export default function UpgradeDepartmentClient() {
           ].map((feature) => (
             <li key={feature} className="flex items-start gap-2">
 
-              {feature}
+              <LocalizedText text={feature} />
             </li>
           ))}
         </ul>
@@ -159,23 +145,19 @@ export default function UpgradeDepartmentClient() {
         {/* Error display */}
         {error && (
           <div className="rounded-md border-l-4 px-4 py-3 text-sm" style={{ borderColor: "#dc2626", background: "#fef2f2", color: "#991b1b" }}>
-            {error}
+            <LocalizedText text={error} />
           </div>
         )}
 
         <label className="block text-sm">
-          <input type="checkbox" checked={renewalConsent} onChange={e => setRenewalConsent(e.target.checked)} />{" "}
-          I agree to automatic renewal: after 14 days, ${pricing.amount.toLocaleString()} is charged monthly until canceled online through team billing. Cancel before the trial ends to avoid a charge, or before renewal to stop the next charge. BAA requires separate review and execution.
-        </label>
+          <input type="checkbox" checked={renewalConsent} onChange={e => setRenewalConsent(e.target.checked)} />{" "}<LocalizedText text={"I agree to automatic renewal: after 14 days, $"} />{pricing.amount.toLocaleString()}{" "}<LocalizedText text={"is charged monthly until canceled online through team billing. Cancel before the trial ends to avoid a charge, or before renewal to stop the next charge. BAA requires separate review and execution."} /></label>
         {/* Submit */}
         <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href="/pricing"
             className="text-sm font-medium"
             style={{ color: "var(--color-secondary)" }}
-          >
-             Back to pricing
-          </Link>
+          ><LocalizedText text={"Back to pricing"} /></Link>
           <button
             type="submit"
             disabled={!canSubmit}
@@ -187,15 +169,11 @@ export default function UpgradeDepartmentClient() {
               letterSpacing: "0.06em",
             }}
           >
-            {submitting ? "Redirecting to checkout…" : `Start ${TRIAL_DAYS}-day trial `}
+            <LocalizedText text={submitting ? "Redirecting to checkout…" : `Start ${TRIAL_DAYS}-day trial `} />
           </button>
         </div>
 
-        <p className="text-xs" style={{ color: "var(--color-dim)" }}>
-          By starting the trial you become the institution admin. You can invite teammates immediately,
-          and assign admin to another user any time from the admin panel. Your card is saved at signup
-          and not charged until the trial ends.
-        </p>
+        <p className="text-xs" style={{ color: "var(--color-dim)" }}><LocalizedText text={"By starting the trial you become the institution admin. You can invite teammates immediately, and assign admin to another user any time from the admin panel. Your card is saved at signup and not charged until the trial ends."} /></p>
       </form>
     </main>
   );

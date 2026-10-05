@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedInput, LocalizedButton } from "@/localization/LocalizedElements";
+
 
 import React, { useState, useEffect, useRef } from "react";
 import { CalculateRequestLevel } from "@/types/calculator";
@@ -245,7 +249,7 @@ export default function LevelEntryTable({
         return (
           <div key={i} className="rounded-md p-2.5 flex flex-col gap-2.5" style={{border: '1px solid var(--color-border)', background: 'var(--color-highlight, #f7fafc)'}}>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Level {i + 1}</span>
+              <span className="text-xs font-bold text-slate-700 uppercase tracking-wide"><LocalizedText text="Level" />{" "}{i + 1}</span>
               <button
                 type="button"
                 tabIndex={-1}
@@ -253,13 +257,13 @@ export default function LevelEntryTable({
                 className="text-[11px] font-semibold underline"
                 style={{ color: "var(--color-primary)" }}
               >
-                {isDateMode ? "Enter hours manually instead" : "Use date & time instead"}
+                <LocalizedText text={isDateMode ? "Enter hours manually instead" : "Use date & time instead"} />
               </button>
             </div>
 
             {/* 1. Vancomycin level concentration */}
             <div>
-              <Label>Vancomycin level concentration (mg/L)</Label>
+              <Label><LocalizedText text="Vancomycin level concentration (mg/L)" /></Label>
               <div className="flex">
                 <ClinicalNumberInput
                   inputMode="decimal"
@@ -284,12 +288,12 @@ export default function LevelEntryTable({
                 </span>
               </div>
               {/* Validation errors only shown after a failed Calculate attempt (set via fieldErrors prop) */}
-              {valueError && <p className="text-xs text-red-600 mt-1">{valueError}</p>}
+              {valueError && <p className="text-xs text-red-600 mt-1"><LocalizedText text={valueError} /></p>}
               {!valueError && parseErrors[`value-${i}`] && (
-                <p className="text-xs text-red-600 mt-1">{parseErrors[`value-${i}`]}</p>
+                <p className="text-xs text-red-600 mt-1"><LocalizedText text={parseErrors[`value-${i}`]} /></p>
               )}
               {!valueError && !parseErrors[`value-${i}`] && levelWarnings[i] && (
-                <p className="text-xs text-amber-700 mt-1 font-medium">⚠ {levelWarnings[i]}</p>
+                <p className="text-xs text-amber-700 mt-1 font-medium">⚠ <LocalizedText text={levelWarnings[i]} /></p>
               )}
             </div>
 
@@ -297,7 +301,7 @@ export default function LevelEntryTable({
               <>
                 {/* 2. Level drawn — date + time */}
                 <div>
-                  <Label>Level drawn</Label>
+                  <Label><LocalizedText text="Level drawn" /></Label>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <DatePartInput
@@ -305,11 +309,11 @@ export default function LevelEntryTable({
                         onChange={(v) => updateDateTime(i, "levelDate", v)}
                         hasError={Boolean(timeError || collectionError)}
                       />
-                      <p className="text-[10px] mt-0.5 text-slate-500">Date (MM / DD / YYYY)</p>
+                      <p className="text-[10px] mt-0.5 text-slate-500"><LocalizedText text="Date (MM / DD / YYYY)" /></p>
                     </div>
                     <div>
                       <div className="flex gap-1">
-                        <input
+                        <LocalizedInput
                           type="text"
                           inputMode="numeric"
                           value={dt.levelTime}
@@ -318,37 +322,33 @@ export default function LevelEntryTable({
                           placeholder="e.g. 1435"
                           maxLength={5}
                         />
-                        <button
+                        <LocalizedButton
                           type="button"
                           tabIndex={-1}
                           onClick={() => updateDateTime(i, "levelTime", nowHHMM())}
                           className="shrink-0 h-9 px-2.5 rounded border text-xs font-semibold transition-colors"
                           style={{border: '1px solid #a0aec0', background: '#fff', color: '#1f5e96'}}
                           title="Stamp current time"
-                        >
-                          Now
-                        </button>
+                        ><LocalizedText text="Now" /></LocalizedButton>
                       </div>
-                      <p className="text-[10px] mt-0.5 text-slate-500">Military time (HH:MM)</p>
-                      {dt.levelTimeErr && <p className="text-[10px] text-red-600">{dt.levelTimeErr}</p>}
+                      <p className="text-[10px] mt-0.5 text-slate-500"><LocalizedText text="Military time (HH:MM)" /></p>
+                      {dt.levelTimeErr && <p className="text-[10px] text-red-600"><LocalizedText text={dt.levelTimeErr} /></p>}
                     </div>
                   </div>
-                  <p className="text-[11px] mt-1 text-slate-500">Exact date and time blood was drawn</p>
+                  <p className="text-[11px] mt-1 text-slate-500"><LocalizedText text="Exact date and time blood was drawn" /></p>
                 </div>
 
                 {/* Cross-midnight banner */}
                 {crossMidnight && (
                   <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 flex items-start gap-2">
                     <span className="text-amber-700 shrink-0">⚠</span>
-                    <p className="text-xs font-semibold text-amber-800">
-                      Level drawn on a different date than dose — please verify this is correct before calculating.
-                    </p>
+                    <p className="text-xs font-semibold text-amber-800"><LocalizedText text="Level drawn on a different date than dose — please verify this is correct before calculating." /></p>
                   </div>
                 )}
 
                 {/* 3. Last dose administered — date + time */}
                 <div>
-                  <Label>Last dose administered</Label>
+                  <Label><LocalizedText text="Last dose administered" /></Label>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <DatePartInput
@@ -356,11 +356,11 @@ export default function LevelEntryTable({
                         onChange={(v) => updateDateTime(i, "doseDate", v)}
                         hasError={false}
                       />
-                      <p className="text-[10px] mt-0.5 text-slate-500">Date (MM / DD / YYYY)</p>
+                      <p className="text-[10px] mt-0.5 text-slate-500"><LocalizedText text="Date (MM / DD / YYYY)" /></p>
                     </div>
                     <div>
                       <div className="flex gap-1">
-                        <input
+                        <LocalizedInput
                           type="text"
                           inputMode="numeric"
                           value={dt.doseTime}
@@ -369,22 +369,20 @@ export default function LevelEntryTable({
                           placeholder="e.g. 0800"
                           maxLength={5}
                         />
-                        <button
+                        <LocalizedButton
                           type="button"
                           tabIndex={-1}
                           onClick={() => updateDateTime(i, "doseTime", nowHHMM())}
                           className="shrink-0 h-9 px-2.5 rounded border text-xs font-semibold transition-colors"
                           style={{border: '1px solid #a0aec0', background: '#fff', color: '#1f5e96'}}
                           title="Stamp current time"
-                        >
-                          Now
-                        </button>
+                        ><LocalizedText text="Now" /></LocalizedButton>
                       </div>
-                      <p className="text-[10px] mt-0.5 text-slate-500">Military time (HH:MM)</p>
-                      {dt.doseTimeErr && <p className="text-[10px] text-red-600">{dt.doseTimeErr}</p>}
+                      <p className="text-[10px] mt-0.5 text-slate-500"><LocalizedText text="Military time (HH:MM)" /></p>
+                      {dt.doseTimeErr && <p className="text-[10px] text-red-600"><LocalizedText text={dt.doseTimeErr} /></p>}
                     </div>
                   </div>
-                  <p className="text-[11px] mt-1 text-slate-500">Start of the <strong>most recent</strong> infusion before this level was drawn</p>
+                  <p className="text-[11px] mt-1 text-slate-500"><LocalizedText text="Start of the" />{" "}<strong><LocalizedText text="most recent" /></strong>{" "}<LocalizedText text="infusion before this level was drawn" /></p>
                 </div>
 
                 {/* Live hours post-dose preview */}
@@ -392,25 +390,23 @@ export default function LevelEntryTable({
                   <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 flex items-center gap-2">
                     <span className="text-blue-600">⏱</span>
                     <div>
-                      <p className="text-xs font-semibold text-blue-800">
-                        Calculated: <strong>{hoursComputed} hours</strong> post-dose
-                      </p>
-                      <p className="text-[11px] text-blue-600">Used automatically for PK calculations</p>
+                      <p className="text-xs font-semibold text-blue-800"><LocalizedText text="Calculated:" />{" "}<strong>{hoursComputed}{" "}<LocalizedText text="hours" /></strong>{" "}<LocalizedText text="post-dose" /></p>
+                      <p className="text-[11px] text-blue-600"><LocalizedText text="Used automatically for PK calculations" /></p>
                     </div>
                   </div>
                 )}
                 {hoursComputed === -1 && (
                   <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-                    <p className="text-xs font-semibold text-red-800">⚠ Level time is before dose time — please check entries</p>
+                    <p className="text-xs font-semibold text-red-800"><LocalizedText text="⚠ Level time is before dose time — please check entries" /></p>
                   </div>
                 )}
                 {(timeError || collectionError) && (
-                  <p className="text-xs text-red-600">{collectionError || timeError}</p>
+                  <p className="text-xs text-red-600"><LocalizedText text={collectionError || timeError} /></p>
                 )}
               </>
             ) : (
               <div>
-                <Label>Time drawn (hours after dose start)</Label>
+                <Label><LocalizedText text="Time drawn (hours after dose start)" /></Label>
                 <div className="flex">
                   <ClinicalNumberInput
                     inputMode="decimal"
@@ -425,13 +421,11 @@ export default function LevelEntryTable({
                     className={(invalidText) => `${inputClass(Boolean(timeError || collectionError || invalidText))} rounded-r-none`}
                     placeholder="e.g. 2.5"
                   />
-                  <span className="flex items-center px-2.5 text-xs rounded-r h-9 shrink-0" style={{background: '#edf2f7', border: '1px solid #a0aec0', borderLeft: 'none', color: '#4a5568'}}>
-                    hours
-                  </span>
+                  <span className="flex items-center px-2.5 text-xs rounded-r h-9 shrink-0" style={{background: '#edf2f7', border: '1px solid #a0aec0', borderLeft: 'none', color: '#4a5568'}}><LocalizedText text="hours" /></span>
                 </div>
-                {(timeError || collectionError) && <p className="text-xs text-red-600 mt-1">{collectionError || timeError}</p>}
+                {(timeError || collectionError) && <p className="text-xs text-red-600 mt-1"><LocalizedText text={collectionError || timeError} /></p>}
                 {!timeError && !collectionError && parseErrors[`hours-${i}`] && (
-                  <p className="text-xs text-red-600 mt-1">{parseErrors[`hours-${i}`]}</p>
+                  <p className="text-xs text-red-600 mt-1"><LocalizedText text={parseErrors[`hours-${i}`]} /></p>
                 )}
               </div>
             )}

@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
+import { LocalizedInput } from "@/localization/LocalizedElements";
+
 
 import { useEffect, useState, useCallback } from "react";
 import { COLIN_2019, VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED, modelShortName } from "@/lib/pk/modelRegistry";
@@ -91,18 +95,16 @@ export default function AdminCalculationsPage() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-xl font-bold text-slate-900">Calculations Audit</h1>
-        <p className="text-sm text-slate-600 mt-1">
-          System-wide feed of calculation events. De-identified — no patient data is stored.
-          Department admins see their own subset at <code className="text-xs bg-slate-100 px-1 py-0.5 rounded">/team</code>.
+        <h1 className="text-xl font-bold text-slate-900"><LocalizedText text={"Calculations Audit"} /></h1>
+        <p className="text-sm text-slate-600 mt-1"><LocalizedText text={"System-wide feed of calculation events. De-identified — no patient data is stored. Department admins see their own subset at"} />{" "}<code className="text-xs bg-slate-100 px-1 py-0.5 rounded">/team</code>.
         </p>
       </div>
 
       {/* Filters */}
       <div className="bg-white border border-slate-200 rounded-md p-3 mb-4 grid grid-cols-2 md:grid-cols-5 gap-2">
         <div>
-          <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase tracking-wide">User email</label>
-          <input
+          <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase tracking-wide"><LocalizedText text={"User email"} /></label>
+          <LocalizedInput
             type="text"
             value={emailFilter}
             onChange={e => { setOffset(0); setEmailFilter(e.target.value); }}
@@ -111,8 +113,8 @@ export default function AdminCalculationsPage() {
           />
         </div>
         <div>
-          <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase tracking-wide">Institution ID</label>
-          <input
+          <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase tracking-wide"><LocalizedText text={"Institution ID"} /></label>
+          <LocalizedInput
             type="number"
             value={institutionFilter}
             onChange={e => { setOffset(0); setInstitutionFilter(e.target.value); }}
@@ -121,40 +123,40 @@ export default function AdminCalculationsPage() {
           />
         </div>
         <div>
-          <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase tracking-wide">Calculation type</label>
+          <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase tracking-wide"><LocalizedText text="Calculation type" /></label>
           <select
             value={workflowFilter}
             onChange={e => { setOffset(0); setWorkflowFilter(e.target.value); }}
             className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded text-slate-900 bg-white"
           >
-            <option value="">All</option>
-            <option value="empiric">Initial regimen</option>
-            <option value="existing">Adjustment</option>
+            <option value=""><LocalizedText text="All" /></option>
+            <option value="empiric"><LocalizedText text={"Initial regimen"} /></option>
+            <option value="existing"><LocalizedText text={"Adjustment"} /></option>
           </select>
         </div>
         <div>
-          <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase tracking-wide">PK model</label>
+          <label className="block text-[11px] font-semibold text-slate-600 mb-1 uppercase tracking-wide"><LocalizedText text={"PK model"} /></label>
           <select
             value={modelFilter}
             onChange={e => { setOffset(0); setModelFilter(e.target.value); }}
             className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded text-slate-900 bg-white"
           >
-            <option value="">All</option>
+            <option value=""><LocalizedText text="All" /></option>
             <option value={COLIN_2019.id}>{COLIN_2019.shortName}</option>
             <option value={VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.id}>{VANCOMYZER_CUSTOM_OBESITY_MODEL_RETIRED.shortName}</option>
           </select>
         </div>
         <div className="flex items-end">
-          <span className="text-xs text-slate-500">{total} {total === 1 ? "entry" : "entries"}</span>
+          <span className="text-xs text-slate-500">{total} <LocalizedText text={total === 1 ? "entry" : "entries"} /></span>
         </div>
       </div>
 
       {error && (
-        <div className="mb-3 px-3 py-2 bg-rose-50 border border-rose-200 text-rose-800 text-sm rounded">{error}</div>
+        <div className="mb-3 px-3 py-2 bg-rose-50 border border-rose-200 text-rose-800 text-sm rounded"><LocalizedText text={error} /></div>
       )}
 
       {loading && rows === null ? (
-        <div className="text-center py-12 text-slate-500 text-sm">Loading…</div>
+        <div className="text-center py-12 text-slate-500 text-sm"><LocalizedText text={"Loading…"} /></div>
       ) : rows && rows.length > 0 ? (
         <div className="bg-white border border-slate-200 rounded-md overflow-x-auto">
           <table className="w-full text-sm">
@@ -162,7 +164,7 @@ export default function AdminCalculationsPage() {
               <tr>
                 {["Date", "User", "Institution", "Tier", "Workflow", "Case ID", "Model", "Dose", "AUC", "Range"].map(h => (
                   <th key={h} className="px-3 py-2 text-left text-[11px] font-bold text-slate-600 uppercase tracking-wide whitespace-nowrap">
-                    {h}
+                    <LocalizedText text={h} />
                   </th>
                 ))}
               </tr>
@@ -176,7 +178,7 @@ export default function AdminCalculationsPage() {
                     {row.user_email && <div className="text-xs text-slate-500">{row.user_email}</div>}
                   </td>
                   <td className="px-3 py-2 text-slate-700">
-                    {row.institution_name ?? <span className="text-slate-400">— individual —</span>}
+                    {row.institution_name ?? <span className="text-slate-400"><LocalizedText text={"— individual —"} /></span>}
                   </td>
                   <td className="px-3 py-2 text-slate-700">
                     <span className="text-xs font-mono uppercase tracking-wide">{row.tier_at_time ?? "—"}</span>
@@ -195,9 +197,9 @@ export default function AdminCalculationsPage() {
                   <td className="px-3 py-2 text-slate-700">{row.auc24 != null ? row.auc24.toFixed(0) : "—"}</td>
                   <td className="px-3 py-2">
                     {row.auc_in_range ? (
-                      <span className="inline-block px-2 py-0.5 text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded">In</span>
+                      <span className="inline-block px-2 py-0.5 text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded"><LocalizedText text={"In"} /></span>
                     ) : (
-                      <span className="inline-block px-2 py-0.5 text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 rounded">Out</span>
+                      <span className="inline-block px-2 py-0.5 text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 rounded"><LocalizedText text={"Out"} /></span>
                     )}
                   </td>
                 </tr>
@@ -206,9 +208,7 @@ export default function AdminCalculationsPage() {
           </table>
         </div>
       ) : (
-        <div className="text-center py-16 text-slate-500 text-sm border border-dashed border-slate-200 rounded">
-          No calculations match the filters.
-        </div>
+        <div className="text-center py-16 text-slate-500 text-sm border border-dashed border-slate-200 rounded"><LocalizedText text={"No calculations match the filters."} /></div>
       )}
 
       {/* Pagination */}
@@ -219,18 +219,14 @@ export default function AdminCalculationsPage() {
             disabled={offset === 0 || loading}
             onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
             className="px-3 py-1.5 border border-slate-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100"
-          >
-             Newer
-          </button>
-          <span>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of {total}</span>
+          ><LocalizedText text={"Newer"} /></button>
+          <span>{offset + 1}–{Math.min(offset + PAGE_SIZE, total)}{" "}<LocalizedText text="of" />{" "}{total}</span>
           <button
             type="button"
             disabled={offset + PAGE_SIZE >= total || loading}
             onClick={() => setOffset(offset + PAGE_SIZE)}
             className="px-3 py-1.5 border border-slate-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100"
-          >
-            Older
-          </button>
+          ><LocalizedText text={"Older"} /></button>
         </div>
       )}
     </div>

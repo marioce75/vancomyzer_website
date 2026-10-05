@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import type { CalculationDetails } from "@/types/calculator";
 
@@ -23,13 +25,13 @@ export default function ClinicalSignalStrip({ auc24, trough, details }: Clinical
     <section className={`rounded-xl border p-3 shadow-sm ${tone(details, auc24)}`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-sm font-semibold">{details.review_status.banner_title}</h2>
-          <p className="mt-1 text-sm">{details.review_status.banner_body}</p>
+          <h2 className="text-sm font-semibold"><LocalizedText text={details.review_status.banner_title} /></h2>
+          <p className="mt-1 text-sm"><LocalizedText text={details.review_status.banner_body} /></p>
           {(auc24 && auc24 > 600) ? (
-            <p className="mt-2 text-sm font-bold text-red-700">Warning: Predicted AUC &gt; 600. Potential for elevated nephrotoxicity risk. Proceed with extreme caution.</p>
+            <p className="mt-2 text-sm font-bold text-red-700"><LocalizedText text="Warning: Predicted AUC > 600. Potential for elevated nephrotoxicity risk. Proceed with extreme caution." /></p>
           ) : null}
         </div>
-        <span className="text-xs font-medium">{details.evidence_strength}</span>
+        <span className="text-xs font-medium"><LocalizedText text={details.evidence_strength} /></span>
       </div>
     </section>
   );

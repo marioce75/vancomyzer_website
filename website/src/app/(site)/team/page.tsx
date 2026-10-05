@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedButton, LocalizedInput, LocalizedSpan } from "@/localization/LocalizedElements";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
@@ -255,19 +259,17 @@ export default function TeamPage() {
   };
 
   if (authLoading) {
-    return <div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}>Loading...</div>;
+    return <div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}><LocalizedText text="Loading..." /></div>;
   }
   if (!user) {
     return (
       <div className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 md:py-16">
-        <span className="mb-[14px] block text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#546471" }}>Team</span>
-        <h1 className="vz-serif text-[clamp(28px,3.4vw,40px)] leading-[1.08]" style={{ color: "#14232f" }}>Sign in to manage your team.</h1>
-        <p className="mt-4 max-w-[60ch] text-lg" style={{ color: "#4a5a68" }}>
-          Team administration is available to Hospital Site administrators.
-        </p>
+        <span className="mb-[14px] block text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#546471" }}><LocalizedText text={"Team"} /></span>
+        <h1 className="vz-serif text-[clamp(28px,3.4vw,40px)] leading-[1.08]" style={{ color: "#14232f" }}><LocalizedText text={"Sign in to manage your team."} /></h1>
+        <p className="mt-4 max-w-[60ch] text-lg" style={{ color: "#4a5a68" }}><LocalizedText text={"Team administration is available to Hospital Site administrators."} /></p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/login" className="vz-mbtn vz-mbtn--primary">Sign in</Link>
-          <Link href="/pricing" className="vz-mbtn vz-mbtn--outline">Site licenses</Link>
+          <Link href="/login" className="vz-mbtn vz-mbtn--primary"><LocalizedText text="Sign in" /></Link>
+          <Link href="/pricing" className="vz-mbtn vz-mbtn--outline"><LocalizedText text={"Site licenses"} /></Link>
         </div>
       </div>
     );
@@ -276,9 +278,7 @@ export default function TeamPage() {
   if (loadError) {
     return (
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px 80px" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 8 }}>
-          Team Management
-        </h1>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 8 }}><LocalizedText text="Team Management" /></h1>
         <div style={{
           padding: "14px 16px",
           background: "#fff5f5",
@@ -288,21 +288,15 @@ export default function TeamPage() {
           borderRadius: 4,
           marginBottom: 16,
         }}>
-          {loadError}
+          <LocalizedText text={loadError} />
         </div>
-        <p style={{ fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.6 }}>
-          Team management requires an existing institutional agreement, and is available only to users
-          designated as institutional admins. If your team needs this feature, see{" "}
+        <p style={{ fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.6 }}><LocalizedText text={"Team management requires an existing institutional agreement, and is available only to users designated as institutional admins. If your team needs this feature, see"} />{" "}
           <a
             href="https://dosys.health/pricing"
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: "var(--color-primary)", textDecoration: "underline" }}
-          >
-            Hospital Site licenses
-          </a>{" "}
-          on dosys.health.
-        </p>
+          ><LocalizedText text="Hospital Site licenses" /></a>{" "}<LocalizedText text={"on dosys.health."} /></p>
       </div>
     );
   }
@@ -310,19 +304,14 @@ export default function TeamPage() {
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 16px 80px" }}>
       <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
-        <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-           Settings
-        </Link>
+        <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text="Settings" /></Link>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-        <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Team Management</span>
+        <span style={{ color: "var(--color-primary)", fontWeight: 600 }}><LocalizedText text="Team Management" /></span>
       </div>
 
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}>
-        Team Management {institutionName && <span style={{ color: "var(--color-secondary)", fontWeight: 400 }}>· {institutionName}</span>}
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}><LocalizedText text="Team Management" />{" "}{institutionName && <span style={{ color: "var(--color-secondary)", fontWeight: 400 }}>· {institutionName}</span>}
       </h1>
-      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 24 }}>
-        Invite teammates, manage roles, and view your institution&apos;s calculation audit log. No PHI is stored.
-      </p>
+      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 24 }}><LocalizedText text={"Invite teammates, manage roles, and view your institution's calculation audit log. No PHI is stored."} /></p>
 
       {/* BAA pending banner — shown until Dōsys countersigns */}
       {baaStatus === "pending" && (
@@ -339,11 +328,7 @@ export default function TeamPage() {
             lineHeight: 1.55,
           }}
         >
-          <strong>BAA awaiting countersign.</strong> We received your signed Business Associate
-          Agreement. Dōsys Health LLC will countersign within one business day and email the
-          fully-executed copy to your signer. Calculator access is not gated on this — your team
-          can continue working.
-        </div>
+          <strong><LocalizedText text={"BAA awaiting countersign."} /></strong>{" "}<LocalizedText text={"We received your signed Business Associate Agreement. Dōsys Health LLC will countersign within one business day and email the fully-executed copy to your signer. Calculator access is not gated on this — your team can continue working."} /></div>
       )}
 
       {/* Seats summary */}
@@ -357,19 +342,17 @@ export default function TeamPage() {
         }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-dim)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                Seats
-              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-dim)", letterSpacing: "0.08em", textTransform: "uppercase" }}><LocalizedText text={"Seats"} /></div>
               <div style={{ fontSize: 18, fontWeight: 700, color: "var(--color-primary)", marginTop: 2 }}>
                 {seats.used} <span style={{ color: "var(--color-secondary)", fontWeight: 400, fontSize: 14 }}>/ {seats.allocated}</span>
                 <span style={{ marginLeft: 10, fontSize: 11, fontWeight: 400, color: "var(--color-secondary)" }}>
-                  ({seats.allocated === 10 ? "Up to 10 — $500/mo" : seats.allocated === 20 ? "Up to 20 — $1,000/mo" : "Custom plan"})
+                  (<LocalizedText text={seats.allocated === 10 ? "Up to 10 — $500/mo" : seats.allocated === 20 ? "Up to 20 — $1,000/mo" : "Custom plan"} />)
                 </span>
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {seats.allocated === 10 && (
-                <button
+                <LocalizedButton
                   type="button"
                   onClick={() => changeTier("large")}
                   disabled={tierChanging}
@@ -387,11 +370,11 @@ export default function TeamPage() {
                   }}
                   title="Switch to the 20-seat plan ($1,000/mo). Prorated through Stripe."
                 >
-                  {tierChanging ? "Updating…" : "Upgrade to 20 seats "}
-                </button>
+                  <LocalizedText text={tierChanging ? "Updating…" : "Upgrade to 20 seats "} />
+                </LocalizedButton>
               )}
               {seats.allocated === 20 && seats.used <= 10 && (
-                <button
+                <LocalizedButton
                   type="button"
                   onClick={() => changeTier("small")}
                   disabled={tierChanging}
@@ -407,10 +390,10 @@ export default function TeamPage() {
                   }}
                   title="Switch back to the 10-seat plan ($500/mo). Refunded difference prorated through Stripe."
                 >
-                  {tierChanging ? "Updating…" : " Downgrade to 10 seats"}
-                </button>
+                  <LocalizedText text={tierChanging ? "Updating…" : " Downgrade to 10 seats"} />
+                </LocalizedButton>
               )}
-              <button
+              <LocalizedButton
                 type="button"
                 onClick={openBillingPortal}
                 disabled={portalLoading}
@@ -426,8 +409,8 @@ export default function TeamPage() {
                 }}
                 title="Update payment method, view invoices, or cancel your subscription. Opens the Stripe-hosted billing portal."
               >
-                {portalLoading ? "Opening…" : "Manage billing "}
-              </button>
+                <LocalizedText text={portalLoading ? "Opening…" : "Manage billing "} />
+              </LocalizedButton>
             </div>
           </div>
           {tierMsg && (
@@ -440,7 +423,7 @@ export default function TeamPage() {
                 lineHeight: 1.5,
               }}
             >
-              {tierMsg.text}
+              <LocalizedText text={tierMsg.text} />
             </p>
           )}
         </div>
@@ -461,14 +444,12 @@ export default function TeamPage() {
         border: "1px solid var(--color-border)",
         borderRadius: 6,
       }}>
-        <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 12 }}>
-          Invite a teammate
-        </h2>
+        <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 12 }}><LocalizedText text={"Invite a teammate"} /></h2>
         <form onSubmit={handleInvite}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 140px auto", gap: 8, alignItems: "end" }}>
             <div>
-              <label style={{ display: "block", fontSize: 11, color: "var(--color-secondary)", marginBottom: 4 }}>Email *</label>
-              <input
+              <label style={{ display: "block", fontSize: 11, color: "var(--color-secondary)", marginBottom: 4 }}><LocalizedText text={"Email *"} /></label>
+              <LocalizedInput
                 type="email"
                 value={inviteEmail}
                 onChange={e => setInviteEmail(e.target.value)}
@@ -478,8 +459,8 @@ export default function TeamPage() {
               />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: 11, color: "var(--color-secondary)", marginBottom: 4 }}>Full name</label>
-              <input
+              <label style={{ display: "block", fontSize: 11, color: "var(--color-secondary)", marginBottom: 4 }}><LocalizedText text="Full name" /></label>
+              <LocalizedInput
                 type="text"
                 value={inviteName}
                 onChange={e => setInviteName(e.target.value)}
@@ -488,8 +469,8 @@ export default function TeamPage() {
               />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: 11, color: "var(--color-secondary)", marginBottom: 4 }}>Credentials</label>
-              <input
+              <label style={{ display: "block", fontSize: 11, color: "var(--color-secondary)", marginBottom: 4 }}><LocalizedText text={"Credentials"} /></label>
+              <LocalizedInput
                 type="text"
                 value={inviteCreds}
                 onChange={e => setInviteCreds(e.target.value)}
@@ -508,7 +489,7 @@ export default function TeamPage() {
                 whiteSpace: "nowrap",
               }}
             >
-              {inviting ? "Sending..." : "Send invite"}
+              <LocalizedText text={inviting ? "Sending..." : "Send invite"} />
             </button>
           </div>
           {inviteMsg && (
@@ -521,7 +502,7 @@ export default function TeamPage() {
               color: inviteMsg.type === "ok" ? "#047857" : "#991b1b",
               borderRadius: 4,
             }}>
-              {inviteMsg.text}
+              <LocalizedText text={inviteMsg.text} />
             </div>
           )}
         </form>
@@ -529,11 +510,9 @@ export default function TeamPage() {
 
       {/* Members table */}
       <section style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>
-          Members
-        </h2>
+        <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}><LocalizedText text={"Members"} /></h2>
         {loading ? (
-          <div style={{ padding: 32, textAlign: "center", color: "var(--color-dim)" }}>Loading…</div>
+          <div style={{ padding: 32, textAlign: "center", color: "var(--color-dim)" }}><LocalizedText text={"Loading…"} /></div>
         ) : members && members.length > 0 ? (
           <div style={{ overflowX: "auto", border: "1px solid var(--color-border)", borderRadius: 6, background: "var(--color-card)" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
@@ -541,7 +520,7 @@ export default function TeamPage() {
                 <tr style={{ background: "var(--color-bg)", borderBottom: "1px solid var(--color-border)" }}>
                   {["Name", "Email", "Credentials", "Role", "Last sign-in", ""].map(h => (
                     <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--color-secondary)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                      {h}
+                      <LocalizedText text={h} />
                     </th>
                   ))}
                 </tr>
@@ -551,13 +530,13 @@ export default function TeamPage() {
                   <tr key={m.id} style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <td style={{ padding: "10px 12px", color: "var(--color-primary)" }}>
                       {m.full_name}
-                      {String(m.id) === user.id && <span style={{ marginLeft: 6, fontSize: 11, color: "var(--color-dim)" }}>(you)</span>}
+                      {String(m.id) === user.id && <span style={{ marginLeft: 6, fontSize: 11, color: "var(--color-dim)" }}><LocalizedText text={"(you)"} /></span>}
                     </td>
                     <td style={{ padding: "10px 12px", color: "var(--color-secondary)" }}>{m.email}</td>
                     <td style={{ padding: "10px 12px", color: "var(--color-secondary)" }}>{m.credentials}</td>
                     <td style={{ padding: "10px 12px" }}>
                       {String(m.id) === user.id ? (
-                        <span
+                        <LocalizedSpan
                           style={{
                             display: "inline-block",
                             padding: "2px 10px",
@@ -569,9 +548,7 @@ export default function TeamPage() {
                             borderRadius: 4,
                           }}
                           title="You can't change your own role. Ask another admin to demote you."
-                        >
-                          ADMIN
-                        </span>
+                        ><LocalizedText text={"ADMIN"} /></LocalizedSpan>
                       ) : (
                         <button
                           type="button"
@@ -592,12 +569,12 @@ export default function TeamPage() {
                               : `Click to promote ${m.full_name || m.email} to admin. Admins can invite, remove, change roles, and manage billing.`
                           }
                         >
-                          {m.institutional_role === "admin" ? "ADMIN ⇄" : "USER ⇄"}
+                          <LocalizedText text={m.institutional_role === "admin" ? "ADMIN ⇄" : "USER ⇄"} />
                         </button>
                       )}
                     </td>
                     <td style={{ padding: "10px 12px", color: "var(--color-secondary)" }}>
-                      {m.last_login ? fmtDate(m.last_login) : <span style={{ color: "var(--color-dim)" }}>never</span>}
+                      {m.last_login ? fmtDate(m.last_login) : <span style={{ color: "var(--color-dim)" }}><LocalizedText text={"never"} /></span>}
                     </td>
                     <td style={{ padding: "10px 12px", textAlign: "right" }}>
                       {String(m.id) !== user.id && (
@@ -612,9 +589,7 @@ export default function TeamPage() {
                             borderRadius: 4,
                             cursor: "pointer",
                           }}
-                        >
-                          Remove
-                        </button>
+                        ><LocalizedText text={"Remove"} /></button>
                       )}
                     </td>
                   </tr>
@@ -623,9 +598,7 @@ export default function TeamPage() {
             </table>
           </div>
         ) : (
-          <div style={{ padding: 32, textAlign: "center", color: "var(--color-dim)", fontSize: 13, border: "1px dashed var(--color-border)", borderRadius: 6 }}>
-            No members yet.
-          </div>
+          <div style={{ padding: 32, textAlign: "center", color: "var(--color-dim)", fontSize: 13, border: "1px dashed var(--color-border)", borderRadius: 6 }}><LocalizedText text={"No members yet."} /></div>
         )}
       </section>
 
@@ -642,12 +615,10 @@ export default function TeamPage() {
             cursor: "pointer", borderRadius: 4, width: "100%", textAlign: "left",
           }}
         >
-          {showAudit ? "Hide" : "Show"}
-          Calculation history (institution-wide; authorized access only)
-        </button>
+          <LocalizedText text={showAudit ? "Hide" : "Show"} /><LocalizedText text={"Calculation history (institution-wide; authorized access only)"} /></button>
         {showAudit && (
           auditLoading ? (
-            <div style={{ padding: 32, textAlign: "center", color: "var(--color-dim)" }}>Loading audit…</div>
+            <div style={{ padding: 32, textAlign: "center", color: "var(--color-dim)" }}><LocalizedText text={"Loading audit…"} /></div>
           ) : audit && audit.length > 0 ? (
             <div style={{ overflowX: "auto", border: "1px solid var(--color-border)", borderRadius: 6, background: "var(--color-card)" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
@@ -655,7 +626,7 @@ export default function TeamPage() {
                   <tr style={{ background: "var(--color-bg)", borderBottom: "1px solid var(--color-border)" }}>
                     {["Date", "User", "Workflow", "Case ID", "Dose", "Interval", "AUC", "Range"].map(h => (
                       <th key={h} style={{ padding: "8px 10px", textAlign: "left", fontSize: 10, fontWeight: 700, color: "var(--color-secondary)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                        {h}
+                        <LocalizedText text={h} />
                       </th>
                     ))}
                   </tr>
@@ -680,9 +651,9 @@ export default function TeamPage() {
                       </td>
                       <td style={{ padding: "8px 10px" }}>
                         {row.auc_in_range ? (
-                          <span style={{ display: "inline-block", padding: "2px 8px", fontSize: 10, fontWeight: 600, background: "#ecfdf5", color: "#047857", border: "1px solid #6ee7b7", borderRadius: 4 }}>In</span>
+                          <span style={{ display: "inline-block", padding: "2px 8px", fontSize: 10, fontWeight: 600, background: "#ecfdf5", color: "#047857", border: "1px solid #6ee7b7", borderRadius: 4 }}><LocalizedText text={"In"} /></span>
                         ) : (
-                          <span style={{ display: "inline-block", padding: "2px 8px", fontSize: 10, fontWeight: 600, background: "#fef3c7", color: "#92400e", border: "1px solid #fcd34d", borderRadius: 4 }}>Out</span>
+                          <span style={{ display: "inline-block", padding: "2px 8px", fontSize: 10, fontWeight: 600, background: "#fef3c7", color: "#92400e", border: "1px solid #fcd34d", borderRadius: 4 }}><LocalizedText text={"Out"} /></span>
                         )}
                       </td>
                     </tr>
@@ -691,9 +662,7 @@ export default function TeamPage() {
               </table>
             </div>
           ) : (
-            <div style={{ padding: 24, textAlign: "center", color: "var(--color-dim)", fontSize: 13, border: "1px dashed var(--color-border)", borderRadius: 6 }}>
-              No calculations recorded yet.
-            </div>
+            <div style={{ padding: 24, textAlign: "center", color: "var(--color-dim)", fontSize: 13, border: "1px dashed var(--color-border)", borderRadius: 6 }}><LocalizedText text={"No calculations recorded yet."} /></div>
           )
         )}
       </section>

@@ -1,4 +1,8 @@
 "use client";
+import { LocalizedDiv } from "@/localization/LocalizedElements";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -78,15 +82,13 @@ function BillingPageInner() {
   }, [checkoutResult]);
 
   if (loading) {
-    return <div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}>Loading...</div>;
+    return <div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}><LocalizedText text="Loading..." /></div>;
   }
 
   if (!user) {
     return (
       <div style={{ padding: 40, textAlign: "center" }}>
-        <p style={{ color: "var(--color-secondary)" }}>
-          Please <Link href="/login" style={{ color: "var(--color-primary)" }}>sign in</Link> to manage your subscription.
-        </p>
+        <p style={{ color: "var(--color-secondary)" }}><LocalizedText text={"Please"} />{" "}<Link href="/login" style={{ color: "var(--color-primary)" }}><LocalizedText text="sign in" /></Link>{" "}<LocalizedText text={"to manage your subscription."} /></p>
       </div>
     );
   }
@@ -138,30 +140,22 @@ function BillingPageInner() {
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px 80px" }}>
       <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
-        <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-           Institutional Settings
-        </Link>
+        <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text="Institutional Settings" /></Link>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-        <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Billing</span>
+        <span style={{ color: "var(--color-primary)", fontWeight: 600 }}><LocalizedText text={"Billing"} /></span>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-        <Link href="/settings/history" style={{ color: "var(--color-dim)", textDecoration: "none" }}>
-          Calculation History
-        </Link>
+        <Link href="/settings/history" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text="Calculation History" /></Link>
       </div>
 
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}>
-        Billing &amp; Subscription
-      </h1>
-      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 24 }}>
-        Manage your Vancomyzer&trade; subscription. Billing is handled by Stripe.
-      </p>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}><LocalizedText text="Billing & Subscription" /></h1>
+      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 24 }}><LocalizedText text={"Manage your Vancomyzer™ subscription. Billing is handled by Stripe."} /></p>
 
       {banner && (
         <div style={{
           padding: "10px 14px", marginBottom: 16,
           background: "#ecfdf5", border: "1px solid #6ee7b7", color: "#047857", fontSize: 13, borderRadius: 4,
         }}>
-          {banner}
+          <LocalizedText text={banner} />
         </div>
       )}
 
@@ -170,14 +164,14 @@ function BillingPageInner() {
           padding: "10px 14px", marginBottom: 16,
           background: "#fff5f5", border: "1px solid #fca5a5", color: "#991b1b", fontSize: 13, borderRadius: 4,
         }}>
-          {error}
+          <LocalizedText text={error} />
         </div>
       )}
 
       {user.complimentaryPro?.active && <div className="mb-6 border border-teal-700 p-4">
-        <h2 className="font-semibold">Complimentary Pro access</h2>
-        <p>{user.complimentaryPro.expiresAt ? `Ends ${new Date(user.complimentaryPro.expiresAt).toUTCString()}.` : "No expiration date."} No card required and no automatic paid renewal.</p>
-        <p>When this grant ends, your underlying plan applies. Any existing paid subscription continues separately; use Manage billing to review or cancel it.</p>
+        <h2 className="font-semibold"><LocalizedText text={"Complimentary Pro access"} /></h2>
+        <p><LocalizedText text={user.complimentaryPro.expiresAt ? `Ends ${new Date(user.complimentaryPro.expiresAt).toUTCString()}.` : "No expiration date."} />{" "}<LocalizedText text={"No card required and no automatic paid renewal."} /></p>
+        <p><LocalizedText text={"When this grant ends, your underlying plan applies. Any existing paid subscription continues separately; use Manage billing to review or cancel it."} /></p>
       </div>}
       {/* Current plan card */}
       <div style={{
@@ -189,14 +183,12 @@ function BillingPageInner() {
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-dim)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>
-              Current plan
-            </div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-dim)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}><LocalizedText text={"Current plan"} /></div>
             <div style={{ fontSize: 18, fontWeight: 700, color: "var(--color-primary)" }}>
               {tier.name}
             </div>
             <div style={{ fontSize: 12, color: "var(--color-secondary)", marginTop: 2 }}>
-              {onPaidTier ? "Your existing subscription amount and renewal terms are shown in Manage billing." : user.complimentaryPro?.active ? "Complimentary · $0" : tier.priceLabel}
+              <LocalizedText text={onPaidTier ? "Your existing subscription amount and renewal terms are shown in Manage billing." : user.complimentaryPro?.active ? "Complimentary · $0" : tier.priceLabel} />
             </div>
           </div>
           {onPaidTier && (
@@ -207,14 +199,14 @@ function BillingPageInner() {
               borderRadius: 4,
               ...statusBadgeStyle(status),
             }}>
-              {statusLabel(status)}
+              <LocalizedText text={statusLabel(status)} />
             </span>
           )}
         </div>
 
         {onPaidTier && user.subscriptionExpiry && (
           <div style={{ fontSize: 12, color: "var(--color-secondary)", paddingTop: 12, borderTop: "1px solid var(--color-border)" }}>
-            {status === "trialing" ? "Trial ends" : status === "canceled" ? "Access ends" : "Renews"}{" "}
+            <LocalizedText text={status === "trialing" ? "Trial ends" : status === "canceled" ? "Access ends" : "Renews"} />{" "}
             <strong style={{ color: "var(--color-primary)" }}>{formatExpiry(user.subscriptionExpiry)}</strong>
           </div>
         )}
@@ -231,11 +223,9 @@ function BillingPageInner() {
                 cursor: working ? "wait" : "pointer", opacity: working ? 0.7 : 1,
               }}
             >
-              {working ? "Opening…" : "Manage billing / cancel"}
+              <LocalizedText text={working ? "Opening…" : "Manage billing / cancel"} />
             </button>
-            <span style={{ fontSize: 11, color: "var(--color-dim)", alignSelf: "center" }}>
-              Change plan, update payment method, download invoices, or cancel — all in Stripe&apos;s secure portal.
-            </span>
+            <span style={{ fontSize: 11, color: "var(--color-dim)", alignSelf: "center" }}><LocalizedText text={"Change plan, update payment method, download invoices, or cancel — all in Stripe's secure portal."} /></span>
           </div>
         )}
       </div>
@@ -249,23 +239,19 @@ function BillingPageInner() {
           border: "2px solid var(--color-primary)",
           borderRadius: 6,
         }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>
-            Upgrade to Individual Pro
-          </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "var(--color-primary)", marginBottom: 8 }}>
-            14-day free trial · card required upfront, no charge until trial ends
-          </div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}><LocalizedText text={"Upgrade to Individual Pro"} /></div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: "var(--color-primary)", marginBottom: 8 }}><LocalizedText text={"14-day free trial · card required upfront, no charge until trial ends"} /></div>
           <ul style={{ margin: "0 0 16px", padding: 0, listStyle: "none", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.7 }}>
             {TIERS.individual_pro.features.map(f => (
               <li key={f} style={{ paddingLeft: 18, position: "relative" }}>
 
-                {f}
+                <LocalizedText text={f} />
               </li>
             ))}
           </ul>
 
           {/* Plan selector */}
-          <div role="radiogroup" aria-label="Billing cadence" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
+          <LocalizedDiv role="radiogroup" aria-label="Billing cadence" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
             {(Object.keys(PLAN_LABELS) as CheckoutPlan[]).map(p => {
               const selected = plan === p;
               const meta = PLAN_LABELS[p];
@@ -287,23 +273,21 @@ function BillingPageInner() {
                   }}
                 >
                   <div style={{ fontSize: 12, fontWeight: 600, opacity: 0.85, marginBottom: 4 }}>
-                    {meta.label}
+                    <LocalizedText text={meta.label} />
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 700 }}>
-                    {meta.price}
+                    <LocalizedText text={meta.price} />
                   </div>
                   <div style={{ fontSize: 10, opacity: 0.85, marginTop: 2 }}>
-                    {meta.sub}
+                    <LocalizedText text={meta.sub} />
                   </div>
                 </button>
               );
             })}
-          </div>
+          </LocalizedDiv>
 
           <label style={{ display: "block", marginBottom: 16, fontSize: 14 }}>
-            <input type="checkbox" checked={renewalConsent} onChange={e => setRenewalConsent(e.target.checked)} />{" "}
-            I agree to automatic renewal: after the 14-day trial, $49.99 is charged yearly until I cancel online in Billing. Any verified discount is shown before payment. Cancel before the trial ends to avoid a charge; otherwise cancel before renewal to stop the next charge.
-          </label>
+            <input type="checkbox" checked={renewalConsent} onChange={e => setRenewalConsent(e.target.checked)} />{" "}<LocalizedText text={"I agree to automatic renewal: after the 14-day trial, $49.99 is charged yearly until I cancel online in Billing. Any verified discount is shown before payment. Cancel before the trial ends to avoid a charge; otherwise cancel before renewal to stop the next charge."} /></label>
           <button
             type="button"
             onClick={startCheckout}
@@ -322,14 +306,11 @@ function BillingPageInner() {
               letterSpacing: "0.02em",
             }}
           >
-            {working ? "Starting checkout…" : `Start 14-Day Trial · ${PLAN_LABELS[plan].label}`}
+            <LocalizedText text={working ? "Starting checkout…" : `Start 14-Day Trial · ${PLAN_LABELS[plan].label}`} />
           </button>
-          <p style={{ fontSize: 11, color: "var(--color-dim)", textAlign: "center", marginTop: 10, marginBottom: 0, lineHeight: 1.5 }}>
-            You will not be charged for 14 days. Cancel any time during the trial in the billing portal — no charge.
-            By starting a trial you agree to our{" "}
-            <Link href="/terms" style={{ color: "var(--color-primary)", textDecoration: "underline" }}>Terms</Link>{" "}
-            and{" "}
-            <Link href="/privacy" style={{ color: "var(--color-primary)", textDecoration: "underline" }}>Privacy Policy</Link>.
+          <p style={{ fontSize: 11, color: "var(--color-dim)", textAlign: "center", marginTop: 10, marginBottom: 0, lineHeight: 1.5 }}><LocalizedText text={"You will not be charged for 14 days. Cancel any time during the trial in the billing portal — no charge. By starting a trial you agree to our"} />{" "}
+            <Link href="/terms" style={{ color: "var(--color-primary)", textDecoration: "underline" }}><LocalizedText text="Terms" /></Link>{" "}<LocalizedText text="and" />{" "}
+            <Link href="/privacy" style={{ color: "var(--color-primary)", textDecoration: "underline" }}><LocalizedText text="Privacy Policy" /></Link>.
           </p>
         </div>
       )}
@@ -343,25 +324,20 @@ function BillingPageInner() {
         fontSize: 13,
         color: "var(--color-secondary)",
         lineHeight: 1.6,
-      }}>
-        Need access for your whole department or hospital? See{" "}
+      }}><LocalizedText text={"Need access for your whole department or hospital? See"} />{" "}
         <a
           href="https://dosys.health/pricing"
           target="_blank"
           rel="noopener noreferrer"
           style={{ color: "var(--color-primary)", textDecoration: "underline" }}
-        >
-          Hospital Site licenses
-        </a>{" "}
-        on dosys.health.
-      </div>
+        ><LocalizedText text="Hospital Site licenses" /></a>{" "}<LocalizedText text={"on dosys.health."} /></div>
     </div>
   );
 }
 
 export default function BillingPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}>Loading...</div>}>
+    <Suspense fallback={<div style={{ padding: 40, textAlign: "center", color: "var(--color-dim)" }}><LocalizedText text="Loading..." /></div>}>
       <BillingPageInner />
     </Suspense>
   );

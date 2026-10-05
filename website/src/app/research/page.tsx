@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
@@ -136,23 +138,23 @@ function ProgressBar({ value, target, color }: { value: number; target: number; 
 }
 
 function IQR({ label, data }: { label: string; data?: { median: number; q1: number; q3: number } }) {
-  if (!data) return <span style={{ color: GRAY, fontSize: 12 }}>{label}: ---</span>;
+  if (!data) return <span style={{ color: GRAY, fontSize: 12 }}><LocalizedText text={label} />: ---</span>;
   return (
     <span style={{ fontSize: 12, color: "#2d3748" }}>
-      <strong>{label}:</strong> {data.median.toFixed(1)} ({data.q1.toFixed(1)}--{data.q3.toFixed(1)})
+      <strong><LocalizedText text={label} />:</strong> {data.median.toFixed(1)} ({data.q1.toFixed(1)}--{data.q3.toFixed(1)})
     </span>
   );
 }
 
 function CountTable({ label, counts }: { label: string; counts?: Record<string, number> }) {
   if (!counts || Object.keys(counts).length === 0)
-    return <div style={{ fontSize: 12, color: GRAY, marginBottom: 4 }}>{label}: ---</div>;
+    return <div style={{ fontSize: 12, color: GRAY, marginBottom: 4 }}><LocalizedText text={label} />: ---</div>;
   return (
     <div style={{ marginBottom: 8 }}>
-      <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 2 }}>{label}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 2 }}><LocalizedText text={label} /></div>
       {Object.entries(counts).map(([k, v]) => (
         <div key={k} style={{ fontSize: 12, color: "#2d3748", paddingLeft: 8 }}>
-          {k}: {v}
+          <LocalizedText text={k} />: {v}
         </div>
       ))}
     </div>
@@ -166,11 +168,11 @@ function ValidationRow({ label, metrics }: { label: string; metrics?: { mpe: num
 
   return (
     <tr>
-      <td style={td}><strong>{label}</strong></td>
+      <td style={td}><strong><LocalizedText text={label} /></strong></td>
       <td style={td}>
         {metrics ? (
           <span>
-            {metrics.mpe.toFixed(1)}% <span style={badge(mpePass)}>{mpePass ? "PASS" : "FAIL"}</span>
+            {metrics.mpe.toFixed(1)}% <span style={badge(mpePass)}><LocalizedText text={mpePass ? "PASS" : "FAIL"} /></span>
           </span>
         ) : "---"}
       </td>
@@ -178,14 +180,14 @@ function ValidationRow({ label, metrics }: { label: string; metrics?: { mpe: num
       <td style={td}>
         {metrics ? (
           <span>
-            {metrics.nrmse.toFixed(2)} <span style={badge(nrmsePass)}>{nrmsePass ? "PASS" : "FAIL"}</span>
+            {metrics.nrmse.toFixed(2)} <span style={badge(nrmsePass)}><LocalizedText text={nrmsePass ? "PASS" : "FAIL"} /></span>
           </span>
         ) : "---"}
       </td>
       <td style={td}>
         {metrics ? (
           <span>
-            {metrics.pct_within_20.toFixed(1)}% <span style={badge(w20Pass)}>{w20Pass ? "PASS" : "FAIL"}</span>
+            {metrics.pct_within_20.toFixed(1)}% <span style={badge(w20Pass)}><LocalizedText text={w20Pass ? "PASS" : "FAIL"} /></span>
           </span>
         ) : "---"}
       </td>
@@ -260,16 +262,14 @@ export default function ResearchDashboard() {
   /* ---- Render ---- */
   if (loading) {
     return (
-      <div style={{ padding: 40, textAlign: "center", color: GRAY, fontFamily: "system-ui, sans-serif" }}>
-        Loading research dashboard...
-      </div>
+      <div style={{ padding: 40, textAlign: "center", color: GRAY, fontFamily: "system-ui, sans-serif" }}><LocalizedText text={"Loading research dashboard..."} /></div>
     );
   }
 
   if (error) {
     return (
       <div style={{ padding: 40, textAlign: "center", color: RED, fontFamily: "system-ui, sans-serif" }}>
-        {error}
+        <LocalizedText text={error} />
       </div>
     );
   }
@@ -282,8 +282,8 @@ export default function ResearchDashboard() {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: NAVY, margin: 0 }}>Research Dashboard</h1>
-          <p style={{ fontSize: 13, color: GRAY, margin: "4px 0 0" }}>Vancomyzer PK Validation Study</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: NAVY, margin: 0 }}><LocalizedText text={"Research Dashboard"} /></h1>
+          <p style={{ fontSize: 13, color: GRAY, margin: "4px 0 0" }}><LocalizedText text={"Vancomyzer PK Validation Study"} /></p>
         </div>
         <Link
           href="/research/enter"
@@ -298,49 +298,47 @@ export default function ResearchDashboard() {
             textDecoration: "none",
             display: "inline-block",
           }}
-        >
-          + Add Patient
-        </Link>
+        ><LocalizedText text={"+ Add Patient"} /></Link>
       </div>
 
       {/* ---- Panel 1: Enrollment Tracker ---- */}
       <div style={card}>
-        <h2 style={sectionTitle}>Enrollment Tracker</h2>
+        <h2 style={sectionTitle}><LocalizedText text={"Enrollment Tracker"} /></h2>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 24, fontWeight: 700, color: NAVY }}>{s?.total ?? 0}</div>
-            <div style={{ fontSize: 11, color: GRAY }}>Total Records</div>
+            <div style={{ fontSize: 11, color: GRAY }}><LocalizedText text={"Total Records"} /></div>
           </div>
           <div>
             <div style={{ fontSize: 24, fontWeight: 700, color: GREEN }}>{s?.eligible ?? 0}</div>
-            <div style={{ fontSize: 11, color: GRAY }}>Eligible</div>
+            <div style={{ fontSize: 11, color: GRAY }}><LocalizedText text={"Eligible"} /></div>
           </div>
           <div>
             <div style={{ fontSize: 24, fontWeight: 700, color: RED }}>{s?.excluded ?? 0}</div>
-            <div style={{ fontSize: 11, color: GRAY }}>Excluded</div>
+            <div style={{ fontSize: 11, color: GRAY }}><LocalizedText text={"Excluded"} /></div>
           </div>
           <div>
             <div style={{ fontSize: 24, fontWeight: 700, color: AMBER }}>{s?.obesity_subgroup ?? 0}</div>
-            <div style={{ fontSize: 11, color: GRAY }}>Obesity (BMI &ge; 40)</div>
+            <div style={{ fontSize: 11, color: GRAY }}><LocalizedText text={"Obesity (BMI ≥ 40)"} /></div>
           </div>
         </div>
 
         <div style={{ marginBottom: 8 }}>
-          <div style={{ fontSize: 11, color: GRAY, marginBottom: 2 }}>Total enrollment (target: 200-400)</div>
+          <div style={{ fontSize: 11, color: GRAY, marginBottom: 2 }}><LocalizedText text={"Total enrollment (target: 200-400)"} /></div>
           <ProgressBar value={s?.total ?? 0} target={400} color={NAVY} />
         </div>
         <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, color: GRAY, marginBottom: 2 }}>Obesity subgroup (minimum: 80)</div>
+          <div style={{ fontSize: 11, color: GRAY, marginBottom: 2 }}><LocalizedText text={"Obesity subgroup (minimum: 80)"} /></div>
           <ProgressBar value={s?.obesity_subgroup ?? 0} target={80} color={AMBER} />
         </div>
 
         {s?.exclusion_breakdown && Object.keys(s.exclusion_breakdown).length > 0 && (
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 4 }}>Exclusion Reasons</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 4 }}><LocalizedText text={"Exclusion Reasons"} /></div>
             {Object.entries(s.exclusion_breakdown).map(([reason, count]) => (
               <div key={reason} style={{ fontSize: 12, color: "#2d3748", paddingLeft: 8, marginBottom: 2 }}>
-                {reason}: <strong>{count}</strong>
+                <LocalizedText text={reason} />: <strong>{count}</strong>
               </div>
             ))}
           </div>
@@ -349,15 +347,15 @@ export default function ResearchDashboard() {
 
       {/* ---- Panel 2: Live Descriptive Statistics ---- */}
       <div style={card}>
-        <h2 style={sectionTitle}>Live Descriptive Statistics</h2>
+        <h2 style={sectionTitle}><LocalizedText text={"Live Descriptive Statistics"} /></h2>
 
         {!d ? (
-          <div style={{ fontSize: 13, color: GRAY }}>No data available yet.</div>
+          <div style={{ fontSize: 13, color: GRAY }}><LocalizedText text={"No data available yet."} /></div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
             {/* Left: continuous variables */}
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 6 }}>Continuous (Median, IQR)</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 6 }}><LocalizedText text={"Continuous (Median, IQR)"} /></div>
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 <IQR label="Age (yr)" data={d.age} />
                 <IQR label="Weight (kg)" data={d.weight} />
@@ -368,10 +366,10 @@ export default function ResearchDashboard() {
             </div>
             {/* Right: categorical */}
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 6 }}>Categorical (n)</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 6 }}><LocalizedText text={"Categorical (n)"} /></div>
               <CountTable label="Sex" counts={d.sex_counts} />
               <CountTable label="Ethnicity" counts={d.ethnicity_counts} />
-              <div style={{ fontSize: 12, color: "#2d3748", marginBottom: 4 }}>ICU: {d.icu_count ?? 0}</div>
+              <div style={{ fontSize: 12, color: "#2d3748", marginBottom: 4 }}><LocalizedText text={"ICU:"} />{" "}{d.icu_count ?? 0}</div>
               <CountTable label="Obesity Class" counts={d.obesity_class_counts} />
               <CountTable label="Indication" counts={d.indication_counts} />
             </div>
@@ -381,19 +379,17 @@ export default function ResearchDashboard() {
 
       {/* ---- Panel 3: Validation Metrics (Aim 1) ---- */}
       <div style={card}>
-        <h2 style={sectionTitle}>Validation Metrics (Aim 1)</h2>
-        <div style={{ fontSize: 11, color: GRAY, marginBottom: 8 }}>
-          Hughes 2024 thresholds: MPE within +/-20%, nRMSE &lt; 8, &ge; 50% within +/-20%
-        </div>
+        <h2 style={sectionTitle}><LocalizedText text={"Validation Metrics (Aim 1)"} /></h2>
+        <div style={{ fontSize: 11, color: GRAY, marginBottom: 8 }}><LocalizedText text={"Hughes 2024 thresholds: MPE within +/-20%, nRMSE < 8, ≥ 50% within +/-20%"} /></div>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", border: `1px solid ${LIGHT_BORDER}` }}>
             <thead>
               <tr>
-                <th style={th}>Method</th>
+                <th style={th}><LocalizedText text="Method" /></th>
                 <th style={th}>MPE (%)</th>
                 <th style={th}>RMSE</th>
                 <th style={th}>nRMSE</th>
-                <th style={th}>% Within +/-20%</th>
+                <th style={th}><LocalizedText text={"% Within +/-20%"} /></th>
               </tr>
             </thead>
             <tbody>
@@ -406,45 +402,35 @@ export default function ResearchDashboard() {
 
       {/* ---- Panel 4: Export Center ---- */}
       <div style={card}>
-        <h2 style={sectionTitle}>Export Center</h2>
+        <h2 style={sectionTitle}><LocalizedText text={"Export Center"} /></h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-          <button style={exportBtn} onClick={() => handleExport("all", "csv", "vancomyzer_complete.csv")}>
-            Complete Dataset CSV
-          </button>
-          <button style={exportBtn} onClick={() => handleExport("eligible", "csv", "vancomyzer_eligible.csv")}>
-            Eligible-Only CSV
-          </button>
-          <button style={exportBtn} onClick={() => handleExport("obesity", "csv", "vancomyzer_obesity.csv")}>
-            Obesity Subgroup CSV
-          </button>
-          <button style={exportBtn} onClick={() => handleExport("all", "summary", "vancomyzer_summary.json")}>
-            Summary JSON
-          </button>
-          <button style={exportBtn} onClick={() => handleExport("all", "csv", "vancomyzer_audit_log.csv")}>
-            Audit Log CSV
-          </button>
+          <button style={exportBtn} onClick={() => handleExport("all", "csv", "vancomyzer_complete.csv")}><LocalizedText text={"Complete Dataset CSV"} /></button>
+          <button style={exportBtn} onClick={() => handleExport("eligible", "csv", "vancomyzer_eligible.csv")}><LocalizedText text={"Eligible-Only CSV"} /></button>
+          <button style={exportBtn} onClick={() => handleExport("obesity", "csv", "vancomyzer_obesity.csv")}><LocalizedText text={"Obesity Subgroup CSV"} /></button>
+          <button style={exportBtn} onClick={() => handleExport("all", "summary", "vancomyzer_summary.json")}><LocalizedText text={"Summary JSON"} /></button>
+          <button style={exportBtn} onClick={() => handleExport("all", "csv", "vancomyzer_audit_log.csv")}><LocalizedText text={"Audit Log CSV"} /></button>
         </div>
       </div>
 
       {/* ---- Patient Table ---- */}
       <div style={card}>
-        <h2 style={sectionTitle}>Patient Records ({patients.length})</h2>
+        <h2 style={sectionTitle}><LocalizedText text={"Patient Records ("} />{patients.length})</h2>
         {patients.length === 0 ? (
-          <div style={{ fontSize: 13, color: GRAY }}>No patients enrolled yet.</div>
+          <div style={{ fontSize: 13, color: GRAY }}><LocalizedText text={"No patients enrolled yet."} /></div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", border: `1px solid ${LIGHT_BORDER}` }}>
               <thead>
                 <tr>
-                  <th style={th}>Study ID</th>
-                  <th style={th}>Age</th>
-                  <th style={th}>Sex</th>
+                  <th style={th}><LocalizedText text={"Study ID"} /></th>
+                  <th style={th}><LocalizedText text={"Age"} /></th>
+                  <th style={th}><LocalizedText text="Sex" /></th>
                   <th style={th}>BMI</th>
                   <th style={th}>CrCl</th>
-                  <th style={th}>ICU</th>
-                  <th style={th}>Indication</th>
-                  <th style={th}>Eligible</th>
-                  <th style={th}>Exclusion Reasons</th>
+                  <th style={th}><LocalizedText text={"ICU"} /></th>
+                  <th style={th}><LocalizedText text={"Indication"} /></th>
+                  <th style={th}><LocalizedText text={"Eligible"} /></th>
+                  <th style={th}><LocalizedText text={"Exclusion Reasons"} /></th>
                 </tr>
               </thead>
               <tbody>
@@ -467,18 +453,18 @@ export default function ResearchDashboard() {
                         </Link>
                       </td>
                       <td style={td}>{p.age}</td>
-                      <td style={td}>{p.sex}</td>
+                      <td style={td}><LocalizedText text={p.sex} /></td>
                       <td style={td}>{p.bmi?.toFixed(1)}</td>
                       <td style={td}>{p.crcl_baseline?.toFixed(1)}</td>
-                      <td style={td}>{p.icu_admission ? "Yes" : "No"}</td>
-                      <td style={td}>{p.indication}</td>
+                      <td style={td}><LocalizedText text={p.icu_admission ? "Yes" : "No"} /></td>
+                      <td style={td}><LocalizedText text={p.indication} /></td>
                       <td style={td}>
                         <span style={badge(p.meets_inclusion === 1)}>
-                          {p.meets_inclusion === 1 ? "ELIGIBLE" : "EXCLUDED"}
+                          <LocalizedText text={p.meets_inclusion === 1 ? "ELIGIBLE" : "EXCLUDED"} />
                         </span>
                       </td>
                       <td style={{ ...td, fontSize: 11, color: GRAY }}>
-                        {exclusions.length > 0 ? exclusions.join(", ") : "---"}
+                        {exclusions.length > 0 ? exclusions.map((reason: string, i: number) => <span key={i}>{i > 0 ? ", " : ""}<LocalizedText text={reason} /></span>) : "---"}
                       </td>
                     </tr>
                   );

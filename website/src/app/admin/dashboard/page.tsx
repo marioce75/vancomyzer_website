@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText } from "@/localization/LanguageProvider";
+
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -24,8 +26,8 @@ export default function OverviewPage() {
     })();
   }, []);
 
-  if (loading) return <div className="text-gray-500 text-center py-20">Loading dashboard...</div>;
-  if (!data) return <div className="text-red-600 text-center py-20">Failed to load dashboard data.</div>;
+  if (loading) return <div className="text-gray-500 text-center py-20"><LocalizedText text={"Loading dashboard..."} /></div>;
+  if (!data) return <div className="text-red-600 text-center py-20"><LocalizedText text={"Failed to load dashboard data."} /></div>;
 
   const cards = [
     {
@@ -68,19 +70,19 @@ export default function OverviewPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}>Dashboard Overview</h1>
-      <p className="text-sm text-gray-500 mb-6">Vancomyzer Admin Console</p>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}><LocalizedText text={"Dashboard Overview"} /></h1>
+      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"Vancomyzer Admin Console"} /></p>
 
       {/* Metric cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {cards.map((card) => (
           <div key={card.title} className="bg-white border border-gray-200 rounded-lg p-5">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{card.title}</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1"><LocalizedText text={card.title} /></p>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold" style={{ color: "#1e4d8c" }}>{card.value}</span>
+              <span className="text-2xl font-bold" style={{ color: "#1e4d8c" }}><LocalizedText text={card.value} /></span>
               {card.badge && (
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${card.badgeColor}`}>
-                  {card.badge}
+                  <LocalizedText text={card.badge} />
                 </span>
               )}
             </div>
@@ -89,27 +91,21 @@ export default function OverviewPage() {
       </div>
 
       {/* Quick actions */}
-      <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3">Quick Actions</h2>
+      <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3"><LocalizedText text={"Quick Actions"} /></h2>
       <div className="flex flex-wrap gap-3">
         <Link
           href="/admin/dashboard/security"
           className="px-4 py-2 text-sm font-medium text-white rounded-md transition-colors hover:opacity-90"
           style={{ background: "#1e4d8c" }}
-        >
-          View Audit Log
-        </Link>
+        ><LocalizedText text={"View Audit Log"} /></Link>
         <Link
           href="/research/enter"
           className="px-4 py-2 text-sm font-medium text-white rounded-md bg-emerald-600 hover:bg-emerald-700 transition-colors"
-        >
-          Add Research Patient
-        </Link>
+        ><LocalizedText text={"Add Research Patient"} /></Link>
         <Link
           href="/admin/dashboard/users"
           className="px-4 py-2 text-sm font-medium text-white rounded-md bg-gray-600 hover:bg-gray-700 transition-colors"
-        >
-          User Management
-        </Link>
+        ><LocalizedText text={"User Management"} /></Link>
       </div>
     </div>
   );

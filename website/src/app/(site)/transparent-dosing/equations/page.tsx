@@ -1,3 +1,8 @@
+import { LocalizedEquation } from "@/localization/LocalizedEquation";
+import { localizeMetadata } from "@/localization/metadata";
+import { requestLocale } from "@/localization/server";
+
+import { LocalizedText } from "@/localization/LanguageProvider";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -11,7 +16,7 @@ import {
   highBmiAdvisory,
 } from "@/lib/pk/modelRegistry";
 
-export const metadata: Metadata = {
+const englishMetadata: Metadata = {
   alternates: { canonical: "https://vancomyzer.com/transparent-dosing/equations" },
   title: "Equations & Derivations — Vancomyzer™",
   description:
@@ -88,19 +93,10 @@ export default function EquationsPage() {
       {/* ── HEADER ─────────────────────────────────────────── */}
       <section className="mx-auto max-w-[1180px] px-4 sm:px-6" style={{ borderBottom: "1px solid #cbd6e0" }}>
         <div className="py-10 md:py-12">
-          <Link href="/transparent-dosing" className="text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#546471" }}>
-            Evidence
-          </Link>
-          <h1 className="vz-serif mt-3 max-w-[24ch] text-[clamp(28px,3.4vw,40px)] leading-[1.08]" style={{ color: "#14232f" }}>
-            Equations &amp; derivations
-          </h1>
-          <p className="mt-[18px] max-w-[62ch] text-lg leading-[1.5]" style={{ color: "#4a5a68" }}>
-            Every equation, constant and reference the calculator uses, so the method can be reviewed
-            and the calculations checked against the cited sources.
-          </p>
-          <p className="mt-3 max-w-[62ch] text-[14px] leading-relaxed" style={{ color: "#546471" }}>
-            Model names, citations and equations on this page use the same reference values as
-            the calculator (calculator version{" "}
+          <Link href="/transparent-dosing" className="text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#546471" }}><LocalizedText text="Evidence" /></Link>
+          <h1 className="vz-serif mt-3 max-w-[24ch] text-[clamp(28px,3.4vw,40px)] leading-[1.08]" style={{ color: "#14232f" }}><LocalizedText text="Equations & derivations" /></h1>
+          <p className="mt-[18px] max-w-[62ch] text-lg leading-[1.5]" style={{ color: "#4a5a68" }}><LocalizedText text="Every equation, constant and reference the calculator uses, so the method can be reviewed and the calculations checked against the cited sources." /></p>
+          <p className="mt-3 max-w-[62ch] text-[14px] leading-relaxed" style={{ color: "#546471" }}><LocalizedText text="Model names, citations and equations on this page use the same reference values as the calculator (calculator version" />{" "}
             <span style={{ color: "#14232f", fontFamily: "'IBM Plex Mono', 'JetBrains Mono', monospace" }}>
               {MODEL_MANIFEST_VERSION}
             </span>
@@ -112,58 +108,47 @@ export default function EquationsPage() {
       {/* ── SECTION 1: COLIN 2019 MODEL (from the model registry) ─────── */}
       <section className="px-4 py-12 sm:px-6 md:py-14" style={{ borderBottom: "1px solid #cbd6e0" }}>
         <div className="mx-auto max-w-[1180px]">
-          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}>
-            1. Population model — {COLIN_2019.shortName}
+          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}><LocalizedText text="1. Population model —" />{" "}{COLIN_2019.shortName}
           </h2>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            Every adult is dosed with the {COLIN_2019.displayName}. Clearance combines four factors: body size, maturation (effectively 1.0 for adults),
-            age-related decline, and serum creatinine. The equations below show how these factors are multiplied.
-          </p>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="Every adult is dosed with the" />{" "}<LocalizedText text={COLIN_2019.displayName} /><LocalizedText text=". Clearance combines four factors: body size, maturation (effectively 1.0 for adults), age-related decline, and serum creatinine. The equations below show how these factors are multiplied." /></p>
 
           <dl className="mt-4 max-w-3xl space-y-2 text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
             <div>
-              <dt className="inline font-semibold" style={{ color: "#14232f" }}>Structure: </dt>
-              <dd className="inline">{COLIN_2019.structure}</dd>
+              <dt className="inline font-semibold" style={{ color: "#14232f" }}><LocalizedText text="Structure:" />{" "}</dt>
+              <dd className="inline"><LocalizedText text={COLIN_2019.structure} /></dd>
             </div>
             <div>
-              <dt className="inline font-semibold" style={{ color: "#14232f" }}>Source data: </dt>
-              <dd className="inline">{COLIN_2019.sourcePopulation}</dd>
+              <dt className="inline font-semibold" style={{ color: "#14232f" }}><LocalizedText text="Source data:" />{" "}</dt>
+              <dd className="inline"><LocalizedText text={COLIN_2019.sourcePopulation} /></dd>
             </div>
             <div>
-              <dt className="inline font-semibold" style={{ color: "#14232f" }}>Scope in Vancomyzer: </dt>
-              <dd className="inline">{COLIN_2019.vancomyzerScope}</dd>
+              <dt className="inline font-semibold" style={{ color: "#14232f" }}><LocalizedText text="Scope in Vancomyzer:" />{" "}</dt>
+              <dd className="inline"><LocalizedText text={COLIN_2019.vancomyzerScope} /></dd>
             </div>
             <div>
-              <dt className="inline font-semibold" style={{ color: "#14232f" }}>Kidney-function input: </dt>
-              <dd className="inline">{COLIN_2019.renalCovariate}</dd>
+              <dt className="inline font-semibold" style={{ color: "#14232f" }}><LocalizedText text="Kidney-function input:" />{" "}</dt>
+              <dd className="inline"><LocalizedText text={COLIN_2019.renalCovariate} /></dd>
             </div>
           </dl>
 
           <pre
             className="mt-6 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
             style={PRE_STYLE} tabIndex={0}
-          >{COLIN_MODEL_BLOCK}</pre>
+          ><LocalizedEquation text={COLIN_MODEL_BLOCK} /></pre>
 
           <div className="mt-6 grid gap-6 sm:grid-cols-2">
             <div>
-              <h3 className="text-base font-semibold" style={{ color: "#14232f" }}>
-                Published patient factors not used
-              </h3>
+              <h3 className="text-base font-semibold" style={{ color: "#14232f" }}><LocalizedText text="Published patient factors not used" /></h3>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
                 {COLIN_2019.omittedCovariates.map((covariate) => (
-                  <li key={covariate}>{covariate}</li>
+                  <li key={covariate}><LocalizedText text={covariate} /></li>
                 ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-base font-semibold" style={{ color: "#14232f" }}>
-                Published variability
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
-                Between-subject variability (CV): CL {pct(VARIABILITY.iivCvCL)}, V1 {pct(VARIABILITY.iivCvV1)}, V2{" "}
-                {pct(VARIABILITY.iivCvV2)}; proportional residual error {pct(VARIABILITY.residualProportional)}. Shown
-                for reference only: the Bayesian fit uses Vancomyzer&rsquo;s own prior widths (section 7).
-              </p>
+              <h3 className="text-base font-semibold" style={{ color: "#14232f" }}><LocalizedText text="Published variability" /></h3>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="Between-subject variability (CV): CL" />{" "}{pct(VARIABILITY.iivCvCL)}, V1 {pct(VARIABILITY.iivCvV1)}, V2{" "}
+                {pct(VARIABILITY.iivCvV2)}<LocalizedText text="; proportional residual error" />{" "}{pct(VARIABILITY.residualProportional)}<LocalizedText text=". Shown for reference only: the Bayesian fit uses Vancomyzer’s own prior widths (section 7)." /></p>
             </div>
           </div>
 
@@ -179,20 +164,13 @@ export default function EquationsPage() {
       {/* ── SECTION 2: TWO-COMPARTMENT RATE CONSTANTS ──────── */}
       <section className="px-4 py-12 sm:px-6 md:py-14" style={{ borderBottom: "1px solid #cbd6e0" }}>
         <div className="mx-auto max-w-[1180px]">
-          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}>
-            2. Two-compartment rate constants
-          </h2>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            Vancomycin behaves as a two-compartment drug: a central compartment (V₁) that contains the
-            measured concentration, and a peripheral compartment (V₂) the drug distributes into and
-            slowly returns from. The hybrid rate constants α (fast, distribution) and β (slow, terminal
-            elimination) are the eigenvalues of the system.
-          </p>
+          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}><LocalizedText text="2. Two-compartment rate constants" /></h2>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="Vancomycin behaves as a two-compartment drug: a central compartment (V₁) that contains the measured concentration, and a peripheral compartment (V₂) the drug distributes into and slowly returns from. The hybrid rate constants α (fast, distribution) and β (slow, terminal elimination) are the eigenvalues of the system." /></p>
 
           <pre
             className="mt-6 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
             style={PRE_STYLE} tabIndex={0}
-          >{`k10 = CL / V1
+          ><LocalizedEquation text={`k10 = CL / V1
 k12 = Q / V1
 k21 = Q / V2
 
@@ -207,25 +185,20 @@ B = (k21 − β) / [V1 × (α − β)]
 
 Half-lives:
   t½α = ln(2) / α     distribution half-life (~0.5–4h)
-  t½β = ln(2) / β     terminal elimination half-life (~6–80h)`}</pre>
+  t½β = ln(2) / β     terminal elimination half-life (~6–80h)`} /></pre>
         </div>
       </section>
 
       {/* ── SECTION 3: SINGLE-DOSE IV INFUSION ─────────────── */}
       <section className="px-4 py-12 sm:px-6 md:py-14" style={{ borderBottom: "1px solid #cbd6e0" }}>
         <div className="mx-auto max-w-[1180px]">
-          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}>
-            3. Single-dose concentration (IV infusion)
-          </h2>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            Closed-form solution for a constant-rate IV infusion of duration T_inf. During infusion the
-            concentration builds; after the pump stops, it falls as a sum of two exponentials.
-          </p>
+          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}><LocalizedText text="3. Single-dose concentration (IV infusion)" /></h2>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="Closed-form solution for a constant-rate IV infusion of duration T_inf. During infusion the concentration builds; after the pump stops, it falls as a sum of two exponentials." /></p>
 
           <pre
             className="mt-6 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
             style={PRE_STYLE} tabIndex={0}
-          >{`R0 = dose_mg / T_inf            (infusion rate, mg/h)
+          ><LocalizedEquation text={`R0 = dose_mg / T_inf            (infusion rate, mg/h)
 
 During infusion (0 ≤ t ≤ T_inf):
   C(t) = R0 × [ A/α × (1 − e^(−α·t))
@@ -233,26 +206,20 @@ During infusion (0 ≤ t ≤ T_inf):
 
 After infusion (t > T_inf):
   C(t) = R0 × [ A/α × (1 − e^(−α·T_inf)) × e^(−α·(t − T_inf))
-              + B/β × (1 − e^(−β·T_inf)) × e^(−β·(t − T_inf)) ]`}</pre>
+              + B/β × (1 − e^(−β·T_inf)) × e^(−β·(t − T_inf)) ]`} /></pre>
         </div>
       </section>
 
       {/* ── SECTION 4: MULTI-DOSE SUPERPOSITION ────────────── */}
       <section className="px-4 py-12 sm:px-6 md:py-14" style={{ borderBottom: "1px solid #cbd6e0" }}>
         <div className="mx-auto max-w-[1180px]">
-          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}>
-            4. Multi-dose superposition (accumulation to steady state)
-          </h2>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            For repeated dosing the total concentration at any time is the linear sum of single-dose
-            contributions from every prior dose. The number of doses simulated is chosen so the curve
-            spans at least 5 terminal half-lives (about 97% of steady state).
-          </p>
+          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}><LocalizedText text="4. Multi-dose superposition (accumulation to steady state)" /></h2>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="For repeated dosing the total concentration at any time is the linear sum of single-dose contributions from every prior dose. The number of doses simulated is chosen so the curve spans at least 5 terminal half-lives (about 97% of steady state)." /></p>
 
           <pre
             className="mt-6 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
             style={PRE_STYLE} tabIndex={0}
-          >{`C_total(t) = Σ C_single(t − k·τ)   for k = 0, 1, 2, …, N−1
+          ><LocalizedEquation text={`C_total(t) = Σ C_single(t − k·τ)   for k = 0, 1, 2, …, N−1
              where t ≥ k·τ
 
 Number of doses simulated:
@@ -260,21 +227,14 @@ Number of doses simulated:
   N    = max(10, ceil(5 × t½β / τ) + 2)
 
 This ensures the graph spans enough time for concentrations
-to approach steady state.`}</pre>
+to approach steady state.`} /></pre>
 
-          <h3 className="mt-10 text-lg font-bold" style={{ color: "#14232f" }}>
-            Levels drawn before steady state, and loading doses
-          </h3>
-          <p className="mt-2 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            When steady state is not confirmed, a measured level is predicted from exactly the doses given, not from an
-            infinite dose train. When dose 1 was a loading dose, it enters the sum with its own amount and infusion
-            time, and the first maintenance dose starts at the entered gap (default: the dosing interval). Levels are
-            timed from the start of the last dose given.
-          </p>
+          <h3 className="mt-10 text-lg font-bold" style={{ color: "#14232f" }}><LocalizedText text="Levels drawn before steady state, and loading doses" /></h3>
+          <p className="mt-2 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="When steady state is not confirmed, a measured level is predicted from exactly the doses given, not from an infinite dose train. When dose 1 was a loading dose, it enters the sum with its own amount and infusion time, and the first maintenance dose starts at the entered gap (default: the dosing interval). Levels are timed from the start of the last dose given." /></p>
           <pre
             className="mt-4 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
             style={PRE_STYLE} tabIndex={0}
-          >{`Dose times (dose 1 = loading dose, N doses given):
+          ><LocalizedEquation text={`Dose times (dose 1 = loading dose, N doses given):
   t₁ = 0                         D₁ = loading dose,  T_inf,1 = loading infusion
   t₂ = G                         D  = maintenance,   T_inf   = maintenance infusion
   tⱼ = G + (j − 2)·τ             (G = gap to first maintenance dose; default τ)
@@ -283,85 +243,64 @@ Predicted level drawn Δt after dose N started:
   C(t_N + Δt) = Σⱼ C_single(Dⱼ, T_inf,j ; t_N + Δt − tⱼ)
 
 The steady-state projection of the maintenance regimen (section 5)
-does not depend on the loading dose.`}</pre>
+does not depend on the loading dose.`} /></pre>
         </div>
       </section>
 
       {/* ── SECTION 5: STEADY-STATE AUC ────────────────────── */}
       <section className="px-4 py-12 sm:px-6 md:py-14" style={{ borderBottom: "1px solid #cbd6e0" }}>
         <div className="mx-auto max-w-[1180px]">
-          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}>
-            5. Steady-state AUC₂₄
-          </h2>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            By linear pharmacokinetics, the steady-state daily exposure depends only on the daily dose
-            and the patient&rsquo;s clearance — independent of how the dose is split across the day.
-          </p>
+          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}><LocalizedText text="5. Steady-state AUC₂₄" /></h2>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="By linear pharmacokinetics, the steady-state daily exposure depends only on the daily dose and the patient’s clearance — independent of how the dose is split across the day." /></p>
 
           <pre
             className="mt-6 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
             style={PRE_STYLE} tabIndex={0}
-          >{`AUC₂₄ = (dose_mg / CL) × (24 / τ)
+          ><LocalizedEquation text={`AUC₂₄ = (dose_mg / CL) × (24 / τ)
 
 Equivalently:
   AUC₂₄ = TDD / CL    (TDD = total daily dose)
 
 This is exact under linear PK; peak and trough use the
 two-compartment steady-state superposition formula
-(not the multi-dose simulation) for maximum numerical accuracy.`}</pre>
+(not the multi-dose simulation) for maximum numerical accuracy.`} /></pre>
         </div>
       </section>
 
       {/* ── SECTION 6: BODY SIZE — NO MODEL SWITCH ─────────── */}
       <section className="px-4 py-12 sm:px-6 md:py-14" style={{ borderBottom: "1px solid #cbd6e0" }}>
         <div className="mx-auto max-w-[1180px]">
-          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}>
-            6. Body size: no model switch
-          </h2>
+          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}><LocalizedText text="6. Body size: no model switch" /></h2>
           <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            {COLIN_2019.shortName} is used for every adult at every body size, including BMI{" "}
-            {HIGH_BMI_THRESHOLD_KG_M2} kg/m² and above. Clearance and volumes scale with total body weight exactly as
-            in section 1: CL and Q with (WT/70)<sup>0.75</sup>, V1 and V2 with WT/70. There is no BMI threshold at
-            which a different model or different equations are used.
-          </p>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            At BMI {HIGH_BMI_THRESHOLD_KG_M2} kg/m² or more, the calculator adds an advisory because published
-            evaluation of this model at that body size is limited. This is the advisory the calculator shows; for a patient weighing 130 kg with a height of 175 cm it reads:
-          </p>
+            {COLIN_2019.shortName}{" "}<LocalizedText text="is used for every adult at every body size, including BMI" />{" "}
+            {HIGH_BMI_THRESHOLD_KG_M2}{" "}<LocalizedText text="kg/m² and above. Clearance and volumes scale with total body weight exactly as in section 1: CL and Q with (WT/70)" /><sup>0.75</sup><LocalizedText text=", V1 and V2 with WT/70. There is no BMI threshold at which a different model or different equations are used." /></p>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="At BMI" />{" "}{HIGH_BMI_THRESHOLD_KG_M2}{" "}<LocalizedText text="kg/m² or more, the calculator adds an advisory because published evaluation of this model at that body size is limited. This is the advisory the calculator shows; for a patient weighing 130 kg with a height of 175 cm it reads:" /></p>
           {HIGH_BMI_EXAMPLE && (
             <blockquote
               className="mt-4 max-w-3xl border-l-[3px] px-5 py-3 text-sm leading-relaxed"
               style={{ borderColor: "#f59e0b", background: "#fffbeb", color: "#78350f" }}
             >
-              {HIGH_BMI_EXAMPLE}
+              <LocalizedText text={HIGH_BMI_EXAMPLE} />
             </blockquote>
           )}
           {HEIGHT_MISSING_EXAMPLE && (
             <>
-              <p className="mt-4 max-w-3xl text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
-                If height is not entered for a heavier patient, it reads:
-              </p>
+              <p className="mt-4 max-w-3xl text-sm leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="If height is not entered for a heavier patient, it reads:" /></p>
               <blockquote
                 className="mt-2 max-w-3xl border-l-[3px] px-5 py-3 text-sm leading-relaxed"
                 style={{ borderColor: "#f59e0b", background: "#fffbeb", color: "#78350f" }}
               >
-                {HEIGHT_MISSING_EXAMPLE}
+                <LocalizedText text={HEIGHT_MISSING_EXAMPLE} />
               </blockquote>
             </>
           )}
 
-          <h3 className="mt-10 text-lg font-bold" style={{ color: "#14232f" }}>
-            Shown for information only
-          </h3>
-          <p className="mt-2 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            At BMI {HIGH_BMI_THRESHOLD_KG_M2} kg/m² or more, the calculator also displays fat-free mass and alternative
-            creatinine-clearance estimates so they can be compared with your own assessment. They use the formulas
-            below and do not change the {COLIN_2019.shortName} calculation.
-          </p>
+          <h3 className="mt-10 text-lg font-bold" style={{ color: "#14232f" }}><LocalizedText text="Shown for information only" /></h3>
+          <p className="mt-2 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="At BMI" />{" "}{HIGH_BMI_THRESHOLD_KG_M2}{" "}<LocalizedText text="kg/m² or more, the calculator also displays fat-free mass and alternative creatinine-clearance estimates so they can be compared with your own assessment. They use the formulas below and do not change the" />{" "}{COLIN_2019.shortName}{" "}<LocalizedText text="calculation." /></p>
           <pre
             className="mt-4 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
             style={PRE_STYLE} tabIndex={0}
-          >{INFORMATIONAL_FORMULAS}</pre>
+          ><LocalizedEquation text={INFORMATIONAL_FORMULAS} /></pre>
           <p className="mt-4 text-xs" style={{ color: "#546471" }}>
             Janmahasatian S, et al. <em>Clin Pharmacokinet</em>. 2005;44(10):1051–1065.&nbsp;
             <a href="https://doi.org/10.2165/00003088-200544100-00004" target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
@@ -375,11 +314,9 @@ two-compartment steady-state superposition formula
           </p>
 
           <div className="mt-10 max-w-3xl border-l-[3px] px-5 py-4" style={{ borderColor: "#1f5e96", background: "#ffffff", outline: "1px solid #cbd6e0" }}>
-            <p className="text-sm font-semibold" style={{ color: "#14232f" }}>
-              Evidence for {COLIN_2019.shortName} in obesity
-            </p>
+            <p className="text-sm font-semibold" style={{ color: "#14232f" }}><LocalizedText text="Evidence for" />{" "}{COLIN_2019.shortName}{" "}<LocalizedText text="in obesity" /></p>
             <p className="mt-1 text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
-              {COLIN_2021_OBESE_EVALUATION.summary}
+              <LocalizedText text={COLIN_2021_OBESE_EVALUATION.summary} />
             </p>
             <p className="mt-2 text-xs" style={{ color: "#546471" }}>
               {COLIN_2021_OBESE_EVALUATION.citation}
@@ -404,21 +341,13 @@ two-compartment steady-state superposition formula
       {/* ── SECTION 7: BAYESIAN POSTERIOR ──────────────────── */}
       <section className="px-4 py-12 sm:px-6 md:py-14" style={{ borderBottom: "1px solid #cbd6e0" }}>
         <div className="mx-auto max-w-[1180px]">
-          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}>
-            7. Adjusting estimates with blood levels
-          </h2>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            Vancomyzer uses Bayesian estimation to combine the population model with the patient&rsquo;s
-            measured blood levels. It considers both the agreement with those levels and how far the
-            estimates differ from the population starting values. It compares several possible solutions
-            to reduce the chance of settling on a poorer fit. The method is called maximum a posteriori
-            (MAP) estimation; the equation and assumptions are shown below.
-          </p>
+          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}><LocalizedText text="7. Adjusting estimates with blood levels" /></h2>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="Vancomyzer uses Bayesian estimation to combine the population model with the patient’s measured blood levels. It considers both the agreement with those levels and how far the estimates differ from the population starting values. It compares several possible solutions to reduce the chance of settling on a poorer fit. The method is called maximum a posteriori (MAP) estimation; the equation and assumptions are shown below." /></p>
 
           <pre
             className="mt-6 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
             style={PRE_STYLE} tabIndex={0}
-          >{`minimize  Σᵢ ½·((Cᵢ_obs − Cᵢ_pred) / σᵢ)² + ln(σᵢ)
+          ><LocalizedEquation text={`minimize  Σᵢ ½·((Cᵢ_obs − Cᵢ_pred) / σᵢ)² + ln(σᵢ)
         + ½·(ln(CL/CL_prior) / ω_CL)²
         + ½·(ln(V1/V1_prior) / ω_V1)²
         + ½·(ln(Q /Q_prior ) / ω_Q )²
@@ -430,57 +359,29 @@ Assay error model:
 Bounds: each fitted parameter is limited to between one-tenth and ten times its prior value.
 
 Prior log-SDs (Vancomyzer settings, all adults):
-  ω_CL = 0.35    ω_V1 = 0.25    ω_Q = 0.50    ω_V2 = 0.50`}</pre>
+  ω_CL = 0.35    ω_V1 = 0.25    ω_Q = 0.50    ω_V2 = 0.50`} /></pre>
 
-          <p className="mt-4 text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
-            With MAP estimation, a single observation is weighed against the prior rather than replacing it. The
-            prior widths above are Vancomyzer settings, not the published {COLIN_2019.shortName} variability shown
-            in section 1. When the residual exceeds 25% relative error, the calculator displays a
-            Fit Quality Advisory and recommends a confirmatory level rather than overriding the prior.
-          </p>
+          <p className="mt-4 text-sm leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="With MAP estimation, a single observation is weighed against the prior rather than replacing it. The prior widths above are Vancomyzer settings, not the published" />{" "}{COLIN_2019.shortName}{" "}<LocalizedText text="variability shown in section 1. When the residual exceeds 25% relative error, the calculator displays a Fit Quality Advisory and recommends a confirmatory level rather than overriding the prior." /></p>
 
-          <h3 className="mt-10 text-lg font-bold" style={{ color: "#14232f" }}>
-            The 90% credible band on the graph
-          </h3>
-          <p className="mt-2 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            The band shows uncertainty in the estimated concentrations. With blood levels available,
-            the calculator considers 4,000 possible sets of pharmacokinetic values and selects 400 according
-            to how well they agree with both the levels and the starting assumptions. Before levels are
-            available, it uses 400 sets from the population assumptions. The middle 90% of the simulated
-            concentrations forms the band at each time. The same inputs give the same band.
-            Measurement error is excluded, so the band does not predict the range of a future blood test result.
-            No band is shown when the estimate is unreliable or when the displayed parameters differ from
-            the fitted values. The mathematical method is given below.
-          </p>
+          <h3 className="mt-10 text-lg font-bold" style={{ color: "#14232f" }}><LocalizedText text="The 90% credible band on the graph" /></h3>
+          <p className="mt-2 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="The band shows uncertainty in the estimated concentrations. With blood levels available, the calculator considers 4,000 possible sets of pharmacokinetic values and selects 400 according to how well they agree with both the levels and the starting assumptions. Before levels are available, it uses 400 sets from the population assumptions. The middle 90% of the simulated concentrations forms the band at each time. The same inputs give the same band. Measurement error is excluded, so the band does not predict the range of a future blood test result. No band is shown when the estimate is unreliable or when the displayed parameters differ from the fitted values. The mathematical method is given below." /></p>
           <pre
             className="mt-4 overflow-x-auto p-5 text-xs leading-relaxed sm:text-sm"
             style={PRE_STYLE} tabIndex={0}
-          >{`Proposal:   x ~ N(x̂_MAP, (1.5)² · H⁻¹)     x = ln(CL, V1, Q, V2), H = Hessian of the objective
+          ><LocalizedEquation text={`Proposal:   x ~ N(x̂_MAP, (1.5)² · H⁻¹)     x = ln(CL, V1, Q, V2), H = Hessian of the objective
 Weight:     w ∝ exp(−objective(x)) / q(x)
 Resample:   400 draws, systematic resampling
-Band(t):    5th and 95th percentile of C(t) across the 400 draws`}</pre>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
-            How often the band contains the true concentration in synthetic patients is reported on the{" "}
-            <a href="/transparent-dosing/software-checks#band" style={{ textDecoration: "underline" }}>software checks</a> page.
-            It has not yet been checked against measured patient levels.
-          </p>
+Band(t):    5th and 95th percentile of C(t) across the 400 draws`} /></pre>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="How often the band contains the true concentration in synthetic patients is reported on the" />{" "}
+            <a href="/transparent-dosing/software-checks#band" style={{ textDecoration: "underline" }}><LocalizedText text="software checks" /></a>{" "}<LocalizedText text="page. It has not yet been checked against measured patient levels." /></p>
         </div>
       </section>
 
       {/* ── SECTION 8: AUC TARGET ──────────────────────────── */}
       <section className="px-4 py-12 sm:px-6 md:py-14" style={{ borderBottom: "1px solid #cbd6e0" }}>
         <div className="mx-auto max-w-[1180px]">
-          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}>
-            8. AUC₂₄ target — ASHP/IDSA/PIDS/SIDP 2020
-          </h2>
-          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}>
-            The therapeutic target of <strong>AUC₂₄ 400–600 mg·h/L</strong> (assuming MIC = 1 mg/L) follows
-            the 2020 revised consensus guideline for serious MRSA infections. The guideline no longer recommends
-            trough-only monitoring and recommends AUC-guided dosing, preferably with Bayesian estimation, citing data
-            associating AUC-guided dosing with less acute kidney injury than trough-guided dosing. The calculator&rsquo;s
-            recommendation search picks the dose × interval combination whose predicted steady-state AUC
-            sits closest to the midpoint of this range.
-          </p>
+          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}><LocalizedText text="8. AUC₂₄ target — ASHP/IDSA/PIDS/SIDP 2020" /></h2>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="The therapeutic target of" />{" "}<strong>AUC₂₄ 400–600 mg·h/L</strong>{" "}<LocalizedText text="(assuming MIC = 1 mg/L) follows the 2020 revised consensus guideline for serious MRSA infections. The guideline no longer recommends trough-only monitoring and recommends AUC-guided dosing, preferably with Bayesian estimation, citing data associating AUC-guided dosing with less acute kidney injury than trough-guided dosing. The calculator’s recommendation search picks the dose × interval combination whose predicted steady-state AUC sits closest to the midpoint of this range." /></p>
           <p className="mt-4 text-xs" style={{ color: "#546471" }}>
             Rybak MJ et al. <em>Am J Health Syst Pharm</em>. 2020;77(11):835–864.&nbsp;
             <a href="https://doi.org/10.1093/ajhp/zxaa036" target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96" }}>
@@ -493,9 +394,7 @@ Band(t):    5th and 95th percentile of C(t) across the 400 draws`}</pre>
       {/* ── FOUNDATIONAL TEXTS + DISCLAIMER ────────────────── */}
       <section className="px-4 py-12 sm:px-6 md:py-14">
         <div className="mx-auto max-w-[1180px]">
-          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}>
-            Foundational texts
-          </h2>
+          <h2 className="vz-serif text-[clamp(24px,2.6vw,32px)] leading-[1.15]" style={{ color: "#14232f" }}><LocalizedText text="Foundational texts" /></h2>
           <ul className="mt-4 max-w-[70ch] space-y-2 text-[15px] leading-relaxed" style={{ color: "#4a5a68" }}>
             <li>
               Rowland M, Tozer TN. <em>Clinical Pharmacokinetics and Pharmacodynamics: Concepts and Applications.</em> 4th ed. Lippincott Williams &amp; Wilkins; 2011.
@@ -506,31 +405,22 @@ Band(t):    5th and 95th percentile of C(t) across the 400 draws`}</pre>
           </ul>
 
           <div className="mt-10 max-w-[70ch] border-l-[3px] bg-white px-5 py-4" style={{ borderColor: "#7a4e00", outline: "1px solid #cbd6e0" }}>
-            <p className="text-sm font-semibold" style={{ color: "#14232f" }}>
-              Decision support, not a substitute for judgment
-            </p>
-            <p className="mt-1 text-sm leading-relaxed" style={{ color: "#4a5a68" }}>
-              These models, equations and references are published for transparency and audit. Vancomyzer&trade;
-              is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of
-              the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has
-              not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare
-              professionals, who must independently review the basis for each recommendation. Vancomyzer has not
-              yet been validated in real patients. Its equations are checked against published values and synthetic
-              test cases; external validation with patient data is planned. See the full{" "}
-              <a href="/disclaimer" style={{ color: "#1f5e96", textDecoration: "underline" }}>Medical Disclaimer</a>.
+            <p className="text-sm font-semibold" style={{ color: "#14232f" }}><LocalizedText text="Decision support, not a substitute for judgment" /></p>
+            <p className="mt-1 text-sm leading-relaxed" style={{ color: "#4a5a68" }}><LocalizedText text="These models, equations and references are published for transparency and audit. Vancomyzer™ is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation. Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. See the full" />{" "}
+              <a href="/disclaimer" style={{ color: "#1f5e96", textDecoration: "underline" }}><LocalizedText text="Medical Disclaimer" /></a>.
             </p>
           </div>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/transparent-dosing" className="vz-mbtn vz-mbtn--outline">
-              Back to evidence
-            </Link>
-            <Link href={isOpenAccess() ? "/calculator" : "/register"} className="vz-mbtn vz-mbtn--primary">
-              Open the calculator
-            </Link>
+            <Link href="/transparent-dosing" className="vz-mbtn vz-mbtn--outline"><LocalizedText text="Back to evidence" /></Link>
+            <Link href={isOpenAccess() ? "/calculator" : "/register"} className="vz-mbtn vz-mbtn--primary"><LocalizedText text="Open the calculator" /></Link>
           </div>
         </div>
       </section>
     </main>
   );
+}
+
+export async function generateMetadata() {
+  return localizeMetadata(englishMetadata, await requestLocale());
 }
