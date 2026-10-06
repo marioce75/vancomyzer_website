@@ -1,0 +1,116 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.400
+Bienvenue dans ce tutoriel de Vancomyzer. Commençons.
+
+00:00:05.000 --> 00:00:13.760
+Pensez à votre application de navigation. Elle propose d'abord l'itinéraire habituel,
+puis l'actualise au fil du trajet.
+
+00:00:13.880 --> 00:00:24.360
+L'estimation bayésienne fonctionne de la même façon : elle utilise les concentrations
+mesurées de vancomycine et des horaires précis pour affiner une estimation initiale.
+
+00:00:24.480 --> 00:00:35.680
+Explorons Vancomyzer : de la vérification des doses antérieures à la dose de charge
+lorsqu'elle est indiquée, puis au suivi des infections graves à SARM.
+
+00:00:35.800 --> 00:00:42.280
+Le modèle appuie votre jugement clinique, et des informations fiables rendent
+l'estimation plus utile.
+
+00:00:42.400 --> 00:00:53.420
+Découvrez Vancomyzer à l'aide de cet exemple fictif chez un adulte. Commencez par
+vérifier les doses récentes de vancomycine administrées dans tous les établissements.
+
+00:00:53.540 --> 00:01:03.680
+Consultez les relevés d'administration des médicaments et les documents de transfert
+pour confirmer la quantité administrée ainsi que les horaires exacts de perfusion et
+
+00:01:03.680 --> 00:01:05.740
+de prélèvement sanguin,
+
+00:01:05.860 --> 00:01:12.580
+car un patient transféré peut déjà avoir reçu une dose de charge et ne doit pas en
+recevoir une autre automatiquement.
+
+00:01:12.700 --> 00:01:23.840
+Dans «Empirique», saisissez l'âge, le sexe, le poids, la taille et la créatinine
+sérique. Confirmez ensuite le recours éventuel à une épuration extrarénale et évaluez
+
+00:01:23.840 --> 00:01:25.080
+la fragilité si nécessaire.
+
+00:01:25.200 --> 00:01:35.270
+Cet outil est destiné aux adultes recevant de la vancomycine intraveineuse
+intermittente ; il ne permet pas de calculer les doses pour les patients dialysés.
+
+00:01:35.390 --> 00:01:46.800
+Calculez et examinez le schéma posologique ainsi que l'exposition prédite. Gardez à
+l'esprit qu'avant de disposer de concentrations mesurées, les résultats restent des
+
+00:01:46.800 --> 00:01:48.760
+estimations populationnelles,
+
+00:01:48.880 --> 00:01:52.880
+et que le graphique et les schémas proposés présentent des prédictions à examiner.
+
+00:01:53.000 --> 00:02:01.500
+Lorsqu'une dose de charge est cliniquement indiquée, vérifiez les doses récentes
+administrées dans cet établissement et dans l'établissement d'origine avant d'en
+
+00:02:01.500 --> 00:02:02.840
+administrer une autre.
+
+00:02:02.960 --> 00:02:08.900
+Ouvrez Dose de charge, sélectionnez la quantité prévue, puis vérifiez la durée de
+perfusion en minutes.
+
+00:02:09.020 --> 00:02:15.100
+Dans cet exemple, une dose de deux mille milligrammes nécessite deux cents minutes, à
+un débit de dix milligrammes par minute.
+
+00:02:15.220 --> 00:02:25.040
+Suivez le protocole de votre établissement et ralentissez la perfusion si nécessaire.
+Sélectionnez ensuite Estimer l'exposition et vérifiez les données réelles
+
+00:02:25.040 --> 00:02:26.220
+d'administration.
+
+00:02:26.340 --> 00:02:32.660
+Sélectionnez Estimer l'exposition après la dose de charge pour accéder à la saisie des
+concentrations.
+
+00:02:32.780 --> 00:02:44.180
+Vérifiez la dose, la durée réelle de perfusion et le nombre de doses administrées.
+Saisissez ensuite la concentration mesurée avec les horaires exacts du prélèvement
+
+00:02:44.180 --> 00:02:45.140
+sanguin et de la perfusion.
+
+00:02:45.260 --> 00:02:51.960
+Sans concentration mesurée, toute prédiction disponible reste fondée sur le modèle a
+priori.
+
+00:02:52.080 --> 00:02:57.740
+Ne saisissez jamais une concentration prédite comme s'il s'agissait d'un résultat
+mesuré.
+
+00:02:57.860 --> 00:03:05.940
+Si des doses ont été modifiées, suspendues ou omises, vérifiez que ce processus permet
+de représenter l'historique d'administration.
+
+00:03:06.060 --> 00:03:16.240
+Examinez la courbe, les schémas proposés et les limites du modèle en utilisant la
+cible d'AUC de 400 à 600 recommandée pour les infections invasives graves à SARM
+
+00:03:16.240 --> 00:03:18.020
+lorsque la CMI est égale à un.
+
+00:03:18.140 --> 00:03:28.960
+Suivez les protocoles de suivi de votre établissement. Deux concentrations sont
+préférables pour l'estimation bayésienne. Réévaluez la situation lorsque la fonction
+
+00:03:28.960 --> 00:03:37.220
+rénale change et documentez votre plan. N'oubliez pas que Vancomyzer reste en attente
+d'une validation indépendante chez des patients.

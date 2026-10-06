@@ -1,0 +1,106 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.400
+Bienvenido al tutorial de Vancomyzer. Comencemos.
+
+00:00:05.000 --> 00:00:12.380
+Piensa en tu aplicación de navegación. Empieza con la ruta habitual y la actualiza a
+medida que avanzas.
+
+00:00:12.500 --> 00:00:22.180
+La estimación bayesiana funciona de forma similar: utiliza las concentraciones medidas
+de vancomicina y los tiempos exactos para ajustar una estimación inicial.
+
+00:00:22.300 --> 00:00:32.280
+Vamos a explorar Vancomyzer: desde comprobar las dosis previas hasta administrar una
+dosis de carga cuando esté indicada y monitorizar las infecciones graves por SARM.
+
+00:00:32.400 --> 00:00:39.260
+El modelo sirve de apoyo al criterio clínico, y disponer de información de calidad
+hace que la estimación sea más útil.
+
+00:00:39.380 --> 00:00:49.600
+Explora Vancomyzer con este ejemplo ficticio de un adulto. Empieza por comprobar las
+dosis recientes de vancomicina administradas en todos los centros.
+
+00:00:49.720 --> 00:00:58.600
+Revisa los registros de administración de medicamentos y de traslado para confirmar la
+cantidad administrada y las horas exactas de perfusión y extracción de sangre,
+
+00:00:58.720 --> 00:01:04.880
+ya que un paciente trasladado puede haber recibido una dosis de carga y no debe
+recibir otra de forma automática.
+
+00:01:05.000 --> 00:01:17.020
+En «Empírica», introduce la edad, el sexo, el peso, la talla y la creatinina sérica.
+Después, confirma si recibe tratamiento renal sustitutivo y valora la fragilidad
+
+00:01:17.020 --> 00:01:17.940
+cuando corresponda.
+
+00:01:18.060 --> 00:01:27.060
+Esta herramienta está destinada a adultos que reciben vancomicina intravenosa
+intermitente; no permite calcular dosis para pacientes en diálisis.
+
+00:01:27.180 --> 00:01:37.100
+Calcula y revisa la pauta y la exposición prevista. Recuerda que, antes de disponer de
+concentraciones medidas, los resultados siguen siendo estimaciones poblacionales,
+
+00:01:37.220 --> 00:01:42.060
+y que la gráfica y las pautas propuestas muestran predicciones que deben revisarse.
+
+00:01:42.180 --> 00:01:52.100
+Cuando esté clínicamente indicada una dosis de carga, comprueba las dosis recientes
+administradas en este centro y en el centro de origen antes de administrar otra.
+
+00:01:52.220 --> 00:01:57.860
+Abre Dosis de carga, selecciona la cantidad prevista y revisa el tiempo de perfusión
+en minutos.
+
+00:01:57.980 --> 00:02:05.000
+En este ejemplo, una dosis de dos mil miligramos requiere doscientos minutos, a una
+velocidad de diez miligramos por minuto.
+
+00:02:05.120 --> 00:02:15.780
+Sigue el protocolo de tu centro y utiliza una perfusión más lenta cuando sea
+necesario. Después, selecciona Estimar la exposición y verifica los datos reales de
+
+00:02:15.780 --> 00:02:16.740
+administración.
+
+00:02:16.860 --> 00:02:24.380
+Selecciona Estimar la exposición tras la dosis de carga para acceder al proceso de
+introducción de concentraciones.
+
+00:02:24.500 --> 00:02:35.740
+Revisa la dosis, la duración real de la perfusión y el número de dosis administradas.
+Después, introduce la concentración medida con las horas exactas de extracción de
+
+00:02:35.740 --> 00:02:36.820
+sangre y de perfusión.
+
+00:02:36.940 --> 00:02:43.760
+Sin una concentración medida, cualquier predicción disponible sigue basándose en el
+modelo a priori.
+
+00:02:43.880 --> 00:02:49.300
+Nunca introduzcas una concentración predicha como si fuera un resultado medido.
+
+00:02:49.420 --> 00:02:57.350
+Si se han modificado, suspendido u omitido dosis, confirma que este proceso permite
+representar el historial de administración.
+
+00:02:57.470 --> 00:03:08.340
+Revisa la curva, las pautas propuestas y las limitaciones del modelo, utilizando el
+objetivo de AUC de 400 a 600 recomendado por las guías para las infecciones invasivas
+
+00:03:08.340 --> 00:03:11.080
+graves por SARM cuando la CMI es de uno.
+
+00:03:11.200 --> 00:03:22.620
+Sigue los protocolos de monitorización de tu centro. Para la estimación bayesiana se
+prefieren dos concentraciones. Reevalúa cuando cambie la función renal y documenta el
+
+00:03:22.620 --> 00:03:28.580
+plan. Recuerda que Vancomyzer sigue pendiente de validación independiente con
+pacientes.

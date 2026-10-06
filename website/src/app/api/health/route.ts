@@ -15,6 +15,7 @@ export async function GET() {
     status: dbStatus === "connected" ? "ok" : "degraded",
     timestamp: new Date().toISOString(),
     version,
+    commit: process.env.RENDER_GIT_COMMIT ?? null,
     db: dbStatus,
     uptime_seconds: Math.floor(process.uptime()),
   }, {
