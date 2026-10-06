@@ -25,8 +25,8 @@ export const tutorialMedia: Readonly<Record<Locale, TutorialMedia | null>> = {
   },
   fr: {
     locale: "fr",
-    src: "/videos/vancomyzer-tutorial-fr-20261006.mp4",
-    poster: "/images/tutorial-fr-20261006.jpg",
+    src: "/videos/vancomyzer-tutorial-fr-20261006-clean.mp4",
+    poster: "/images/tutorial-fr-20261006-clean.jpg",
     durationSeconds: 217.233333,
     captions: { src: "/videos/vancomyzer-tutorial-fr-20261006.vtt", language: "fr-FR", label: "Français" },
   },
