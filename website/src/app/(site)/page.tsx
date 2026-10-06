@@ -5,7 +5,7 @@ import { LocalizedDiv, LocalizedUl } from "@/localization/LocalizedElements";
 
 import { LocalizedText } from "@/localization/LanguageProvider";
 import type { Metadata } from "next";
-import CalculatorWalkthrough from "@/components/landing/CalculatorWalkthrough";
+import CalculatorWalkthrough, { TutorialLinkLabel } from "@/components/landing/CalculatorWalkthrough";
 import Link from "next/link";
 import OpenCalculatorButton from "@/components/landing/OpenCalculatorButton";
 import SyntheticExample from "@/components/landing/SyntheticExample";
@@ -220,7 +220,7 @@ export default function LandingPage() {
           <p className="mt-4 max-w-[60ch] text-[15px] font-semibold" style={{ color: INK2 }}><LocalizedText text="Adults receiving intermittent IV vancomycin only. For clinician review. Independent clinical validation is pending." /></p>
           <div className="mt-[30px] flex flex-wrap gap-3">
             <OpenCalculatorButton source="landing_hero" className="vz-mbtn vz-mbtn--primary"><LocalizedText text="Open the calculator" /></OpenCalculatorButton>
-            <Link href="#how" className="vz-mbtn vz-mbtn--outline"><LocalizedText text="Watch walkthrough · 2:55" /></Link>
+            <Link href="#how" className="vz-mbtn vz-mbtn--outline"><TutorialLinkLabel /></Link>
           </div>
           <p className="mt-5 max-w-[70ch] text-[15px]" style={{ color: INK2 }}><LocalizedText text={LAUNCH_LINE} /></p>
         </div>

@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
 import { LocalizedVideo } from "@/localization/LocalizedElements";
-import { getTutorialMedia, tutorialCopy, type TutorialMedia } from "@/localization/tutorialMedia";
+import { getTutorialMedia, tutorialCopy, tutorialDuration, type TutorialMedia } from "@/localization/tutorialMedia";
 import type { Locale } from "@/localization/catalog";
 import { track } from "@/lib/analytics";
 
@@ -63,7 +63,7 @@ function TutorialPlayer({ media, locale, captionId }: { media: TutorialMedia; lo
     setStarted(false);
   }
 
-  const duration = `${Math.floor(media.durationSeconds / 60)}:${String(Math.floor(media.durationSeconds % 60)).padStart(2, "0")}`;
+  const duration = tutorialDuration(media);
   return <>
     <div className="relative overflow-hidden rounded-md border bg-white shadow-sm" style={{ borderColor: "#cbd6e0", aspectRatio: media.locale === "en" ? "16 / 9" : "3 / 2" }}>
       <LocalizedVideo ref={video} src={media.src} lang={media.locale} className="block h-full w-full object-contain" controls={started} playsInline preload="none" poster={media.poster}
@@ -88,4 +88,11 @@ function TutorialPlayer({ media, locale, captionId }: { media: TutorialMedia; lo
       <a className="underline" href={media.src} hrefLang={media.locale}>{copy.direct}</a>
     </div>
   </>;
+}
+
+/** Keep homepage links and the player on the same locale-specific duration. */
+export function TutorialLinkLabel() {
+  const { locale } = useLanguage();
+  const media = getTutorialMedia(locale);
+  return <>{tutorialCopy[locale].watch}{media && ` · ${tutorialDuration(media)}`}</>;
 }

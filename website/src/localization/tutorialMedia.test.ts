@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
-import { tutorialMedia } from "./tutorialMedia";
+import { tutorialMedia, tutorialDuration } from "./tutorialMedia";
 
 // Approved review artifacts: reject superseded narration or slide drafts.
 const approved = {
@@ -28,4 +28,10 @@ test("every locale serves the exact approved tutorial and its own captions", () 
       assert.ok(captions.includes(locale === "es" ? "validación independiente" : "validation indépendante"));
     }
   }
+});
+
+test("tutorial links use the selected recording duration", () => {
+  assert.equal(tutorialDuration(tutorialMedia.en!), "2:55");
+  assert.equal(tutorialDuration(tutorialMedia.es!), "3:29");
+  assert.equal(tutorialDuration(tutorialMedia.fr!), "3:37");
 });
