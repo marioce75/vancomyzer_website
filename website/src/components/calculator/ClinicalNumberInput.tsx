@@ -2,7 +2,9 @@
 
 import { useLanguage } from "@/localization/LanguageProvider";
 import { useEffect, useState, useId, type InputHTMLAttributes } from "react";
-import { parseClinicalNumber, clinicalNumberError, formatClinicalInput, AMBIGUOUS_NUMBER, INVALID_NUMBER, NUMBER_RANGE } from "@/lib/parseClinicalNumber";
+import { parseClinicalNumber, clinicalNumberError, formatClinicalInput, AMBIGUOUS_NUMBER, INVALID_NUMBER, NUMBER_RANGE, type NumberInterpretation } from "@/lib/parseClinicalNumber";
+
+import NumberClarification from "./NumberClarification";
 
 type NativeInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -28,8 +30,8 @@ export interface ClinicalNumberInputProps extends NativeInputProps {
 
 export const INVALID_NUMBER_MESSAGE = INVALID_NUMBER;
 export const AMBIGUOUS_THOUSANDS_MESSAGE = AMBIGUOUS_NUMBER;
-function describe(raw: string): { value: number | null; error: string | null } {
-  return { value: parseClinicalNumber(raw), error: clinicalNumberError(raw) };
+function describe(raw: string, interpretation?: NumberInterpretation): { value: number | null; error: string | null } {
+  return { value: parseClinicalNumber(raw, interpretation), error: clinicalNumberError(raw, interpretation) };
 }
 
 /**
@@ -52,21 +54,24 @@ export default function ClinicalNumberInput({
   const errorId = useId();
   const [raw, setRaw] = useState<string>(() => (value ? formatClinicalInput(value) : ""));
 
+  const [interpretation, setInterpretation] = useState<NumberInterpretation | undefined>(Number.isFinite(value) ? "decimal" : undefined);
+
   // Follow changes made outside this field (reset, pre-fill, loaded case)
   // without rewriting what the clinician is typing: resync only when the
   // parent's number differs from what the current text parses to.
   useEffect(() => {
     if (!Number.isFinite(value)) return;
-    const parsed = describe(raw).value;
+    const parsed = describe(raw, interpretation).value;
     if (!value) {
       if (parsed !== 0) setRaw("");
     } else if (parsed !== value) {
       setRaw(formatClinicalInput(value));
+      setInterpretation("decimal");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- resync only when the parent's value changes
   }, [value]);
 
-  const parsed = describe(raw);
+  const parsed = describe(raw, interpretation);
   const rangeError = parsed.value !== null && ((min !== undefined && parsed.value < Number(min)) || (max !== undefined && parsed.value > Number(max)) || (String(step) === "1" && !Number.isInteger(parsed.value)));
   const error = parsed.error || (!Number.isFinite(value) && raw.trim() === "" ? INVALID_NUMBER : null) || (rangeError ? NUMBER_RANGE : null);
   const invalidText = error !== null;
@@ -91,19 +96,28 @@ export default function ClinicalNumberInput({
       onChange={(e) => {
         const next = e.target.value;
         setRaw(next);
+        setInterpretation(undefined);
         const result = describe(next);
         const n = result.value;
         const outside = n !== null && ((min !== undefined && n < Number(min)) || (max !== undefined && n > Number(max)) || (String(step) === "1" && !Number.isInteger(n)));
         onValueChange(result.error || outside ? NaN : n ?? 0);
       }}
       onBlur={() => {
-        const { value: parsed, error } = describe(raw);
+        const { value: parsed, error } = describe(raw, interpretation);
         // Preserve the entered decimal mark and explicit precision on blur.
         onBlurValue?.(rangeError ? null : parsed, raw, error || (rangeError ? NUMBER_RANGE : null));
       }}
       className={typeof className === "function" ? className(invalidText) : className}
     />
     {showInlineError && error && <span id={errorId} role="status" className="mt-1 block text-xs text-red-700">{t(error)}</span>}
+    <NumberClarification raw={raw} interpretation={interpretation} onChoose={choice => {
+      const result = describe(raw, choice);
+      const n = result.value;
+      const outside = n !== null && ((min !== undefined && n < Number(min)) || (max !== undefined && n > Number(max)) || (String(step) === "1" && !Number.isInteger(n)));
+      setInterpretation(choice);
+      onValueChange(result.error || outside ? NaN : n ?? 0);
+      onBlurValue?.(outside ? null : n, raw, result.error || (outside ? NUMBER_RANGE : null));
+    }} />
     </span>
   );
 }

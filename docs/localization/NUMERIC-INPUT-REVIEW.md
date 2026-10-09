@@ -33,19 +33,13 @@ Vancomyzer, website/src/:
 - app/(site)/settings/page.tsx: numeric institutional AUC/trough targets, infusion/loading-dose policies, dose limits and other numeric fields from its FIELDS configuration. Values must pass input validation before Save; no setting was saved during QA.
 - Nonclinical administrator filtering/billing-count inputs were not changed.
 
-## Deliberate entry policy
+## Final entry policy (supersedes the trailing-zero workaround)
 
-- Accept one decimal point OR comma in every language, independent of the current language; preserve the exact entered text through editing, blur and language changes. Messages are translated.
-- Reject mixed/repeated separators, grouping spaces, units, exponents, plus signs and trailing/incomplete characters. `1.` and `1,` remain visible but invalid until completed.
-- Reject a nonzero integer of up to three significant digits followed by exactly three fractional digits: `1,000`, `1.000`, `75,500`. Do not guess whether it means grouping or a decimal.
-- Remove the separator to confirm an integer; append a zero to confirm a decimal (`1.2340` means exactly 1.234). This preserves precision rather than demanding rounding. `0.001` remains unambiguous. Trusted numeric prefills receive an explicit trailing zero where needed.
-- Existing field bounds and integer-count requirements remain in force. Ordinary `1.2` is unaffected; three-place point entries matching the ambiguity rule now need explicit confirmation in formerly unguarded fields.
-- Malformed text cannot become a stale last-valid value, optional zero, omitted optional timing or JSON null. A restored invalid numeric field needs re-entry; the exact malformed raw text is not persisted across reloads. Valid numeric session state continues to restore normally.
-- Output number formatting stays unchanged. This patch does not localize result grouping or change engine numeric values.
+Ambiguous forms now require explicit decimal/whole-number clarification in place. Raw text remains unchanged, neither option is preselected for a new raw edit, and unresolved values remain blocked. No extra decimal digit is suggested or appended. Editing clears the choice; changing language preserves it and the raw/canonical values. See CLARIFICATION-REVIEW.md for exact UI wording, canonical-state boundaries, tests and the final decision. The original source reproduction above remains historical evidence, not live-production verification.
 
 ## Verification and limitations
 
-Dōsys: 56 application tests and 13 locale tests passed. Vancomyzer: full existing npm test chain and 30 locale/parser tests passed. Both typechecks, lints and production builds passed; Vancomyzer research typecheck passed. Existing lint warnings remain. Source inspection confirms no dosing/PK formula changes.
+Dōsys: 61 application tests and 13 locale tests passed. Vancomyzer: full existing npm test chain and 35 locale/parser tests passed. Both typechecks, lints and production builds passed; Vancomyzer research typecheck passed. Existing lint warnings remain. Source inspection confirms no dosing/PK formula changes.
 
 Browser checks passed: 156 rejection cases across shared Vancomyzer components and four locales, plus accepted decimals, raw precision, bounds, integer counts, empty/partial edits, blur, reset, locale changes, real regimen optional timing and exact-dose-count fields; 208 ambiguity cases across all 52 currently rendered synthetic PN fields/four locales, plus typed punctuation and mixed/invalid text. Parser/engine tests compare canonical point/comma inputs and initial/existing Vancomyzer and PN results. Session serialization tests preserve invalid status. Forty responsive route/viewport combinations passed on the pt-BR builds. QA uses an isolated headless profile and local synthetic data.
 

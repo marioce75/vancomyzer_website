@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { parseClinicalNumber, formatClinicalInput, hasInvalidNumericValues } from '../lib/parseClinicalNumber';
+import { parseClinicalNumber, formatClinicalInput, parseCanonicalClinicalNumber, clinicalNumberChoices, INVALID_CLINICAL_ENTRY, hasInvalidNumericValues } from '../lib/parseClinicalNumber';
 const valid: [string, number][] = [['1.2',1.2],['1,2',1.2],[' 0,83 ',.83],['.5',.5],[',5',.5],['0.001',.001],['0,001',.001],['1.2340',1.234],['1,2340',1.234],['1000',1000],['-3',-3],['0',0],['1000.123',1000.123]];
 const invalid = ['1,000','1.000','70,000','75.500','001,234','-1.234','1,234.5','1.234,5','1 000','1\u00a0000','1\u202f000','1e3','+1','75kg','1.2mg','1.','1,','.','-','--2','1/2','1..2','Infinity','NaN',''];
 for (const locale of ['en','es','fr','pt-BR']) {
@@ -9,8 +9,8 @@ for (const locale of ['en','es','fr','pt-BR']) {
   for (const raw of invalid) assert.equal(parseClinicalNumber(raw),null,raw);
  });
 }
-test('numeric prefill and explicit three-place decimals roundtrip without guessing', () => {
- for (const n of [0,1.234,75.555,-1.234,1000,.001,30,300]) assert.equal(parseClinicalNumber(formatClinicalInput(n)),n);
+test('trusted numeric prefills roundtrip without synthetic precision', () => {
+ for (const n of [0,1.234,75.555,-1.234,1000,.001,30,300]) assert.equal(parseCanonicalClinicalNumber(formatClinicalInput(n)),n);
  assert.equal(parseClinicalNumber(NaN),null); assert.equal(parseClinicalNumber(Infinity),null);
  assert.equal(hasInvalidNumericValues({patient:{weight:NaN}}),true);
  assert.equal(hasInvalidNumericValues({levels:[{value:Infinity}]}),true);
@@ -37,4 +37,31 @@ test('interrupted invalid draft cannot restore an optional malformed field as nu
  assert.ok(Number.isNaN(restored.patient.height_cm));
  assert.ok(Number.isNaN(restored.regimen.loading_to_maintenance_hours));
  assert.equal(restored.patient.weight_kg,70);
+});
+
+for (const locale of ['en','es','fr','pt-BR']) test(`${locale}: ambiguity requires explicit meaning without adding precision`,()=>{
+ for(const [raw,decimal,whole] of [['1.000',1,1000],['1,000',1,1000],['1.234',1.234,1234],['1,234',1.234,1234],['75.500',75.5,75500],['-1.234',-1.234,-1234]] as const){
+  assert.equal(parseClinicalNumber(raw),null);
+  assert.deepEqual(clinicalNumberChoices(raw),{decimal,whole});
+  assert.equal(parseClinicalNumber(raw,'decimal'),decimal);
+  assert.equal(parseClinicalNumber(raw,'whole'),whole);
+  assert.equal(parseCanonicalClinicalNumber(String(decimal)),decimal);
+ }
+ for(const raw of ['1,234.5','1.234,5','1 234','1.2kg','1.','1e3']){
+  assert.equal(clinicalNumberChoices(raw),null);
+  assert.equal(parseClinicalNumber(raw,'decimal'),null);
+  assert.equal(parseClinicalNumber(raw,'whole'),null);
+ }
+ assert.equal(parseCanonicalClinicalNumber(INVALID_CLINICAL_ENTRY),null);
+ assert.equal(parseCanonicalClinicalNumber('1,234'),null);
+ assert.equal(formatClinicalInput(1.234),'1.234');
+});
+
+test('confirmed three-place decimal preserves initial and existing-regimen results',()=>{
+ const scr=parseClinicalNumber('1.234','decimal')!;
+ assert.equal(scr,1.234);
+ assert.deepEqual(computeInitialRegimen({...patient,serum_creatinine_mg_dl:scr}),computeInitialRegimen({...patient,serum_creatinine_mg_dl:1.234}));
+ const run=(n:number)=>runExistingRegimenPipeline({patient:{...patient,serum_creatinine_mg_dl:n},regimen:{dose_mg:1000,interval_hours:12,infusion_duration_hours:1},levels:[{value_mcg_ml:12,collection_time:'',time_since_last_dose_hours:3}]});
+ assert.deepEqual(run(scr),run(1.234));
+ assert.equal(parseClinicalNumber('1.234'),null);
 });
