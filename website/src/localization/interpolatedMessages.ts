@@ -4,6 +4,7 @@ export function translateInvitationMessage(source: string, locale: Locale): stri
   if (locale === "en") return source;
   const match = /^Invited ([^\r\n]+)\. Sign-in link sent to their inbox\.$/.exec(source);
   if (!match) return undefined;
+  if (locale === "pt-BR") return `Convite enviado para ${match[1]}. O link de acesso foi enviado para a caixa de entrada dessa pessoa.`;
   return locale === "es"
     ? `Se invitó a ${match[1]}. Se envió un enlace de inicio de sesión a su buzón.`
     : `Invitation envoyée à ${match[1]}. Un lien de connexion a été envoyé dans sa boîte de réception.`;

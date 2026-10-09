@@ -35,3 +35,7 @@ test("tutorial links use the selected recording duration", () => {
   assert.equal(tutorialDuration(tutorialMedia.es!), "3:29");
   assert.equal(tutorialDuration(tutorialMedia.fr!), "3:37");
 });
+
+test("Portuguese never aliases English audio as Portuguese", () => {
+  assert.equal(tutorialMedia["pt-BR"], null);
+});

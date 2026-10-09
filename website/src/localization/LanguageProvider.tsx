@@ -14,14 +14,14 @@ export function LanguageProvider({ initialLocale, children }: { initialLocale: L
   const [locale, updateLocale] = useState(initialLocale);
   const pathname = usePathname();
   useEffect(() => {
-    document.documentElement.lang = locale === "es" ? "es-ES" : locale === "fr" ? "fr-FR" : "en";
+    document.documentElement.lang = locale === "pt-BR" ? "pt-BR" : locale === "es" ? "es-ES" : locale === "fr" ? "fr-FR" : "en";
     document.title = translateMetadataText(document.title, locale);
     const selectors = ["meta[name=description]", "meta[property='og:title']", "meta[property='og:description']", "meta[property='og:image:alt']", "meta[name='twitter:title']", "meta[name='twitter:description']", "meta[name='twitter:image:alt']"];
     document.querySelectorAll<HTMLMetaElement>(selectors.join(",")).forEach(meta => {
       meta.content = translateMetadataText(meta.content, locale);
     });
     const ogLocale = document.querySelector<HTMLMetaElement>("meta[property='og:locale']");
-    if (ogLocale) ogLocale.content = locale === "es" ? "es_ES" : locale === "fr" ? "fr_FR" : "en_US";
+    if (ogLocale) ogLocale.content = locale === "pt-BR" ? "pt_BR" : locale === "es" ? "es_ES" : locale === "fr" ? "fr_FR" : "en_US";
   }, [locale, pathname]);
   function setLocale(value: Locale) {
     const next = parseLocale(value);
@@ -49,7 +49,7 @@ export function LanguageSwitcher() {
   const hydrated = useSyncExternalStore(subscribeHydration, () => true, () => false);
   const { locale, setLocale } = useLanguage();
   const id = useId();
-  const label = { en: "Language", es: "Idioma", fr: "Langue" }[locale];
+  const label = { en: "Language", es: "Idioma", fr: "Langue", "pt-BR": "Idioma" }[locale];
   return <div className="language-switcher" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: 8, padding: "8px 16px", fontSize: 14 }}>
     <label htmlFor={id}>{label}</label>
     <select id={id} disabled={!hydrated} value={locale} onChange={event => setLocale(parseLocale(event.target.value))}
@@ -57,6 +57,7 @@ export function LanguageSwitcher() {
       <option value="en" lang="en">English</option>
       <option value="es" lang="es-ES">Español</option>
       <option value="fr" lang="fr-FR">Français</option>
+      <option value="pt-BR" lang="pt-BR">Português (Brasil)</option>
     </select>
   </div>;
 }

@@ -16,7 +16,7 @@ const fixture: ReportData = {
 test("localized report keeps all numeric tokens, links, CSS, escaping and source data", () => {
   const before = JSON.stringify(fixture);
   const en = generateReportHTML(fixture, "free");
-  for (const locale of ["es", "fr"] as const) {
+  for (const locale of ["es", "fr", "pt-BR"] as const) {
     const html = generateReportHTML(fixture, "free", locale);
     assert.deepEqual(html.match(/\d+(?:\.\d+)?/g), en.match(/\d+(?:\.\d+)?/g));
     assert.equal(html.match(/<style>[\s\S]*?<\/style>/)?.[0], en.match(/<style>[\s\S]*?<\/style>/)?.[0]);
@@ -26,7 +26,7 @@ test("localized report keeps all numeric tokens, links, CSS, escaping and source
     assert.ok(!html.includes(">Patient Parameters<"));
     assert.ok(html.includes('<span data-localization="preserve">Peak</span>'));
     assert.ok(html.includes('<span data-localization="preserve">Hospital</span>'));
-    assert.ok(html.includes(`lang="${locale === "es" ? "es-ES" : "fr-FR"}"`));
+    assert.ok(html.includes(`lang="${locale === "pt-BR" ? "pt-BR" : locale === "es" ? "es-ES" : "fr-FR"}"`));
   }
   assert.equal(JSON.stringify(fixture), before);
   assert.equal(localizeReportMarkup(en, "en"), en);

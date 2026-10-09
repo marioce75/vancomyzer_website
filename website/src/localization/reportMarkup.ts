@@ -18,7 +18,7 @@ export function localizeReportMarkup(html: string, locale: Locale): string {
       const opening = /^<(style|script)\b/i.exec(part);
       if (opening) protectedTag = opening[1].toLowerCase();
       if (protectedTag && part.toLowerCase().startsWith(`</${protectedTag}`)) protectedTag = "";
-      if (/^<html\b/i.test(part)) return part.replace('lang="en"', `lang="${locale === "es" ? "es-ES" : "fr-FR"}"`);
+      if (/^<html\b/i.test(part)) return part.replace('lang="en"', `lang="${locale === "pt-BR" ? "pt-BR" : locale === "es" ? "es-ES" : "fr-FR"}"`);
       return part;
     }
     if (protectedTag || preserveSpan) return part;

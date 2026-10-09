@@ -22,7 +22,7 @@ export default function RegisterPage() {
 
 function RegisterPageInner() {
   const { locale, t } = useLanguage();
-  const countryNames = new Intl.DisplayNames([locale === "es" ? "es-ES" : locale === "fr" ? "fr-FR" : "en"], { type: "region" });
+  const countryNames = new Intl.DisplayNames([locale === "pt-BR" ? "pt-BR" : locale === "es" ? "es-ES" : locale === "fr" ? "fr-FR" : "en"], { type: "region" });
   const router = useRouter();
   const searchParams = useSearchParams();
   const [step, setStep] = useState(1);

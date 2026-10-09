@@ -1,0 +1,95 @@
+WEBVTT
+
+NOTE Draft Portuguese text at English source timings. Not linked to a player.
+
+1
+00:00:00.000 --> 00:00:05.000
+Bem-vindo ao tutorial do Vancomyzer. Vamos começar.
+
+2
+00:00:05.000 --> 00:00:11.000
+Pense no seu aplicativo de navegação. Ele começa com o trajeto habitual e o atualiza durante o percurso.
+
+3
+00:00:11.000 --> 00:00:18.000
+A estimativa bayesiana funciona de forma semelhante, usando concentrações medidas de vancomicina e horários precisos para refinar uma estimativa inicial.
+
+4
+00:00:18.000 --> 00:00:26.000
+Vamos conhecer o Vancomyzer, desde a verificação das doses anteriores até a dose de ataque, quando indicada, e a monitorização de infecções graves por MRSA.
+
+5
+00:00:26.000 --> 00:00:34.000
+O modelo apoia seu julgamento clínico, e informações de qualidade tornam a estimativa mais útil.
+
+6
+00:00:34.000 --> 00:00:42.000
+Explore o Vancomyzer com este exemplo fictício de um adulto. Comece verificando as doses recentes de vancomicina em todas as instituições.
+
+7
+00:00:42.000 --> 00:00:50.000
+Revise os registros de administração de medicamentos e de transferência para confirmar a quantidade administrada e os horários exatos de infusão e coleta de sangue,
+
+8
+00:00:50.000 --> 00:00:57.000
+pois um paciente transferido pode já ter recebido uma dose de ataque e não deve receber outra automaticamente.
+
+9
+00:00:57.000 --> 00:01:06.000
+Na opção Empírico, informe idade, sexo, peso, altura e creatinina sérica. Em seguida, confirme a situação quanto à terapia renal substitutiva e avalie a fragilidade, quando pertinente.
+
+10
+00:01:06.000 --> 00:01:12.000
+Esta ferramenta oferece apoio para adultos recebendo vancomicina intravenosa intermitente; não calcula doses para pacientes em diálise.
+
+11
+00:01:12.000 --> 00:01:20.000
+Calcule e examine o esquema e a exposição prevista, lembrando que os resultados anteriores à inclusão de concentrações medidas continuam sendo estimativas populacionais,
+
+12
+00:01:20.000 --> 00:01:24.000
+e que o gráfico e os esquemas candidatos mostram previsões que devem ser revisadas.
+
+13
+00:01:24.000 --> 00:01:33.000
+Quando houver indicação clínica de dose de ataque, verifique as doses recentes nesta instituição e na instituição de origem antes de administrar outra.
+
+14
+00:01:33.000 --> 00:01:39.000
+Abra Dose de ataque, selecione a quantidade pretendida e revise o tempo de infusão em minutos.
+
+15
+00:01:39.000 --> 00:01:44.000
+Neste exemplo, 2000 miligramas exigem 200 minutos a 10 miligramas por minuto.
+
+16
+00:01:44.000 --> 00:01:57.000
+Siga o protocolo da sua instituição e use uma infusão mais lenta quando necessário. Depois, selecione Estimar exposição e confira os dados reais de administração.
+
+17
+00:01:57.000 --> 00:02:02.000
+Selecione Estimar exposição após a dose de ataque para acessar o fluxo de inserção das concentrações.
+
+18
+00:02:02.000 --> 00:02:12.000
+Revise a dose, a duração real da infusão e o número de doses administradas. Depois, informe a concentração medida com os horários exatos de coleta de sangue e de infusão.
+
+19
+00:02:12.000 --> 00:02:17.000
+Sem uma concentração medida, qualquer previsão disponível continua baseada no modelo a priori.
+
+20
+00:02:17.000 --> 00:02:22.000
+Nunca informe uma concentração prevista como se fosse um resultado medido.
+
+21
+00:02:22.000 --> 00:02:28.000
+Se houver doses alteradas, suspensas ou omitidas, confirme se este fluxo consegue representar o histórico.
+
+22
+00:02:28.000 --> 00:02:40.000
+Revise a curva, os esquemas candidatos e as limitações do modelo, usando o alvo de AUC de 400 a 600 recomendado pela diretriz para infecção invasiva grave por MRSA quando a CIM for um.
+
+23
+00:02:40.000 --> 00:02:55.000
+Siga os protocolos de monitorização da instituição, preferindo duas concentrações para a estimativa bayesiana. Reavalie quando a função renal mudar e documente seu plano, lembrando que o Vancomyzer ainda aguarda validação independente em pacientes.

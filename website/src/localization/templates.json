@@ -1,482 +1,602 @@
 {
   "{n1} answers. Open any question; the references are listed under each answer.": {
     "es": "{n1} respuestas. Abra cualquier pregunta; las referencias figuran debajo de cada respuesta.",
-    "fr": "{n1} réponses. Ouvrez une question ; les références figurent sous chaque réponse."
+    "fr": "{n1} réponses. Ouvrez une question ; les références figurent sous chaque réponse.",
+    "pt-BR": "{n1} respostas. Abra qualquer pergunta; as referências estão listadas abaixo de cada resposta."
   },
   "Current regimen: {n1} mg every {n2} h.": {
     "es": "Pauta actual: {n1} mg cada {n2} h.",
-    "fr": "Schéma actuel : {n1} mg toutes les {n2} h."
+    "fr": "Schéma actuel : {n1} mg toutes les {n2} h.",
+    "pt-BR": "Esquema atual: {n1} mg a cada {n2} h."
   },
   "Loading dose simulation: {n1} mg single dose.": {
     "es": "Simulación de dosis de carga: {n1} mg en dosis única.",
-    "fr": "Simulation de dose de charge : {n1} mg en dose unique."
+    "fr": "Simulation de dose de charge : {n1} mg en dose unique.",
+    "pt-BR": "Simulação da dose de ataque: {n1} mg em dose única."
   },
   "Two-compartment model (SCr {n1} mg/dL).": {
     "es": "Modelo bicompartimental (creatinina sérica {n1} mg/dL).",
-    "fr": "Modèle bicompartimental (créatininémie {n1} mg/dL)."
+    "fr": "Modèle bicompartimental (créatininémie {n1} mg/dL).",
+    "pt-BR": "Modelo bicompartimental (SCr {n1} mg/dL)."
   },
   "Recommended adjustment: {n1} mg every {n2} h infused over {n3} minutes.": {
     "es": "Ajuste recomendado: {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
-    "fr": "Adaptation recommandée : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes."
+    "fr": "Adaptation recommandée : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes.",
+    "pt-BR": "Ajuste recomendado: {n1} mg a cada {n2} h, com infusão em {n3} minutos."
   },
   "Suggested maintenance regimen: {n1} mg every {n2} h infused over {n3} minutes.": {
     "es": "Pauta de mantenimiento sugerida: {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
-    "fr": "Schéma d’entretien proposé : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes."
+    "fr": "Schéma d’entretien proposé : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes.",
+    "pt-BR": "Esquema de manutenção sugerido: {n1} mg a cada {n2} h, com infusão em {n3} minutos."
   },
   "Initial population estimate: AUC24 {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
     "es": "Estimación poblacional inicial: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
-    "fr": "Estimation populationnelle initiale : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L."
+    "fr": "Estimation populationnelle initiale : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
+    "pt-BR": "Estimativa populacional inicial: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
   "Posterior-updated estimate: AUC24 {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
     "es": "Estimación actualizada a posteriori: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
-    "fr": "Estimation actualisée a posteriori : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L."
+    "fr": "Estimation actualisée a posteriori : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
+    "pt-BR": "Estimativa atualizada pela distribuição a posteriori: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
   "Posterior-updated but high-uncertainty estimate: AUC24 {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
     "es": "Estimación actualizada a posteriori, pero con incertidumbre alta: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
-    "fr": "Estimation actualisée a posteriori, mais à forte incertitude : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L."
+    "fr": "Estimation actualisée a posteriori, mais à forte incertitude : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
+    "pt-BR": "Estimativa atualizada pela distribuição a posteriori, mas com alta incerteza: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
   "Initial regimen suggestion: {n1} mg every {n2} hours infused over {n3} hours.": {
     "es": "Pauta inicial sugerida: {n1} mg cada {n2} horas en perfusión durante {n3} horas.",
-    "fr": "Schéma initial proposé : {n1} mg toutes les {n2} heures en perfusion sur {n3} heures."
+    "fr": "Schéma initial proposé : {n1} mg toutes les {n2} heures en perfusion sur {n3} heures.",
+    "pt-BR": "Sugestão de esquema inicial: {n1} mg a cada {n2} horas, com infusão em {n3} horas."
   },
   "Prior-based initial estimate: AUC24 {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
     "es": "Estimación inicial basada en la distribución a priori: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
-    "fr": "Estimation initiale fondée sur la distribution a priori : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L."
+    "fr": "Estimation initiale fondée sur la distribution a priori : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
+    "pt-BR": "Estimativa inicial baseada na distribuição a priori: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
   "Prior-based estimate: AUC24 {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
     "es": "Estimación basada en la distribución a priori: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
-    "fr": "Estimation fondée sur la distribution a priori : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L."
+    "fr": "Estimation fondée sur la distribution a priori : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
+    "pt-BR": "Estimativa baseada na distribuição a priori: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
   "AUC24: {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
     "es": "AUC24: {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
-    "fr": "AUC24 : {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L."
+    "fr": "AUC24 : {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
+    "pt-BR": "AUC24: {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
   "Dose: {n1} mg; Interval: every {n2} hours; Infusion: {n3} hours.": {
     "es": "Dosis: {n1} mg; intervalo: cada {n2} horas; perfusión: {n3} horas.",
-    "fr": "Dose : {n1} mg ; intervalle : toutes les {n2} heures ; perfusion : {n3} heures."
+    "fr": "Dose : {n1} mg ; intervalle : toutes les {n2} heures ; perfusion : {n3} heures.",
+    "pt-BR": "Dose: {n1} mg; intervalo: a cada {n2} horas; infusão: {n3} horas."
   },
   "Amino acids: {n1} g/day; dextrose: {n2} g/day; lipid: {n3} g/day.": {
     "es": "Aminoácidos: {n1} g/day; dextrosa: {n2} g/day; lípidos: {n3} g/day.",
-    "fr": "Acides aminés : {n1} g/day ; glucose : {n2} g/day ; lipides : {n3} g/day."
+    "fr": "Acides aminés : {n1} g/day ; glucose : {n2} g/day ; lipides : {n3} g/day.",
+    "pt-BR": "Aminoácidos: {n1} g/day; dextrose: {n2} g/day; lipídios: {n3} g/day."
   },
   "PN energy: {n1} kcal/day; other sources: {n2} kcal/day; combined: {n3} kcal/day.": {
     "es": "Energía de NP: {n1} kcal/day; otras fuentes: {n2} kcal/day; total combinado: {n3} kcal/day.",
-    "fr": "Énergie de NP : {n1} kcal/day ; autres sources : {n2} kcal/day ; total combiné : {n3} kcal/day."
+    "fr": "Énergie de NP : {n1} kcal/day ; autres sources : {n2} kcal/day ; total combiné : {n3} kcal/day.",
+    "pt-BR": "Energia da NP: {n1} kcal/day; outras fontes: {n2} kcal/day; total combinado: {n3} kcal/day."
   },
   "User-entered energy target: {n1} kcal/day; combined intake minus target: {n2} kcal/day.": {
     "es": "Objetivo energético introducido por el usuario: {n1} kcal/day; aporte combinado menos objetivo: {n2} kcal/day.",
-    "fr": "Cible énergétique saisie par l’utilisateur : {n1} kcal/day ; apport combiné moins cible : {n2} kcal/day."
+    "fr": "Cible énergétique saisie par l’utilisateur : {n1} kcal/day ; apport combiné moins cible : {n2} kcal/day.",
+    "pt-BR": "Meta energética informada pelo usuário: {n1} kcal/day; oferta combinada menos a meta: {n2} kcal/day."
   },
   "Bag: {n1} mL over {n2} h; rate: {n3} mL/h.": {
     "es": "Bolsa: {n1} mL durante {n2} h; velocidad: {n3} mL/h.",
-    "fr": "Poche : {n1} mL sur {n2} h ; débit : {n3} mL/h."
+    "fr": "Poche : {n1} mL sur {n2} h ; débit : {n3} mL/h.",
+    "pt-BR": "Bolsa: {n1} mL em {n2} h; velocidade: {n3} mL/h."
   },
   "Lipid duration: {n1} h; lipid rate: {n2} g/kg/h.": {
     "es": "Duración de lípidos: {n1} h; velocidad de lípidos: {n2} g/kg/h.",
-    "fr": "Durée de perfusion lipidique : {n1} h ; débit lipidique : {n2} g/kg/h."
+    "fr": "Durée de perfusion lipidique : {n1} h ; débit lipidique : {n2} g/kg/h.",
+    "pt-BR": "Duração dos lipídios: {n1} h; velocidade dos lipídios: {n2} g/kg/h."
   },
   "Total PN volume including lipid once: {n1} mL/day.": {
     "es": "Volumen total de NP, incluyendo los lípidos una sola vez: {n1} mL/day.",
-    "fr": "Volume total de NP, lipides comptés une seule fois : {n1} mL/day."
+    "fr": "Volume total de NP, lipides comptés une seule fois : {n1} mL/day.",
+    "pt-BR": "Volume total de NP, incluindo os lipídios uma única vez: {n1} mL/day."
   },
   "GIR: {n1} mg/kg/min; amino acids: {n2} g/kg/day.": {
     "es": "Velocidad de infusión de glucosa (GIR): {n1} mg/kg/min; aminoácidos: {n2} g/kg/day.",
-    "fr": "Débit de perfusion de glucose (GIR) : {n1} mg/kg/min ; acides aminés : {n2} g/kg/day."
+    "fr": "Débit de perfusion de glucose (GIR) : {n1} mg/kg/min ; acides aminés : {n2} g/kg/day.",
+    "pt-BR": "GIR: {n1} mg/kg/min; aminoácidos: {n2} g/kg/day."
   },
   "{n1} mg every {n2} hours infused over {n3} hours": {
     "es": "{n1} mg cada {n2} horas en perfusión durante {n3} horas",
-    "fr": "{n1} mg toutes les {n2} heures en perfusion sur {n3} heures"
+    "fr": "{n1} mg toutes les {n2} heures en perfusion sur {n3} heures",
+    "pt-BR": "{n1} mg a cada {n2} horas, com infusão em {n3} horas"
   },
   "{n1} mg every {n2} h infused over {n3} minutes": {
     "es": "{n1} mg cada {n2} h en perfusión durante {n3} minutos",
-    "fr": "{n1} mg toutes les {n2} h en perfusion sur {n3} minutes"
+    "fr": "{n1} mg toutes les {n2} h en perfusion sur {n3} minutes",
+    "pt-BR": "{n1} mg a cada {n2} h, com infusão em {n3} minutos"
   },
   "every {n1} hours": {
     "es": "cada {n1} horas",
-    "fr": "toutes les {n1} heures"
+    "fr": "toutes les {n1} heures",
+    "pt-BR": "a cada {n1} horas"
   },
   "{n1} hours.": {
     "es": "{n1} horas.",
-    "fr": "{n1} heures."
+    "fr": "{n1} heures.",
+    "pt-BR": "{n1} horas."
   },
   "dose increase from {n1} mg to {n2} mg": {
     "es": "aumento de dosis de {n1} mg a {n2} mg",
-    "fr": "augmentation de dose de {n1} mg à {n2} mg"
+    "fr": "augmentation de dose de {n1} mg à {n2} mg",
+    "pt-BR": "aumento da dose de {n1} mg para {n2} mg"
   },
   "dose decrease from {n1} mg to {n2} mg": {
     "es": "reducción de dosis de {n1} mg a {n2} mg",
-    "fr": "réduction de dose de {n1} mg à {n2} mg"
+    "fr": "réduction de dose de {n1} mg à {n2} mg",
+    "pt-BR": "redução da dose de {n1} mg para {n2} mg"
   },
   "interval extension from q{n1}h to q{n2}h": {
     "es": "ampliación del intervalo de q{n1}h a q{n2}h",
-    "fr": "allongement de l’intervalle de q{n1}h à q{n2}h"
+    "fr": "allongement de l’intervalle de q{n1}h à q{n2}h",
+    "pt-BR": "prolongamento do intervalo de q{n1}h para q{n2}h"
   },
   "interval shortening from q{n1}h to q{n2}h": {
     "es": "acortamiento del intervalo de q{n1}h a q{n2}h",
-    "fr": "raccourcissement de l’intervalle de q{n1}h à q{n2}h"
+    "fr": "raccourcissement de l’intervalle de q{n1}h à q{n2}h",
+    "pt-BR": "encurtamento do intervalo de q{n1}h para q{n2}h"
   },
   "Creatinine {n1} mg/dL (entered interval {n2}–{n3}); urine {n4} mL over {n5} h.": {
     "es": "Creatinina {n1} mg/dL (intervalo introducido {n2}–{n3}); diuresis {n4} mL durante {n5} h.",
-    "fr": "Créatinine {n1} mg/dL (intervalle saisi {n2}–{n3}) ; diurèse {n4} mL sur {n5} h."
+    "fr": "Créatinine {n1} mg/dL (intervalle saisi {n2}–{n3}) ; diurèse {n4} mL sur {n5} h.",
+    "pt-BR": "Creatinina {n1} mg/dL (intervalo informado {n2}–{n3}); urina {n4} mL em {n5} h."
   },
   "Phosphate salt contributes Na {n1} mEq and K {n2} mEq, already included in daily targets.": {
     "es": "La sal de fosfato aporta Na {n1} mEq y K {n2} mEq, ya incluidos en los objetivos diarios.",
-    "fr": "Le sel de phosphate apporte Na {n1} mEq et K {n2} mEq, déjà inclus dans les cibles quotidiennes."
+    "fr": "Le sel de phosphate apporte Na {n1} mEq et K {n2} mEq, déjà inclus dans les cibles quotidiennes.",
+    "pt-BR": "O sal de fosfato contribui com Na {n1} mEq e K {n2} mEq, já incluídos nas metas diárias."
   },
   "Calculated chloride {n1} mEq; acetate {n2} mEq, including labeled amino-acid contributions.": {
     "es": "Cloruro calculado {n1} mEq; acetato {n2} mEq, incluidas las contribuciones de aminoácidos indicadas en las fichas.",
-    "fr": "Chlorure calculé {n1} mEq ; acétate {n2} mEq, incluant les apports des acides aminés indiqués dans les notices."
+    "fr": "Chlorure calculé {n1} mEq ; acétate {n2} mEq, incluant les apports des acides aminés indiqués dans les notices.",
+    "pt-BR": "Cloreto calculado {n1} mEq; acetato {n2} mEq, incluindo as contribuições dos aminoácidos indicadas na bula."
   },
   "WITHHELD, {n1} review item(s) listed below.": {
     "es": "NO DISPONIBLE, {n1} elemento(s) de revisión enumerado(s) a continuación.",
-    "fr": "SUSPENDUE, {n1} élément(s) à vérifier ci-dessous."
+    "fr": "SUSPENDUE, {n1} élément(s) à vérifier ci-dessous.",
+    "pt-BR": "RETIDO, {n1} item(ns) para revisão listado(s) abaixo."
   },
   "OUTSTANDING WARNINGS AND REVIEWS ({n1}).": {
     "es": "ADVERTENCIAS Y REVISIONES PENDIENTES ({n1}).",
-    "fr": "AVERTISSEMENTS ET VÉRIFICATIONS EN ATTENTE ({n1})."
+    "fr": "AVERTISSEMENTS ET VÉRIFICATIONS EN ATTENTE ({n1}).",
+    "pt-BR": "AVISOS E REVISÕES PENDENTES ({n1})."
   },
   "{n1} years": {
     "es": "{n1} años",
-    "fr": "{n1} ans"
+    "fr": "{n1} ans",
+    "pt-BR": "{n1} anos"
   },
   "{n1} mg every {n2} h": {
     "es": "{n1} mg cada {n2} h",
-    "fr": "{n1} mg toutes les {n2} h"
+    "fr": "{n1} mg toutes les {n2} h",
+    "pt-BR": "{n1} mg a cada {n2} h"
   },
   "Infuse over {n1} minutes": {
     "es": "Perfundir durante {n1} minutos",
-    "fr": "Perfuser sur {n1} minutes"
+    "fr": "Perfuser sur {n1} minutes",
+    "pt-BR": "Infundir em {n1} minutos"
   },
   "Each patient contributes one held-out concentration, {n1} h into the same steady-state interval as the two fitted levels (between the two fitted sample times). There are no dose changes, no levels before steady state and no change in physiology over time. This is held-out interpolation, not future forecasting: it does not show how well Vancomyzer forecasts later levels after a regimen change or as a patient's condition changes.": {
     "es": "Cada paciente aporta una concentración reservada para evaluación, a las {n1} h del mismo intervalo en estado estacionario que las dos concentraciones utilizadas para el ajuste (entre sus tiempos de muestreo). No hay cambios de dosis, concentraciones previas al estado estacionario ni cambios fisiológicos a lo largo del tiempo. Se trata de interpolación con datos reservados, no de predicción futura: no muestra la capacidad de Vancomyzer para predecir concentraciones posteriores tras un cambio de pauta o cuando cambia el estado del paciente.",
-    "fr": "Chaque patient apporte une concentration réservée à l’évaluation, à {n1} h dans le même intervalle à l’état d’équilibre que les deux concentrations utilisées pour l’ajustement (entre leurs horaires de prélèvement). Il n’y a ni changement de dose, ni concentration avant l’état d’équilibre, ni évolution physiologique au cours du temps. Il s’agit d’une interpolation sur données réservées, et non d’une prévision future : elle ne montre pas la capacité de Vancomyzer à prévoir des concentrations ultérieures après un changement de schéma ou une évolution de l’état du patient."
+    "fr": "Chaque patient apporte une concentration réservée à l’évaluation, à {n1} h dans le même intervalle à l’état d’équilibre que les deux concentrations utilisées pour l’ajustement (entre leurs horaires de prélèvement). Il n’y a ni changement de dose, ni concentration avant l’état d’équilibre, ni évolution physiologique au cours du temps. Il s’agit d’une interpolation sur données réservées, et non d’une prévision future : elle ne montre pas la capacité de Vancomyzer à prévoir des concentrations ultérieures après un changement de schéma ou une évolution de l’état du patient.",
+    "pt-BR": "Cada paciente contribui com uma concentração reservada para avaliação, {n1} h após o início do mesmo intervalo em estado de equilíbrio das duas concentrações usadas no ajuste (entre os dois horários de coleta usados no ajuste). Não há mudanças de dose, concentrações antes do estado de equilíbrio nem alteração da fisiologia ao longo do tempo. Trata-se de interpolação de um dado reservado para avaliação, não de previsão futura: isso não demonstra a capacidade do Vancomyzer de prever concentrações posteriores após uma mudança de esquema ou uma alteração na condição do paciente."
   },
   "Typical values come from Goti 2018, but the weight scaling, the between-subject variability (ω = {n1} / {n2} / {n3} / {n4}) and the residual error are developer choices. Different choices would change the results; the sensitivity has not been quantified.": {
     "es": "Los valores típicos proceden de Goti 2018, pero el escalado por peso, la variabilidad interindividual (ω = {n1} / {n2} / {n3} / {n4}) y el error residual son elecciones de los desarrolladores. Otras elecciones cambiarían los resultados; la sensibilidad no se ha cuantificado.",
-    "fr": "Les valeurs typiques proviennent de Goti 2018, mais la mise à l’échelle selon le poids, la variabilité interindividuelle (ω = {n1} / {n2} / {n3} / {n4}) et l’erreur résiduelle sont des choix des développeurs. D’autres choix modifieraient les résultats ; la sensibilité n’a pas été quantifiée."
+    "fr": "Les valeurs typiques proviennent de Goti 2018, mais la mise à l’échelle selon le poids, la variabilité interindividuelle (ω = {n1} / {n2} / {n3} / {n4}) et l’erreur résiduelle sont des choix des développeurs. D’autres choix modifieraient les résultats ; la sensibilité n’a pas été quantifiée.",
+    "pt-BR": "Os valores típicos vêm de Goti 2018, mas o escalonamento pelo peso, a variabilidade entre indivíduos (ω = {n1} / {n2} / {n3} / {n4}) e o erro residual são escolhas do desenvolvedor. Outras escolhas mudariam os resultados; a sensibilidade não foi quantificada."
   },
   "No dialysis, CRRT or ECMO patients are simulated. Augmented renal clearance is included ({n1} of {n2} patients above 130 mL/min), but CrCl is capped at {n3} mL/min. Only {n4} patients have a BMI of 40 or more, so this analysis says little about high body weight.": {
     "es": "No se simulan pacientes en diálisis, CRRT ni ECMO. Se incluye aclaramiento renal aumentado ({n1} de {n2} pacientes por encima de 130 mL/min), pero el CrCl se limita a {n3} mL/min. Solo {n4} pacientes tienen un IMC de 40 o más, por lo que este análisis aporta poca información sobre el peso corporal elevado.",
-    "fr": "Aucun patient sous dialyse, CRRT ou ECMO n’est simulé. L’hyperclairance rénale est incluse ({n1} patients sur {n2} au-dessus de 130 mL/min), mais la CrCl est plafonnée à {n3} mL/min. Seuls {n4} patients ont un IMC de 40 ou plus ; cette analyse apporte donc peu d’informations sur les poids corporels élevés."
+    "fr": "Aucun patient sous dialyse, CRRT ou ECMO n’est simulé. L’hyperclairance rénale est incluse ({n1} patients sur {n2} au-dessus de 130 mL/min), mais la CrCl est plafonnée à {n3} mL/min. Seuls {n4} patients ont un IMC de 40 ou plus ; cette analyse apporte donc peu d’informations sur les poids corporels élevés.",
+    "pt-BR": "Não são simulados pacientes em diálise, CRRT ou ECMO. A depuração renal aumentada está incluída ({n1} de {n2} pacientes acima de 130 mL/min), mas a CrCl é limitada a {n3} mL/min. Apenas {n4} pacientes têm IMC de 40 ou mais, portanto esta análise informa pouco sobre peso corporal elevado."
   },
   "SCr {n1} mg/dL (Colin 2019 renal covariate).": {
     "es": "Creatinina sérica {n1} mg/dL (covariable renal de Colin 2019).",
-    "fr": "Créatininémie {n1} mg/dL (covariable rénale de Colin 2019)."
+    "fr": "Créatininémie {n1} mg/dL (covariable rénale de Colin 2019).",
+    "pt-BR": "SCr {n1} mg/dL (covariável renal de Colin 2019)."
   },
   "SCr: {n1} mg/dL (Colin 2019 renal covariate).": {
     "es": "Creatinina sérica: {n1} mg/dL (covariable renal de Colin 2019).",
-    "fr": "Créatininémie : {n1} mg/dL (covariable rénale de Colin 2019)."
+    "fr": "Créatininémie : {n1} mg/dL (covariable rénale de Colin 2019).",
+    "pt-BR": "SCr: {n1} mg/dL (covariável renal de Colin 2019)."
   },
   "Initial regimen option: {n1} mg every {n2} hours infused over {n3} hours.": {
     "es": "Opción de pauta inicial: {n1} mg cada {n2} horas en perfusión durante {n3} horas.",
-    "fr": "Option de schéma initial : {n1} mg toutes les {n2} heures en perfusion sur {n3} heures."
+    "fr": "Option de schéma initial : {n1} mg toutes les {n2} heures en perfusion sur {n3} heures.",
+    "pt-BR": "Opção de esquema inicial: {n1} mg a cada {n2} horas, com infusão em {n3} horas."
   },
   "If immediate severe-infection coverage is clinically necessary under local practice, a clinician may optionally consider an empiric loading-dose estimate around {n1} mg (Guideline-aligned optional empiric loading-dose estimate using actual body weight at {n2} mg/kg, capped at {n3} mg, infused over at least {n4} minutes to stay within the {n5} mg/min maximum rate. This does not encode severity, indication, or local protocol.) before maintenance dosing.": {
     "es": "Si la práctica local exige clínicamente una cobertura inmediata de una infección grave, el clínico puede considerar de forma opcional una dosis de carga empírica estimada de unos {n1} mg (estimación opcional de dosis de carga empírica acorde con las guías, basada en el peso corporal real a {n2} mg/kg, limitada a {n3} mg y perfundida durante al menos {n4} minutos para respetar la velocidad máxima de {n5} mg/min. Esto no incorpora gravedad, indicación ni protocolo local.) antes de la dosificación de mantenimiento.",
-    "fr": "Si une couverture immédiate d’une infection sévère est cliniquement nécessaire selon les pratiques locales, le clinicien peut envisager, à titre facultatif, une dose de charge empirique estimée à environ {n1} mg (estimation facultative de dose de charge empirique conforme aux recommandations, fondée sur le poids réel à {n2} mg/kg, plafonnée à {n3} mg, perfusée sur au moins {n4} minutes pour respecter le débit maximal de {n5} mg/min. Cela n’intègre ni gravité, ni indication, ni protocole local.) avant la posologie d’entretien."
+    "fr": "Si une couverture immédiate d’une infection sévère est cliniquement nécessaire selon les pratiques locales, le clinicien peut envisager, à titre facultatif, une dose de charge empirique estimée à environ {n1} mg (estimation facultative de dose de charge empirique conforme aux recommandations, fondée sur le poids réel à {n2} mg/kg, plafonnée à {n3} mg, perfusée sur au moins {n4} minutes pour respecter le débit maximal de {n5} mg/min. Cela n’intègre ni gravité, ni indication, ni protocole local.) avant la posologie d’entretien.",
+    "pt-BR": "Se a cobertura imediata de uma infecção grave for clinicamente necessária segundo a prática local, o profissional pode considerar, opcionalmente, uma estimativa de dose de ataque empírica de cerca de {n1} mg (estimativa opcional de dose de ataque empírica alinhada à diretriz, usando o peso corporal real a {n2} mg/kg, limitada a {n3} mg, com infusão em pelo menos {n4} minutos para respeitar a velocidade máxima de {n5} mg/min. Isso não incorpora gravidade, indicação ou protocolo local.) antes da manutenção."
   },
   "If rapid empiric attainment is clinically necessary under local practice, an optional actual-body-weight loading-dose estimate around {n1} mg may be considered (Guideline-aligned optional empiric loading-dose estimate using actual body weight at {n2} mg/kg, capped at {n3} mg, infused over at least {n4} minutes to stay within the {n5} mg/min maximum rate. This does not encode severity, indication, or local protocol.).": {
     "es": "Si alcanzar rápidamente el objetivo de forma empírica es clínicamente necesario según la práctica local, puede considerarse una dosis de carga opcional estimada de unos {n1} mg basada en el peso corporal real (estimación opcional de dosis de carga empírica acorde con las guías, basada en el peso corporal real a {n2} mg/kg, limitada a {n3} mg y perfundida durante al menos {n4} minutos para respetar la velocidad máxima de {n5} mg/min. Esto no incorpora gravedad, indicación ni protocolo local.).",
-    "fr": "Si l’atteinte empirique rapide de la cible est cliniquement nécessaire selon les pratiques locales, une dose de charge facultative estimée à environ {n1} mg selon le poids réel peut être envisagée (estimation facultative de dose de charge empirique conforme aux recommandations, fondée sur le poids réel à {n2} mg/kg, plafonnée à {n3} mg, perfusée sur au moins {n4} minutes pour respecter le débit maximal de {n5} mg/min. Cela n’intègre ni gravité, ni indication, ni protocole local.)."
+    "fr": "Si l’atteinte empirique rapide de la cible est cliniquement nécessaire selon les pratiques locales, une dose de charge facultative estimée à environ {n1} mg selon le poids réel peut être envisagée (estimation facultative de dose de charge empirique conforme aux recommandations, fondée sur le poids réel à {n2} mg/kg, plafonnée à {n3} mg, perfusée sur au moins {n4} minutes pour respecter le débit maximal de {n5} mg/min. Cela n’intègre ni gravité, ni indication, ni protocole local.).",
+    "pt-BR": "Se atingir rapidamente a exposição empírica for clinicamente necessário segundo a prática local, pode-se considerar uma estimativa opcional de dose de ataque pelo peso corporal real de cerca de {n1} mg (estimativa opcional de dose de ataque empírica alinhada à diretriz, usando o peso corporal real a {n2} mg/kg, limitada a {n3} mg, com infusão em pelo menos {n4} minutos para respeitar a velocidade máxima de {n5} mg/min. Isso não incorpora gravidade, indicação ou protocolo local.)."
   },
   "SCr: {n1} mg/dL (direct Colin 2019 covariate in the population prior; separate fitted-clearance cap uses Cockcroft-Gault).": {
     "es": "Creatinina sérica: {n1} mg/dL (covariable directa de Colin 2019 en la distribución poblacional a priori; el límite independiente del aclaramiento ajustado utiliza Cockcroft-Gault).",
-    "fr": "Créatininémie : {n1} mg/dL (covariable directe de Colin 2019 dans la distribution populationnelle a priori ; le plafonnement distinct de la clairance ajustée utilise Cockcroft-Gault)."
+    "fr": "Créatininémie : {n1} mg/dL (covariable directe de Colin 2019 dans la distribution populationnelle a priori ; le plafonnement distinct de la clairance ajustée utilise Cockcroft-Gault).",
+    "pt-BR": "SCr: {n1} mg/dL (covariável direta de Colin 2019 na distribuição populacional a priori; o limite separado da depuração ajustada usa Cockcroft-Gault)."
   },
   "Fit quality: weak ({n1} level informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%; single-level fits remain highly uncertain even when bounded.).": {
     "es": "Calidad del ajuste: débil ({n1} concentración utilizada para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%; los ajustes con una sola concentración siguen siendo muy inciertos incluso cuando están acotados.).",
-    "fr": "Qualité de l’ajustement : faible ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.)."
+    "fr": "Qualité de l’ajustement : faible ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.).",
+    "pt-BR": "Qualidade do ajuste: fraca ({n1} concentração medida informou o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%; ajustes com uma única concentração continuam altamente incertos, mesmo com limites.)."
   },
   "Fit quality: weak ({n1} levels informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%.).": {
     "es": "Calidad del ajuste: débil ({n1} concentraciones utilizadas para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%.).",
-    "fr": "Qualité de l’ajustement : faible ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.)."
+    "fr": "Qualité de l’ajustement : faible ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.).",
+    "pt-BR": "Qualidade do ajuste: fraca ({n1} concentrações medidas informaram o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%.)."
   },
   "Fit quality: moderate ({n1} level informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%; single-level fits remain highly uncertain even when bounded.).": {
     "es": "Calidad del ajuste: moderada ({n1} concentración utilizada para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%; los ajustes con una sola concentración siguen siendo muy inciertos incluso cuando están acotados.).",
-    "fr": "Qualité de l’ajustement : modérée ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.)."
+    "fr": "Qualité de l’ajustement : modérée ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.).",
+    "pt-BR": "Qualidade do ajuste: moderada ({n1} concentração medida informou o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%; ajustes com uma única concentração continuam altamente incertos, mesmo com limites.)."
   },
   "Fit quality: moderate ({n1} levels informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%.).": {
     "es": "Calidad del ajuste: moderada ({n1} concentraciones utilizadas para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%.).",
-    "fr": "Qualité de l’ajustement : modérée ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.)."
+    "fr": "Qualité de l’ajustement : modérée ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.).",
+    "pt-BR": "Qualidade do ajuste: moderada ({n1} concentrações medidas informaram o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%.)."
   },
   "Fit quality: good ({n1} level informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%; single-level fits remain highly uncertain even when bounded.).": {
     "es": "Calidad del ajuste: buena ({n1} concentración utilizada para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%; los ajustes con una sola concentración siguen siendo muy inciertos incluso cuando están acotados.).",
-    "fr": "Qualité de l’ajustement : bonne ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.)."
+    "fr": "Qualité de l’ajustement : bonne ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.).",
+    "pt-BR": "Qualidade do ajuste: boa ({n1} concentração medida informou o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%; ajustes com uma única concentração continuam altamente incertos, mesmo com limites.)."
   },
   "Fit quality: good ({n1} levels informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%.).": {
     "es": "Calidad del ajuste: buena ({n1} concentraciones utilizadas para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%.).",
-    "fr": "Qualité de l’ajustement : bonne ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.)."
+    "fr": "Qualité de l’ajustement : bonne ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.).",
+    "pt-BR": "Qualidade do ajuste: boa ({n1} concentrações medidas informaram o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%.)."
   },
   "Fit quality: strong ({n1} level informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%; single-level fits remain highly uncertain even when bounded.).": {
     "es": "Calidad del ajuste: fuerte ({n1} concentración utilizada para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%; los ajustes con una sola concentración siguen siendo muy inciertos incluso cuando están acotados.).",
-    "fr": "Qualité de l’ajustement : forte ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.)."
+    "fr": "Qualité de l’ajustement : forte ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.).",
+    "pt-BR": "Qualidade do ajuste: forte ({n1} concentração medida informou o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%; ajustes com uma única concentração continuam altamente incertos, mesmo com limites.)."
   },
   "Fit quality: strong ({n1} levels informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%.).": {
     "es": "Calidad del ajuste: fuerte ({n1} concentraciones utilizadas para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%.).",
-    "fr": "Qualité de l’ajustement : forte ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.)."
+    "fr": "Qualité de l’ajustement : forte ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.).",
+    "pt-BR": "Qualidade do ajuste: forte ({n1} concentrações medidas informaram o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%.)."
   },
   "Posterior fit quality: weak ({n1} level informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%; single-level fits remain highly uncertain even when bounded.).": {
     "es": "Calidad del ajuste a posteriori: débil ({n1} concentración utilizada para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%; los ajustes con una sola concentración siguen siendo muy inciertos incluso cuando están acotados.).",
-    "fr": "Qualité de l’ajustement a posteriori : faible ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.)."
+    "fr": "Qualité de l’ajustement a posteriori : faible ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.).",
+    "pt-BR": "Qualidade do ajuste a posteriori: fraca ({n1} concentração medida informou o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%; ajustes com uma única concentração continuam altamente incertos, mesmo com limites.)."
   },
   "Posterior fit quality: weak ({n1} levels informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%.).": {
     "es": "Calidad del ajuste a posteriori: débil ({n1} concentraciones utilizadas para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%.).",
-    "fr": "Qualité de l’ajustement a posteriori : faible ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.)."
+    "fr": "Qualité de l’ajustement a posteriori : faible ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.).",
+    "pt-BR": "Qualidade do ajuste a posteriori: fraca ({n1} concentrações medidas informaram o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%.)."
   },
   "Posterior fit quality: moderate ({n1} level informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%; single-level fits remain highly uncertain even when bounded.).": {
     "es": "Calidad del ajuste a posteriori: moderada ({n1} concentración utilizada para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%; los ajustes con una sola concentración siguen siendo muy inciertos incluso cuando están acotados.).",
-    "fr": "Qualité de l’ajustement a posteriori : modérée ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.)."
+    "fr": "Qualité de l’ajustement a posteriori : modérée ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.).",
+    "pt-BR": "Qualidade do ajuste a posteriori: moderada ({n1} concentração medida informou o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%; ajustes com uma única concentração continuam altamente incertos, mesmo com limites.)."
   },
   "Posterior fit quality: moderate ({n1} levels informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%.).": {
     "es": "Calidad del ajuste a posteriori: moderada ({n1} concentraciones utilizadas para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%.).",
-    "fr": "Qualité de l’ajustement a posteriori : modérée ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.)."
+    "fr": "Qualité de l’ajustement a posteriori : modérée ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.).",
+    "pt-BR": "Qualidade do ajuste a posteriori: moderada ({n1} concentrações medidas informaram o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%.)."
   },
   "Posterior fit quality: good ({n1} level informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%; single-level fits remain highly uncertain even when bounded.).": {
     "es": "Calidad del ajuste a posteriori: buena ({n1} concentración utilizada para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%; los ajustes con una sola concentración siguen siendo muy inciertos incluso cuando están acotados.).",
-    "fr": "Qualité de l’ajustement a posteriori : bonne ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.)."
+    "fr": "Qualité de l’ajustement a posteriori : bonne ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.).",
+    "pt-BR": "Qualidade do ajuste a posteriori: boa ({n1} concentração medida informou o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%; ajustes com uma única concentração continuam altamente incertos, mesmo com limites.)."
   },
   "Posterior fit quality: good ({n1} levels informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%.).": {
     "es": "Calidad del ajuste a posteriori: buena ({n1} concentraciones utilizadas para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%.).",
-    "fr": "Qualité de l’ajustement a posteriori : bonne ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.)."
+    "fr": "Qualité de l’ajustement a posteriori : bonne ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.).",
+    "pt-BR": "Qualidade do ajuste a posteriori: boa ({n1} concentrações medidas informaram o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%.)."
   },
   "Posterior fit quality: strong ({n1} level informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%; single-level fits remain highly uncertain even when bounded.).": {
     "es": "Calidad del ajuste a posteriori: fuerte ({n1} concentración utilizada para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%; los ajustes con una sola concentración siguen siendo muy inciertos incluso cuando están acotados.).",
-    "fr": "Qualité de l’ajustement a posteriori : forte ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.)."
+    "fr": "Qualité de l’ajustement a posteriori : forte ({n1} concentration utilisée pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}% ; les ajustements fondés sur une seule concentration restent très incertains, même encadrés.).",
+    "pt-BR": "Qualidade do ajuste a posteriori: forte ({n1} concentração medida informou o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%; ajustes com uma única concentração continuam altamente incertos, mesmo com limites.)."
   },
   "Posterior fit quality: strong ({n1} levels informed the bounded posterior MAP fit; RMS error {n2} mg/L; mean absolute error {n3} mg/L; mean relative error {n4}%; CL shift {n5}%; V1 shift {n6}%.).": {
     "es": "Calidad del ajuste a posteriori: fuerte ({n1} concentraciones utilizadas para el ajuste MAP a posteriori acotado; error RMS {n2} mg/L; error absoluto medio {n3} mg/L; error relativo medio {n4}%; cambio de CL {n5}%; cambio de V1 {n6}%.).",
-    "fr": "Qualité de l’ajustement a posteriori : forte ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.)."
+    "fr": "Qualité de l’ajustement a posteriori : forte ({n1} concentrations utilisées pour l’ajustement MAP a posteriori encadré ; erreur RMS {n2} mg/L ; erreur absolue moyenne {n3} mg/L ; erreur relative moyenne {n4}% ; variation de CL {n5}% ; variation de V1 {n6}%.).",
+    "pt-BR": "Qualidade do ajuste a posteriori: forte ({n1} concentrações medidas informaram o ajuste MAP a posteriori com limites; erro RMS {n2} mg/L; erro absoluto médio {n3} mg/L; erro relativo médio {n4}%; variação de CL {n5}%; variação de V1 {n6}%.)."
   },
   "{n1} checks": {
     "es": "{n1} comprobaciones",
-    "fr": "{n1} vérifications"
+    "fr": "{n1} vérifications",
+    "pt-BR": "{n1} verificações"
   },
   "{n1} groups": {
     "es": "{n1} grupos",
-    "fr": "{n1} groupes"
+    "fr": "{n1} groupes",
+    "pt-BR": "{n1} grupos"
   },
   "{n1} regimens": {
     "es": "{n1} pautas",
-    "fr": "{n1} schémas"
+    "fr": "{n1} schémas",
+    "pt-BR": "{n1} esquemas"
   },
   "{n1} such cases": {
     "es": "{n1} casos de este tipo",
-    "fr": "{n1} cas de ce type"
+    "fr": "{n1} cas de ce type",
+    "pt-BR": "{n1} casos desse tipo"
   },
   "{n1} of {n2}": {
     "es": "{n1} de {n2}",
-    "fr": "{n1} sur {n2}"
+    "fr": "{n1} sur {n2}",
+    "pt-BR": "{n1} de {n2}"
   },
   "Simulated blood test at {n1} h (including measurement error)": {
     "es": "Análisis sanguíneo simulado a las {n1} h (incluido el error de medición)",
-    "fr": "Analyse sanguine simulée à {n1} h (erreur de mesure incluse)"
+    "fr": "Analyse sanguine simulée à {n1} h (erreur de mesure incluse)",
+    "pt-BR": "Exame sanguíneo simulado em {n1} h (incluindo erro de medição)"
   },
   "Simulated concentration at {n1} h (without measurement error)": {
     "es": "Concentración simulada a las {n1} h (sin error de medición)",
-    "fr": "Concentration simulée à {n1} h (sans erreur de mesure)"
+    "fr": "Concentration simulée à {n1} h (sans erreur de mesure)",
+    "pt-BR": "Concentração simulada em {n1} h (sem erro de medição)"
   },
   "SCr {n1} mg/dL (Colin 2019 renal covariate)": {
     "es": "Creatinina sérica {n1} mg/dL (covariable renal de Colin 2019)",
-    "fr": "Créatininémie {n1} mg/dL (covariable rénale de Colin 2019)"
+    "fr": "Créatininémie {n1} mg/dL (covariable rénale de Colin 2019)",
+    "pt-BR": "SCr {n1} mg/dL (covariável renal de Colin 2019)"
   },
   "Weight {n1} kg": {
     "es": "Peso {n1} kg",
-    "fr": "Poids {n1} kg"
+    "fr": "Poids {n1} kg",
+    "pt-BR": "Peso {n1} kg"
   },
   "Safety infusion duration {n1} h": {
     "es": "Duración de perfusión por seguridad {n1} h",
-    "fr": "Durée de perfusion pour la sécurité {n1} h"
+    "fr": "Durée de perfusion pour la sécurité {n1} h",
+    "pt-BR": "Duração da infusão para segurança {n1} h"
   },
   "Estimated CL {n1} L/h": {
     "es": "CL estimado {n1} L/h",
-    "fr": "CL estimée {n1} L/h"
+    "fr": "CL estimée {n1} L/h",
+    "pt-BR": "CL estimada {n1} L/h"
   },
   "{n1} measured level": {
     "es": "{n1} concentración medida",
-    "fr": "{n1} concentration mesurée"
+    "fr": "{n1} concentration mesurée",
+    "pt-BR": "{n1} concentração medida"
   },
   "{n1} measured levels": {
     "es": "{n1} concentraciones medidas",
-    "fr": "{n1} concentrations mesurées"
+    "fr": "{n1} concentrations mesurées",
+    "pt-BR": "{n1} concentrações medidas"
   },
   "Current regimen {n1} mg q{n2}h": {
     "es": "Pauta actual {n1} mg q{n2}h",
-    "fr": "Schéma actuel {n1} mg q{n2}h"
+    "fr": "Schéma actuel {n1} mg q{n2}h",
+    "pt-BR": "Esquema atual {n1} mg q{n2}h"
   },
   "Imported {n1} files. {n2} error(s).": {
     "es": "Se importaron {n1} archivos. {n2} error(es).",
-    "fr": "{n1} fichiers importés. {n2} erreur(s)."
+    "fr": "{n1} fichiers importés. {n2} erreur(s).",
+    "pt-BR": "{n1} arquivos importados. {n2} erro(s)."
   },
   "Approved {n1}-{n2}-{n3}": {
     "es": "Aprobado {n1}-{n2}-{n3}",
-    "fr": "Approuvé {n1}-{n2}-{n3}"
+    "fr": "Approuvé {n1}-{n2}-{n3}",
+    "pt-BR": "Aprovado em {n1}-{n2}-{n3}"
   },
   "Estimated CrCl {n1} mL/min (Cockcroft-Gault, ideal body weight {n2} kg; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min (Cockcroft-Gault, peso corporal ideal {n2} kg; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids idéal {n2} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids idéal {n2} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min (Cockcroft-Gault, peso corporal ideal {n2} kg; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "Estimated CrCl {n1} mL/min (Cockcroft-Gault, actual body weight {n2} kg; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min (Cockcroft-Gault, peso corporal real {n2} kg; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids réel {n2} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids réel {n2} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min (Cockcroft-Gault, peso corporal real {n2} kg; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "Estimated CrCl {n1} mL/min (Cockcroft-Gault, adjusted body weight {n2} kg; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min (Cockcroft-Gault, peso corporal ajustado {n2} kg; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids ajusté {n2} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids ajusté {n2} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min (Cockcroft-Gault, peso corporal ajustado {n2} kg; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "{n1} (the interval)": {
     "es": "{n1} (el intervalo)",
-    "fr": "{n1} (l’intervalle)"
+    "fr": "{n1} (l’intervalle)",
+    "pt-BR": "{n1} (o intervalo)"
   },
   "Estimated CrCl {n1} mL/min (Cockcroft-Gault, actual body weight {n2} kg; height not entered; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min (Cockcroft-Gault, peso corporal real {n2} kg; talla no introducida; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids réel {n2} kg ; taille non saisie ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids réel {n2} kg ; taille non saisie ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min (Cockcroft-Gault, peso corporal real {n2} kg; altura não informada; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "Estimated CrCl {n1} mL/min (Cockcroft-Gault, actual body weight {n2} kg; sex not entered; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min (Cockcroft-Gault, peso corporal real {n2} kg; sexo no introducido; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids réel {n2} kg ; sexe non saisi ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids réel {n2} kg ; sexe non saisi ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min (Cockcroft-Gault, peso corporal real {n2} kg; sexo não informado; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "Estimated CrCl {n1} mL/min (Cockcroft-Gault, actual body weight {n2} kg; height and sex not entered; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min (Cockcroft-Gault, peso corporal real {n2} kg; talla y sexo no introducidos; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids réel {n2} kg ; taille et sexe non saisis ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min (Cockcroft-Gault, poids réel {n2} kg ; taille et sexe non saisis ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min (Cockcroft-Gault, peso corporal real {n2} kg; altura e sexo não informados; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "Estimated CrCl {n1} mL/min if male / {n2} mL/min if female (sex not entered) (Cockcroft-Gault, ideal body weight {n3} kg; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min si es hombre / {n2} mL/min si es mujer (sexo no introducido) (Cockcroft-Gault, peso corporal ideal {n3} kg; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids idéal {n3} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids idéal {n3} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min se masculino / {n2} mL/min se feminino (sexo não informado) (Cockcroft-Gault, peso corporal ideal {n3} kg; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "Estimated CrCl {n1} mL/min if male / {n2} mL/min if female (sex not entered) (Cockcroft-Gault, adjusted body weight {n3} kg; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min si es hombre / {n2} mL/min si es mujer (sexo no introducido) (Cockcroft-Gault, peso corporal ajustado {n3} kg; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids ajusté {n3} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids ajusté {n3} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min se masculino / {n2} mL/min se feminino (sexo não informado) (Cockcroft-Gault, peso corporal ajustado {n3} kg; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "Estimated CrCl {n1} mL/min if male / {n2} mL/min if female (sex not entered) (Cockcroft-Gault, actual body weight {n3} kg; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min si es hombre / {n2} mL/min si es mujer (sexo no introducido) (Cockcroft-Gault, peso corporal real {n3} kg; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids réel {n3} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids réel {n3} kg ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min se masculino / {n2} mL/min se feminino (sexo não informado) (Cockcroft-Gault, peso corporal real {n3} kg; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "Estimated CrCl {n1} mL/min if male / {n2} mL/min if female (sex not entered) (Cockcroft-Gault, actual body weight {n3} kg; height not entered; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min si es hombre / {n2} mL/min si es mujer (sexo no introducido) (Cockcroft-Gault, peso corporal real {n3} kg; talla no introducida; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids réel {n3} kg ; taille non saisie ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids réel {n3} kg ; taille non saisie ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min se masculino / {n2} mL/min se feminino (sexo não informado) (Cockcroft-Gault, peso corporal real {n3} kg; altura não informada; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "Estimated CrCl {n1} mL/min if male / {n2} mL/min if female (sex not entered) (Cockcroft-Gault, actual body weight {n3} kg; sex not entered; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min si es hombre / {n2} mL/min si es mujer (sexo no introducido) (Cockcroft-Gault, peso corporal real {n3} kg; sexo no introducido; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids réel {n3} kg ; sexe non saisi ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids réel {n3} kg ; sexe non saisi ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min se masculino / {n2} mL/min se feminino (sexo não informado) (Cockcroft-Gault, peso corporal real {n3} kg; sexo não informado; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "Estimated CrCl {n1} mL/min if male / {n2} mL/min if female (sex not entered) (Cockcroft-Gault, actual body weight {n3} kg; height and sex not entered; absolute, not indexed to 1.73 m²) — shown for context; the dose is calculated from serum creatinine and does not use this value": {
     "es": "Aclaramiento de creatinina estimado {n1} mL/min si es hombre / {n2} mL/min si es mujer (sexo no introducido) (Cockcroft-Gault, peso corporal real {n3} kg; talla y sexo no introducidos; absoluto, no indexado a 1.73 m²) — se muestra como contexto; la dosis se calcula a partir de la creatinina sérica y no utiliza este valor",
-    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids réel {n3} kg ; taille et sexe non saisis ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur"
+    "fr": "Clairance de la créatinine estimée {n1} mL/min si homme / {n2} mL/min si femme (sexe non saisi) (Cockcroft-Gault, poids réel {n3} kg ; taille et sexe non saisis ; absolue, non indexée à 1.73 m²) — affichée à titre indicatif ; la dose est calculée à partir de la créatininémie et n’utilise pas cette valeur",
+    "pt-BR": "CrCl estimada {n1} mL/min se masculino / {n2} mL/min se feminino (sexo não informado) (Cockcroft-Gault, peso corporal real {n3} kg; altura e sexo não informados; absoluta, não indexada a 1.73 m²) — mostrada para contextualização; a dose é calculada a partir da creatinina sérica e não utiliza este valor"
   },
   "{n1} locked": {
     "es": "{n1} bloqueadas",
-    "fr": "{n1} verrouillés"
+    "fr": "{n1} verrouillés",
+    "pt-BR": "{n1} bloqueados"
   },
   "{n1} eligible": {
     "es": "{n1} elegibles",
-    "fr": "{n1} admissibles"
+    "fr": "{n1} admissibles",
+    "pt-BR": "{n1} elegíveis"
   },
   "+{n1} this week": {
     "es": "+{n1} esta semana",
-    "fr": "+{n1} cette semaine"
+    "fr": "+{n1} cette semaine",
+    "pt-BR": "+{n1} nesta semana"
   },
   "{n1} in 30d": {
     "es": "{n1} en 30d",
-    "fr": "{n1} en 30j"
+    "fr": "{n1} en 30j",
+    "pt-BR": "{n1} em 30d"
   },
   "{n1} user": {
     "es": "{n1} usuario",
-    "fr": "{n1} utilisateur"
+    "fr": "{n1} utilisateur",
+    "pt-BR": "{n1} usuário"
   },
   "{n1} users": {
     "es": "{n1} usuarios",
-    "fr": "{n1} utilisateurs"
+    "fr": "{n1} utilisateurs",
+    "pt-BR": "{n1} usuários"
   },
   "{n1} member": {
     "es": "{n1} miembro",
-    "fr": "{n1} membre"
+    "fr": "{n1} membre",
+    "pt-BR": "{n1} membro"
   },
   "{n1} members": {
     "es": "{n1} miembros",
-    "fr": "{n1} membres"
+    "fr": "{n1} membres",
+    "pt-BR": "{n1} membros"
   },
   "{n1}% free": {
     "es": "{n1}% gratuito",
-    "fr": "{n1}% gratuit"
+    "fr": "{n1}% gratuit",
+    "pt-BR": "{n1}% livre"
   },
   "{n1} cross-model reference": {
     "es": "{n1} referencia entre modelos",
-    "fr": "{n1} référence entre modèles"
+    "fr": "{n1} référence entre modèles",
+    "pt-BR": "{n1} referência entre modelos"
   },
   "{n1} cross-model references": {
     "es": "{n1} referencias entre modelos",
-    "fr": "{n1} références entre modèles"
+    "fr": "{n1} références entre modèles",
+    "pt-BR": "{n1} referências entre modelos"
   },
   "{n1} reference band": {
     "es": "{n1} banda de referencia",
-    "fr": "{n1} bande de référence"
+    "fr": "{n1} bande de référence",
+    "pt-BR": "{n1} faixa de referência"
   },
   "{n1} reference bands": {
     "es": "{n1} bandas de referencia",
-    "fr": "{n1} bandes de référence"
+    "fr": "{n1} bandes de référence",
+    "pt-BR": "{n1} faixas de referência"
   },
   "Infuse over {n1} minutes.": {
     "es": "Administrar en perfusión durante {n1} minutos.",
-    "fr": "Perfuser sur {n1} minutes."
+    "fr": "Perfuser sur {n1} minutes.",
+    "pt-BR": "Infundir em {n1} minutos."
   },
   "Cockcroft-Gault, adjusted body weight {n1} kg": {
     "es": "Cockcroft-Gault, peso corporal ajustado {n1} kg",
-    "fr": "Cockcroft-Gault, poids corporel ajusté {n1} kg"
+    "fr": "Cockcroft-Gault, poids corporel ajusté {n1} kg",
+    "pt-BR": "Cockcroft-Gault, peso corporal ajustado {n1} kg"
   },
   "Cockcroft-Gault, ideal body weight {n1} kg": {
     "es": "Cockcroft-Gault, peso corporal ideal {n1} kg",
-    "fr": "Cockcroft-Gault, poids corporel idéal {n1} kg"
+    "fr": "Cockcroft-Gault, poids corporel idéal {n1} kg",
+    "pt-BR": "Cockcroft-Gault, peso corporal ideal {n1} kg"
   },
   "Cockcroft-Gault, actual body weight {n1} kg": {
     "es": "Cockcroft-Gault, peso corporal real {n1} kg",
-    "fr": "Cockcroft-Gault, poids corporel réel {n1} kg"
+    "fr": "Cockcroft-Gault, poids corporel réel {n1} kg",
+    "pt-BR": "Cockcroft-Gault, peso corporal real {n1} kg"
   },
   "{n1}% population range (model-based; not yet validated)": {
     "es": "Intervalo poblacional del {n1}% (basado en el modelo; aún no validado)",
-    "fr": "Plage de population à {n1}% (fondée sur le modèle ; pas encore validée)"
+    "fr": "Plage de population à {n1}% (fondée sur le modèle ; pas encore validée)",
+    "pt-BR": "Faixa populacional de {n1}% (baseada no modelo; ainda não validada)"
   },
   "{n1}% credible band (model-based; not yet validated)": {
     "es": "Banda de credibilidad del {n1}% (basada en el modelo; aún no validada)",
-    "fr": "Bande de crédibilité à {n1}% (fondée sur le modèle ; pas encore validée)"
+    "fr": "Bande de crédibilité à {n1}% (fondée sur le modèle ; pas encore validée)",
+    "pt-BR": "Faixa de credibilidade de {n1}% (baseada no modelo; ainda não validada)"
   },
   "{n1}% range of concentrations across {n2} parameter sets drawn from the population prior (no measured level has narrowed it). Parameter uncertainty only; conditional on this calculator's prior variances. Model-based: its coverage has not yet been checked against measured patient levels.": {
     "es": "Intervalo de concentraciones del {n1}% entre {n2} conjuntos de parámetros extraídos de la distribución a priori poblacional (ninguna concentración medida lo ha acotado). Solo incertidumbre de los parámetros; condicionado a las varianzas a priori de esta calculadora. Basado en el modelo: su cobertura aún no se ha comprobado frente a concentraciones medidas en pacientes.",
-    "fr": "Plage de concentrations à {n1}% parmi {n2} jeux de paramètres tirés de la distribution a priori de population (aucune concentration mesurée ne l’a resserrée). Incertitude des paramètres uniquement ; conditionnelle aux variances a priori de cette calculatrice. Fondée sur le modèle : sa couverture n’a pas encore été vérifiée par rapport à des concentrations mesurées chez des patients."
+    "fr": "Plage de concentrations à {n1}% parmi {n2} jeux de paramètres tirés de la distribution a priori de population (aucune concentration mesurée ne l’a resserrée). Incertitude des paramètres uniquement ; conditionnelle aux variances a priori de cette calculatrice. Fondée sur le modèle : sa couverture n’a pas encore été vérifiée par rapport à des concentrations mesurées chez des patients.",
+    "pt-BR": "Faixa de {n1}% das concentrações em {n2} conjuntos de parâmetros amostrados da distribuição populacional a priori (nenhuma concentração medida a restringiu). Apenas incerteza dos parâmetros; condicionada às variâncias a priori desta calculadora. Baseada no modelo: sua cobertura ainda não foi verificada com concentrações medidas em pacientes."
   },
   "{n1}% credible band for the model-predicted concentration: {n2} parameter sets drawn from the posterior (sampling-importance-resampling around the MAP fit) and the {n3}th–{n4}th percentiles taken at each time. Parameter uncertainty only: assay error is excluded, so it is not a prediction interval for a new level. Conditional on this calculator's prior variances and residual error model. Model-based: its coverage has not yet been checked against measured patient levels.": {
     "es": "Banda de credibilidad del {n1}% para la concentración predicha por el modelo: {n2} conjuntos de parámetros extraídos de la distribución posterior (muestreo y remuestreo por importancia alrededor del ajuste MAP), tomando los percentiles {n3}–{n4} en cada instante. Solo incertidumbre de los parámetros: se excluye el error analítico, por lo que no es un intervalo de predicción para una nueva concentración. Condicionada a las varianzas a priori y al modelo de error residual de esta calculadora. Basada en el modelo: su cobertura aún no se ha comprobado frente a concentraciones medidas en pacientes.",
-    "fr": "Bande de crédibilité à {n1}% pour la concentration prédite par le modèle : {n2} jeux de paramètres tirés de la distribution a posteriori (échantillonnage-rééchantillonnage d’importance autour de l’ajustement MAP), avec les percentiles {n3}–{n4} à chaque instant. Incertitude des paramètres uniquement : l’erreur analytique est exclue ; il ne s’agit donc pas d’un intervalle de prédiction pour une nouvelle concentration. Conditionnelle aux variances a priori et au modèle d’erreur résiduelle de cette calculatrice. Fondée sur le modèle : sa couverture n’a pas encore été vérifiée par rapport à des concentrations mesurées chez des patients."
+    "fr": "Bande de crédibilité à {n1}% pour la concentration prédite par le modèle : {n2} jeux de paramètres tirés de la distribution a posteriori (échantillonnage-rééchantillonnage d’importance autour de l’ajustement MAP), avec les percentiles {n3}–{n4} à chaque instant. Incertitude des paramètres uniquement : l’erreur analytique est exclue ; il ne s’agit donc pas d’un intervalle de prédiction pour une nouvelle concentration. Conditionnelle aux variances a priori et au modèle d’erreur résiduelle de cette calculatrice. Fondée sur le modèle : sa couverture n’a pas encore été vérifiée par rapport à des concentrations mesurées chez des patients.",
+    "pt-BR": "Faixa de credibilidade de {n1}% para a concentração prevista pelo modelo: {n2} conjuntos de parâmetros amostrados da distribuição a posteriori (amostragem por importância e reamostragem em torno do ajuste MAP), com os percentis {n3}–{n4} calculados em cada instante. Apenas incerteza dos parâmetros: o erro do ensaio é excluído, portanto não é um intervalo de predição para uma nova concentração. Condicionada às variâncias a priori e ao modelo de erro residual desta calculadora. Baseada no modelo: sua cobertura ainda não foi verificada com concentrações medidas em pacientes."
   },
   "Actual history — dose {n1}:": {
     "es": "Historial real — dosis {n1}:",
-    "fr": "Historique réel — dose {n1} :"
+    "fr": "Historique réel — dose {n1} :",
+    "pt-BR": "Histórico real — dose {n1}:"
   },
   "modeled peak {n1} / trough {n2} mg/L": {
     "es": "pico modelizado {n1} / valle {n2} mg/L",
-    "fr": "pic modélisé {n1} / concentration résiduelle {n2} mg/L"
+    "fr": "pic modélisé {n1} / concentration résiduelle {n2} mg/L",
+    "pt-BR": "pico modelado {n1} / vale {n2} mg/L"
   },
   "AUC over that interval {n1} mg·h/L (not a daily AUC)": {
     "es": "AUC en ese intervalo {n1} mg·h/L (no es un AUC diario)",
-    "fr": "AUC sur cet intervalle {n1} mg·h/L (ce n’est pas une AUC quotidienne)"
+    "fr": "AUC sur cet intervalle {n1} mg·h/L (ce n’est pas une AUC quotidienne)",
+    "pt-BR": "AUC nesse intervalo {n1} mg·h/L (não é uma AUC diária)"
   },
   "{n1}% of steady state (t½ {n2} h).": {
     "es": "{n1}% del estado estacionario (t½ {n2} h).",
-    "fr": "{n1}% de l’état d’équilibre (t½ {n2} h)."
+    "fr": "{n1}% de l’état d’équilibre (t½ {n2} h).",
+    "pt-BR": "{n1}% do estado de equilíbrio (t½ {n2} h)."
   },
   "In range: AUC₂₄ {n1} mg·h/L (target 400–600)": {
     "es": "Dentro del intervalo: AUC₂₄ {n1} mg·h/L (objetivo 400–600)",
-    "fr": "Dans la plage : AUC₂₄ {n1} mg·h/L (cible 400–600)"
+    "fr": "Dans la plage : AUC₂₄ {n1} mg·h/L (cible 400–600)",
+    "pt-BR": "Na faixa: AUC₂₄ {n1} mg·h/L (alvo 400–600)"
   },
   "Above target: AUC₂₄ {n1} mg·h/L (target 400–600)": {
     "es": "Por encima del objetivo: AUC₂₄ {n1} mg·h/L (objetivo 400–600)",
-    "fr": "Au-dessus de la cible : AUC₂₄ {n1} mg·h/L (cible 400–600)"
+    "fr": "Au-dessus de la cible : AUC₂₄ {n1} mg·h/L (cible 400–600)",
+    "pt-BR": "Acima do alvo: AUC₂₄ {n1} mg·h/L (alvo 400–600)"
   },
   "Below target: AUC₂₄ {n1} mg·h/L (target 400–600)": {
     "es": "Por debajo del objetivo: AUC₂₄ {n1} mg·h/L (objetivo 400–600)",
-    "fr": "En dessous de la cible : AUC₂₄ {n1} mg·h/L (cible 400–600)"
+    "fr": "En dessous de la cible : AUC₂₄ {n1} mg·h/L (cible 400–600)",
+    "pt-BR": "Abaixo do alvo: AUC₂₄ {n1} mg·h/L (alvo 400–600)"
   },
   "TROUGH {n1}": {
     "es": "VALLE {n1}",
-    "fr": "RÉSIDUELLE {n1}"
+    "fr": "RÉSIDUELLE {n1}",
+    "pt-BR": "VALE {n1}"
   }
 }

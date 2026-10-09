@@ -1,6 +1,6 @@
 import templates from "./templates.json";
 
-type Translation = { es: string; fr: string };
+type Translation = { es: string; fr: string; "pt-BR": string };
 // Only explicitly catalogued numeric templates can match. Captures are inserted
 // byte-for-byte: no parsing, rounding, unit conversion or clinical calculation.
 const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -9,7 +9,7 @@ const compiled = Object.entries(templates as Record<string, Translation>).map(([
   const pattern = source.split(/\{n\d+\}/g).map(escapeRegex).join("(-?\\d+(?:[.,]\\d+)*)");
   return { names, regex: new RegExp(`^${pattern}$`), translations };
 });
-export function translateNumericTemplate(source: string, locale: "es" | "fr"): string | undefined {
+export function translateNumericTemplate(source: string, locale: "es" | "fr" | "pt-BR"): string | undefined {
   for (const entry of compiled) {
     const match = entry.regex.exec(source);
     if (!match) continue;

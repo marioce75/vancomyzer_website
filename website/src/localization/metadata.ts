@@ -26,7 +26,7 @@ export function localizeMetadata(source: Metadata, locale: Locale): Metadata {
       ...(typeof source.openGraph.title === "string" ? { title: t(source.openGraph.title) } : {}),
       ...(source.openGraph.description ? { description: t(source.openGraph.description) } : {}),
       images: images(source.openGraph.images),
-      locale: locale === "es" ? "es_ES" : locale === "fr" ? "fr_FR" : source.openGraph.locale,
+      locale: locale === "pt-BR" ? "pt_BR" : locale === "es" ? "es_ES" : locale === "fr" ? "fr_FR" : source.openGraph.locale,
     } as Metadata["openGraph"] } : {}),
     ...(source.twitter ? { twitter: {
       ...source.twitter,
