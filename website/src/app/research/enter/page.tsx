@@ -189,6 +189,22 @@ const INDICATIONS = [
 /*  Component                                                         */
 /* ------------------------------------------------------------------ */
 
+// Keep wrapper identities stable so numeric input raw text and choices survive edits.
+/* ---- Field grid helper ---- */
+const FieldGrid = ({ children, cols = 3 }: { children: React.ReactNode; cols?: number }) => (
+  <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 12, marginBottom: 12 }}>
+    {children}
+  </div>
+);
+
+const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div>
+    <label style={labelStyle}><LocalizedText text={label} /></label>
+    {children}
+  </div>
+);
+
+
 export default function ResearchEntryForm() {
   /* -- Demographics -- */
   const [age, setAge] = useState("");
@@ -415,20 +431,6 @@ export default function ResearchEntryForm() {
       setSubmitting(false);
     }
   };
-
-  /* ---- Field grid helper ---- */
-  const FieldGrid = ({ children, cols = 3 }: { children: React.ReactNode; cols?: number }) => (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 12, marginBottom: 12 }}>
-      {children}
-    </div>
-  );
-
-  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <div>
-      <label style={labelStyle}><LocalizedText text={label} /></label>
-      {children}
-    </div>
-  );
 
   /* ============================================================== */
   /*  RENDER                                                        */
