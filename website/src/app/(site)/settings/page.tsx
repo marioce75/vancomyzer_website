@@ -1,4 +1,5 @@
 "use client";
+import ClinicalNumberInput from "@/components/calculator/ClinicalNumberInput";
 import { LocalizedText } from "@/localization/LanguageProvider";
 
 
@@ -81,6 +82,8 @@ export default function InstitutionalSettingsPage() {
   };
 
   const handleSave = async () => {
+    const malformed = document.querySelector<HTMLInputElement>('input[data-clinical-number="true"]:invalid');
+    if (malformed) { malformed.reportValidity(); malformed.focus(); return; }
     setSaving(true);
     setMessage(null);
     const result = await updateSettings(localSettings);
@@ -198,10 +201,10 @@ export default function InstitutionalSettingsPage() {
                       />
                     ) : (
                       <>
-                        <input
-                          type="number"
+                        <ClinicalNumberInput
+
                           value={(val as number) ?? 0}
-                          onChange={e => handleChange(field.key, Number(e.target.value))}
+                          onValueChange={n => handleChange(field.key, n)}
                           min={field.min}
                           max={field.max}
                           step={field.step}

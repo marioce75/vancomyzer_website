@@ -147,7 +147,6 @@ export default function PatientCharacteristicsForm({
               text leaves the value empty and marks the field invalid. */}
           <ClinicalNumberInput
             inputMode="decimal"
-            rejectThousandsGrouping
             value={value.serum_creatinine_mg_dl}
             onValueChange={(n) => update("serum_creatinine_mg_dl", n)}
             onBlurValue={(parsed, _raw, parseError) => {

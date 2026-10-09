@@ -35,9 +35,9 @@ test('developer synthetic checks: locale presentation preserves initial, one-lev
     }
   }
 });
-test('existing decimal parser remains locale-independent; ambiguous single grouping is guarded by the input component', () => {
+test('approved strict decimal parser rejects ambiguity consistently in every locale', () => {
   for (const locale of locales) {
-    for (const [raw, expected] of [['1.2', 1.2], ['1,2', 1.2], ['0,83', .83], ['1,000', 1], ['1.000', 1], ['1000', 1000], ['1,234.5', null], ['1.234,5', null], ['1 000', null], ['1e3', null], ['75kg', null]] as const) {
+    for (const [raw, expected] of [['1.2', 1.2], ['1,2', 1.2], ['0,83', .83], ['1,000', null], ['1.000', null], ['1000', 1000], ['1,234.5', null], ['1.234,5', null], ['1 000', null], ['1e3', null], ['75kg', null]] as const) {
       assert.equal(parseClinicalNumber(raw), expected, `${locale}: ${raw}`);
     }
   }

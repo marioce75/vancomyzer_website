@@ -16028,5 +16028,20 @@
     "es": "El modelo Colin 2019 no está validado en pacientes con tratamiento renal sustitutivo (CRRT, HD, PD). Utilice un protocolo posológico especializado en tratamiento renal sustitutivo o consulte a farmacia.",
     "fr": "Le modèle Colin 2019 n’est pas validé chez les patients sous épuration extrarénale (CRRT, HD, PD). Utilisez un protocole posologique spécialisé ou consultez la pharmacie.",
     "pt-BR": "O modelo Colin 2019 não é validado para pacientes em terapia renal substitutiva (CRRT, HD, DP). Utilize um protocolo de dosagem especialista específico para o RRT ou consulte a farmácia."
+  },
+  "Ambiguous separator: remove it for a whole number, or add a trailing zero to confirm a decimal.": {
+    "es": "Separador ambiguo: elimínelo para un número entero o añada un cero al final para confirmar un decimal.",
+    "fr": "Séparateur ambigu : supprimez-le pour un entier ou ajoutez un zéro final pour confirmer une décimale.",
+    "pt-BR": "Separador ambíguo: remova-o para indicar um número inteiro ou acrescente um zero ao final para confirmar um decimal."
+  },
+  "Use digits with one decimal point or comma, without grouping, units or trailing characters. Complete the decimal before continuing.": {
+    "es": "Use cifras con un solo punto o coma decimal, sin separadores de millares, unidades ni caracteres al final. Complete el decimal antes de continuar.",
+    "fr": "Utilisez des chiffres avec un seul point ou une seule virgule décimale, sans séparateurs de milliers, unités ni caractères finaux. Complétez la décimale avant de continuer.",
+    "pt-BR": "Use algarismos com um único ponto ou vírgula decimal, sem separadores de milhares, unidades ou caracteres ao final. Complete o decimal antes de continuar."
+  },
+  "Enter a number within this field's permitted range.": {
+    "es": "Introduzca un número dentro del rango permitido para este campo.",
+    "fr": "Saisissez un nombre dans la plage autorisée pour ce champ.",
+    "pt-BR": "Digite um número dentro do intervalo permitido para este campo."
   }
 }
