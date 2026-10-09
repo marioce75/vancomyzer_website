@@ -37,5 +37,16 @@ test("tutorial links use the selected recording duration", () => {
 });
 
 test("Portuguese never aliases English audio as Portuguese", () => {
-  assert.equal(tutorialMedia["pt-BR"], null);
+  const media = tutorialMedia["pt-BR"]!;
+  assert.ok(media);
+  assert.equal(media.locale, "pt-BR");
+  assert.notEqual(media.src, tutorialMedia.en!.src);
+  assert.equal(media.captions?.language, "pt-BR");
+  assert.equal(tutorialDuration(media), "3:29");
+  assert.ok(existsSync(join(process.cwd(), "public", media.poster)));
+  assert.equal(createHash("sha256").update(readFileSync(join(process.cwd(), "public", media.src))).digest("hex"), "53a6fde207b0ee6d905ee7765ffec456df6fda2b70a96733947ba7cd8f5ed4f7");
+  const captions = readFileSync(join(process.cwd(), "public", media.captions!.src), "utf8");
+  assert.ok(captions.startsWith("WEBVTT"));
+  assert.ok(captions.replace(/\s+/g, " ").includes("validação independente em pacientes"));
+  assert.ok(captions.includes("um decimal ou um inteiro"));
 });

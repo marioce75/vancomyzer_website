@@ -8,9 +8,15 @@ export type TutorialMedia = {
   captions?: { src: string; language: string; label: string };
 };
 
-/** Approved 2026-10-06 release. Keep each locale paired with its own narration and captions. */
+/** Existing 2026-10-06 media plus Portuguese 2026-10-09 release. Keep each locale paired with its own narration and captions. */
 export const tutorialMedia: Readonly<Record<Locale, TutorialMedia | null>> = {
-  "pt-BR": null,
+  "pt-BR": {
+    locale: "pt-BR",
+    src: "/videos/vancomyzer-tutorial-pt-BR-20261009.mp4",
+    poster: "/images/tutorial-pt-BR-20261009.jpg",
+    durationSeconds: 209.16,
+    captions: { src: "/videos/vancomyzer-tutorial-pt-BR-20261009.vtt", language: "pt-BR", label: "Português (Brasil)" },
+  },
   en: {
     locale: "en",
     src: "/videos/vancomyzer-tutorial-en-20261006.mp4",

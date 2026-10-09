@@ -317,12 +317,12 @@
   "Visit dosys.health": {
     "es": "Visitar dosys.health",
     "fr": "Visiter dosys.health",
-    "pt-BR": "Visite os dosys.health"
+    "pt-BR": "Visite dosys.health"
   },
   "clinician review support": {
     "es": "apoyo a la revisión clínica",
     "fr": "aide à l’examen clinique",
-    "pt-BR": "apoio de revisão clinica"
+    "pt-BR": "apoio à revisão clínica"
   },
   "Dashboard": {
     "es": "Panel de control",
@@ -382,7 +382,7 @@
   "Estimate a starting regimen or use measured levels to compare dosing options. Targets follow the 2020 ASHP/IDSA/PIDS/SIDP consensus guideline. Review the model assumptions and limitations before using an estimate.": {
     "es": "Estime una pauta inicial o utilice concentraciones medidas para comparar opciones de dosificación. Los objetivos siguen la guía de consenso de 2020 de ASHP/IDSA/PIDS/SIDP. Revise los supuestos y las limitaciones del modelo antes de utilizar una estimación.",
     "fr": "Estimez un schéma posologique initial ou utilisez des concentrations mesurées pour comparer les options posologiques. Les cibles suivent les recommandations consensuelles ASHP/IDSA/PIDS/SIDP de 2020. Examinez les hypothèses et les limites du modèle avant d’utiliser une estimation.",
-    "pt-BR": "Estimar um esquema inicial ou utilizar níveis medidos para comparar as opções de dosagem. Os objetivos seguem a diretriz de consenso ASHP/IDSA/PIDS/SIDP 2020. Reveja os pressupostos e limitações do modelo antes de utilizar uma estimativa."
+    "pt-BR": "Estime um esquema inicial ou use concentrações medidas para comparar opções de dose. Os alvos seguem a diretriz de consenso ASHP/IDSA/PIDS/SIDP de 2020. Revise os pressupostos e as limitações do modelo antes de utilizar uma estimativa."
   },
   "Adults receiving intermittent IV vancomycin only. For clinician review. Independent clinical validation is pending.": {
     "es": "Solo para adultos que reciben vancomicina IV intermitente. Para revisión por un profesional clínico. La validación clínica independiente está pendiente.",
@@ -402,7 +402,7 @@
   "Patient inputs, dosing estimates and model details.": {
     "es": "Datos del paciente, estimaciones de dosificación y detalles del modelo.",
     "fr": "Données du patient, estimations posologiques et détails du modèle.",
-    "pt-BR": "Entradas do paciente, estimativas de dosagem e detalhes do modelo."
+    "pt-BR": "Dados do paciente, estimativas de dose e detalhes do modelo."
   },
   "Your first Vancomyzer walkthrough": {
     "es": "Su primer recorrido por Vancomyzer",
@@ -462,7 +462,7 @@
   "Other regimens computed from the same parameters, the four PK parameters, the method, and a note you can copy into the chart.": {
     "es": "Otras pautas calculadas con los mismos parámetros, los cuatro parámetros farmacocinéticos, el método y una nota que puede copiar en la historia clínica.",
     "fr": "D’autres schémas calculés à partir des mêmes paramètres, les quatre paramètres pharmacocinétiques, la méthode et une note à copier dans le dossier du patient.",
-    "pt-BR": "Outros esquemas computados a partir dos mesmos parâmetros, os quatro parâmetros PK, o método, e uma nota que você pode copiar para o gráfico."
+    "pt-BR": "Outros esquemas calculados com os mesmos parâmetros, os quatro parâmetros farmacocinéticos, o método e uma nota que pode ser copiada para o prontuário."
   },
   "Synthetic example": {
     "es": "Ejemplo sintético",
@@ -477,7 +477,7 @@
   "What a starting-regimen comparison looks like": {
     "es": "Cómo se presenta una comparación de pautas iniciales",
     "fr": "Présentation d’une comparaison de schémas initiaux",
-    "pt-BR": "O que uma comparação inicial-esquema se parece"
+    "pt-BR": "Como é apresentada a comparação de esquemas iniciais"
   },
   "The table is produced by the same calculation method as the application for a stated set of synthetic inputs. It is an illustration of the output, not evidence of clinical validation, and the regimens are not for use with a patient.": {
     "es": "La tabla se genera con el mismo método de cálculo que la aplicación, para un conjunto definido de datos sintéticos. Ilustra los resultados; no constituye evidencia de validación clínica y las pautas no deben utilizarse en un paciente.",
@@ -492,12 +492,12 @@
   "For adults receiving intermittent intravenous vancomycin.": {
     "es": "Para adultos que reciben vancomicina intravenosa intermitente.",
     "fr": "Pour les adultes recevant de la vancomycine intraveineuse intermittente.",
-    "pt-BR": "Para adultos a receber vancomicina intravenosa intermitente."
+    "pt-BR": "Para adultos recebendo vancomicina intravenosa intermitente."
   },
   "From the first dose to level-guided adjustment": {
     "es": "Desde la primera dosis hasta el ajuste según concentraciones",
     "fr": "De la première dose à l’ajustement guidé par les concentrations",
-    "pt-BR": "Desde a primeira dose até ao ajuste guiado pelo nível"
+    "pt-BR": "Da primeira dose ao ajuste orientado pelas concentrações"
   },
   "Review the evidence before you rely on it": {
     "es": "Revise la evidencia antes de basarse en los resultados",
@@ -507,7 +507,7 @@
   "Method pages document the model equations, assumptions and sources. Vancomyzer has not yet been validated in real patients; published model evidence and developer-run checks are not independent validation. Each row links to the methods, results and limitations.": {
     "es": "Las páginas de métodos documentan las ecuaciones, los supuestos y las fuentes del modelo. Vancomyzer aún no se ha validado en pacientes reales; la evidencia publicada del modelo y las comprobaciones realizadas por el desarrollador no constituyen una validación independiente. Cada fila enlaza con los métodos, los resultados y las limitaciones.",
     "fr": "Les pages sur les méthodes documentent les équations, les hypothèses et les sources du modèle. Vancomyzer n’a pas encore été validé chez des patients réels ; les données publiées sur le modèle et les vérifications du développeur ne constituent pas une validation indépendante. Chaque ligne renvoie aux méthodes, aux résultats et aux limites.",
-    "pt-BR": "Páginas do método documentam as equações do modelo, suposições e fontes. Vancomyzer ainda não foi validado em pacientes reais; evidências publicadas de modelo e verificações de execução do desenvolvedor não são validação independente. Cada linha liga-se aos métodos, resultados e limitações."
+    "pt-BR": "As páginas de métodos documentam as equações, os pressupostos e as fontes do modelo. O Vancomyzer ainda não foi validado em pacientes reais; as evidências publicadas sobre o modelo e as verificações realizadas pelo desenvolvedor não constituem validação independente. Cada linha contém links para os métodos, os resultados e as limitações."
   },
   "Evidence status table; scrolls horizontally on small screens": {
     "es": "Tabla del estado de la evidencia; desplazamiento horizontal en pantallas pequeñas",
@@ -547,42 +547,42 @@
   "Designed for": {
     "es": "Diseñado para",
     "fr": "Conçu pour",
-    "pt-BR": "Concebido para"
+    "pt-BR": "Destinado a"
   },
   "Adults (18 years and older) receiving intermittent intravenous vancomycin.": {
     "es": "Adultos (de 18 años o más) que reciben vancomicina intravenosa intermitente.",
     "fr": "Adultes (18 ans et plus) recevant de la vancomycine intraveineuse intermittente.",
-    "pt-BR": "Adultos (18 anos ou mais) a receber vancomicina intravenosa intermitente."
+    "pt-BR": "Adultos (18 anos ou mais) recebendo vancomicina intravenosa intermitente."
   },
   "Intended users": {
     "es": "Usuarios previstos",
     "fr": "Utilisateurs concernés",
-    "pt-BR": "Utilizadores intencionados"
+    "pt-BR": "Usuários previstos"
   },
   "Intended for qualified healthcare professionals and clinical trainees. Every recommendation must be independently reviewed by a licensed clinician before any change to therapy. Not intended for patients or caregivers.": {
     "es": "Dirigido a profesionales sanitarios cualificados y personal clínico en formación. Un profesional clínico autorizado debe revisar de forma independiente cada recomendación antes de modificar el tratamiento. No está dirigido a pacientes ni a cuidadores.",
     "fr": "Destiné aux professionnels de santé qualifiés et aux personnes en formation clinique. Chaque recommandation doit être examinée de manière indépendante par un clinicien habilité avant toute modification du traitement. N’est pas destiné aux patients ni aux aidants.",
-    "pt-BR": "Destinado a profissionais de saúde qualificados e estagiários clínicos. Todas as recomendações devem ser revistas de forma independente por um clínico licenciado antes de qualquer mudança para a terapia. Não destinado a pacientes ou prestadores de cuidados."
+    "pt-BR": "Destinado a profissionais de saúde qualificados e profissionais em formação clínica. Todas as recomendações devem ser revisadas de forma independente por um profissional legalmente habilitado antes de qualquer alteração no tratamento. Não se destina a pacientes ou cuidadores."
   },
   "Not designed for": {
     "es": "No diseñado para",
     "fr": "Non conçu pour",
-    "pt-BR": "Não concebidos para"
+    "pt-BR": "Não destinado a"
   },
   "Recommendations are withheld when renal replacement therapy is selected. Continuous infusion and pediatric dosing use different models and are out of scope.": {
     "es": "No se ofrecen recomendaciones cuando se selecciona tratamiento renal sustitutivo. La perfusión continua y la dosificación pediátrica utilizan modelos diferentes y quedan fuera del ámbito de aplicación.",
     "fr": "Aucune recommandation n’est fournie lorsqu’un épuration extrarénale est sélectionné. La perfusion continue et la posologie pédiatrique utilisent d’autres modèles et sont hors du champ d’application.",
-    "pt-BR": "As recomendações são suspensas quando a terapêutica de substituição renal é selecionada. A infusão contínua e a dosagem pediátrica utilizam diferentes modelos e estão fora de alcance."
+    "pt-BR": "Não são fornecidas recomendações quando a terapia renal substitutiva é selecionada. A infusão contínua e a dosagem pediátrica utilizam modelos diferentes e estão fora do escopo."
   },
   "Free for individual clinicians; site licences by bed count.": {
     "es": "Gratis para profesionales clínicos individuales; licencias de centro según el número de camas.",
     "fr": "Gratuit pour les cliniciens à titre individuel ; licences d’établissement selon le nombre de lits.",
-    "pt-BR": "Livre para clínicos individuais; licenças de local por contagem de leito."
+    "pt-BR": "Gratuito para profissionais individuais; licenças institucionais conforme o número de leitos."
   },
   "Hospital Site licenses": {
     "es": "Licencias de centro hospitalario",
     "fr": "Licences d’établissement hospitalier",
-    "pt-BR": "Licenças do Site Hospitalar"
+    "pt-BR": "Licenças institucionais hospitalares"
   },
   "Create a free account": {
     "es": "Crear una cuenta gratuita",
@@ -802,7 +802,7 @@
   "Dōsys products are clinical decision-support tools intended for qualified healthcare professionals. They support, and do not replace, independent clinical judgment. Not FDA-cleared, approved or otherwise reviewed. See the": {
     "es": "Los productos de Dōsys son herramientas de apoyo a la decisión clínica destinadas a profesionales sanitarios cualificados. Apoyan el juicio clínico independiente y no lo sustituyen. No cuentan con autorización, aprobación ni otra revisión de la FDA. Consulte el",
     "fr": "Les produits de Dōsys sont des outils d’aide à la décision clinique destinés aux professionnels de santé qualifiés. Ils soutiennent le jugement clinique indépendant sans le remplacer. Ils n’ont reçu ni autorisation, ni approbation, ni autre examen de la FDA. Consultez l’",
-    "pt-BR": "Os produtos Dōsys são ferramentas de apoio à decisão clínica destinadas a profissionais de saúde qualificados. Apoiam e não substituem o julgamento clínico independente. Não liberado pela FDA, aprovado ou revisado de outra forma. Ver o"
+    "pt-BR": "Os produtos Dōsys são ferramentas de apoio à decisão clínica destinadas a profissionais de saúde qualificados. Apoiam, sem substituir, o julgamento clínico independente. Não receberam autorização, aprovação nem outra análise da FDA. Consulte o"
   },
   "For use by qualified healthcare professionals only. Vancomyzer™ is a clinical decision-support tool and does not constitute medical advice. All dosing recommendations must be independently reviewed and validated by a licensed clinician prior to patient administration. Not a substitute for professional judgment, institutional protocols, or therapeutic drug monitoring.": {
     "es": "Solo para uso por profesionales sanitarios cualificados. Vancomyzer™ es una herramienta de apoyo a la decisión clínica y no constituye asesoramiento médico. Un profesional clínico autorizado debe revisar y validar de forma independiente todas las recomendaciones de dosificación antes de administrar el tratamiento al paciente. No sustituye el juicio profesional, los protocolos institucionales ni la monitorización farmacocinética.",
@@ -1352,7 +1352,7 @@
   "Developer-run checks of Vancomyzer's arithmetic against an independent reference calculation, its loading-dose handling, and the coverage of its 90% credible band in synthetic patients.": {
     "es": "Comprobaciones realizadas por el desarrollador de los cálculos aritméticos de Vancomyzer frente a un cálculo de referencia independiente, de su tratamiento de la dosis de carga y de la cobertura de su banda de credibilidad del 90% en pacientes sintéticos.",
     "fr": "Vérifications réalisées par le développeur des calculs arithmétiques de Vancomyzer par rapport à un calcul de référence indépendant, de la prise en compte de la dose de charge et de la couverture de sa bande de crédibilité à 90% chez des patients synthétiques.",
-    "pt-BR": "Verificações de desenvolvimento da aritmética de Vancomyzer contra um cálculo de referência independente, seu manuseio de carga-dose e a cobertura de sua faixa de 90% confiável em pacientes sintéticos."
+    "pt-BR": "Verificações realizadas pelo desenvolvedor da aritmética do Vancomyzer em relação a um cálculo de referência independente, do tratamento das doses de ataque e da cobertura de sua faixa de credibilidade de 90% em pacientes sintéticos."
   },
   "VANCOMYZER™": {
     "es": "VANCOMYZER™",
@@ -1407,7 +1407,7 @@
   "Low SCr in bedbound patients may reflect reduced muscle mass rather than preserved renal function, so the estimate may overstate clearance. Routinely rounding SCr up to a fixed value is not recommended: rounding to 1 mg/dL reduced dose-prediction accuracy in a retrospective study of older adults (Bukhari 2024). Plan early therapeutic drug monitoring to help individualize dosing. Cystatin C or a measured creatinine clearance can inform your clinical assessment but cannot be entered into the Colin 2019 model.": {
     "es": "Una creatinina sérica baja en pacientes encamados puede reflejar una masa muscular reducida en lugar de una función renal conservada, por lo que la estimación puede sobreestimar el aclaramiento. No se recomienda redondear sistemáticamente la creatinina sérica al alza hasta un valor fijo: redondearla a 1 mg/dL redujo la exactitud de la predicción posológica en un estudio retrospectivo de adultos mayores (Bukhari 2024). Planifique una monitorización farmacocinética temprana para individualizar la dosificación. La cistatina C o un aclaramiento de creatinina medido pueden orientar la valoración clínica, pero no se pueden introducir en el modelo de Colin 2019.",
     "fr": "Une créatinine sérique basse chez les patients alités peut refléter une faible masse musculaire plutôt qu’une fonction rénale préservée ; l’estimation peut donc surestimer la clairance. Il n’est pas recommandé d’arrondir systématiquement la créatinine sérique à une valeur fixe supérieure : l’arrondi à 1 mg/dL a réduit l’exactitude de la prédiction posologique dans une étude rétrospective chez des adultes âgés (Bukhari 2024). Prévoyez un suivi thérapeutique pharmacologique précoce pour individualiser la posologie. La cystatine C ou une clairance de la créatinine mesurée peuvent éclairer l’évaluation clinique, mais ne peuvent pas être saisies dans le modèle de Colin 2019.",
-    "pt-BR": "Baixa SCr em pacientes acamados pode refletir redução da massa muscular em vez de função renal preservada, de modo que a estimativa pode superestimar a depuração. Não se recomenda arredondamento rotineiro SCr até um valor fixo: arredondamento até 1 mg/dL redução da precisão dose-predição em um estudo retrospectivo com idosos (Bukhari 2024). Planeje o monitoramento precoce de medicamentos terapêuticos para ajudar a individualizar a dosagem. A cistatina C ou uma depuração de creatinina medida pode informar a sua avaliação clínica, mas não pode ser inserida no modelo Colin 2019."
+    "pt-BR": "A creatinina sérica baixa em pacientes acamados pode refletir redução da massa muscular, em vez de função renal preservada, e a estimativa pode superestimar a depuração. Não se recomenda arredondar rotineiramente a creatinina sérica para um valor fixo: o arredondamento para 1 mg/dL reduziu a precisão da previsão de dose em um estudo retrospectivo com idosos (Bukhari 2024). Planeje a monitorização terapêutica precoce para ajudar a individualizar a dose. A cistatina C ou a depuração de creatinina medida podem auxiliar a avaliação clínica, mas não podem ser inseridas no modelo Colin 2019."
   },
   "Individualize the loading dose": {
     "es": "Individualizar la dosis de carga",
@@ -1417,7 +1417,7 @@
   "Bedbound status or frailty alone does not establish a specific loading dose or a 2,000 mg maximum. Review infection severity, actual body weight, fluid status, renal trajectory, prior doses and your institutional protocol. Select maintenance dosing separately, with early therapeutic drug monitoring when indicated.": {
     "es": "El encamamiento o la fragilidad por sí solos no determinan una dosis de carga específica ni un máximo de 2,000 mg. Revise la gravedad de la infección, el peso corporal real, el estado hídrico, la evolución renal, las dosis previas y el protocolo institucional. Seleccione por separado la pauta de mantenimiento, con monitorización farmacocinética temprana cuando esté indicada.",
     "fr": "L’alitement ou la fragilité seuls ne déterminent ni une dose de charge spécifique ni un maximum de 2,000 mg. Examinez la gravité de l’infection, le poids corporel réel, l’état hydrique, l’évolution rénale, les doses antérieures et le protocole de l’établissement. Choisissez séparément la posologie d’entretien, avec un suivi thérapeutique pharmacologique précoce lorsqu’il est indiqué.",
-    "pt-BR": "O estado de ligação ao leito ou fragilidade isoladamente não estabelece uma dose de ataque específica ou um máximo de 2,000 mg. Reveja a gravidade da infecção, o peso corporal real, o estado dos fluidos, a trajectória renal, as doses anteriores e o seu protocolo institucional. Selecione a dose de manutenção separadamente, com monitorização precoce do fármaco terapêutico quando indicado."
+    "pt-BR": "Estar acamado ou apresentar fragilidade, isoladamente, não determina uma dose de ataque específica nem um limite máximo de 2,000 mg. Avalie a gravidade da infecção, o peso corporal real, o estado volêmico, a evolução da função renal, as doses anteriores e o protocolo institucional. Defina a dose de manutenção separadamente, com monitorização terapêutica precoce quando indicada."
   },
   "What the guideline supports": {
     "es": "Qué respalda la guía",
@@ -1432,7 +1432,7 @@
   "For Bayesian AUC assessment, the guideline prefers two concentrations, typically 1–2 hours after infusion and at the end of the dosing interval. A single early post-load level is not a universally validated sampling strategy for bedbound patients. Follow the selected method and local protocol.": {
     "es": "Para la evaluación bayesiana del AUC, la guía prefiere dos concentraciones, habitualmente 1–2 horas después de la perfusión y al final del intervalo posológico. Una única concentración temprana tras la dosis de carga no constituye una estrategia de muestreo universalmente validada en pacientes encamados. Siga el método seleccionado y el protocolo local.",
     "fr": "Pour l’évaluation bayésienne de l’AUC, les recommandations privilégient deux concentrations, généralement 1–2 heures après la perfusion et à la fin de l’intervalle posologique. Une seule concentration précoce après la dose de charge ne constitue pas une stratégie de prélèvement universellement validée chez les patients alités. Suivez la méthode choisie et le protocole local.",
-    "pt-BR": "Para a avaliação da AUC bayesiana, a diretriz prefere duas concentrações, tipicamente 1-2 horas após a infusão e no final do intervalo de dosagem. Um único nível de pós-carga precoce não é uma estratégia de amostragem universalmente validada para pacientes acamados. Siga o método selecionado e o protocolo local."
+    "pt-BR": "Para avaliar a AUC pelo método bayesiano, a diretriz dá preferência a duas concentrações, geralmente 1–2 horas após a infusão e ao final do intervalo entre doses. Uma única concentração precoce após a dose de ataque não é uma estratégia de coleta universalmente validada para pacientes acamados. Siga o método selecionado e o protocolo local."
   },
   "Read the 2020 ASHP/IDSA/PIDS/SIDP consensus guideline": {
     "es": "Leer la guía de consenso ASHP/IDSA/PIDS/SIDP de 2020",
@@ -1442,7 +1442,7 @@
   "The small 2022 bedridden-patient study evaluated AUC prediction, not loading doses, and used a different model. It does not validate a bedbound dose rule or Vancomyzer.": {
     "es": "El pequeño estudio de 2022 en pacientes encamados evaluó la predicción del AUC, no las dosis de carga, y utilizó un modelo distinto. No valida una regla de dosificación para pacientes encamados ni Vancomyzer.",
     "fr": "La petite étude de 2022 chez des patients alités a évalué la prédiction de l’AUC, et non les doses de charge, avec un modèle différent. Elle ne valide ni une règle posologique pour les patients alités ni Vancomyzer.",
-    "pt-BR": "O pequeno estudo de 2022, acamado, avaliou a predição da AUC, não as doses de ataque, e utilizou um modelo diferente. Não valida uma regra de dose embebida no leito ou Vancomyzer."
+    "pt-BR": "O pequeno estudo de 2022 em pacientes acamados avaliou a previsão de AUC, não as doses de ataque, e utilizou outro modelo. Ele não valida uma regra de dose para pacientes acamados nem o Vancomyzer."
   },
   "Read Sonoda et al., 2022": {
     "es": "Leer Sonoda et al., 2022",
@@ -1537,7 +1537,7 @@
   "Frequent or daily monitoring may be appropriate when renal function or hemodynamics are unstable; bedbound status alone does not set the schedule.": {
     "es": "Una monitorización frecuente o diaria puede ser adecuada si la función renal o la hemodinámica son inestables; el encamamiento por sí solo no determina la frecuencia.",
     "fr": "Un suivi fréquent ou quotidien peut être approprié en cas d’instabilité rénale ou hémodynamique ; l’alitement seul ne détermine pas la fréquence.",
-    "pt-BR": "A monitorização frequente ou diária pode ser adequada quando a função renal ou a hemodinâmica são instáveis; o estado do leito isoladamente não define o esquema."
+    "pt-BR": "A monitorização frequente ou diária pode ser adequada quando a função renal ou a hemodinâmica estiverem instáveis; estar acamado, isoladamente, não determina a frequência."
   },
   "Dosing History pre-filled:": {
     "es": "Historial de dosificación rellenado automáticamente:",
@@ -2392,7 +2392,7 @@
   "This is decision-support output only. Holding maintenance dosing is the calculator's safety recommendation when no acceptable dose-down or interval-extension exists in its search grid; clinical context (infection severity, hemodynamics, institutional protocol) remains the clinician's judgment.": {
     "es": "Este resultado es únicamente de apoyo a la decisión. Suspender la dosificación de mantenimiento es la recomendación de seguridad de la calculadora cuando no existe una reducción de dosis ni una ampliación del intervalo aceptables en su rejilla de búsqueda; el contexto clínico (gravedad de la infección, hemodinámica y protocolo institucional) sigue siendo competencia del juicio clínico.",
     "fr": "Ce résultat constitue uniquement une aide à la décision. La suspension des doses d’entretien est la recommandation de sécurité du calculateur lorsqu’aucune réduction de dose ni prolongation d’intervalle acceptable n’existe dans sa grille de recherche ; le contexte clinique (gravité de l’infection, hémodynamique, protocole de l’établissement) relève toujours du jugement du professionnel.",
-    "pt-BR": "Esta é apenas a saída de apoio à decisão. Manter a dosagem de manutenção é a recomendação de segurança da calculadora quando não existe nenhuma dose aceitável para baixo ou intervalo-extensão em sua grade de busca; contexto clínico (gravidade da infecção, hemodinâmica, protocolo institucional) permanece o julgamento do clínico."
+    "pt-BR": "Este resultado é apenas um apoio à decisão. Suspender a administração das doses de manutenção é a recomendação de segurança da calculadora quando sua grade de busca não contém uma redução de dose ou ampliação de intervalo aceitável. A avaliação do contexto clínico (gravidade da infecção, hemodinâmica e protocolo institucional) permanece a critério do profissional de saúde."
   },
   "Why this result": {
     "es": "Por qué este resultado",
@@ -2707,7 +2707,7 @@
   "model is not validated for patients on renal replacement therapy (CRRT, HD, PD). Use a specialist RRT-specific dosing protocol or consult pharmacy.": {
     "es": "el modelo no está validado en pacientes con tratamiento renal sustitutivo (CRRT, HD, PD). Utilice un protocolo posológico especializado en tratamiento renal sustitutivo o consulte a farmacia.",
     "fr": "le modèle n’est pas validé chez les patients sous épuration extrarénale (CRRT, HD, PD). Utilisez un protocole posologique spécialisé ou consultez la pharmacie.",
-    "pt-BR": "o modelo não é validado para pacientes em terapêutica renal de substituição (CRRT, HD, DP). Utilize um protocolo de dosagem especialista específico para o RRT ou consulte a farmácia."
+    "pt-BR": "o modelo não foi validado para pacientes em terapia renal substitutiva (CRRT, HD, DP). Utilize um protocolo especializado de dosagem para essa modalidade ou consulte a equipe de farmácia."
   },
   "BMI:": {
     "es": "IMC:",
@@ -2937,7 +2937,7 @@
   "Without confirmation, the exact dose count is used. Levels must follow the last dose given. A loading dose as dose 1 is supported; changed, held or missed maintenance doses are not.": {
     "es": "Sin confirmación, se utiliza el número exacto de dosis. Las concentraciones deben corresponder a muestras posteriores a la última dosis administrada. Se admite una dosis de carga como dosis 1; no se admiten dosis de mantenimiento modificadas, suspendidas u omitidas.",
     "fr": "Sans confirmation, le nombre exact de doses est utilisé. Les prélèvements doivent suivre la dernière dose administrée. Une dose de charge en dose 1 est prise en charge ; les doses d’entretien modifiées, suspendues ou omises ne le sont pas.",
-    "pt-BR": "Sem confirmação, é utilizada a contagem de dose exacta. Os níveis devem seguir a última dose administrada. Uma dose de ataque como dose 1 é suportada; as doses de manutenção não são alteradas, mantidas ou esquecidas."
+    "pt-BR": "Sem confirmação, utiliza-se o número exato de doses. As concentrações devem ter sido coletadas após a última dose administrada. Uma dose de ataque como dose 1 é aceita; doses de manutenção alteradas, suspensas ou omitidas não são contempladas."
   },
   "Optional regimen scaffold": {
     "es": "Esquema posológico orientativo opcional",
@@ -3497,7 +3497,7 @@
   "Dōsys™ provides Vancomyzer™, a vancomycin dosing calculator, for review by licensed healthcare professionals. It is not for use in patient care decisions without independent clinical review. The core calculator is free permanently. Paid plans (Individual Pro and Hospital Site) add account features such as calculation history and email support; during the launch period, PDF export, clinical-note copy and result interpretation are free for everyone. The pharmacokinetic model, equations, and clinical safety checks are identical across all plans.\n\nDōsys™ makes no representations or warranties regarding the accuracy, quality, completeness, timeliness, appropriateness, or suitability of this tool. Dōsys™ assumes no obligation to update the tool or advise on further developments concerning vancomycin dosage. Medical information changes rapidly. YOU AS THE USER (“USER”) ACKNOWLEDGE THAT THE TOOL IS PROVIDED ON AN “AS IS” BASIS AND THAT ANY USE OF OR RELIANCE ON THE TOOL SHALL BE AT YOUR SOLE RISK.": {
     "es": "Dōsys™ ofrece Vancomyzer™, una calculadora de dosificación de vancomicina, para su revisión por profesionales sanitarios habilitados. No debe utilizarse para tomar decisiones asistenciales sin una revisión clínica independiente. La calculadora básica es gratuita de forma permanente. Los planes de pago (Individual Pro y Hospital Site) añaden funciones de cuenta, como historial de cálculos y asistencia por correo electrónico; durante el periodo de lanzamiento, la exportación a PDF, la copia de notas clínicas y la interpretación de resultados son gratuitas para todos. El modelo farmacocinético, las ecuaciones y las comprobaciones de seguridad clínica son idénticos en todos los planes.\n\nDōsys™ no formula declaraciones ni ofrece garantías sobre la exactitud, calidad, integridad, actualidad, adecuación o idoneidad de esta herramienta. Dōsys™ no asume obligación alguna de actualizarla ni de informar de novedades sobre la dosificación de vancomicina. La información médica cambia con rapidez. USTED, COMO USUARIO («USUARIO»), RECONOCE QUE LA HERRAMIENTA SE OFRECE «TAL CUAL» Y QUE CUALQUIER USO O CONFIANZA EN ELLA SERÁ BAJO SU EXCLUSIVA RESPONSABILIDAD.",
     "fr": "Dōsys™ fournit Vancomyzer™, un calculateur de posologie de la vancomycine, pour examen par des professionnels de santé habilités. Il ne doit pas être utilisé pour prendre des décisions de soins sans examen clinique indépendant. Le calculateur de base est gratuit de manière permanente. Les forfaits payants (Individual Pro et Hospital Site) ajoutent des fonctionnalités de compte, telles que l’historique des calculs et l’assistance par e-mail ; pendant la période de lancement, l’export PDF, la copie des notes cliniques et l’interprétation des résultats sont gratuits pour tous. Le modèle pharmacocinétique, les équations et les contrôles de sécurité clinique sont identiques pour tous les forfaits.\n\nDōsys™ ne formule aucune déclaration ni garantie concernant l’exactitude, la qualité, l’exhaustivité, l’actualité, le caractère approprié ou l’adéquation de cet outil. Dōsys™ n’est tenue à aucune obligation de mettre à jour l’outil ni de communiquer de nouvelles informations concernant la posologie de la vancomycine. Les informations médicales évoluent rapidement. EN TANT QU’UTILISATEUR («UTILISATEUR»), VOUS RECONNAISSEZ QUE L’OUTIL EST FOURNI «EN L’ÉTAT» ET QUE TOUTE UTILISATION DE L’OUTIL OU TOUTE CONFIANCE ACCORDÉE À CELUI-CI RELÈVE DE VOTRE SEULE RESPONSABILITÉ.",
-    "pt-BR": "Dōsys™ fornece Vancomyzer™, uma calculadora de dosagem de vancomicina, para revisão por profissionais de saúde licenciados. Não é para uso em decisões de cuidados aos pacientes sem revisão clínica independente. A calculadora básica é gratuita permanentemente. Planos pagos (Pro Individual e Site Hospitalar) adicionam recursos de conta, como histórico de cálculo e suporte por e-mail; durante o período de lançamento, exportação de PDF, cópia de notas clínicas e interpretação de resultados são gratuitos para todos. O modelo farmacocinético, as equações e os controlos clínicos de segurança são idênticos em todos os planos.\n\nO Dōsys™ não faz representações ou garantias quanto à precisão, qualidade, completude, atualidade, adequação ou adequação desta ferramenta. O Dōsys™ não assume nenhuma obrigação de atualizar a ferramenta ou aconselhar sobre novos desenvolvimentos em relação à dosagem de vancomicina. A informação médica muda rapidamente. Você, como usuário (“userador”) reconhece que a ferramenta é fornecida em uma base “assim como é” e que qualquer uso ou confiança na toalha estará em seu único risco."
+    "pt-BR": "Dōsys™ disponibiliza o Vancomyzer™, uma calculadora de doses de vancomicina, para revisão por profissionais de saúde legalmente habilitados. Não deve ser utilizado em decisões de assistência ao paciente sem revisão clínica independente. A calculadora básica é permanentemente gratuita. Os planos pagos (Individual Pro e Hospital Site) acrescentam recursos de conta, como histórico de cálculos e suporte por e-mail; durante o período de lançamento, a exportação em PDF, a cópia de notas clínicas e a interpretação dos resultados são gratuitas para todos. O modelo farmacocinético, as equações e as verificações de segurança clínica são idênticos em todos os planos.\n\nDōsys™ não faz declarações nem oferece garantias quanto à precisão, qualidade, completude, atualidade, adequação ou aplicabilidade desta ferramenta. Dōsys™ não assume a obrigação de atualizar a ferramenta ou informar novos avanços relativos à dosagem de vancomicina. As informações médicas mudam rapidamente. VOCÊ, NA QUALIDADE DE USUÁRIO (\"USUÁRIO\"), RECONHECE QUE A FERRAMENTA É FORNECIDA \"NO ESTADO EM QUE SE ENCONTRA\" E QUE QUALQUER USO OU CONFIANÇA NA FERRAMENTA SERÁ POR SUA CONTA E RISCO."
   },
   "NOT MEDICAL ADVICE": {
     "es": "NO CONSTITUYE ASESORAMIENTO MÉDICO",
@@ -3507,7 +3507,7 @@
   "Vancomyzer™ is intended to support, not replace, clinical judgment. Every recommendation produced by the tool must be independently evaluated by a qualified clinician against the patient’s clinical status, institutional protocols, product labeling, and current therapeutic drug monitoring before any change to therapy is initiated. Healthcare professionals who use this tool retain full responsibility for the clinical decisions they make. This tool is not designed for, and should not be used by, patients, caregivers, or other non-clinical users — they should consult their physician or pharmacist for medication guidance.": {
     "es": "Vancomyzer™ está destinado a apoyar el juicio clínico, no a sustituirlo. Antes de modificar el tratamiento, cada recomendación de la herramienta debe ser evaluada de forma independiente por un profesional cualificado, teniendo en cuenta el estado clínico del paciente, los protocolos institucionales, la información del producto y la monitorización farmacocinética actual. Los profesionales sanitarios que utilizan esta herramienta conservan toda la responsabilidad sobre sus decisiones clínicas. Esta herramienta no está diseñada para pacientes, cuidadores u otros usuarios no clínicos, ni deben utilizarla; deben consultar a su médico o farmacéutico para recibir orientación sobre medicamentos.",
     "fr": "Vancomyzer™ est destiné à étayer le jugement clinique, et non à le remplacer. Avant toute modification du traitement, chaque recommandation doit être évaluée indépendamment par un professionnel qualifié au regard de l’état clinique du patient, des protocoles de l’établissement, des informations du produit et du suivi thérapeutique pharmacologique actuel. Les professionnels de santé utilisant cet outil conservent l’entière responsabilité de leurs décisions cliniques. Cet outil n’est pas conçu pour les patients, les aidants ou d’autres utilisateurs non cliniciens et ne doit pas être utilisé par eux ; ils doivent consulter leur médecin ou leur pharmacien pour des conseils sur les médicaments.",
-    "pt-BR": "Vancomyzer™ destina-se a apoiar, não substituir, o julgamento clínico. Cada recomendação produzida pela ferramenta deve ser avaliada de forma independente por um clínico qualificado contra o estado clínico do paciente, protocolos institucionais, rotulagem do produto e monitoramento atual de medicamentos terapêuticos antes do início de qualquer mudança terapêutica. Os profissionais de saúde que utilizam essa ferramenta mantêm total responsabilidade pelas decisões clínicas que tomam. Este instrumento não foi concebido para, e não deve ser utilizado por, pacientes, cuidadores ou outros usuários não clínicos — deve consultar o seu médico ou farmacêutico para orientação de medicamentos."
+    "pt-BR": "Vancomyzer™ destina-se a apoiar, sem substituir, o julgamento clínico. Antes de qualquer alteração no tratamento, cada recomendação produzida pela ferramenta deve ser avaliada de forma independente por um profissional qualificado, à luz do estado clínico do paciente, dos protocolos institucionais, da bula do produto e da monitorização terapêutica atual. Os profissionais de saúde que utilizam esta ferramenta mantêm integral responsabilidade por suas decisões clínicas. A ferramenta não foi desenvolvida para pacientes, cuidadores ou outros usuários sem formação clínica e não deve ser utilizada por eles; para orientações sobre medicamentos, devem consultar seu médico ou farmacêutico."
   },
   "REGULATORY STATUS": {
     "es": "SITUACIÓN NORMATIVA",
@@ -3547,7 +3547,7 @@
   "IN NO EVENT SHALL DŌSYS™, ITS DIRECTORS, EMPLOYEES, OR AGENTS BE LIABLE TO ANY USER OR THIRD PARTY FOR ANY DAMAGES ARISING OUT OF THE USE OF THIS TOOL INCLUDING WITHOUT LIMITATION CONSEQUENTIAL, INCIDENTAL, INDIRECT, SPECIAL, OR PUNITIVE DAMAGES.": {
     "es": "EN NINGÚN CASO DŌSYS™, SUS DIRECTIVOS, EMPLEADOS O AGENTES SERÁN RESPONSABLES ANTE NINGÚN USUARIO O TERCERO POR DAÑOS DERIVADOS DEL USO DE ESTA HERRAMIENTA, INCLUIDOS, SIN LIMITACIÓN, DAÑOS CONSECUENCIALES, INCIDENTALES, INDIRECTOS, ESPECIALES O PUNITIVOS.",
     "fr": "EN AUCUN CAS DŌSYS™, SES DIRIGEANTS, EMPLOYÉS OU MANDATAIRES NE SERONT RESPONSABLES ENVERS UN UTILISATEUR OU UN TIERS DE DOMMAGES DÉCOULANT DE L’UTILISATION DE CET OUTIL, Y COMPRIS, SANS LIMITATION, LES DOMMAGES CONSÉCUTIFS, ACCESSOIRES, INDIRECTS, SPÉCIAUX OU PUNITIFS.",
-    "pt-BR": "Em caso algum, os seus directores, empregados ou agentes podem beneficiar de qualquer parte do usuário ou de terceiros, para quaisquer danos resultantes da utilização desta ferramenta, incluindo sem limitação de dimensões conseqüentes, imprevistas, directas, especiais ou punitivas."
+    "pt-BR": "EM NENHUMA HIPÓTESE DŌSYS™, SEUS DIRETORES, FUNCIONÁRIOS OU REPRESENTANTES SERÃO RESPONSÁVEIS PERANTE QUALQUER USUÁRIO OU TERCEIRO POR DANOS DECORRENTES DO USO DESTA FERRAMENTA, INCLUINDO, SEM LIMITAÇÃO, DANOS CONSEQUENCIAIS, INCIDENTAIS, INDIRETOS, ESPECIAIS OU PUNITIVOS."
   },
   "INDEMNIFICATION": {
     "es": "INDEMNIZACIÓN",
@@ -3942,7 +3942,7 @@
   "Unstable renal function, poor chronology, or sparse/mistimed levels increase uncertainty and should not be overinterpreted.": {
     "es": "La función renal inestable, una cronología deficiente o concentraciones escasas o mal temporizadas aumentan la incertidumbre y no deben sobreinterpretarse.",
     "fr": "Une fonction rénale instable, une chronologie insuffisante ou des concentrations peu nombreuses ou mal datées augmentent l’incertitude et ne doivent pas être surinterprétées.",
-    "pt-BR": "Função renal instável, cronologia ruim, ou níveis esparsos/acidentes aumentam a incerteza e não devem ser superinterpretados."
+    "pt-BR": "Função renal instável, cronologia imprecisa ou poucas concentrações, ou concentrações coletadas em horários inadequados, aumentam a incerteza e exigem cautela na interpretação."
   },
   "Adults receiving intermittent IV vancomycin only; not for pediatric, dialysis-specific, or continuous-infusion use.": {
     "es": "Solo adultos que reciben vancomicina IV intermitente; no apto para uso pediátrico, dosificación específica de diálisis ni perfusión continua.",
@@ -3952,7 +3952,7 @@
   "Uses an explicit adult population prior with bounded initial level-based refinement when applicable; this is not presented as a validated commercial Bayesian platform.": {
     "es": "Utiliza una distribución previa poblacional adulta explícita con un ajuste inicial limitado basado en concentraciones cuando procede; no se presenta como una plataforma bayesiana comercial validada.",
     "fr": "Utilise une distribution a priori explicite de population adulte avec un ajustement initial borné aux concentrations lorsque cela s’applique ; il n’est pas présenté comme une plateforme bayésienne commerciale validée.",
-    "pt-BR": "Utiliza uma população adulta explícita antes com refinamento de nível inicial limitado, quando aplicável; esta não é apresentada como uma plataforma Bayesiana comercial validada."
+    "pt-BR": "Utiliza um modelo populacional a priori explícito para adultos, com refinamento inicial limitado com base nas concentrações, quando aplicável; não é apresentado como uma plataforma bayesiana comercial validada."
   },
   "Review the assumptions, limitations, and clinical context before applying any dose change.": {
     "es": "Revise los supuestos, las limitaciones y el contexto clínico antes de aplicar cualquier cambio de dosis.",
@@ -3962,7 +3962,7 @@
   "This result is a maintenance-regimen suggestion from prior information only. Any loading-dose note is generic empiric support, not a patient-specific severity decision.": {
     "es": "Este resultado es una sugerencia de pauta de mantenimiento basada únicamente en información previa. Cualquier nota de dosis de carga es un apoyo empírico genérico, no una decisión basada en la gravedad específica del paciente.",
     "fr": "Ce résultat est une suggestion de schéma d’entretien fondée uniquement sur les informations a priori. Toute note sur la dose de charge constitue une aide empirique générale, et non une décision fondée sur la gravité propre au patient.",
-    "pt-BR": "Este resultado é uma sugestão de manutenção-esquema apenas de informações prévias. Qualquer nota de carga-dose é suporte empírico genérico, não uma decisão de gravidade específica do paciente."
+    "pt-BR": "Este resultado é uma sugestão de esquema de manutenção baseada apenas nas informações a priori. Qualquer observação sobre dose de ataque constitui apoio empírico genérico, não uma decisão sobre a gravidade específica do paciente."
   },
   "Measured levels included": {
     "es": "Incluye concentraciones medidas",
@@ -4097,7 +4097,7 @@
   "Consult Infectious Diseases and/or nephrology. Continuous infusion is outside this calculator’s scope — it is not modeled or dosed here, so manage it per local protocol rather than from these numbers": {
     "es": "Consulte a Enfermedades Infecciosas o Nefrología. La perfusión continua queda fuera del ámbito de esta calculadora: aquí no se modeliza ni se calcula su dosis; manéjela según el protocolo local, no a partir de estas cifras",
     "fr": "Consultez l’infectiologie ou la néphrologie. La perfusion continue est hors du champ de ce calculateur : elle n’y est ni modélisée ni calculée ; gérez-la selon le protocole local plutôt qu’à partir de ces chiffres",
-    "pt-BR": "Consulte Doenças Infecciosas e/ou Nefrologia. A infusão contínua está fora do escopo desta calculadora — ela não é modelada ou dotada aqui, então gerencie-a por protocolo local em vez de a partir destes números"
+    "pt-BR": "Consulte a infectologia e/ou a nefrologia. A infusão contínua está fora do escopo desta calculadora: ela não é modelada e suas doses não são calculadas aqui. Siga o protocolo local, sem utilizar estes números para esse fim"
   },
   "Threshold and definition: Udy 2013 (Crit Care 17:R35); Barletta 2017 (J Trauma Acute Care Surg 82:665–71); Cucci 2023 (Pharmacotherapy 43:1131–8). The 2020 ASHP/IDSA/SIDP vancomycin guideline does not define an adult ARC threshold.": {
     "es": "Umbral y definición: Udy 2013 (Crit Care 17:R35); Barletta 2017 (J Trauma Acute Care Surg 82:665–71); Cucci 2023 (Pharmacotherapy 43:1131–8). La guía de vancomicina ASHP/IDSA/SIDP de 2020 no define un umbral de aumento del aclaramiento renal en adultos.",
@@ -4237,7 +4237,7 @@
   "When you choose a language, this site stores that preference in a first-party cookie named site-language for up to one year. It contains only the language choice, not patient data, and is not used for tracking.": {
     "es": "Al elegir un idioma, este sitio guarda la preferencia en una cookie propia denominada site-language durante un máximo de un año. Solo contiene el idioma elegido, no datos de pacientes, y no se utiliza para seguimiento.",
     "fr": "Lorsque vous choisissez une langue, ce site enregistre cette préférence dans un cookie propriétaire nommé site-language pendant un an au maximum. Il contient uniquement le choix de langue, aucune donnée de patient, et n’est pas utilisé pour le suivi.",
-    "pt-BR": "Quando você escolhe um idioma, este site armazena essa preferência em um cookie de primeira parte chamado site-linguagem por até um ano. Ele contém apenas a escolha da linguagem, não dados do paciente, e não é usado para rastreamento."
+    "pt-BR": "Ao escolher um idioma, este site armazena sua preferência por até um ano em um cookie próprio chamado site-language. Ele contém apenas a escolha do idioma, não dados de pacientes, e não é usado para rastreamento."
   },
   "Early access sign-up for Dōsys Parenteral Nutrition": {
     "es": "Registro de acceso anticipado a Dōsys Nutrición Parenteral",
@@ -5162,7 +5162,7 @@
   "Clinical pharmacists, antimicrobial stewardship teams, hospital clinicians reviewing dosing options, and learners exploring vancomycin dosing interpretation. It is not for patients or caregivers.": {
     "es": "Farmacéuticos clínicos, equipos de optimización del uso de antimicrobianos, profesionales hospitalarios que revisan opciones posológicas y estudiantes que exploran la interpretación de la posología de vancomicina. No está destinado a pacientes ni cuidadores.",
     "fr": "Pharmaciens cliniciens, équipes de bon usage des antimicrobiens, cliniciens hospitaliers examinant les options posologiques et étudiants explorant l’interprétation de la posologie de la vancomycine. Cet outil n’est pas destiné aux patients ni aux aidants.",
-    "pt-BR": "Farmacêuticos clínicos, equipes de administração de antimicrobianos, clínicos hospitalares revendo opções de dosagem e aprendizes explorando a interpretação da dosagem de vancomicina. Não é para pacientes ou cuidadores."
+    "pt-BR": "Farmacêuticos clínicos, equipes de gerenciamento do uso de antimicrobianos, profissionais hospitalares que revisam opções de dose e estudantes que exploram a interpretação da dosagem de vancomicina. Não se destina a pacientes ou cuidadores."
   },
   "Vancomyzer is a product of": {
     "es": "Vancomyzer es un producto de",
@@ -5192,7 +5192,7 @@
   "The published population model and developer-run checks are not independent clinical validation of Vancomyzer. Independent evaluation with patient data is pending; the": {
     "es": "El modelo poblacional publicado y las comprobaciones realizadas por el desarrollador no constituyen una validación clínica independiente de Vancomyzer. La evaluación independiente con datos de pacientes está pendiente; el",
     "fr": "Le modèle de population publié et les vérifications effectuées par le développeur ne constituent pas une validation clinique indépendante de Vancomyzer. Une évaluation indépendante sur des données de patients reste à réaliser ; l’",
-    "pt-BR": "O modelo populacional publicado e os controles de execução não são validação clínica independente de Vancomyzer. A avaliação independente com os dados do paciente está pendente; o"
+    "pt-BR": "O modelo populacional publicado e as verificações realizadas pelo desenvolvedor não constituem validação clínica independente do Vancomyzer. A avaliação independente com dados de pacientes está pendente; o"
   },
   "evidence status": {
     "es": "estado de la evidencia",
@@ -5387,7 +5387,7 @@
   "THIS TOOL IS PROVIDED “AS IS” AND “AS AVAILABLE” WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF ACCURACY, FITNESS FOR A PARTICULAR PURPOSE, COMPLETENESS, OR TIMELINESS. THE DEVELOPERS MAKE NO REPRESENTATION THAT THE TOOL OR ITS OUTPUTS ARE FREE FROM ERROR. ANY USE OF OR RELIANCE ON THIS TOOL SHALL BE AT YOUR SOLE RISK.": {
     "es": "ESTA HERRAMIENTA SE PROPORCIONA «TAL CUAL» Y «SEGÚN DISPONIBILIDAD», SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUIDAS, ENTRE OTRAS, GARANTÍAS DE EXACTITUD, IDONEIDAD PARA UN FIN DETERMINADO, INTEGRIDAD O ACTUALIDAD. LOS DESARROLLADORES NO DECLARAN QUE LA HERRAMIENTA O SUS RESULTADOS ESTÉN LIBRES DE ERRORES. CUALQUIER USO DE ESTA HERRAMIENTA O CONFIANZA DEPOSITADA EN ELLA SERÁ POR SU CUENTA Y RIESGO.",
     "fr": "CET OUTIL EST FOURNI « EN L’ÉTAT » ET « SELON DISPONIBILITÉ », SANS GARANTIE D’AUCUNE SORTE, EXPRESSE OU IMPLICITE, NOTAMMENT SANS GARANTIE D’EXACTITUDE, D’ADÉQUATION À UN USAGE PARTICULIER, D’EXHAUSTIVITÉ OU D’ACTUALITÉ. LES DÉVELOPPEURS NE DÉCLARENT PAS QUE L’OUTIL OU SES RÉSULTATS SONT EXEMPTS D’ERREUR. TOUTE UTILISATION DE CET OUTIL OU CONFIANCE ACCORDÉE À CELUI-CI RELÈVE DE VOTRE SEUL RISQUE.",
-    "pt-BR": "Esta ferramenta é fornecida “como é” e “como disponível” sem garantia de qualquer tipo, expressão ou aplicação, incluindo, mas não limitada a garantias de precisão, adequação para um objetivo particular, completude, ou linhas de tempo. Os Developers não fazem nenhuma declaração de que a toalha ou os seus outputs estão livres de erros. Qualquer uso ou confiança nesta ferramenta estará em seu único risco."
+    "pt-BR": "ESTA FERRAMENTA É FORNECIDA \"NO ESTADO EM QUE SE ENCONTRA\" E \"CONFORME DISPONÍVEL\", SEM GARANTIA DE QUALQUER NATUREZA, EXPRESSA OU IMPLÍCITA, INCLUINDO, SEM LIMITAÇÃO, GARANTIAS DE PRECISÃO, ADEQUAÇÃO A UMA FINALIDADE ESPECÍFICA, COMPLETUDE OU ATUALIDADE. OS DESENVOLVEDORES NÃO DECLARAM QUE A FERRAMENTA OU SEUS RESULTADOS ESTÃO LIVRES DE ERROS. QUALQUER USO OU CONFIANÇA NESTA FERRAMENTA SERÁ POR SUA CONTA E RISCO."
   },
   "The developers have no obligation to update the tool, correct errors, or advise users of changes. Information may become outdated as clinical guidelines evolve.": {
     "es": "Los desarrolladores no están obligados a actualizar la herramienta, corregir errores ni informar a los usuarios de cambios. La información puede quedar obsoleta a medida que evolucionan las guías clínicas.",
@@ -5637,12 +5637,12 @@
   "Individual Pro is $49.99 per year, billed annually after a 14-day trial when you explicitly choose that subscription. It renews yearly until canceled. Verified discounts and their duration are shown at checkout. Free accounts and free pilots are never automatically converted to paid billing.": {
     "es": "Individual Pro cuesta $49.99 al año, facturados anualmente tras una prueba de 14 días cuando elige expresamente esa suscripción. Se renueva cada año hasta que se cancele. Los descuentos verificados y su duración se muestran al finalizar la compra. Las cuentas y los pilotos gratuitos nunca se convierten automáticamente en facturación de pago.",
     "fr": "Individual Pro coûte $49.99 par an, facturés annuellement après un essai de 14 jours lorsque vous choisissez explicitement cet abonnement. Il est renouvelé chaque année jusqu’à résiliation. Les réductions vérifiées et leur durée sont indiquées lors du paiement. Les comptes et pilotes gratuits ne sont jamais automatiquement convertis en abonnements payants.",
-    "pt-BR": "Individual Pro é $49.99 por ano, faturado anualmente após um julgamento de 14 dias, quando você explicitamente escolher essa assinatura. Renova anualmente até ser cancelado. Os descontos verificados e sua duração são mostrados no checkout. Contas gratuitas e pilotos livres nunca são automaticamente convertidos para faturamento pago."
+    "pt-BR": "O Individual Pro custa US$ 49.99 por ano, com cobrança anual após um período de avaliação de 14 dias, quando você escolhe explicitamente essa assinatura. A renovação é anual até o cancelamento. Os descontos verificados e sua duração são apresentados na finalização da compra. Contas gratuitas e projetos-piloto gratuitos nunca são convertidos automaticamente em cobranças pagas."
   },
   "Cancel online through Settings, then Billing, then Manage billing / cancel. Administrators of existing institutional subscriptions use Team, then Manage billing. Cancel before the trial ends to avoid a charge, or before the next renewal to stop that charge. Cancellation stops future renewal; access continues through the remaining paid period unless otherwise stated in your agreement.": {
     "es": "Cancele en línea mediante Ajustes, después Facturación y después Gestionar facturación / cancelar. Los administradores de suscripciones institucionales existentes deben ir a Equipo y después Gestionar facturación. Cancele antes de que finalice la prueba para evitar un cargo o antes de la siguiente renovación para evitar ese cargo. La cancelación impide futuras renovaciones; el acceso continúa durante el periodo pagado restante, salvo que su acuerdo indique lo contrario.",
     "fr": "Résiliez en ligne dans Paramètres, puis Facturation, puis Gérer la facturation / résilier. Les administrateurs d’abonnements institutionnels existants utilisent Équipe, puis Gérer la facturation. Résiliez avant la fin de l’essai pour éviter un prélèvement, ou avant le prochain renouvellement pour éviter ce prélèvement. La résiliation met fin aux renouvellements futurs ; l’accès se poursuit jusqu’à la fin de la période payée, sauf disposition contraire de votre accord.",
-    "pt-BR": "Cancelar on-line através de Configurações, em seguida, Billing, em seguida, Gerenciar faturamento / cancelar. Administradores de assinaturas institucionais existentes usam a Equipe, em seguida, Gerenciar faturamento. Cancele antes que o julgamento termine para evitar uma acusação, ou antes da próxima renovação para parar essa acusação. O cancelamento impede a renovação futura; o acesso continua durante o período de pagamento restante, salvo indicação em contrário no seu acordo."
+    "pt-BR": "Cancelar on-line através de Configurações, em seguida, Cobrança, em seguida, Gerenciar faturamento / cancelar. Administradores de assinaturas institucionais existentes usam a Equipe, em seguida, Gerenciar faturamento. Cancele antes que o período de avaliação termine para evitar uma cobrança, ou antes da próxima renovação para parar essa cobrança. O cancelamento impede a renovação futura; o acesso continua durante o período de pagamento restante, salvo indicação em contrário no seu acordo."
   },
   "A confirmation email records your subscription and cancellation details. Renewal reminders include management links. We will provide required advance notice of accepted fee changes, including 7–30 days before a change takes effect where California law applies. The new public prices do not automatically change existing subscription agreements.": {
     "es": "Un correo electrónico de confirmación recoge los detalles de su suscripción y cancelación. Los recordatorios de renovación incluyen enlaces de gestión. Proporcionaremos el preaviso exigido de los cambios de tarifas aceptados, incluidos 7–30 días antes de su entrada en vigor cuando sea aplicable la legislación de California. Los nuevos precios públicos no modifican automáticamente los acuerdos de suscripción existentes.",
@@ -5652,7 +5652,7 @@
   "Hospital Site licenses cost $990/year for up to 100 beds or $2,500/year for 101–400 beds, with unlimited individual users at one named site and no implementation fee. Annual or two-year agreements require site review and account setup before billing. Team administration, audit logs, multi-site arrangements and any BAA require separate written scope review; they are not automatically included in a site license. No plan currently includes EHR integration.": {
     "es": "Las licencias Hospital Site cuestan $990/año para hasta 100 camas o $2,500/año para 101–400 camas, con usuarios individuales ilimitados en un único centro identificado y sin cuota de implantación. Los acuerdos anuales o de dos años requieren revisión del centro y configuración de la cuenta antes de facturar. La administración de equipos, los registros de auditoría, los acuerdos multicentro y cualquier BAA requieren una revisión escrita del alcance por separado; no se incluyen automáticamente en una licencia de centro. Ningún plan incluye actualmente integración con la historia clínica electrónica.",
     "fr": "Les licences Hospital Site coûtent $990/an pour un maximum de 100 lits ou $2,500/an pour 101–400 lits, avec un nombre illimité d’utilisateurs individuels sur un seul site désigné et sans frais de mise en œuvre. Les accords annuels ou de deux ans nécessitent un examen du site et la configuration du compte avant facturation. L’administration des équipes, les journaux d’audit, les accords multisites et tout BAA nécessitent un examen écrit distinct du périmètre ; ils ne sont pas automatiquement inclus dans une licence de site. Aucun forfait ne comprend actuellement d’intégration au dossier patient informatisé.",
-    "pt-BR": "As licenças do Site Hospitalar custam $990/ano para até 100 leitos ou $2,500/ano para 101-400 leitos, com usuários individuais ilimitados em um site nomeado e sem taxa de implementação. Acordos anuais ou de dois anos exigem revisão do site e configuração da conta antes de faturamento. Administração de equipe, registros de auditoria, arranjos multi-site e qualquer BAA exigem revisão de escopo por escrito separada; eles não são automaticamente incluídos em uma licença do site. Actualmente, nenhum plano inclui a integração da RHE."
+    "pt-BR": "As licenças Hospital Site custam US$ 990/ano para até 100 leitos ou US$ 2,500/ano para 101–400 leitos, com usuários individuais ilimitados em uma unidade identificada e sem taxa de implantação. Contratos anuais ou de dois anos exigem análise da unidade e configuração da conta antes da cobrança. Administração de equipes, registros de auditoria, acordos para múltiplas unidades e qualquer BAA exigem análise separada do escopo por escrito; não estão incluídos automaticamente na licença institucional. Nenhum plano inclui atualmente integração com prontuário eletrônico (EHR)."
   },
   "Acceptance of Terms": {
     "es": "Aceptación de las condiciones",
@@ -5732,7 +5732,7 @@
   "TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE DEVELOPERS OF VANCOMYZER SHALL NOT BE LIABLE FOR ANY DAMAGES OF ANY KIND ARISING FROM USE OF THIS TOOL. SEE THE FULL MEDICAL DISCLAIMER FOR COMPLETE LIABILITY LANGUAGE.": {
     "es": "EN LA MÁXIMA MEDIDA PERMITIDA POR LA LEY, LOS DESARROLLADORES DE VANCOMYZER NO SERÁN RESPONSABLES DE DAÑOS DE NINGÚN TIPO DERIVADOS DEL USO DE ESTA HERRAMIENTA. CONSULTE EL AVISO MÉDICO COMPLETO PARA CONOCER TODAS LAS DISPOSICIONES SOBRE RESPONSABILIDAD.",
     "fr": "DANS TOUTE LA MESURE PERMISE PAR LA LOI, LES DÉVELOPPEURS DE VANCOMYZER NE SAURAIENT ÊTRE TENUS RESPONSABLES DE DOMMAGES DE QUELQUE NATURE QUE CE SOIT RÉSULTANT DE L’UTILISATION DE CET OUTIL. CONSULTEZ L’AVERTISSEMENT MÉDICAL COMPLET POUR L’ENSEMBLE DES DISPOSITIONS RELATIVES À LA RESPONSABILITÉ.",
-    "pt-BR": "Para a extensão máxima permitida por lei, os servidores de vancomyzer não são lícitos em caso algum que resulte da utilização desta ferramenta. Ver o Disclaimer MÉDICO TOTAL PARA A LÍNGUA DE RESPONSABILIDADE COMPLETA."
+    "pt-BR": "NA MÁXIMA EXTENSÃO PERMITIDA POR LEI, OS DESENVOLVEDORES DO VANCOMYZER NÃO SERÃO RESPONSÁVEIS POR DANOS DE QUALQUER NATUREZA DECORRENTES DO USO DESTA FERRAMENTA. CONSULTE O AVISO MÉDICO COMPLETO PARA A ÍNTEGRA DAS DISPOSIÇÕES SOBRE RESPONSABILIDADE."
   },
   "Modifications": {
     "es": "Modificaciones",
@@ -5887,7 +5887,7 @@
   "Covariates in the published final model that Vancomyzer does not apply:\n• Hematological malignancy (+29.4% CL in the published model): not captured as an input.\n• Heel-prick sampling (neonatal): not applicable to adult venous sampling.": {
     "es": "Covariables del modelo final publicado que Vancomyzer no aplica:\n• Neoplasia hematológica (+29.4% de CL en el modelo publicado): no se recoge como dato de entrada.\n• Muestra por punción del talón (neonatal): no aplicable a muestras venosas de adultos.",
     "fr": "Covariables du modèle final publié que Vancomyzer n’applique pas :\n• Hémopathie maligne (+29.4% de CL dans le modèle publié) : non recueillie comme donnée d’entrée.\n• Prélèvement au talon (néonatal) : non applicable aux prélèvements veineux chez l’adulte.",
-    "pt-BR": "Covariáveis no modelo final publicado que Vancomyzer não se aplica:\n• Malignidade hematológica (+29.4% CL no modelo publicado): não capturada como entrada.\n• Amostragem do calcanhar-prick (neonatal): não aplicável à amostragem venosa de adultos."
+    "pt-BR": "Covariáveis do modelo final publicado que o Vancomyzer não aplica:\n• Neoplasia hematológica (+29.4% na CL no modelo publicado): não é coletada como dado de entrada.\n• Coleta por punção do calcanhar (neonatal): não se aplica à coleta venosa em adultos."
   },
   "Full equations, parameter values and a typical-adult reference check are on the Equations & derivations page.": {
     "es": "Las ecuaciones completas, los valores de los parámetros y una comprobación de referencia para un adulto típico están en la página Ecuaciones y derivaciones.",
@@ -5977,12 +5977,12 @@
   "Evidence to date is developer-run: reproduction of published literature cases, synthetic simulation, a synthetic cross-check against Tucuxi, an independent reference calculation of the equations (including loading-dose schedules), and a synthetic check of the uncertainty band's coverage. These checks test whether the equations are implemented as intended; they do not show how accurately Vancomyzer predicts levels in real patients.": {
     "es": "La evidencia disponible procede de comprobaciones realizadas por el desarrollador: reproducción de casos publicados, simulación sintética, comparación sintética con Tucuxi, un cálculo de referencia independiente de las ecuaciones (incluidas pautas con dosis de carga) y una comprobación sintética de la cobertura de la banda de incertidumbre. Estas comprobaciones evalúan si las ecuaciones se implementan según lo previsto; no muestran con qué exactitud Vancomyzer predice concentraciones en pacientes reales.",
     "fr": "Les données disponibles proviennent de vérifications réalisées par le développeur : reproduction de cas publiés, simulation synthétique, comparaison synthétique avec Tucuxi, calcul de référence indépendant des équations (y compris les schémas avec dose de charge) et vérification synthétique de la couverture de la bande d’incertitude. Ces vérifications évaluent si les équations sont implémentées comme prévu ; elles ne montrent pas avec quelle exactitude Vancomyzer prédit les concentrations chez des patients réels.",
-    "pt-BR": "Evidências até o momento é desenvolvedor-run: reprodução de casos de literatura publicada, simulação sintética, um cruzamento sintético contra Tucuxi, um cálculo de referência independente das equações (incluindo horários de carregamento-dose), e uma verificação sintética da cobertura da banda de incerteza. Essas verificações testam se as equações são implementadas como pretendido; elas não mostram com que precisão Vancomyzer prediz níveis em pacientes reais."
+    "pt-BR": "As evidências disponíveis até o momento provêm de verificações realizadas pelo desenvolvedor: reprodução de casos da literatura publicada, simulação sintética, comparação sintética com o Tucuxi, cálculo de referência independente das equações (incluindo esquemas com dose de ataque) e verificação sintética da cobertura da faixa de incerteza. Essas verificações avaliam se as equações foram implementadas conforme previsto; não demonstram a precisão com que o Vancomyzer prevê concentrações em pacientes reais."
   },
   "The shaded area on the concentration–time graph is a 90% credible band. It shows the middle 90% of concentrations from 400 simulated sets of pharmacokinetic values, using the population estimates before blood levels are entered and updated estimates afterward. It reflects uncertainty in those model estimates but excludes measurement error, so it is not a range for predicting a future blood test result. The calculator explains when it cannot estimate a band reliably. The band’s reliability in patients has not yet been established.": {
     "es": "El área sombreada del gráfico concentración-tiempo es una banda de credibilidad del 90%. Muestra el 90% central de las concentraciones procedentes de 400 conjuntos simulados de valores farmacocinéticos, utilizando estimaciones poblacionales antes de introducir concentraciones sanguíneas y estimaciones actualizadas después. Refleja la incertidumbre de esas estimaciones del modelo, pero excluye el error de medición, por lo que no es un intervalo para predecir el resultado de un futuro análisis de sangre. La calculadora explica cuándo no puede estimar una banda de forma fiable. La fiabilidad de la banda en pacientes aún no se ha establecido.",
     "fr": "La zone ombrée du graphique concentration-temps est une bande de crédibilité à 90%. Elle montre les 90% centraux des concentrations provenant de 400 ensembles simulés de valeurs pharmacocinétiques, à partir des estimations de population avant la saisie des concentrations sanguines, puis des estimations actualisées. Elle reflète l’incertitude de ces estimations du modèle, mais exclut l’erreur de mesure ; ce n’est donc pas un intervalle de prédiction du résultat d’un futur prélèvement sanguin. Le calculateur explique lorsqu’il ne peut pas estimer une bande de manière fiable. La fiabilité de cette bande chez les patients n’a pas encore été établie.",
-    "pt-BR": "A área sombreada no gráfico de concentração-tempo é uma faixa de 90% confiável. Mostra os 90% médios das concentrações de 400 conjuntos simulados de valores farmacocinéticos, utilizando as estimativas populacionais antes de os níveis sanguíneos serem introduzidos e atualizados estimativas posteriores. Reflete incerteza nessas estimativas do modelo, mas exclui erro de medição, por isso não é um intervalo para prever um resultado de exame de sangue futuro. A calculadora explica quando ela não pode estimar uma banda de forma confiável. A confiabilidade da banda em pacientes ainda não foi estabelecida."
+    "pt-BR": "A área sombreada no gráfico de concentração–tempo é uma faixa de credibilidade de 90%. Ela apresenta os 90% centrais das concentrações de 400 conjuntos simulados de valores farmacocinéticos, usando estimativas populacionais antes da inserção das concentrações sanguíneas e estimativas atualizadas depois disso. Reflete a incerteza nessas estimativas do modelo, mas exclui o erro de medição; portanto, não é um intervalo para prever o resultado de um futuro exame de sangue. A calculadora explica quando não consegue estimar a faixa de forma confiável. A confiabilidade da faixa em pacientes ainda não foi estabelecida."
   },
   "Literature reproducibility cases": {
     "es": "Casos de reproducibilidad de la literatura",
@@ -6012,7 +6012,7 @@
   "Not for the dosing calculation. Serum creatinine is used directly (mg/dL) as the Colin 2019 renal covariate: FSCR = exp(−0.649 × (SCr − SCRstd)), where SCRstd is the age-standardized reference creatinine. Cockcroft-Gault does not enter this population prior; after a fit to measured levels, the calculator caps fitted clearance at twice the estimated CrCl.": {
     "es": "No para el cálculo posológico. La creatinina sérica se utiliza directamente (mg/dL) como covariable renal de Colin 2019: FSCR = exp(−0.649 × (SCr − SCRstd)), donde SCRstd es la creatinina de referencia estandarizada por edad. Cockcroft-Gault no interviene en esta distribución a priori poblacional; tras ajustar a concentraciones medidas, la calculadora limita el aclaramiento ajustado al doble del CrCl estimado.",
     "fr": "Pas pour le calcul posologique. La créatinine sérique est utilisée directement (mg/dL) comme covariable rénale de Colin 2019 : FSCR = exp(−0.649 × (SCr − SCRstd)), où SCRstd est la créatinine de référence standardisée selon l’âge. Cockcroft-Gault n’intervient pas dans cette distribution a priori de population ; après ajustement aux concentrations mesurées, le calculateur plafonne la clairance ajustée à deux fois la CrCl estimée.",
-    "pt-BR": "Não para o cálculo da dose. A creatinina sérica é utilizada diretamente (mg/dL) como covariável renal de Colin 2019: FSCR = exp(−0.649 × (SCr − SCRstd)), onde o SCRstd é a creatinina de referência padronizada por idade. Cockcroft-Gault não entra nesta população antes; após um ajuste aos níveis medidos, as tampas da calculadora ajustadas depuração em duas vezes o CrCl estimado."
+    "pt-BR": "Não para o cálculo da dose. A creatinina sérica é usada diretamente (mg/dL) como covariável renal de Colin 2019: FSCR = exp(−0.649 × (SCr − SCRstd)), em que SCRstd é a creatinina de referência padronizada por idade. Cockcroft-Gault não entra nessa distribuição populacional a priori; após o ajuste às concentrações medidas, a calculadora limita a depuração ajustada ao dobro da CrCl estimada."
   },
   "Cockcroft-Gault estimates appear only in advisories: one can flag possible augmented renal clearance, and at BMI ≥ 40 kg/m² fat-free mass and alternative creatinine-clearance estimates are shown for information only. None of these changes the clearance estimate.": {
     "es": "Las estimaciones de Cockcroft-Gault aparecen solo en los avisos: una puede señalar posible aclaramiento renal aumentado y, con IMC ≥ 40 kg/m², la masa libre de grasa y las estimaciones alternativas del aclaramiento de creatinina se muestran solo como información. Ninguna modifica la estimación del aclaramiento.",
@@ -6027,7 +6027,7 @@
   "Fat-free mass is the part of body weight that is not adipose tissue: muscle, bone, organs and water. The Janmahasatian 2005 equations estimate it from weight, height and sex:": {
     "es": "La masa libre de grasa es la parte del peso corporal que no es tejido adiposo: músculo, hueso, órganos y agua. Las ecuaciones de Janmahasatian 2005 la estiman a partir del peso, la talla y el sexo:",
     "fr": "La masse maigre est la part du poids corporel qui n’est pas du tissu adipeux : muscles, os, organes et eau. Les équations de Janmahasatian 2005 l’estiment à partir du poids, de la taille et du sexe :",
-    "pt-BR": "Massa livre de gordura é a parte do peso corporal que não é tecido adiposo: músculo, osso, órgãos e água. As equações de Janmahasaciano 2005 estimam-no a partir de peso, altura e sexo:"
+    "pt-BR": "A massa livre de gordura é a parte do peso corporal que não é tecido adiposo: músculos, ossos, órgãos e água. As equações de Janmahasatian 2005 a estimam a partir do peso, da altura e do sexo:"
   },
   "Vancomyzer does not use FFM in its calculation. Colin 2019 scales clearance and volumes with total body weight at every BMI. At BMI ≥ 40 kg/m², FFM is shown for information only.": {
     "es": "Vancomyzer no utiliza la FFM en su cálculo. Colin 2019 escala el aclaramiento y los volúmenes con el peso corporal total para todos los IMC. Con IMC ≥ 40 kg/m², la FFM se muestra solo como información.",
@@ -6997,7 +6997,7 @@
   "With MAP estimation, a single observation is weighed against the prior rather than replacing it. The prior widths above are Vancomyzer settings, not the published": {
     "es": "En la estimación MAP, una observación se pondera frente a la distribución a priori, en lugar de sustituirla. Las amplitudes a priori anteriores son ajustes de Vancomyzer, no la variabilidad publicada de",
     "fr": "Avec l’estimation MAP, une observation est pondérée par rapport à la distribution a priori plutôt que de la remplacer. Les largeurs a priori ci-dessus sont des réglages de Vancomyzer, et non la variabilité publiée de",
-    "pt-BR": "Com a estimativa do MAP, uma única observação é ponderada em relação ao anterior, em vez de substituí-lo. As larguras anteriores acima são as configurações de Vancomyzer, não as publicadas"
+    "pt-BR": "Na estimativa MAP, uma única observação é ponderada em relação à distribuição a priori, em vez de substituí-la. As amplitudes da distribuição a priori acima são configurações do Vancomyzer, não os valores publicados de"
   },
   "variability shown in section 1. When the residual exceeds 25% relative error, the calculator displays a Fit Quality Advisory and recommends a confirmatory level rather than overriding the prior.": {
     "es": "que se muestra en la sección 1. Cuando el residuo supera un error relativo del 25%, la calculadora muestra un aviso de calidad del ajuste y recomienda una concentración de confirmación en lugar de anular la distribución a priori.",
@@ -7012,7 +7012,7 @@
   "The band shows uncertainty in the estimated concentrations. With blood levels available, the calculator considers 4,000 possible sets of pharmacokinetic values and selects 400 according to how well they agree with both the levels and the starting assumptions. Before levels are available, it uses 400 sets from the population assumptions. The middle 90% of the simulated concentrations forms the band at each time. The same inputs give the same band. Measurement error is excluded, so the band does not predict the range of a future blood test result. No band is shown when the estimate is unreliable or when the displayed parameters differ from the fitted values. The mathematical method is given below.": {
     "es": "La banda muestra la incertidumbre de las concentraciones estimadas. Cuando hay concentraciones sanguíneas disponibles, la calculadora considera 4,000 conjuntos posibles de valores farmacocinéticos y selecciona 400 según su concordancia tanto con las concentraciones como con los supuestos iniciales. Antes de disponer de concentraciones, utiliza 400 conjuntos de los supuestos poblacionales. El 90% central de las concentraciones simuladas forma la banda en cada instante. Los mismos datos generan la misma banda. Se excluye el error de medición, por lo que la banda no predice el intervalo del resultado de un futuro análisis de sangre. No se muestra una banda cuando la estimación no es fiable o los parámetros mostrados difieren de los valores ajustados. El método matemático figura a continuación.",
     "fr": "La bande montre l’incertitude des concentrations estimées. Lorsque des concentrations sanguines sont disponibles, le calculateur considère 4,000 ensembles possibles de valeurs pharmacocinétiques et en sélectionne 400 selon leur accord avec les concentrations et les hypothèses initiales. Avant que des concentrations soient disponibles, il utilise 400 ensembles issus des hypothèses de population. Les 90% centraux des concentrations simulées forment la bande à chaque instant. Les mêmes données donnent la même bande. L’erreur de mesure est exclue ; la bande ne prédit donc pas l’intervalle du résultat d’un futur prélèvement sanguin. Aucune bande n’est affichée lorsque l’estimation est peu fiable ou lorsque les paramètres affichés diffèrent des valeurs ajustées. La méthode mathématique figure ci-dessous.",
-    "pt-BR": "A banda mostra incerteza nas concentrações estimadas. Com os níveis sanguíneos disponíveis, a calculadora considera 4,000 possíveis conjuntos de valores farmacocinéticos e seleciona 400 de acordo com o quão bem eles concordam com os níveis e os pressupostos iniciais. Antes que os níveis estejam disponíveis, utiliza 400 conjuntos a partir dos pressupostos populacionais. A média de 90% das concentrações simuladas forma a banda em cada momento. As mesmas entradas dão a mesma banda. Excluem-se os erros de medição, de modo que a banda não prevê o intervalo de um resultado de exame de sangue futuro. Nenhuma banda é mostrada quando a estimativa não é confiável ou quando os parâmetros exibidos diferem dos valores ajustados. O método matemático é dado abaixo."
+    "pt-BR": "A faixa mostra a incerteza nas concentrações estimadas. Quando há concentrações sanguíneas disponíveis, a calculadora considera 4,000 conjuntos possíveis de valores farmacocinéticos e seleciona 400 conforme sua concordância com as concentrações e os pressupostos iniciais. Antes de haver concentrações disponíveis, utiliza 400 conjuntos provenientes dos pressupostos populacionais. Os 90% centrais das concentrações simuladas formam a faixa em cada momento. As mesmas entradas produzem a mesma faixa. O erro de medição é excluído; portanto, a faixa não prevê o intervalo do resultado de um futuro exame de sangue. Nenhuma faixa é exibida quando a estimativa não é confiável ou quando os parâmetros exibidos diferem dos valores ajustados. O método matemático é apresentado abaixo."
   },
   "How often the band contains the true concentration in synthetic patients is reported on the": {
     "es": "La frecuencia con la que la banda contiene la concentración verdadera en pacientes sintéticos se comunica en la página de",
@@ -7042,7 +7042,7 @@
   "(assuming MIC = 1 mg/L) follows the 2020 revised consensus guideline for serious MRSA infections. The guideline no longer recommends trough-only monitoring and recommends AUC-guided dosing, preferably with Bayesian estimation, citing data associating AUC-guided dosing with less acute kidney injury than trough-guided dosing. The calculator’s recommendation search picks the dose × interval combination whose predicted steady-state AUC sits closest to the midpoint of this range.": {
     "es": "(suponiendo CMI = 1 mg/L) sigue la guía de consenso revisada de 2020 para infecciones graves por SARM. La guía ya no recomienda monitorización basada solo en concentraciones valle y recomienda posología guiada por AUC, preferiblemente mediante estimación bayesiana, citando datos que asocian la posología guiada por AUC con menos lesión renal aguda que la guiada por concentraciones valle. La búsqueda de recomendaciones de la calculadora selecciona la combinación dosis × intervalo cuyo AUC predicho en estado estacionario se aproxima más al punto medio de este intervalo.",
     "fr": "(en supposant une CMI = 1 mg/L) suit les recommandations de consensus révisées de 2020 pour les infections graves à SARM. Elles ne recommandent plus le suivi fondé uniquement sur les concentrations résiduelles et préconisent la posologie guidée par l’AUC, de préférence par estimation bayésienne, en citant des données associant cette approche à moins d’atteintes rénales aiguës que la posologie guidée par les concentrations résiduelles. La recherche de recommandations du calculateur choisit la combinaison dose × intervalle dont l’AUC prédite à l’état d’équilibre est la plus proche du milieu de cet intervalle.",
-    "pt-BR": "(assumindo CIM = 1 mg/L) segue a diretiva de consenso revista de 2020 para infecções graves por MRSA. A diretriz não recomenda mais a monitorização apenas através da administração de doses guiadas por AUC, de preferência com a estimativa bayesiana, citando dados que associam a administração de doses guiadas por AUC com menos lesão renal aguda do que a administração de doses guiadas por vale. A pesquisa de recomendação da calculadora escolhe a combinação dose × intervalo cuja AUC predita no estado de equilíbrio está mais próxima do ponto médio deste intervalo."
+    "pt-BR": "(considerando CIM = 1 mg/L) segue a diretriz de consenso revisada de 2020 para infecções graves por MRSA. A diretriz não recomenda mais a monitorização baseada apenas na concentração de vale e recomenda a dosagem orientada pela AUC, preferencialmente com estimativa bayesiana, citando dados que associam essa abordagem a menos lesão renal aguda do que a dosagem orientada pelo vale. A busca de recomendações da calculadora seleciona a combinação dose × intervalo cuja AUC prevista no estado de equilíbrio mais se aproxima do ponto médio desse intervalo."
   },
   "Foundational texts": {
     "es": "Textos fundamentales",
@@ -7202,7 +7202,7 @@
   "mg/dL); height uses developer-chosen values. No dialysis, CRRT or ECMO. Augmented renal clearance is not excluded: Cockcroft–Gault CrCl is capped at": {
     "es": "mg/dL); la talla utiliza valores elegidos por el desarrollador. Sin diálisis, CRRT ni ECMO. No se excluye el aclaramiento renal aumentado: el CrCl de Cockcroft–Gault se limita a",
     "fr": "mg/dL) ; la taille utilise des valeurs choisies par le développeur. Pas de dialyse, de CRRT ni d’ECMO. L’hyperclairance rénale n’est pas exclue : la CrCl de Cockcroft–Gault est plafonnée à",
-    "pt-BR": "mg/dL); altura utiliza valores escolhidos pelo desenvolvedor. Sem diálise, TJCR ou ECMO. A depuração renal aumentada não está excluída: Cockcroft–Gault CrCl está"
+    "pt-BR": "mg/dL); a altura utiliza valores escolhidos pelo desenvolvedor. Sem diálise, CRRT ou ECMO. A depuração renal aumentada não é excluída: a CrCl de Cockcroft–Gault é limitada a"
   },
   "patients are above 130 mL/min and": {
     "es": "pacientes superan 130 mL/min y",
@@ -7527,7 +7527,7 @@
   "This patient matches the population model exactly, so entering the loading dose recovers the true value. In patients who differ from the model, one level still leaves the estimate pulled toward the population model; the automated tests check that entering the loading dose gives the same accuracy as for the same patient without one, and that leaving it out adds a consistent overestimate. A loading dose equal to the maintenance dose reproduces the equal-dose result exactly. Held, missed or changed maintenance doses are still refused rather than guessed.": {
     "es": "Este paciente coincide exactamente con el modelo poblacional, por lo que introducir la dosis de carga recupera el valor verdadero. En pacientes que difieren del modelo, una sola concentración sigue dejando la estimación atraída hacia el modelo poblacional; las pruebas automatizadas comprueban que introducir la dosis de carga da la misma exactitud que para el mismo paciente sin ella y que omitirla añade una sobreestimación sistemática. Una dosis de carga igual a la de mantenimiento reproduce exactamente el resultado de dosis iguales. Las dosis de mantenimiento retenidas, omitidas o modificadas siguen rechazándose en lugar de inferirse.",
     "fr": "Ce patient correspond exactement au modèle de population ; saisir la dose de charge permet donc de retrouver la valeur vraie. Chez les patients qui diffèrent du modèle, une seule concentration laisse encore l’estimation attirée vers le modèle de population. Les tests automatisés vérifient que saisir la dose de charge donne la même exactitude que pour le même patient sans dose de charge, et que l’omettre ajoute une surestimation systématique. Une dose de charge égale à la dose d’entretien reproduit exactement le résultat à doses égales. Les doses d’entretien suspendues, omises ou modifiées sont toujours refusées plutôt que supposées.",
-    "pt-BR": "Este paciente corresponde exatamente ao modelo populacional, assim que entrar na dose de ataque recupera o verdadeiro valor. Em pacientes que diferem do modelo, um nível ainda deixa a estimativa puxada para o modelo populacional; os testes automatizados verificam que a entrada na dose de ataque dá a mesma precisão que para o mesmo paciente sem um, e que deixá-lo para fora adiciona uma superestimação consistente. Uma dose de ataque igual à dose de manutenção reproduz exactamente o resultado da dose igual. As doses de manutenção mantidas, perdidas ou alteradas ainda são recusadas em vez de adivinhadas."
+    "pt-BR": "Este paciente corresponde exatamente ao modelo populacional; portanto, inserir a dose de ataque recupera o valor verdadeiro. Em pacientes que diferem do modelo, uma única concentração ainda mantém a estimativa próxima ao modelo populacional. Os testes automatizados verificam se inserir a dose de ataque proporciona a mesma precisão que para o mesmo paciente sem essa dose e se omiti-la acrescenta uma superestimação consistente. Uma dose de ataque igual à dose de manutenção reproduz exatamente o resultado de doses iguais. Doses de manutenção suspensas, omitidas ou alteradas continuam sendo recusadas, sem tentativa de estimá-las."
   },
   "Developer-run · synthetic · not yet validated in patients": {
     "es": "Realizado por el desarrollador · sintético · aún no validado en pacientes",
@@ -7647,7 +7647,7 @@
   "The shaded band shows the middle 90% of concentrations from 400 simulated sets of pharmacokinetic values. It reflects uncertainty in the model estimates, updated with blood levels when available. It excludes measurement error, so it is not a range for predicting a future blood test result. Its reliability in patients has not been established.": {
     "es": "La banda sombreada muestra el 90% central de las concentraciones de 400 conjuntos simulados de valores farmacocinéticos. Refleja la incertidumbre de las estimaciones del modelo, actualizadas con concentraciones sanguíneas cuando están disponibles. Excluye el error de medición, por lo que no es un intervalo para predecir el resultado de un futuro análisis de sangre. No se ha establecido su fiabilidad en pacientes.",
     "fr": "La bande ombrée montre les 90% centraux des concentrations issues de 400 ensembles simulés de valeurs pharmacocinétiques. Elle reflète l’incertitude des estimations du modèle, actualisées avec les concentrations sanguines lorsqu’elles sont disponibles. Elle exclut l’erreur de mesure ; ce n’est donc pas un intervalle de prédiction du résultat d’un futur prélèvement sanguin. Sa fiabilité chez les patients n’a pas été établie.",
-    "pt-BR": "A banda sombreada mostra os 90% médios das concentrações de 400 conjuntos simulados de valores farmacocinéticos. Reflete incerteza nas estimativas do modelo, atualizadas com os níveis sanguíneos quando disponíveis. Exclui erro de medição, por isso não é um intervalo para prever um resultado de exame de sangue futuro. A sua fiabilidade nos pacientes não foi estabelecida."
+    "pt-BR": "A faixa sombreada apresenta os 90% centrais das concentrações de 400 conjuntos simulados de valores farmacocinéticos. Reflete a incerteza nas estimativas do modelo, atualizadas com concentrações sanguíneas quando disponíveis. Exclui o erro de medição; portanto, não é um intervalo para prever o resultado de um futuro exame de sangue. Sua confiabilidade em pacientes não foi estabelecida."
   },
   "Published starting model": {
     "es": "Modelo inicial publicado",
@@ -7742,7 +7742,7 @@
   "Concentration, AUC and dose-history calculations compared with a separate mathematical calculation, including 40 random loading-dose schedules; agreement within one part in a million.": {
     "es": "Cálculos de concentraciones, AUC e historial de dosis comparados con un cálculo matemático independiente, incluidas 40 pautas aleatorias con dosis de carga; concordancia dentro de una parte por millón.",
     "fr": "Calculs de concentrations, d’AUC et d’historique des doses comparés à un calcul mathématique distinct, dont 40 schémas aléatoires avec dose de charge ; accord à une partie par million près.",
-    "pt-BR": "Concentração, AUC e cálculos de dose-história em comparação com um cálculo matemático separado, incluindo 40 esquemas de carga-dose aleatórios; concordância dentro de uma parte em um milhão."
+    "pt-BR": "Concentração, AUC e cálculos de dose-história em comparação com um cálculo matemático separado, incluindo 40 esquemas de dose de ataque aleatórios; concordância dentro de uma parte em um milhão."
   },
   "Levels drawn after a loading dose are fitted to the doses actually given, removing the overestimate that comes from recording the load as a maintenance dose.": {
     "es": "Las concentraciones obtenidas tras una dosis de carga se ajustan a las dosis realmente administradas, eliminando la sobreestimación que se produce al registrar la carga como una dosis de mantenimiento.",
@@ -7777,7 +7777,7 @@
   "Intended to support review, not replace clinician judgment.": {
     "es": "Su finalidad es apoyar la revisión, no sustituir el criterio clínico.",
     "fr": "Destiné à faciliter l’examen, sans remplacer le jugement clinique.",
-    "pt-BR": "Pretendia apoiar a revisão, não substituir o julgamento clínico."
+    "pt-BR": "Destinado a apoiar a revisão, sem substituir o julgamento clínico."
   },
   "Recommendation kept conservative because posterior evidence is weak/high-uncertainty.": {
     "es": "La recomendación se mantiene conservadora porque la evidencia posterior es débil o presenta alta incertidumbre.",
@@ -7907,7 +7907,7 @@
   "Age, weight, height, serum creatinine and renal replacement status. Estimated creatinine clearance is shown for context; the dose is calculated from serum creatinine as the": {
     "es": "Edad, peso, talla, creatinina sérica y situación de tratamiento renal sustitutivo. El aclaramiento estimado de creatinina se muestra como contexto; la dosis se calcula a partir de la creatinina sérica como",
     "fr": "Âge, poids, taille, créatininémie et situation d’épuration extrarénale. La clairance estimée de la créatinine est affichée à titre de contexte ; la dose est calculée à partir de la créatininémie comme",
-    "pt-BR": "Idade, peso, altura, creatinina sérica e estado de substituição renal. A depuração estimada da creatinina mostra- se no contexto; a dose é calculada a partir da creatinina sérica como a"
+    "pt-BR": "Idade, peso, altura, creatinina sérica e situação quanto à terapia renal substitutiva. A depuração estimada de creatinina é apresentada como contexto; a dose é calculada usando a creatinina sérica como entrada do modelo"
   },
   "model input.": {
     "es": "entrada del modelo.",
@@ -8147,7 +8147,7 @@
   "THIS TOOL IS PROVIDED \"AS IS\" AND \"AS AVAILABLE\" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT SHALL THE DEVELOPERS BE LIABLE FOR ANY DAMAGES ARISING OUT OF THE USE OF THIS TOOL.": {
     "es": "ESTA HERRAMIENTA SE PROPORCIONA «TAL CUAL» Y «SEGÚN DISPONIBILIDAD», SIN GARANTÍAS DE NINGÚN TIPO, EXPRESAS NI IMPLÍCITAS. EN NINGÚN CASO LOS DESARROLLADORES SERÁN RESPONSABLES DE DAÑOS DERIVADOS DEL USO DE ESTA HERRAMIENTA.",
     "fr": "CET OUTIL EST FOURNI « EN L’ÉTAT » ET « SELON DISPONIBILITÉ », SANS GARANTIE D’AUCUNE SORTE, EXPRESSE OU IMPLICITE. LES DÉVELOPPEURS NE POURRONT EN AUCUN CAS ÊTRE TENUS RESPONSABLES DES DOMMAGES RÉSULTANT DE L’UTILISATION DE CET OUTIL.",
-    "pt-BR": "Esta ferramenta é fornecida \"assim como é\" e \"como disponível\" sem qualquer tipo de garantia, expressão ou implícuo. Em caso algum, os servidores serão lícitos por qualquer dano causado pela utilização desta ferramenta."
+    "pt-BR": "ESTA FERRAMENTA É FORNECIDA \"NO ESTADO EM QUE SE ENCONTRA\" E \"CONFORME DISPONÍVEL\", SEM GARANTIA DE QUALQUER NATUREZA, EXPRESSA OU IMPLÍCITA. EM NENHUMA HIPÓTESE OS DESENVOLVEDORES SERÃO RESPONSÁVEIS POR DANOS DECORRENTES DO USO DESTA FERRAMENTA."
   },
   "— END OF DISCLAIMER —": {
     "es": "— FIN DEL AVISO —",
@@ -8412,7 +8412,7 @@
   "Levels drawn during infusion or too close to infusion completion are not interpreted by this simple steady-state model and should be recollected later in the interval.": {
     "es": "Las concentraciones obtenidas durante la perfusión o demasiado cerca de su finalización no se interpretan con este modelo sencillo de estado estacionario y deben repetirse más tarde dentro del intervalo.",
     "fr": "Les concentrations prélevées pendant la perfusion ou trop près de sa fin ne sont pas interprétées par ce modèle simple à l’état d’équilibre ; un nouveau prélèvement doit être effectué plus tard dans l’intervalle.",
-    "pt-BR": "Os níveis obtidos durante a infusão ou demasiado próximos da conclusão da infusão não são interpretados por este modelo simples de estado de equilíbrio e devem ser recordados mais tarde no intervalo."
+    "pt-BR": "Concentrações coletadas durante a infusão ou muito próximas do término da infusão não são interpretadas por este modelo simples de estado de equilíbrio. Deve-se realizar uma nova coleta mais adiante no intervalo entre doses."
   },
   "Near-continuous infusion regimens are outside this intermittent steady-state model; infusion duration should remain materially shorter than the dosing interval.": {
     "es": "Las pautas de perfusión casi continua quedan fuera de este modelo intermitente en estado estacionario; la duración de la perfusión debe ser claramente menor que el intervalo posológico.",
@@ -8437,7 +8437,7 @@
   "No measured levels; re-evaluate after levels are available. Intended to support review, not replace clinician judgment.": {
     "es": "No hay concentraciones medidas; reevaluar cuando estén disponibles. Su finalidad es apoyar la revisión, no sustituir el criterio clínico.",
     "fr": "Aucune concentration mesurée ; réévaluer lorsque des concentrations seront disponibles. Destiné à faciliter l’examen, sans remplacer le jugement clinique.",
-    "pt-BR": "Não existem níveis medidos; reavaliar após os níveis disponíveis. Pretendia apoiar a revisão, não substituir o julgamento clínico."
+    "pt-BR": "Sem concentrações medidas; reavalie quando estiverem disponíveis. Destinado a apoiar a revisão, sem substituir o julgamento clínico."
   },
   "Patient inputs are outside the adult intermittent-infusion scope of this calculator.": {
     "es": "Los datos del paciente quedan fuera del ámbito de esta calculadora para perfusión intermitente en adultos.",
@@ -8487,7 +8487,7 @@
   "Empiric loading-dose note, when shown, is a capped actual-body-weight estimate for clinician consideration and does not encode severity, indication, or critical-illness context.": {
     "es": "La nota sobre dosis de carga empírica, cuando se muestra, es una estimación limitada basada en el peso corporal real para consideración del clínico; no incorpora gravedad, indicación ni contexto de enfermedad crítica.",
     "fr": "La note sur la dose de charge empirique, lorsqu’elle est affichée, est une estimation plafonnée fondée sur le poids réel, à l’appréciation du clinicien ; elle n’intègre ni gravité, ni indication, ni contexte de maladie critique.",
-    "pt-BR": "A nota de carga-dose empírica, quando apresentada, é uma estimativa de peso corporal real para consideração clínica e não codifica o contexto de gravidade, indicação ou doença crítica."
+    "pt-BR": "A observação sobre dose de ataque empírica, quando exibida, é uma estimativa baseada no peso corporal real, com limite máximo, para avaliação pelo profissional de saúde. Ela não incorpora gravidade, indicação nem contexto de doença crítica."
   },
   "No measured vancomycin levels; no posterior or Bayesian update.": {
     "es": "No hay concentraciones medidas de vancomicina; sin actualización a posteriori ni bayesiana.",
@@ -8507,12 +8507,12 @@
   "The best available intermittent regimen does not achieve the target AUC24 of 400–600 mg·h/L. Clinical review and alternative dosing strategies (e.g., continuous infusion) may be required.": {
     "es": "La mejor pauta intermitente disponible no alcanza el objetivo de AUC24 de 400–600 mg·h/L. Puede ser necesaria una revisión clínica y otras estrategias posológicas (p. ej., perfusión continua).",
     "fr": "Le meilleur schéma intermittent disponible n’atteint pas la cible d’AUC24 de 400–600 mg·h/L. Un examen clinique et d’autres stratégies posologiques (p. ex., perfusion continue) peuvent être nécessaires.",
-    "pt-BR": "O melhor esquema intermitente disponível não atinge a AUC24-alvo de 400-600 mg·h/L. Podem ser necessárias análises clínicas e estratégias de dosagem alternativas (por exemplo, infusão contínua)."
+    "pt-BR": "O melhor esquema intermitente disponível não atinge a AUC24-alvo de 400–600 mg·h/L. Podem ser necessárias revisão clínica e estratégias alternativas de dosagem (por exemplo, infusão contínua)."
   },
   "Any loading-dose note is optional generic empiric support only and should not replace clinician judgment about infection severity, critical illness, low body weight, or institutional protocol.": {
     "es": "Cualquier nota sobre dosis de carga es solo una ayuda empírica genérica opcional y no debe sustituir el criterio clínico sobre la gravedad de la infección, la enfermedad crítica, el bajo peso corporal o el protocolo institucional.",
     "fr": "Toute note sur la dose de charge constitue uniquement une aide empirique générique facultative et ne doit pas remplacer le jugement clinique concernant la gravité de l’infection, la maladie critique, le faible poids corporel ou le protocole de l’établissement.",
-    "pt-BR": "Qualquer nota de carga-dose é opcional suporte empírico genérico apenas e não deve substituir o julgamento clínico sobre gravidade da infecção, doença crítica, baixo peso corporal ou protocolo institucional."
+    "pt-BR": "Qualquer observação sobre dose de ataque é apenas um apoio empírico genérico e opcional e não deve substituir o julgamento clínico sobre gravidade da infecção, doença crítica, baixo peso corporal ou protocolo institucional."
   },
   "Adult concentration limits (for example, dilution ≤5 mg/mL) were not enforced because infusion volume is not entered in this workflow.": {
     "es": "No se aplicaron los límites de concentración para adultos (por ejemplo, dilución ≤5 mg/mL) porque el volumen de perfusión no se introduce en este flujo de trabajo.",
@@ -8537,7 +8537,7 @@
   "Limitations: no measured levels; reassess when levels are available. Do not overinterpret prior-only outputs as patient-specific precision.": {
     "es": "Limitaciones: no hay concentraciones medidas; reevaluar cuando estén disponibles. No atribuir a los resultados basados solo en la distribución a priori una precisión específica del paciente.",
     "fr": "Limites : aucune concentration mesurée ; réévaluer lorsque des concentrations seront disponibles. Ne pas attribuer aux résultats fondés uniquement sur la distribution a priori une précision propre au patient.",
-    "pt-BR": "Limitações: sem níveis medidos; reavaliar quando os níveis estiverem disponíveis. Não interprete excessivamente as saídas anteriores apenas como precisão específica do paciente."
+    "pt-BR": "Limitações: sem concentrações medidas; reavalie quando estiverem disponíveis. Não atribua precisão específica para o paciente a resultados baseados apenas nas informações a priori."
   },
   "No posterior refinement from measured levels was applied.": {
     "es": "No se aplicó refinamiento a posteriori a partir de concentraciones medidas.",
@@ -8547,7 +8547,7 @@
   "Loading-dose language is optional generic empiric support, not patient-specific severity logic.": {
     "es": "La formulación sobre dosis de carga es una ayuda empírica genérica opcional, no una lógica de gravedad específica del paciente.",
     "fr": "Le texte relatif à la dose de charge est une aide empirique générique facultative, et non une logique de gravité propre au patient.",
-    "pt-BR": "A linguagem de carga-dose é suporte empírico genérico opcional, e não lógica de gravidade específica do paciente."
+    "pt-BR": "A linguagem de dose de ataque é suporte empírico genérico opcional, e não lógica de gravidade específica do paciente."
   },
   "AUC24 is BELOW the target range of 400–600 mg·h/L — clinical review required.": {
     "es": "El AUC24 está POR DEBAJO del intervalo objetivo de 400–600 mg·h/L: se requiere revisión clínica.",
@@ -9202,7 +9202,7 @@
   "Starting-regimen comparisons from the current calculator:": {
     "es": "Comparaciones de pautas iniciales de la calculadora actual:",
     "fr": "Comparaisons de schémas initiaux issues du calculateur actuel :",
-    "pt-BR": "Comparações de início-esquema com a calculadora atual:"
+    "pt-BR": "Comparações de esquemas iniciais com a calculadora atual:"
   },
   "Infused over": {
     "es": "En perfusión durante",
@@ -9322,7 +9322,7 @@
   "Start 14-Day Trial": {
     "es": "Iniciar prueba de 14 días",
     "fr": "Commencer l’essai de 14 jours",
-    "pt-BR": "Iniciar julgamento de 14 dias"
+    "pt-BR": "Iniciar avaliação de 14 dias"
   },
   "card required at signup · cancel anytime": {
     "es": "se requiere tarjeta al registrarse · cancele cuando quiera",
@@ -9537,7 +9537,7 @@
   "The calculator always receives two levels, one after the infusion and one before the next dose. Trough-only sampling and levels drawn before steady state were not simulated.": {
     "es": "La calculadora siempre recibe dos concentraciones, una después de la perfusión y otra antes de la siguiente dosis. No se simularon muestreos solo de valle ni concentraciones obtenidas antes del estado estacionario.",
     "fr": "Le calculateur reçoit toujours deux concentrations, l’une après la perfusion et l’autre avant la dose suivante. Ni les prélèvements résiduels seuls ni les concentrations avant l’état d’équilibre n’ont été simulés.",
-    "pt-BR": "A calculadora recebe sempre dois níveis, um após a infusão e outro antes da dose seguinte. Não foi simulada a amostragem e os níveis obtidos antes do estado de equilíbrio."
+    "pt-BR": "A calculadora sempre recebe duas concentrações, uma após a infusão e outra antes da dose seguinte. Não foram simuladas coletas baseadas apenas no vale nem concentrações coletadas antes do estado de equilíbrio."
   },
   "Truth model is partly developer-defined": {
     "es": "El modelo generador de referencia está definido en parte por los desarrolladores",
@@ -9882,7 +9882,7 @@
   "Suggested regimens aim for an AUC₂₄ of 400–600 mg·h/L, the target range recommended for serious MRSA infections (assuming an MIC of 1 mg/L) by the 2020 ASHP/IDSA/PIDS/SIDP vancomycin consensus guideline.": {
     "es": "Las pautas sugeridas buscan un AUC₂₄ de 400–600 mg·h/L, el intervalo objetivo recomendado para infecciones graves por SARM (suponiendo una CMI de 1 mg/L) por la guía de consenso sobre vancomicina de 2020 de ASHP/IDSA/PIDS/SIDP.",
     "fr": "Les schémas proposés visent une AUC₂₄ de 400–600 mg·h/L, l’intervalle cible recommandé pour les infections sévères à SARM (en supposant une CMI de 1 mg/L) par les recommandations consensuelles sur la vancomycine de 2020 de l’ASHP/IDSA/PIDS/SIDP.",
-    "pt-BR": "Os esquemas sugeridos visam uma AUC₂₄ de 400-600 mg·h/L, o intervalo alvo recomendado para infecções graves por MRSA (supondo um CIM de 1 mg/L) pela diretriz de consenso ASHP/IDSA/PIDS/SIDP vancomicina 2020."
+    "pt-BR": "Os esquemas sugeridos visam uma AUC₂₄ de 400-600 mg·h/L, o intervalo alvo recomendado para infecções graves por MRSA (considerando uma CIM de 1 mg/L) pela diretriz de consenso ASHP/IDSA/PIDS/SIDP vancomicina 2020."
   },
   "Empiric dosing from patient characteristics": {
     "es": "Dosificación empírica a partir de las características del paciente",
@@ -9892,7 +9892,7 @@
   "Before any levels are available, get a suggested starting regimen, including loading-dose guidance, based on age, weight, serum creatinine and other patient characteristics.": {
     "es": "Antes de disponer de concentraciones, obtenga una pauta inicial sugerida, incluida orientación sobre dosis de carga, basada en la edad, el peso, la creatinina sérica y otras características del paciente.",
     "fr": "Avant de disposer de concentrations, obtenez une proposition de schéma initial, comprenant des indications sur la dose de charge, fondée sur l’âge, le poids, la créatininémie et d’autres caractéristiques du patient.",
-    "pt-BR": "Antes de quaisquer níveis estarem disponíveis, obtenha um esquema de início sugerido, incluindo orientação de dose de ataque, com base na idade, peso, creatinina sérica e outras características do paciente."
+    "pt-BR": "Antes de dispor de concentrações medidas, obtenha uma sugestão de esquema inicial, incluindo orientações sobre dose de ataque, com base na idade, no peso, na creatinina sérica e em outras características do paciente."
   },
   "Refinement with one or two levels": {
     "es": "Refinamiento con una o dos concentraciones",
@@ -9907,7 +9907,7 @@
   "Colin 2019 pooled population model": {
     "es": "Modelo poblacional combinado de Colin 2019",
     "fr": "Modèle populationnel groupé de Colin 2019",
-    "pt-BR": "Colin 2019 modelo de população agrupada"
+    "pt-BR": "Modelo populacional de Colin 2019 baseado em dados agrupados"
   },
   "A published, peer-reviewed analysis that pools 14 vancomycin studies. Vancomyzer shows the model, assumptions and evidence behind each estimate.": {
     "es": "Un análisis publicado y revisado por pares que combina 14 estudios de vancomicina. Vancomyzer muestra el modelo, los supuestos y la evidencia que sustentan cada estimación.",
@@ -9917,17 +9917,17 @@
   "One model for all adults, with a high-BMI advisory": {
     "es": "Un modelo para todos los adultos, con aviso de IMC alto",
     "fr": "Un modèle pour tous les adultes, avec un avertissement en cas d’IMC élevé",
-    "pt-BR": "Um modelo para todos os adultos, com um aconselhamento de alta BMI"
+    "pt-BR": "Um modelo para todos os adultos, com aviso para IMC elevado"
   },
   "Colin 2019 is used for every adult, at every body size. At a BMI of 40 kg/m² or higher, an advisory notes that published evaluation at that size is limited, and fat-free mass and alternative creatinine-clearance estimates are shown for context only. They do not change the calculation.": {
     "es": "Colin 2019 se utiliza para todos los adultos, independientemente de su tamaño corporal. Con un IMC de 40 kg/m² o superior, un aviso indica que la evaluación publicada en ese tamaño corporal es limitada, y se muestran la masa libre de grasa y estimaciones alternativas de aclaramiento de creatinina solo como contexto. No modifican el cálculo.",
     "fr": "Colin 2019 est utilisé pour tous les adultes, quelle que soit leur corpulence. À partir d’un IMC de 40 kg/m², un avertissement indique que l’évaluation publiée à cette corpulence est limitée ; la masse maigre et d’autres estimations de la clairance de la créatinine sont présentées uniquement à titre de contexte. Elles ne modifient pas le calcul.",
-    "pt-BR": "Colin 2019 é usado para todos os adultos, em cada corpo. Em um IMC igual ou superior a 40 kg/m², nota-se que a avaliação publicada nesse tamanho é limitada, e as estimativas de massa livre de gordura e de depuração de creatinina alternativa são apresentadas apenas para o contexto. Eles não alteram o cálculo."
+    "pt-BR": "Colin 2019 é utilizado para todos os adultos, independentemente do tamanho corporal. Com IMC de 40 kg/m² ou mais, um aviso informa que a avaliação publicada nessa faixa é limitada. A massa livre de gordura e as estimativas alternativas de depuração de creatinina são apresentadas apenas como contexto. Elas não alteram o cálculo."
   },
   "Infusions are kept to a maximum rate of 10 mg/min and at least 60 minutes. Recommendations are withheld for dialysis or renal replacement therapy, and warnings flag severely reduced kidney function, questionable level timing and a poor fit to measured levels.": {
     "es": "Las perfusiones se limitan a una velocidad máxima de 10 mg/min y una duración mínima de 60 minutos. No se emiten recomendaciones en diálisis o tratamiento renal sustitutivo, y los avisos señalan función renal muy reducida, tiempos de muestreo cuestionables y mal ajuste a las concentraciones medidas.",
     "fr": "Les perfusions sont limitées à un débit maximal de 10 mg/min et à une durée minimale de 60 minutes. Aucune recommandation n’est proposée en cas de dialyse ou d’épuration extrarénale ; des avertissements signalent une fonction rénale très diminuée, des horaires de prélèvement discutables et un mauvais ajustement aux concentrations mesurées.",
-    "pt-BR": "As infusões são mantidas até uma taxa máxima de 10 mg/min e pelo menos 60 minutos. Recomendações são retidos para diálise ou terapia renal de substituição, e avisos sinalizam grave redução da função renal, questionável nível de tempo e um ajuste ruim para os níveis medidos."
+    "pt-BR": "As infusões são limitadas à velocidade máxima de 10 mg/min e à duração mínima de 60 minutos. Não são fornecidas recomendações para pacientes em diálise ou terapia renal substitutiva. Os avisos sinalizam função renal muito reduzida, horários de coleta questionáveis e ajuste inadequado às concentrações medidas."
   },
   "Patients on dialysis or other renal replacement therapy": {
     "es": "Pacientes en diálisis u otro tratamiento renal sustitutivo",
@@ -10062,17 +10062,17 @@
   "14-day free trial · card required upfront, no charge until trial ends": {
     "es": "Prueba gratuita de 14 días · tarjeta requerida por adelantado, sin cargos hasta que finalice la prueba",
     "fr": "Essai gratuit de 14 jours · carte requise dès le départ, aucun débit avant la fin de l’essai",
-    "pt-BR": "14 dias de teste gratuito · cartão exigido adiantado, sem custo até o julgamento termina"
+    "pt-BR": "Avaliação gratuita de 14 dias · cartão exigido no início, sem cobrança até o fim do período de avaliação"
   },
   "I agree to automatic renewal: after the 14-day trial, $49.99 is charged yearly until I cancel online in Billing. Any verified discount is shown before payment. Cancel before the trial ends to avoid a charge; otherwise cancel before renewal to stop the next charge.": {
     "es": "Acepto la renovación automática: tras la prueba de 14 días, se cobrarán $49.99 anuales hasta que cancele en línea en Facturación. Cualquier descuento verificado se mostrará antes del pago. Cancele antes del final de la prueba para evitar un cargo; después, cancele antes de la renovación para evitar el siguiente cargo.",
     "fr": "J’accepte le renouvellement automatique : après l’essai de 14 jours, $49.99 sont facturés chaque année jusqu’à résiliation en ligne dans Facturation. Toute réduction vérifiée est affichée avant le paiement. Résiliez avant la fin de l’essai pour éviter un débit ; ensuite, résiliez avant le renouvellement pour éviter le débit suivant.",
-    "pt-BR": "Eu concordo com a renovação automática: após o julgamento de 14 dias, $49.99 é cobrado anualmente até que eu cancele on-line em Billing. Qualquer desconto verificado é mostrado antes do pagamento. Cancele antes que o teste termine para evitar uma cobrança; caso contrário, cancele antes da renovação para parar a próxima carga."
+    "pt-BR": "Eu concordo com a renovação automática: após o período de avaliação de 14 dias, $49.99 é cobrado anualmente até que eu cancele on-line em Cobrança. Qualquer desconto verificado é mostrado antes do pagamento. Cancele antes que o teste termine para evitar uma cobrança; caso contrário, cancele antes da renovação para parar a próxima cobrança."
   },
   "You will not be charged for 14 days. Cancel any time during the trial in the billing portal — no charge. By starting a trial you agree to our": {
     "es": "No se le cobrará durante 14 días. Cancele en cualquier momento durante la prueba en el portal de facturación, sin cargos. Al iniciar una prueba acepta nuestras",
     "fr": "Aucun débit pendant 14 jours. Résiliez à tout moment pendant l’essai dans le portail de facturation, sans frais. En commençant un essai, vous acceptez nos",
-    "pt-BR": "Você não será cobrado por 14 dias. Cancele a qualquer momento durante o julgamento no portal de faturamento — sem custo. Ao iniciar um julgamento, você concorda com o nosso"
+    "pt-BR": "Você não receberá cobranças por 14 dias. Cancele a qualquer momento durante o período de avaliação no portal de cobrança, sem custo. Ao iniciar um período de avaliação, você concorda com nossos"
   },
   "Need access for your whole department or hospital? See": {
     "es": "¿Necesita acceso para todo su departamento u hospital? Consulte",
@@ -10362,7 +10362,7 @@
   "is charged monthly until canceled online through team billing. Cancel before the trial ends to avoid a charge, or before renewal to stop the next charge. BAA requires separate review and execution.": {
     "es": "se cobrarán mensualmente hasta que cancele en línea mediante la facturación del equipo. Cancele antes de que finalice la prueba para evitar un cargo, o antes de la renovación para evitar el siguiente cargo. El BAA requiere revisión y formalización por separado.",
     "fr": "sont facturés chaque mois jusqu’à résiliation en ligne dans la facturation de l’équipe. Résiliez avant la fin de l’essai pour éviter un débit, ou avant le renouvellement pour éviter le débit suivant. Le BAA nécessite un examen et une signature distincts.",
-    "pt-BR": "é cobrado mensalmente até cancelado online através de faturamento da equipe. Cancele antes que o julgamento termine para evitar uma carga, ou antes da renovação para parar a próxima carga. A BAA exige uma revisão e execução separadas."
+    "pt-BR": "é cobrado mensalmente até cancelado online através de faturamento da equipe. Cancele antes que o período de avaliação termine para evitar uma cobrança, ou antes da renovação para parar a próxima cobrança. A BAA exige uma revisão e execução separadas."
   },
   "Back to pricing": {
     "es": "Volver a precios",
@@ -10372,7 +10372,7 @@
   "By starting the trial you become the institution admin. You can invite teammates immediately, and assign admin to another user any time from the admin panel. Your card is saved at signup and not charged until the trial ends.": {
     "es": "Al iniciar la prueba se convierte en administrador de la institución. Puede invitar a compañeros de inmediato y asignar el rol de administrador a otro usuario en cualquier momento desde el panel. Su tarjeta se guarda al registrarse y no se realizan cargos hasta que finalice la prueba.",
     "fr": "En commençant l’essai, vous devenez administrateur de l’établissement. Vous pouvez immédiatement inviter des collègues et attribuer le rôle d’administrateur à un autre utilisateur à tout moment depuis le panneau d’administration. Votre carte est enregistrée à l’inscription et n’est débitée qu’à la fin de l’essai.",
-    "pt-BR": "Ao iniciar o julgamento você se torna o administrador da instituição. Você pode convidar colegas de equipe imediatamente e atribuir o administrador a outro usuário a qualquer momento do painel de administração. Seu cartão é salvo na inscrição e não cobrado até que o julgamento termine."
+    "pt-BR": "Ao iniciar o período de avaliação, você se torna administrador da instituição. Pode convidar colegas imediatamente e atribuir a função de administrador a outro usuário a qualquer momento no painel de administração. Seu cartão é salvo no cadastro, e a cobrança só ocorre após o término do período de avaliação."
   },
   "BAA Queue": {
     "es": "BAA pendientes",
@@ -12552,7 +12552,7 @@
   "Carreno 2017 found that Bayesian estimates from a peak and a trough approximated the full-data AUC better than trough-only or midpoint-and-trough estimates. The published range is a cohort result for real patients and other models, while this card's patient values and levels are illustrative, so the difference is context only.": {
     "es": "Carreno 2017 observó que las estimaciones bayesianas con una concentración máxima y una mínima se aproximaban mejor al AUC con datos completos que las estimaciones solo con mínima o con concentración intermedia y mínima. El intervalo publicado es un resultado de cohorte para pacientes reales y otros modelos, mientras que los valores y concentraciones del paciente de esta tarjeta son ilustrativos; por tanto, la diferencia solo aporta contexto.",
     "fr": "Carreno 2017 a constaté que les estimations bayésiennes à partir d’un pic et d’une concentration résiduelle approchaient mieux l’AUC avec données complètes que les estimations fondées uniquement sur la concentration résiduelle ou sur une concentration intermédiaire et résiduelle. L’intervalle publié est un résultat de cohorte portant sur des patients réels et d’autres modèles, tandis que les valeurs et concentrations de cette fiche sont illustratives ; l’écart fournit donc uniquement du contexte.",
-    "pt-BR": "Carreno 2017 descobriu que as estimativas bayesianas de um pico e de um vale aproximavam a AUC de dados completos melhor do que as estimativas de ponto-e-ponto-médio. A faixa publicada é um resultado de coorte para pacientes reais e outros modelos, enquanto os valores e níveis desse cartão são ilustrativos, portanto a diferença é apenas o contexto."
+    "pt-BR": "Carreno 2017 observou que as estimativas bayesianas obtidas com um pico e um vale se aproximavam da AUC calculada com todos os dados melhor do que as estimativas baseadas apenas no vale ou em uma concentração no ponto médio e um vale. O intervalo publicado é um resultado de coorte com pacientes reais e outros modelos; os valores e as concentrações deste cartão são ilustrativos, de modo que a diferença serve apenas como contexto."
   },
   "Range of full-data AUC₂₄ estimates (437–489 mg·h/L) read from the abstract; midpoint 463 derived by Vancomyzer. The levels on this card (25 mg/L 3.5 h after the start of the dose, 1 h after the end of a 2.5 h infusion; 10 mg/L at 11.5 h) are illustrative and were chosen by Vancomyzer.": {
     "es": "Intervalo de estimaciones del AUC₂₄ con datos completos (437–489 mg·h/L) extraído del resumen; punto medio 463 derivado por Vancomyzer. Las concentraciones de esta tarjeta (25 mg/L 3.5 h después del inicio de la dosis, 1 h después del final de una infusión de 2.5 h; 10 mg/L a las 11.5 h) son ilustrativas y fueron elegidas por Vancomyzer.",
@@ -12637,7 +12637,7 @@
   "Heel-prick sampling (neonatal): not applicable to adult venous sampling.": {
     "es": "Muestra por punción del talón (neonatal): no aplicable a muestras venosas de adultos.",
     "fr": "Prélèvement au talon (néonatal) : sans objet pour les prélèvements veineux chez l’adulte.",
-    "pt-BR": "Amostragem do calcanhar-prick (neonatal): não aplicável à amostragem venosa de adultos."
+    "pt-BR": "Coleta por punção do calcanhar (neonatal): não se aplica à coleta venosa em adultos."
   },
   "External evaluation in 49 obese adults (15 with BMI of 40 or more). Colin 2019 had the lowest a-priori imprecision and the best a-posteriori bias and imprecision among the models compared; the cohort is small.": {
     "es": "Evaluación externa en 49 adultos con obesidad (15 con BMI de 40 o más). Colin 2019 presentó la menor imprecisión a priori y el mejor sesgo e imprecisión a posteriori entre los modelos comparados; la cohorte es pequeña.",
@@ -12822,7 +12822,7 @@
   "Built-in safety checks": {
     "es": "Comprobaciones de seguridad integradas",
     "fr": "Vérifications de sécurité intégrées",
-    "pt-BR": "Controlos de segurança integrados"
+    "pt-BR": "Verificações de segurança integradas"
   },
   "Annual": {
     "es": "Anual",
@@ -13747,7 +13747,7 @@
   "Start 14-day trial — then $49.99/year": {
     "es": "Iniciar prueba de 14 días — después $49.99/año",
     "fr": "Commencer l’essai de 14 jours — puis $49.99/an",
-    "pt-BR": "Comece o julgamento de 14 dias – então $49.99/ano"
+    "pt-BR": "Iniciar avaliação de 14 dias — depois US$ 49.99/ano"
   },
   "Not included": {
     "es": "No incluido",
@@ -13832,7 +13832,7 @@
   "Save 90 days of de-identified calculation history with optional case IDs. Search past calcs without re-entering patient data.": {
     "es": "Guarde 90 días de historial de cálculos desidentificados con identificadores de caso opcionales. Busque cálculos anteriores sin volver a introducir los datos del paciente.",
     "fr": "Conservez 90 jours d’historique de calculs désidentifiés avec des identifiants de cas facultatifs. Retrouvez les calculs précédents sans ressaisir les données du patient.",
-    "pt-BR": "Economize 90 dias de histórico de cálculo desidentificado com IDs de caso opcionais. Pesquise os cálculos passados sem reentrar nos dados dos pacientes."
+    "pt-BR": "Salve 90 dias de histórico de cálculos desidentificados com identificadores de caso opcionais. Pesquise cálculos anteriores sem inserir novamente os dados do paciente."
   },
   "Team management is a Department feature": {
     "es": "La gestión de equipos es una función Department",
@@ -14212,7 +14212,7 @@
   "The Vancomyzer BAA template is under attorney review and not yet available for customer signing. Please contact contact@dosys.health to request the BAA via the manual process while the self-serve template is finalized.": {
     "es": "La plantilla de BAA de Vancomyzer está en revisión jurídica y aún no está disponible para la firma de clientes. Contacte con contact@dosys.health para solicitar el BAA mediante el proceso manual mientras se finaliza la plantilla de autoservicio.",
     "fr": "Le modèle de BAA Vancomyzer est en cours d’examen juridique et n’est pas encore disponible pour signature par les clients. Contactez contact@dosys.health pour demander le BAA par la procédure manuelle pendant la finalisation du modèle en libre-service.",
-    "pt-BR": "O modelo da Vancomyzer BAA está sob revisão advocatícia e ainda não está disponível para assinatura do cliente. Entre em contato com@dosys.health para solicitar o BAA através do processo manual, enquanto o modelo de auto-servir é finalizado."
+    "pt-BR": "O modelo de BAA do Vancomyzer está sob análise jurídica e ainda não está disponível para assinatura pelo cliente. Entre em contato pelo endereço contact@dosys.health para solicitar o BAA pelo processo manual enquanto o modelo de autoatendimento é finalizado."
   },
   "No executed BAA on file yet.": {
     "es": "Aún no hay ningún BAA firmado por ambas partes archivado.",
@@ -14312,7 +14312,7 @@
   "No active subscription. Start a trial first.": {
     "es": "No hay suscripción activa. Inicie primero una prueba.",
     "fr": "Aucun abonnement actif. Commencez d’abord un essai.",
-    "pt-BR": "Nenhuma subscrição activa. Iniciar um julgamento primeiro."
+    "pt-BR": "Nenhuma assinatura ativa. Inicie um período de avaliação primeiro."
   },
   "Missing stripe-signature header.": {
     "es": "Falta la cabecera stripe-signature.",
@@ -14822,7 +14822,7 @@
   "Weight (147.9 kg) is the published cohort median; height 173 cm gives BMI 49.4 (published median 49.5). Age 50 years, SCr 0.9 mg/dL and female sex are approximations chosen by Vancomyzer and have not been verified against the paper.": {
     "es": "El peso (147.9 kg) es la mediana publicada de la cohorte; la talla de 173 cm da un BMI de 49.4 (mediana publicada 49.5). La edad de 50 años, la SCr de 0.9 mg/dL y el sexo femenino son aproximaciones elegidas por Vancomyzer y no se han verificado con el artículo.",
     "fr": "Le poids (147.9 kg) est la médiane publiée de la cohorte ; la taille de 173 cm donne un BMI de 49.4 (médiane publiée 49.5). L’âge de 50 ans, la SCr de 0.9 mg/dL et le sexe féminin sont des approximations choisies par Vancomyzer et n’ont pas été vérifiés dans l’article.",
-    "pt-BR": "Peso (147.9 kg) é a mediana da coorte publicada; altura 173 cm dá IMC 49.4 (média publicada 49.5). Idade 50 anos, SCr 0.9 mg/dL e sexo feminino são aproximações escolhidas por Vancomyzer e não foram verificadas contra o artigo."
+    "pt-BR": "O peso (147.9 kg) é a mediana da coorte publicada; a altura de 173 cm resulta em IMC de 49.4 (mediana publicada de 49.5). A idade de 50 anos, a SCr de 0.9 mg/dL e o sexo feminino são aproximações escolhidas pelo Vancomyzer e não foram verificados no artigo."
   },
   "Carreno 2017 abstract — full-data AUC₂₄ range across four population models, obese adults (different models)": {
     "es": "Resumen de Carreno 2017 — intervalo de AUC₂₄ con datos completos en cuatro modelos poblacionales, adultos con obesidad (modelos diferentes)",
@@ -15052,7 +15052,7 @@
   "Trial started. Your subscription will appear once Stripe confirms — usually within a few seconds.": {
     "es": "Prueba iniciada. Su suscripción aparecerá cuando Stripe la confirme, normalmente en unos segundos.",
     "fr": "Essai démarré. Votre abonnement apparaîtra après confirmation par Stripe, généralement en quelques secondes.",
-    "pt-BR": "O julgamento começou. Sua assinatura aparecerá assim que a Stripe confirmar — geralmente em poucos segundos."
+    "pt-BR": "Período de avaliação iniciado. Sua assinatura aparecerá assim que a Stripe confirmar, geralmente em poucos segundos."
   },
   "Checkout cancelled. No charges were made.": {
     "es": "Pago cancelado. No se realizó ningún cargo.",
