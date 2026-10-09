@@ -35,7 +35,7 @@ export default async function RootLayout({
 }) {
   const locale = parseLocale((await cookies()).get(localeCookie)?.value);
   return (
-    <html lang={locale === "es" ? "es-ES" : locale === "fr" ? "fr-FR" : "en"}>
+    <html lang={locale === "pt-BR" ? "pt-BR" : locale === "es" ? "es-ES" : locale === "fr" ? "fr-FR" : "en"}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

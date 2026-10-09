@@ -1,0 +1,15 @@
+{
+  "Colin 2019 two-compartment model; population equations and references, with the assumptions used to adjust estimates to measured levels": "Modelo bicompartimental de Colin 2019; equações populacionais e referências, com os pressupostos usados para ajustar as estimativas às concentrações medidas",
+  "Selected published population values compared with calculator estimates": "Valores populacionais publicados selecionados, comparados com as estimativas da calculadora",
+  "Predictions checked in simulated ICU patients using a model adapted from published research": "Previsões verificadas em pacientes simulados de UTI, usando um modelo adaptado de pesquisa publicada",
+  "Estimates compared with Tucuxi in simulated patients, using limits set before the analysis": "Estimativas comparadas com o Tucuxi em pacientes simulados, usando limites definidos antes da análise",
+  "Independent reference calculation (including loading-dose schedules) and synthetic coverage of the 90% uncertainty band": "Cálculo de referência independente (incluindo esquemas com dose de ataque) e cobertura da faixa de incerteza de 90% em dados sintéticos",
+  "Pharmacists": "Farmacêuticos",
+  "Physicians": "Médicos",
+  "Nurse practitioners": "Enfermeiros de prática avançada (nurse practitioners)",
+  "Physician assistants": "Assistentes médicos (physician assistants)",
+  "Residents": "Residentes",
+  "Students": "Estudantes",
+  "Pediatric patients": "Pacientes pediátricos",
+  "Continuous-infusion vancomycin": "Vancomicina em infusão contínua"
+}

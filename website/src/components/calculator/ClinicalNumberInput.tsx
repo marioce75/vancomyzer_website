@@ -1,8 +1,10 @@
 "use client";
 
 import { useLanguage } from "@/localization/LanguageProvider";
-import { useEffect, useState, type InputHTMLAttributes } from "react";
-import { parseClinicalNumber } from "@/lib/parseClinicalNumber";
+import { useEffect, useState, useId, type InputHTMLAttributes } from "react";
+import { parseClinicalNumber, clinicalNumberError, formatClinicalInput, AMBIGUOUS_NUMBER, INVALID_NUMBER, NUMBER_RANGE, type NumberInterpretation } from "@/lib/parseClinicalNumber";
+
+import NumberClarification from "./NumberClarification";
 
 type NativeInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -13,8 +15,7 @@ export interface ClinicalNumberInputProps extends NativeInputProps {
   /** The parent's number. 0 is the calculator's "empty" value and shows a blank field. */
   value: number;
   /**
-   * Called on every edit with the parsed number, or 0 when the text is empty or
-   * not a valid number. The field then reads as missing, so validation flags it
+   * Called on every edit with the parsed number, 0 when empty, or NaN when malformed. The field then reads as missing, so validation flags it
    * instead of a stale or truncated value being used.
    */
   onValueChange: (value: number) => void;
@@ -23,76 +24,69 @@ export interface ClinicalNumberInputProps extends NativeInputProps {
    * text, and a message when the text is not a usable number (null otherwise).
    */
   onBlurValue?: (value: number | null, raw: string, error: string | null) => void;
-  /**
-   * Treat text such as "1,000" or "1.500" (a separator followed by exactly three
-   * digits) as invalid. parseClinicalNumber reads it as a decimal (1.0, 1.5),
-   * but in a dose or creatinine field it is far more likely a thousands
-   * separator, which would be a 1000-fold error.
-   */
-  rejectThousandsGrouping?: boolean;
   /** Class names, or a function that receives whether the text is not a usable number. */
   className?: string | ((invalidText: boolean) => string);
 }
 
-/** Inline message for text that parseClinicalNumber rejects. */
-export const INVALID_NUMBER_MESSAGE =
-  "Not a valid number. Use digits with one decimal point or comma (e.g. 1.2 or 1,2), without units or thousands separators.";
-
-/** Inline message for "1,000"-style text in a field that rejects thousands grouping. */
-export const AMBIGUOUS_THOUSANDS_MESSAGE =
-  "Ambiguous number: a comma or point followed by three digits may be a thousands separator. Enter it without a separator (e.g. 1000) or with fewer decimals (e.g. 1.5).";
-
-const THOUSANDS_GROUPING_PATTERN = /^-?[1-9][0-9]{0,2}[.,][0-9]{3}$/;
-
-function describe(raw: string, rejectThousandsGrouping: boolean): { value: number | null; error: string | null } {
-  const text = raw.trim();
-  if (text === "") return { value: null, error: null };
-  if (rejectThousandsGrouping && THOUSANDS_GROUPING_PATTERN.test(text)) {
-    return { value: null, error: AMBIGUOUS_THOUSANDS_MESSAGE };
-  }
-  const value = parseClinicalNumber(text);
-  return value === null ? { value: null, error: INVALID_NUMBER_MESSAGE } : { value, error: null };
+export const INVALID_NUMBER_MESSAGE = INVALID_NUMBER;
+export const AMBIGUOUS_THOUSANDS_MESSAGE = AMBIGUOUS_NUMBER;
+function describe(raw: string, interpretation?: NumberInterpretation): { value: number | null; error: string | null } {
+  return { value: parseClinicalNumber(raw, interpretation), error: clinicalNumberError(raw, interpretation) };
 }
 
 /**
  * Text input for clinical numbers. Accepts "1.2" or "1,2" (see
  * parseClinicalNumber), keeps the typed text while the clinician edits so a
- * trailing separator is not rewritten, and shows the number as it was read
- * (e.g. "1,2" becomes "1.2") when the field loses focus.
+ * trailing separator is not rewritten, and preserves the entered decimal mark on blur and language changes.
  */
 export default function ClinicalNumberInput({
   value,
   onValueChange,
   onBlurValue,
-  rejectThousandsGrouping = false,
+
   className,
   inputMode = "decimal",
   autoComplete = "off",
+  min, max, step,
   ...rest
 }: ClinicalNumberInputProps) {
   const { t } = useLanguage();
-  const [raw, setRaw] = useState<string>(() => (value ? String(value) : ""));
+  const errorId = useId();
+  const [raw, setRaw] = useState<string>(() => (value ? formatClinicalInput(value) : ""));
+
+  const [interpretation, setInterpretation] = useState<NumberInterpretation | undefined>(Number.isFinite(value) ? "decimal" : undefined);
 
   // Follow changes made outside this field (reset, pre-fill, loaded case)
   // without rewriting what the clinician is typing: resync only when the
   // parent's number differs from what the current text parses to.
   useEffect(() => {
-    const parsed = describe(raw, rejectThousandsGrouping).value;
+    if (!Number.isFinite(value)) return;
+    const parsed = describe(raw, interpretation).value;
     if (!value) {
-      if (parsed !== null && parsed !== 0) setRaw("");
+      if (parsed !== 0) setRaw("");
     } else if (parsed !== value) {
-      setRaw(String(value));
+      setRaw(formatClinicalInput(value));
+      setInterpretation("decimal");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- resync only when the parent's value changes
   }, [value]);
 
-  const invalidText = describe(raw, rejectThousandsGrouping).error !== null;
+  const parsed = describe(raw, interpretation);
+  const rangeError = parsed.value !== null && ((min !== undefined && parsed.value < Number(min)) || (max !== undefined && parsed.value > Number(max)) || (String(step) === "1" && !Number.isInteger(parsed.value)));
+  const error = parsed.error || (!Number.isFinite(value) && raw.trim() === "" ? INVALID_NUMBER : null) || (rangeError ? NUMBER_RANGE : null);
+  const invalidText = error !== null;
+  // Existing form wrappers display callback errors on blur; avoid repeating them.
+  const showInlineError = Boolean(error && (!onBlurValue || (raw.trim() === "" && !Number.isFinite(value))));
 
   return (
+    <span className="block min-w-0 flex-1">
     <input
       {...rest}
+      data-clinical-number="true"
+      aria-describedby={[rest["aria-describedby"], showInlineError ? errorId : null].filter(Boolean).join(" ") || undefined}
+      ref={(node) => { node?.setCustomValidity(error ? t(error) : ""); }}
       placeholder={rest.placeholder ? t(rest.placeholder) : undefined}
-      title={rest.title ? t(rest.title) : undefined}
+      title={error ? t(error) : rest.title ? t(rest.title) : undefined}
       aria-label={rest["aria-label"] ? t(rest["aria-label"]) : undefined}
       type="text"
       inputMode={inputMode}
@@ -102,14 +96,28 @@ export default function ClinicalNumberInput({
       onChange={(e) => {
         const next = e.target.value;
         setRaw(next);
-        onValueChange(describe(next, rejectThousandsGrouping).value ?? 0);
+        setInterpretation(undefined);
+        const result = describe(next);
+        const n = result.value;
+        const outside = n !== null && ((min !== undefined && n < Number(min)) || (max !== undefined && n > Number(max)) || (String(step) === "1" && !Number.isInteger(n)));
+        onValueChange(result.error || outside ? NaN : n ?? 0);
       }}
       onBlur={() => {
-        const { value: parsed, error } = describe(raw, rejectThousandsGrouping);
-        if (parsed !== null && String(parsed) !== raw) setRaw(String(parsed));
-        onBlurValue?.(parsed, raw, error);
+        const { value: parsed, error } = describe(raw, interpretation);
+        // Preserve the entered decimal mark and explicit precision on blur.
+        onBlurValue?.(rangeError ? null : parsed, raw, error || (rangeError ? NUMBER_RANGE : null));
       }}
       className={typeof className === "function" ? className(invalidText) : className}
     />
+    {showInlineError && error && <span id={errorId} role="status" className="mt-1 block text-xs text-red-700">{t(error)}</span>}
+    <NumberClarification raw={raw} interpretation={interpretation} onChoose={choice => {
+      const result = describe(raw, choice);
+      const n = result.value;
+      const outside = n !== null && ((min !== undefined && n < Number(min)) || (max !== undefined && n > Number(max)) || (String(step) === "1" && !Number.isInteger(n)));
+      setInterpretation(choice);
+      onValueChange(result.error || outside ? NaN : n ?? 0);
+      onBlurValue?.(outside ? null : n, raw, result.error || (outside ? NUMBER_RANGE : null));
+    }} />
+    </span>
   );
 }

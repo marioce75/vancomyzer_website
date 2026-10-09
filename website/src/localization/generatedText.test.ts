@@ -21,6 +21,6 @@ test("generated clinical prose preserves every numeric token, line and unknown s
 
 test("unknown generated text and free-text numerical expressions fall back without rewriting", () => {
   for (const source of ["A custom policy 400–600 v1.2\n", "not a registered template", "0.000001", "", " \n  "]) {
-    for (const locale of ["en", "es", "fr"] as const) assert.equal(translateGeneratedText(source, locale), source);
+    for (const locale of ["en", "es", "fr", "pt-BR"] as const) assert.equal(translateGeneratedText(source, locale), source);
   }
 });

@@ -1,4 +1,7 @@
 "use client";
+import NumericTextInput from "@/components/calculator/NumericTextInput";
+import { parseCanonicalClinicalNumber, INVALID_NUMBER } from "@/lib/parseClinicalNumber";
+const numeric = (raw: string) => parseCanonicalClinicalNumber(raw) ?? NaN;
 import { LocalizedText } from "@/localization/LanguageProvider";
 
 
@@ -186,6 +189,22 @@ const INDICATIONS = [
 /*  Component                                                         */
 /* ------------------------------------------------------------------ */
 
+// Keep wrapper identities stable so numeric input raw text and choices survive edits.
+/* ---- Field grid helper ---- */
+const FieldGrid = ({ children, cols = 3 }: { children: React.ReactNode; cols?: number }) => (
+  <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 12, marginBottom: 12 }}>
+    {children}
+  </div>
+);
+
+const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div>
+    <label style={labelStyle}><LocalizedText text={label} /></label>
+    {children}
+  </div>
+);
+
+
 export default function ResearchEntryForm() {
   /* -- Demographics -- */
   const [age, setAge] = useState("");
@@ -230,10 +249,10 @@ export default function ResearchEntryForm() {
   const [error, setError] = useState("");
 
   /* ---- Computed fields ---- */
-  const w = parseFloat(weightKg) || 0;
-  const h = parseFloat(heightCm) || 0;
-  const a = parseFloat(age) || 0;
-  const scr = parseFloat(scrBaseline) || 0;
+  const w = numeric(weightKg) || 0;
+  const h = numeric(heightCm) || 0;
+  const a = numeric(age) || 0;
+  const scr = numeric(scrBaseline) || 0;
 
   const computed = useMemo(() => {
     const bmi = calcBMI(w, h);
@@ -274,13 +293,13 @@ export default function ResearchEntryForm() {
   /* ---- Level timing flags ---- */
   const levelFlags = useMemo(() => {
     return levels.map((lvl) => {
-      const t = parseFloat(lvl.time_hours);
+      const t = numeric(lvl.time_hours);
       if (isNaN(t)) return { during_infusion: false, in_distribution: false };
       let during = false;
       let distribution = false;
       for (const d of doses) {
-        const doseTime = parseFloat(d.time_hours);
-        const dur = parseFloat(d.infusion_duration_min);
+        const doseTime = numeric(d.time_hours);
+        const dur = numeric(d.infusion_duration_min);
         if (isNaN(doseTime) || isNaN(dur)) continue;
         const endInfusion = doseTime + dur / 60;
         if (t >= doseTime && t <= endInfusion) during = true;
@@ -294,6 +313,8 @@ export default function ResearchEntryForm() {
   const handleSubmit = async () => {
     setError("");
     setResult(null);
+    const malformed = document.querySelector<HTMLInputElement>('input[data-clinical-number="true"]:invalid');
+    if (malformed) { setError(INVALID_NUMBER); malformed.reportValidity(); malformed.focus(); return; }
     setSubmitting(true);
 
     try {
@@ -332,9 +353,9 @@ export default function ResearchEntryForm() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            dose_mg: parseFloat(dose.dose_mg),
-            infusion_duration_min: parseFloat(dose.infusion_duration_min),
-            time_hours: parseFloat(dose.time_hours),
+            dose_mg: numeric(dose.dose_mg),
+            infusion_duration_min: numeric(dose.infusion_duration_min),
+            time_hours: numeric(dose.time_hours),
             is_loading_dose: dose.is_loading_dose,
           }),
         });
@@ -347,8 +368,8 @@ export default function ResearchEntryForm() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            concentration_mcg_ml: parseFloat(lvl.concentration_mcg_ml),
-            time_hours: parseFloat(lvl.time_hours),
+            concentration_mcg_ml: numeric(lvl.concentration_mcg_ml),
+            time_hours: numeric(lvl.time_hours),
           }),
         });
       }
@@ -360,8 +381,8 @@ export default function ResearchEntryForm() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            scr_mg_dl: parseFloat(s.scr_mg_dl),
-            time_hours: parseFloat(s.time_hours),
+            scr_mg_dl: numeric(s.scr_mg_dl),
+            time_hours: numeric(s.time_hours),
           }),
         });
       }
@@ -391,7 +412,7 @@ export default function ResearchEntryForm() {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            hospital_los_days: hospitalLos ? parseFloat(hospitalLos) : null,
+            hospital_los_days: hospitalLos ? numeric(hospitalLos) : null,
             vanc_discontinued_early: vancDiscontinued,
             discontinuation_reason: discontinuationReason || null,
             microbiological_outcome: microOutcome || null,
@@ -410,20 +431,6 @@ export default function ResearchEntryForm() {
       setSubmitting(false);
     }
   };
-
-  /* ---- Field grid helper ---- */
-  const FieldGrid = ({ children, cols = 3 }: { children: React.ReactNode; cols?: number }) => (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 12, marginBottom: 12 }}>
-      {children}
-    </div>
-  );
-
-  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <div>
-      <label style={labelStyle}><LocalizedText text={label} /></label>
-      {children}
-    </div>
-  );
 
   /* ============================================================== */
   /*  RENDER                                                        */
@@ -472,7 +479,7 @@ export default function ResearchEntryForm() {
             <h2 style={sectionTitle}><LocalizedText text={"Demographics"} /></h2>
             <FieldGrid>
               <Field label="Age (years)">
-                <input type="number" min={18} value={age} onChange={(e) => setAge(e.target.value)} style={inputStyle} />
+                <NumericTextInput  min={18} value={age} onValueChange={(canonical) => setAge(canonical)} style={inputStyle} />
               </Field>
               <Field label="Sex">
                 <select value={sex} onChange={(e) => setSex(e.target.value)} style={selectStyle}>
@@ -490,13 +497,13 @@ export default function ResearchEntryForm() {
             </FieldGrid>
             <FieldGrid>
               <Field label="Weight (kg)">
-                <input type="number" min={30} step="0.1" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} style={inputStyle} />
+                <NumericTextInput  min={30} step="0.1" value={weightKg} onValueChange={(canonical) => setWeightKg(canonical)} style={inputStyle} />
               </Field>
               <Field label="Height (cm)">
-                <input type="number" min={100} step="0.1" value={heightCm} onChange={(e) => setHeightCm(e.target.value)} style={inputStyle} />
+                <NumericTextInput  min={100} step="0.1" value={heightCm} onValueChange={(canonical) => setHeightCm(canonical)} style={inputStyle} />
               </Field>
               <Field label="SCr Baseline (mg/dL)">
-                <input type="number" min={0.1} step="0.01" value={scrBaseline} onChange={(e) => setScrBaseline(e.target.value)} style={inputStyle} />
+                <NumericTextInput  min={0.1} step="0.01" value={scrBaseline} onValueChange={(canonical) => setScrBaseline(canonical)} style={inputStyle} />
               </Field>
             </FieldGrid>
             <FieldGrid>
@@ -558,20 +565,20 @@ export default function ResearchEntryForm() {
             {doses.map((dose, i) => (
               <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 8, flexWrap: "wrap" }}>
                 <Field label="Dose (mg)">
-                  <input type="number" min={0} value={dose.dose_mg} onChange={(e) => updateDose(i, "dose_mg", e.target.value)} style={{ ...inputStyle, width: 100 }} />
+                  <NumericTextInput  min={0} value={dose.dose_mg} onValueChange={(canonical) => updateDose(i, "dose_mg", canonical)} style={{ ...inputStyle, width: 100 }} />
                 </Field>
                 <Field label="Infusion (min)">
-                  <input type="number" min={1} value={dose.infusion_duration_min} onChange={(e) => updateDose(i, "infusion_duration_min", e.target.value)} style={{ ...inputStyle, width: 90 }} />
+                  <NumericTextInput  min={1} value={dose.infusion_duration_min} onValueChange={(canonical) => updateDose(i, "infusion_duration_min", canonical)} style={{ ...inputStyle, width: 90 }} />
                 </Field>
                 <Field label="Time from 1st Dose (h)">
-                  <input type="number" min={0} step="0.1" value={dose.time_hours} onChange={(e) => updateDose(i, "time_hours", e.target.value)} style={{ ...inputStyle, width: 120 }} />
+                  <NumericTextInput  min={0} step="0.1" value={dose.time_hours} onValueChange={(canonical) => updateDose(i, "time_hours", canonical)} style={{ ...inputStyle, width: 120 }} />
                 </Field>
                 <Field label="Rate (mg/h)">
                   <input
                     readOnly
                     value={
-                      parseFloat(dose.dose_mg) && parseFloat(dose.infusion_duration_min)
-                        ? (parseFloat(dose.dose_mg) / (parseFloat(dose.infusion_duration_min) / 60)).toFixed(0)
+                      numeric(dose.dose_mg) && numeric(dose.infusion_duration_min)
+                        ? (numeric(dose.dose_mg) / (numeric(dose.infusion_duration_min) / 60)).toFixed(0)
                         : "---"
                     }
                     style={{ ...readOnlyStyle, width: 80 }}
@@ -601,10 +608,10 @@ export default function ResearchEntryForm() {
               return (
                 <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 8, flexWrap: "wrap" }}>
                   <Field label="Concentration (mcg/mL)">
-                    <input type="number" min={0} step="0.1" value={lvl.concentration_mcg_ml} onChange={(e) => updateLevel(i, "concentration_mcg_ml", e.target.value)} style={{ ...inputStyle, width: 140 }} />
+                    <NumericTextInput  min={0} step="0.1" value={lvl.concentration_mcg_ml} onValueChange={(canonical) => updateLevel(i, "concentration_mcg_ml", canonical)} style={{ ...inputStyle, width: 140 }} />
                   </Field>
                   <Field label="Time from 1st Dose (h)">
-                    <input type="number" min={0} step="0.1" value={lvl.time_hours} onChange={(e) => updateLevel(i, "time_hours", e.target.value)} style={{ ...inputStyle, width: 140 }} />
+                    <NumericTextInput  min={0} step="0.1" value={lvl.time_hours} onValueChange={(canonical) => updateLevel(i, "time_hours", canonical)} style={{ ...inputStyle, width: 140 }} />
                   </Field>
                   {flags?.during_infusion && (
                     <span style={{ fontSize: 11, fontWeight: 700, color: RED, paddingBottom: 10 }}><LocalizedText text={"DURING INFUSION"} /></span>
@@ -630,10 +637,10 @@ export default function ResearchEntryForm() {
             {scrPoints.map((s, i) => (
               <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 8 }}>
                 <Field label="SCr (mg/dL)">
-                  <input type="number" min={0} step="0.01" value={s.scr_mg_dl} onChange={(e) => updateScr(i, "scr_mg_dl", e.target.value)} style={{ ...inputStyle, width: 120 }} />
+                  <NumericTextInput  min={0} step="0.01" value={s.scr_mg_dl} onValueChange={(canonical) => updateScr(i, "scr_mg_dl", canonical)} style={{ ...inputStyle, width: 120 }} />
                 </Field>
                 <Field label="Time from 1st Dose (h)">
-                  <input type="number" min={0} step="0.1" value={s.time_hours} onChange={(e) => updateScr(i, "time_hours", e.target.value)} style={{ ...inputStyle, width: 140 }} />
+                  <NumericTextInput  min={0} step="0.1" value={s.time_hours} onValueChange={(canonical) => updateScr(i, "time_hours", canonical)} style={{ ...inputStyle, width: 140 }} />
                 </Field>
                 <button style={{ ...removeBtn, marginBottom: 8 }} onClick={() => removeScr(i)}><LocalizedText text={"Remove"} /></button>
               </div>
@@ -669,7 +676,7 @@ export default function ResearchEntryForm() {
             <h2 style={sectionTitle}><LocalizedText text={"Clinical Outcomes (optional)"} /></h2>
             <FieldGrid>
               <Field label="Hospital LOS (days)">
-                <input type="number" min={0} value={hospitalLos} onChange={(e) => setHospitalLos(e.target.value)} style={inputStyle} />
+                <NumericTextInput  min={0} value={hospitalLos} onValueChange={(canonical) => setHospitalLos(canonical)} style={inputStyle} />
               </Field>
               <Field label="Microbiological Outcome">
                 <select value={microOutcome} onChange={(e) => setMicroOutcome(e.target.value)} style={selectStyle}>

@@ -16,7 +16,7 @@ test('equation annotations preserve numerical tokens, symbols and unannotated fo
   visit(sf);
   for (const example of examples) {
     assert.equal(translateEquationAnnotations(example, 'en'), example);
-    for (const locale of ['es', 'fr'] as const) {
+    for (const locale of ['es', 'fr', 'pt-BR'] as const) {
       const rendered = translateEquationAnnotations(example, locale);
       assert.deepEqual(rendered.match(/\d+(?:\.\d+)?/g), example.match(/\d+(?:\.\d+)?/g));
       for (const line of example.split('\n').filter(line => /^[\sαβA-Z_0-9(t)]*\s*=/.test(line) && !/[a-z]{3}/.test(line))) {

@@ -71,7 +71,6 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
         <InputGroup label="Dose (mg)" error={fieldErrors.dose_mg ?? parseErrors.dose}>
           <ClinicalNumberInput
             inputMode="decimal"
-            rejectThousandsGrouping
             placeholder="e.g. 1000"
             value={value.dose_mg}
             onValueChange={(n) => update({ dose_mg: n })}
@@ -176,10 +175,10 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                 <strong><LocalizedText text="Actual history:" /></strong>{" "}<LocalizedText text="with" />{" "}{value.doses_given}{" "}<LocalizedText text="doses the level is fitted by superposing exactly" />{" "}{value.doses_given}{" "}<LocalizedText text="doses; exposure at dose" />{" "}{value.doses_given}{" "}<LocalizedText text="is reported separately from the steady-state projection." /></p>
             </div>
           )}
-          {(value.doses_given ?? 0) >= 6 && (
-            <label className="mt-2 block text-xs text-slate-600"><LocalizedText text="Exact number of doses given" /><LocalizedInput aria-label="Exact number of doses given" type="number" min={6} max={1000} step={1}
+          {((value.doses_given ?? 0) >= 6 || value.doses_given === 0 || Number.isNaN(value.doses_given)) && (
+            <label className="mt-2 block text-xs text-slate-600"><LocalizedText text="Exact number of doses given" /><ClinicalNumberInput aria-label="Exact number of doses given" min={6} max={1000} step={1}
                 className={inputClass(Boolean(fieldErrors.doses_given))} value={value.doses_given ?? 6}
-                onChange={(e) => update({ doses_given: Number(e.target.value), steady_state_confirmed: false })} />
+                onValueChange={(n) => update({ doses_given: n, steady_state_confirmed: false })} />
             </label>
           )}
           {(value.doses_given ?? 0) > 1 && (
@@ -215,9 +214,8 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                   <InputGroup label="Loading dose (mg)" error={fe("loading_dose_mg")}>
                     <ClinicalNumberInput
                       inputMode="decimal"
-                      rejectThousandsGrouping
                       placeholder="e.g. 2000"
-                      value={value.loading_dose_mg || 0}
+                      value={value.loading_dose_mg ?? 0}
                       onValueChange={(n) => update({ loading_dose_mg: n })}
                       className={(invalidText) => inputClass(Boolean(fe("loading_dose_mg") || invalidText))}
                     />
@@ -226,7 +224,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                     <ClinicalNumberInput
                       inputMode="decimal"
                       placeholder="e.g. 200"
-                      value={Number(((value.loading_infusion_duration_hours || 0) * 60).toFixed(6))}
+                      value={Number(((value.loading_infusion_duration_hours ?? 0) * 60).toFixed(6))}
                       onValueChange={(n) => update({ loading_infusion_duration_hours: n / 60 })}
                       className={(invalidText) => inputClass(Boolean(fe("loading_infusion_duration_hours") || invalidText))}
                     />
@@ -236,8 +234,8 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                       <ClinicalNumberInput
                         inputMode="decimal"
                         placeholder={value.interval_hours ? `${value.interval_hours} (the interval)` : "e.g. 12"}
-                        value={value.loading_to_maintenance_hours || 0}
-                        onValueChange={(n) => update({ loading_to_maintenance_hours: n && n > 0 ? n : undefined })}
+                        value={value.loading_to_maintenance_hours ?? 0}
+                        onValueChange={(n) => update({ loading_to_maintenance_hours: !Number.isFinite(n) ? NaN : n > 0 ? n : undefined })}
                         className={(invalidText) => inputClass(Boolean(fe("loading_to_maintenance_hours") || invalidText))}
                       />
                     </InputGroup>

@@ -4,11 +4,11 @@ import templates from './templates.json';
 import { translate } from './catalog';
 
 test('numeric templates preserve every captured byte and numeric token across switches', () => {
-  for (const [source, translations] of Object.entries(templates as Record<string, { es: string; fr: string }>)) {
+  for (const [source, translations] of Object.entries(templates as Record<string, { es: string; fr: string; "pt-BR": string }>)) {
     const names = source.match(/\{n\d+\}/g) ?? [];
     assert.equal(new Set(names).size, names.length, `Duplicate placeholder: ${source}`);
     const sample = (value: string) => value.replace(/\{n(\d+)\}/g, (_, n) => `${n}234.056`);
-    for (const locale of ['es', 'fr'] as const) {
+    for (const locale of ['es', 'fr', 'pt-BR'] as const) {
       assert.deepEqual(translations[locale].match(/\{n\d+\}/g), names, source);
       assert.equal(translate(sample(source), locale), sample(translations[locale]), source);
       assert.deepEqual(sample(translations[locale]).match(/\d+(?:[.,]\d+)*/g), sample(source).match(/\d+(?:[.,]\d+)*/g), source);

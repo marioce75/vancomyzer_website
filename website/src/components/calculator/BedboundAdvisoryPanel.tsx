@@ -62,6 +62,7 @@ export default function BedboundAdvisoryPanel({
 
 
   // Infusion end time for level draw recommendation (shown once infusion duration entered)
+  const numericEdited = useRef(false);
   const [doseGiven, setDoseGiven] = useState<number>(0);
   const [infusionHours, setInfusionHours] = useState<number>(0);
   const [adminDate, setAdminDate] = useState<string>(today);
@@ -71,7 +72,7 @@ export default function BedboundAdvisoryPanel({
 
   // Fire callback whenever form values change
   useEffect(() => {
-    if (doseGiven > 0 && infusionHours > 0) {
+    if (numericEdited.current || (doseGiven > 0 && infusionHours > 0)) {
       onLoadingDoseChange?.({
         dose_mg: doseGiven,
         infusion_duration_hours: infusionHours,
@@ -138,10 +139,9 @@ export default function BedboundAdvisoryPanel({
             <Label><LocalizedText text="Dose given (mg)" /></Label>
             <ClinicalNumberInput
               inputMode="decimal"
-              rejectThousandsGrouping
               placeholder="e.g. 1000"
               value={doseGiven}
-              onValueChange={setDoseGiven}
+              onValueChange={(n) => { numericEdited.current = true; setDoseGiven(n); }}
               onBlurValue={(_v, _raw, parseError) => setParseErrors((prev) => ({ ...prev, dose: parseError ?? undefined }))}
               className={(invalidText) => inputCls(invalidText)}
             />
@@ -155,7 +155,7 @@ export default function BedboundAdvisoryPanel({
               inputMode="decimal"
               placeholder="e.g. 1.5"
               value={infusionHours}
-              onValueChange={setInfusionHours}
+              onValueChange={(n) => { numericEdited.current = true; setInfusionHours(n); }}
               onBlurValue={(_v, _raw, parseError) => setParseErrors((prev) => ({ ...prev, infusion: parseError ?? undefined }))}
               className={(invalidText) => inputCls(invalidText)}
             />

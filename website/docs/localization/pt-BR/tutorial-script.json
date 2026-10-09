@@ -1,0 +1,145 @@
+{
+  "status": "Portuguese text draft; bilingual clinical review and narration approval pending. No Portuguese audio exists.",
+  "source": "English segments of the 2026-10-06 approved tutorial script",
+  "timing": "English source cue timings only; retime to approved Portuguese narration before publishing.",
+  "segments": [
+    {
+      "start": 0,
+      "end": 5,
+      "en": "Welcome to the vancomyzer tutorial. Let's get started.",
+      "pt-BR": "Bem-vindo ao tutorial do Vancomyzer. Vamos começar."
+    },
+    {
+      "start": 5,
+      "end": 11,
+      "en": "Think of your navigation app. It starts with the usual route, then updates as you travel.",
+      "pt-BR": "Pense no seu aplicativo de navegação. Ele começa com o trajeto habitual e o atualiza durante o percurso."
+    },
+    {
+      "start": 11,
+      "end": 18,
+      "en": "Bayesian estimation works the same way, using measured vancomycin levels and accurate timing to refine a starting estimate.",
+      "pt-BR": "A estimativa bayesiana funciona de forma semelhante, usando concentrações medidas de vancomicina e horários precisos para refinar uma estimativa inicial."
+    },
+    {
+      "start": 18,
+      "end": 26,
+      "en": "Let's explore vancomyzer from checking previous doses to loading when indicated and monitoring serious MRSA infections.",
+      "pt-BR": "Vamos conhecer o Vancomyzer, desde a verificação das doses anteriores até a dose de ataque, quando indicada, e a monitorização de infecções graves por MRSA."
+    },
+    {
+      "start": 26,
+      "end": 34,
+      "en": "The model supports your judgment, and good information makes the estimate more useful.",
+      "pt-BR": "O modelo apoia seu julgamento clínico, e informações de qualidade tornam a estimativa mais útil."
+    },
+    {
+      "start": 34,
+      "end": 42,
+      "en": "Explore vancomyzer with this fictional adult example and begin by checking recent vancomycin doses at every facility.",
+      "pt-BR": "Explore o Vancomyzer com este exemplo fictício de um adulto. Comece verificando as doses recentes de vancomicina em todas as instituições."
+    },
+    {
+      "start": 42,
+      "end": 50,
+      "en": "Review medication administration and transfer records to confirm the amount given and exact infusion and blood draw times,",
+      "pt-BR": "Revise os registros de administração de medicamentos e de transferência para confirmar a quantidade administrada e os horários exatos de infusão e coleta de sangue,"
+    },
+    {
+      "start": 50,
+      "end": 57,
+      "en": "because a transferred patient may already have received a loading dose and should not automatically receive another.",
+      "pt-BR": "pois um paciente transferido pode já ter recebido uma dose de ataque e não deve receber outra automaticamente."
+    },
+    {
+      "start": 57,
+      "end": 66,
+      "en": "In empiric, enter age, sex, weight, height and serum creatinine, then confirm renal replacement status and review frailty when relevant.",
+      "pt-BR": "Na opção Empírico, informe idade, sexo, peso, altura e creatinina sérica. Em seguida, confirme a situação quanto à terapia renal substitutiva e avalie a fragilidade, quando pertinente."
+    },
+    {
+      "start": 66,
+      "end": 72,
+      "en": "This tool supports adults receiving intermittent intravenous vancomycin rather than dialysis dosing,",
+      "pt-BR": "Esta ferramenta oferece apoio para adultos recebendo vancomicina intravenosa intermitente; não calcula doses para pacientes em diálise."
+    },
+    {
+      "start": 72,
+      "end": 80,
+      "en": "so calculate and inspect the regimen and predicted exposure while remembering that results before measured levels remain population estimates",
+      "pt-BR": "Calcule e examine o esquema e a exposição prevista, lembrando que os resultados anteriores à inclusão de concentrações medidas continuam sendo estimativas populacionais,"
+    },
+    {
+      "start": 80,
+      "end": 84,
+      "en": "and the graph and candidate regimens show predictions to review.",
+      "pt-BR": "e que o gráfico e os esquemas candidatos mostram previsões que devem ser revisadas."
+    },
+    {
+      "start": 84,
+      "end": 93,
+      "en": "When a loading dose is clinically indicated, check recent doses at this facility and any transferring facility before giving another.",
+      "pt-BR": "Quando houver indicação clínica de dose de ataque, verifique as doses recentes nesta instituição e na instituição de origem antes de administrar outra."
+    },
+    {
+      "start": 93,
+      "end": 99,
+      "en": "Open loading dose and select the intended amount, then review the infusion time in minutes.",
+      "pt-BR": "Abra Dose de ataque, selecione a quantidade pretendida e revise o tempo de infusão em minutos."
+    },
+    {
+      "start": 99,
+      "end": 104,
+      "en": "This 2000 milligram example takes 200 minutes at 10 milligrams per minute.",
+      "pt-BR": "Neste exemplo, 2000 miligramas exigem 200 minutos a 10 miligramas por minuto."
+    },
+    {
+      "start": 104,
+      "end": 117,
+      "en": "Follow your institution's protocol and use a slower infusion when required, then select estimate exposure and verify the actual administration details.",
+      "pt-BR": "Siga o protocolo da sua instituição e use uma infusão mais lenta quando necessário. Depois, selecione Estimar exposição e confira os dados reais de administração."
+    },
+    {
+      "start": 117,
+      "end": 122,
+      "en": "Select estimate exposure after loading dose to enter the level workflow.",
+      "pt-BR": "Selecione Estimar exposição após a dose de ataque para acessar o fluxo de inserção das concentrações."
+    },
+    {
+      "start": 122,
+      "end": 132,
+      "en": "Review the dose, actual infusion duration and number of doses given, then enter the measured concentration with exact blood draw and infusion times.",
+      "pt-BR": "Revise a dose, a duração real da infusão e o número de doses administradas. Depois, informe a concentração medida com os horários exatos de coleta de sangue e de infusão."
+    },
+    {
+      "start": 132,
+      "end": 137,
+      "en": "Without a measured level, any available prediction remains based on the prior model.",
+      "pt-BR": "Sem uma concentração medida, qualquer previsão disponível continua baseada no modelo a priori."
+    },
+    {
+      "start": 137,
+      "end": 142,
+      "en": "Never enter a predicted concentration as a measured result.",
+      "pt-BR": "Nunca informe uma concentração prevista como se fosse um resultado medido."
+    },
+    {
+      "start": 142,
+      "end": 148,
+      "en": "For changed, held or missed doses, confirm this workflow can represent the history.",
+      "pt-BR": "Se houver doses alteradas, suspensas ou omitidas, confirme se este fluxo consegue representar o histórico."
+    },
+    {
+      "start": 148,
+      "end": 160,
+      "en": "Review the curve, candidate regimens and model limitations using the guideline AUC target of 400 to 600 for serious invasive MRSA infection when the MIC is one.",
+      "pt-BR": "Revise a curva, os esquemas candidatos e as limitações do modelo, usando o alvo de AUC de 400 a 600 recomendado pela diretriz para infecção invasiva grave por MRSA quando a CIM for um."
+    },
+    {
+      "start": 160,
+      "end": 175,
+      "en": "Follow institutional monitoring protocols with two levels preferred for Bayesian estimation, reassess when kidney function changes and document your plan remembering that vancomyzer still awaits independent patient validation.",
+      "pt-BR": "Siga os protocolos de monitorização da instituição, preferindo duas concentrações para a estimativa bayesiana. Reavalie quando a função renal mudar e documente seu plano, lembrando que o Vancomyzer ainda aguarda validação independente em pacientes."
+    }
+  ]
+}

@@ -7,10 +7,10 @@ test('locale input is restricted to the supported languages', () => {
   for (const value of [undefined, null, '', 'de', 'ES', '<script>', {}, 42]) assert.equal(parseLocale(value), 'en');
   for (const locale of locales) assert.equal(parseLocale(locale), locale);
 });
-test('each catalog entry has nonempty Spanish and French, preserving numerical tokens', () => {
+test('each catalog entry has nonempty Spanish, French and Brazilian Portuguese, preserving numerical tokens', () => {
   for (const [source, pair] of Object.entries(messages)) {
-    assert.deepEqual(Object.keys(pair).sort(), ['es','fr']);
-    for (const locale of ['es','fr'] as const) {
+    assert.deepEqual(Object.keys(pair).sort(), ['es','fr','pt-BR']);
+    for (const locale of ['es','fr','pt-BR'] as const) {
       assert.ok(pair[locale].trim(), `${source}: ${locale}`);
       assert.deepEqual(pair[locale].match(/\d+(?:\.\d+)?/g), source.match(/\d+(?:\.\d+)?/g), `${source}: ${locale} numbers`);
     }
@@ -19,8 +19,8 @@ test('each catalog entry has nonempty Spanish and French, preserving numerical t
 test('English and uncatalogued text are preserved exactly; switching is reversible', () => {
   for (const source of Object.keys(messages)) {
     assert.equal(translate(source,'en'),source);
-    for (const locale of ['es','fr','en','fr','es','en'] as const) {
-      const expected=locale==='en'?source:(messages as Record<string,{es:string;fr:string}>)[source][locale];
+    for (const locale of ['es','pt-BR','fr','en','pt-BR','fr','es','en'] as const) {
+      const expected=locale==='en'?source:(messages as Record<string,{es:string;fr:string;"pt-BR":string}>)[source][locale];
       assert.equal(translate(source,locale),expected);
     }
   }

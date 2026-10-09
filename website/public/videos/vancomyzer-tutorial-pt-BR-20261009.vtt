@@ -1,0 +1,143 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:03.360
+Bem-vindo ao tutorial do Vancomyzer. Vamos começar.
+
+00:00:05.000 --> 00:00:13.185
+Pense no seu aplicativo de navegação. Ele começa com o
+trajeto habitual e o atualiza durante o percurso.
+
+00:00:13.185 --> 00:00:19.097
+A estimativa bayesiana funciona de forma semelhante,
+usando concentrações medidas de vancomicina e
+
+00:00:19.097 --> 00:00:22.280
+horários precisos para refinar uma estimativa inicial.
+
+00:00:22.460 --> 00:00:29.116
+Vamos conhecer o Vancomyzer, desde a verificação das
+doses anteriores até a dose de ataque, quando
+
+00:00:29.116 --> 00:00:35.772
+indicada, e a monitorização de infecções graves por
+MRSA. O modelo apoia seu julgamento clínico, e
+
+00:00:35.772 --> 00:00:39.100
+informações de qualidade tornam a estimativa mais útil.
+
+00:00:39.280 --> 00:00:45.600
+Explore o Vancomyzer com este exemplo fictício de um
+adulto. Comece verificando as doses recentes de
+
+00:00:45.600 --> 00:00:51.130
+vancomicina em todas as instituições. Revise os
+registros de administração de medicamentos e de
+
+00:00:51.130 --> 00:00:57.055
+transferência para confirmar a quantidade administrada
+e os horários exatos de infusão e coleta de
+
+00:00:57.055 --> 00:01:04.165
+sangue, pois um paciente transferido pode já ter
+recebido uma dose de ataque e não deve receber outra
+
+00:01:04.165 --> 00:01:04.560
+automaticamente.
+
+00:01:04.740 --> 00:01:12.041
+Na opção Empírico, informe idade, sexo, peso, altura e
+creatinina sérica. Em seguida, confirme a situação
+
+00:01:12.041 --> 00:01:17.060
+quanto à terapia renal substitutiva e avalie a
+fragilidade, quando pertinente.
+
+00:01:17.240 --> 00:01:24.092
+Se um número puder indicar um decimal ou um inteiro,
+selecione o valor pretendido antes de continuar. O
+
+00:01:24.092 --> 00:01:28.280
+texto digitado é mantido; editar o número exige uma
+nova confirmação.
+
+00:01:28.460 --> 00:01:33.882
+Esta ferramenta oferece apoio para adultos recebendo
+vancomicina intravenosa intermitente; não calcula
+
+00:01:33.882 --> 00:01:41.564
+doses para pacientes em diálise. Calcule e examine o
+esquema e a exposição prevista, lembrando que os
+
+00:01:41.564 --> 00:01:46.986
+resultados anteriores à inclusão de concentrações
+medidas continuam sendo estimativas populacionais, e
+
+00:01:46.986 --> 00:01:52.860
+que o gráfico e os esquemas candidatos mostram
+previsões que devem ser revisadas.
+
+00:01:53.040 --> 00:01:59.440
+Quando houver indicação clínica de dose de ataque,
+verifique as doses recentes nesta instituição e na
+
+00:01:59.440 --> 00:02:02.240
+instituição de origem antes de administrar outra.
+
+00:02:02.420 --> 00:02:09.414
+Abra Dose de ataque, selecione a quantidade pretendida
+e revise o tempo de infusão em minutos. Neste
+
+00:02:09.414 --> 00:02:13.940
+exemplo, 2000 miligramas exigem 200 minutos a 10
+miligramas por minuto.
+
+00:02:14.120 --> 00:02:20.776
+Siga o protocolo da sua instituição e use uma infusão
+mais lenta quando necessário. Depois, selecione
+
+00:02:20.776 --> 00:02:24.520
+Estimar exposição e confira os dados reais de
+administração.
+
+00:02:24.700 --> 00:02:30.933
+Selecione Estimar exposição após a dose de ataque para
+acessar o fluxo de inserção das concentrações.
+
+00:02:30.933 --> 00:02:37.556
+Revise a dose, a duração real da infusão e o número de
+doses administradas. Depois, informe a
+
+00:02:37.556 --> 00:02:42.620
+concentração medida com os horários exatos de coleta de
+sangue e de infusão.
+
+00:02:42.800 --> 00:02:49.003
+Sem uma concentração medida, qualquer previsão
+disponível continua baseada no modelo a priori. Nunca
+
+00:02:49.003 --> 00:02:55.649
+informe uma concentração prevista como se fosse um
+resultado medido. Se houver doses alteradas, suspensas
+
+00:02:55.649 --> 00:03:00.080
+ou omitidas, confirme se este fluxo consegue
+representar o histórico.
+
+00:03:00.260 --> 00:03:08.119
+Revise a curva, os esquemas candidatos e as limitações
+do modelo, usando o alvo de AUC de 400 a 600
+
+00:03:08.119 --> 00:03:13.620
+recomendado pela diretriz para infecção invasiva grave
+por MRSA quando a CIM for um.
+
+00:03:13.800 --> 00:03:19.673
+Siga os protocolos de monitorização da instituição,
+preferindo duas concentrações para a estimativa
+
+00:03:19.673 --> 00:03:26.901
+bayesiana. Reavalie quando a função renal mudar e
+documente seu plano, lembrando que o Vancomyzer ainda
+
+00:03:26.901 --> 00:03:29.160
+aguarda validação independente em pacientes.

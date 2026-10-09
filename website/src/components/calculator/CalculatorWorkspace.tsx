@@ -48,7 +48,7 @@ import { useFeature } from "@/hooks/useFeature";
 import { translateGeneratedText } from "@/localization/generatedText";
 import { printReport, type ReportData } from "@/lib/generateReport";
 import { track } from "@/lib/analytics";
-import { parseClinicalNumber } from "@/lib/parseClinicalNumber";
+import { parseClinicalNumber, hasInvalidNumericValues, INVALID_NUMBER, clinicalDraftReplacer, clinicalDraftReviver } from "@/lib/parseClinicalNumber";
 import { COLIN_2019, modelDisplayName, modelShortName } from "@/lib/pk/modelRegistry";
 import { fmt } from "@/lib/formatNumber";
 const defaultPatient: CalculateRequestPatient = { age: 0, weight_kg: 0, height_cm: 0, sex: "", serum_creatinine_mg_dl: 0 };
@@ -180,7 +180,7 @@ export default function CalculatorWorkspace() {
     try {
       const raw = sessionStorage.getItem(SESSION_KEY);
       if (!raw) return;
-      const s = JSON.parse(raw);
+      const s = JSON.parse(raw, clinicalDraftReviver);
       if (Date.now() - (s.timestamp ?? 0) > EIGHT_HOURS) {
         sessionStorage.removeItem(SESSION_KEY);
         return;
@@ -215,7 +215,7 @@ export default function CalculatorWorkspace() {
         viewMode, mode, activeSection,
         result, selectedFrequencyOption,
         timestamp: Date.now(),
-      }));
+      }, clinicalDraftReplacer));
     } catch { /* storage full — ignore */ }
   }, [patient, rrt, regimen, levels, bedbound, viewMode, mode, activeSection, result, selectedFrequencyOption]);
 
@@ -322,7 +322,7 @@ export default function CalculatorWorkspace() {
     const hasLoading = (regimen.doses_given ?? 0) >= 2 && regimen.loading_dose_mg !== undefined;
     const { loading_dose_mg, loading_infusion_duration_hours, loading_to_maintenance_hours, ...maintenance } = regimen;
     const sentRegimen = hasLoading
-      ? { ...maintenance, loading_dose_mg, loading_infusion_duration_hours, ...(loading_to_maintenance_hours ? { loading_to_maintenance_hours } : {}) }
+      ? { ...maintenance, loading_dose_mg, loading_infusion_duration_hours, ...(loading_to_maintenance_hours !== undefined ? { loading_to_maintenance_hours } : {}) }
       : maintenance;
     return { ...base, regimen: sentRegimen, levels: validLevels };
   }, [mode, patient, rrt, regimen, levels, canSaveHistory]);
@@ -355,6 +355,12 @@ export default function CalculatorWorkspace() {
     setLoading(true);
     const request = { ...buildRequest(), intent };
     const seq = ++requestSeqRef.current;
+    if (hasInvalidNumericValues(request)) {
+      setError({ error_type: "validation_error", message: INVALID_NUMBER });
+      setResult(null);
+      setLoading(false);
+      return;
+    }
     const submittedAt = Date.now();
 
     try {
@@ -525,7 +531,14 @@ export default function CalculatorWorkspace() {
   }, [loading, rrt, handleCalculate]);
 
   useEffect(() => {
-    if (!bedboundDoseData || !(bedboundDoseData.dose_mg > 0) || !(bedboundDoseData.infusion_duration_hours > 0)) return;
+    if (!bedboundDoseData) return;
+    if (!(bedboundDoseData.dose_mg > 0) || !(bedboundDoseData.infusion_duration_hours > 0)) {
+      setRegimen((prev) => ({ ...prev, dose_mg: bedboundDoseData.dose_mg, infusion_duration_hours: bedboundDoseData.infusion_duration_hours }));
+      setResult(null);
+      ++requestSeqRef.current;
+      setLoading(false);
+      return;
+    }
     if (viewMode !== "one_level") applyViewMode("one_level");
     setRegimen((prev) => ({
       ...prev,
@@ -541,6 +554,14 @@ export default function CalculatorWorkspace() {
 
   useEffect(() => {
     setLastInputChangedAt(Date.now());
+    // Invalidate in-flight results immediately when a partial/malformed edit
+    // cannot be represented as a clinical number; never redisplay an old fit.
+    if (hasInvalidNumericValues({ patient, ...(mode === "initial_regimen" ? {} : { regimen, levels }) })) {
+      ++requestSeqRef.current;
+      setResult(null);
+      setLastCalculatedAt(null);
+      setLoading(false);
+    }
     // Clear field-level validation errors when the user modifies inputs so stale
     // "Must be a positive concentration" messages don't persist while the form is
     // still being filled. Errors reappear on the next failed Calculate attempt.
