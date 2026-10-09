@@ -70,16 +70,18 @@ export default function ClinicalNumberInput({
   const rangeError = parsed.value !== null && ((min !== undefined && parsed.value < Number(min)) || (max !== undefined && parsed.value > Number(max)) || (String(step) === "1" && !Number.isInteger(parsed.value)));
   const error = parsed.error || (!Number.isFinite(value) && raw.trim() === "" ? INVALID_NUMBER : null) || (rangeError ? NUMBER_RANGE : null);
   const invalidText = error !== null;
+  // Existing form wrappers display callback errors on blur; avoid repeating them.
+  const showInlineError = Boolean(error && (!onBlurValue || (raw.trim() === "" && !Number.isFinite(value))));
 
   return (
     <span className="block min-w-0 flex-1">
     <input
       {...rest}
       data-clinical-number="true"
-      aria-describedby={[rest["aria-describedby"], error ? errorId : null].filter(Boolean).join(" ") || undefined}
+      aria-describedby={[rest["aria-describedby"], showInlineError ? errorId : null].filter(Boolean).join(" ") || undefined}
       ref={(node) => { node?.setCustomValidity(error ? t(error) : ""); }}
       placeholder={rest.placeholder ? t(rest.placeholder) : undefined}
-      title={rest.title ? t(rest.title) : undefined}
+      title={error ? t(error) : rest.title ? t(rest.title) : undefined}
       aria-label={rest["aria-label"] ? t(rest["aria-label"]) : undefined}
       type="text"
       inputMode={inputMode}
@@ -101,7 +103,7 @@ export default function ClinicalNumberInput({
       }}
       className={typeof className === "function" ? className(invalidText) : className}
     />
-    {error && <span id={errorId} role="status" className="mt-1 block text-xs text-red-700">{t(error)}</span>}
+    {showInlineError && error && <span id={errorId} role="status" className="mt-1 block text-xs text-red-700">{t(error)}</span>}
     </span>
   );
 }
