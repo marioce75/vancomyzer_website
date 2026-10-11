@@ -356,8 +356,7 @@ export default function LandingPage() {
       <Section label="Pricing" note="Free for individual clinicians; site licences by bed count." last>
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
           <div>
-            <H2><LocalizedText text="Open the calculator" /></H2>
-            <p className="mt-2.5 max-w-[60ch] text-lg" style={{ color: INK2 }}><LocalizedText text={LAUNCH_LINE} /></p>
+            <H2><LocalizedText text="Access and plans" /></H2>
           </div>
           <div className="flex flex-wrap gap-3 md:flex-col">
             <OpenCalculatorButton source="landing_closing" className="vz-mbtn vz-mbtn--primary"><LocalizedText text="Open the calculator" /></OpenCalculatorButton>

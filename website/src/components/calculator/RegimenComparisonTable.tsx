@@ -57,7 +57,8 @@ function statusChip(auc: number) {
   const short = inRange ? "In range" : auc > 600 ? "High" : "Low";
   return (
     <LocalizedSpan className={`vz-chip ${cls}`} title={`${r.label}: AUC₂₄ ${auc} mg·h/L (target 400–600)`} style={{ padding: "0 5px", fontSize: 10 }}>
-      <LocalizedText text={short} /><span className="sr-only"> (<LocalizedText text={r.label} />)</span>
+      <LocalizedText text={short} />
+      {short !== r.label && <span className="sr-only"> (<LocalizedText text={r.label} />)</span>}
     </LocalizedSpan>
   );
 }

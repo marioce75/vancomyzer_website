@@ -364,6 +364,11 @@
     "fr": "Avertissement réglementaire",
     "pt-BR": "Disclaimer de regulamentação"
   },
+  "Access and plans": {
+    "es": "Acceso y planes",
+    "fr": "Accès et offres",
+    "pt-BR": "Acesso e planos"
+  },
   "Open the calculator": {
     "es": "Abrir la calculadora",
     "fr": "Ouvrir le calculateur",
@@ -2409,10 +2414,10 @@
     "fr": "Concentration",
     "pt-BR": "Nível"
   },
-  "Vancomycin level concentration (mg/L)": {
+  "Vancomycin concentration (mg/L)": {
     "es": "Concentración de vancomicina (mg/L)",
     "fr": "Concentration de vancomycine (mg/L)",
-    "pt-BR": "Concentração do nível de vancomicina (mg/L)"
+    "pt-BR": "Concentração de vancomicina (mg/L)"
   },
   "e.g. 18.5": {
     "es": "p. ej., 18.5",
@@ -10327,7 +10332,7 @@
   "Two flat plans. Pick how many clinicians will use Vancomyzer.": {
     "es": "Dos planes de tarifa fija. Elija cuántos profesionales clínicos utilizarán Vancomyzer.",
     "fr": "Deux offres forfaitaires. Choisissez le nombre de cliniciens qui utiliseront Vancomyzer.",
-    "pt-BR": "Dois planos planos. Escolha quantos clínicos usarão Vancomyzer."
+    "pt-BR": "Dois planos de preço fixo. Escolha quantos clínicos usarão Vancomyzer."
   },
   "seats": {
     "es": "plazas",
