@@ -91,9 +91,9 @@ export async function sendDiscountDecisionEmail(args: {
             Your Vancomyzer ${typeLabel} discount has been approved. The discount will be applied automatically the next time you start a Pro subscription — you'll see the reduced price at checkout.
           </p>
           <p style="margin-top: 16px;">
-            <a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/upgrade"
+            <a href="${process.env.NEXTAUTH_URL ?? "https://vancomyzer.com"}/calculator"
                style="display: inline-block; padding: 10px 22px; background: #1e4d8c; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 4px;">
-              Start your Pro trial
+              Open the calculator
             </a>
           </p>
           <p style="margin-top: 16px; font-size: 12px; color: #4a5568; line-height: 1.55;">

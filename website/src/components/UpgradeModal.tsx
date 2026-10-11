@@ -4,27 +4,11 @@ import { LocalizedText } from "@/localization/LanguageProvider";
 import { LocalizedButton } from "@/localization/LocalizedElements";
 
 
-/**
- * Upgrade modal shown when a Free user attempts a Pro+ feature.
- *
- * Two CTAs per spec: "Start 14-day trial" (primary) and "No thanks"
- * (secondary, closes modal). Routes to /settings/billing where the
- * trial actually starts. No dark patterns — × close in the corner,
- * Esc-to-close, click-outside-to-close.
- *
- * Usage:
- *   const [open, setOpen] = useState(false);
- *   <button onClick={() => !canSaveHistory && setOpen(true)}>...</button>
- *   <UpgradeModal
- *     open={open}
- *     onClose={() => setOpen(false)}
- *     feature="history.calculation"
- *   />
- */
+/** Availability notice. Feature permission checks remain in the caller. */
 
 import { useEffect, useCallback } from "react";
 import Link from "next/link";
-import { upgradeTargetFor, type FeatureId } from "@/lib/tiers";
+import { type FeatureId } from "@/lib/tiers";
 
 interface UpgradeModalProps {
   open: boolean;
@@ -36,38 +20,6 @@ interface UpgradeModalProps {
   description?: string;
 }
 
-const DEFAULT_COPY: Partial<Record<FeatureId, { title: string; description: string }>> = {
-  "export.pdf": {
-    title: "PDF export is a Pro feature",
-    description:
-      "Export clinical-note PDFs of your calculations for the medical record. Available on Individual Pro and higher.",
-  },
-  "export.note.copy": {
-    title: "Clinical note export is a Pro feature",
-    description:
-      "Copy a clinician-ready note to your clipboard for paste into the EHR. Available on Individual Pro and higher.",
-  },
-  "export.note.unwatermarked": {
-    title: "Clinical-note export is a Pro feature",
-    description:
-      "Pro unlocks PDF and note export for the medical record — Free tier is calculator-only.",
-  },
-  "history.calculation": {
-    title: "Calculation history is a Pro feature",
-    description:
-      "Save 90 days of de-identified calculation history with optional case IDs. Search past calcs without re-entering patient data.",
-  },
-  "org.admin_panel": {
-    title: "Team management is a Department feature",
-    description:
-      "Invite teammates, manage roles, and view your institution's calculation audit log. Institutional availability requires a scope review.",
-  },
-  "org.invite_users": {
-    title: "Invitations are a Department feature",
-    description:
-      "Add teammates to your shared workspace. Institutional availability requires a scope review.",
-  },
-};
 
 export default function UpgradeModal({ open, onClose, feature, title, description }: UpgradeModalProps) {
   const handleEscape = useCallback(
@@ -89,22 +41,12 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
 
   if (!open) return null;
 
-  const upgradeTier = upgradeTargetFor(feature);
-  const copy = DEFAULT_COPY[feature] ?? {
-    title: "Institutional feature",
-    description: "Contact Dosys to discuss institutional requirements and availability.",
-  };
-  const headline = title ?? copy.title;
-  const body = description ?? copy.description;
-
-  // Individual Pro and Department are self-serve (trial checkout).
-  // Hospital CTA goes to dosys.health/contact (sales).
-  const isSelfServe = upgradeTier.id === "individual_pro";
-  const primaryHref = isSelfServe
-    ? "/settings/billing"
-    : "https://dosys.health/contact?type=site-license";
-  const primaryLabel = isSelfServe ? "Start 14-day trial" : "Discuss site requirements";
-  const primaryExternal = !isSelfServe;
+  const headline = title ?? "Feature access";
+  const body = description ?? "This feature is not available for your current account access. Contact us to discuss availability.";
+  const primaryHref = "https://dosys.health/contact";
+  const primaryLabel = "Contact";
+  const primaryExternal = true;
+  void feature;
 
   return (
     <div
@@ -155,9 +97,6 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
           ×
         </LocalizedButton>
 
-        <div style={{ fontSize: 11, fontWeight: 700, color: "#0d9488", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}><LocalizedText text={"Upgrade to"} />{" "}{upgradeTier.name}
-        </div>
-
         <h2 id="upgrade-modal-title" style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 700, color: "#0f172a" }}>
           <LocalizedText text={headline} />
         </h2>
@@ -165,21 +104,6 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
         <p style={{ margin: "0 0 16px", fontSize: 14, color: "#475569", lineHeight: 1.55 }}>
           <LocalizedText text={body} />
         </p>
-
-        <div style={{
-          padding: 12,
-          background: "#f8fafc",
-          border: "1px solid #e2e8f0",
-          borderRadius: 4,
-          marginBottom: 20,
-        }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "#0f172a", marginBottom: 4 }}>
-            <LocalizedText text={upgradeTier.priceLabel} />
-          </div>
-          <div style={{ fontSize: 11, color: "#64748b" }}>
-            <LocalizedText text={upgradeTier.audience} />
-          </div>
-        </div>
 
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
           <button

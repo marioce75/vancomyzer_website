@@ -145,7 +145,7 @@ export default function TransparentDosingPage() {
       <Record label="Open the calculator" note="Free for individual clinicians; no account needed during launch." last>
         <div className="flex flex-wrap items-center gap-3">
           <Link href={OPEN_ACCESS ? "/calculator" : "/register"} className="vz-mbtn vz-mbtn--primary"><LocalizedText text="Open the calculator" /></Link>
-          <Link href="/pricing" className="vz-mbtn vz-mbtn--outline"><LocalizedText text="See pricing" /></Link>
+          <Link href="/pricing" className="vz-mbtn vz-mbtn--outline"><LocalizedText text="Free access" /></Link>
         </div>
         <p className="mt-5 max-w-[70ch] text-[13.5px] leading-[1.5]" style={{ color: INK3 }}><LocalizedText text="Vancomyzer™ is a clinical decision-support tool for qualified healthcare professionals only. Not FDA-cleared or approved. Designed to meet the non-device clinical decision support criteria of FD&C Act §520(o)(1)(E); not reviewed by the FDA. Engineered by" />{" "}
           <a href="https://dosys.health" target="_blank" rel="noopener noreferrer" style={{ color: "#1f5e96", textDecoration: "underline" }}><LocalizedText text="Dōsys™" /></a>.

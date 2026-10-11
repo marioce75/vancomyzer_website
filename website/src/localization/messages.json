@@ -16193,5 +16193,155 @@
     "es": "Sus ecuaciones se comprueban con valores publicados y casos simulados. Está prevista la validación externa con datos de pacientes.",
     "fr": "Ses équations sont vérifiées à l’aide de valeurs publiées et de cas synthétiques ; une validation externe sur des données de patients est prévue.",
     "pt-BR": "Suas equações são verificadas com valores publicados e casos sintéticos; está prevista validação externa com dados de pacientes."
+  },
+  "Free access": {
+    "es": "Acceso gratuito",
+    "fr": "Accès gratuit",
+    "pt-BR": "Acesso gratuito"
+  },
+  "Vancomyzer free access": {
+    "es": "Acceso gratuito a Vancomyzer",
+    "fr": "Accès gratuit à Vancomyzer",
+    "pt-BR": "Acesso gratuito ao Vancomyzer"
+  },
+  "Access to Vancomyzer is currently free.": {
+    "es": "Actualmente, el acceso a Vancomyzer es gratuito.",
+    "fr": "L’accès à Vancomyzer est actuellement gratuit.",
+    "pt-BR": "Atualmente, o acesso ao Vancomyzer é gratuito."
+  },
+  "Is Vancomyzer free?": {
+    "es": "¿Es gratuito Vancomyzer?",
+    "fr": "Vancomyzer est-il gratuit ?",
+    "pt-BR": "O Vancomyzer é gratuito?"
+  },
+  "Yes. Access to Vancomyzer is currently free.": {
+    "es": "Sí. Actualmente, el acceso a Vancomyzer es gratuito.",
+    "fr": "Oui. L’accès à Vancomyzer est actuellement gratuit.",
+    "pt-BR": "Sim. Atualmente, o acesso ao Vancomyzer é gratuito."
+  },
+  "Access and institutional requirements": {
+    "es": "Acceso y requisitos institucionales",
+    "fr": "Accès et besoins institutionnels",
+    "pt-BR": "Acesso e requisitos institucionais"
+  },
+  "Discuss your institution’s requirements.": {
+    "es": "Coméntenos los requisitos de su institución.",
+    "fr": "Parlons des besoins de votre établissement.",
+    "pt-BR": "Converse conosco sobre os requisitos da sua instituição."
+  },
+  "Institutional services, support and integrations require a separate review of requirements and availability.": {
+    "es": "Los servicios institucionales, la asistencia y las integraciones requieren una revisión independiente de los requisitos y la disponibilidad.",
+    "fr": "Les services institutionnels, l’assistance et les intégrations nécessitent un examen distinct des besoins et de leur disponibilité.",
+    "pt-BR": "Serviços institucionais, suporte e integrações exigem uma análise separada dos requisitos e da disponibilidade."
+  },
+  "Questions about access?": {
+    "es": "¿Tiene preguntas sobre el acceso?",
+    "fr": "Des questions sur l’accès ?",
+    "pt-BR": "Dúvidas sobre o acesso?"
+  },
+  "Contact us about account access or institutional requirements.": {
+    "es": "Contacte con nosotros para consultar el acceso a su cuenta o los requisitos institucionales.",
+    "fr": "Contactez-nous au sujet de l’accès à votre compte ou des besoins de votre établissement.",
+    "pt-BR": "Entre em contato conosco sobre o acesso à conta ou os requisitos institucionais."
+  },
+  "Existing subscriptions and institutional agreements retain their agreed terms. Manage an existing subscription in Billing, or contact us about your agreement.": {
+    "es": "Las suscripciones y los acuerdos institucionales existentes mantienen sus condiciones acordadas. Gestione una suscripción existente en Facturación o contacte con nosotros para consultar su acuerdo.",
+    "fr": "Les abonnements et accords institutionnels existants conservent les conditions convenues. Gérez un abonnement existant dans Facturation ou contactez-nous au sujet de votre accord.",
+    "pt-BR": "As assinaturas e os acordos institucionais existentes mantêm os termos acordados. Gerencie uma assinatura existente em Faturamento ou entre em contato conosco sobre seu acordo."
+  },
+  "Free access — Vancomyzer™": {
+    "es": "Acceso gratuito — Vancomyzer™",
+    "fr": "Accès gratuit — Vancomyzer™",
+    "pt-BR": "Acesso gratuito — Vancomyzer™"
+  },
+  "Access the Vancomyzer calculator and review its methods, scope and limitations.": {
+    "es": "Acceda a la calculadora Vancomyzer y consulte sus métodos, alcance y limitaciones.",
+    "fr": "Accédez au calculateur Vancomyzer et consultez ses méthodes, son champ d’application et ses limites.",
+    "pt-BR": "Acesse a calculadora Vancomyzer e consulte seus métodos, escopo e limitações."
+  },
+  "Who it is for, and how to access it.": {
+    "es": "A quién va dirigido y cómo acceder.",
+    "fr": "À qui il s’adresse et comment y accéder.",
+    "pt-BR": "A quem se destina e como acessar."
+  },
+  "Feature access": {
+    "es": "Acceso a las funciones",
+    "fr": "Accès aux fonctionnalités",
+    "pt-BR": "Acesso aos recursos"
+  },
+  "This feature is not available for your current account access. Contact us to discuss availability.": {
+    "es": "Esta función no está disponible con el acceso actual de su cuenta. Contacte con nosotros para consultar su disponibilidad.",
+    "fr": "Cette fonctionnalité n’est pas disponible avec les droits actuels de votre compte. Contactez-nous pour connaître sa disponibilité.",
+    "pt-BR": "Este recurso não está disponível com o acesso atual da sua conta. Entre em contato conosco para consultar a disponibilidade."
+  },
+  "; access is currently free. Its equations are published; its implementation has been checked against published values, synthetic patients and a separately built program. It has not been validated in real patients.": {
+    "es": "; el acceso es gratuito actualmente. Sus ecuaciones están publicadas; su implementación se ha comprobado frente a valores publicados, pacientes sintéticos y un programa desarrollado de forma independiente. No se ha validado en pacientes reales.",
+    "fr": "; l’accès est actuellement gratuit. Ses équations sont publiées ; son implémentation a été vérifiée par rapport à des valeurs publiées, des patients simulés et un programme développé séparément. Il n’a pas été validé chez des patients réels.",
+    "pt-BR": "; o acesso é gratuito atualmente. Suas equações estão publicadas; a implementação foi verificada em relação a valores publicados, pacientes sintéticos e um programa desenvolvido separadamente. Não foi validado em pacientes reais."
+  },
+  "Institutional discussions depend on requirements, approvals and agreed scope. Evaluation participation does not create a subscription.": {
+    "es": "Las conversaciones con instituciones dependen de los requisitos, las aprobaciones y el alcance acordado. Participar en una evaluación no crea una suscripción.",
+    "fr": "Les échanges avec les établissements dépendent des besoins, des autorisations et du périmètre convenu. Participer à une évaluation ne crée pas d’abonnement.",
+    "pt-BR": "As discussões com instituições dependem dos requisitos, das aprovações e do escopo acordado. Participar de uma avaliação não cria uma assinatura."
+  },
+  "Questions about Dōsys methods, a hospital evaluation or institutional requirements.": {
+    "es": "Preguntas sobre los métodos de Dōsys, una evaluación hospitalaria o los requisitos institucionales.",
+    "fr": "Questions sur les méthodes de Dōsys, une évaluation hospitalière ou les besoins institutionnels.",
+    "pt-BR": "Dúvidas sobre os métodos da Dōsys, uma avaliação hospitalar ou os requisitos institucionais."
+  },
+  "Existing institutional agreements retain their written scope. Team administration, audit logs, multi-site arrangements and any business associate agreement require separate written review. EHR integration is not included.": {
+    "es": "Los acuerdos institucionales existentes mantienen su alcance escrito. La administración de equipos, los registros de auditoría, los acuerdos para varios centros y cualquier acuerdo de socio comercial requieren una revisión escrita independiente. No se incluye integración con la historia clínica electrónica.",
+    "fr": "Les accords institutionnels existants conservent leur périmètre écrit. L’administration des équipes, les journaux d’audit, les dispositifs multisites et tout accord de partenaire commercial nécessitent un examen écrit distinct. L’intégration au dossier patient informatisé n’est pas incluse.",
+    "pt-BR": "Os acordos institucionais existentes mantêm seu escopo por escrito. Administração de equipes, registros de auditoria, acordos para múltiplas unidades e qualquer acordo de associado comercial exigem análise escrita separada. A integração com o prontuário eletrônico não está incluída."
+  },
+  "Your existing referral credits and subscription terms remain unchanged.": {
+    "es": "Sus créditos por recomendaciones y las condiciones de su suscripción existentes no cambian.",
+    "fr": "Vos crédits de parrainage et les conditions de votre abonnement existants restent inchangés.",
+    "pt-BR": "Seus créditos de indicação e os termos da sua assinatura existentes permanecem inalterados."
+  },
+  "Invite a colleague": {
+    "es": "Invite a un compañero",
+    "fr": "Invitez un collègue",
+    "pt-BR": "Convide um colega"
+  },
+  "Your colleague can open the calculator to review its methods and limitations.": {
+    "es": "Su compañero puede abrir la calculadora para consultar sus métodos y limitaciones.",
+    "fr": "Votre collègue peut ouvrir le calculateur pour consulter ses méthodes et ses limites.",
+    "pt-BR": "Seu colega pode abrir a calculadora para consultar seus métodos e limitações."
+  },
+  "Questions about access, institutional requirements or evaluation.": {
+    "es": "Preguntas sobre el acceso, los requisitos institucionales o la evaluación.",
+    "fr": "Questions sur l’accès, les besoins institutionnels ou l’évaluation.",
+    "pt-BR": "Dúvidas sobre acesso, requisitos institucionais ou avaliação."
+  },
+  "Dōsys™ provides Vancomyzer™, a vancomycin dosing calculator, for review by licensed healthcare professionals. It is not for use in patient care decisions without independent clinical review. Access to Vancomyzer is currently free. Existing subscriptions and institutional agreements retain their agreed terms. The pharmacokinetic model, equations, and clinical safety checks are identical across all plans.\n\nDōsys™ makes no representations or warranties regarding the accuracy, quality, completeness, timeliness, appropriateness, or suitability of this tool. Dōsys™ assumes no obligation to update the tool or advise on further developments concerning vancomycin dosage. Medical information changes rapidly. YOU AS THE USER (“USER”) ACKNOWLEDGE THAT THE TOOL IS PROVIDED ON AN “AS IS” BASIS AND THAT ANY USE OF OR RELIANCE ON THE TOOL SHALL BE AT YOUR SOLE RISK.": {
+    "es": "Dōsys™ ofrece Vancomyzer™, una calculadora de dosificación de vancomicina, para su revisión por profesionales sanitarios habilitados. No debe utilizarse para tomar decisiones asistenciales sin una revisión clínica independiente. Actualmente, el acceso a Vancomyzer es gratuito. Las suscripciones y los acuerdos institucionales existentes mantienen las condiciones acordadas. El modelo farmacocinético, las ecuaciones y las comprobaciones de seguridad clínica son idénticos en todos los planes.\n\nDōsys™ no formula declaraciones ni ofrece garantías sobre la exactitud, calidad, integridad, actualidad, adecuación o idoneidad de esta herramienta. Dōsys™ no asume obligación alguna de actualizarla ni de informar de novedades sobre la dosificación de vancomicina. La información médica cambia con rapidez. USTED, COMO USUARIO («USUARIO»), RECONOCE QUE LA HERRAMIENTA SE OFRECE «TAL CUAL» Y QUE CUALQUIER USO O CONFIANZA EN ELLA SERÁ BAJO SU EXCLUSIVA RESPONSABILIDAD.",
+    "fr": "Dōsys™ fournit Vancomyzer™, un calculateur de posologie de la vancomycine, pour examen par des professionnels de santé habilités. Il ne doit pas être utilisé pour prendre des décisions de soins sans examen clinique indépendant. L’accès à Vancomyzer est actuellement gratuit. Les abonnements et accords institutionnels existants conservent leurs conditions convenues. Le modèle pharmacocinétique, les équations et les contrôles de sécurité clinique sont identiques pour tous les forfaits.\n\nDōsys™ ne formule aucune déclaration ni garantie concernant l’exactitude, la qualité, l’exhaustivité, l’actualité, le caractère approprié ou l’adéquation de cet outil. Dōsys™ n’est tenue à aucune obligation de mettre à jour l’outil ni de communiquer de nouvelles informations concernant la posologie de la vancomycine. Les informations médicales évoluent rapidement. EN TANT QU’UTILISATEUR («UTILISATEUR»), VOUS RECONNAISSEZ QUE L’OUTIL EST FOURNI «EN L’ÉTAT» ET QUE TOUTE UTILISATION DE L’OUTIL OU TOUTE CONFIANCE ACCORDÉE À CELUI-CI RELÈVE DE VOTRE SEULE RESPONSABILITÉ.",
+    "pt-BR": "Dōsys™ disponibiliza o Vancomyzer™, uma calculadora de doses de vancomicina, para revisão por profissionais de saúde legalmente habilitados. Não deve ser utilizado em decisões de assistência ao paciente sem revisão clínica independente. Atualmente, o acesso ao Vancomyzer é gratuito. As assinaturas e os acordos institucionais existentes mantêm os termos acordados. O modelo farmacocinético, as equações e as verificações de segurança clínica são idênticos em todos os planos.\n\nDōsys™ não faz declarações nem oferece garantias quanto à precisão, qualidade, completude, atualidade, adequação ou aplicabilidade desta ferramenta. Dōsys™ não assume a obrigação de atualizar a ferramenta ou informar novos avanços relativos à dosagem de vancomicina. As informações médicas mudam rapidamente. VOCÊ, NA QUALIDADE DE USUÁRIO (\"USUÁRIO\"), RECONHECE QUE A FERRAMENTA É FORNECIDA \"NO ESTADO EM QUE SE ENCONTRA\" E QUE QUALQUER USO OU CONFIANÇA NA FERRAMENTA SERÁ POR SUA CONTA E RISCO."
+  },
+  "Your pilot data is complete. Generate your personalized summary report below and share it with your pharmacy director or P&T committee. Contact us about continued access to your case log.": {
+    "es": "Los datos de su piloto están completos. Genere su informe de resumen personalizado a continuación y compártalo con su director de farmacia o comité de farmacia y terapéutica. Contáctenos sobre la continuidad del acceso a su registro de casos.",
+    "fr": "Les données de votre pilote sont complètes. Générez votre rapport de synthèse personnalisé ci-dessous et partagez-le avec votre responsable de pharmacie ou votre comité du médicament. Contactez-nous au sujet du maintien de l’accès à votre registre de cas.",
+    "pt-BR": "Os dados do seu piloto estão completos. Gere seu relatório de resumo personalizado abaixo e compartilhe-o com o diretor de farmácia ou a comissão de farmácia e terapêutica. Entre em contato para tratar da continuidade do acesso ao seu registro de casos."
+  },
+  "Access to Vancomyzer is currently free. All plans use the same calculation method. Contact us about account access or institutional requirements.": {
+    "es": "Actualmente, el acceso a Vancomyzer es gratuito. Todos los planes utilizan el mismo método de cálculo. Contáctenos sobre el acceso a la cuenta o los requisitos institucionales.",
+    "fr": "L’accès à Vancomyzer est actuellement gratuit. Tous les forfaits utilisent la même méthode de calcul. Contactez-nous au sujet de l’accès au compte ou des besoins institutionnels.",
+    "pt-BR": "Atualmente, o acesso ao Vancomyzer é gratuito. Todos os planos usam o mesmo método de cálculo. Entre em contato sobre acesso à conta ou requisitos institucionais."
+  },
+  "Dōsys™ provides Vancomyzer™, a vancomycin dosing calculator, for review by licensed healthcare professionals. It is not for use in patient care decisions without independent clinical review. Access to Vancomyzer is currently free. Existing access commitments remain unchanged. Existing subscriptions and institutional agreements retain their agreed terms. The pharmacokinetic model, equations, and clinical safety checks are identical across all plans.\n\nDōsys™ makes no representations or warranties regarding the accuracy, quality, completeness, timeliness, appropriateness, or suitability of this tool. Dōsys™ assumes no obligation to update the tool or advise on further developments concerning vancomycin dosage. Medical information changes rapidly. YOU AS THE USER (“USER”) ACKNOWLEDGE THAT THE TOOL IS PROVIDED ON AN “AS IS” BASIS AND THAT ANY USE OF OR RELIANCE ON THE TOOL SHALL BE AT YOUR SOLE RISK.": {
+    "es": "Dōsys™ ofrece Vancomyzer™, una calculadora de dosificación de vancomicina, para su revisión por profesionales sanitarios habilitados. No debe utilizarse para tomar decisiones asistenciales sin una revisión clínica independiente. Actualmente, el acceso a Vancomyzer es gratuito. Los compromisos de acceso existentes no cambian. Las suscripciones y los acuerdos institucionales existentes mantienen las condiciones acordadas. El modelo farmacocinético, las ecuaciones y las comprobaciones de seguridad clínica son idénticos en todos los planes.\n\nDōsys™ no formula declaraciones ni ofrece garantías sobre la exactitud, calidad, integridad, actualidad, adecuación o idoneidad de esta herramienta. Dōsys™ no asume obligación alguna de actualizarla ni de informar de novedades sobre la dosificación de vancomicina. La información médica cambia con rapidez. USTED, COMO USUARIO («USUARIO»), RECONOCE QUE LA HERRAMIENTA SE OFRECE «TAL CUAL» Y QUE CUALQUIER USO O CONFIANZA EN ELLA SERÁ BAJO SU EXCLUSIVA RESPONSABILIDAD.",
+    "fr": "Dōsys™ fournit Vancomyzer™, un calculateur de posologie de la vancomycine, pour examen par des professionnels de santé habilités. Il ne doit pas être utilisé pour prendre des décisions de soins sans examen clinique indépendant. L’accès à Vancomyzer est actuellement gratuit. Les engagements d’accès existants restent inchangés. Les abonnements et accords institutionnels existants conservent leurs conditions convenues. Le modèle pharmacocinétique, les équations et les contrôles de sécurité clinique sont identiques pour tous les forfaits.\n\nDōsys™ ne formule aucune déclaration ni garantie concernant l’exactitude, la qualité, l’exhaustivité, l’actualité, le caractère approprié ou l’adéquation de cet outil. Dōsys™ n’est tenue à aucune obligation de mettre à jour l’outil ni de communiquer de nouvelles informations concernant la posologie de la vancomycine. Les informations médicales évoluent rapidement. EN TANT QU’UTILISATEUR («UTILISATEUR»), VOUS RECONNAISSEZ QUE L’OUTIL EST FOURNI «EN L’ÉTAT» ET QUE TOUTE UTILISATION DE L’OUTIL OU TOUTE CONFIANCE ACCORDÉE À CELUI-CI RELÈVE DE VOTRE SEULE RESPONSABILITÉ.",
+    "pt-BR": "Dōsys™ disponibiliza o Vancomyzer™, uma calculadora de doses de vancomicina, para revisão por profissionais de saúde legalmente habilitados. Não deve ser utilizado em decisões de assistência ao paciente sem revisão clínica independente. Atualmente, o acesso ao Vancomyzer é gratuito. Os compromissos de acesso existentes permanecem inalterados. As assinaturas e os acordos institucionais existentes mantêm os termos acordados. O modelo farmacocinético, as equações e as verificações de segurança clínica são idênticos em todos os planos.\n\nDōsys™ não faz declarações nem oferece garantias quanto à precisão, qualidade, completude, atualidade, adequação ou aplicabilidade desta ferramenta. Dōsys™ não assume a obrigação de atualizar a ferramenta ou informar novos avanços relativos à dosagem de vancomicina. As informações médicas mudam rapidamente. VOCÊ, NA QUALIDADE DE USUÁRIO (\"USUÁRIO\"), RECONHECE QUE A FERRAMENTA É FORNECIDA \"NO ESTADO EM QUE SE ENCONTRA\" E QUE QUALQUER USO OU CONFIANÇA NA FERRAMENTA SERÁ POR SUA CONTA E RISCO."
+  },
+  "Saved history, institution details on exports and team administration depend on your account access. Contact us about availability.": {
+    "es": "El historial guardado, los datos institucionales en las exportaciones y la administración de equipos dependen del acceso de su cuenta. Contáctenos sobre su disponibilidad.",
+    "fr": "L’historique enregistré, les informations de l’établissement sur les exports et l’administration des équipes dépendent des droits d’accès de votre compte. Contactez-nous pour connaître leur disponibilité.",
+    "pt-BR": "O histórico salvo, os dados institucionais nas exportações e a administração de equipes dependem do acesso da sua conta. Entre em contato sobre a disponibilidade."
+  },
+  "Use Vancomyzer as your primary dosing support tool. Your case data is accumulating. At day 75, a personalized summary report will be generated showing your AUC attainment rate, case volume and key insights from your logged cases — a document you can share with your pharmacy director for institutional review.": {
+    "es": "Utilice Vancomyzer como herramienta principal de apoyo a la dosificación. Los datos de sus casos se van acumulando. El día 75 se generará un informe de resumen personalizado con su tasa de consecución del AUC objetivo, volumen de casos y observaciones principales de los casos registrados: un documento que podrá compartir con su director de farmacia para una revisión institucional.",
+    "fr": "Utilisez Vancomyzer comme outil principal d’aide à la posologie. Les données de vos cas s’accumulent. Au jour 75, un rapport de synthèse personnalisé sera généré avec votre taux d’atteinte de l’AUC cible, le nombre de cas et les principaux enseignements des cas enregistrés : un document à partager avec votre responsable de pharmacie pour un examen institutionnel.",
+    "pt-BR": "Utilize Vancomyzer como sua principal ferramenta de suporte à dosagem. Os seus dados do caso estão a acumular-se. No dia 75, será gerado um relatório de resumo personalizado mostrando a taxa de obtenção da AUC, o volume do caso e os principais insights de seus casos registrados — um documento que você pode compartilhar com seu diretor de farmácia para revisão institucional."
   }
 }

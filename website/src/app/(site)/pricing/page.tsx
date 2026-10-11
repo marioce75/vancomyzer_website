@@ -5,9 +5,9 @@ import PricingClient from "./PricingClient";
 
 const englishMetadata: Metadata = {
   alternates: { canonical: "https://vancomyzer.com/pricing" },
-  title: "Pricing — Vancomyzer™",
+  title: "Free access — Vancomyzer™",
   description:
-    "The core Vancomyzer calculator is free. Individual Pro and Hospital Site plans add account and site features; every plan uses the same calculation method.",
+    "Access the Vancomyzer calculator and review its methods, scope and limitations.",
 };
 
 export default function PricingPage() {

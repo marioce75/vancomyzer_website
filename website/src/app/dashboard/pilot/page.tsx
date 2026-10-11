@@ -139,13 +139,13 @@ export default function PilotDashboardPage() {
         {currentPhase === 'PHASE_2' && !isExpired && (
           <>
             <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={"Phase 2 — Active Use (Days 15–75)"} /></div>
-            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Use Vancomyzer as your primary dosing support tool. Your case data is accumulating. At day 75, a personalized summary report will be generated showing your AUC attainment rate, case volume and key insights from your logged cases — a document you can share with your pharmacy director to make the case for an institutional subscription."} /></p>
+            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Use Vancomyzer as your primary dosing support tool. Your case data is accumulating. At day 75, a personalized summary report will be generated showing your AUC attainment rate, case volume and key insights from your logged cases — a document you can share with your pharmacy director for institutional review."} /></p>
           </>
         )}
         {(currentPhase === 'PHASE_3' || isExpired) && !isConverted && (
           <>
             <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={"Phase 3 — Value Review (Days 76–90)"} /></div>
-            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Your pilot data is complete. Generate your personalized summary report below and share it with your pharmacy director or P&T committee. Subscribe before day 90 to retain your full case log and continue without interruption."} /></p>
+            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Your pilot data is complete. Generate your personalized summary report below and share it with your pharmacy director or P&T committee. Contact us about continued access to your case log."} /></p>
           </>
         )}
         {isConverted && (
@@ -192,13 +192,13 @@ export default function PilotDashboardPage() {
         )}
         {(isExpired || currentPhase === 'PHASE_3') && !isConverted && (
           <a
-            href="/upgrade"
+            href="/contact"
             style={{
               display: 'inline-block', background: GREEN, color: NAVY,
               border: 'none', padding: '10px 20px', fontSize: 13, fontWeight: 700,
               cursor: 'pointer', textDecoration: 'none',
             }}
-          ><LocalizedText text={"Subscribe — $49.99/year"} /></a>
+          ><LocalizedText text={"Contact"} /></a>
         )}
       </div>
 

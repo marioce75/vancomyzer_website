@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const navItems = [
   { href: "/transparent-dosing", label: "Evidence" },
   { href: "/faq", label: "FAQ" },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/pricing", label: "Free access" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];

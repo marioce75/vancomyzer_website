@@ -21,9 +21,9 @@
  * server the helpers report "not accepted" and record nothing.
  */
 
-// 2026-09-16: model, regulatory, validation-status and plan wording changed
-// (external review of 15 Sep 2026), so every visitor accepts again.
-export const DISCLAIMER_VERSION = "2026-09-16";
+// 2026-10-11: access wording changed; clinical and regulatory wording unchanged.
+// Returning visitors must review and accept the revised notice.
+export const DISCLAIMER_VERSION = "2026-10-11";
 
 export const DISCLAIMER_STORAGE_KEY = "vmz_disclaimer_acceptance";
 

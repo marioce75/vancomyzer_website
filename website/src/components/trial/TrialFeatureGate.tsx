@@ -32,8 +32,8 @@ export function TrialFeatureGate({ feature, children }: Props) {
             background: 'transparent',
             cursor: 'pointer',
           }}
-          onClick={() => { window.location.href = '/upgrade' }}
-        ><LocalizedText text={"🔒 Available with subscription"} /></button>
+          onClick={() => { window.location.href = '/contact' }}
+        ><LocalizedText text={"Feature access"} /></button>
       </div>
     </div>
   )

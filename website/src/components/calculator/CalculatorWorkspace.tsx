@@ -1122,9 +1122,9 @@ export default function CalculatorWorkspace() {
             feature="interpretation.why_this_result"
             fallback={
               <div className="rounded-md border px-3 py-2" style={{ borderColor: "#c6d6e6", background: "#e6eef5" }}>
-                <p className="text-xs font-semibold" style={{ color: "#1f5e96" }}><LocalizedText text="Why this result — Individual Pro" /></p>
-                <p className="mt-1 text-xs leading-relaxed" style={{ color: "#14232f" }}><LocalizedText text="The plain-language clinical reasoning behind each recommendation (drivers, evidence, caveats) is part of the documentation suite on Individual Pro and above — alongside Copy Note and Export PDF." /></p>
-                <Link href="/pricing" className="mt-1.5 inline-block text-xs font-semibold underline" style={{ color: "#1f5e96" }}><LocalizedText text="See pricing" /></Link>
+                <p className="text-xs font-semibold" style={{ color: "#1f5e96" }}><LocalizedText text="Feature access" /></p>
+                <p className="mt-1 text-xs leading-relaxed" style={{ color: "#14232f" }}><LocalizedText text="This feature is not available for your current account access. Contact us to discuss availability." /></p>
+                <Link href="/contact" className="mt-1.5 inline-block text-xs font-semibold underline" style={{ color: "#1f5e96" }}><LocalizedText text="Contact" /></Link>
               </div>
             }
           >

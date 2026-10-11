@@ -18,7 +18,7 @@ const channels = [
     ),
     title: "Hospital & institutional",
     email: "contact@vancomyzer.com",
-    description: "Pilot requests, business associate agreements, demonstrations, and pricing for departments and health systems.",
+    description: "Questions about access, institutional requirements or evaluation.",
   },
   {
     icon: (

@@ -107,20 +107,8 @@ export default function DiscountStatusCard() {
     );
   }
 
-  // ─── NO DISCOUNT YET — show CTA ──────────────────────────────────
-  return (
-    <section style={cardStyle}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
-        <h2 style={titleStyle}><LocalizedText text={"Student or resident? Apply for a discount"} /></h2>
-      </header>
-      <p style={{ fontSize: 12, color: "var(--color-secondary)", lineHeight: 1.55, margin: "0 0 10px 0" }}><LocalizedText text={"Vancomyzer offers reduced pricing for pharmacy students, medical students, and residents in training. Submit a short application and we'll verify your training status within 1-2 business days."} /></p>
-      {!showForm ? (
-        <button type="button" onClick={() => setShowForm(true)} style={primaryBtnStyle}><LocalizedText text={"Apply for discount"} /></button>
-      ) : (
-        <ApplicationForm onSubmitted={() => { setShowForm(false); void load(); }} />
-      )}
-    </section>
-  );
+  // Existing discount records above remain available; no new acquisition offer.
+  return null;
 }
 
 // ─────────────────────────────────────────────────────────────────────

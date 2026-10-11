@@ -1,5 +1,4 @@
 "use client";
-import { LocalizedDiv } from "@/localization/LocalizedElements";
 
 import { LocalizedText } from "@/localization/LanguageProvider";
 
@@ -9,16 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { TIERS, isPaidTier } from "@/lib/tiers";
-
-type CheckoutPlan = "annual";
-
-const PLAN_LABELS: Record<CheckoutPlan, { label: string; price: string; sub: string }> = {
-  annual: {
-    label: "Annual",
-    price: "$49.99 / year",
-    sub: "billed yearly · cancel online",
-  },
-};
 
 function statusBadgeStyle(status: string): React.CSSProperties {
   switch (status) {
@@ -67,8 +56,6 @@ function BillingPageInner() {
   const searchParams = useSearchParams();
   const checkoutResult = searchParams.get("checkout");
 
-  const [plan, setPlan] = useState<CheckoutPlan>("annual");
-  const [renewalConsent, setRenewalConsent] = useState(false);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [banner, setBanner] = useState<string | null>(null);
@@ -92,28 +79,6 @@ function BillingPageInner() {
       </div>
     );
   }
-
-  const startCheckout = async () => {
-    setError(null);
-    setWorking(true);
-    try {
-      const res = await fetch("/api/billing/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, renewalConsent }),
-      });
-      const body = await res.json();
-      if (!res.ok || !body.url) {
-        setError(body.error ?? "Could not start checkout. Try again.");
-        setWorking(false);
-        return;
-      }
-      window.location.href = body.url;
-    } catch {
-      setError("Network error. Try again.");
-      setWorking(false);
-    }
-  };
 
   const openPortal = async () => {
     setError(null);
@@ -230,90 +195,11 @@ function BillingPageInner() {
         )}
       </div>
 
-      {/* Upgrade card — only for free users */}
-      {!onPaidTier && !user.complimentaryPro?.active && (
-        <div style={{
-          padding: 20,
-          marginBottom: 24,
-          background: "var(--color-card)",
-          border: "2px solid var(--color-primary)",
-          borderRadius: 6,
-        }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}><LocalizedText text={"Upgrade to Individual Pro"} /></div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "var(--color-primary)", marginBottom: 8 }}><LocalizedText text={"14-day free trial · card required upfront, no charge until trial ends"} /></div>
-          <ul style={{ margin: "0 0 16px", padding: 0, listStyle: "none", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.7 }}>
-            {TIERS.individual_pro.features.map(f => (
-              <li key={f} style={{ paddingLeft: 18, position: "relative" }}>
-
-                <LocalizedText text={f} />
-              </li>
-            ))}
-          </ul>
-
-          {/* Plan selector */}
-          <LocalizedDiv role="radiogroup" aria-label="Billing cadence" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
-            {(Object.keys(PLAN_LABELS) as CheckoutPlan[]).map(p => {
-              const selected = plan === p;
-              const meta = PLAN_LABELS[p];
-              return (
-                <button
-                  key={p}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  onClick={() => setPlan(p)}
-                  style={{
-                    padding: "12px 14px",
-                    textAlign: "left",
-                    background: selected ? "var(--color-primary)" : "var(--color-card)",
-                    color: selected ? "#ffffff" : "var(--color-secondary)",
-                    border: `2px solid ${selected ? "var(--color-primary)" : "var(--color-border)"}`,
-                    borderRadius: 4,
-                    cursor: "pointer",
-                  }}
-                >
-                  <div style={{ fontSize: 12, fontWeight: 600, opacity: 0.85, marginBottom: 4 }}>
-                    <LocalizedText text={meta.label} />
-                  </div>
-                  <div style={{ fontSize: 18, fontWeight: 700 }}>
-                    <LocalizedText text={meta.price} />
-                  </div>
-                  <div style={{ fontSize: 10, opacity: 0.85, marginTop: 2 }}>
-                    <LocalizedText text={meta.sub} />
-                  </div>
-                </button>
-              );
-            })}
-          </LocalizedDiv>
-
-          <label style={{ display: "block", marginBottom: 16, fontSize: 14 }}>
-            <input type="checkbox" checked={renewalConsent} onChange={e => setRenewalConsent(e.target.checked)} />{" "}<LocalizedText text={"I agree to automatic renewal: after the 14-day trial, $49.99 is charged yearly until I cancel online in Billing. Any verified discount is shown before payment. Cancel before the trial ends to avoid a charge; otherwise cancel before renewal to stop the next charge."} /></label>
-          <button
-            type="button"
-            onClick={startCheckout}
-            disabled={working || !renewalConsent}
-            style={{
-              width: "100%",
-              padding: 14,
-              fontSize: 14,
-              fontWeight: 700,
-              background: "var(--color-primary)",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: 4,
-              cursor: working ? "wait" : "pointer",
-              opacity: working ? 0.7 : 1,
-              letterSpacing: "0.02em",
-            }}
-          >
-            <LocalizedText text={working ? "Starting checkout…" : `Start 14-Day Trial · ${PLAN_LABELS[plan].label}`} />
-          </button>
-          <p style={{ fontSize: 11, color: "var(--color-dim)", textAlign: "center", marginTop: 10, marginBottom: 0, lineHeight: 1.5 }}><LocalizedText text={"You will not be charged for 14 days. Cancel any time during the trial in the billing portal — no charge. By starting a trial you agree to our"} />{" "}
-            <Link href="/terms" style={{ color: "var(--color-primary)", textDecoration: "underline" }}><LocalizedText text="Terms" /></Link>{" "}<LocalizedText text="and" />{" "}
-            <Link href="/privacy" style={{ color: "var(--color-primary)", textDecoration: "underline" }}><LocalizedText text="Privacy Policy" /></Link>.
-          </p>
-        </div>
-      )}
+      {!onPaidTier && <section className="mb-6 border p-4">
+        <h2><LocalizedText text="Free access" /></h2>
+        <p><LocalizedText text="Access to Vancomyzer is currently free." /></p>
+        <Link href="/calculator" className="underline"><LocalizedText text="Open the calculator" /></Link>
+      </section>}
 
       {/* Department / Hospital hint */}
       <div style={{
@@ -324,13 +210,13 @@ function BillingPageInner() {
         fontSize: 13,
         color: "var(--color-secondary)",
         lineHeight: 1.6,
-      }}><LocalizedText text={"Need access for your whole department or hospital? See"} />{" "}
+      }}><LocalizedText text={"Contact us about account access or institutional requirements."} />{" "}
         <a
-          href="https://dosys.health/pricing"
+          href="https://dosys.health/contact"
           target="_blank"
           rel="noopener noreferrer"
           style={{ color: "var(--color-primary)", textDecoration: "underline" }}
-        ><LocalizedText text="Hospital Site licenses" /></a>{" "}<LocalizedText text={"on dosys.health."} /></div>
+        ><LocalizedText text="Contact" /></a>{" "}<LocalizedText text={"on dosys.health."} /></div>
     </div>
   );
 }

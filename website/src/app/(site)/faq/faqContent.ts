@@ -63,6 +63,7 @@ const REF_BUKHARI_2024: FaqRef = {
 };
 
 export const FAQ_ITEMS: FaqItem[] = [
+  { question: "Is Vancomyzer free?", answer: ["Yes. Access to Vancomyzer is currently free."], refs: [] },
   {
     question: "Where does Vancomyzer’s pharmacokinetic data come from?",
     answer: [

@@ -161,7 +161,7 @@ export async function generatePilotReport(
   page.drawRectangle({ x: 0, y: y - 72, width: 4, height: 72, color: GREEN })
 
   page.drawText('Ready to Continue?', { x: 20, y: y - 18, size: 13, font: fontBold, color: NAVY })
-  page.drawText('Subscribe to Vancomyzer™ Pro to keep your calculation history after the pilot ends.', { x: 20, y: y - 34, size: 9, font: fontReg, color: SLATE })
+  page.drawText('Contact Dosys about calculation history access after the pilot ends.', { x: 20, y: y - 34, size: 9, font: fontReg, color: SLATE })
   page.drawText('The core calculator remains free for individual clinicians.', { x: 20, y: y - 46, size: 9, font: fontReg, color: SLATE })
   page.drawText('Visit vancomyzer.com/upgrade to get started.', { x: 20, y: y - 60, size: 9, font: fontBold, color: GREEN })
 
