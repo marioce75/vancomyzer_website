@@ -9,11 +9,11 @@ export default function Footer() {
   return (
     <footer className="border-t" style={{ borderTopColor: "var(--color-border)", background: "var(--color-card)" }}>
       <div className="mx-auto max-w-7xl px-3 sm:px-4 py-6 sm:py-8 md:py-10">
-        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
 
           {/* Brand + disclaimer */}
-          <div className="max-w-xl">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="min-w-0 max-w-xl">
+            <div className="flex flex-wrap items-center gap-3 mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <LocalizedA href="https://dosys.health" target="_blank" rel="noopener noreferrer" aria-label="Visit dosys.health">
                 <LocalizedImg
@@ -57,7 +57,7 @@ export default function Footer() {
                 <Link
                   key={href}
                   href={href}
-                  className="transition"
+                  className="min-w-0 [overflow-wrap:anywhere] transition"
                   style={{ color: "var(--color-secondary)" }}
                 >
                   <LocalizedText text={label} />
@@ -82,7 +82,7 @@ export default function Footer() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition"
+                  className="min-w-0 [overflow-wrap:anywhere] transition"
                   style={{ color: "var(--color-secondary)" }}
                 >
                   <LocalizedText text={label} />

@@ -305,7 +305,7 @@ export default function ResearchDashboard() {
       <div style={card}>
         <h2 style={sectionTitle}><LocalizedText text={"Enrollment Tracker"} /></h2>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 12rem), 1fr))", gap: 16, marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 24, fontWeight: 700, color: NAVY }}>{s?.total ?? 0}</div>
             <div style={{ fontSize: 11, color: GRAY }}><LocalizedText text={"Total Records"} /></div>
@@ -352,7 +352,7 @@ export default function ResearchDashboard() {
         {!d ? (
           <div style={{ fontSize: 13, color: GRAY }}><LocalizedText text={"No data available yet."} /></div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 20rem), 1fr))", gap: 20 }}>
             {/* Left: continuous variables */}
             <div>
               <div style={{ fontSize: 12, fontWeight: 600, color: NAVY, marginBottom: 6 }}><LocalizedText text={"Continuous (Median, IQR)"} /></div>

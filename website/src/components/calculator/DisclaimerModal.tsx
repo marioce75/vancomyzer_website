@@ -146,6 +146,9 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+            flexShrink: 0,
             padding: "16px 20px",
             borderBottom: "1px solid #e2e8f0",
             background: "#f8fafc",
@@ -182,7 +185,7 @@ export default function DisclaimerModal({ open, onClose }: DisclaimerModalProps)
         </div>
 
         {/* Scrollable content */}
-        <div style={{ overflowY: "auto", padding: "20px", flex: 1, background: "#ffffff" }}>
+        <div style={{ minHeight: 0, overflowY: "auto", padding: "20px", flex: 1, background: "#ffffff" }}>
           {SECTIONS.map((section) => (
             <div key={section.heading} style={{ marginBottom: 24 }}>
               <h3

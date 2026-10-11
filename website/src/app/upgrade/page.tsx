@@ -150,7 +150,7 @@ export default function UpgradePage() {
       <div style={{ border: '1px solid #e2e8f0', overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 80px', background: NAVY, padding: '10px 20px' }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.08em' }}><LocalizedText text={"FEATURE"} /></div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textAlign: 'center' as const }}>Free</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textAlign: 'center' as const }}><LocalizedText text="Free" /></div>
           <div style={{ fontSize: 11, fontWeight: 700, color: GREEN, textAlign: 'center' as const }}>Pro</div>
         </div>
         {FEATURES.map((f, i) => (

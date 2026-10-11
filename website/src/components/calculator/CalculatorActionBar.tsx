@@ -45,7 +45,7 @@ export default function CalculatorActionBar({
             onChange={e => onCaseIdChange?.(e.target.value)}
             placeholder="optional · e.g. ICU bed 12 · NO PHI"
             maxLength={64}
-            className="flex-1 px-2 py-1 text-xs"
+            className="min-w-0 flex-1 px-2 py-1 text-xs"
             style={{
               border: "1px solid var(--color-border)",
               background: "var(--color-card)",
@@ -56,7 +56,7 @@ export default function CalculatorActionBar({
         </div>
       )}
       <div className="flex items-center justify-end gap-2">
-      <div className="flex flex-1 justify-end gap-2">
+      <div className="flex flex-1 flex-wrap justify-end gap-2">
         <button
           type="button"
           onClick={onReset}

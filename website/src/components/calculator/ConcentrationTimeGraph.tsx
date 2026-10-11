@@ -695,10 +695,10 @@ export default function ConcentrationTimeGraph({
     <LocalizedDiv className={`flex flex-col gap-0 w-full ${fill ? "vz-graph-fill" : ""}`} aria-label="Concentration-time graph">
       {/* Header line */}
       <div
-        className="flex items-center justify-between gap-2 px-1 pb-1.5 shrink-0"
+        className="flex flex-wrap items-center justify-between gap-2 px-1 pb-1.5 shrink-0"
         style={{ fontFamily: FONT }}
       >
-        <div className="flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap">
+        <div className="flex flex-wrap min-w-0 items-center gap-2">
         <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: getCSSColor("--color-secondary", "#00cc44") }}><LocalizedText text="CONCENTRATION-TIME PROFILE" /></span>
         {modelLabel && (
           <span className="hidden md:contents">

@@ -8,26 +8,29 @@ import UpgradeModal from "@/components/UpgradeModal";
 
 interface PdfExportGateProps {
   tier: string;
+  disabled?: boolean;
   onExport: () => void;
 }
 
-export default function PdfExportGate({ tier, onExport }: PdfExportGateProps) {
+export default function PdfExportGate({ tier, disabled = false, onExport }: PdfExportGateProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const allowed = hasFeature(tier, "export.pdf");
 
   const handleClick = useCallback(() => {
+    if (disabled) return;
     if (allowed) {
       onExport();
     } else {
       setModalOpen(true);
     }
-  }, [allowed, onExport]);
+  }, [allowed, onExport, disabled]);
 
   return (
     <div>
       <button
         type="button"
         onClick={handleClick}
+        disabled={disabled}
         className="border px-2 py-0.5 text-[10px] font-semibold transition-colors"
         style={{ borderColor: "var(--color-border)", background: "transparent", color: "var(--color-secondary)" }}
         onMouseEnter={e => {

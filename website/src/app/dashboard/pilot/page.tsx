@@ -66,7 +66,7 @@ export default function PilotDashboardPage() {
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px', fontFamily: 'var(--font-sans, system-ui)' }}>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: NAVY, margin: 0 }}><LocalizedText text={"Your 90-Day Pilot"} /></h1>
           <p style={{ fontSize: 13, color: SLATE, marginTop: 4 }}>
@@ -99,7 +99,7 @@ export default function PilotDashboardPage() {
       )}
 
       {/* Phase timeline */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 28 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 12rem), 1fr))', gap: 12, marginBottom: 28 }}>
         {phases.map(phase => {
           const isActive = currentPhase === phase.key && !isExpired
           return (
@@ -154,7 +154,7 @@ export default function PilotDashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 28 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 12rem), 1fr))', gap: 12, marginBottom: 28 }}>
         {statCards.map(card => (
           <div key={card.label} style={{ border: '1px solid #e2e8f0', padding: '18px 16px', background: '#fff' }}>
             <div style={{ fontSize: 24, fontWeight: 700, color: GREEN, fontFamily: 'monospace', marginBottom: 4 }}>{card.value}</div>
@@ -206,7 +206,7 @@ export default function PilotDashboardPage() {
       {!isConverted && (
         <div style={{ border: '1px dashed #cbd5e1', padding: '20px 24px' }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: NAVY, marginBottom: 12 }}><LocalizedText text={"What is included after the pilot"} /></div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 32px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 16rem), 1fr))', gap: '8px 32px' }}>
             {([
               ['Calculation history (90-day retention)', true],
               ['Pilot summary report PDF', true],

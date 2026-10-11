@@ -8,17 +8,19 @@ import UpgradeModal from "@/components/UpgradeModal";
 
 interface NoteExportGateProps {
   tier: string;
+  disabled?: boolean;
   onCopy: () => void;
   noteText: string;
 }
 
-export default function NoteExportGate({ tier, onCopy, noteText: _noteText }: NoteExportGateProps) {
+export default function NoteExportGate({ tier, disabled = false, onCopy, noteText: _noteText }: NoteExportGateProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const allowed = hasFeature(tier, "export.note.copy");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleClick = useCallback(() => {
+    if (disabled) return;
     if (!allowed) {
       setModalOpen(true);
       return;
@@ -27,7 +29,7 @@ export default function NoteExportGate({ tier, onCopy, noteText: _noteText }: No
     setCopied(true);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setCopied(false), 2000);
-  }, [allowed, onCopy]);
+  }, [allowed, onCopy, disabled]);
 
   // Clear pending timer if the button unmounts mid-flash to avoid setState-after-unmount.
   useEffect(() => () => {
@@ -39,6 +41,7 @@ export default function NoteExportGate({ tier, onCopy, noteText: _noteText }: No
       <button
         type="button"
         onClick={handleClick}
+        disabled={disabled}
         aria-live="polite"
         className="rounded px-4 py-2 text-xs font-bold uppercase tracking-wider transition"
         style={{

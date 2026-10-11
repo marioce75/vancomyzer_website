@@ -192,7 +192,7 @@ const INDICATIONS = [
 // Keep wrapper identities stable so numeric input raw text and choices survive edits.
 /* ---- Field grid helper ---- */
 const FieldGrid = ({ children, cols = 3 }: { children: React.ReactNode; cols?: number }) => (
-  <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 12, marginBottom: 12 }}>
+  <div className={cols === 5 ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"} style={{ gap: 12, marginBottom: 12 }}>
     {children}
   </div>
 );
@@ -635,7 +635,7 @@ export default function ResearchEntryForm() {
               <div style={{ fontSize: 12, color: GRAY, marginBottom: 8 }}><LocalizedText text={"No additional SCr values added."} /></div>
             )}
             {scrPoints.map((s, i) => (
-              <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 8 }}>
+              <div key={i} style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "flex-end", marginBottom: 8 }}>
                 <Field label="SCr (mg/dL)">
                   <NumericTextInput  min={0} step="0.01" value={s.scr_mg_dl} onValueChange={(canonical) => updateScr(i, "scr_mg_dl", canonical)} style={{ ...inputStyle, width: 120 }} />
                 </Field>
@@ -651,7 +651,7 @@ export default function ResearchEntryForm() {
           {/* ---- Section 5: Concomitant Nephrotoxins ---- */}
           <div style={card}>
             <h2 style={sectionTitle}><LocalizedText text={"Concomitant Nephrotoxins"} /></h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 4, marginBottom: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 12rem), 1fr))", gap: 4, marginBottom: 12 }}>
               {NEPHROTOXINS.map((drug) => (
                 <label key={drug} style={{ ...toggleRow, marginBottom: 0 }}>
                   <input
