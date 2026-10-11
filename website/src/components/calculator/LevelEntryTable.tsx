@@ -171,9 +171,9 @@ export default function LevelEntryTable({
               </button>
             </div>
 
-            {/* 1. Vancomycin level concentration */}
+            {/* 1. Vancomycin concentration */}
             <div>
-              <Label><LocalizedText text="Vancomycin level concentration (mg/L)" /></Label>
+              <Label><LocalizedText text="Vancomycin concentration (mg/L)" /></Label>
               <div className="flex">
                 <ClinicalNumberInput
                   inputMode="decimal"
