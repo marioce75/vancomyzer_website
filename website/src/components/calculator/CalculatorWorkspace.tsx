@@ -1186,10 +1186,10 @@ export default function CalculatorWorkspace() {
                 <span className="vz-chip vz-chip--neutral" role="status"><LocalizedText text="Running PK model" /><span className="mx-blink">_</span></span>
               )}
             </div>
-            <div className="flex shrink-0 items-center gap-1.5">
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
               {displayResult && (
                 <div className={exportsDisabled ? "pointer-events-none opacity-40" : ""} aria-disabled={exportsDisabled}>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     {!isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (
                       <LoadingDosePopover weightKg={patient.weight_kg > 0 ? patient.weight_kg : null} onSimulate={handleSimulateLoadingDose} />
                     )}

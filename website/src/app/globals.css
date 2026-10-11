@@ -1184,3 +1184,34 @@ body.theme-basic .vz-mbtn--small { padding: 7px 14px; font-size: 14px; }
 /* Inline links in running text are underlined; form controls get the amber focus ring */
 body.theme-basic main p a:not(.vz-mbtn), body.theme-basic main li a:not(.vz-mbtn), body.theme-basic main dd a:not(.vz-mbtn) { text-decoration: underline; text-underline-offset: 2px; }
 body.theme-basic input:focus-visible, body.theme-basic select:focus-visible, body.theme-basic textarea:focus-visible { outline: 3px solid #b45309 !important; outline-offset: 2px !important; }
+
+/* Localized controls need intrinsic height and room to reflow. Keep the mode
+   selector on its own row until the full navigation has adequate space. */
+.vz-calculator-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 12px;
+  min-height: var(--vz-header-h, 48px);
+}
+.vz-mode-switcher { grid-column: 1 / -1; grid-row: 2; min-width: 0; }
+.vz-mode-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.vz-mode-tabs > button { min-width: 0; min-height: 44px; overflow-wrap: anywhere; }
+.vz-calculator-header > .hidden { grid-column: 2; }
+@media (min-width: 1280px) {
+  .vz-calculator-header { display: flex; flex-wrap: wrap; }
+  .vz-mode-switcher { flex: 1 1 24rem; }
+}
+.vz-level-datetime {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 8px;
+}
+.vz-level-datetime > *, .vz-field { min-width: 0; }
+.vz-section-head { flex-wrap: wrap; }
+.vz-section-head > span { flex-wrap: wrap; min-width: 0; }
+.vz-panel-title, .vz-chip, .vz-tabs > button { white-space: normal; overflow-wrap: anywhere; }
+.vz-kv { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.vz-kv dt { white-space: normal; overflow-wrap: anywhere; }
+.vz-regulatory-footer { height: auto; min-height: var(--vz-footer-h); overflow: visible; }

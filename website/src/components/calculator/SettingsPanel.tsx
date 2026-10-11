@@ -142,7 +142,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
       >
         {/* ── Header ────────────────────────────────────────────── */}
         <div
-          className="flex items-center justify-between"
+          className="flex items-center justify-between gap-3"
           style={{
             padding: "20px 20px 16px",
             borderBottom: "1px solid var(--color-border)",
@@ -167,8 +167,9 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               background: "transparent",
               border: "1px solid var(--color-border)",
               color: "var(--color-secondary)",
-              width: 32,
-              height: 32,
+              width: 44,
+              flexShrink: 0,
+              height: 44,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -233,7 +234,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           {/* ── 2. FONT SIZE ──────────────────────────────────── */}
           <section>
             <SectionLabel><LocalizedText text="FONT SIZE" /></SectionLabel>
-            <div className="flex gap-0" style={{ marginTop: 10 }}>
+            <div className="grid grid-cols-2 gap-1" style={{ marginTop: 10 }}>
               {FONT_SIZES.map((fs) => {
                 const active = settings.fontSize === fs.value;
                 return (
@@ -269,7 +270,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
 
                 return (
                   <div key={slider.key}>
-                    <div className="flex items-center justify-between" style={{ marginBottom: 6 }}>
+                    <div className="flex items-center justify-between gap-3" style={{ marginBottom: 6 }}>
                       <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
                         <LocalizedText text={slider.label} />
                       </span>
@@ -312,7 +313,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 return (
                   <div
                     key={toggle.key}
-                    className="flex items-center justify-between"
+                    className="flex items-center justify-between gap-3"
                   >
                     <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}>
                       <LocalizedText text={toggle.label} />
@@ -357,7 +358,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           {/* ── 4b. TEACHING MODE ──────────────────────────── */}
           <section>
             <SectionLabel><LocalizedText text="TEACHING MODE" /></SectionLabel>
-            <div className="flex items-center justify-between" style={{ marginTop: 10 }}>
+            <div className="flex items-center justify-between gap-3" style={{ marginTop: 10 }}>
               <div style={{ flex: 1, paddingRight: 12 }}>
                 <span style={{ fontSize: 12, color: "var(--color-secondary)", ...FONT }}><LocalizedText text="Show inline “Why” explanations" /></span>
                 <p style={{ fontSize: 10, color: "var(--color-dim)", marginTop: 2, lineHeight: 1.4, ...FONT }}><LocalizedText text="Adds expandable PK-concept notes next to AUC, dose recommendation, and Bayesian fit results." /></p>

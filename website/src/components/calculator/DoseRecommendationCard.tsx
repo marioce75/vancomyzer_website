@@ -225,7 +225,7 @@ export function LoadingDosePopover({ weightKg, onSimulate }: LoadingDoseConfigur
           id="vz-loading-dose-popover"
           role="dialog"
           aria-label="Loading dose configurator"
-          className="absolute right-0 z-30 mt-1 w-[min(360px,90vw)] shadow-md"
+          className="fixed left-1/2 top-1/2 z-30 w-[min(360px,calc(100vw-24px))] max-h-[calc(100dvh-24px)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto shadow-md"
         >
           <LoadingDoseConfigurator weightKg={weightKg} onSimulate={(d, i, h) => { setOpen(false); onSimulate?.(d, i, h); }} />
         </LocalizedDiv>

@@ -78,7 +78,7 @@ export { manualHoursCollectionTime };
 // ── Shared styles ─────────────────────────────────────────────
 
 const inputClass = (hasError: boolean) =>
-  `w-full h-9 px-2.5 border rounded text-sm focus:outline-none focus:ring-2 ${
+  `min-w-0 w-full h-9 px-2.5 border rounded text-sm focus:outline-none focus:ring-2 ${
     hasError
       ? "border-red-500 ring-1 ring-red-500 bg-[rgba(239,68,68,0.06)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
       : "border-[var(--navy-border-strong)] bg-[rgba(255,255,255,0.05)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:ring-[var(--teal)] focus:border-[var(--teal)]"
@@ -248,7 +248,7 @@ export default function LevelEntryTable({
 
         return (
           <div key={i} className="rounded-md p-2.5 flex flex-col gap-2.5" style={{border: '1px solid var(--color-border)', background: 'var(--color-highlight, #f7fafc)'}}>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-bold text-slate-700 uppercase tracking-wide"><LocalizedText text="Level" />{" "}{i + 1}</span>
               <button
                 type="button"
@@ -302,7 +302,7 @@ export default function LevelEntryTable({
                 {/* 2. Level drawn — date + time */}
                 <div>
                   <Label><LocalizedText text="Level drawn" /></Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="vz-level-datetime">
                     <div>
                       <DatePartInput
                         value={dt.levelDate}
@@ -349,7 +349,7 @@ export default function LevelEntryTable({
                 {/* 3. Last dose administered — date + time */}
                 <div>
                   <Label><LocalizedText text="Last dose administered" /></Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="vz-level-datetime">
                     <div>
                       <DatePartInput
                         value={dt.doseDate}

@@ -246,8 +246,7 @@ export default function LandingPage() {
         <div className="mt-8 grid gap-8 md:grid-cols-3">
           <div>
             <H3><LocalizedText text="1 · Patient" /></H3>
-            <p className="mt-2" style={{ color: INK2 }}><LocalizedText text={"Age, weight, height, serum creatinine and renal replacement status. Estimated creatinine clearance is shown for context; the dose is calculated from serum creatinine as the"} />{" "}
-              {COLIN_2019.shortName}{" "}<LocalizedText text={"model input."} /></p>
+            <p className="mt-2" style={{ color: INK2 }}><LocalizedText text={`Age, weight, height, serum creatinine and renal replacement status. Estimated creatinine clearance is shown for context; the dose is calculated from serum creatinine as the ${COLIN_2019.shortName} model input.`} /></p>
           </div>
           <div>
             <H3><LocalizedText text="2 · Recommendation" /></H3>

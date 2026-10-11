@@ -1455,7 +1455,7 @@
     "pt-BR": "Dose de ataque administrada"
   },
   "Enter details below. Dosing History will be pre-filled automatically — do not re-enter.": {
-    "es": "Introduzca los datos a continuación. El historial de dosificación se rellenará automáticamente; no los vuelva a introducir.",
+    "es": "Introduzca los datos a continuación. El historial de administración se rellenará automáticamente; no vuelva a introducirlos.",
     "fr": "Saisissez les informations ci-dessous. L’historique des doses sera prérempli automatiquement ; ne les saisissez pas à nouveau.",
     "pt-BR": "Introduza detalhes abaixo. O histórico de dosagem será preenchido automaticamente — não volte a entrar."
   },
@@ -1485,7 +1485,7 @@
     "pt-BR": "Data de administração"
   },
   "Time administered (military)": {
-    "es": "Hora de administración (formato de veinticuatro horas)",
+    "es": "Hora de inicio de la perfusión (HH:MM)",
     "fr": "Heure d’administration (format vingt-quatre heures)",
     "pt-BR": "Tempo de administração (militar)"
   },
@@ -1540,7 +1540,7 @@
     "pt-BR": "A monitorização frequente ou diária pode ser adequada quando a função renal ou a hemodinâmica estiverem instáveis; estar acamado, isoladamente, não determina a frequência."
   },
   "Dosing History pre-filled:": {
-    "es": "Historial de dosificación rellenado automáticamente:",
+    "es": "Historial de administración rellenado automáticamente:",
     "fr": "Historique des doses prérempli :",
     "pt-BR": "História da Posologia pré- cheia:"
   },
@@ -1780,12 +1780,12 @@
     "pt-BR": "Paciente"
   },
   "Dosing history": {
-    "es": "Historial de dosificación",
+    "es": "Historial de administración",
     "fr": "Historique des doses",
     "pt-BR": "Histórico de dosagem"
   },
   "Drug levels": {
-    "es": "Concentraciones del fármaco",
+    "es": "Concentraciones de vancomicina",
     "fr": "Concentrations du médicament",
     "pt-BR": "Níveis de drogas"
   },
@@ -2090,7 +2090,7 @@
     "pt-BR": "Sem faixa de incerteza:"
   },
   "Trough reference 10–20 mg/L (not the dosing target; target is AUC₂₄ 400–600)": {
-    "es": "Referencia valle de 10–20 mg/L (no es el objetivo posológico; el objetivo es AUC₂₄ 400–600)",
+    "es": "Referencia de concentración valle: 10–20 mg/L (no es el objetivo posológico; el objetivo es AUC₂₄ 400–600)",
     "fr": "Référence résiduelle de 10–20 mg/L (ce n’est pas la cible posologique ; la cible est l’AUC₂₄ 400–600)",
     "pt-BR": "Referência de vale 10–20 mg/L (não é o alvo de dose; o alvo é AUC₂₄ 400–600)"
   },
@@ -2420,7 +2420,7 @@
     "pt-BR": "p. ex. 18.5"
   },
   "Level drawn": {
-    "es": "Muestra extraída",
+    "es": "Extracción de la muestra",
     "fr": "Prélèvement effectué",
     "pt-BR": "Nível sorteado"
   },
@@ -2435,7 +2435,7 @@
     "pt-BR": "Por exemplo, 1435"
   },
   "Military time (HH:MM)": {
-    "es": "Hora en formato de veinticuatro horas (HH:MM)",
+    "es": "Hora (HH:MM)",
     "fr": "Heure au format vingt-quatre heures (HH:MM)",
     "pt-BR": "Tempo militar (HH:MM)"
   },
@@ -2445,12 +2445,12 @@
     "pt-BR": "Data e hora exatas da coleta de sangue"
   },
   "Level drawn on a different date than dose — please verify this is correct before calculating.": {
-    "es": "La muestra se extrajo en una fecha distinta a la dosis; verifique que sea correcto antes de calcular.",
+    "es": "La muestra se extrajo en una fecha distinta a la del inicio de la perfusión; verifique que sea correcto antes de calcular.",
     "fr": "Le prélèvement a eu lieu à une date différente de celle de la dose ; vérifiez ces informations avant de calculer.",
     "pt-BR": "Nível desenhado numa data diferente da dose — verifique se esta está correcta antes de calcular."
   },
   "Last dose administered": {
-    "es": "Última dosis administrada",
+    "es": "Inicio de la última perfusión",
     "fr": "Dernière dose administrée",
     "pt-BR": "Última dose administrada"
   },
@@ -2480,7 +2480,7 @@
     "pt-BR": "horas"
   },
   "post-dose": {
-    "es": "tras la dosis",
+    "es": "desde el inicio de la perfusión",
     "fr": "après la dose",
     "pt-BR": "após a dose"
   },
@@ -2495,7 +2495,7 @@
     "pt-BR": "O tempo de nível é anterior ao tempo de dose — verifique por favor as entradas"
   },
   "Time drawn (hours after dose start)": {
-    "es": "Hora de extracción (horas desde el inicio de la dosis)",
+    "es": "Tiempo desde el inicio de la perfusión hasta la extracción (horas)",
     "fr": "Heure du prélèvement (heures après le début de la dose)",
     "pt-BR": "Tempo determinado (horas após o início da dose)"
   },
@@ -2695,7 +2695,7 @@
     "pt-BR": "Est. CrCl"
   },
   "· population prior uses SCr; a separate fitted-clearance limit uses CrCl": {
-    "es": "· la distribución previa poblacional utiliza creatinina sérica; un límite independiente del aclaramiento ajustado utiliza el aclaramiento de creatinina",
+    "es": "· la distribución poblacional a priori utiliza creatinina sérica; un límite independiente del aclaramiento ajustado utiliza el aclaramiento de creatinina",
     "fr": "· la distribution a priori de population utilise la créatinine sérique ; une limite distincte de la clairance ajustée utilise la clairance de la créatinine",
     "pt-BR": "· usos prévios da população SCr; um limite de depuração separado usado CrCl"
   },
@@ -2720,7 +2720,7 @@
     "pt-BR": "⚠ Verifique as unidades — peso em kg, altura em cm"
   },
   "Bedbound or frail older patient": {
-    "es": "Paciente encamado o adulto mayor frágil",
+    "es": "Paciente encamado o persona mayor frágil",
     "fr": "Patient alité ou adulte âgé fragile",
     "pt-BR": "Paciente idoso acamado ou frágil"
   },
@@ -2740,7 +2740,7 @@
     "pt-BR": "Não para uso pediátrico, dialítico-específico ou de infusão contínua."
   },
   "Unstable renal function, poor chronology, or sparse/mistimed levels require extra caution.": {
-    "es": "La función renal inestable, una cronología deficiente o concentraciones escasas o mal temporizadas requieren especial cautela.",
+    "es": "La función renal inestable, un registro horario deficiente o un número escaso de concentraciones medidas o muestras extraídas en momentos inadecuados requieren especial cautela.",
     "fr": "Une fonction rénale instable, une chronologie insuffisante ou des concentrations peu nombreuses ou mal datées nécessitent une prudence accrue.",
     "pt-BR": "A função renal instável, a cronologia fraca ou os níveis esparsos/acidentes requerem precaução extra."
   },
@@ -2780,12 +2780,12 @@
     "pt-BR": "AUC₂₄ no estado de equilíbrio previsto (mg·h/L)"
   },
   "Predicted peak (mg/L)": {
-    "es": "Pico previsto (mg/L)",
+    "es": "Concentración máxima (pico) estimada (mg/L)",
     "fr": "Pic prédit (mg/L)",
     "pt-BR": "Pico previsto (mg/L)"
   },
   "Predicted trough (mg/L)": {
-    "es": "Valle previsto (mg/L)",
+    "es": "Concentración mínima (valle) estimada (mg/L)",
     "fr": "Concentration résiduelle prédite (mg/L)",
     "pt-BR": "Vale previsto (mg/L)"
   },
@@ -2825,7 +2825,7 @@
     "pt-BR": "Previsões de estado de equilíbrio a partir dos mesmos parâmetros PK. Não são oferecidos candidatos com AUC₂₄ acima de 600 ou doses abaixo de 500 mg."
   },
   "Copy the selected regimen into the dosing-history draft": {
-    "es": "Copiar la pauta seleccionada al borrador del historial de dosificación",
+    "es": "Copiar la pauta seleccionada al borrador del historial de administración",
     "fr": "Copier le schéma sélectionné dans le brouillon de l’historique des doses",
     "pt-BR": "Copie o esquema selecionado para o rascunho da história da dosagem"
   },
@@ -2975,7 +2975,7 @@
     "pt-BR": "Não para pediatria, diálise específica ou infusão contínua."
   },
   "Prior-only maintenance support; not patient-specific severity direction.": {
-    "es": "Apoyo al mantenimiento basado solo en la distribución previa; no orienta según la gravedad específica del paciente.",
+    "es": "Apoyo al mantenimiento basado solo en la distribución a priori; no orienta según la gravedad específica del paciente.",
     "fr": "Aide à l’entretien fondée uniquement sur la distribution a priori ; ne fournit pas d’orientation selon la gravité propre au patient.",
     "pt-BR": "Suporte de manutenção prévio; não direção de gravidade específica do paciente."
   },
@@ -3235,7 +3235,7 @@
     "pt-BR": "Estimativa sem níveis medidos"
   },
   "Drug handling": {
-    "es": "Cinética del fármaco",
+    "es": "Farmacocinética",
     "fr": "Cinétique du médicament",
     "pt-BR": "Manipulação de medicamentos"
   },
@@ -3685,7 +3685,7 @@
     "pt-BR": "Modelo de volume para tecidos que se equilibram mais lentamente."
   },
   "Distribution clearance": {
-    "es": "Aclaramiento de distribución",
+    "es": "Aclaramiento intercompartimental",
     "fr": "Clairance de distribution",
     "pt-BR": "Depuração da distribuição"
   },
@@ -3770,7 +3770,7 @@
     "pt-BR": "Use apenas o esquema de intervalo atual interpretável e o timing de nível."
   },
   "Treat as prior-based support rather than high-certainty individualized dosing.": {
-    "es": "Considérelo un apoyo basado en la distribución previa, no una dosificación individualizada de alta certeza.",
+    "es": "Considérelo un apoyo basado en la distribución a priori, no una dosificación individualizada de alta certeza.",
     "fr": "Considérez-le comme une aide fondée sur la distribution a priori, et non comme une posologie individualisée de grande certitude.",
     "pt-BR": "Tratar como suporte prévio em vez de dosagem individualizada de alta certeza."
   },
@@ -3940,7 +3940,7 @@
     "pt-BR": "Utilizar os níveis a partir do intervalo posológico actual e evitar os níveis obtidos durante a infusão ou imediatamente após a conclusão da infusão."
   },
   "Unstable renal function, poor chronology, or sparse/mistimed levels increase uncertainty and should not be overinterpreted.": {
-    "es": "La función renal inestable, una cronología deficiente o concentraciones escasas o mal temporizadas aumentan la incertidumbre y no deben sobreinterpretarse.",
+    "es": "La función renal inestable, un registro horario deficiente o un número escaso de concentraciones medidas o muestras extraídas en momentos inadecuados aumentan la incertidumbre; los resultados deben interpretarse con cautela.",
     "fr": "Une fonction rénale instable, une chronologie insuffisante ou des concentrations peu nombreuses ou mal datées augmentent l’incertitude et ne doivent pas être surinterprétées.",
     "pt-BR": "Função renal instável, cronologia imprecisa ou poucas concentrações, ou concentrações coletadas em horários inadequados, aumentam a incerteza e exigem cautela na interpretação."
   },
@@ -3950,7 +3950,7 @@
     "pt-BR": "Adultos que recebem apenas vancomicina intravenosa intermitente; não para uso pediátrico, específico para diálise ou infusão contínua."
   },
   "Uses an explicit adult population prior with bounded initial level-based refinement when applicable; this is not presented as a validated commercial Bayesian platform.": {
-    "es": "Utiliza una distribución previa poblacional adulta explícita con un ajuste inicial limitado basado en concentraciones cuando procede; no se presenta como una plataforma bayesiana comercial validada.",
+    "es": "Utiliza una distribución poblacional a priori adulta explícita con un ajuste inicial limitado basado en concentraciones cuando procede; no se presenta como una plataforma bayesiana comercial validada.",
     "fr": "Utilise une distribution a priori explicite de population adulte avec un ajustement initial borné aux concentrations lorsque cela s’applique ; il n’est pas présenté comme une plateforme bayésienne commerciale validée.",
     "pt-BR": "Utiliza um modelo populacional a priori explícito para adultos, com refinamento inicial limitado com base nas concentrações, quando aplicável; não é apresentado como uma plataforma bayesiana comercial validada."
   },
@@ -4025,7 +4025,7 @@
     "pt-BR": "— volume periférico (L). Onde a droga temporariamente “esconde”; lentamente retorna ao centro à medida que o nível central cai."
   },
   "When you enter a measured level, the Bayesian MAP fit shifts these parameters from the population prior toward your patient’s individual values — bounded so a single observation can’t over-fit.": {
-    "es": "Al introducir una concentración medida, el ajuste bayesiano MAP desplaza estos parámetros desde la distribución previa poblacional hacia los valores individuales del paciente, con límites para evitar el sobreajuste a una única observación.",
+    "es": "Al introducir una concentración medida, el ajuste bayesiano MAP desplaza estos parámetros desde la distribución poblacional a priori hacia los valores individuales del paciente, con límites para evitar el sobreajuste a una única observación.",
     "fr": "Lorsque vous saisissez une concentration mesurée, l’ajustement bayésien MAP déplace ces paramètres depuis la distribution a priori de population vers les valeurs individuelles du patient, avec des bornes pour éviter le surajustement à une seule observation.",
     "pt-BR": "Quando você entra em um nível medido, o ajuste bayesiano MAP desloca esses parâmetros da população anterior para os valores individuais do seu paciente — limitado para que uma única observação não possa se ajustar demais."
   },
@@ -4045,7 +4045,7 @@
     "pt-BR": ". Menos de 400 subdosados (risco de falência do tratamento e selecção de resistência). Acima de 600 risco significativo de nefrotoxicidade, especialmente se mantido para além de 48 horas. O número mínimo em monoterapia já não é o alvo recomendado — a AUC integra todo o intervalo posológico e é mais clinicamente significativo."
   },
   "The calculator starts with a population prior — what we’d expect for an “average” patient with this age, weight, and SCr, from the": {
-    "es": "La calculadora parte de una distribución previa poblacional: lo que se esperaría de un paciente «medio» con esta edad, peso y creatinina sérica, a partir del",
+    "es": "La calculadora parte de una distribución poblacional a priori: lo que se esperaría de un paciente «medio» con esta edad, peso y creatinina sérica, a partir del",
     "fr": "Le calculateur part d’une distribution a priori de population : ce qui serait attendu pour un patient «moyen» de cet âge, de ce poids et de cette créatinine sérique, d’après le",
     "pt-BR": "A calculadora começa com uma população anterior — o que esperaríamos para um paciente “média” com esta idade, peso, e SCr, do"
   },
@@ -4060,7 +4060,7 @@
     "pt-BR": "Quando você entra em um nível medido, a estimativa MAP-bayesiano muda os parâmetros individuais de PK do paciente para valores que melhor explicam a medida, enquanto uma penalidade prévia log-normal mantém o deslocamento limitado – uma única observação não pode mover as estimativas para longe do que o modelo populacional considera plausível."
   },
   "With one level the fit is bounded by the prior; with two or more well-timed levels (peak + trough) the fit becomes much more individualized and the recommendation can deviate further from population averages. If the residual stays large, you’ll see a Fit Quality Advisory — that’s a signal to draw a confirmatory level rather than over-trust the recommendation.": {
-    "es": "Con una concentración, el ajuste está limitado por la distribución previa; con dos o más concentraciones obtenidas en momentos adecuados (pico y valle), el ajuste es mucho más individualizado y la recomendación puede alejarse más de las medias poblacionales. Si el residuo sigue siendo grande, verá un aviso de calidad del ajuste: indica que debe obtener una concentración de confirmación en lugar de confiar en exceso en la recomendación.",
+    "es": "Con una concentración, el ajuste está limitado por la distribución a priori; con dos o más concentraciones obtenidas en momentos adecuados (pico y valle), el ajuste es mucho más individualizado y la recomendación puede alejarse más de las medias poblacionales. Si el residuo sigue siendo grande, verá un aviso de calidad del ajuste: indica que debe obtener una concentración de confirmación en lugar de confiar en exceso en la recomendación.",
     "fr": "Avec une concentration, l’ajustement est borné par la distribution a priori ; avec deux concentrations ou plus prélevées à des moments appropriés (pic et concentration résiduelle), il devient beaucoup plus individualisé et la recommandation peut s’écarter davantage des moyennes de population. Si le résidu reste important, un avis sur la qualité de l’ajustement apparaît : il invite à obtenir une concentration de confirmation plutôt qu’à accorder une confiance excessive à la recommandation.",
     "pt-BR": "Com um nível o ajuste é limitado pelo anterior; com dois ou mais níveis bem cronometrados (pico + vale) o ajuste torna-se muito mais individualizado e a recomendação pode desviar-se ainda mais das médias populacionais. Se o resíduo permanecer grande, você verá uma Advisoria de Qualidade Fit – isso é um sinal para desenhar um nível confirmatório em vez de confiar demais na recomendação."
   },
@@ -4075,7 +4075,7 @@
     "pt-BR": "A calculadora compara doses de 500-2000 mg em q6h, q8h, q12h ou q24h, descarta candidatos cujo pico predito, vale ou AUC₂₄ excede os limites de segurança, e escolhe aquele cujo estado de equilíbrio previsto AUC₂₄ pousa mais próximo do ponto médio do alvo 400-600."
   },
   "Peak and trough are forward-predicted from the patient’s posterior PK (or population prior if no level is fit) using the two-compartment model. The recommendation always favors options that stay within target rather than ones that hit midpoint exactly outside the window.": {
-    "es": "El pico y el valle se predicen a partir de la farmacocinética posterior del paciente (o de la distribución previa poblacional si no se ajusta ninguna concentración), utilizando el modelo bicompartimental. La recomendación siempre favorece las opciones que permanecen dentro del objetivo frente a las que alcanzan exactamente el punto medio fuera de la ventana.",
+    "es": "El pico y el valle se predicen a partir de la farmacocinética posterior del paciente (o de la distribución poblacional a priori si no se ajusta ninguna concentración), utilizando el modelo bicompartimental. La recomendación siempre favorece las opciones que permanecen dentro del objetivo frente a las que alcanzan exactamente el punto medio fuera de la ventana.",
     "fr": "Le pic et la concentration résiduelle sont prédits à partir de la pharmacocinétique a posteriori du patient (ou de la distribution a priori de population si aucune concentration n’est ajustée), avec le modèle bicompartimental. La recommandation privilégie toujours les options restant dans la cible plutôt que celles qui atteignent exactement le milieu en dehors de la fenêtre.",
     "pt-BR": "O pico e o vale são preditos para a frente a partir da PK posterior do paciente (ou da população anterior se não houver nível adequado) utilizando o modelo de dois compartimentos. A recomendação sempre favorece opções que permanecem dentro do alvo ao invés de aquelas que atingiram o ponto médio exatamente fora da janela."
   },
@@ -8300,7 +8300,7 @@
     "pt-BR": "Tempo de recolha de níveis assumido dentro do intervalo posológico actual (tempo_desde_último_intervalo ≤dose)."
   },
   "Measured level(s) can produce a bounded MAP-style initial posterior refinement around that adult prior; this is not a full Bayesian commercial engine.": {
-    "es": "Las concentraciones medidas pueden producir un refinamiento inicial a posteriori acotado de tipo MAP en torno a esa distribución a priori para adultos; no se trata de un motor bayesiano comercial completo.",
+    "es": "Las concentraciones medidas pueden producir un ajuste inicial a posteriori acotado de tipo MAP en torno a esa distribución a priori para adultos; no se trata de un motor bayesiano comercial completo.",
     "fr": "Les concentrations mesurées peuvent permettre un ajustement initial a posteriori encadré de type MAP autour de cette distribution a priori pour l’adulte ; il ne s’agit pas d’un moteur bayésien commercial complet.",
     "pt-BR": "Concentrações medidas podem produzir um refinamento inicial a posteriori do tipo MAP com limites em torno dessa distribuição a priori para adultos; não se trata de um mecanismo bayesiano comercial completo."
   },
@@ -8370,7 +8370,7 @@
     "pt-BR": "Estimativa populacional inicial"
   },
   "Simple two-compartment adult prior model with bounded initial MAP refinement from level(s), not a full Bayesian engine.": {
-    "es": "Modelo a priori bicompartimental sencillo para adultos con refinamiento MAP inicial acotado a partir de las concentraciones; no es un motor bayesiano completo.",
+    "es": "Modelo a priori bicompartimental sencillo para adultos con ajuste MAP inicial acotado a partir de las concentraciones; no es un motor bayesiano completo.",
     "fr": "Modèle a priori bicompartimental simple pour l’adulte avec ajustement MAP initial encadré à partir des concentrations ; ce n’est pas un moteur bayésien complet.",
     "pt-BR": "Modelo a priori bicompartimental simples para adultos, com refinamento MAP inicial com limites a partir das concentrações; não é um mecanismo bayesiano completo."
   },
@@ -8385,12 +8385,12 @@
     "pt-BR": "O julgamento clínico e a reavaliação baseada nos níveis permanecem essenciais."
   },
   "Simple two-compartment adult population prior model only; no refinement from levels in this pass.": {
-    "es": "Solo modelo poblacional a priori bicompartimental sencillo para adultos; sin refinamiento a partir de concentraciones en esta evaluación.",
+    "es": "Solo modelo poblacional a priori bicompartimental sencillo para adultos; sin ajuste a partir de concentraciones en esta evaluación.",
     "fr": "Modèle populationnel a priori bicompartimental simple pour l’adulte uniquement ; aucun ajustement à partir des concentrations lors de cette évaluation.",
     "pt-BR": "Apenas o modelo populacional a priori bicompartimental simples para adultos; sem refinamento por concentrações nesta etapa."
   },
   "Measured levels are displayed but not used to refine parameters in this pass.": {
-    "es": "Las concentraciones medidas se muestran, pero no se utilizan para refinar los parámetros en esta evaluación.",
+    "es": "Las concentraciones medidas se muestran, pero no se utilizan para ajustar los parámetros en esta evaluación.",
     "fr": "Les concentrations mesurées sont affichées, mais ne servent pas à ajuster les paramètres lors de cette évaluation.",
     "pt-BR": "Níveis medidos são exibidos, mas não usados para refinar parâmetros nesta passagem."
   },
@@ -8420,7 +8420,7 @@
     "pt-BR": "Os esquemas de infusão quase contínuos estão fora deste modelo intermitente de estado de equilíbrio; a duração da infusão deve permanecer materialmente mais curta do que o intervalo posológico."
   },
   "Single level used for initial parameter refinement; posterior fit quality may be weak even when the model returns a bounded estimate.": {
-    "es": "Se utilizó una sola concentración para el refinamiento inicial de los parámetros; la calidad del ajuste a posteriori puede ser débil aunque el modelo devuelva una estimación acotada.",
+    "es": "Se utilizó una sola concentración para el ajuste inicial de los parámetros; la calidad del ajuste a posteriori puede ser débil aunque el modelo devuelva una estimación acotada.",
     "fr": "Une seule concentration a servi à l’ajustement initial des paramètres ; la qualité de l’ajustement a posteriori peut être faible même lorsque le modèle fournit une estimation encadrée.",
     "pt-BR": "Nível único utilizado para o refinamento inicial do parâmetro; a qualidade do ajuste posterior pode ser fraca mesmo quando o modelo devolve uma estimativa limitada."
   },
@@ -8540,7 +8540,7 @@
     "pt-BR": "Limitações: sem concentrações medidas; reavalie quando estiverem disponíveis. Não atribua precisão específica para o paciente a resultados baseados apenas nas informações a priori."
   },
   "No posterior refinement from measured levels was applied.": {
-    "es": "No se aplicó refinamiento a posteriori a partir de concentraciones medidas.",
+    "es": "No se aplicó ajuste a posteriori a partir de concentraciones medidas.",
     "fr": "Aucun ajustement a posteriori à partir de concentrations mesurées n’a été appliqué.",
     "pt-BR": "Não foi aplicado refinamento posterior a partir dos níveis medidos."
   },
@@ -9390,7 +9390,7 @@
     "pt-BR": "Exportação de PDF, cópia de nota e interpretação são gratuitas durante o lançamento · após o lançamento, uma avaliação de 14 dias, em seguida, $49.99/ano"
   },
   "Based on patient characteristics, without measured levels. Enter a measured vancomycin level to refine the estimate.": {
-    "es": "Basado en las características del paciente, sin concentraciones medidas. Introduzca una concentración medida de vancomicina para refinar la estimación.",
+    "es": "Basado en las características del paciente, sin concentraciones medidas. Introduzca una concentración medida de vancomicina para ajustar la estimación.",
     "fr": "Fondé sur les caractéristiques du patient, sans concentrations mesurées. Saisissez une concentration mesurée de vancomycine pour affiner l’estimation.",
     "pt-BR": "Com base nas características dos pacientes, sem os níveis medidos. Introduza um nível de vancomicina medido para refinar a estimativa."
   },
@@ -9465,7 +9465,7 @@
     "pt-BR": "Os pacientes e seus níveis são gerados por computador. O desempenho real-paciente não foi avaliado; a análise de Desempenho Preditivo também é sintética."
   },
   "Two-level sampling": {
-    "es": "Muestreo de dos concentraciones",
+    "es": "Muestreo con dos concentraciones",
     "fr": "Prélèvement de deux concentrations",
     "pt-BR": "Amostragem de dois níveis"
   },
@@ -9530,7 +9530,7 @@
     "pt-BR": "Uma concentração mantida em um intervalo de estado de equilíbrio"
   },
   "Two-level sampling only": {
-    "es": "Solo muestreo de dos concentraciones",
+    "es": "Solo muestreo con dos concentraciones",
     "fr": "Prélèvement de deux concentrations uniquement",
     "pt-BR": "Apenas amostragem a dois níveis"
   },
@@ -9895,7 +9895,7 @@
     "pt-BR": "Antes de dispor de concentrações medidas, obtenha uma sugestão de esquema inicial, incluindo orientações sobre dose de ataque, com base na idade, no peso, na creatinina sérica e em outras características do paciente."
   },
   "Refinement with one or two levels": {
-    "es": "Refinamiento con una o dos concentraciones",
+    "es": "Ajuste con una o dos concentraciones",
     "fr": "Ajustement à partir d’une ou deux concentrations",
     "pt-BR": "Refinamento com um ou dois níveis"
   },
@@ -11890,7 +11890,7 @@
     "pt-BR": "Campos Calculados"
   },
   "Dosing History": {
-    "es": "Historial de dosificación",
+    "es": "Historial de administración",
     "fr": "Historique des administrations",
     "pt-BR": "Histórico Positivo"
   },
@@ -11905,7 +11905,7 @@
     "pt-BR": "Níveis Observados"
   },
   "DURING INFUSION": {
-    "es": "DURANTE LA INFUSIÓN",
+    "es": "DURANTE LA PERFUSIÓN",
     "fr": "PENDANT LA PERFUSION",
     "pt-BR": "DURANTE A INFUSÃO"
   },
@@ -12445,7 +12445,7 @@
     "pt-BR": "• Disponível com assinatura"
   },
   "The calculator's Colin 2019 prior for the published typical adult (35 y, 70 kg, SCr 0.83 mg/dL) should match the published CL (4.10 L/h), V1 (42.9 L) and the AUC₂₄ that CL implies at 1000 mg every 12 h, each within 1%.": {
-    "es": "La distribución previa Colin 2019 de la calculadora para el adulto típico publicado (35 años, 70 kg, SCr 0.83 mg/dL) debe coincidir con CL (4.10 L/h), V1 (42.9 L) y el AUC₂₄ derivado de esa CL con 1000 mg cada 12 h, con una diferencia máxima del 1% en cada caso.",
+    "es": "La distribución a priori de Colin 2019 de la calculadora para el adulto típico publicado (35 años, 70 kg, SCr 0.83 mg/dL) debe coincidir con CL (4.10 L/h), V1 (42.9 L) y el AUC₂₄ derivado de esa CL con 1000 mg cada 12 h, con una diferencia máxima del 1% en cada caso.",
     "fr": "L’a priori Colin 2019 du calculateur pour l’adulte type publié (35 ans, 70 kg, SCr 0.83 mg/dL) doit correspondre à la CL (4.10 L/h), au V1 (42.9 L) et à l’AUC₂₄ découlant de cette CL avec 1000 mg toutes les 12 h, à 1% près pour chaque valeur.",
     "pt-BR": "Colin 2019 da calculadora anterior para o adulto típico publicado (35 y, 70 kg, SCr 0.83 mg/dL) deve corresponder à CL publicada (4.10 L/h), V1 (42.9 L) e a AUC₂₄ que CL implica em 1000 mg a cada 12 h, cada um dentro de 1%."
   },
@@ -12470,7 +12470,7 @@
     "pt-BR": "V1 42.9 L, V2 41.7 L, CL 4.10 L/h e Q 3.22 L/h para um paciente de 35 anos de idade, 70 kg com SCr 0.83 mg/dL são indicados no resumo (PMID 30656565). A AUC₂₄ é derivada como dose diária dividida pela CL publicada."
   },
   "The calculator's Colin 2019 prior for a 60-year-old, 65-kg patient with SCr 0.97 mg/dL should match the published CL (2.55 L/h) and the AUC₂₄ it implies at 750 mg every 12 h, each within 1%. This exercises the age-decline and serum creatinine terms together.": {
-    "es": "La distribución previa Colin 2019 de la calculadora para un paciente de 60 años, 65 kg y SCr 0.97 mg/dL debe coincidir con la CL publicada (2.55 L/h) y el AUC₂₄ que implica con 750 mg cada 12 h, con una diferencia máxima del 1% en cada caso. Esto comprueba conjuntamente los términos de disminución por edad y creatinina sérica.",
+    "es": "La distribución a priori de Colin 2019 de la calculadora para un paciente de 60 años, 65 kg y SCr 0.97 mg/dL debe coincidir con la CL publicada (2.55 L/h) y el AUC₂₄ que implica con 750 mg cada 12 h, con una diferencia máxima del 1% en cada caso. Esto comprueba conjuntamente los términos de disminución por edad y creatinina sérica.",
     "fr": "L’a priori Colin 2019 du calculateur pour un patient de 60 ans, 65 kg et SCr 0.97 mg/dL doit correspondre à la CL publiée (2.55 L/h) et à l’AUC₂₄ qu’elle implique avec 750 mg toutes les 12 h, à 1% près pour chaque valeur. Cela vérifie conjointement les termes de diminution liée à l’âge et de créatinine sérique.",
     "pt-BR": "Colin 2019 da calculadora anterior para um paciente de 60 anos, 65 kg com SCr 0.97 mg/dL deve corresponder à CL publicada (2.55 L/h) e a AUC₂₄ implica em 750 mg a cada 12 h, cada um dentro de 1%. Isto exerce os termos idade-declínio e creatinina sérica juntos."
   },
@@ -12555,7 +12555,7 @@
     "pt-BR": "Carreno 2017 observou que as estimativas bayesianas obtidas com um pico e um vale se aproximavam da AUC calculada com todos os dados melhor do que as estimativas baseadas apenas no vale ou em uma concentração no ponto médio e um vale. O intervalo publicado é um resultado de coorte com pacientes reais e outros modelos; os valores e as concentrações deste cartão são ilustrativos, de modo que a diferença serve apenas como contexto."
   },
   "Range of full-data AUC₂₄ estimates (437–489 mg·h/L) read from the abstract; midpoint 463 derived by Vancomyzer. The levels on this card (25 mg/L 3.5 h after the start of the dose, 1 h after the end of a 2.5 h infusion; 10 mg/L at 11.5 h) are illustrative and were chosen by Vancomyzer.": {
-    "es": "Intervalo de estimaciones del AUC₂₄ con datos completos (437–489 mg·h/L) extraído del resumen; punto medio 463 derivado por Vancomyzer. Las concentraciones de esta tarjeta (25 mg/L 3.5 h después del inicio de la dosis, 1 h después del final de una infusión de 2.5 h; 10 mg/L a las 11.5 h) son ilustrativas y fueron elegidas por Vancomyzer.",
+    "es": "Intervalo de estimaciones del AUC₂₄ con datos completos (437–489 mg·h/L) extraído del resumen; punto medio 463 derivado por Vancomyzer. Las concentraciones de esta tarjeta (25 mg/L 3.5 h después del inicio de la dosis, 1 h después del final de una perfusión de 2.5 h; 10 mg/L a las 11.5 h) son ilustrativas y fueron elegidas por Vancomyzer.",
     "fr": "Intervalle des estimations d’AUC₂₄ avec données complètes (437–489 mg·h/L) relevé dans le résumé ; point médian 463 calculé par Vancomyzer. Les concentrations de cette fiche (25 mg/L 3.5 h après le début de la dose, 1 h après la fin d’une perfusion de 2.5 h ; 10 mg/L à 11.5 h) sont illustratives et ont été choisies par Vancomyzer.",
     "pt-BR": "Gama de estimativas completas da AUC₂₄ (437-489 mg·h/L) lidas do resumo; ponto médio 463 derivado de Vancomyzer. Os níveis nesta placa (25 mg/L 3.5 h após o início da dose, 1 h após o final de uma infusão de 2.5 h; 10 mg/L a 11.5 h) são ilustrativos e foram escolhidos por Vancomyzer."
   },
@@ -12610,7 +12610,7 @@
     "pt-BR": "Modelo Vancomyzer utilizado para a dosagem"
   },
   "Two-compartment model, intermittent IV infusion, first-order elimination": {
-    "es": "Modelo bicompartimental, infusión IV intermitente, eliminación de primer orden",
+    "es": "Modelo bicompartimental, perfusión IV intermitente, eliminación de primer orden",
     "fr": "Modèle bicompartimental, perfusion IV intermittente, élimination d’ordre un",
     "pt-BR": "Modelo de dois compartimentos, infusão intravenosa intermitente, eliminação de primeira ordem"
   },
@@ -12625,7 +12625,7 @@
     "pt-BR": "Adultos (18 anos ou mais) que estejam a receber vancomicina intravenosa intermitente e que não estejam a fazer terapêutica renal de substituição. Usado para cada tamanho corporal, incluindo IMC 40 kg/m2 e acima."
   },
   "Serum creatinine is used directly (mg/dL) as the Colin 2019 renal covariate: FSCR = exp(−0.649 × (SCr − SCRstd)), where SCRstd is the age-standardized reference creatinine. Cockcroft-Gault does not enter this population prior; after a fit to measured levels, the calculator caps fitted clearance at twice the estimated CrCl.": {
-    "es": "La creatinina sérica se utiliza directamente (mg/dL) como covariable renal de Colin 2019: FSCR = exp(−0.649 × (SCr − SCRstd)), donde SCRstd es la creatinina de referencia estandarizada por edad. Cockcroft-Gault no interviene en esta distribución previa poblacional; después del ajuste a las concentraciones medidas, la calculadora limita el aclaramiento ajustado al doble de la CrCl estimada.",
+    "es": "La creatinina sérica se utiliza directamente (mg/dL) como covariable renal de Colin 2019: FSCR = exp(−0.649 × (SCr − SCRstd)), donde SCRstd es la creatinina de referencia estandarizada por edad. Cockcroft-Gault no interviene en esta distribución poblacional a priori; después del ajuste a las concentraciones medidas, la calculadora limita el aclaramiento ajustado al doble de la CrCl estimada.",
     "fr": "La créatinine sérique est utilisée directement (mg/dL) comme covariable rénale de Colin 2019 : FSCR = exp(−0.649 × (SCr − SCRstd)), où SCRstd est la créatinine de référence standardisée pour l’âge. Cockcroft-Gault n’intervient pas dans cet a priori de population ; après ajustement aux concentrations mesurées, le calculateur plafonne la clairance ajustée au double de la CrCl estimée.",
     "pt-BR": "A creatinina sérica é usada diretamente (mg/dL) como covariável renal de Colin 2019: FSCR = exp(−0.649 × (SCr − SCRstd)), em que SCRstd é a creatinina de referência padronizada por idade. Cockcroft-Gault não entra nessa distribuição populacional a priori; após o ajuste às concentrações medidas, a calculadora limita a depuração ajustada ao dobro da CrCl estimada."
   },
@@ -12675,7 +12675,7 @@
     "pt-BR": "A calculadora contra o cálculo de referência: estimativas iniciais baseadas em Colin 2019, o esquema de referência, cada caso de teste (incluindo eliminação lenta, infusões q18h/q36h e 0.5–4 h), 20 esquemas aleatórios para adultos e a AUC analítica."
   },
   "The loading-dose history against the reference: 40 random schedules (loading dose, infusion times, a shortened gap to the first maintenance dose, 2–7 doses), comparing concentrations, AUC, the trough and AUC after the selected dose, and the fit's predicted level.": {
-    "es": "El historial de dosis de carga frente a la referencia: 40 esquemas aleatorios (dosis de carga, tiempos de infusión, intervalo reducido hasta la primera dosis de mantenimiento, 2–7 dosis), comparando concentraciones, AUC, concentración mínima y AUC tras la dosis seleccionada, y la concentración predicha por el ajuste.",
+    "es": "El historial de dosis de carga frente a la referencia: 40 esquemas aleatorios (dosis de carga, tiempos de perfusión, intervalo reducido hasta la primera dosis de mantenimiento, 2–7 dosis), comparando concentraciones, AUC, concentración mínima y AUC tras la dosis seleccionada, y la concentración predicha por el ajuste.",
     "fr": "L’historique de dose de charge comparé à la référence : 40 schémas aléatoires (dose de charge, durées de perfusion, délai raccourci avant la première dose d’entretien, 2–7 doses), comparant concentrations, AUC, concentration résiduelle et AUC après la dose sélectionnée, et concentration prédite par l’ajustement.",
     "pt-BR": "O historial da dose de ataque contra a referência: 40 esquemas aleatórios (dose de ataque, tempos de infusão, um intervalo reduzido para a primeira dose de manutenção, 2–7 doses), comparando concentrações, AUC, vale e AUC após a dose selecionada, e o nível previsto do ajuste."
   },
@@ -12900,17 +12900,17 @@
     "pt-BR": "Alvo de otimização para a seleção da dose"
   },
   "Trough Reference Low": {
-    "es": "Límite inferior de referencia de la concentración mínima",
+    "es": "Límite inferior de referencia de la concentración valle",
     "fr": "Limite basse de référence de la concentration résiduelle",
     "pt-BR": "Limite inferior da referência de vale"
   },
   "Trough Reference High": {
-    "es": "Límite superior de referencia de la concentración mínima",
+    "es": "Límite superior de referencia de la concentración valle",
     "fr": "Limite haute de référence de la concentration résiduelle",
     "pt-BR": "Limite superior da referência de vale"
   },
   "Max Infusion Rate": {
-    "es": "Velocidad máxima de infusión",
+    "es": "Velocidad máxima de perfusión",
     "fr": "Débit maximal de perfusion",
     "pt-BR": "Taxa máxima de infusão"
   },
@@ -12920,7 +12920,7 @@
     "pt-BR": "Rótulo FDA: 10 mg/min no máximo"
   },
   "Min Infusion Duration": {
-    "es": "Duración mínima de infusión",
+    "es": "Duración mínima de perfusión",
     "fr": "Durée minimale de perfusion",
     "pt-BR": "Duração da infusão mínima"
   },
@@ -13610,7 +13610,7 @@
     "pt-BR": "CrCl (mL/min)"
   },
   "Infusion (min)": {
-    "es": "Infusión (min)",
+    "es": "Perfusión (min)",
     "fr": "Perfusion (min)",
     "pt-BR": "Infusão (min)"
   },
@@ -14740,12 +14740,12 @@
     "pt-BR": "Se confirmada, a dosagem intermitente padrão pode não atingir a AUC24-alvo de 400-600 mg·h/L;"
   },
   "Continuous infusion is outside this calculator's scope — it is neither modeled nor dosed here, so manage it": {
-    "es": "La infusión continua queda fuera del alcance de esta calculadora: aquí no se modela ni se calcula su dosificación; debe gestionarse",
+    "es": "La perfusión continua queda fuera del alcance de esta calculadora: aquí no se modela ni se calcula su dosificación; debe gestionarse",
     "fr": "La perfusion continue est hors du périmètre de ce calculateur : elle n’y est ni modélisée ni dosée ; elle doit être gérée",
     "pt-BR": "A infusão contínua está fora do escopo desta calculadora – ela não é modelada nem dotada aqui, então gerencie-a"
   },
   "Continuous infusion is outside this calculator's scope — it is neither modeled nor dosed here, so manage it ": {
-    "es": "La infusión continua queda fuera del alcance de esta calculadora: aquí no se modela ni se calcula su dosificación; debe gestionarse ",
+    "es": "La perfusión continua queda fuera del alcance de esta calculadora: aquí no se modela ni se calcula su dosificación; debe gestionarse ",
     "fr": "La perfusion continue est hors du périmètre de ce calculateur : elle n’y est ni modélisée ni dosée ; elle doit être gérée ",
     "pt-BR": "A infusão contínua está fora do escopo desta calculadora – ela não é modelada nem dotada aqui, então gerencie-a"
   },
@@ -14890,12 +14890,12 @@
     "pt-BR": "Objectivos da AUC"
   },
   "Trough Reference": {
-    "es": "Referencia de concentración mínima",
+    "es": "Referencia de concentración valle",
     "fr": "Référence de concentration résiduelle",
     "pt-BR": "Referência de vale"
   },
   "Infusion Policy": {
-    "es": "Política de infusión",
+    "es": "Política de perfusión",
     "fr": "Politique de perfusion",
     "pt-BR": "Política de infusão"
   },
@@ -15830,12 +15830,12 @@
     "pt-BR": "Terapêutica de substituição renal (CRRT, HD, DP)"
   },
   "Level drawn during infusion": {
-    "es": "Concentración obtenida durante la perfusión",
+    "es": "Muestra extraída durante la perfusión",
     "fr": "Concentration prélevée pendant la perfusion",
     "pt-BR": "Nível obtido durante a infusão"
   },
   "Level drawn in distribution phase (<2h post-infusion)": {
-    "es": "Concentración obtenida en la fase de distribución (<2h tras la perfusión)",
+    "es": "Muestra extraída en la fase de distribución (<2h tras finalizar la perfusión)",
     "fr": "Concentration prélevée pendant la phase de distribution (<2h après la perfusion)",
     "pt-BR": "Nível obtido na fase de distribuição (< 2h pós- infusão)"
   },
@@ -16068,5 +16068,75 @@
     "es": "Valor entero",
     "fr": "Valeur entière",
     "pt-BR": "Valor inteiro"
+  },
+  "Colin 2019 two-compartment model; population equations and references, with the assumptions used to adjust estimates to measured levels": {
+    "es": "Modelo bicompartimental de Colin 2019; ecuaciones poblacionales y referencias, con los supuestos utilizados para ajustar las estimaciones a las concentraciones medidas",
+    "fr": "Colin 2019 two-compartment model; population equations and references, with the assumptions used to adjust estimates to measured levels",
+    "pt-BR": "Modelo bicompartimental de Colin 2019; equações populacionais e referências, com os pressupostos usados para ajustar as estimativas às concentrações medidas"
+  },
+  "Selected published population values compared with calculator estimates": {
+    "es": "Comparación de valores poblacionales publicados seleccionados con las estimaciones de la calculadora",
+    "fr": "Selected published population values compared with calculator estimates",
+    "pt-BR": "Valores populacionais publicados selecionados, comparados com as estimativas da calculadora"
+  },
+  "Predictions checked in simulated ICU patients using a model adapted from published research": {
+    "es": "Comprobación de predicciones en pacientes de UCI simulados mediante un modelo adaptado de investigaciones publicadas",
+    "fr": "Predictions checked in simulated ICU patients using a model adapted from published research",
+    "pt-BR": "Previsões verificadas em pacientes simulados de UTI, usando um modelo adaptado de pesquisa publicada"
+  },
+  "Estimates compared with Tucuxi in simulated patients, using limits set before the analysis": {
+    "es": "Comparación de estimaciones con Tucuxi en pacientes simulados, con límites establecidos antes del análisis",
+    "fr": "Estimates compared with Tucuxi in simulated patients, using limits set before the analysis",
+    "pt-BR": "Estimativas comparadas com o Tucuxi em pacientes simulados, usando limites definidos antes da análise"
+  },
+  "Independent reference calculation (including loading-dose schedules) and synthetic coverage of the 90% uncertainty band": {
+    "es": "Cálculo de referencia independiente (incluidas las pautas con dosis de carga) y cobertura de la banda de incertidumbre del 90% en datos sintéticos",
+    "fr": "Independent reference calculation (including loading-dose schedules) and synthetic coverage of the 90% uncertainty band",
+    "pt-BR": "Cálculo de referência independente (incluindo esquemas com dose de ataque) e cobertura da faixa de incerteza de 90% em dados sintéticos"
+  },
+  "Pharmacists": {
+    "es": "Farmacéuticos",
+    "fr": "Pharmacists",
+    "pt-BR": "Farmacêuticos"
+  },
+  "Physicians": {
+    "es": "Médicos",
+    "fr": "Physicians",
+    "pt-BR": "Médicos"
+  },
+  "Nurse practitioners": {
+    "es": "Profesionales de enfermería de práctica avanzada (nurse practitioners)",
+    "fr": "Nurse practitioners",
+    "pt-BR": "Enfermeiros de prática avançada (nurse practitioners)"
+  },
+  "Physician assistants": {
+    "es": "Asistentes médicos (physician assistants)",
+    "fr": "Physician assistants",
+    "pt-BR": "Assistentes médicos (physician assistants)"
+  },
+  "Residents": {
+    "es": "Residentes",
+    "fr": "Residents",
+    "pt-BR": "Residentes"
+  },
+  "Students": {
+    "es": "Estudiantes",
+    "fr": "Students",
+    "pt-BR": "Estudantes"
+  },
+  "Pediatric patients": {
+    "es": "Pacientes pediátricos",
+    "fr": "Pediatric patients",
+    "pt-BR": "Pacientes pediátricos"
+  },
+  "Continuous-infusion vancomycin": {
+    "es": "Vancomicina en perfusión continua",
+    "fr": "Continuous-infusion vancomycin",
+    "pt-BR": "Vancomicina em infusão contínua"
+  },
+  "Age, weight, height, serum creatinine and renal replacement status. Estimated creatinine clearance is shown for context; the dose is calculated from serum creatinine as the Colin 2019 model input.": {
+    "es": "Edad, peso, talla, creatinina sérica y situación respecto al tratamiento renal sustitutivo. El aclaramiento estimado de creatinina se muestra como referencia; la dosis se calcula a partir de la creatinina sérica, que es una variable de entrada del modelo Colin 2019.",
+    "fr": "Âge, poids, taille, créatininémie et situation d’épuration extrarénale. La clairance estimée de la créatinine est affichée à titre de contexte ; la dose est calculée à partir de la créatininémie comme Colin 2019 donnée d’entrée du modèle.",
+    "pt-BR": "Idade, peso, altura, creatinina sérica e situação quanto à terapia renal substitutiva. A depuração estimada de creatinina é apresentada como contexto; a dose é calculada usando a creatinina sérica como entrada do modelo Colin 2019 modelo de entrada."
   }
 }
