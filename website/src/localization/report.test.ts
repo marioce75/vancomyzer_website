@@ -31,3 +31,18 @@ test("localized report keeps all numeric tokens, links, CSS, escaping and source
   assert.equal(JSON.stringify(fixture), before);
   assert.equal(localizeReportMarkup(en, "en"), en);
 });
+test('Spanish generated warnings retain values, dose history and uncertainty without English fallback', async () => {
+  const { translateGeneratedText } = await import('./generatedText');
+  const sources = [
+    'Actual-history analysis: the level was fitted after exactly 5 doses; exposure of the current regimen is reported as its steady-state projection, with dose-5 peak/trough shown separately.',
+    'Actual-history analysis after 5 doses: the measured level was fitted by superposing exactly 5 doses. AUC24/peak/trough for the current regimen are its steady-state projection (comparable with the candidate regimens); the modeled dose-5 peak/trough (26.6 / 9.3 mg/L, AUC over that interval 191 mg·h/L) are reported separately — the model puts the patient at 87% of steady state.',
+    'Posterior fit quality was weak (2 levels informed the bounded posterior MAP fit; RMS error 1.6 mg/L; mean absolute error 1.1 mg/L; mean relative error 6%; CL shift 69%; V1 shift 8%.); uncertainty remains high.',
+  ];
+  for (const source of sources) {
+    const output = translateGeneratedText(source, 'es');
+    assert.notEqual(output, source);
+    assert.doesNotMatch(output, /Actual-history|fitted|uncertainty remains|informed the/);
+    assert.deepEqual(output.match(/\d+(?:\.\d+)?/g), source.match(/\d+(?:\.\d+)?/g));
+  }
+  assert.match(translateGeneratedText(sources[2], 'es'), /incertidumbre sigue siendo alta/);
+});

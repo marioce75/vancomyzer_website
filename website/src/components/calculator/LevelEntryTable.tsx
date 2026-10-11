@@ -292,7 +292,7 @@ export default function LevelEntryTable({
                       {dt.doseTimeErr && <p className="text-[10px] text-red-600"><LocalizedText text={dt.doseTimeErr} /></p>}
                     </div>
                   </div>
-                  <p className="text-[11px] mt-1 text-slate-500"><LocalizedText text="Start of the" />{" "}<strong><LocalizedText text="most recent" /></strong>{" "}<LocalizedText text="infusion before this level was drawn" /></p>
+                  <p className="text-[11px] mt-1 text-slate-500"><LocalizedText text="Start of the most recent infusion before this level was drawn" /></p>
                 </div>
 
                 {/* Live hours post-dose preview */}

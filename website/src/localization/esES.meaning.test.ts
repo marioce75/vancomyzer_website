@@ -22,3 +22,8 @@ test('Spanish homepage data-driven lists do not silently fall back to English', 
   assert.match(es('Nurse practitioners'), /nurse practitioners/);
   assert.match(es('Physician assistants'), /physician assistants/);
 });
+test('Spanish timing validation is clinically specific and avoids internal field names', () => {
+  assert.match(es('Complete valid sample timing. In date/time mode, the sample must not precede the dose.'), /extracción.*inicio de la perfusión/);
+  assert.match(es('Start of the most recent infusion before this level was drawn'), /Inicio de la última perfusión.*antes de extraer/);
+  assert.doesNotMatch(es('Level collection time assumed within the current dosing interval (time_since_last_dose ≤ interval).'), /time_since_last_dose|workflow|backend/);
+});

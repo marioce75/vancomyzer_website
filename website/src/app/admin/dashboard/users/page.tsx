@@ -690,7 +690,7 @@ function UserDetailDrawer({
         role="dialog"
         aria-label={`User detail for ${user.full_name}`}
         className="fixed top-0 right-0 bottom-0 z-50 bg-white border-l border-gray-200 shadow-xl overflow-y-auto"
-        style={{ width: 420 }}
+        style={{ width: "min(420px, 100vw)" }}
       >
         <header className="px-5 py-4 border-b border-gray-200 flex items-start justify-between gap-3">
           <div>

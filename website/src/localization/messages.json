@@ -1455,7 +1455,7 @@
     "pt-BR": "Dose de ataque administrada"
   },
   "Enter details below. Dosing History will be pre-filled automatically — do not re-enter.": {
-    "es": "Introduzca los datos a continuación. El historial de administración se rellenará automáticamente; no vuelva a introducirlos.",
+    "es": "Introduzca los datos a continuación. Se copiarán al historial de administración; no es necesario introducirlos de nuevo.",
     "fr": "Saisissez les informations ci-dessous. L’historique des doses sera prérempli automatiquement ; ne les saisissez pas à nouveau.",
     "pt-BR": "Introduza detalhes abaixo. O histórico de dosagem será preenchido automaticamente — não volte a entrar."
   },
@@ -1540,7 +1540,7 @@
     "pt-BR": "A monitorização frequente ou diária pode ser adequada quando a função renal ou a hemodinâmica estiverem instáveis; estar acamado, isoladamente, não determina a frequência."
   },
   "Dosing History pre-filled:": {
-    "es": "Historial de administración rellenado automáticamente:",
+    "es": "Datos copiados al historial de administración:",
     "fr": "Historique des doses prérempli :",
     "pt-BR": "História da Posologia pré- cheia:"
   },
@@ -1975,7 +1975,7 @@
     "pt-BR": "Recomendação recusada"
   },
   "Reconcile the discordant same-time levels, then recalculate.": {
-    "es": "Concilie las concentraciones discordantes obtenidas a la misma hora y vuelva a calcular.",
+    "es": "Revise las concentraciones discordantes registradas a la misma hora, corrija los datos y vuelva a calcular.",
     "fr": "Vérifiez les concentrations discordantes prélevées au même moment, puis recalculez.",
     "pt-BR": "Reconcile os níveis discordantes ao mesmo tempo, em seguida, recalcule."
   },
@@ -2445,7 +2445,7 @@
     "pt-BR": "Data e hora exatas da coleta de sangue"
   },
   "Level drawn on a different date than dose — please verify this is correct before calculating.": {
-    "es": "La muestra se extrajo en una fecha distinta a la del inicio de la perfusión; verifique que sea correcto antes de calcular.",
+    "es": "La fecha de extracción no coincide con la de inicio de la perfusión. Compruebe ambas fechas antes de calcular.",
     "fr": "Le prélèvement a eu lieu à une date différente de celle de la dose ; vérifiez ces informations avant de calculer.",
     "pt-BR": "Nível desenhado numa data diferente da dose — verifique se esta está correcta antes de calcular."
   },
@@ -2490,7 +2490,7 @@
     "pt-BR": "Usado automaticamente para cálculos PK"
   },
   "⚠ Level time is before dose time — please check entries": {
-    "es": "⚠ La hora de la muestra es anterior a la dosis; revise los datos",
+    "es": "⚠ La extracción es anterior al inicio de la perfusión. Revise la fecha y la hora.",
     "fr": "⚠ L’heure du prélèvement précède celle de la dose ; vérifiez les données",
     "pt-BR": "O tempo de nível é anterior ao tempo de dose — verifique por favor as entradas"
   },
@@ -2740,7 +2740,7 @@
     "pt-BR": "Não para uso pediátrico, dialítico-específico ou de infusão contínua."
   },
   "Unstable renal function, poor chronology, or sparse/mistimed levels require extra caution.": {
-    "es": "La función renal inestable, un registro horario deficiente o un número escaso de concentraciones medidas o muestras extraídas en momentos inadecuados requieren especial cautela.",
+    "es": "Interprete los resultados con especial cautela si la función renal es inestable, las horas están mal registradas o se dispone de pocas muestras o de muestras extraídas en momentos inadecuados.",
     "fr": "Une fonction rénale instable, une chronologie insuffisante ou des concentrations peu nombreuses ou mal datées nécessitent une prudence accrue.",
     "pt-BR": "A função renal instável, a cronologia fraca ou os níveis esparsos/acidentes requerem precaução extra."
   },
@@ -2975,7 +2975,7 @@
     "pt-BR": "Não para pediatria, diálise específica ou infusão contínua."
   },
   "Prior-only maintenance support; not patient-specific severity direction.": {
-    "es": "Apoyo al mantenimiento basado solo en la distribución a priori; no orienta según la gravedad específica del paciente.",
+    "es": "Estimación de la pauta de mantenimiento basada solo en el modelo poblacional. No tiene en cuenta la gravedad clínica del paciente.",
     "fr": "Aide à l’entretien fondée uniquement sur la distribution a priori ; ne fournit pas d’orientation selon la gravité propre au patient.",
     "pt-BR": "Suporte de manutenção prévio; não direção de gravidade específica do paciente."
   },
@@ -3110,7 +3110,7 @@
     "pt-BR": "Revise os pressupostos do modelo ao lado dos níveis medidos e das informações do paciente."
   },
   "Enter valid 24h time (e.g. 1400)": {
-    "es": "Introduzca una hora válida en formato de 24h (p. ej., 1400)",
+    "es": "Introduzca una hora válida en formato de 24 horas (p. ej., 1400).",
     "fr": "Saisissez une heure valide au format 24h (p. ex. 1400)",
     "pt-BR": "Digite a hora 24h válida (por exemplo, 1400)"
   },
@@ -3320,7 +3320,7 @@
     "pt-BR": "Entradas alteradas — recalculando..."
   },
   "Inputs changed — press Calculate to refresh these results.": {
-    "es": "Datos modificados: pulse Calcular para actualizar los resultados.",
+    "es": "Los datos han cambiado. Pulse Calcular para actualizar los resultados.",
     "fr": "Données modifiées : cliquez sur Calculer pour actualiser les résultats.",
     "pt-BR": "Entradas alteradas — pressione Calcular para atualizar esses resultados."
   },
@@ -3630,7 +3630,7 @@
     "pt-BR": "necessita de entrada"
   },
   "Enter valid 24h time (e.g. 0835)": {
-    "es": "Introduzca una hora válida en formato de 24h (p. ej., 0835)",
+    "es": "Introduzca una hora válida en formato de 24 horas (p. ej., 0835).",
     "fr": "Saisissez une heure valide au format 24h (p. ex. 0835)",
     "pt-BR": "Indicar a hora válida das 24h (por exemplo, 0835)"
   },
@@ -3770,7 +3770,7 @@
     "pt-BR": "Use apenas o esquema de intervalo atual interpretável e o timing de nível."
   },
   "Treat as prior-based support rather than high-certainty individualized dosing.": {
-    "es": "Considérelo un apoyo basado en la distribución a priori, no una dosificación individualizada de alta certeza.",
+    "es": "Esta estimación se basa en el modelo poblacional. No ofrece una pauta individualizada con un alto grado de certeza.",
     "fr": "Considérez-le comme une aide fondée sur la distribution a priori, et non comme une posologie individualisée de grande certitude.",
     "pt-BR": "Tratar como suporte prévio em vez de dosagem individualizada de alta certeza."
   },
@@ -3940,7 +3940,7 @@
     "pt-BR": "Utilizar os níveis a partir do intervalo posológico actual e evitar os níveis obtidos durante a infusão ou imediatamente após a conclusão da infusão."
   },
   "Unstable renal function, poor chronology, or sparse/mistimed levels increase uncertainty and should not be overinterpreted.": {
-    "es": "La función renal inestable, un registro horario deficiente o un número escaso de concentraciones medidas o muestras extraídas en momentos inadecuados aumentan la incertidumbre; los resultados deben interpretarse con cautela.",
+    "es": "La incertidumbre aumenta si la función renal es inestable, las horas están mal registradas o se dispone de pocas muestras o de muestras extraídas en momentos inadecuados. Interprete los resultados con cautela.",
     "fr": "Une fonction rénale instable, une chronologie insuffisante ou des concentrations peu nombreuses ou mal datées augmentent l’incertitude et ne doivent pas être surinterprétées.",
     "pt-BR": "Função renal instável, cronologia imprecisa ou poucas concentrações, ou concentrações coletadas em horários inadequados, aumentam a incerteza e exigem cautela na interpretação."
   },
@@ -3950,7 +3950,7 @@
     "pt-BR": "Adultos que recebem apenas vancomicina intravenosa intermitente; não para uso pediátrico, específico para diálise ou infusão contínua."
   },
   "Uses an explicit adult population prior with bounded initial level-based refinement when applicable; this is not presented as a validated commercial Bayesian platform.": {
-    "es": "Utiliza una distribución poblacional a priori adulta explícita con un ajuste inicial limitado basado en concentraciones cuando procede; no se presenta como una plataforma bayesiana comercial validada.",
+    "es": "Parte de una distribución poblacional a priori para adultos y, cuando hay concentraciones medidas, aplica un ajuste inicial con límites. No se presenta como un programa comercial de dosificación bayesiana validado.",
     "fr": "Utilise une distribution a priori explicite de population adulte avec un ajustement initial borné aux concentrations lorsque cela s’applique ; il n’est pas présenté comme une plateforme bayésienne commerciale validée.",
     "pt-BR": "Utiliza um modelo populacional a priori explícito para adultos, com refinamento inicial limitado com base nas concentrações, quando aplicável; não é apresentado como uma plataforma bayesiana comercial validada."
   },
@@ -3975,7 +3975,7 @@
     "pt-BR": "Atenção: capacidade de interpretação limitada"
   },
   "Fallback option: use the initial-regimen maintenance workflow if the current dose history is too irregular for steady-state interpretation.": {
-    "es": "Alternativa: utilice el flujo de mantenimiento de la pauta inicial si el historial actual es demasiado irregular para interpretarlo en estado estacionario.",
+    "es": "Alternativa: utilice la opción de pauta inicial de mantenimiento si el historial de administración es demasiado irregular para interpretarlo en estado estacionario.",
     "fr": "Alternative : utilisez le parcours d’entretien du schéma initial si l’historique actuel des doses est trop irrégulier pour une interprétation à l’état d’équilibre.",
     "pt-BR": "Opção de retrocesso: use o fluxo de trabalho de manutenção do aparelho inicial se o histórico de dose atual for muito irregular para interpretação em estado de equilíbrio."
   },
@@ -4025,7 +4025,7 @@
     "pt-BR": "— volume periférico (L). Onde a droga temporariamente “esconde”; lentamente retorna ao centro à medida que o nível central cai."
   },
   "When you enter a measured level, the Bayesian MAP fit shifts these parameters from the population prior toward your patient’s individual values — bounded so a single observation can’t over-fit.": {
-    "es": "Al introducir una concentración medida, el ajuste bayesiano MAP desplaza estos parámetros desde la distribución poblacional a priori hacia los valores individuales del paciente, con límites para evitar el sobreajuste a una única observación.",
+    "es": "Al introducir una concentración medida, la estimación bayesiana MAP ajusta los parámetros poblacionales a los datos del paciente. El ajuste tiene límites para evitar que una sola medición tenga un peso excesivo.",
     "fr": "Lorsque vous saisissez une concentration mesurée, l’ajustement bayésien MAP déplace ces paramètres depuis la distribution a priori de population vers les valeurs individuelles du patient, avec des bornes pour éviter le surajustement à une seule observation.",
     "pt-BR": "Quando você entra em um nível medido, o ajuste bayesiano MAP desloca esses parâmetros da população anterior para os valores individuais do seu paciente — limitado para que uma única observação não possa se ajustar demais."
   },
@@ -4060,7 +4060,7 @@
     "pt-BR": "Quando você entra em um nível medido, a estimativa MAP-bayesiano muda os parâmetros individuais de PK do paciente para valores que melhor explicam a medida, enquanto uma penalidade prévia log-normal mantém o deslocamento limitado – uma única observação não pode mover as estimativas para longe do que o modelo populacional considera plausível."
   },
   "With one level the fit is bounded by the prior; with two or more well-timed levels (peak + trough) the fit becomes much more individualized and the recommendation can deviate further from population averages. If the residual stays large, you’ll see a Fit Quality Advisory — that’s a signal to draw a confirmatory level rather than over-trust the recommendation.": {
-    "es": "Con una concentración, el ajuste está limitado por la distribución a priori; con dos o más concentraciones obtenidas en momentos adecuados (pico y valle), el ajuste es mucho más individualizado y la recomendación puede alejarse más de las medias poblacionales. Si el residuo sigue siendo grande, verá un aviso de calidad del ajuste: indica que debe obtener una concentración de confirmación en lugar de confiar en exceso en la recomendación.",
+    "es": "Con una concentración, la distribución a priori limita el ajuste. Con dos o más concentraciones obtenidas en momentos adecuados (pico y valle), el ajuste se individualiza más y la pauta puede alejarse de la estimación poblacional. Si persiste una diferencia importante entre las concentraciones medidas y las estimadas, aparecerá un aviso sobre la calidad del ajuste. Obtenga una nueva muestra para confirmar el resultado antes de dar por válida la recomendación.",
     "fr": "Avec une concentration, l’ajustement est borné par la distribution a priori ; avec deux concentrations ou plus prélevées à des moments appropriés (pic et concentration résiduelle), il devient beaucoup plus individualisé et la recommandation peut s’écarter davantage des moyennes de population. Si le résidu reste important, un avis sur la qualité de l’ajustement apparaît : il invite à obtenir une concentration de confirmation plutôt qu’à accorder une confiance excessive à la recommandation.",
     "pt-BR": "Com um nível o ajuste é limitado pelo anterior; com dois ou mais níveis bem cronometrados (pico + vale) o ajuste torna-se muito mais individualizado e a recomendação pode desviar-se ainda mais das médias populacionais. Se o resíduo permanecer grande, você verá uma Advisoria de Qualidade Fit – isso é um sinal para desenhar um nível confirmatório em vez de confiar demais na recomendação."
   },
@@ -4075,7 +4075,7 @@
     "pt-BR": "A calculadora compara doses de 500-2000 mg em q6h, q8h, q12h ou q24h, descarta candidatos cujo pico predito, vale ou AUC₂₄ excede os limites de segurança, e escolhe aquele cujo estado de equilíbrio previsto AUC₂₄ pousa mais próximo do ponto médio do alvo 400-600."
   },
   "Peak and trough are forward-predicted from the patient’s posterior PK (or population prior if no level is fit) using the two-compartment model. The recommendation always favors options that stay within target rather than ones that hit midpoint exactly outside the window.": {
-    "es": "El pico y el valle se predicen a partir de la farmacocinética posterior del paciente (o de la distribución poblacional a priori si no se ajusta ninguna concentración), utilizando el modelo bicompartimental. La recomendación siempre favorece las opciones que permanecen dentro del objetivo frente a las que alcanzan exactamente el punto medio fuera de la ventana.",
+    "es": "El modelo bicompartimental estima el pico y el valle a partir de los parámetros farmacocinéticos ajustados a las concentraciones del paciente. Si no hay ajuste, utiliza la distribución poblacional a priori. La recomendación prioriza las opciones dentro del intervalo objetivo; aproximarse al punto medio no justifica salir de ese intervalo.",
     "fr": "Le pic et la concentration résiduelle sont prédits à partir de la pharmacocinétique a posteriori du patient (ou de la distribution a priori de population si aucune concentration n’est ajustée), avec le modèle bicompartimental. La recommandation privilégie toujours les options restant dans la cible plutôt que celles qui atteignent exactement le milieu en dehors de la fenêtre.",
     "pt-BR": "O pico e o vale são preditos para a frente a partir da PK posterior do paciente (ou da população anterior se não houver nível adequado) utilizando o modelo de dois compartimentos. A recomendação sempre favorece opções que permanecem dentro do alvo ao invés de aquelas que atingiram o ponto médio exatamente fora da janela."
   },
@@ -6500,7 +6500,7 @@
     "pt-BR": "Repetindo os cálculos de Vancomyzer com versão"
   },
   "gave the same estimates for these patients. This check covered two blood levels at steady state; it did not cover every calculator workflow.": {
-    "es": "se obtuvieron las mismas estimaciones para estos pacientes. Esta comprobación cubrió dos concentraciones sanguíneas en estado estacionario; no todos los flujos de trabajo de la calculadora.",
+    "es": "se obtuvieron las mismas estimaciones para estos pacientes. La comprobación se limitó a dos concentraciones sanguíneas en estado estacionario; no abarcó todas las opciones de cálculo.",
     "fr": "a donné les mêmes estimations pour ces patients. Cette vérification portait sur deux concentrations sanguines à l’état d’équilibre ; elle ne couvrait pas tous les parcours du calculateur.",
     "pt-BR": "deram as mesmas estimativas para estes pacientes. Esta verificação cobriu dois níveis de sangue no estado de equilíbrio; não cobriu cada fluxo de trabalho calculador."
   },
@@ -8295,12 +8295,12 @@
     "pt-BR": "O nível deve ser determinado na fase de eliminação pós-distributiva (≥2 h após a conclusão da infusão) para uma estimativa válida de dose única de PK por ASHP/IDSA/SIDP 2020."
   },
   "Level collection time assumed within the current dosing interval (time_since_last_dose ≤ interval).": {
-    "es": "Se presupone que el momento de obtención de la concentración está dentro del intervalo posológico actual (time_since_last_dose ≤ interval).",
+    "es": "Se presupone que la muestra se extrajo dentro del intervalo posológico actual: el tiempo desde el inicio de la última perfusión no supera dicho intervalo.",
     "fr": "Le prélèvement de la concentration est supposé se situer dans l’intervalle posologique actuel (time_since_last_dose ≤ interval).",
     "pt-BR": "Tempo de recolha de níveis assumido dentro do intervalo posológico actual (tempo_desde_último_intervalo ≤dose)."
   },
   "Measured level(s) can produce a bounded MAP-style initial posterior refinement around that adult prior; this is not a full Bayesian commercial engine.": {
-    "es": "Las concentraciones medidas pueden producir un ajuste inicial a posteriori acotado de tipo MAP en torno a esa distribución a priori para adultos; no se trata de un motor bayesiano comercial completo.",
+    "es": "Las concentraciones medidas permiten un ajuste inicial a posteriori de tipo MAP, limitado por la distribución a priori para adultos. No equivale a un programa comercial completo de dosificación bayesiana.",
     "fr": "Les concentrations mesurées peuvent permettre un ajustement initial a posteriori encadré de type MAP autour de cette distribution a priori pour l’adulte ; il ne s’agit pas d’un moteur bayésien commercial complet.",
     "pt-BR": "Concentrações medidas podem produzir um refinamento inicial a posteriori do tipo MAP com limites em torno dessa distribuição a priori para adultos; não se trata de um mecanismo bayesiano comercial completo."
   },
@@ -8370,7 +8370,7 @@
     "pt-BR": "Estimativa populacional inicial"
   },
   "Simple two-compartment adult prior model with bounded initial MAP refinement from level(s), not a full Bayesian engine.": {
-    "es": "Modelo a priori bicompartimental sencillo para adultos con ajuste MAP inicial acotado a partir de las concentraciones; no es un motor bayesiano completo.",
+    "es": "Modelo bicompartimental sencillo para adultos, con un ajuste MAP inicial limitado a partir de las concentraciones medidas. No es un programa bayesiano completo.",
     "fr": "Modèle a priori bicompartimental simple pour l’adulte avec ajustement MAP initial encadré à partir des concentrations ; ce n’est pas un moteur bayésien complet.",
     "pt-BR": "Modelo a priori bicompartimental simples para adultos, com refinamento MAP inicial com limites a partir das concentrações; não é um mecanismo bayesiano completo."
   },
@@ -8385,12 +8385,12 @@
     "pt-BR": "O julgamento clínico e a reavaliação baseada nos níveis permanecem essenciais."
   },
   "Simple two-compartment adult population prior model only; no refinement from levels in this pass.": {
-    "es": "Solo modelo poblacional a priori bicompartimental sencillo para adultos; sin ajuste a partir de concentraciones en esta evaluación.",
+    "es": "Este cálculo utiliza únicamente un modelo poblacional a priori bicompartimental sencillo para adultos, sin ajuste a las concentraciones medidas.",
     "fr": "Modèle populationnel a priori bicompartimental simple pour l’adulte uniquement ; aucun ajustement à partir des concentrations lors de cette évaluation.",
     "pt-BR": "Apenas o modelo populacional a priori bicompartimental simples para adultos; sem refinamento por concentrações nesta etapa."
   },
   "Measured levels are displayed but not used to refine parameters in this pass.": {
-    "es": "Las concentraciones medidas se muestran, pero no se utilizan para ajustar los parámetros en esta evaluación.",
+    "es": "Las concentraciones medidas se muestran, pero no se utilizan para ajustar los parámetros en este cálculo.",
     "fr": "Les concentrations mesurées sont affichées, mais ne servent pas à ajuster les paramètres lors de cette évaluation.",
     "pt-BR": "Níveis medidos são exibidos, mas não usados para refinar parâmetros nesta passagem."
   },
@@ -8405,7 +8405,7 @@
     "pt-BR": "Estimativa bayesiana com base no nível único pré-estacionário – monitorize e confirme com um nível de seguimento após doses adicionais."
   },
   "Pulse-dose / single-dose workflow: projected AUC24 and recommended maintenance dose assume steady-state PK will match the individual parameters estimated from this one level.": {
-    "es": "Flujo de dosis aislada / dosis única: el AUC24 proyectado y la dosis de mantenimiento recomendada presuponen que la farmacocinética en estado estacionario coincidirá con los parámetros individuales estimados a partir de esta única concentración.",
+    "es": "Tras una dosis aislada, el AUC24 previsto y la dosis de mantenimiento recomendada suponen que la farmacocinética en estado estacionario coincidirá con los parámetros individuales estimados a partir de esta única concentración.",
     "fr": "Parcours après dose isolée / unique : l’AUC24 projetée et la dose d’entretien recommandée supposent que la pharmacocinétique à l’état d’équilibre correspondra aux paramètres individuels estimés sur cette seule concentration.",
     "pt-BR": "Fluxo de trabalho da dose de pulso/dose única: AUC24 projetada e dose de manutenção recomendada assumem que a PK no estado de equilíbrio corresponderá aos parâmetros individuais estimados a partir deste nível."
   },
@@ -8420,12 +8420,12 @@
     "pt-BR": "Os esquemas de infusão quase contínuos estão fora deste modelo intermitente de estado de equilíbrio; a duração da infusão deve permanecer materialmente mais curta do que o intervalo posológico."
   },
   "Single level used for initial parameter refinement; posterior fit quality may be weak even when the model returns a bounded estimate.": {
-    "es": "Se utilizó una sola concentración para el ajuste inicial de los parámetros; la calidad del ajuste a posteriori puede ser débil aunque el modelo devuelva una estimación acotada.",
+    "es": "El ajuste inicial de los parámetros se basa en una sola concentración. La calidad del ajuste a posteriori puede ser baja, aunque la estimación se mantenga dentro de los límites del modelo.",
     "fr": "Une seule concentration a servi à l’ajustement initial des paramètres ; la qualité de l’ajustement a posteriori peut être faible même lorsque le modèle fournit une estimation encadrée.",
     "pt-BR": "Nível único utilizado para o refinamento inicial do parâmetro; a qualidade do ajuste posterior pode ser fraca mesmo quando o modelo devolve uma estimativa limitada."
   },
   "Posterior fit quality was weak; sparse or mismatched levels should not be overinterpreted as precise patient-specific PK.": {
-    "es": "La calidad del ajuste a posteriori fue débil; no deben interpretarse en exceso concentraciones escasas o discordantes como una farmacocinética precisa específica del paciente.",
+    "es": "La calidad del ajuste a posteriori fue baja. Un número escaso de concentraciones o unos resultados discordantes no permiten describir con precisión la farmacocinética individual.",
     "fr": "La qualité de l’ajustement a posteriori était faible ; des concentrations peu nombreuses ou discordantes ne doivent pas être surinterprétées comme une pharmacocinétique précise propre au patient.",
     "pt-BR": "A qualidade do ajuste posterior foi fraca; níveis esparsos ou desiguais não devem ser superinterpretados como PK específico para o paciente."
   },
@@ -8515,7 +8515,7 @@
     "pt-BR": "Qualquer observação sobre dose de ataque é apenas um apoio empírico genérico e opcional e não deve substituir o julgamento clínico sobre gravidade da infecção, doença crítica, baixo peso corporal ou protocolo institucional."
   },
   "Adult concentration limits (for example, dilution ≤5 mg/mL) were not enforced because infusion volume is not entered in this workflow.": {
-    "es": "No se aplicaron los límites de concentración para adultos (por ejemplo, dilución ≤5 mg/mL) porque el volumen de perfusión no se introduce en este flujo de trabajo.",
+    "es": "No se comprobaron los límites de concentración de la solución para adultos (por ejemplo, dilución ≤5 mg/mL), porque esta opción no recoge el volumen de perfusión.",
     "fr": "Les limites de concentration pour l’adulte (par exemple, dilution ≤5 mg/mL) n’ont pas été appliquées car le volume de perfusion n’est pas saisi dans ce parcours.",
     "pt-BR": "Os limites de concentração em adultos (por exemplo, diluição ≤5 mg/ml) não foram aplicados porque o volume de infusão não foi introduzido neste fluxo de trabalho."
   },
@@ -8570,7 +8570,7 @@
     "pt-BR": "Reveja suposições, exclusões de escopo e protocolo local antes de agir."
   },
   "Adult prior model only in a two-compartment intermittent steady-state maintenance-selection workflow": {
-    "es": "Solo modelo a priori para adultos en un flujo de selección de mantenimiento bicompartimental intermitente en estado estacionario",
+    "es": "Selección de la pauta de mantenimiento intermitente en estado estacionario, basada únicamente en un modelo a priori bicompartimental para adultos",
     "fr": "Modèle a priori pour l’adulte uniquement dans un parcours de sélection d’entretien intermittent bicompartimental à l’état d’équilibre",
     "pt-BR": "Somente modelo a priori para adultos em um fluxo bicompartimental de seleção de manutenção intermitente em estado de equilíbrio"
   },
@@ -8595,12 +8595,12 @@
     "pt-BR": "A pesquisa empírica restringiu- se a intervalos de q6/q8/q12/q24 com dose ≥ 500 mg por piso de segurança institucional."
   },
   "Pulse-dose-then-level is the standard workflow when fixed-interval empiric dosing is unsafe.": {
-    "es": "Dosis aislada seguida de concentración es el flujo estándar cuando la dosificación empírica a intervalo fijo no es segura.",
+    "es": "Cuando una pauta empírica a intervalos fijos no es segura, el procedimiento habitual es administrar una dosis aislada y medir después la concentración.",
     "fr": "Une dose isolée suivie d’une concentration constitue le parcours standard lorsque la posologie empirique à intervalle fixe n’est pas sûre.",
     "pt-BR": "A dose de pulso-então-nível é o fluxo de trabalho padrão quando a dosagem empírica de intervalo fixo é insegura."
   },
   "Empiric workflow is refused for this patient — the prior estimates severe renal impairment with prolonged elimination half-life.": {
-    "es": "Se rechaza el flujo empírico para este paciente: la distribución a priori estima insuficiencia renal grave con semivida de eliminación prolongada.",
+    "es": "No se ofrece una pauta empírica para este paciente: el modelo a priori estima insuficiencia renal grave y una semivida de eliminación prolongada.",
     "fr": "Le parcours empirique est refusé pour ce patient : la distribution a priori estime une insuffisance rénale sévère avec une demi-vie d’élimination prolongée.",
     "pt-BR": "O fluxo de trabalho empírico é recusado para este paciente — as estimativas anteriores de compromisso renal grave com semivida de eliminação prolongada."
   },
@@ -9465,7 +9465,7 @@
     "pt-BR": "Os pacientes e seus níveis são gerados por computador. O desempenho real-paciente não foi avaliado; a análise de Desempenho Preditivo também é sintética."
   },
   "Two-level sampling": {
-    "es": "Muestreo con dos concentraciones",
+    "es": "Obtención de dos muestras",
     "fr": "Prélèvement de deux concentrations",
     "pt-BR": "Amostragem de dois níveis"
   },
@@ -9530,7 +9530,7 @@
     "pt-BR": "Uma concentração mantida em um intervalo de estado de equilíbrio"
   },
   "Two-level sampling only": {
-    "es": "Solo muestreo con dos concentraciones",
+    "es": "Solo obtención de dos muestras",
     "fr": "Prélèvement de deux concentrations uniquement",
     "pt-BR": "Apenas amostragem a dois níveis"
   },
@@ -9620,42 +9620,42 @@
     "pt-BR": "Modelo a priori explícito para adultos: Colin 2019 bicompartimental; sem atualização a posteriori."
   },
   "Change rationale: recommends a higher dose relative to the current regimen to move estimated exposure toward the target range while keeping interpretation bounded.": {
-    "es": "Justificación del cambio: recomienda una dosis mayor respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, manteniendo una interpretación acotada.",
+    "es": "Justificación del cambio: recomienda una dosis mayor respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, sin olvidar la incertidumbre de la estimación.",
     "fr": "Justification du changement : recommande une dose plus élevée par rapport au schéma actuel pour rapprocher l’exposition estimée de l’intervalle cible, tout en conservant une interprétation encadrée.",
     "pt-BR": "Mudança de raciocínio: recomenda uma dose maior em relação ao esquema atual para mover a exposição estimada para o intervalo alvo, mantendo a interpretação limitada."
   },
   "Change rationale: recommends a lower dose relative to the current regimen to move estimated exposure toward the target range while keeping interpretation bounded.": {
-    "es": "Justificación del cambio: recomienda una dosis menor respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, manteniendo una interpretación acotada.",
+    "es": "Justificación del cambio: recomienda una dosis menor respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, sin olvidar la incertidumbre de la estimación.",
     "fr": "Justification du changement : recommande une dose plus faible par rapport au schéma actuel pour rapprocher l’exposition estimée de l’intervalle cible, tout en conservant une interprétation encadrée.",
     "pt-BR": "Mudança de raciocínio: recomenda uma dose mais baixa em relação ao esquema atual para mover a exposição estimada para o intervalo alvo, mantendo a interpretação limitada."
   },
   "Change rationale: recommends a longer interval relative to the current regimen to move estimated exposure toward the target range while keeping interpretation bounded.": {
-    "es": "Justificación del cambio: recomienda un intervalo más largo respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, manteniendo una interpretación acotada.",
+    "es": "Justificación del cambio: recomienda un intervalo más largo respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, sin olvidar la incertidumbre de la estimación.",
     "fr": "Justification du changement : recommande un intervalle plus long par rapport au schéma actuel pour rapprocher l’exposition estimée de l’intervalle cible, tout en conservant une interprétation encadrée.",
     "pt-BR": "Mudança de raciocínio: recomenda um intervalo mais longo em relação ao esquema atual para mover a exposição estimada para o intervalo alvo, mantendo a interpretação limitada."
   },
   "Change rationale: recommends a shorter interval relative to the current regimen to move estimated exposure toward the target range while keeping interpretation bounded.": {
-    "es": "Justificación del cambio: recomienda un intervalo más corto respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, manteniendo una interpretación acotada.",
+    "es": "Justificación del cambio: recomienda un intervalo más corto respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, sin olvidar la incertidumbre de la estimación.",
     "fr": "Justification du changement : recommande un intervalle plus court par rapport au schéma actuel pour rapprocher l’exposition estimée de l’intervalle cible, tout en conservant une interprétation encadrée.",
     "pt-BR": "Mudança de raciocínio: recomenda um intervalo mais curto em relação ao esquema atual para mover a exposição estimada para o intervalo alvo, mantendo a interpretação limitada."
   },
   "Change rationale: recommends a higher dose and longer interval relative to the current regimen to move estimated exposure toward the target range while keeping interpretation bounded.": {
-    "es": "Justificación del cambio: recomienda una dosis mayor y un intervalo más largo respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, manteniendo una interpretación acotada.",
+    "es": "Justificación del cambio: recomienda una dosis mayor y un intervalo más largo respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, sin olvidar la incertidumbre de la estimación.",
     "fr": "Justification du changement : recommande une dose plus élevée et un intervalle plus long par rapport au schéma actuel pour rapprocher l’exposition estimée de l’intervalle cible, tout en conservant une interprétation encadrée.",
     "pt-BR": "Mudança de raciocínio: recomenda uma dose maior e maior intervalo em relação ao esquema atual para mover a exposição estimada para o intervalo alvo, mantendo a interpretação limitada."
   },
   "Change rationale: recommends a higher dose and shorter interval relative to the current regimen to move estimated exposure toward the target range while keeping interpretation bounded.": {
-    "es": "Justificación del cambio: recomienda una dosis mayor y un intervalo más corto respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, manteniendo una interpretación acotada.",
+    "es": "Justificación del cambio: recomienda una dosis mayor y un intervalo más corto respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, sin olvidar la incertidumbre de la estimación.",
     "fr": "Justification du changement : recommande une dose plus élevée et un intervalle plus court par rapport au schéma actuel pour rapprocher l’exposition estimée de l’intervalle cible, tout en conservant une interprétation encadrée.",
     "pt-BR": "Mudança de raciocínio: recomenda uma dose mais elevada e um intervalo mais curto em relação ao esquema atual para mover a exposição estimada para o intervalo alvo, mantendo a interpretação limitada."
   },
   "Change rationale: recommends a lower dose and longer interval relative to the current regimen to move estimated exposure toward the target range while keeping interpretation bounded.": {
-    "es": "Justificación del cambio: recomienda una dosis menor y un intervalo más largo respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, manteniendo una interpretación acotada.",
+    "es": "Justificación del cambio: recomienda una dosis menor y un intervalo más largo respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, sin olvidar la incertidumbre de la estimación.",
     "fr": "Justification du changement : recommande une dose plus faible et un intervalle plus long par rapport au schéma actuel pour rapprocher l’exposition estimée de l’intervalle cible, tout en conservant une interprétation encadrée.",
     "pt-BR": "Mudança de raciocínio: recomenda uma dose mais baixa e maior intervalo em relação ao esquema atual para mover a exposição estimada para o intervalo alvo, mantendo a interpretação limitada."
   },
   "Change rationale: recommends a lower dose and shorter interval relative to the current regimen to move estimated exposure toward the target range while keeping interpretation bounded.": {
-    "es": "Justificación del cambio: recomienda una dosis menor y un intervalo más corto respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, manteniendo una interpretación acotada.",
+    "es": "Justificación del cambio: recomienda una dosis menor y un intervalo más corto respecto a la pauta actual para acercar la exposición estimada al intervalo objetivo, sin olvidar la incertidumbre de la estimación.",
     "fr": "Justification du changement : recommande une dose plus faible et un intervalle plus court par rapport au schéma actuel pour rapprocher l’exposition estimée de l’intervalle cible, tout en conservant une interprétation encadrée.",
     "pt-BR": "Mudança de raciocínio: recomenda uma dose mais baixa e um intervalo mais curto em relação ao esquema atual para mover a exposição estimada para o intervalo alvo, mantendo a interpretação limitada."
   },
@@ -10125,7 +10125,7 @@
     "pt-BR": "Registro de 90 dias desidentificado de seus cálculos Vancomyzer™. Nenhum identificador de paciente armazenado."
   },
   "Workflow": {
-    "es": "Flujo de trabajo",
+    "es": "Tipo de cálculo",
     "fr": "Parcours",
     "pt-BR": "Fluxo de trabalho"
   },
@@ -12545,7 +12545,7 @@
     "pt-BR": "Valores de coorte verificados em relação ao resumo PubMed (PMID 25644478): n = 31, peso mediano 147.9 kg, IMC 49.5 kg/m², Cockcroft-Gault ClCr 124.8 mL/min/1.73 m², dose mediana 4000 mg/day, AUC₂₄ mediana 582.9 mg·h/L (IQR 513.8–726.2), população média V 0.51 L/kg e CL 6.54 L/h. O resumo também afirma que foi coletado o depuração de creatinina urinária de 24 horas. Os valores do nível do paciente (Tabela 1) não foram verificados."
   },
   "The calculator's Colin 2019 Bayesian AUC₂₄ from two illustrative levels, next to the range of full-data AUC₂₄ estimates (437–489 mg·h/L) that Carreno 2017 reported across four other population models in 12 obese adults.": {
-    "es": "AUC₂₄ bayésien Colin 2019 de la calculadora a partir de dos concentraciones ilustrativas, junto con el intervalo de estimaciones de AUC₂₄ con datos completos (437–489 mg·h/L) que Carreno 2017 comunicó para cuatro modelos poblacionales distintos en 12 adultos con obesidad.",
+    "es": "Estimación bayesiana del AUC₂₄ con el modelo Colin 2019 de la calculadora, a partir de dos concentraciones ilustrativas. Se muestra junto al intervalo de AUC₂₄ estimado con datos completos (437–489 mg·h/L) que Carreno 2017 publicó para otros cuatro modelos poblacionales en 12 adultos con obesidad.",
     "fr": "AUC₂₄ bayésienne Colin 2019 du calculateur à partir de deux concentrations illustratives, à côté de l’intervalle des estimations d’AUC₂₄ avec données complètes (437–489 mg·h/L) rapporté par Carreno 2017 pour quatre autres modèles de population chez 12 adultes obèses.",
     "pt-BR": "A AUC₂₄ bayesiano Colin 2019 da calculadora a partir de dois níveis ilustrativos, próximo à gama de estimativas completas da AUC₂₄ (437-489 mg·h/L) que Carreno 2017 relatou em quatro outros modelos populacionais em 12 adultos obesos."
   },
@@ -14895,7 +14895,7 @@
     "pt-BR": "Referência de vale"
   },
   "Infusion Policy": {
-    "es": "Política de perfusión",
+    "es": "Criterios de perfusión",
     "fr": "Politique de perfusion",
     "pt-BR": "Política de infusão"
   },
@@ -15960,7 +15960,7 @@
     "pt-BR": "Resultado posterior com maior coerência"
   },
   "The measured data are more coherent for this workflow, though clinician review and scope checks still matter.": {
-    "es": "Los datos medidos son más coherentes para este flujo de trabajo, aunque siguen siendo necesarias la revisión clínica y la comprobación del ámbito de uso.",
+    "es": "Los datos medidos son más coherentes para este cálculo. Aun así, es necesario revisar los resultados y comprobar que el paciente cumple los criterios de uso.",
     "fr": "Les données mesurées sont plus cohérentes pour ce parcours, mais l’évaluation clinique et la vérification du champ d’application restent nécessaires.",
     "pt-BR": "Os dados medidos são mais coerentes para esse fluxo de trabalho, embora a revisão clínica e as verificações de escopo ainda sejam importantes."
   },
@@ -16135,13 +16135,58 @@
     "pt-BR": "Vancomicina em infusão contínua"
   },
   "Age, weight, height, serum creatinine and renal replacement status. Estimated creatinine clearance is shown for context; the dose is calculated from serum creatinine as the Colin 2019 model input.": {
-    "es": "Edad, peso, talla, creatinina sérica y situación respecto al tratamiento renal sustitutivo. El aclaramiento estimado de creatinina se muestra como referencia; la dosis se calcula a partir de la creatinina sérica, que es una variable de entrada del modelo Colin 2019.",
+    "es": "Edad, peso, talla, creatinina sérica y si el paciente recibe tratamiento renal sustitutivo. El aclaramiento estimado de creatinina se muestra como referencia; el modelo Colin 2019 utiliza la creatinina sérica para calcular la dosis.",
     "fr": "Âge, poids, taille, créatininémie et situation d’épuration extrarénale. La clairance estimée de la créatinine est affichée à titre de contexte ; la dose est calculée à partir de la créatininémie comme Colin 2019 donnée d’entrée du modèle.",
     "pt-BR": "Idade, peso, altura, creatinina sérica e situação quanto à terapia renal substitutiva. A depuração estimada de creatinina é apresentada como contexto; a dose é calculada usando a creatinina sérica como entrada do modelo Colin 2019 modelo de entrada."
   },
   "Complete valid sample timing. In date/time mode, the sample must not precede the dose.": {
-    "es": "Complete correctamente el momento de la extracción. Si utiliza fecha y hora, la muestra no puede ser anterior al inicio de la dosis.",
+    "es": "Revise los tiempos de administración y extracción. La muestra no puede haberse extraído antes del inicio de la perfusión.",
     "fr": "Complétez correctement le moment du prélèvement. En mode date et heure, le prélèvement ne doit pas précéder le début de la dose.",
     "pt-BR": "Preencha corretamente o momento da coleta. No modo de data e hora, a coleta não pode preceder o início da dose."
+  },
+  "Start of the most recent infusion before this level was drawn": {
+    "es": "Inicio de la última perfusión administrada antes de extraer esta muestra",
+    "fr": "Début de la dernière perfusion administrée avant ce prélèvement",
+    "pt-BR": "Início da última infusão administrada antes da coleta desta amostra"
+  },
+  "Free": {
+    "es": "Gratuito",
+    "fr": "Gratuit",
+    "pt-BR": "Gratuito"
+  },
+  "Weight": {
+    "es": "Peso",
+    "fr": "Poids",
+    "pt-BR": "Peso"
+  },
+  "Posterior-updated": {
+    "es": "Ajustada a las concentraciones medidas",
+    "fr": "Ajustée aux concentrations mesurées",
+    "pt-BR": "Ajustada às concentrações medidas"
+  },
+  "IN RANGE": {
+    "es": "DENTRO DEL INTERVALO",
+    "fr": "DANS L’INTERVALLE",
+    "pt-BR": "DENTRO DO INTERVALO"
+  },
+  "Colin 2019 two-compartment prior.": {
+    "es": "Distribución a priori bicompartimental de Colin 2019.",
+    "fr": "Distribution a priori bicompartimentale de Colin 2019.",
+    "pt-BR": "Distribuição a priori bicompartimental de Colin 2019."
+  },
+  "Colin 2019 two-compartment population PK model.": {
+    "es": "Modelo farmacocinético poblacional bicompartimental de Colin 2019.",
+    "fr": "Modèle pharmacocinétique de population bicompartimental de Colin 2019.",
+    "pt-BR": "Modelo farmacocinético populacional bicompartimental de Colin 2019."
+  },
+  "Designed to meet the non-device clinical decision support criteria of FD&C Act §520(o)(1)(E); not reviewed by the FDA.": {
+    "es": "Diseñado para cumplir los criterios de apoyo a la decisión clínica que no constituye un producto sanitario, según la sección 520(o)(1)(E) de la ley estadounidense FD&C. La FDA no lo ha revisado.",
+    "fr": "Conçu pour répondre aux critères d’aide à la décision clinique ne constituant pas un dispositif médical selon la section 520(o)(1)(E) de la loi américaine FD&C ; non examiné par la FDA.",
+    "pt-BR": "Desenvolvido para atender aos critérios de apoio à decisão clínica que não constitui dispositivo médico, segundo a seção 520(o)(1)(E) da lei norte-americana FD&C; não revisado pela FDA."
+  },
+  "Its equations are checked against published values and synthetic test cases; external validation with patient data is planned.": {
+    "es": "Sus ecuaciones se comprueban con valores publicados y casos simulados. Está prevista la validación externa con datos de pacientes.",
+    "fr": "Ses équations sont vérifiées à l’aide de valeurs publiées et de cas synthétiques ; une validation externe sur des données de patients est prévue.",
+    "pt-BR": "Suas equações são verificadas com valores publicados e casos sintéticos; está prevista validação externa com dados de pacientes."
   }
 }

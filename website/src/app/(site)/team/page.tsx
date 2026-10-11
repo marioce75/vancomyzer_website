@@ -446,7 +446,7 @@ export default function TeamPage() {
       }}>
         <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 12 }}><LocalizedText text={"Invite a teammate"} /></h2>
         <form onSubmit={handleInvite}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 140px auto", gap: 8, alignItems: "end" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 12rem), 1fr))", gap: 8, alignItems: "end" }}>
             <div>
               <label style={{ display: "block", fontSize: 11, color: "var(--color-secondary)", marginBottom: 4 }}><LocalizedText text={"Email *"} /></label>
               <LocalizedInput
