@@ -60,15 +60,15 @@ function HistoryUpgradeCard() {
       border: "2px solid var(--color-primary)",
       borderRadius: 6,
     }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}><LocalizedText text={"Calculation history is a Pro feature"} /></div>
-      <p style={{ fontSize: 14, color: "var(--color-secondary)", margin: "0 0 16px", lineHeight: 1.6 }}><LocalizedText text={"Pro users get 90 days of de-identified calculation history with optional case IDs for tracking — search, review, and export previous calculations again without re-entering patient data."} /></p>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}><LocalizedText text={"Feature access"} /></div>
+      <p style={{ fontSize: 14, color: "var(--color-secondary)", margin: "0 0 16px", lineHeight: 1.6 }}><LocalizedText text={"This feature is not available for your current account access. Contact us to discuss availability."} /></p>
       <ul style={{ margin: "0 0 16px", padding: 0, listStyle: "none", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.7 }}>
         <li style={{ paddingLeft: 18, position: "relative" }}><LocalizedText text={"Optional case IDs (do not enter patient identifiers)"} /></li>
         <li style={{ paddingLeft: 18, position: "relative" }}><LocalizedText text={"Filter by calculation type, date, case ID"} /></li>
         <li style={{ paddingLeft: 18, position: "relative" }}><LocalizedText text={"90-day retention, automatically purged"} /></li>
       </ul>
       <Link
-        href="/settings/billing"
+        href="/contact?topic=restricted_access"
         style={{
           display: "inline-block",
           padding: "10px 20px",
@@ -79,7 +79,7 @@ function HistoryUpgradeCard() {
           borderRadius: 4,
           textDecoration: "none",
         }}
-      ><LocalizedText text={"Start 14-Day Trial"} /></Link>
+      ><LocalizedText text={"Request restricted access"} /></Link>
     </div>
   );
 }
@@ -139,7 +139,7 @@ export default function HistoryPage() {
       <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
         <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text="Institutional Settings" /></Link>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-        <Link href="/settings/billing" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text={"Billing"} /></Link>
+        <Link href="/contact?topic=restricted_access" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text={"Billing"} /></Link>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
         <span style={{ color: "var(--color-primary)", fontWeight: 600 }}><LocalizedText text={"History"} /></span>
       </div>

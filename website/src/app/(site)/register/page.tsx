@@ -172,7 +172,7 @@ function RegisterPageInner() {
             color: "#047857", fontSize: 12, borderRadius: 4,
             lineHeight: 1.55,
           }}>
-            🎁 <strong><LocalizedText text={"Referred by a colleague."} /></strong>{" "}<LocalizedText text={"When you subscribe to Pro, your referrer earns 1 month free — and you get full Pro access via the 14-day trial."} /></div>
+            🎁 <strong><LocalizedText text={"Referred by a colleague."} /></strong>{" "}<LocalizedText text={"Access to Vancomyzer is currently free."} /></div>
         )}
 
         {step === 1 && (

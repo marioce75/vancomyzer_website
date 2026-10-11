@@ -62,7 +62,7 @@ export interface DisclaimerSection {
 export const SECTIONS: readonly DisclaimerSection[] = [
   {
     heading: "INTENDED USE",
-    body: `D\u014Dsys\u2122 provides Vancomyzer\u2122, a vancomycin dosing calculator, for review by licensed healthcare professionals. It is not for use in patient care decisions without independent clinical review. The core calculator is free permanently. Paid plans (Individual Pro and Hospital Site) add account features such as calculation history and email support; during the launch period, PDF export, clinical-note copy and result interpretation are free for everyone. The pharmacokinetic model, equations, and clinical safety checks are identical across all plans.
+    body: `D\u014Dsys\u2122 provides Vancomyzer\u2122, a vancomycin dosing calculator, for review by licensed healthcare professionals. It is not for use in patient care decisions without independent clinical review. Access to Vancomyzer is currently free. Existing access commitments remain unchanged. Existing subscriptions and institutional agreements retain their agreed terms. The pharmacokinetic model, equations, and clinical safety checks are identical across all plans.
 
 D\u014Dsys\u2122 makes no representations or warranties regarding the accuracy, quality, completeness, timeliness, appropriateness, or suitability of this tool. D\u014Dsys\u2122 assumes no obligation to update the tool or advise on further developments concerning vancomycin dosage. Medical information changes rapidly. YOU AS THE USER (\u201CUSER\u201D) ACKNOWLEDGE THAT THE TOOL IS PROVIDED ON AN \u201CAS IS\u201D BASIS AND THAT ANY USE OF OR RELIANCE ON THE TOOL SHALL BE AT YOUR SOLE RISK.`,
   },

@@ -7,7 +7,7 @@ export const REVIEW_POINTS = [
   { title: "90% credible band", body: "The shaded band shows the middle 90% of concentrations from 400 simulated sets of pharmacokinetic values. It reflects uncertainty in the model estimates, updated with blood levels when available. It excludes measurement error, so it is not a range for predicting a future blood test result. Its reliability in patients has not been established." },
   { title: "Published starting model", body: `${COLIN_2019.citation} ${COLIN_2019.sourcePopulation} Published model evidence does not establish clinical validation of Vancomyzer.` },
   { title: "Scope", body: "Vancomyzer supports adults receiving intermittent intravenous vancomycin. Pediatric dosing, dialysis and continuous infusion are outside its scope. Independent clinical validation is pending." },
-  { title: "Access", body: "The core calculator is free. Paid plans add account features. All plans use the same calculation method; see the pricing page for current terms." },
+  { title: "Access", body: "Access to Vancomyzer is currently free. All plans use the same calculation method. Contact us about account access or institutional requirements." },
 ];
 
 export const LIMITS = [

@@ -52,7 +52,7 @@ export default function Footer() {
                 { href: "/faq", label: "FAQ" },
                 { href: "/about", label: "About" },
                 { href: "/contact", label: "Contact" },
-                { href: "/pricing", label: "Pricing" },
+                { href: "/pricing", label: "Free access" },
               ].map(({ href, label }) => (
                 <Link
                   key={href}

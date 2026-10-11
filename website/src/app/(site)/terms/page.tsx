@@ -24,10 +24,10 @@ export default function TermsPage() {
 
         <section>
           <h2 className="vz-serif mb-2 text-[22px]" style={{ color: INK }}><LocalizedText text="Subscriptions, renewal and cancellation" /></h2>
-          <p><LocalizedText text="Individual Pro is $49.99 per year, billed annually after a 14-day trial when you explicitly choose that subscription. It renews yearly until canceled. Verified discounts and their duration are shown at checkout. Free accounts and free pilots are never automatically converted to paid billing." /></p>
+          <p><LocalizedText text="Existing subscriptions and institutional agreements retain their agreed terms. Manage an existing subscription in Billing, or contact us about your agreement." /></p>
           <p className="mt-3"><LocalizedText text="Cancel online through Settings, then Billing, then Manage billing / cancel. Administrators of existing institutional subscriptions use Team, then Manage billing. Cancel before the trial ends to avoid a charge, or before the next renewal to stop that charge. Cancellation stops future renewal; access continues through the remaining paid period unless otherwise stated in your agreement." /></p>
           <p className="mt-3"><LocalizedText text="A confirmation email records your subscription and cancellation details. Renewal reminders include management links. We will provide required advance notice of accepted fee changes, including 7–30 days before a change takes effect where California law applies. The new public prices do not automatically change existing subscription agreements." /></p>
-          <p className="mt-3"><LocalizedText text="Hospital Site licenses cost $990/year for up to 100 beds or $2,500/year for 101–400 beds, with unlimited individual users at one named site and no implementation fee. Annual or two-year agreements require site review and account setup before billing. Team administration, audit logs, multi-site arrangements and any BAA require separate written scope review; they are not automatically included in a site license. No plan currently includes EHR integration." /></p>
+          <p className="mt-3"><LocalizedText text="Existing institutional agreements retain their written scope. Team administration, audit logs, multi-site arrangements and any business associate agreement require separate written review. EHR integration is not included." /></p>
         </section>
 
         <section>

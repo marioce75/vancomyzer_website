@@ -96,8 +96,8 @@ export function buildExportWatermark(tier: string): WatermarkOutput {
   const bannerHtml =
     `<div class="vmz-free-banner">` +
     `This calculation was generated using the free tier of Vancomyzer™. ` +
-    `Upgrade to Individual Pro for PDF export, un-watermarked note copy and calculation history at ` +
-    `<a href="https://dosys.health/pricing" style="color:#0d9488">dosys.health/pricing</a>.` +
+    `Contact Dōsys about account features at ` +
+    `<a href="https://dosys.health/contact" style="color:#0d9488">dosys.health/contact</a>.` +
     `</div>`;
 
   return { styleCss, overlayHtml, bannerHtml };

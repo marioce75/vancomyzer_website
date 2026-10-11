@@ -75,8 +75,8 @@ export default function ReferralCard() {
   return (
     <section style={cardStyle}>
       <header style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
-        <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--color-primary)", margin: 0, letterSpacing: "0.04em", textTransform: "uppercase" }}><LocalizedText text={"Invite a colleague — get 1 month free"} /></h2>
-        <span style={{ fontSize: 11, color: "var(--color-dim)" }}><LocalizedText text={"Earn one free month every time a referred colleague subscribes to Pro."} /></span>
+        <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--color-primary)", margin: 0, letterSpacing: "0.04em", textTransform: "uppercase" }}><LocalizedText text={"Invite a colleague"} /></h2>
+        <span style={{ fontSize: 11, color: "var(--color-dim)" }}><LocalizedText text={"Your existing referral credits and subscription terms remain unchanged."} /></span>
       </header>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
@@ -123,7 +123,7 @@ export default function ReferralCard() {
         <Stat label="Earned" value={`$${earned}`} highlight={data.stats.credits_total_cents > 0} />
       </div>
 
-      <p style={{ fontSize: 11, color: "var(--color-dim)", margin: 0, lineHeight: 1.55 }}><LocalizedText text={"Share your link with colleagues. When they subscribe to Pro, a $9.99 referral credit is applied to your next Stripe invoice automatically. If you're still on Free, the credit is held until your first paid subscription."} /></p>
+      <p style={{ fontSize: 11, color: "var(--color-dim)", margin: 0, lineHeight: 1.55 }}><LocalizedText text={"Your existing referral credits and subscription terms remain unchanged."} /></p>
     </section>
   );
 }

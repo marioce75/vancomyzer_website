@@ -58,12 +58,7 @@ const englishMetadata: Metadata = {
   },
 };
 
-// Pricing facts: the core calculator is free, permanently. During the launch
-// period PDF export, note copy and interpretation are also free with no
-// account; afterwards they return to Individual Pro.
-const LAUNCH_LINE = OPEN_ACCESS
-  ? "The core calculator is free, permanently. During our launch period, PDF export, note copy and result interpretation are free too — no account needed."
-  : "The core calculator is free for individual clinicians, permanently — create a free account or sign in to get started.";
+const LAUNCH_LINE = "Access to Vancomyzer is currently free.";
 
 const CAPABILITIES: { title: string; body: string; source?: string }[] = [
   {
@@ -353,15 +348,15 @@ export default function LandingPage() {
       </Section>
 
       {/* ── PRICING + REGULATORY ───────────────────────────── */}
-      <Section label="Pricing" note="Free for individual clinicians; site licences by bed count." last>
+      <Section label="Free access" note="Access and institutional requirements" last>
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
           <div>
-            <H2><LocalizedText text="Access and plans" /></H2>
+            <H2><LocalizedText text="Free access" /></H2>
           </div>
           <div className="flex flex-wrap gap-3 md:flex-col">
             <OpenCalculatorButton source="landing_closing" className="vz-mbtn vz-mbtn--primary"><LocalizedText text="Open the calculator" /></OpenCalculatorButton>
             {OPEN_ACCESS ? (
-              <Link href="/pricing" className="vz-mbtn vz-mbtn--outline"><LocalizedText text="Hospital Site licenses" /></Link>
+              <Link href="/contact" className="vz-mbtn vz-mbtn--outline"><LocalizedText text="Contact" /></Link>
             ) : (
               <Link href="/register" className="vz-mbtn vz-mbtn--outline"><LocalizedText text="Create a free account" /></Link>
             )}

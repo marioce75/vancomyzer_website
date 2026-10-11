@@ -48,7 +48,7 @@ export async function sendReportReadyEmail(user: { email: string; name: string }
       <p>Hi ${user.name},</p>
       <p>You have reached day 75 of your Vancomyzer™ pilot. <strong>Your personalized summary report is ready to generate.</strong></p>
       <p>The report documents your AUC target attainment rate and case volume —
-      everything you need to make the case for an institutional subscription to your pharmacy director.</p>
+      for review with your pharmacy director.</p>
       <p><a href="https://vancomyzer.com/dashboard/pilot" style="color:#00d4aa;font-weight:bold;">
         Generate my report
       </a></p>
@@ -65,10 +65,9 @@ export async function sendTrialExpiringEmail(user: { email: string; name: string
     `
       <p>Hi ${user.name},</p>
       <p>Your Vancomyzer™ free pilot ends in <strong>${daysLeft} days</strong>.</p>
-      <p>Subscribe now to keep your calculation history after the pilot ends. The core calculator
-      remains free.</p>
-      <p><a href="https://vancomyzer.com/upgrade" style="color:#00d4aa;font-weight:bold;">
-        Subscribe — $49.99/year
+      <p>Contact us about continued access to your calculation history after the pilot ends. Calculator access is currently free.</p>
+      <p><a href="https://vancomyzer.com/contact?topic=restricted_access" style="color:#00d4aa;font-weight:bold;">
+        Contact
       </a></p>
       <p>— The Dosys Health LLC Team</p>
     `
