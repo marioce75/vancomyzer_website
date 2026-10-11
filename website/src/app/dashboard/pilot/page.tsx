@@ -192,7 +192,7 @@ export default function PilotDashboardPage() {
         )}
         {(isExpired || currentPhase === 'PHASE_3') && !isConverted && (
           <a
-            href="/contact"
+            href="/contact?topic=restricted_access"
             style={{
               display: 'inline-block', background: GREEN, color: NAVY,
               border: 'none', padding: '10px 20px', fontSize: 13, fontWeight: 700,

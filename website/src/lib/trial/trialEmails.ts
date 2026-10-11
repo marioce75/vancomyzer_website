@@ -66,7 +66,7 @@ export async function sendTrialExpiringEmail(user: { email: string; name: string
       <p>Hi ${user.name},</p>
       <p>Your Vancomyzer™ free pilot ends in <strong>${daysLeft} days</strong>.</p>
       <p>Contact us about continued access to your calculation history after the pilot ends. Calculator access is currently free.</p>
-      <p><a href="https://vancomyzer.com/contact" style="color:#00d4aa;font-weight:bold;">
+      <p><a href="https://vancomyzer.com/contact?topic=restricted_access" style="color:#00d4aa;font-weight:bold;">
         Contact
       </a></p>
       <p>— The Dosys Health LLC Team</p>

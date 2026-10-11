@@ -32,7 +32,7 @@ export function TrialFeatureGate({ feature, children }: Props) {
             background: 'transparent',
             cursor: 'pointer',
           }}
-          onClick={() => { window.location.href = '/contact' }}
+          onClick={() => { window.location.href = '/contact?topic=restricted_access' }}
         ><LocalizedText text={"Feature access"} /></button>
       </div>
     </div>

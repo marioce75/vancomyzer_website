@@ -43,9 +43,9 @@ export default function UpgradeModal({ open, onClose, feature, title, descriptio
 
   const headline = title ?? "Feature access";
   const body = description ?? "This feature is not available for your current account access. Contact us to discuss availability.";
-  const primaryHref = "https://dosys.health/contact";
-  const primaryLabel = "Contact";
-  const primaryExternal = true;
+  const primaryHref = "/contact?topic=restricted_access";
+  const primaryLabel = "Request restricted access";
+  const primaryExternal = false;
   void feature;
 
   return (

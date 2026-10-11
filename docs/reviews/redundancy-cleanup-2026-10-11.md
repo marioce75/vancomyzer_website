@@ -1,6 +1,8 @@
 # Redundancy cleanup — 11 October 2026
 
-Review-only follow-up on branch `fix/redundancy-cleanup-20261011`, based on verified remote main and production `cbf541ba17e113c7297d9053ea57268a963ddbb0` (v0.1.0). No push, PR, merge or deployment of this follow-up is authorized or performed. Unrelated untracked review artifacts are preserved.
+Historical record of the redundancy-only follow-up on `fix/redundancy-cleanup-20261011`, based on verified remote main and production `cbf541ba17e113c7297d9053ea57268a963ddbb0` (v0.1.0). It began as a review-only change on 11 October 2026. Later that day, Mario approved publication of `ddd2996592d14e0f2012edc609f4e1763067190f`; [PR #29](https://github.com/marioce75/vancomyzer_website/pull/29) merged at 22:38:45 UTC as `91ef262ff95cb8399f606d42bae3cf0405297d5a`. Render deployment `dep-db60vtrrjlhs73b8p1r0` reached **Live**, and production version/health checks confirmed that commit. The deployed merge tree matched the approved tree exactly. Unrelated edits were preserved.
+
+The wording tables below describe PR #29 at publication, not later free-access/contact changes. This documentation reconciliation belongs to the subsequent isolated review branch; it does not reopen, roll back or redeploy PR #29.
 
 ## Exact wording
 
@@ -47,10 +49,15 @@ Clinical scope restrictions, FDA and regulatory/legal disclosures, validation li
 
 - Full `npm test` passed, including 19 timing regressions; localization 41/41 passed.
 - Lint passed with existing warnings; research types, production build and `tsc --noEmit` passed. Packaged logs record each check.
-- Local production-build HTTP smoke: all four locale requests returned200 with the translated closing heading and exactly one rendered full launch offer. No desktop focus required.
+- Local production-build HTTP smoke: all four locale requests returned 200 with the translated closing heading and exactly one rendered full launch offer. No desktop focus required.
 - Standalone React server-render semantics harness: 20 real-component cases (four languages × AUC399,400,500,600,601) passed. In-range label appears once, low/high retain full meaning, numeric title retains AUC/target, and radiogroup/radio, checked state and tabIndex remain. Harness/log in review package.
 - `git diff --check` passed. `website/src/lib`, `website/src/types`, and `website/src/app/api` are byte-identical to the verified base.
-- New browser screenshots and VoiceOver checks are pending: global-focus coordination messages to the Bambu/drainage tasks were rejected by automatic approval review for lack of verified destination authorization. No browser focus was taken or printer accessed. Earlier production screenshots are not represented as screenshots of this follow-up. Source/render checks do not substitute for those visual checks.
+- Initial review stage, 11 October: cross-task foreground coordination was blocked by automatic approval review; visual work was deferred at that stage. This is historical context, not the final verification status.
+- Final prepublication visual review, 11 October: four production-build homepage locales at 375×812 and 12 synthetic real-component previews (LevelEntryTable and RegimenComparisonTable at 320×740; retired Department component at 375×812). An additional French comparison view at 430 px retained intended internal table scrolling. Sixteen root-width measurements had no page-wide overflow.
+- Component previews were static server-rendered source linked to built CSS, not hydrated full-app/checkout workflows. The local origin required new disclaimer acceptance, which was not accepted or bypassed; no new full local calculator session was claimed.
+- Postpublication checks, 11 October: live four-language homepage headings and concentration labels, non-duplicated accessible in-range status, selected-radio semantics and input preservation passed. The existing production profile had already accepted the disclaimer. A synthetic adult case returned 1250 mg every 12 hours over 125 minutes, AUC 518.5, peak 34.4 and trough 13.2, matching the reviewed result. No real patient data or billing submission was used.
+- Full VoiceOver, authenticated department checkout and physical iPhone testing remain unperformed. The earlier complete responsive matrix was not repeated after deployment. The live retired department URL redirected to pricing; catalog verification is not a live department checkout test. No printer/Bambu controls were accessed.
+- Supporting confirmed Library artifacts: final visual report `libfile_63bbc5ddb54c81919e8fea22c88f65c6`; publication report `libfile_c82485a12b64819184b372d4edfd7e95`; release evidence `libfile_06d5e26a11e48191986031e202062984`.
 
 ## Changed source files
 
@@ -60,3 +67,7 @@ Clinical scope restrictions, FDA and regulatory/legal disclosures, validation li
 - `website/src/localization/messages.json`: localized heading, concentration label and Portuguese typo.
 
 This review document is the only additional tracked file. Generated legacy coverage inventories are not rewritten; current runtime localization tests and the exact changed bindings were checked.
+
+## Documentation review follow-up
+
+On the subsequent isolated review branch, the stale publication/visual status and `returned 200` spacing were corrected. GitHub review threads for comments [4243553474](https://github.com/marioce75/vancomyzer_website/pull/29#discussion_r4243553474), [4243553501](https://github.com/marioce75/vancomyzer_website/pull/29#discussion_r4243553501), and [4243553511](https://github.com/marioce75/vancomyzer_website/pull/29#discussion_r4243553511) were verified unresolved. They remain unresolved until this corrected artifact is published and verified. These are documentation findings, not runtime defects.

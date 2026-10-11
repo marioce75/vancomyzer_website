@@ -1124,7 +1124,7 @@ export default function CalculatorWorkspace() {
               <div className="rounded-md border px-3 py-2" style={{ borderColor: "#c6d6e6", background: "#e6eef5" }}>
                 <p className="text-xs font-semibold" style={{ color: "#1f5e96" }}><LocalizedText text="Feature access" /></p>
                 <p className="mt-1 text-xs leading-relaxed" style={{ color: "#14232f" }}><LocalizedText text="This feature is not available for your current account access. Contact us to discuss availability." /></p>
-                <Link href="/contact" className="mt-1.5 inline-block text-xs font-semibold underline" style={{ color: "#1f5e96" }}><LocalizedText text="Contact" /></Link>
+                <Link href="/contact?topic=restricted_access" className="mt-1.5 inline-block text-xs font-semibold underline" style={{ color: "#1f5e96" }}><LocalizedText text="Contact" /></Link>
               </div>
             }
           >

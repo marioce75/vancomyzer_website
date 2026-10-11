@@ -16343,5 +16343,50 @@
     "es": "Utilice Vancomyzer como herramienta principal de apoyo a la dosificación. Los datos de sus casos se van acumulando. El día 75 se generará un informe de resumen personalizado con su tasa de consecución del AUC objetivo, volumen de casos y observaciones principales de los casos registrados: un documento que podrá compartir con su director de farmacia para una revisión institucional.",
     "fr": "Utilisez Vancomyzer comme outil principal d’aide à la posologie. Les données de vos cas s’accumulent. Au jour 75, un rapport de synthèse personnalisé sera généré avec votre taux d’atteinte de l’AUC cible, le nombre de cas et les principaux enseignements des cas enregistrés : un document à partager avec votre responsable de pharmacie pour un examen institutionnel.",
     "pt-BR": "Utilize Vancomyzer como sua principal ferramenta de suporte à dosagem. Os seus dados do caso estão a acumular-se. No dia 75, será gerado um relatório de resumo personalizado mostrando a taxa de obtenção da AUC, o volume do caso e os principais insights de seus casos registrados — um documento que você pode compartilhar com seu diretor de farmácia para revisão institucional."
+  },
+  "Request restricted access": {
+    "es": "Solicitar acceso restringido",
+    "fr": "Demander un accès restreint",
+    "pt-BR": "Solicitar acesso restrito"
+  },
+  "Saved history and institutional access": {
+    "es": "Historial guardado y acceso institucional",
+    "fr": "Historique enregistré et accès institutionnel",
+    "pt-BR": "Histórico salvo e acesso institucional"
+  },
+  "Saved history and institutional features remain restricted and are not currently available for new access requests. You may register your interest using the access-request topic.": {
+    "es": "El historial guardado y las funciones institucionales siguen restringidos y actualmente no están disponibles para nuevas solicitudes de acceso. Puede registrar su interés seleccionando el tema de solicitud de acceso.",
+    "fr": "L’historique enregistré et les fonctionnalités institutionnelles restent restreints et ne sont actuellement pas disponibles pour de nouvelles demandes d’accès. Vous pouvez manifester votre intérêt en sélectionnant le sujet de demande d’accès.",
+    "pt-BR": "O histórico salvo e os recursos institucionais permanecem restritos e não estão disponíveis para novas solicitações de acesso. Você pode registrar seu interesse selecionando o assunto de solicitação de acesso."
+  },
+  "Technical questions": {
+    "es": "Preguntas técnicas",
+    "fr": "Questions techniques",
+    "pt-BR": "Dúvidas técnicas"
+  },
+  "For technical questions, email contact@vancomyzer.com or sign in and use the bug-report form in the calculator’s Settings.": {
+    "es": "Para preguntas técnicas, escriba a contact@vancomyzer.com o inicie sesión y utilice el formulario de errores en los ajustes de la calculadora.",
+    "fr": "Pour les questions techniques, écrivez à contact@vancomyzer.com ou connectez-vous et utilisez le formulaire de signalement dans les paramètres du calculateur.",
+    "pt-BR": "Para dúvidas técnicas, escreva para contact@vancomyzer.com ou entre na sua conta e use o formulário de erros nas configurações da calculadora."
+  },
+  "Send me an acknowledgement of this restricted-access enquiry by email.": {
+    "es": "Envíenme por correo electrónico una confirmación de esta consulta sobre acceso restringido.",
+    "fr": "Envoyez-moi par e-mail un accusé de réception de cette demande d’accès restreint.",
+    "pt-BR": "Envie-me por e-mail uma confirmação desta consulta sobre acesso restrito."
+  },
+  "Questions about the calculator, its evidence or restricted access. Use the appropriate topic below. Do not include patient information.": {
+    "es": "Preguntas sobre la calculadora, sus datos científicos o el acceso restringido. Seleccione el tema adecuado a continuación. No incluya información de pacientes.",
+    "fr": "Questions sur le calculateur, ses données probantes ou l’accès restreint. Sélectionnez le sujet approprié ci-dessous. N’incluez aucune information sur les patients.",
+    "pt-BR": "Dúvidas sobre a calculadora, suas evidências ou o acesso restrito. Selecione o assunto apropriado abaixo. Não inclua informações de pacientes."
+  },
+  "Questions about a method, an evaluation or restricted access.": {
+    "es": "Preguntas sobre un método, una evaluación o el acceso restringido.",
+    "fr": "Questions sur une méthode, une évaluation ou l’accès restreint.",
+    "pt-BR": "Dúvidas sobre um método, uma avaliação ou o acesso restrito."
+  },
+  "Institutional requirements": {
+    "es": "Requisitos institucionales",
+    "fr": "Besoins institutionnels",
+    "pt-BR": "Requisitos institucionais"
   }
 }

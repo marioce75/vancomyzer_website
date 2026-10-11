@@ -12,8 +12,8 @@ export default function PricingClient() {
       <h2 className="text-xl font-semibold"><LocalizedText text="Questions about access?" /></h2>
       <p className="mt-3"><LocalizedText text="Contact us about account access or institutional requirements." /></p>
       <p className="mt-3"><LocalizedText text="Institutional services, support and integrations require a separate review of requirements and availability." /></p>
-      <p className="mt-3"><LocalizedText text="Saved history, institution details on exports and team administration depend on your account access. Contact us about availability." /></p>
-      <Link href="/contact" className="mt-3 inline-block underline"><LocalizedText text="Contact" /></Link>
+      <p className="mt-3"><LocalizedText text="Saved history and institutional features remain restricted and are not currently available for new access requests. You may register your interest using the access-request topic." /></p>
+      <Link href="/contact?topic=restricted_access" className="mt-3 inline-block underline"><LocalizedText text="Request restricted access" /></Link>
     </section>
     <p className="mt-8 text-sm"><LocalizedText text="Existing subscriptions and institutional agreements retain their agreed terms. Manage an existing subscription in Billing, or contact us about your agreement." /></p>
     <Link href="/settings/billing" className="mt-3 inline-block underline"><LocalizedText text="Billing" /></Link>

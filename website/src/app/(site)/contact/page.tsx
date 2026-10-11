@@ -1,10 +1,10 @@
 "use client";
 import { LocalizedInput, LocalizedTextarea } from "@/localization/LocalizedElements";
 
-import { LocalizedText } from "@/localization/LanguageProvider";
+import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageHeader, Record, INK, INK2, INK3, RULE } from "@/components/site/Record";
 
@@ -45,6 +45,8 @@ const channels = [
 ];
 
 const topics = [
+  { value: "restricted_access", label: "Request restricted access" },
+  { value: "technical", label: "Technical questions" },
   { value: "hospital", label: "Hospital / institutional pilot" },
   { value: "research", label: "Research & academic collaboration" },
   { value: "clinical", label: "Clinical support question" },
@@ -52,10 +54,15 @@ const topics = [
 ];
 
 export default function ContactPage() {
+  const { locale } = useLanguage();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [topic, setTopic] = useState("hospital");
+  const [topic, setTopic] = useState("other");
   const [message, setMessage] = useState("");
+  const [acknowledgement, setAcknowledgement] = useState(false);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("topic") === "restricted_access") setTopic("restricted_access");
+  }, []);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -69,7 +76,7 @@ export default function ContactPage() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, topic, message }),
+        body: JSON.stringify({ name, email, topic, message, locale, acknowledgement: topic === "restricted_access" && acknowledgement }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -90,8 +97,14 @@ export default function ContactPage() {
         kicker="Contact · Dōsys LLC"
         title="Reach the team behind Vancomyzer™"
         compact
-        lede="Questions about the calculator, its evidence, or a site license. Use the address that fits your question, or the form below."
+        lede="Questions about the calculator, its evidence or restricted access. Use the appropriate topic below. Do not include patient information."
       />
+      <section className="mx-auto max-w-[1180px] px-4 py-6 sm:px-6">
+        <h2 className="text-xl font-semibold"><LocalizedText text="Saved history and institutional access" /></h2>
+        <p className="mt-3"><LocalizedText text="Saved history and institutional features remain restricted and are not currently available for new access requests. You may register your interest using the access-request topic." /></p>
+        <p className="mt-3"><LocalizedText text="For technical questions, email contact@vancomyzer.com or sign in and use the bug-report form in the calculator’s Settings." /></p>
+        <a className="mt-2 inline-block underline" href="mailto:contact@vancomyzer.com">contact@vancomyzer.com</a>
+      </section>
       <Record label="Addresses" note="Two mailboxes, one for each kind of question.">
       {/* Channel cards */}
       <div className="grid gap-4 sm:grid-cols-3">
@@ -121,7 +134,7 @@ export default function ContactPage() {
       </Record>
 
       {/* Inquiry form */}
-      <Record label="Send an inquiry" note="All fields required. We reply by email." last>
+      <Record label="Send an inquiry" note="We reply by email." last>
       <div className="border bg-white p-6 sm:p-8" style={{ borderColor: RULE }}>
         {success ? (
           <div className="text-center py-8">
@@ -182,6 +195,10 @@ export default function ContactPage() {
                 </select>
               </div>
 
+              {topic === "restricted_access" && <label className="flex items-start gap-3 text-sm">
+                <input type="checkbox" checked={acknowledgement} onChange={e => setAcknowledgement(e.target.checked)} className="mt-1" />
+                <LocalizedText text="Send me an acknowledgement of this restricted-access enquiry by email." />
+              </label>}
               <div>
                 <label htmlFor="contact-message" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em]" style={{ color: INK3 }}><LocalizedText text="Message" /></label>
                 <LocalizedTextarea

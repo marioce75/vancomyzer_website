@@ -269,7 +269,7 @@ export default function TeamPage() {
         <p className="mt-4 max-w-[60ch] text-lg" style={{ color: "#4a5a68" }}><LocalizedText text={"Team administration is available to Hospital Site administrators."} /></p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/login" className="vz-mbtn vz-mbtn--primary"><LocalizedText text="Sign in" /></Link>
-          <Link href="/contact" className="vz-mbtn vz-mbtn--outline"><LocalizedText text={"Contact"} /></Link>
+          <Link href="/contact?topic=restricted_access" className="vz-mbtn vz-mbtn--outline"><LocalizedText text={"Request restricted access"} /></Link>
         </div>
       </div>
     );
@@ -292,11 +292,11 @@ export default function TeamPage() {
         </div>
         <p style={{ fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.6 }}><LocalizedText text={"Team management requires an existing institutional agreement, and is available only to users designated as institutional admins. If your team needs this feature, see"} />{" "}
           <a
-            href="https://dosys.health/contact"
+            href="https://vancomyzer.com/contact?topic=restricted_access"
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: "var(--color-primary)", textDecoration: "underline" }}
-          ><LocalizedText text="Contact" /></a>{" "}<LocalizedText text={"on dosys.health."} /></p>
+          ><LocalizedText text="Request restricted access" /></a>{" "}<LocalizedText text={"on dosys.health."} /></p>
       </div>
     );
   }
