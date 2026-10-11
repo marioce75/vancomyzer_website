@@ -16071,73 +16071,73 @@
   },
   "Colin 2019 two-compartment model; population equations and references, with the assumptions used to adjust estimates to measured levels": {
     "es": "Modelo bicompartimental de Colin 2019; ecuaciones poblacionales y referencias, con los supuestos utilizados para ajustar las estimaciones a las concentraciones medidas",
-    "fr": "Colin 2019 two-compartment model; population equations and references, with the assumptions used to adjust estimates to measured levels",
+    "fr": "Modèle bicompartimental de Colin 2019 ; équations populationnelles et références, avec les hypothèses utilisées pour ajuster les estimations aux concentrations mesurées",
     "pt-BR": "Modelo bicompartimental de Colin 2019; equações populacionais e referências, com os pressupostos usados para ajustar as estimativas às concentrações medidas"
   },
   "Selected published population values compared with calculator estimates": {
     "es": "Comparación de valores poblacionales publicados seleccionados con las estimaciones de la calculadora",
-    "fr": "Selected published population values compared with calculator estimates",
+    "fr": "Comparaison de valeurs populationnelles publiées sélectionnées avec les estimations du calculateur",
     "pt-BR": "Valores populacionais publicados selecionados, comparados com as estimativas da calculadora"
   },
   "Predictions checked in simulated ICU patients using a model adapted from published research": {
     "es": "Comprobación de predicciones en pacientes de UCI simulados mediante un modelo adaptado de investigaciones publicadas",
-    "fr": "Predictions checked in simulated ICU patients using a model adapted from published research",
+    "fr": "Vérification des prédictions chez des patients simulés de réanimation à l’aide d’un modèle adapté de travaux publiés",
     "pt-BR": "Previsões verificadas em pacientes simulados de UTI, usando um modelo adaptado de pesquisa publicada"
   },
   "Estimates compared with Tucuxi in simulated patients, using limits set before the analysis": {
     "es": "Comparación de estimaciones con Tucuxi en pacientes simulados, con límites establecidos antes del análisis",
-    "fr": "Estimates compared with Tucuxi in simulated patients, using limits set before the analysis",
+    "fr": "Comparaison des estimations avec Tucuxi chez des patients simulés, avec des limites définies avant l’analyse",
     "pt-BR": "Estimativas comparadas com o Tucuxi em pacientes simulados, usando limites definidos antes da análise"
   },
   "Independent reference calculation (including loading-dose schedules) and synthetic coverage of the 90% uncertainty band": {
     "es": "Cálculo de referencia independiente (incluidas las pautas con dosis de carga) y cobertura de la banda de incertidumbre del 90% en datos sintéticos",
-    "fr": "Independent reference calculation (including loading-dose schedules) and synthetic coverage of the 90% uncertainty band",
+    "fr": "Calcul de référence indépendant (y compris les schémas avec dose de charge) et couverture de la bande d’incertitude à 90% sur des données synthétiques",
     "pt-BR": "Cálculo de referência independente (incluindo esquemas com dose de ataque) e cobertura da faixa de incerteza de 90% em dados sintéticos"
   },
   "Pharmacists": {
     "es": "Farmacéuticos",
-    "fr": "Pharmacists",
+    "fr": "Pharmaciens",
     "pt-BR": "Farmacêuticos"
   },
   "Physicians": {
     "es": "Médicos",
-    "fr": "Physicians",
+    "fr": "Médecins",
     "pt-BR": "Médicos"
   },
   "Nurse practitioners": {
     "es": "Profesionales de enfermería de práctica avanzada (nurse practitioners)",
-    "fr": "Nurse practitioners",
+    "fr": "Infirmiers en pratique avancée (nurse practitioners)",
     "pt-BR": "Enfermeiros de prática avançada (nurse practitioners)"
   },
   "Physician assistants": {
     "es": "Asistentes médicos (physician assistants)",
-    "fr": "Physician assistants",
+    "fr": "Assistants médicaux (physician assistants)",
     "pt-BR": "Assistentes médicos (physician assistants)"
   },
   "Residents": {
     "es": "Residentes",
-    "fr": "Residents",
+    "fr": "Médecins en formation spécialisée",
     "pt-BR": "Residentes"
   },
   "Students": {
     "es": "Estudiantes",
-    "fr": "Students",
+    "fr": "Étudiants",
     "pt-BR": "Estudantes"
   },
   "Pediatric patients": {
     "es": "Pacientes pediátricos",
-    "fr": "Pediatric patients",
+    "fr": "Patients pédiatriques",
     "pt-BR": "Pacientes pediátricos"
   },
   "Continuous-infusion vancomycin": {
     "es": "Vancomicina en perfusión continua",
-    "fr": "Continuous-infusion vancomycin",
+    "fr": "Vancomycine en perfusion continue",
     "pt-BR": "Vancomicina em infusão contínua"
   },
   "Age, weight, height, serum creatinine and renal replacement status. Estimated creatinine clearance is shown for context; the dose is calculated from serum creatinine as the Colin 2019 model input.": {
     "es": "Edad, peso, talla, creatinina sérica y si el paciente recibe tratamiento renal sustitutivo. El aclaramiento estimado de creatinina se muestra como referencia; el modelo Colin 2019 utiliza la creatinina sérica para calcular la dosis.",
-    "fr": "Âge, poids, taille, créatininémie et situation d’épuration extrarénale. La clairance estimée de la créatinine est affichée à titre de contexte ; la dose est calculée à partir de la créatininémie comme Colin 2019 donnée d’entrée du modèle.",
-    "pt-BR": "Idade, peso, altura, creatinina sérica e situação quanto à terapia renal substitutiva. A depuração estimada de creatinina é apresentada como contexto; a dose é calculada usando a creatinina sérica como entrada do modelo Colin 2019 modelo de entrada."
+    "fr": "Âge, poids, taille, créatininémie et situation d’épuration extrarénale. La clairance estimée de la créatinine est affichée à titre de contexte ; le modèle Colin 2019 utilise la créatininémie pour calculer la dose.",
+    "pt-BR": "Idade, peso, altura, creatinina sérica e situação quanto à terapia renal substitutiva. A depuração estimada de creatinina é apresentada como contexto; o modelo Colin 2019 usa a creatinina sérica para calcular a dose."
   },
   "Complete valid sample timing. In date/time mode, the sample must not precede the dose.": {
     "es": "Revise los tiempos de administración y extracción. La muestra no puede haberse extraído antes del inicio de la perfusión.",

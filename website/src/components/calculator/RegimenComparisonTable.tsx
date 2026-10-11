@@ -78,7 +78,7 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="relative overflow-x-auto">
       <LocalizedTable className="vz-table" role="radiogroup" aria-label="Candidate regimens">
         <thead>
           <tr>

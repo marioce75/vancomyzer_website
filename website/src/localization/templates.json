@@ -733,5 +733,40 @@
     "es": "© {n1} Vancomyzer™ · Desarrollado por",
     "fr": "© {n1} Vancomyzer™ · Développé par",
     "pt-BR": "© {n1} Vancomyzer™ · Desenvolvido por"
+  },
+  "Recommended adjustment: {n1} every {n2} h infused over {n3} minutes.": {
+    "es": "Ajuste recomendado: {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
+    "fr": "Adaptation recommandée : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes.",
+    "pt-BR": "Ajuste recomendado: {n1} mg a cada {n2} h, com infusão em {n3} minutos."
+  },
+  "{n1} every {n2} h infused over {n3} minutes": {
+    "es": "{n1} mg cada {n2} h en perfusión durante {n3} minutos",
+    "fr": "{n1} mg toutes les {n2} h en perfusion sur {n3} minutes",
+    "pt-BR": "{n1} mg a cada {n2} h, com infusão em {n3} minutos"
+  },
+  "dose increase from {n1} mg to {n2} mg.": {
+    "es": "aumento de dosis de {n1} mg a {n2} mg.",
+    "fr": "augmentation de dose de {n1} mg à {n2} mg.",
+    "pt-BR": "aumento da dose de {n1} mg para {n2} mg."
+  },
+  "dose decrease from {n1} mg to {n2} mg.": {
+    "es": "reducción de dosis de {n1} mg a {n2} mg.",
+    "fr": "réduction de dose de {n1} mg à {n2} mg.",
+    "pt-BR": "redução da dose de {n1} mg para {n2} mg."
+  },
+  "interval extension from q{n1}h to q{n2}h.": {
+    "es": "ampliación del intervalo de cada {n1} h a cada {n2} h.",
+    "fr": "allongement de l’intervalle de q{n1}h à q{n2}h.",
+    "pt-BR": "prolongamento do intervalo de q{n1}h para q{n2}h."
+  },
+  "interval shortening from q{n1}h to q{n2}h.": {
+    "es": "reducción del intervalo de cada {n1} h a cada {n2} h.",
+    "fr": "raccourcissement de l’intervalle de q{n1}h à q{n2}h.",
+    "pt-BR": "encurtamento do intervalo de q{n1}h para q{n2}h."
+  },
+  "Selected regimen steady-state projection ({n1} mg every {n2} h): AUC24 {n3} mg·h/L; peak {n4} mg/L; trough {n5} mg/L.": {
+    "es": "Proyección de la pauta seleccionada en estado estacionario ({n1} mg cada {n2} h): AUC24 {n3} mg·h/L; pico {n4} mg/L; valle {n5} mg/L.",
+    "fr": "Projection du schéma sélectionné à l’état d’équilibre ({n1} mg toutes les {n2} h) : AUC24 {n3} mg·h/L ; pic {n4} mg/L ; concentration résiduelle {n5} mg/L.",
+    "pt-BR": "Projeção do esquema selecionado no estado de equilíbrio ({n1} mg a cada {n2} h): AUC24 {n3} mg·h/L; pico {n4} mg/L; vale {n5} mg/L."
   }
 }
