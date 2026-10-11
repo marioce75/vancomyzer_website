@@ -21,9 +21,8 @@ function todayYMD(): string {
 }
 
 export function splitDate(v: string): { mm: string; dd: string; yyyy: string } {
-  return /^\d{4}-\d{2}-\d{2}$/.test(v)
-    ? { mm: v.slice(5, 7), dd: v.slice(8, 10), yyyy: v.slice(0, 4) }
-    : { mm: "", dd: "", yyyy: "" };
+  const match = /^(\d{0,4})-(\d{0,2})-(\d{0,2})$/.exec(v);
+  return match ? { mm: match[2], dd: match[3], yyyy: match[1] } : { mm: "", dd: "", yyyy: "" };
 }
 
 // ── Calendar Popup ─────────────────────────────────────────────
@@ -173,15 +172,12 @@ function CalendarPopup({ selectedDate, anchorEl, onSelect, onClose }: CalendarPo
 // Three-part MM/DD/YYYY entry with custom calendar popup.
 // Works in all browsers (no reliance on <input type="date">).
 //
-// Key invariants:
-//   • onChange is called ONLY with a complete YYYY-MM-DD string, never with "".
-//   • The valueparts sync effect only runs for complete incoming dates,
-//     preventing feedback loops that would clear in-progress user input.
-//   • Tab between segments does not clear values.
+// Partial segments are propagated too, so a cleared date cannot retain a valid
+// timestamp in the parent. The draft value preserves segments across remounts.
 
 export interface DatePartInputProps {
-  value: string; // YYYY-MM-DD or ""
-  onChange: (v: string) => void; // called with YYYY-MM-DD when all three parts are complete
+  value: string; // YYYY-MM-DD, a partial YYYY-MM-DD draft, or ""
+  onChange: (v: string) => void; // every edit, including incomplete segments
   hasError?: boolean;
 }
 
@@ -194,11 +190,8 @@ export default function DatePartInput({ value, onChange, hasError }: DatePartInp
   const [parts, setParts] = useState(() => splitDate(value));
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  // Sync external value  parts ONLY when value is a complete YYYY-MM-DD.
-  // Ignoring empty/partial values prevents re-render feedback loops that would
-  // clear the MM/DD/YYYY fields while the user is mid-entry.
+  // The parent retains the complete draft, including partial/cleared segments.
   useEffect(() => {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return;
     const next = splitDate(value);
     setParts(prev => {
       if (prev.mm === next.mm && prev.dd === next.dd && prev.yyyy === next.yyyy) return prev;
@@ -215,10 +208,7 @@ export default function DatePartInput({ value, onChange, hasError }: DatePartInp
     const v = raw.replace(/\D/g, "").slice(0, field === "yyyy" ? 4 : 2);
     const next = { ...parts, [field]: v };
     setParts(next);
-    // Never call onChange("") — only notify parent when all three segments are complete.
-    if (next.mm.length === 2 && next.dd.length === 2 && next.yyyy.length === 4) {
-      onChange(`${next.yyyy}-${next.mm}-${next.dd}`);
-    }
+    onChange(`${next.yyyy}-${next.mm}-${next.dd}`);
   };
 
   const onCalendarSelect = useCallback((date: string) => {

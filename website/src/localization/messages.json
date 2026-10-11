@@ -16138,5 +16138,10 @@
     "es": "Edad, peso, talla, creatinina sérica y situación respecto al tratamiento renal sustitutivo. El aclaramiento estimado de creatinina se muestra como referencia; la dosis se calcula a partir de la creatinina sérica, que es una variable de entrada del modelo Colin 2019.",
     "fr": "Âge, poids, taille, créatininémie et situation d’épuration extrarénale. La clairance estimée de la créatinine est affichée à titre de contexte ; la dose est calculée à partir de la créatininémie comme Colin 2019 donnée d’entrée du modèle.",
     "pt-BR": "Idade, peso, altura, creatinina sérica e situação quanto à terapia renal substitutiva. A depuração estimada de creatinina é apresentada como contexto; a dose é calculada usando a creatinina sérica como entrada do modelo Colin 2019 modelo de entrada."
+  },
+  "Complete valid sample timing. In date/time mode, the sample must not precede the dose.": {
+    "es": "Complete correctamente el momento de la extracción. Si utiliza fecha y hora, la muestra no puede ser anterior al inicio de la dosis.",
+    "fr": "Complétez correctement le moment du prélèvement. En mode date et heure, le prélèvement ne doit pas précéder le début de la dose.",
+    "pt-BR": "Preencha corretamente o momento da coleta. No modo de data e hora, a coleta não pode preceder o início da dose."
   }
 }

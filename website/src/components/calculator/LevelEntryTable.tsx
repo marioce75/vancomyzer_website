@@ -5,14 +5,14 @@ import { LocalizedInput, LocalizedButton } from "@/localization/LocalizedElement
 
 
 import React, { useState, useEffect, useRef } from "react";
-import { CalculateRequestLevel } from "@/types/calculator";
+import { timingDraft, withTiming, switchTimingMode, withManualHours, calcHours, type LevelDraft } from "./levelTiming";
 import ClinicalNumberInput from "./ClinicalNumberInput";
 import DatePartInput from "./DatePartInput";
-import { isManualHoursCollectionTime, manualHoursCollectionTime } from "@/lib/manualHoursTimestamp";
+import { manualHoursCollectionTime } from "@/lib/manualHoursTimestamp";
 
 interface LevelEntryTableProps {
-  levels: CalculateRequestLevel[];
-  onChange: (levels: CalculateRequestLevel[]) => void;
+  levels: LevelDraft[];
+  onChange: (levels: LevelDraft[]) => void;
   fieldErrors?: Record<string, string>;
   intervalHours?: number;
   prefillDoseDate?: string; // YYYY-MM-DD — pre-fills dose date (from bedbound panel)
@@ -36,26 +36,6 @@ function parse24hTime(raw: string): { hours: number; minutes: number } | null {
   const m = cleaned.length === 4 ? parseInt(cleaned.slice(2)) : parseInt(cleaned.slice(1));
   if (h < 0 || h > 23 || m < 0 || m > 59) return null;
   return { hours: h, minutes: m };
-}
-
-function buildDateTime(date: string, timeFormatted: string): Date | null {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
-  if (!/^\d{2}:\d{2}$/.test(timeFormatted)) return null;
-  const iso = `${date}T${timeFormatted}:00`;
-  const dt = new Date(iso);
-  return isNaN(dt.getTime()) ? null : dt;
-}
-
-function calcHours(
-  doseDate: string, doseTime: string,
-  levelDate: string, levelTime: string,
-): number | null {
-  const a = buildDateTime(doseDate, doseTime);
-  const b = buildDateTime(levelDate, levelTime);
-  if (!a || !b) return null;
-  const diffMs = b.getTime() - a.getTime();
-  if (diffMs < 0) return -1;
-  return Math.round((diffMs / 3600000) * 100) / 100;
 }
 
 /**
@@ -108,66 +88,29 @@ export default function LevelEntryTable({
   const levelsRef = useRef(levels);
   levelsRef.current = levels;
 
-  const [dateTimes, setDateTimes] = useState<{
-    doseDate: string; doseTime: string;
-    levelDate: string; levelTime: string;
-    levelTimeErr: string;
-    doseTimeErr: string;
-  }[]>(levels.map(() => ({
-    doseDate: today,
-    doseTime: "",
-    levelDate: today,
-    levelTime: "",
-    levelTimeErr: "",
-    doseTimeErr: "",
-  })));
-
-  // Levels that already carry a synthetic manual-hours timestamp (e.g. after the
-  // section panel remounts) reopen in manual-hours mode.
-  const [useDateTime, setUseDateTime] = useState<boolean[]>(() =>
-    levels.map((l) => !isManualHoursCollectionTime(l.collection_time)),
-  );
-  const [levelWarnings, setLevelWarnings] = useState<string[]>(levels.map(() => ""));
+  const [levelWarnings, setLevelWarnings] = useState<string[]>([]);
   const [parseErrors, setParseErrors] = useState<Record<string, string>>({});
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
-  // Restore level date/time from collection_time on mount (handles section panel remounts)
+  // Prefill changes (including clearing) must update derived timing as well.
   useEffect(() => {
-    let anyRestored = false;
-    const restoredDateTimes = dateTimes.map((dt, i) => {
-      const level = levels[i];
-      if (dt.levelTime) return dt; // already has time — skip
-      if (!level?.collection_time) return dt;
-      if (isManualHoursCollectionTime(level.collection_time)) return dt; // synthetic, not a real draw time
-      const ms = Date.parse(level.collection_time);
-      if (isNaN(ms)) return dt;
-      const d = new Date(ms);
-      const restoredDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      const restoredTime = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-      if (restoredDate === dt.levelDate && restoredTime === dt.levelTime) return dt;
-      anyRestored = true;
-      return { ...dt, levelDate: restoredDate, levelTime: restoredTime };
+    if (prefillDoseDate === undefined && prefillDoseTime === undefined) return;
+    const next = levelsRef.current.map(level => {
+      const draft = timingDraft(level, today);
+      const timing = { ...draft, ...(prefillDoseDate !== undefined ? { doseDate: prefillDoseDate } : {}), ...(prefillDoseTime !== undefined ? { doseTime: prefillDoseTime } : {}) };
+      return timing.dateMode ? withTiming(level, timing) : { ...level, timing };
     });
-    if (anyRestored) setDateTimes(restoredDateTimes);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // mount only
+    levelsRef.current = next;
+    onChangeRef.current(next);
+  }, [prefillDoseDate, prefillDoseTime, today]);
 
-  // Sync bedbound prefill: pre-fill dose date/time when loading dose panel provides them
-  useEffect(() => {
-    if (!prefillDoseDate && !prefillDoseTime) return;
-    setDateTimes((prev) =>
-      prev.map((dt) => ({
-        ...dt,
-        ...(prefillDoseDate ? { doseDate: prefillDoseDate } : {}),
-        ...(prefillDoseTime ? { doseTime: prefillDoseTime } : {}),
-      }))
-    );
-  }, [prefillDoseDate, prefillDoseTime]);
-
-  const update = (index: number, updates: Partial<CalculateRequestLevel>) => {
+  const update = (index: number, updates: Partial<LevelDraft>) => {
     // Use levelsRef.current (not the closure-captured `levels`) to prevent
     // stale reads when rapid events arrive before a re-render commits.
     const next = [...levelsRef.current];
     next[index] = { ...next[index], ...updates };
+    levelsRef.current = next;
     onChange(next);
   };
 
@@ -182,50 +125,16 @@ export default function LevelEntryTable({
     field: "doseDate" | "doseTime" | "levelDate" | "levelTime",
     value: string
   ) => {
-    const next = [...dateTimes];
-    const cur = { ...next[index] };
-
-    if (field === "doseTime" || field === "levelTime") {
-      const formatted = formatDisplay(value);
-      cur[field] = formatted;
-      const valid = parse24hTime(formatted) !== null || formatted === "";
-      if (field === "doseTime") cur.doseTimeErr = !valid && formatted.length >= 4 ? "Enter valid 24h time (e.g. 1400)" : "";
-      if (field === "levelTime") cur.levelTimeErr = !valid && formatted.length >= 4 ? "Enter valid 24h time (e.g. 0835)" : "";
-    } else {
-      cur[field] = value; // YYYY-MM-DD from DatePartInput (always complete when called)
-    }
-
-    next[index] = cur;
-    setDateTimes(next);
-
-    const levelDt = buildDateTime(cur.levelDate, cur.levelTime);
-    const collectionTime = levelDt ? levelDt.toISOString() : "";
-    const hours = calcHours(cur.doseDate, cur.doseTime, cur.levelDate, cur.levelTime);
-    if (hours !== null && hours >= 0) {
-      update(index, { time_since_last_dose_hours: hours, collection_time: collectionTime });
-    } else if (collectionTime) {
-      update(index, { collection_time: collectionTime });
-    }
+    const level = levelsRef.current[index];
+    const draft = timingDraft(level, today, prefillDoseDate, prefillDoseTime);
+    const timing = { ...draft, [field]: field === "doseTime" || field === "levelTime" ? formatDisplay(value) : value };
+    update(index, withTiming(level, timing));
   };
 
   const toggleMode = (index: number) => {
-    const next = [...useDateTime];
-    next[index] = !(next[index] ?? true);
-    setUseDateTime(next);
-    setParseErrors((prev) => ({ ...prev, [`hours-${index}`]: "" }));
-    if (!next[index]) {
-      update(index, { time_since_last_dose_hours: 0, collection_time: "" });
-    } else {
-      // Back to date & time: drop the synthetic manual-hours timestamp and use
-      // whatever the date and time fields currently give.
-      const cur = dateTimes[index];
-      const levelDt = cur ? buildDateTime(cur.levelDate, cur.levelTime) : null;
-      const hours = cur ? calcHours(cur.doseDate, cur.doseTime, cur.levelDate, cur.levelTime) : null;
-      update(index, {
-        time_since_last_dose_hours: hours !== null && hours >= 0 ? hours : 0,
-        collection_time: levelDt ? levelDt.toISOString() : "",
-      });
-    }
+    const level = levelsRef.current[index];
+    update(index, switchTimingMode(level, timingDraft(level, today, prefillDoseDate, prefillDoseTime)));
+    setParseErrors(prev => ({ ...prev, [`hours-${index}`]: "" }));
   };
 
   return (
@@ -234,12 +143,13 @@ export default function LevelEntryTable({
         const timeError = fieldErrors[`levels[${i}].time_since_last_dose_hours`];
         const valueError = fieldErrors[`levels[${i}].value_mcg_ml`];
         const collectionError = fieldErrors[`levels[${i}].collection_time`];
-        const dt = dateTimes[i] ?? {
-          doseDate: today, doseTime: "", levelDate: today, levelTime: "",
-          doseTimeErr: "", levelTimeErr: "",
+        const draft = timingDraft(level, today, prefillDoseDate, prefillDoseTime);
+        const dt = { ...draft,
+          doseTimeErr: draft.doseTime.length >= 4 && !parse24hTime(draft.doseTime) ? "Enter valid 24h time (e.g. 1400)" : "",
+          levelTimeErr: draft.levelTime.length >= 4 && !parse24hTime(draft.levelTime) ? "Enter valid 24h time (e.g. 0835)" : "",
         };
         const hoursComputed = calcHours(dt.doseDate, dt.doseTime, dt.levelDate, dt.levelTime);
-        const isDateMode = useDateTime[i] ?? true;
+        const isDateMode = draft.dateMode;
         const crossMidnight =
           dt.levelDate && dt.doseDate &&
           dt.levelDate !== dt.doseDate &&
@@ -354,7 +264,7 @@ export default function LevelEntryTable({
                       <DatePartInput
                         value={dt.doseDate}
                         onChange={(v) => updateDateTime(i, "doseDate", v)}
-                        hasError={false}
+                        hasError={Boolean(timeError || collectionError)}
                       />
                       <p className="text-[10px] mt-0.5 text-slate-500"><LocalizedText text="Date (MM / DD / YYYY)" /></p>
                     </div>
@@ -411,10 +321,7 @@ export default function LevelEntryTable({
                   <ClinicalNumberInput
                     inputMode="decimal"
                     value={level.time_since_last_dose_hours}
-                    onValueChange={(hours) => update(i, {
-                      time_since_last_dose_hours: hours,
-                      collection_time: manualHoursCollectionTime(hours),
-                    })}
+                    onValueChange={(hours) => update(i, withManualHours(levelsRef.current[i], hours))}
                     onBlurValue={(_v, _raw, parseError) => {
                       setParseErrors((prev) => ({ ...prev, [`hours-${i}`]: parseError ?? "" }));
                     }}

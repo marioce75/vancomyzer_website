@@ -24,6 +24,8 @@ import PatientCharacteristicsForm from "@/components/calculator/PatientCharacter
 import CalculationMethodPanel from "@/components/calculator/CalculationMethodPanel";
 import RegimenForm from "@/components/calculator/RegimenForm";
 import LevelEntryTable, { manualHoursCollectionTime } from "@/components/calculator/LevelEntryTable";
+import { isEnteredLevel, requestLevel, timingIsValid, restoreLevelDrafts, type LevelDraft } from "./levelTiming";
+import { nextInputRevision, resultIsCurrent, responseIsCurrent } from "./inputRevision";
 import CalculatorActionBar from "@/components/calculator/CalculatorActionBar";
 import PrimaryMetricsCard from "@/components/calculator/PrimaryMetricsCard";
 import DoseRecommendationCard, { LoadingDosePopover } from "@/components/calculator/DoseRecommendationCard";
@@ -99,7 +101,7 @@ export default function CalculatorWorkspace() {
   const [patient, setPatient] = useState<CalculateRequestPatient>(defaultPatient);
   const [rrt, setRrt] = useState<boolean | null>(null);
   const [regimen, setRegimen] = useState<CalculateRequestRegimen>(defaultRegimen);
-  const [levels, setLevels] = useState<(typeof defaultLevel)[]>([{ ...defaultLevel }]);
+  const [levels, setLevels] = useState<LevelDraft[]>([{ ...defaultLevel }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<CalculateErrorResponse | null>(null);
   const [result, setResult] = useState<CalculateResponse | null>(null);
@@ -107,8 +109,13 @@ export default function CalculatorWorkspace() {
   const [bedbound, setBedbound] = useState(false);
   const [bedboundDoseData, setBedboundDoseData] = useState<BedboundDoseData | null>(null);
 
-  const [lastInputChangedAt, setLastInputChangedAt] = useState<number | null>(null);
-  const [lastCalculatedAt, setLastCalculatedAt] = useState<number | null>(null);
+  const [resultRevision, setResultRevision] = useState<number | null>(null);
+  const inputRevisionRef = useRef({ key: "", revision: 0 });
+  inputRevisionRef.current = nextInputRevision(inputRevisionRef.current, {
+    mode, patient, rrt, ...(mode === "initial_regimen" ? {} : { regimen, levels }),
+  });
+  const inputRevision = inputRevisionRef.current.revision;
+  const invalidTiming = mode !== "initial_regimen" && levels.some(level => isEnteredLevel(level) && !timingIsValid(level));
   const [selectedFrequencyOption, setSelectedFrequencyOption] = useState<FrequencyOption | null>(null);
   // Existing-regimen path only: view the CURRENT regimen (as entered) instead
   // of the engine's recommendation. The response's top-level auc24/peak/trough
@@ -123,7 +130,7 @@ export default function CalculatorWorkspace() {
     viewMode: WorkspaceViewMode;
     mode: CalculatorMode;
     regimen: CalculateRequestRegimen;
-    levels: (typeof defaultLevel)[];
+    levels: LevelDraft[];
     result: CalculateResponse | null;
     selectedFrequencyOption: FrequencyOption | null;
   } | null>(null);
@@ -161,13 +168,8 @@ export default function CalculatorWorkspace() {
   // from the Retry-After header; explicit Calculate clicks are not blocked.
   const rateLimitedUntilRef = useRef<number>(0);
 
-  // Result lifecycle guard. Each submission takes a sequence number and the
-  // timestamp of the inputs it was built from. A response is applied only if it
-  // is the LATEST submission; an older response that completes late is
-  // discarded, so it can never overwrite a newer input, clear an RRT block or
-  // resurrect a superseded regimen. lastCalculatedAt is set to the SUBMIT time
-  // (not the response time), so inputs edited while the request was in flight
-  // still read as stale.
+  // Both submission sequence and input revision must match. Edits invalidate
+  // responses even when two edits happen within a millisecond or restore old values.
   const requestSeqRef = useRef(0);
   const rrtRef = useRef<boolean | null>(null);
   useEffect(() => { rrtRef.current = rrt; }, [rrt]);
@@ -188,16 +190,12 @@ export default function CalculatorWorkspace() {
       if (s.patient) setPatient(s.patient);
       if (s.rrt !== undefined) setRrt(s.rrt);
       if (s.regimen) setRegimen(s.regimen);
-      if (s.levels) setLevels(s.levels);
+      if (s.levels) setLevels(restoreLevelDrafts(s.levels, s.timingDraftVersion));
       if (s.bedbound !== undefined) setBedbound(s.bedbound);
       if (s.viewMode) setViewMode(s.viewMode);
       if (s.mode) setMode(s.mode);
       if (s.activeSection) setActiveSection(s.activeSection);
-      if (s.result) {
-        setResult(s.result);
-        setLastCalculatedAt(Date.now());
-      }
-      if (s.selectedFrequencyOption) setSelectedFrequencyOption(s.selectedFrequencyOption);
+      // Restore drafts only: cached results cannot prove they match these inputs.
     } catch { /* corrupted — ignore */ }
   }, []);
 
@@ -211,7 +209,7 @@ export default function CalculatorWorkspace() {
     }
     try {
       sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-        patient, rrt, regimen, levels, bedbound,
+        patient, rrt, regimen, levels, bedbound, timingDraftVersion: 1,
         viewMode, mode, activeSection,
         result, selectedFrequencyOption,
         timestamp: Date.now(),
@@ -313,9 +311,7 @@ export default function CalculatorWorkspace() {
     // Drop only completely untouched rows (loading-dose simulation has no measured
     // levels). A row with a time but an unreadable/zero value is sent as-is so the
     // server rejects it visibly instead of silently fitting one level fewer.
-    const validLevels = levels.filter(
-      (l) => l.value_mcg_ml !== 0 || l.time_since_last_dose_hours !== 0 || (l.collection_time ?? "").trim() !== "",
-    );
+    const validLevels = levels.filter(isEnteredLevel).map(requestLevel);
     // Loading-dose fields travel only with a multi-dose level workflow where
     // "Loading dose" is selected (an unfilled 0 is sent so the server rejects
     // it visibly); otherwise they are dropped so a stale entry cannot change the fit.
@@ -331,7 +327,7 @@ export default function CalculatorWorkspace() {
     setViewMode(next);
     setError(null);
     setResult(null);
-    setLastCalculatedAt(null);
+    setResultRevision(null);
     if (next === "empiric") {
       setMode("initial_regimen");
       setActiveSection("patient");
@@ -355,13 +351,16 @@ export default function CalculatorWorkspace() {
     setLoading(true);
     const request = { ...buildRequest(), intent };
     const seq = ++requestSeqRef.current;
-    if (hasInvalidNumericValues(request)) {
-      setError({ error_type: "validation_error", message: INVALID_NUMBER });
+    if (invalidTiming || hasInvalidNumericValues(request)) {
+      const timingMessage = "Complete valid sample timing. In date/time mode, the sample must not precede the dose.";
+      setError({ error_type: "validation_error", message: invalidTiming ? timingMessage : INVALID_NUMBER,
+        ...(invalidTiming ? { field_errors: Object.fromEntries(levels.flatMap((level, i) => isEnteredLevel(level) && !timingIsValid(level) ? [[`levels[${i}].collection_time`, timingMessage]] : [])) } : {}),
+      });
       setResult(null);
       setLoading(false);
       return;
     }
-    const submittedAt = Date.now();
+    const submittedRevision = inputRevisionRef.current.revision;
 
     try {
       const res = await fetch("/api/calculate", {
@@ -373,7 +372,7 @@ export default function CalculatorWorkspace() {
 
       // Superseded by a newer submission, or the patient was switched to RRT
       // while this request was in flight: discard, do not touch state.
-      if (seq !== requestSeqRef.current || rrtRef.current === true) {
+      if (!responseIsCurrent(seq, requestSeqRef.current, submittedRevision, inputRevisionRef.current.revision) || rrtRef.current === true) {
         return;
       }
 
@@ -461,7 +460,7 @@ export default function CalculatorWorkspace() {
         review_hold: data.review_hold,
         result_snapshot: data.result_snapshot,
       });
-      setLastCalculatedAt(submittedAt);
+      setResultRevision(submittedRevision);
       setSelectedFrequencyOption(null);
       setViewCurrentRegimen(false);
       setError(null);
@@ -515,7 +514,7 @@ export default function CalculatorWorkspace() {
     } finally {
       if (seq === requestSeqRef.current) setLoading(false);
     }
-  }, [buildRequest, playSound]);
+  }, [buildRequest, playSound, invalidTiming, levels]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -553,20 +552,14 @@ export default function CalculatorWorkspace() {
   }, [bedboundDoseData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    setLastInputChangedAt(Date.now());
-    // Invalidate in-flight results immediately when a partial/malformed edit
-    // cannot be represented as a clinical number; never redisplay an old fit.
-    if (hasInvalidNumericValues({ patient, ...(mode === "initial_regimen" ? {} : { regimen, levels }) })) {
-      ++requestSeqRef.current;
-      setResult(null);
-      setLastCalculatedAt(null);
-      setLoading(false);
-    }
+    // Cancel all in-flight work on clinical edits; keep old output obscured.
+    ++requestSeqRef.current;
+    setLoading(false);
     // Clear field-level validation errors when the user modifies inputs so stale
     // "Must be a positive concentration" messages don't persist while the form is
     // still being filled. Errors reappear on the next failed Calculate attempt.
     setError((prev) => (prev?.field_errors ? { ...prev, field_errors: undefined } : prev));
-  }, [patient, regimen, levels, mode]);
+  }, [inputRevision]);
 
   useEffect(() => {
     const hasPatientCore = patient.age > 0 && patient.weight_kg > 0 && patient.serum_creatinine_mg_dl > 0;
@@ -589,7 +582,7 @@ export default function CalculatorWorkspace() {
     setResult(null);
     setViewMode("empiric");
     setMode("initial_regimen");
-    setLastCalculatedAt(null);
+    setResultRevision(null);
     setSelectedFrequencyOption(null);
     setViewCurrentRegimen(false);
     setRrt(null);
@@ -601,7 +594,7 @@ export default function CalculatorWorkspace() {
   const fieldErrors = getModeScopedFieldErrors(mode, error?.field_errors);
   const handleSwitchToInitialRegimen = useCallback(() => applyViewMode("empiric"), [applyViewMode]);
 
-  const hasStaleResult = Boolean(result && lastCalculatedAt && lastInputChangedAt && lastInputChangedAt > lastCalculatedAt);
+  const hasStaleResult = Boolean(result && (!resultIsCurrent(resultRevision, inputRevision) || invalidTiming));
   const visibleResult = hasStaleResult ? null : result;
 
   // Single source of truth: the currently active frequency option.
@@ -633,7 +626,7 @@ export default function CalculatorWorkspace() {
           clinical_note: visibleResult.documentation_preview?.clinical_note,
         }
       : null;
-  const activeOption = currentRegimenOption ?? (selectedFrequencyOption ?? recommendedOption);
+  const activeOption = visibleResult ? currentRegimenOption ?? (selectedFrequencyOption ?? recommendedOption) : null;
   const activeIsCurrent = currentRegimenOption != null;
   // Estimated CrCl is reported by the engine as context text in key_inputs; it
   // is parsed for display on the renal row and never used in any calculation.
@@ -647,7 +640,7 @@ export default function CalculatorWorkspace() {
   const isPulseDose = regimen.doses_given === 1;
   const regimenReady = regimen.dose_mg > 0 && regimen.infusion_duration_hours > 0 &&
     (isPulseDose || regimen.interval_hours > 0);
-  const levelReady = levels.some((level) => level.value_mcg_ml > 0 && level.time_since_last_dose_hours >= 0);
+  const levelReady = levels.some((level) => level.value_mcg_ml > 0) && !invalidTiming;
 
   // Bedbound two-phase gating:
   // Phase 1 — loading dose entered, level not yet drawn  Calculate hidden
@@ -741,13 +734,14 @@ export default function CalculatorWorkspace() {
   }, [mode, regimen, handleCalculate]);
 
   const handleCopyNote = useCallback(() => {
+    if (!visibleResult || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
     const note = activeOption?.clinical_note ?? visibleResult?.documentation_preview?.clinical_note;
     if (!note) return;
     navigator.clipboard.writeText(translateGeneratedText(note, locale)).catch(() => {/* clipboard not available */});
-  }, [activeOption, visibleResult, locale]);
+  }, [activeOption, visibleResult, locale, resultRevision]);
 
   const handleExportPDF = useCallback(() => {
-    if (!visibleResult) return;
+    if (!visibleResult || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
     const opt = activeOption;
     const reportData: ReportData = {
       age: patient.age,
@@ -781,7 +775,7 @@ export default function CalculatorWorkspace() {
       })),
     };
     printReport(reportData, user?.subscriptionTier ?? "free", locale);
-  }, [visibleResult, activeOption, patient, user?.subscriptionTier, locale]);
+  }, [visibleResult, activeOption, patient, user?.subscriptionTier, locale, resultRevision]);
 
   const leftColumn = (
     <div className="flex h-full flex-col">
@@ -804,7 +798,7 @@ export default function CalculatorWorkspace() {
                 setResult(null);
                 setError(null);
                 setSelectedFrequencyOption(null);
-                setLastCalculatedAt(null);
+                setResultRevision(null);
               }
             }}
             bedbound={bedbound}
@@ -1193,9 +1187,9 @@ export default function CalculatorWorkspace() {
                     {!isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (
                       <LoadingDosePopover weightKg={patient.weight_kg > 0 ? patient.weight_kg : null} onSimulate={handleSimulateLoadingDose} />
                     )}
-                    <PdfExportGate tier={user?.subscriptionTier ?? "free"} onExport={handleExportPDF} />
+                    <PdfExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? "free"} onExport={handleExportPDF} />
                     {clinicalNote && (
-                      <NoteExportGate tier={user?.subscriptionTier ?? "free"} onCopy={handleCopyNote} noteText={clinicalNote} />
+                      <NoteExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? "free"} onCopy={handleCopyNote} noteText={clinicalNote} />
                     )}
                   </div>
                 </div>
