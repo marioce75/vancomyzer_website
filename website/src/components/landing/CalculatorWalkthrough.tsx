@@ -27,7 +27,7 @@ function LocaleWalkthrough({ locale }: { locale: Locale }) {
       <TutorialPlayer key={media.src} media={media} locale={locale} captionId={captionId} />
     </>}
     <figcaption id={captionId} className="mt-3 text-[13px] leading-[1.5]" style={{ color: "#546471" }}>
-      {media?.locale === "pt-BR" && <span lang="pt-BR" className="mb-1 block">Narração e legendas em português brasileiro; gravação da interface em inglês, com uma demonstração em português da confirmação de valores numéricos.</span>}
+      {media?.locale === "pt-BR" && <span lang="pt-BR" className="mb-1 block">Narração, legendas e explicações em português brasileiro; demonstração gravada com dados fictícios.</span>}
       <LocalizedText text="Calculator walkthrough using fictional inputs, including Bayesian estimation and loading dose guidance. For learning the interface. Independent clinical validation is pending." />
     </figcaption>
   </figure>;
@@ -66,7 +66,7 @@ function TutorialPlayer({ media, locale, captionId }: { media: TutorialMedia; lo
 
   const duration = tutorialDuration(media);
   return <>
-    <div className="relative overflow-hidden rounded-md border bg-white shadow-sm" style={{ borderColor: "#cbd6e0", aspectRatio: (media.locale === "en" || media.locale === "es") ? "16 / 9" : "3 / 2" }}>
+    <div className="relative overflow-hidden rounded-md border bg-white shadow-sm" style={{ borderColor: "#cbd6e0", aspectRatio: "16 / 9" }}>
       <LocalizedVideo ref={video} src={media.src} lang={media.locale} className="block h-full w-full object-contain" controls={started} playsInline preload="none" poster={media.poster}
         aria-label="Vancomyzer calculator tutorial with Bayesian estimation and loading dose guidance" aria-describedby={captionId}
         onPlay={() => setStarted(true)} onPlaying={recordPlayback} onError={() => { video.current?.pause(); setFailed(true); }}>

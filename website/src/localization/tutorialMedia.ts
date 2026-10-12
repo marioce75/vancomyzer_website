@@ -8,35 +8,52 @@ export type TutorialMedia = {
   captions?: { src: string; language: string; label: string };
 };
 
-/** Approved language-specific releases; Spanish Eva v4 updated 2026-10-12. Keep each locale paired with its own narration and captions. */
+/** Approved navigation tutorials, 2026-10-12. Preserve exact masters and locale pairing. */
 export const tutorialMedia: Readonly<Record<Locale, TutorialMedia | null>> = {
+  "en": {
+    "locale": "en",
+    "src": "/videos/vancomyzer-tutorial-en-navigation-20261012.mp4",
+    "poster": "/images/vancomyzer-tutorial-en-navigation-20261012.jpg",
+    "durationSeconds": 137.0,
+    "captions": {
+      "src": "/videos/vancomyzer-tutorial-en-navigation-20261012.vtt",
+      "language": "en",
+      "label": "English"
+    }
+  },
+  "es": {
+    "locale": "es",
+    "src": "/videos/vancomyzer-tutorial-es-ES-navigation-20261012.mp4",
+    "poster": "/images/vancomyzer-tutorial-es-ES-navigation-20261012.jpg",
+    "durationSeconds": 152.6,
+    "captions": {
+      "src": "/videos/vancomyzer-tutorial-es-ES-navigation-20261012.vtt",
+      "language": "es-ES",
+      "label": "Español"
+    }
+  },
+  "fr": {
+    "locale": "fr",
+    "src": "/videos/vancomyzer-tutorial-fr-FR-navigation-20261012.mp4",
+    "poster": "/images/vancomyzer-tutorial-fr-FR-navigation-20261012.jpg",
+    "durationSeconds": 173.27999999999997,
+    "captions": {
+      "src": "/videos/vancomyzer-tutorial-fr-FR-navigation-20261012.vtt",
+      "language": "fr-FR",
+      "label": "Français"
+    }
+  },
   "pt-BR": {
-    locale: "pt-BR",
-    src: "/videos/vancomyzer-tutorial-pt-BR-20261009.mp4",
-    poster: "/images/tutorial-pt-BR-20261009.jpg",
-    durationSeconds: 209.16,
-    captions: { src: "/videos/vancomyzer-tutorial-pt-BR-20261009.vtt", language: "pt-BR", label: "Português (Brasil)" },
-  },
-  en: {
-    locale: "en",
-    src: "/videos/vancomyzer-tutorial-en-20261006.mp4",
-    poster: "/images/tutorial-en-20261006.jpg",
-    durationSeconds: 175.334,
-  },
-  es: {
-    locale: "es",
-    src: "/videos/vancomyzer-tutorial-es-eva-v4-20261012.mp4",
-    poster: "/images/vancomyzer-tutorial-es-eva-v4-20261012.jpg",
-    durationSeconds: 118.7,
-    captions: { src: "/videos/vancomyzer-tutorial-es-eva-v4-20261012.vtt", language: "es-ES", label: "Español" },
-  },
-  fr: {
-    locale: "fr",
-    src: "/videos/vancomyzer-tutorial-fr-20261006-clean.mp4",
-    poster: "/images/tutorial-fr-20261006-clean.jpg",
-    durationSeconds: 217.233333,
-    captions: { src: "/videos/vancomyzer-tutorial-fr-20261006.vtt", language: "fr-FR", label: "Français" },
-  },
+    "locale": "pt-BR",
+    "src": "/videos/vancomyzer-tutorial-pt-BR-navigation-20261012.mp4",
+    "poster": "/images/vancomyzer-tutorial-pt-BR-navigation-20261012.jpg",
+    "durationSeconds": 160.67333333333332,
+    "captions": {
+      "src": "/videos/vancomyzer-tutorial-pt-BR-navigation-20261012.vtt",
+      "language": "pt-BR",
+      "label": "Português (Brasil)"
+    }
+  }
 };
 
 export function getTutorialMedia(locale: Locale): TutorialMedia | null {
