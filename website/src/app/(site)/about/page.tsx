@@ -48,8 +48,8 @@ export default function AboutPage() {
       <Record label="Who makes it" note="Mario Cardenas, PharmD, MBA." last>
         <Prose>
           <p><LocalizedText text="Vancomyzer is a product of" />{" "}
-            <a href="https://dosys.health" target="_blank" rel="noopener noreferrer"><LocalizedText text="Dōsys Health LLC" /></a><LocalizedText text=". Mario Cardenas, PharmD, MBA, is an ICU clinical pharmacist and the company’s founder and CEO. He leads product development. Questions and research inquiries go through the" />{" "}
-            <Link href="/contact"><LocalizedText text="contact page" /></Link><LocalizedText text="; the evidence behind the calculator is on the" />{" "}
+            <a href="https://dosys.health" target="_blank" rel="noopener noreferrer"><LocalizedText text="Dōsys Health LLC" /></a><LocalizedText text=". Mario Cardenas, PharmD, MBA, is an ICU clinical pharmacist and the company’s founder and CEO. He develops the calculator. For questions or research enquiries, use the" />{" "}
+            <Link href="/contact"><LocalizedText text="contact page" /></Link><LocalizedText text="; methods and results are documented on the" />{" "}
             <Link href="/transparent-dosing"><LocalizedText text="evidence page" /></Link>.
           </p>
           <p><LocalizedText text="The published population model and developer-run checks are not independent clinical validation of Vancomyzer. Independent evaluation with patient data is pending; the" />{" "}

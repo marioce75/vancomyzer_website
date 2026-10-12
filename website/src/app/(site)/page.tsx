@@ -286,7 +286,7 @@ export default function LandingPage() {
       {/* ── EVIDENCE STATUS ────────────────────────────────── */}
       <Section id="evidence" label="Evidence status" note="What has been checked, by whom, and what has not.">
         <H2><LocalizedText text="Review the evidence before you rely on it" /></H2>
-        <p className="mb-6 mt-2.5 max-w-[60ch] text-xl leading-[1.5]" style={{ color: INK2 }}><LocalizedText text="Method pages document the model equations, assumptions and sources. Vancomyzer has not yet been validated in real patients; published model evidence and developer-run checks are not independent validation. Each row links to the methods, results and limitations." /></p>
+        <p className="mb-6 mt-2.5 max-w-[60ch] text-xl leading-[1.5]" style={{ color: INK2 }}><LocalizedText text="The pages below document the model equations, assumptions, sources, results and limitations. Vancomyzer has not yet been validated in real patients; published model evidence and developer-run checks are not independent clinical validation." /></p>
         <LocalizedDiv className="overflow-x-auto" tabIndex={0} aria-label="Evidence status table; scrolls horizontally on small screens">
           <table className="vz-ledger">
             <thead>
