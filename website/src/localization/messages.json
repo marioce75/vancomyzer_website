@@ -1520,9 +1520,9 @@
     "pt-BR": "Introduza concentrações medidas e tempos de recolha reais em"
   },
   "Drug Levels": {
-    "es": "Concentraciones del fármaco",
+    "es": "Concentraciones de vancomicina",
     "fr": "Concentrations du médicament",
-    "pt-BR": "Níveis de Drogas"
+    "pt-BR": "Concentrações de vancomicina"
   },
   ". Review whether the available history and levels support a maintenance estimate before using the result.": {
     "es": ". Revise si el historial y las concentraciones disponibles permiten estimar una pauta de mantenimiento antes de utilizar el resultado.",
@@ -1792,7 +1792,7 @@
   "Drug levels": {
     "es": "Concentraciones de vancomicina",
     "fr": "Concentrations du médicament",
-    "pt-BR": "Níveis de drogas"
+    "pt-BR": "Concentrações de vancomicina"
   },
   "Phase 1 complete — awaiting level": {
     "es": "Fase 1 completada: pendiente de concentración",
@@ -2427,7 +2427,7 @@
   "Level drawn": {
     "es": "Extracción de la muestra",
     "fr": "Prélèvement effectué",
-    "pt-BR": "Nível sorteado"
+    "pt-BR": "Coleta da amostra"
   },
   "Date (MM / DD / YYYY)": {
     "es": "Fecha (MM / DD / YYYY)",
@@ -2992,7 +2992,7 @@
   "CLINICAL SETTINGS": {
     "es": "AJUSTES CLÍNICOS",
     "fr": "PARAMÈTRES CLINIQUES",
-    "pt-BR": "CONSTRUÇÕES CLÍNICAS"
+    "pt-BR": "CONFIGURAÇÕES CLÍNICAS"
   },
   "Close settings": {
     "es": "Cerrar ajustes",
@@ -3007,7 +3007,7 @@
   "FONT SIZE": {
     "es": "TAMAÑO DE LETRA",
     "fr": "TAILLE DU TEXTE",
-    "pt-BR": "DIMENSÃO DA FONTADE"
+    "pt-BR": "TAMANHO DA FONTE"
   },
   "DISPLAY": {
     "es": "VISUALIZACIÓN",
@@ -3082,7 +3082,7 @@
   "[ RESET TO DEFAULTS ]": {
     "es": "[ RESTABLECER VALORES PREDETERMINADOS ]",
     "fr": "[ RÉTABLIR LES PARAMÈTRES PAR DÉFAUT ]",
-    "pt-BR": "[ RESISTIR A DEFICIENTES ]"
+    "pt-BR": "[ RESTAURAR PADRÕES ]"
   },
   "Information": {
     "es": "Información",
@@ -4092,7 +4092,7 @@
   "After loading dose: draw first level 1.5–6h post-infusion end for early Bayesian estimation, or peak + trough near dose 3–4 for highest accuracy. Target AUC₂₄ 400–600 mg·h/L within 48h per ASHP/IDSA 2020.": {
     "es": "Tras la dosis de carga: obtenga la primera concentración 1.5–6h después del final de la perfusión para una estimación bayesiana temprana, o pico y valle en torno a la dosis 3–4 para la mayor exactitud. Objetivo AUC₂₄ 400–600 mg·h/L en 48h según ASHP/IDSA 2020.",
     "fr": "Après la dose de charge : prélevez la première concentration 1.5–6h après la fin de la perfusion pour une estimation bayésienne précoce, ou un pic et une concentration résiduelle vers la dose 3–4 pour la meilleure exactitude. Cible AUC₂₄ 400–600 mg·h/L dans les 48h selon ASHP/IDSA 2020.",
-    "pt-BR": "Após a dose de ataque: desenhar o primeiro nível 1.5–6h de final pós-infusão para estimativa bayesiana precoce, ou pico + vale próximo da dose 3–4 para maior precisão. AUC₂₄ alvo 400-600 mg·h/L dentro de 48h por ASHP/IDSA 2020."
+    "pt-BR": "Após a dose de ataque: coletar a primeira amostra 1.5–6h após o término da infusão para estimativa bayesiana precoce, ou amostras de pico + vale próximo da dose 3–4 para maior exatidão. AUC₂₄ alvo 400–600 mg·h/L em até 48h, conforme ASHP/IDSA 2020."
   },
   "Obtain two vancomycin levels early (2–4h and 6–8h post-dose) to confirm individual PK parameters before proceeding": {
     "es": "Obtenga pronto dos concentraciones de vancomicina (2–4h y 6–8h tras la dosis) para confirmar los parámetros farmacocinéticos individuales antes de continuar",
@@ -16423,5 +16423,35 @@
     "es": "; los métodos y resultados se documentan en la",
     "fr": " ; les méthodes et résultats sont documentés sur la",
     "pt-BR": "; os métodos e resultados estão documentados na"
+  },
+  "single level / high uncertainty": {
+    "es": "una concentración / incertidumbre alta",
+    "fr": "une concentration / incertitude élevée",
+    "pt-BR": "uma concentração / alta incerteza"
+  },
+  "single level / bounded uncertainty": {
+    "es": "una concentración / incertidumbre acotada",
+    "fr": "une concentration / incertitude bornée",
+    "pt-BR": "uma concentração / incerteza delimitada"
+  },
+  "multiple coherent levels": {
+    "es": "varias concentraciones coherentes",
+    "fr": "plusieurs concentrations cohérentes",
+    "pt-BR": "múltiplas concentrações coerentes"
+  },
+  "multiple levels / bounded uncertainty": {
+    "es": "varias concentraciones / incertidumbre acotada",
+    "fr": "plusieurs concentrations / incertitude bornée",
+    "pt-BR": "múltiplas concentrações / incerteza delimitada"
+  },
+  "Maintenance after loading dose — steady-state PK": {
+    "es": "Mantenimiento tras la dosis de carga — farmacocinética en estado estacionario",
+    "fr": "Entretien après la dose de charge — pharmacocinétique à l’état d’équilibre",
+    "pt-BR": "Manutenção após a dose de ataque — farmacocinética no estado de equilíbrio"
+  },
+  "Current regimen — steady-state projection (actual history: ? doses given)": {
+    "es": "Pauta actual — proyección en estado estacionario (historial real: ? dosis administradas)",
+    "fr": "Schéma actuel — projection à l’état d’équilibre (historique réel : ? doses administrées)",
+    "pt-BR": "Esquema atual — projeção no estado de equilíbrio (histórico real: ? doses administradas)"
   }
 }
