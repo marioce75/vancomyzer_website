@@ -1,0 +1,100 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:02.260
+Welcome to the Vancomyzer tutorial.
+
+00:00:03.080 --> 00:00:03.820
+Let's get started.
+
+00:00:04.400 --> 00:00:07.720
+Think of a GPS estimating arrival time across a small city.
+
+00:00:08.420 --> 00:00:11.060
+Usual travel patterns provide a starting estimate;
+
+00:00:11.560 --> 00:00:13.420
+details of your trip personalize it.
+
+00:00:14.120 --> 00:00:18.360
+Bayesian dosing starts with a population model, then uses patient characteristics
+
+00:00:18.360 --> 00:00:19.800
+to personalize the estimate.
+
+00:00:20.680 --> 00:00:25.840
+Measured concentrations, with reliable dose and sample times, update it like new
+
+00:00:25.840 --> 00:00:26.780
+traffic information.
+
+00:00:27.860 --> 00:00:32.940
+Uncertainty remains: poor inputs or a poorly matched model can mislead.
+
+00:00:32.940 --> 00:00:35.420
+The estimate still needs clinical review.
+
+00:00:35.940 --> 00:00:41.540
+Explore Vancomyzer with this fictional adult example and begin by checking recent vancomycin
+
+00:00:41.540 --> 00:00:43.120
+doses at every facility.
+
+00:00:44.000 --> 00:00:48.820
+Review medication administration and transfer records to confirm the amount given and
+
+00:00:48.820 --> 00:00:53.980
+exact infusion and blood draw times, because a transferred patient may already have received
+
+00:00:53.980 --> 00:00:57.140
+a loading dose and should not automatically receive another.
+
+00:00:57.670 --> 00:01:04.250
+In empiric, enter age, sex, weight, height and serum creatinine, then confirm renal replacement
+
+00:01:04.250 --> 00:01:06.650
+status and review frailty when relevant.
+
+00:01:07.030 --> 00:01:12.410
+This tool supports adults receiving intermittent intravenous vancomycin rather than dialysis
+
+00:01:12.410 --> 00:01:17.450
+dosing, so calculate and inspect the regimen and predicted exposure while remembering
+
+00:01:17.450 --> 00:01:22.590
+that results before measured levels remain population estimates and the graph and candidate
+
+00:01:22.590 --> 00:01:24.650
+regimens show predictions to review.
+
+00:01:25.000 --> 00:01:31.760
+Review the dose, actual infusion duration and number of doses given, then enter the measured
+
+00:01:31.760 --> 00:01:34.980
+concentration with exact blood draw and infusion times.
+
+00:01:35.720 --> 00:01:40.520
+Without a measured level, any available prediction remains based on the prior model.
+
+00:01:41.360 --> 00:01:44.920
+Never enter a predicted concentration as a measured result.
+
+00:01:45.320 --> 00:01:47.800
+Changed, held or missed maintenance doses
+
+00:01:47.800 --> 00:01:49.800
+are not supported by this workflow.
+
+00:01:50.060 --> 00:01:56.680
+Review the curve, candidate regimens and model limitations using the guideline AUC target
+
+00:01:56.680 --> 00:02:02.060
+of 400 to 600 for serious invasive MRSA infection when the MIC is one.
+
+00:02:02.540 --> 00:02:07.800
+Follow institutional monitoring protocols with two levels preferred for Bayesian estimation,
+
+00:02:08.460 --> 00:02:13.960
+reassess when kidney function changes and document your plan remembering that Vancomyzer
+
+00:02:13.960 --> 00:02:16.300
+still awaits independent patient validation.

@@ -1,0 +1,154 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:02.900
+Bienvenido a Vancomyzer. Veamos un ejemplo.
+
+00:00:03.000 --> 00:00:07.240
+Piensa en un GPS que calcula la hora de llegada al cruzar una pequeña ciudad.
+
+00:00:07.820 --> 00:00:10.180
+Los tiempos habituales dan una estimación inicial;
+
+00:00:10.820 --> 00:00:13.180
+los detalles del trayecto la personalizan.
+
+00:00:13.740 --> 00:00:17.920
+La dosificación bayesiana parte de un modelo poblacional y lo adapta a las
+
+00:00:17.920 --> 00:00:19.280
+características del paciente.
+
+00:00:19.860 --> 00:00:24.020
+Las concentraciones medidas, con horarios fiables de administración y extracción,
+
+00:00:24.420 --> 00:00:27.740
+actualizan la estimación, como la nueva información del tráfico.
+
+00:00:27.740 --> 00:00:32.860
+Sigue habiendo incertidumbre: los datos incorrectos o un modelo inadecuado pueden
+
+00:00:32.860 --> 00:00:33.700
+inducir a error.
+
+00:00:34.160 --> 00:00:36.600
+El resultado requiere revisión clínica.
+
+00:00:36.900 --> 00:00:39.740
+Actualicemos una estimación con concentraciones medidas.
+
+00:00:40.340 --> 00:00:41.620
+Este caso es ficticio.
+
+00:00:42.020 --> 00:00:46.960
+Usaremos un varón de 58 años, 80 kilos y 180 centímetros,
+
+00:00:47.320 --> 00:00:50.160
+con creatinina sérica de 1 miligramo por decilitro.
+
+00:00:50.580 --> 00:00:52.400
+Suponemos una función renal estable,
+
+00:00:52.720 --> 00:00:55.420
+sin tratamiento renal sustitutivo ni fragilidad.
+
+00:00:55.720 --> 00:00:57.480
+Comprueba los datos y sus unidades.
+
+00:00:58.200 --> 00:01:00.740
+La estimación inicial parte del modelo poblacional.
+
+00:01:01.300 --> 00:01:03.680
+Para actualizarla, necesitamos el historial
+
+00:01:03.680 --> 00:01:05.460
+y las concentraciones del laboratorio.
+
+00:01:05.460 --> 00:01:10.100
+Este paciente ha recibido 4 dosis de 1.000 miligramos cada 12 horas,
+
+00:01:10.500 --> 00:01:12.360
+todas en perfusiones de 100 minutos.
+
+00:01:12.920 --> 00:01:14.360
+La primera fue igual a las demás.
+
+00:01:14.800 --> 00:01:15.960
+No hubo dosis de carga.
+
+00:01:16.500 --> 00:01:18.020
+Introduce 4 dosis.
+
+00:01:18.440 --> 00:01:21.460
+Ese número no confirma por sí solo el estado estacionario.
+
+00:01:21.900 --> 00:01:25.740
+La última perfusión empezó a las 8 y terminó a las 9 y 40.
+
+00:01:26.400 --> 00:01:30.500
+La primera concentración fue de 32 miligramos por litro, a las 12.
+
+00:01:30.960 --> 00:01:34.880
+La segunda, de 18,5 miligramos por litro, a las 18.
+
+00:01:35.460 --> 00:01:37.760
+Introduce las fechas y horas exactas.
+
+00:01:38.060 --> 00:01:42.020
+4 y 10 horas desde el inicio de la perfusión, no desde su final.
+
+00:01:42.540 --> 00:01:44.300
+La segunda muestra no es un valle
+
+00:01:44.300 --> 00:01:46.460
+inmediatamente anterior a la siguiente dosis.
+
+00:01:46.960 --> 00:01:49.020
+Calcula y revisa la pauta propuesta.
+
+00:01:49.560 --> 00:01:51.580
+El área bajo la curva en 24 horas
+
+00:01:51.580 --> 00:01:54.160
+corresponde a esa pauta en estado estacionario.
+
+00:01:54.600 --> 00:01:56.420
+La exposición del cuarto intervalo
+
+00:01:56.420 --> 00:01:59.840
+describe el historial introducido y no es un área diaria.
+
+00:02:00.260 --> 00:02:02.360
+La calculadora advierte que este resultado
+
+00:02:02.360 --> 00:02:03.880
+tiene una certeza limitada.
+
+00:02:03.880 --> 00:02:08.040
+El objetivo de 400 a 600 miligramos hora por litro
+
+00:02:08.040 --> 00:02:10.500
+se refiere a infecciones graves por SARM,
+
+00:02:10.780 --> 00:02:14.360
+con una concentración mínima inhibitoria de 1 miligramo por litro.
+
+00:02:14.800 --> 00:02:16.880
+Si hay dosis de mantenimiento modificadas,
+
+00:02:17.220 --> 00:02:18.700
+suspendidas u omitidas,
+
+00:02:19.180 --> 00:02:21.520
+este cálculo no representa ese historial.
+
+00:02:21.920 --> 00:02:24.480
+Revisa el resultado según el protocolo de tu centro.
+
+00:02:24.980 --> 00:02:27.480
+Las comprobaciones del desarrollador son sintéticas.
+
+00:02:27.900 --> 00:02:30.180
+La validación clínica independiente en pacientes
+
+00:02:30.180 --> 00:02:31.220
+sigue pendiente.
