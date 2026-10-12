@@ -139,7 +139,7 @@ export default function HistoryPage() {
       <div style={{ display: "flex", gap: 16, fontSize: 13, marginBottom: 16, flexWrap: "wrap" }}>
         <Link href="/settings" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text="Institutional Settings" /></Link>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
-        <Link href="/contact?topic=restricted_access" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text={"Billing"} /></Link>
+        <Link href="/settings/billing" style={{ color: "var(--color-dim)", textDecoration: "none" }}><LocalizedText text={"Billing"} /></Link>
         <span aria-hidden="true" style={{ color: "#546471" }}>·</span>
         <span style={{ color: "var(--color-primary)", fontWeight: 600 }}><LocalizedText text={"History"} /></span>
       </div>

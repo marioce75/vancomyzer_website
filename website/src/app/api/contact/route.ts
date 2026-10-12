@@ -1,3 +1,4 @@
+import { accessAcknowledgementsEnabled } from "@/lib/contact/configuration";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import db from "@/lib/db";
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Failed to send inquiry. Please email us directly." }, { status: 503 });
   }
-  const recipient = acknowledgementRecipient(body, process.env.ACCESS_REQUEST_ACK_ENABLED === "true" && !request.headers.has("auto-submitted") && !request.headers.has("list-id") && !request.headers.has("x-auto-response-suppress"), sender);
+  const recipient = acknowledgementRecipient(body, accessAcknowledgementsEnabled() && !request.headers.has("auto-submitted") && !request.headers.has("list-id") && !request.headers.has("x-auto-response-suppress"), sender);
   if (recipient) {
     try {
       if (claimAcknowledgement(db, recipient)) {
