@@ -10227,7 +10227,7 @@
       "file": "src/components/calculator/PrimaryMetricsCard.tsx",
       "line": 79,
       "surface": "child",
-      "expression": "caption && (\n          <p className=\"vz-kicker m-0 truncate\" style={{ fontFamily: \"'Share Tech Mono', monospace\" }}><LocalizedText text={caption} /></p>\n        )",
+      "expression": "caption && (\n          <p className=\"vz-kicker m-0 whitespace-normal break-words leading-relaxed\" style={{ fontFamily: \"'Share Tech Mono', monospace\" }}><LocalizedText text={caption} /></p>\n        )",
       "category": "structural JSX — descendants inventoried separately",
       "type": "\"\" | Element | null | undefined",
       "finiteValues": [

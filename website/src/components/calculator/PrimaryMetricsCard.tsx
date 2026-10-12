@@ -77,7 +77,7 @@ export default function PrimaryMetricsCard({ auc24, peak, trough, compact = fals
     return (
       <div className="flex min-w-0 flex-col gap-1">
         {caption && (
-          <p className="vz-kicker m-0 truncate" style={{ fontFamily: "'Share Tech Mono', monospace" }}><LocalizedText text={caption} /></p>
+          <p className="vz-kicker m-0 whitespace-normal break-words leading-relaxed" style={{ fontFamily: "'Share Tech Mono', monospace" }}><LocalizedText text={caption} /></p>
         )}
         <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
           <div className="col-span-2 sm:col-span-1">

@@ -1,7 +1,7 @@
 {
   "notice": "INCOMPLETE. Explicit bindings, unbound static text, and unreviewed child expressions are inventoried separately. No percentage is claimed. Dynamic API messages, report exports, imported datasets, metadata and rich text also require review. Article integrity is checked by articles.test.ts in Dosys. Citation language is retained. No clinical or legal review is implied.",
   "summary": {
-    "catalogEntries": 3285,
+    "catalogEntries": 3291,
     "files": 243,
     "staticBindings": 1732,
     "dynamicBindingsRequiringRuntimeAudit": 430,
@@ -21482,7 +21482,7 @@
       "file": "src/components/calculator/PrimaryMetricsCard.tsx",
       "line": 79,
       "tag": "div",
-      "expression": "caption && (\n          <p className=\"vz-kicker m-0 truncate\" style={{ fontFamily: \"'Share Tech Mono', monospace\" }}><LocalizedText text={caption} /></p>\n        )",
+      "expression": "caption && (\n          <p className=\"vz-kicker m-0 whitespace-normal break-words leading-relaxed\" style={{ fontFamily: \"'Share Tech Mono', monospace\" }}><LocalizedText text={caption} /></p>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {

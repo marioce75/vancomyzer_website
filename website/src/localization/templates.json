@@ -768,5 +768,20 @@
     "es": "Proyección de la pauta seleccionada en estado estacionario ({n1} mg cada {n2} h): AUC24 {n3} mg·h/L; pico {n4} mg/L; valle {n5} mg/L.",
     "fr": "Projection du schéma sélectionné à l’état d’équilibre ({n1} mg toutes les {n2} h) : AUC24 {n3} mg·h/L ; pic {n4} mg/L ; concentration résiduelle {n5} mg/L.",
     "pt-BR": "Projeção do esquema selecionado no estado de equilíbrio ({n1} mg a cada {n2} h): AUC24 {n3} mg·h/L; pico {n4} mg/L; vale {n5} mg/L."
+  },
+  "Maintenance after loading dose — {n1} mg q{n2}h — steady-state PK": {
+    "es": "Mantenimiento tras la dosis de carga — {n1} mg cada {n2} h — farmacocinética en estado estacionario",
+    "fr": "Entretien après la dose de charge — {n1} mg toutes les {n2} h — pharmacocinétique à l’état d’équilibre",
+    "pt-BR": "Manutenção após a dose de ataque — {n1} mg a cada {n2} h — farmacocinética no estado de equilíbrio"
+  },
+  "Loading dose — {n1} mg × 1 · first 24 h, not steady state": {
+    "es": "Dosis de carga — {n1} mg × 1 · primeras 24 h, no en estado estacionario",
+    "fr": "Dose de charge — {n1} mg × 1 · premières 24 h, hors état d’équilibre",
+    "pt-BR": "Dose de ataque — {n1} mg × 1 · primeiras 24 h, fora do estado de equilíbrio"
+  },
+  "Current regimen — steady-state projection (actual history: {n1} doses given)": {
+    "es": "Pauta actual — proyección en estado estacionario (historial real: {n1} dosis administradas)",
+    "fr": "Schéma actuel — projection à l’état d’équilibre (historique réel : {n1} doses administrées)",
+    "pt-BR": "Esquema atual — projeção no estado de equilíbrio (histórico real: {n1} doses administradas)"
   }
 }
