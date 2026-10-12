@@ -126,7 +126,7 @@ export default function TransparentDosingPage() {
             </tbody>
           </table>
         </div>
-        <p className="mt-4 max-w-[70ch] text-[14px] leading-[1.5]" style={{ color: INK3 }}><LocalizedText text="“Developer-run” means a check written and executed by the developer against published values or simulated patients. None of these is independent clinical validation." /></p>
+        <p className="mt-4 max-w-[70ch] text-[14px] leading-[1.5]" style={{ color: INK3 }}><LocalizedText text="“Developer-run” identifies checks designed and performed by the software’s author using published values or simulated patients. These are not independent clinical validation." /></p>
       </Record>
 
       {/* ── LIMITS ──────────────────────────────────────────── */}

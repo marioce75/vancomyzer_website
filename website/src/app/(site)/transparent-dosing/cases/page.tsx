@@ -638,7 +638,7 @@ function Limitations() {
     >
       <h2 className="vz-serif" style={{ fontSize: 22, color: "#14232f", marginTop: 0, marginBottom: 10, lineHeight: 1.25 }}><LocalizedText text="Limitations" /></h2>
       <ul style={{ fontSize: 12, color: "var(--color-secondary)", lineHeight: 1.65, marginLeft: 18, marginTop: 0, marginBottom: 0 }}>
-        <li><LocalizedText text="These cases check the calculator against published values; they are not clinical validation. Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned." /></li>
+        <li><LocalizedText text="These cases compare the calculator with published values, alongside other synthetic software tests. They are not clinical validation. Vancomyzer has not yet been validated in real patients; external evaluation with patient data is planned." /></li>
         <li><LocalizedText text="Only the same-model reproductions (" />{COLIN_2019.shortName}<LocalizedText text=") are pass/fail tests. They use model-typical individuals without measured levels. They test selected population predictions and derived steady-state AUC, not the complete Bayesian random-effects structure, residual model, or clinical dosing accuracy." /></li>
         <li><LocalizedText text="Cross-model references compare the calculator (" />{COLIN_2019.shortName}<LocalizedText text=") with a different published model or a cohort statistic." />{" "}<LocalizedText text={CROSS_MODEL_WORDING} />{" "}<LocalizedText text="A difference does not show which model is more accurate for a given patient. Some of these cards use approximated or illustrative inputs; each card says which." /></li>
         <li>
@@ -647,7 +647,7 @@ function Limitations() {
           <strong><LocalizedText text="Sources considered but not added as cases:" /></strong>
           {" "}<LocalizedText text="Rybak/ASHP 2020 (narrative recommendations only, no worked patient example to reproduce);" />{" "}<LocalizedText text="Pai 2014 (aggregate results across the cohort, no per-patient demographics with AUC);" />{" "}<LocalizedText text="Turner 2018 (aggregate medians and interquartile ranges per program across 19 ICU patients; not yet added as a reference band);" />{" "}<LocalizedText text="Neely 2014 cohort trough (the comparison was circular: the fitted level was the value being compared);" />{" "}<LocalizedText text={"Shingde 2020 single-sample Bayesian (the candidate \"published AUC\" was derived rather than read from the paper, so the comparison would have been circular)."} />{" "}<LocalizedText text="Patanwala 2022 is shown above as a reference band." /></li>
         <li><LocalizedText text={"A \"within tolerance\" result does not mean a recommendation is correct for any individual patient. Every clinical decision remains the responsibility of the treating clinician."} /></li>
-        <li><LocalizedText text="These cases run in the automated checks; a difference outside the stated tolerance fails the check. A case outside tolerance is still shown on this page, with an amber badge." /></li>
+        <li><LocalizedText text="These cases are included in the automated test suite. A difference beyond the stated tolerance causes a failure; the affected result remains visible on this page with an amber badge." /></li>
       </ul>
     </section>
   );

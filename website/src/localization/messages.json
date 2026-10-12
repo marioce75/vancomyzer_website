@@ -5810,8 +5810,8 @@
     "pt-BR": "Quais são as limitações do Cockcroft-Gault para a dosagem de vancomicina?"
   },
   "Cockcroft-Gault was published in 1976 to estimate creatinine clearance in adult men (derivation data from 249 patients). It was not developed to predict vancomycin pharmacokinetics.": {
-    "es": "Cockcroft-Gault se publicó en 1976 para estimar el aclaramiento de creatinina en varones adultos (datos de desarrollo de 249 pacientes). No se desarrolló para predecir la farmacocinética de vancomicina.",
-    "fr": "Cockcroft-Gault a été publié en 1976 pour estimer la clairance de la créatinine chez l’homme adulte (données de développement provenant de 249 patients). Il n’a pas été développé pour prédire la pharmacocinétique de la vancomycine.",
+    "es": "Cockcroft-Gault se publicó en 1976 para estimar el aclaramiento de creatinina en varones adultos, a partir de datos de 249 pacientes. Su finalidad no era predecir la farmacocinética de la vancomicina.",
+    "fr": "Cockcroft-Gault a été publié en 1976 pour estimer la clairance de la créatinine chez l’homme adulte, à partir de données de 249 patients. Son objectif n’était pas de prédire la pharmacocinétique de la vancomycine.",
     "pt-BR": "O Cockcroft-Gault foi publicado em 1976 para estimar a depuração da creatinina em homens adultos (dados de derivação de 249 pacientes). Não foi desenvolvido para prever a farmacocinética da vancomicina."
   },
   "Like other creatinine-based estimates, it can mislead when muscle mass is low (older, sarcopenic or bedbound patients), when renal function is changing, and in critical illness. In obesity, the result depends heavily on which body weight is entered. It was also derived before creatinine assays were standardized (see the next question).": {
@@ -7162,7 +7162,7 @@
   "Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. The results below come from a developer-run synthetic analysis (not real patients). They do not show how Vancomyzer performs in patients.": {
     "es": "Sus ecuaciones se comprueban frente a valores publicados y casos sintéticos; está prevista una validación externa con datos de pacientes. Los resultados siguientes proceden de un análisis sintético realizado por el desarrollador (no son pacientes reales). No muestran cómo funciona Vancomyzer en pacientes.",
     "fr": "Ses équations sont vérifiées par rapport à des valeurs publiées et des cas synthétiques ; une validation externe sur des données de patients est prévue. Les résultats ci-dessous proviennent d’une analyse synthétique réalisée par le développeur (pas de patients réels). Ils ne montrent pas les performances de Vancomyzer chez les patients.",
-    "pt-BR": "Suas equações são verificadas em relação aos valores publicados e aos casos de testes sintéticos; a validação externa com dados do paciente é planejada. Os resultados abaixo vêm de uma análise sintética desenvolvida por desenvolvedor (não de pacientes reais). Eles não mostram como Vancomyzer se comporta em pacientes."
+    "pt-BR": "Suas equações são verificadas com valores publicados e casos de teste sintéticos; está prevista validação externa com dados de pacientes. Os resultados abaixo vêm de uma análise sintética realizada pelo autor do software, sem pacientes reais. Eles não demonstram o desempenho do Vancomyzer na prática clínica."
   },
   "Analysis by the Vancomyzer team using": {
     "es": "Análisis del equipo de Vancomyzer con",
@@ -16388,5 +16388,40 @@
     "es": "Requisitos institucionales",
     "fr": "Besoins institutionnels",
     "pt-BR": "Requisitos institucionais"
+  },
+  "“Developer-run” identifies checks designed and performed by the software’s author using published values or simulated patients. These are not independent clinical validation.": {
+    "es": "«Realizado por el desarrollador» identifica pruebas que el autor del programa diseñó y ejecutó con valores publicados o pacientes simulados. No constituyen validación clínica independiente.",
+    "fr": "« Réalisé par le développeur » désigne des tests conçus et exécutés par l’auteur du logiciel à partir de valeurs publiées ou de patients simulés. Ils ne constituent pas une validation clinique indépendante.",
+    "pt-BR": "“Realizado pelo desenvolvedor” identifica testes concebidos e executados pelo autor do software com valores publicados ou pacientes simulados. Não constituem validação clínica independente."
+  },
+  "The pages below document the model equations, assumptions, sources, results and limitations. Vancomyzer has not yet been validated in real patients; published model evidence and developer-run checks are not independent clinical validation.": {
+    "es": "Las páginas siguientes documentan las ecuaciones del modelo, sus supuestos, fuentes, resultados y limitaciones. Vancomyzer aún no se ha validado en pacientes reales; la evidencia publicada sobre el modelo y las comprobaciones realizadas por el desarrollador no constituyen validación clínica independiente.",
+    "fr": "Les pages ci-dessous présentent les équations du modèle, ses hypothèses, sources, résultats et limites. Vancomyzer n’a pas encore été validé chez des patients réels ; les données publiées sur le modèle et les vérifications réalisées par le développeur ne constituent pas une validation clinique indépendante.",
+    "pt-BR": "As páginas abaixo documentam as equações do modelo, suas premissas, fontes, resultados e limitações. O Vancomyzer ainda não foi validado em pacientes reais; as evidências publicadas sobre o modelo e as verificações realizadas pelo desenvolvedor não constituem validação clínica independente."
+  },
+  "The developer uses published cases and synthetic comparisons to test the software. This work is not independent clinical validation.": {
+    "es": "El desarrollador utiliza casos publicados y comparaciones sintéticas para probar el programa. Este trabajo no constituye validación clínica independiente.",
+    "fr": "Le développeur utilise des cas publiés et des comparaisons synthétiques pour tester le logiciel. Ce travail ne constitue pas une validation clinique indépendante.",
+    "pt-BR": "O desenvolvedor usa casos publicados e comparações sintéticas para testar o software. Esse trabalho não constitui validação clínica independente."
+  },
+  "These cases compare the calculator with published values, alongside other synthetic software tests. They are not clinical validation. Vancomyzer has not yet been validated in real patients; external evaluation with patient data is planned.": {
+    "es": "Estos casos comparan la calculadora con valores publicados, junto con otras pruebas sintéticas del programa. No constituyen validación clínica. Vancomyzer aún no se ha validado en pacientes reales; está prevista una evaluación externa con datos de pacientes.",
+    "fr": "Ces cas comparent le calculateur à des valeurs publiées, en complément d’autres tests synthétiques du logiciel. Ils ne constituent pas une validation clinique. Vancomyzer n’a pas encore été validé chez des patients réels ; une évaluation externe sur des données de patients est prévue.",
+    "pt-BR": "Esses casos comparam a calculadora com valores publicados, junto a outros testes sintéticos do software. Não constituem validação clínica. O Vancomyzer ainda não foi validado em pacientes reais; uma avaliação externa com dados de pacientes está prevista."
+  },
+  "These cases are included in the automated test suite. A difference beyond the stated tolerance causes a failure; the affected result remains visible on this page with an amber badge.": {
+    "es": "Estos casos forman parte del conjunto de pruebas automatizadas. Una diferencia que supere la tolerancia indicada produce un fallo; el resultado afectado sigue visible en esta página con un distintivo ámbar.",
+    "fr": "Ces cas font partie de la suite de tests automatisés. Un écart au-delà de la tolérance indiquée entraîne un échec ; le résultat concerné reste visible sur cette page avec un badge ambre.",
+    "pt-BR": "Esses casos fazem parte da suíte de testes automatizados. Uma diferença acima da tolerância indicada causa uma falha; o resultado afetado permanece visível nesta página com um indicador âmbar."
+  },
+  ". Mario Cardenas, PharmD, MBA, is an ICU clinical pharmacist and the company’s founder and CEO. He develops the calculator. For questions or research enquiries, use the": {
+    "es": ". Mario Cardenas, PharmD, MBA, es farmacéutico clínico de UCI, fundador y director ejecutivo de la empresa. Desarrolla la calculadora. Para consultas o propuestas de investigación, utilice la",
+    "fr": ". Mario Cardenas, PharmD, MBA, est pharmacien clinicien en réanimation, fondateur et directeur général de l’entreprise. Il développe le calculateur. Pour toute question ou proposition de recherche, utilisez la",
+    "pt-BR": ". Mario Cardenas, PharmD, MBA, é farmacêutico clínico de UTI, fundador e diretor executivo da empresa. Ele desenvolve a calculadora. Para dúvidas ou propostas de pesquisa, use a"
+  },
+  "; methods and results are documented on the": {
+    "es": "; los métodos y resultados se documentan en la",
+    "fr": " ; les méthodes et résultats sont documentés sur la",
+    "pt-BR": "; os métodos e resultados estão documentados na"
   }
 }

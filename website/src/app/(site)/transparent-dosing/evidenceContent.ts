@@ -13,7 +13,7 @@ export const REVIEW_POINTS = [
 export const LIMITS = [
   "Vancomyzer is not FDA-cleared or approved. Its intended regulatory basis and limitations are described in the medical disclaimer.",
   "A poor fit to measured levels calls for review of timing, data quality and the clinical situation. It does not establish that a proposed regimen is appropriate.",
-  "Published-case checks and synthetic comparisons are developer-run software checks, not independent clinical validation.",
+  "The developer uses published cases and synthetic comparisons to test the software. This work is not independent clinical validation.",
   "The clinician must review a recommendation against the patient’s condition, local protocol and therapeutic drug monitoring.",
 ];
 
