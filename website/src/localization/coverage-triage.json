@@ -3,9 +3,10 @@
   "counts": {
     "verified citation/brand invariant": 31,
     "numeric/unit invariant": 22,
-    "verified identifier/brand/citation/unit": 29,
+    "verified identifier/brand/citation/unit": 27,
     "verified formula/unit invariant": 30,
-    "verified shared-component binding": 9
+    "verified shared-component binding": 9,
+    "verified locale-specific media notice": 1
   },
   "candidates": [
     {
@@ -498,7 +499,7 @@
     },
     {
       "file": "src/app/research/enter/page.tsx",
-      "line": 530,
+      "line": 537,
       "kind": "Unbound JSX text",
       "text": "RRT",
       "classification": "verified identifier/brand/citation/unit",
@@ -506,7 +507,7 @@
     },
     {
       "file": "src/app/research/enter/page.tsx",
-      "line": 586,
+      "line": 593,
       "kind": "Unbound JSX text",
       "text": "LD",
       "classification": "verified identifier/brand/citation/unit",
@@ -549,22 +550,6 @@
       "line": 429,
       "kind": "Unbound JSX text",
       "text": "CrCl",
-      "classification": "verified identifier/brand/citation/unit",
-      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
-    },
-    {
-      "file": "src/app/upgrade/page.tsx",
-      "line": 153,
-      "kind": "Unbound JSX text",
-      "text": "Free",
-      "classification": "verified identifier/brand/citation/unit",
-      "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
-    },
-    {
-      "file": "src/app/upgrade/page.tsx",
-      "line": 154,
-      "kind": "Unbound JSX text",
-      "text": "Pro",
       "classification": "verified identifier/brand/citation/unit",
       "reason": "Manually inspected source identifier, product tier name, clinical abbreviation, unit or scientific citation; retained unchanged."
     },
@@ -634,7 +619,7 @@
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 854,
+      "line": 869,
       "kind": "Unbound JSX text",
       "text": "2026 Vancomyzer",
       "classification": "verified citation/brand invariant",
@@ -642,7 +627,7 @@
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 856,
+      "line": 871,
       "kind": "Unbound JSX text",
       "text": "sys",
       "classification": "verified citation/brand invariant",
@@ -650,7 +635,7 @@
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1087,
+      "line": 1102,
       "kind": "Unbound JSX text",
       "text": "AUC₂₄",
       "classification": "numeric/unit invariant",
@@ -658,7 +643,7 @@
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1088,
+      "line": 1103,
       "kind": "Unbound JSX text",
       "text": "400–600 mg·h/L",
       "classification": "verified formula/unit invariant",
@@ -666,7 +651,7 @@
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1262,
+      "line": 1277,
       "kind": "Unbound JSX text",
       "text": "mg",
       "classification": "numeric/unit invariant",
@@ -674,7 +659,7 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 787,
+      "line": 791,
       "kind": "Unbound JSX text",
       "text": "AUC₂₄",
       "classification": "numeric/unit invariant",
@@ -682,7 +667,7 @@
     },
     {
       "file": "src/components/calculator/DisclaimerModal.tsx",
-      "line": 166,
+      "line": 169,
       "kind": "Unbound JSX text",
       "text": "VANCOMYZER",
       "classification": "verified citation/brand invariant",
@@ -794,7 +779,7 @@
     },
     {
       "file": "src/components/calculator/LevelEntryTable.tsx",
-      "line": 287,
+      "line": 197,
       "kind": "Unbound JSX text",
       "text": "mg/L",
       "classification": "numeric/unit invariant",
@@ -882,7 +867,7 @@
     },
     {
       "file": "src/components/calculator/PatientCharacteristicsForm.tsx",
-      "line": 174,
+      "line": 173,
       "kind": "Unbound JSX text",
       "text": "µmol/L ÷ 88.4",
       "classification": "verified formula/unit invariant",
@@ -890,7 +875,7 @@
     },
     {
       "file": "src/components/calculator/PatientCharacteristicsForm.tsx",
-      "line": 202,
+      "line": 201,
       "kind": "Unbound JSX text",
       "text": "mL/min",
       "classification": "numeric/unit invariant",
@@ -898,7 +883,7 @@
     },
     {
       "file": "src/components/calculator/PatientCharacteristicsForm.tsx",
-      "line": 224,
+      "line": 223,
       "kind": "Unbound JSX text",
       "text": "kg/m²",
       "classification": "verified formula/unit invariant",
@@ -906,7 +891,7 @@
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 86,
+      "line": 87,
       "kind": "Unbound JSX text",
       "text": "AUC₂₄",
       "classification": "numeric/unit invariant",
@@ -914,7 +899,7 @@
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 127,
+      "line": 128,
       "kind": "Unbound JSX text",
       "text": "mg q",
       "classification": "verified formula/unit invariant",
@@ -930,7 +915,7 @@
     },
     {
       "file": "src/components/calculator/SettingsPanel.tsx",
-      "line": 413,
+      "line": 414,
       "kind": "Unbound JSX text",
       "text": "AUC",
       "classification": "verified formula/unit invariant",
@@ -943,6 +928,14 @@
       "text": "AUC₂₄",
       "classification": "numeric/unit invariant",
       "reason": "Literal mathematical quantity, symbol or unit; preserve unchanged."
+    },
+    {
+      "file": "src/components/landing/CalculatorWalkthrough.tsx",
+      "line": 30,
+      "kind": "Unbound JSX text",
+      "text": "Narração e legendas em português brasileiro; gravação da interface em inglês, com uma demonstração em português da confirmação de valores numéricos.",
+      "classification": "verified locale-specific media notice",
+      "reason": "Portuguese caption appears only when the selected tutorial media locale is pt-BR; language is explicitly marked."
     },
     {
       "file": "src/components/landing/SyntheticExample.tsx",
