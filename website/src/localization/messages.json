@@ -415,7 +415,7 @@
     "pt-BR": "Seu primeiro tutorial do Vancomyzer"
   },
   "Learn how Bayesian estimation works, then follow a fictional adult example through the calculator. Review patient inputs, loading doses when appropriate, estimated exposure, and calculation details.": {
-    "es": "Conozca cómo funciona la estimación bayesiana y siga un ejemplo de un adulto ficticio en la calculadora. Revise los datos del paciente, las dosis de carga cuando corresponda, la exposición estimada y los detalles del cálculo.",
+    "es": "Siga un caso ficticio de un adulto: revise los datos, cuatro dosis regulares y dos concentraciones medidas. Compare la exposición de la pauta propuesta con la del historial introducido y revise las limitaciones.",
     "fr": "Découvrez le fonctionnement de l’estimation bayésienne, puis suivez un exemple d’adulte fictif dans le calculateur. Examinez les données du patient, les doses de charge lorsqu’elles sont indiquées, l’exposition estimée et les détails du calcul.",
     "pt-BR": "Entenda como funciona a estimativa bayesiana e acompanhe um exemplo fictício de adulto na calculadora. Revise os dados do paciente, as doses de ataque quando pertinentes, a exposição estimada e os detalhes do cálculo."
   },
@@ -425,7 +425,7 @@
     "pt-BR": "Leia o resumo do tutorial"
   },
   "Welcome to the Vancomyzer tutorial. Learn about Bayesian estimation through a navigation app analogy, then explore the calculator using fictional patient inputs.": {
-    "es": "Bienvenido al tutorial de Vancomyzer. Conozca la estimación bayesiana mediante una analogía con una aplicación de navegación y explore la calculadora con datos de un paciente ficticio.",
+    "es": "Este tutorial muestra cómo actualizar una estimación con concentraciones medidas mediante un caso ficticio. La estimación inicial parte del modelo poblacional.",
     "fr": "Bienvenue dans le tutoriel de Vancomyzer. Découvrez l’estimation bayésienne à travers une analogie avec une application de navigation, puis explorez le calculateur avec des données de patient fictif.",
     "pt-BR": "Bem-vindo ao tutorial Vancomyzer. Saiba mais sobre a estimativa bayesiana através de uma analogia de aplicativo de navegação, em seguida, explore a calculadora usando entradas de pacientes fictícios."
   },
@@ -4515,7 +4515,7 @@
     "pt-BR": "AAAA"
   },
   "Vancomyzer calculator tutorial with Bayesian estimation and loading dose guidance": {
-    "es": "Tutorial de la calculadora Vancomyzer con estimación bayesiana y orientación sobre dosis de carga",
+    "es": "Tutorial de Vancomyzer: datos, dos concentraciones medidas, exposición y limitaciones",
     "fr": "Tutoriel du calculateur Vancomyzer avec estimation bayésienne et indications sur la dose de charge",
     "pt-BR": "Tutorial da calculadora Vancomyzer com estimativa bayesiana e orientações sobre dose de ataque"
   },
@@ -9180,7 +9180,7 @@
     "pt-BR": "Assistir ao tutorial"
   },
   "Calculator walkthrough using fictional inputs, including Bayesian estimation and loading dose guidance. For learning the interface. Independent clinical validation is pending.": {
-    "es": "Demostración de la calculadora con datos ficticios, incluida la estimación bayesiana y la orientación sobre dosis de carga. Para aprender a utilizar la interfaz. La validación clínica independiente está pendiente.",
+    "es": "Tutorial con un caso ficticio y una grabación real de la interfaz en español, con ampliaciones para facilitar la lectura. Incluye dos concentraciones medidas, exposición y limitaciones. La validación clínica independiente sigue pendiente.",
     "fr": "Démonstration du calculateur avec des données fictives, comprenant l’estimation bayésienne et les indications sur la dose de charge. Pour apprendre à utiliser l’interface. La validation clinique indépendante est en attente.",
     "pt-BR": "Tutorial da calculadora com dados fictícios, incluindo estimativa bayesiana e orientações sobre dose de ataque. Destinado ao aprendizado da interface. A validação clínica independente está pendente."
   },

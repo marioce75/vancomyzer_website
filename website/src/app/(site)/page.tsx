@@ -1,3 +1,4 @@
+import { TutorialSummary } from "@/components/landing/CalculatorWalkthrough";
 import { localizeMetadata } from "@/localization/metadata";
 import { requestLocale } from "@/localization/server";
 
@@ -230,10 +231,12 @@ export default function LandingPage() {
           <details className="min-w-0 flex-1 text-[15px]" style={{ color: INK2 }}>
             <summary className="cursor-pointer py-2" style={{ color: ACTION }}><LocalizedText text="Read the tutorial summary" /></summary>
             <div className="mt-2 space-y-4">
+              <TutorialSummary>
               <p><LocalizedText text="Welcome to the Vancomyzer tutorial. Learn about Bayesian estimation through a navigation app analogy, then explore the calculator using fictional patient inputs." /></p>
               <p><LocalizedText text="Review the patient information and dosing history before calculating. Before considering a loading dose, always check for recent doses given at this facility and at any other facility the patient visited." /></p>
               <p><LocalizedText text="When a loading dose is appropriate, review the recommended amount and infusion duration. The calculator uses a maximum infusion rate of 10 mg per minute and a minimum duration of 60 minutes. A 2000 mg dose therefore requires at least 200 minutes." /></p>
               <p><LocalizedText text="Review the estimated exposure and calculation details. Predictions are model estimates, not measured patient values. Use clinical judgment, institutional protocols, and therapeutic drug monitoring. Independent clinical validation is pending." /></p>
+              </TutorialSummary>
             </div>
           </details>
           <OpenCalculatorButton source="landing_walkthrough" className="vz-mbtn vz-mbtn--primary shrink-0"><LocalizedText text="Open the calculator" /></OpenCalculatorButton>

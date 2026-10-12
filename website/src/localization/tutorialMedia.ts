@@ -8,7 +8,7 @@ export type TutorialMedia = {
   captions?: { src: string; language: string; label: string };
 };
 
-/** Existing 2026-10-06 media plus Portuguese 2026-10-09 release. Keep each locale paired with its own narration and captions. */
+/** Approved language-specific releases; Spanish Eva v4 updated 2026-10-12. Keep each locale paired with its own narration and captions. */
 export const tutorialMedia: Readonly<Record<Locale, TutorialMedia | null>> = {
   "pt-BR": {
     locale: "pt-BR",
@@ -25,10 +25,10 @@ export const tutorialMedia: Readonly<Record<Locale, TutorialMedia | null>> = {
   },
   es: {
     locale: "es",
-    src: "/videos/vancomyzer-tutorial-es-20261006.mp4",
-    poster: "/images/tutorial-es-20261006.jpg",
-    durationSeconds: 208.58,
-    captions: { src: "/videos/vancomyzer-tutorial-es-20261006.vtt", language: "es-ES", label: "Español" },
+    src: "/videos/vancomyzer-tutorial-es-eva-v4-20261012.mp4",
+    poster: "/images/vancomyzer-tutorial-es-eva-v4-20261012.jpg",
+    durationSeconds: 118.7,
+    captions: { src: "/videos/vancomyzer-tutorial-es-eva-v4-20261012.vtt", language: "es-ES", label: "Español" },
   },
   fr: {
     locale: "fr",

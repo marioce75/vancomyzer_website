@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
 import { LocalizedVideo } from "@/localization/LocalizedElements";
 import { getTutorialMedia, tutorialCopy, tutorialDuration, type TutorialMedia } from "@/localization/tutorialMedia";
@@ -66,7 +66,7 @@ function TutorialPlayer({ media, locale, captionId }: { media: TutorialMedia; lo
 
   const duration = tutorialDuration(media);
   return <>
-    <div className="relative overflow-hidden rounded-md border bg-white shadow-sm" style={{ borderColor: "#cbd6e0", aspectRatio: media.locale === "en" ? "16 / 9" : "3 / 2" }}>
+    <div className="relative overflow-hidden rounded-md border bg-white shadow-sm" style={{ borderColor: "#cbd6e0", aspectRatio: (media.locale === "en" || media.locale === "es") ? "16 / 9" : "3 / 2" }}>
       <LocalizedVideo ref={video} src={media.src} lang={media.locale} className="block h-full w-full object-contain" controls={started} playsInline preload="none" poster={media.poster}
         aria-label="Vancomyzer calculator tutorial with Bayesian estimation and loading dose guidance" aria-describedby={captionId}
         onPlay={() => setStarted(true)} onPlaying={recordPlayback} onError={() => { video.current?.pause(); setFailed(true); }}>
@@ -96,4 +96,16 @@ export function TutorialLinkLabel() {
   const { locale } = useLanguage();
   const media = getTutorialMedia(locale);
   return <>{tutorialCopy[locale].watch}{media && ` · ${tutorialDuration(media)}`}</>;
+}
+
+/** The approved Spanish edit covers a different example from the older recordings. */
+export function TutorialSummary({ children }: { children: ReactNode }) {
+  const { locale } = useLanguage();
+  if (locale !== "es") return <>{children}</>;
+  return <>
+    <p>Compruebe los datos del paciente y sus unidades. El caso ficticio utiliza cuatro dosis de 1000 mg cada 12 horas, administradas en perfusiones de 100 minutos, sin dosis de carga. Cuatro dosis no confirman por sí solas el estado estacionario.</p>
+    <p>Introduzca las concentraciones medidas y los horarios exactos. Los tiempos de 4 y 10 horas se cuentan desde el inicio de la perfusión. El AUC24 de la pauta propuesta en estado estacionario y la exposición del cuarto intervalo representan ventanas distintas.</p>
+    <p>El resultado tiene una certeza limitada. El objetivo de AUC24 de 400–600 mg·h/L se refiere a infecciones graves por SARM con una CIM de 1 mg/L.</p>
+    <p>Las dosis de mantenimiento modificadas, suspendidas u omitidas no están representadas. Siga el protocolo del centro; la validación clínica independiente en pacientes sigue pendiente.</p>
+  </>;
 }

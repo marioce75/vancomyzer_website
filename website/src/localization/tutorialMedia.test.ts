@@ -8,7 +8,7 @@ import { tutorialMedia, tutorialDuration } from "./tutorialMedia";
 // Approved review artifacts: reject superseded narration or slide drafts.
 const approved = {
   en: "901d79d28089861be7e96412ac4cdc182e74398c6e4207a697968968690a4005",
-  es: "f3f0aaa5539364f3733cf320d356f5d4f26d77e3e72d62f2c544d04b5829a735",
+  es: "0a1d798f48c41dcf2d689fcdee341f6c50a43ad191583d50cdb3d09964658cae",
   fr: "3abf71a0c49fe756b31259106d5c5042323253697cc80dd89a92f3c4e37e4f6b",
 };
 
@@ -25,14 +25,14 @@ test("every locale serves the exact approved tutorial and its own captions", () 
       assert.equal(media.captions.language, locale === "es" ? "es-ES" : "fr-FR");
       const captions = readFileSync(join(process.cwd(), "public", media.captions.src), "utf8");
       assert.ok(captions.startsWith("WEBVTT"));
-      assert.ok(captions.includes(locale === "es" ? "validación independiente" : "validation indépendante"));
+      assert.ok(captions.includes(locale === "es" ? "validación clínica independiente" : "validation indépendante"));
     }
   }
 });
 
 test("tutorial links use the selected recording duration", () => {
   assert.equal(tutorialDuration(tutorialMedia.en!), "2:55");
-  assert.equal(tutorialDuration(tutorialMedia.es!), "3:29");
+  assert.equal(tutorialDuration(tutorialMedia.es!), "1:59");
   assert.equal(tutorialDuration(tutorialMedia.fr!), "3:37");
 });
 
