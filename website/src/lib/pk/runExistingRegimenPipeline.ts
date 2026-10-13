@@ -1,3 +1,4 @@
+import { loadingDoseCurvePoints } from "./steadyStateTwoCompartment";
 import { validateRawInput } from "./validate/validateRawInput";
 import { normalizePatient } from "./normalize/normalizePatient";
 import { normalizeRegimen } from "./normalize/normalizeRegimen";
@@ -89,29 +90,18 @@ export function runExistingRegimenPipeline(
   const engineOutput = runExistingRegimenEngine({ patient, regimen, levels });
   const recommendation = buildAdjustmentRecommendation(engineOutput, input.policy);
 
-  // `engineOutput.curve` must stay the series the shipped auc24/peak/trough were
-  // sampled from. A block here used to overwrite it, for doses_given === 1, with
-  // a curve built on the *recommended* maintenance regimen after those metrics
-  // had already been computed from the patient's own regimen. When the
-  // recommended interval was shorter than the entered one it placed a
-  // maintenance dose inside the first interval, so the panel read trough 5.9 /
-  // AUC24 300 ("increase the dose") while the graph beside it never fell below
-  // ~17.9 mcg/mL ("hold or reduce") — opposite actions from one result. Across
-  // 2025 simulated cases the shipped curve disagreed with the shipped numbers in
-  // 727 of them, worst case 15.75 mcg/mL of trough.
-  //
-  // The override was redundant as well as wrong: existingRegimenEngine already
-  // ships the forward plan separately as `curve_engine_recommended`, and
-  // buildCalculateResponse builds a per-option curve for each frequency tab.
-  // The engine picks its comparison maintenance regimen from an uncapped grid,
-  // so in the one state where the safety layer has determined that no safe
-  // maintenance regimen exists, the chart still offered an "Engine
-  // recommendation" toggle plotting a regimen above the trough and AUC caps —
-  // the very regimen class just refused (measured: 250 mg q24h at trough 55.1,
-  // AUC24 1371, beside a card saying to hold dosing). A refusal gets no
-  // comparison curve.
-  if (recommendation.adjustment_dosing_blocked) {
-    engineOutput.curve_engine_recommended = undefined;
+  // The optional comparison must describe the same policy-checked regimen as
+  // the card, candidate table and exports. Never run a second uncapped selector.
+  if (regimen.doses_given === 1 && !recommendation.adjustment_dosing_blocked) {
+    const uncertainty = engineOutput.parameter_uncertainty;
+    engineOutput.curve_engine_recommended = loadingDoseCurvePoints(
+      { CL: engineOutput.CL, V1: engineOutput.V1, Q: engineOutput.Q, V2: engineOutput.V2 },
+      regimen.dose_mg, regimen.infusion_duration_hours,
+      Number.parseFloat(recommendation.recommended_dose), recommendation.recommended_interval_hours,
+      recommendation.recommended_infusion_duration_hours ?? 1,
+      undefined,
+      uncertainty && uncertainty.method !== "unavailable" ? { draws: uncertainty.draws, level: uncertainty.level } : undefined,
+    );
   }
 
   const explanationInput: ExplanationInput = { engineOutput, recommendation };

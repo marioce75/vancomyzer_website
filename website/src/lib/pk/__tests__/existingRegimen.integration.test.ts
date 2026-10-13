@@ -201,9 +201,12 @@ function testCase20(): void {
   const highExposureSparse = runExistingRegimenPipeline({ patient: defaultPatient, regimen: { dose_mg: 1500, interval_hours: 8, infusion_duration_hours: 1 }, levels: [{ value_mcg_ml: 32, collection_time: "", time_since_last_dose_hours: 7 }] });
   assert(!("ok" in highExposureSparse && highExposureSparse.ok === false), "Case 20: expected success");
   const r = highExposureSparse as { recommended_interval_hours: number; recommended_dose: string; interpretation_summary: string; documentation_preview: { quick_summary: string; clinical_note: string } };
-  assert(r.recommended_interval_hours > 8, "Case 20: clearly supra-therapeutic sparse single-level case should allow bounded interval extension");
-  assert(r.interpretation_summary.includes("permits interval extension"), "Case 20: interpretation should explain bounded interval-extension behavior");
-  assert(r.documentation_preview.quick_summary.includes("interval extension") || r.documentation_preview.clinical_note.includes("interval extension"), "Case 20: documentation preview should preserve interval-extension rationale");
+  // The former extension was 750 mg q12h, AUC ~349 (below target).
+  // Keep the constrained sparse path, but require the recomputed on-target
+  // same-interval result rather than accepting an under-target extension.
+  assert(r.recommended_interval_hours === 8 && r.recommended_dose === "750 mg", "Case 20: reject below-target interval extension and recompute the same-interval dose");
+  assert((highExposureSparse as { predicted_auc24: number }).predicted_auc24 >= 400 && (highExposureSparse as { predicted_auc24: number }).predicted_auc24 <= 600, "Case 20: final recommendation must meet the AUC target");
+
 }
 
 /**

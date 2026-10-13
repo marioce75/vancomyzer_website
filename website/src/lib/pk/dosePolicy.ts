@@ -66,3 +66,11 @@ export function dosePolicyFromSettings(settings: DosePolicySettingsInput | null 
     loadingDoseMaxMg: tighten(settings.loading_dose_max_mg, DEFAULT_DOSE_POLICY.loadingDoseMaxMg),
   };
 }
+
+/** Product policy for automatic adult maintenance suggestions, not a prescribing
+ * minimum. Keep 250 mg rounding increments; historical and manual doses are
+ * intentionally not validated against this grid. Loading doses are separate. */
+export const AUTOMATIC_ADULT_MAINTENANCE_DOSES_MG = [500, 750, 1000, 1250, 1500, 1750, 2000];
+export function isAutomaticAdultMaintenanceDose(doseMg: number): boolean {
+  return AUTOMATIC_ADULT_MAINTENANCE_DOSES_MG.includes(doseMg);
+}

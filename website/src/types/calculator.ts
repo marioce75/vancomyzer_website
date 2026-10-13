@@ -223,6 +223,7 @@ export interface CalculateResponse {
    * fields, which will contain sentinel zeros in this case.
    */
   empiric_dosing_blocked?: {
+    review_required?: boolean;
     reason: string;
     recommended_pulse_dose_mg: number;
     safety_message: string;
@@ -235,6 +236,7 @@ export interface CalculateResponse {
    * in place of the standard recommendation card.
    */
   adjustment_dosing_blocked?: {
+    review_required?: boolean;
     reason: string;
     recommended_action: string;
     safety_message: string;

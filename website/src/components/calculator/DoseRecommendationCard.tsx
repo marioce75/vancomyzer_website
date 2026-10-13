@@ -38,6 +38,7 @@ interface DoseRecommendationCardProps {
   onUndoLoadingDose?: (() => void);
   /** When set, replaces the standard dose card with a pulse-dose safety state. */
   empiricDosingBlocked?: {
+    review_required?: boolean;
     reason: string;
     recommended_pulse_dose_mg: number;
     safety_message: string;
@@ -45,6 +46,7 @@ interface DoseRecommendationCardProps {
   } | null;
   /** When set, replaces the standard dose card with a hold-and-recheck safety state. */
   adjustmentDosingBlocked?: {
+    review_required?: boolean;
     reason: string;
     recommended_action: string;
     safety_message: string;
@@ -305,6 +307,10 @@ export default function DoseRecommendationCard({
   //     for the patient (severe AKI, etc.)  pulse-then-level workflow
   //   - adjustment_dosing_blocked: existing patient on too-aggressive
   //     regimen, no safe adjustment exists  hold + recheck level
+  if (empiricDosingBlocked?.review_required || adjustmentDosingBlocked?.review_required) {
+    const blocked = empiricDosingBlocked?.review_required ? empiricDosingBlocked : adjustmentDosingBlocked!;
+    return <div role="alert" className="border-l-4 border-amber-600 bg-amber-50 p-4"><strong><LocalizedText text="Pharmacy review required — no automatic maintenance regimen" /></strong><p className="mt-2 text-sm"><LocalizedText text={blocked.safety_message} /></p></div>;
+  }
   if (empiricDosingBlocked) {
     return <EmpiricDosingBlockedCard data={empiricDosingBlocked} />;
   }

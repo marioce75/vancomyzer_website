@@ -34,7 +34,7 @@ import type { ExistingRegimenEngineOutput, AdjustmentRecommendation, FrequencyOp
 import { simulateCandidateExposure } from "./simulateCandidateExposure";
 import { computeSafeInfusionDurationHours } from "./infusionSafety";
 import { curvePoints, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
-import { DEFAULT_DOSE_POLICY, type DosePolicy } from "../dosePolicy";
+import { DEFAULT_DOSE_POLICY, AUTOMATIC_ADULT_MAINTENANCE_DOSES_MG, isAutomaticAdultMaintenanceDose, type DosePolicy } from "../dosePolicy";
 
 // AUC₂₄ target band — Rybak MJ et al. AJHP 2020;77(11):835-864.
 // DOI:10.1093/ajhp/zxaa036. Mirror: CID 2020;71(6):1361-1364, DOI:10.1093/cid/ciaa303.
@@ -42,7 +42,7 @@ const TARGET_AUC24_LOW = 400;
 const TARGET_AUC24_HIGH = 600;
 const TARGET_AUC24_MID = 500;
 
-const DOSE_OPTIONS_MG = [250, 500, 750, 1000, 1250, 1500, 1750, 2000];
+const DOSE_OPTIONS_MG = AUTOMATIC_ADULT_MAINTENANCE_DOSES_MG;
 const INTERVAL_OPTIONS_H = [6, 8, 12, 18, 24, 36, 48];
 
 // Hard TDD ceiling — IDSA/ASHP 2020 institutional standard. Empirically the
@@ -135,6 +135,9 @@ function finalizeRecommendation(
   requested_infusion_hours: number | null | undefined,
   safety: { CL: number; V1: number; Q: number; V2: number },
 ): AdjustmentRecommendation {
+  if (!isAutomaticAdultMaintenanceDose(dose_mg) || !INTERVAL_OPTIONS_H.includes(interval_hours)) {
+    return buildNoSuitableRecommendation(safety.CL);
+  }
   const infusion = computeSafeInfusionDurationHours(dose_mg, requested_infusion_hours);
   // Verify the proposed regimen against the safety caps before construction.
   const exposure = simulateCandidateExposure(safety.CL, safety.V1, safety.Q, safety.V2, {
@@ -155,6 +158,10 @@ function finalizeRecommendation(
       predictedTrough: exposure.trough,
       predictedAuc24: exposure.auc24,
     });
+  }
+  if (![exposure.auc24, exposure.peak, exposure.trough].every(Number.isFinite) ||
+      exposure.auc24 < TARGET_AUC24_LOW || exposure.auc24 > TARGET_AUC24_HIGH) {
+    return buildNoSuitableRecommendation(safety.CL);
   }
   return {
     recommended_dose: `${dose_mg} mg`,
@@ -224,6 +231,7 @@ function conservativeSameIntervalDose(
 function boundedSparseHighExposureRecommendation(
   output: ExistingRegimenEngineOutput,
   maxTddMgPerDay: number = MAX_TDD_MG_PER_DAY,
+  maxSingleDoseMg: number = 2000,
 ): AdjustmentRecommendation | null {
   const { CL, V1, Q, V2, auc24, current_regimen_dose_mg, current_regimen_interval_hours, current_regimen_infusion_hours } = output;
   if (CL == null || V1 == null || Q == null || V2 == null || CL <= 0 || V1 <= 0 || Q <= 0 || V2 <= 0) return null;
@@ -242,6 +250,8 @@ function boundedSparseHighExposureRecommendation(
     });
 
     if (
+      isAutomaticAdultMaintenanceDose(heuristicDose) &&
+      heuristicDose <= maxSingleDoseMg && heuristicDose * 24 / nextLongerInterval <= maxTddMgPerDay &&
       heuristicExposure.peak <= MAX_PEAK_MCG_ML &&
       heuristicExposure.trough <= MAX_TROUGH_MCG_ML &&
       heuristicExposure.auc24 <= Math.max(TARGET_AUC24_HIGH + 50, auc24 * 0.8)
@@ -263,12 +273,13 @@ function boundedSparseHighExposureRecommendation(
   const candidates: CandidateScore[] = [];
   for (const interval_hours of intervalOptions) {
     for (const dose_mg of doseOptions) {
+      if (!isAutomaticAdultMaintenanceDose(dose_mg) || dose_mg > maxSingleDoseMg) continue;
       const dailyDose = (dose_mg * 24) / interval_hours;
       if (dailyDose > maxTddMgPerDay) continue;
       const exp = simulateCandidateExposure(CL, V1, Q, V2, {
         dose_mg,
         interval_hours,
-        infusion_duration_hours: Math.min(infusion_hours, interval_hours),
+        infusion_duration_hours: Math.min(computeSafeInfusionDurationHours(dose_mg, infusion_hours).infusion_duration_hours, interval_hours),
       });
       if (exp.peak > MAX_PEAK_MCG_ML || exp.trough > MAX_TROUGH_MCG_ML || exp.auc24 > MAX_AUC24_MG_H_L) continue;
       candidates.push({
@@ -284,8 +295,8 @@ function boundedSparseHighExposureRecommendation(
     }
   }
 
-  const saferCandidates = candidates.filter((candidate) => candidate.auc24 <= TARGET_AUC24_HIGH && candidate.trough <= 20);
-  const ranked = (saferCandidates.length > 0 ? saferCandidates : candidates).sort((a, b) => {
+  const saferCandidates = candidates.filter((candidate) => candidate.auc24 >= TARGET_AUC24_LOW && candidate.auc24 <= TARGET_AUC24_HIGH && candidate.trough <= 20);
+  const ranked = saferCandidates.sort((a, b) => {
     const aPenalty = Math.abs(a.auc24 - TARGET_AUC24_MID) + Math.max(0, a.trough - 15) * 8;
     const bPenalty = Math.abs(b.auc24 - TARGET_AUC24_MID) + Math.max(0, b.trough - 15) * 8;
     if (aPenalty !== bPenalty) return aPenalty - bPenalty;
@@ -443,7 +454,7 @@ export function buildAdjustmentRecommendation(
       const exp = simulateCandidateExposure(CL, V1, Q, V2, {
         dose_mg,
         interval_hours,
-        infusion_duration_hours: Math.min(infusion_hours, interval_hours),
+        infusion_duration_hours: Math.min(computeSafeInfusionDurationHours(dose_mg, infusion_hours).infusion_duration_hours, interval_hours),
       });
       if (exp.peak > MAX_PEAK_MCG_ML || exp.trough > MAX_TROUGH_MCG_ML || exp.auc24 > MAX_AUC24_MG_H_L) continue;
       candidates.push({
@@ -491,40 +502,12 @@ export function buildAdjustmentRecommendation(
       });
       return finalizeRecommendation(inRangeCandidates[0].dose_mg, inRangeCandidates[0].interval_hours, infusion_hours, safety);
     }
-    if (candidates.length > 0) {
-      candidates.sort((a, b) => {
-        const aPenalty = Math.abs(a.auc24 - targetAucMid);
-        const bPenalty = Math.abs(b.auc24 - targetAucMid);
-        if (aPenalty !== bPenalty) return aPenalty - bPenalty;
-        const aSafetyPenalty = Math.max(0, a.trough - 20) + Math.max(0, a.peak - 40) * 0.25;
-        const bSafetyPenalty = Math.max(0, b.trough - 20) + Math.max(0, b.peak - 40) * 0.25;
-        if (aSafetyPenalty !== bSafetyPenalty) return aSafetyPenalty - bSafetyPenalty;
-        if (!isPulseDose) {
-          if (a.sameInterval !== b.sameInterval) return a.sameInterval ? -1 : 1;
-          if (a.intervalDistance !== b.intervalDistance) return a.intervalDistance - b.intervalDistance;
-        } else {
-          if (a.interval_hours !== b.interval_hours) return a.interval_hours - b.interval_hours;
-        }
-        return a.dailyDose - b.dailyDose;
-      });
-      return finalizeRecommendation(candidates[0].dose_mg, candidates[0].interval_hours, infusion_hours, safety);
-    }
     return null;
   };
 
-  /**
-   * Fallback when the grid is empty: same-interval scaling (itself routed
-   * through finalizeRecommendation) or the current regimen re-checked.
-   * @safety-checked-via: finalizeRecommendation
-   */
-  const lastResort = (): AdjustmentRecommendation =>
-    auc24 > 0
-      ? conservativeSameIntervalDose(current_regimen_dose_mg, current_regimen_interval_hours, auc24, current_regimen_infusion_hours, safety, maxTddMgPerDay, maxSingleDoseMg)
-      : finalizeRecommendation(current_regimen_dose_mg, current_regimen_interval_hours, current_regimen_infusion_hours, safety);
-
   if (!isPulseDose && weakEvidenceRecommendation) {
     const sparse = isClearlySupraTherapeuticSparseCase(output)
-      ? boundedSparseHighExposureRecommendation(output, maxTddMgPerDay)
+      ? boundedSparseHighExposureRecommendation(output, maxTddMgPerDay, maxSingleDoseMg)
       : null;
     // boundedSparseHighExposureRecommendation now returns null (not a refusal)
     // when its own candidate fails the caps, so this falls through to
@@ -542,7 +525,7 @@ export function buildAdjustmentRecommendation(
     // refusal is the answer (existingRegimen.integration.test.ts case 27).
     base = sparse ?? conservativeSameIntervalDose(current_regimen_dose_mg, current_regimen_interval_hours, auc24, current_regimen_infusion_hours, safety, maxTddMgPerDay, maxSingleDoseMg);
   } else {
-    base = gridRecommendation() ?? lastResort();
+    base = gridRecommendation() ?? buildNoSuitableRecommendation(CL);
   }
 
   // ─── POST-RECOMMENDATION SAFETY CHECK (DEFENSE IN DEPTH) ──────────
@@ -561,7 +544,9 @@ export function buildAdjustmentRecommendation(
         interval_hours: recIntervalCheck,
         infusion_duration_hours: Math.min(recInfusionCheck, recIntervalCheck),
       });
-      if (
+      if (!isAutomaticAdultMaintenanceDose(recDoseCheck) || recDoseCheck > maxSingleDoseMg || recDoseCheck * 24 / recIntervalCheck > maxTddMgPerDay) {
+        base = buildNoSuitableRecommendation(CL);
+      } else if (
         recExposure.peak > MAX_PEAK_MCG_ML ||
         recExposure.trough > MAX_TROUGH_MCG_ML ||
         recExposure.auc24 > MAX_AUC24_MG_H_L
@@ -647,6 +632,23 @@ function buildAdjustmentRefusal(args: {
       reason: `No regimen in the search grid satisfies peak ≤ ${MAX_PEAK_MCG_ML} mg/L, trough ≤ ${MAX_TROUGH_MCG_ML} mg/L, AND AUC₂₄ ≤ ${MAX_AUC24_MG_H_L} mg·h/L at estimated CL ${CL.toFixed(2)} L/h.`,
       recommended_action: `Hold maintenance dosing; recheck level when trough < ${WARN_TROUGH_MCG_ML} mg/L; redose via the 1 Level tab.`,
       safety_message: safetyMessage,
+      estimated_cl_l_h: Math.round(CL * 100) / 100,
+    },
+  };
+}
+
+/** @safety-checked-via: self (review-needed response, no actionable dose) */
+function buildNoSuitableRecommendation(CL: number): AdjustmentRecommendation {
+  return {
+    recommended_dose: "—",
+    recommended_interval_hours: 0,
+    recommended_infusion_duration_hours: 0,
+    frequency_options: [],
+    adjustment_dosing_blocked: {
+      review_required: true,
+      reason: "No suitable automatic adult maintenance regimen within the supported dose/interval constraints and AUC₂₄ target of 400–600 mg·h/L.",
+      recommended_action: "Pharmacy review required; no automatic maintenance regimen is suggested.",
+      safety_message: "Automatic adult maintenance suggestions exclude 250 mg doses by product policy. Doses are not increased automatically to compensate. No suitable regimen was found within this workflow's constraints; review the dose, interval, exposure and level data with pharmacy. This policy does not change recorded doses or establish a universal prescribing minimum.",
       estimated_cl_l_h: Math.round(CL * 100) / 100,
     },
   };

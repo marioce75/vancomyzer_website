@@ -68,7 +68,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
   // the safety card gives, in the permanent record.
   const blocked = recommendation.adjustment_dosing_blocked;
   const recommendationLines = blocked
-    ? [`Maintenance dosing held — ${blocked.safety_message}`, blocked.recommended_action]
+    ? [`${blocked.review_required ? "Pharmacy review required — no automatic maintenance regimen" : "Maintenance dosing held"} — ${blocked.safety_message}`, blocked.recommended_action]
     : [
         `Recommendation: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${Number(((recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1) * 60).toFixed(6))} minutes`,
         changeSummary,

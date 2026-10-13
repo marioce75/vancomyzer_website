@@ -64,10 +64,9 @@ function statusChip(auc: number) {
 }
 
 export default function RegimenComparisonTable({ options, activeOption, onSelect, current, onApply }: RegimenComparisonTableProps) {
-  // Same display rule the dose card has always used, plus the engine's own
-  // recommendation, which is never hidden from the comparison.
-  const rows = (options ?? []).filter((o) => o.is_recommended || (o.dose_mg >= 500 && o.auc24 <= 600));
-  const recommendedOutsideRule = rows.some((o) => o.is_recommended && !(o.dose_mg >= 500 && o.auc24 <= 600));
+  // Automatic options obey the same policy as the engine. The separate current
+  // row preserves actual historical doses, including 250 mg.
+  const rows = (options ?? []).filter((o) => o.dose_mg >= 500 && o.auc24 >= 400 && o.auc24 <= 600);
   if (rows.length === 0 && !current) return null;
 
   const isActive = (o: FrequencyOption) =>
@@ -129,9 +128,7 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
                   {o.is_recommended && (
                     <LocalizedSpan className="block text-[9px] font-semibold" style={{ color: "var(--color-primary)" }} title="Suggested regimen"><LocalizedText text="Recommended" /></LocalizedSpan>
                   )}
-                  {o.is_recommended && !(o.dose_mg >= 500 && o.auc24 <= 600) && (
-                    <LocalizedSpan className="ml-1 vz-chip vz-chip--caution" style={{ padding: "0 4px", fontSize: 9 }} title="Outside the candidate display rule (dose ≥ 500 mg, AUC₂₄ ≤ 600)"><LocalizedText text="review" /></LocalizedSpan>
-                  )}
+
                 </td>
                 <td style={MONO}>{o.auc24.toFixed(0)}</td>
                 <td style={MONO}>{fmt(o.peak, 1)}</td>
@@ -144,7 +141,7 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
       </LocalizedTable>
       <div className="flex items-start justify-between gap-2 px-2 pt-1.5">
         <p className="m-0 text-[10px] leading-4" style={{ color: "var(--color-dim)" }}>
-          <LocalizedText text={current?.single_dose ? "Loading-dose row: that single dose over its first 24 h. Other rows: " : ""} /><LocalizedText text="Steady-state predictions from the same PK parameters. Candidates with AUC₂₄ above 600 or doses below 500 mg are not offered" /><LocalizedText text={recommendedOutsideRule ? "; the calculator's recommendation is always listed and flagged when it falls outside that rule" : ""} />.
+          <LocalizedText text={current?.single_dose ? "Loading-dose row: that single dose over its first 24 h. Other rows: " : ""} /><LocalizedText text="Steady-state predictions from the same PK parameters. Automatic candidates must have AUC₂₄ within 400–600 and doses of at least 500 mg by product policy" />.
         </p>
         {onApply && activeOption && (
           <LocalizedButton
