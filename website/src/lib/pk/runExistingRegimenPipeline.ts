@@ -90,6 +90,13 @@ export function runExistingRegimenPipeline(
   const engineOutput = runExistingRegimenEngine({ patient, regimen, levels });
   const recommendation = buildAdjustmentRecommendation(engineOutput, input.policy);
 
+  // A blocked single-dose result must not plot an implied maintenance plan.
+  // The engine's default pulse curve continues the entered dose repeatedly;
+  // retain only the actual single-dose history when no regimen is suggested.
+  if (regimen.doses_given === 1 && recommendation.adjustment_dosing_blocked) {
+    engineOutput.curve = engineOutput.loading_dose_curve ?? [];
+  }
+
   // The optional comparison must describe the same policy-checked regimen as
   // the card, candidate table and exports. Never run a second uncapped selector.
   if (regimen.doses_given === 1 && !recommendation.adjustment_dosing_blocked) {

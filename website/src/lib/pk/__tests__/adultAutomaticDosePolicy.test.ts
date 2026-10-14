@@ -79,7 +79,14 @@ for (const weight_kg of [30, 50, 70, 150, 300]) for (const scr of [0.2, 1, 3, 8]
 const blocked: any = runExistingRegimenPipeline({ patient, regimen, levels: [], policy: { ...DEFAULT_DOSE_POLICY, maxSingleDoseMg: 250 } });
 assert.ok(blocked.adjustment_dosing_blocked.review_required);
 assert.equal(blocked.curve_engine_recommended, undefined);
+assert.deepEqual(blocked.curve, blocked.loading_dose_curve, 'blocked pulse graph must not imply repeated maintenance doses');
+assert.ok(blocked.curve.length > 0, 'recorded single-dose exposure remains inspectable');
+const afterInfusion = blocked.curve.filter((p: any) => p.time_hours >= regimen.infusion_duration_hours);
+assert.ok(afterInfusion.every((p: any, i: number) => i === 0 || p.concentration <= afterInfusion[i - 1].concentration), 'no maintenance-dose peaks after the recorded infusion');
 assert.deepEqual(blocked.frequency_options, []);
+const blockedHistory: any = runExistingRegimenPipeline({ patient, regimen: { ...regimen, dose_mg: 250, doses_given: 3, steady_state_confirmed: false }, levels: [{ value_mcg_ml: 8, time_since_last_dose_hours: 20 }], policy: { ...DEFAULT_DOSE_POLICY, maxSingleDoseMg: 250 } });
+assert.ok(blockedHistory.adjustment_dosing_blocked);
+assert.deepEqual(blockedHistory.curve, history.curve, 'blocked non-pulse history prediction remains unchanged');
 assert.doesNotMatch(blocked.documentation_preview.clinical_note, /Maintenance dosing held|every 0 h/);
 const html = generateReportHTML({ age: 70, weight_kg: 50, serum_creatinine_mg_dl: 1.5, mode: 'existing_regimen',
  recommended_dose: blocked.recommended_dose, recommended_interval_hours: 0, auc24: blocked.auc24, peak: blocked.peak, trough: blocked.trough,

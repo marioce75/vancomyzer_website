@@ -1316,6 +1316,9 @@ export default function CalculatorWorkspace() {
 
         {/* ── Concentration-time graph ── */}
         <LocalizedSection className={`vz-area-graph vz-panel flex flex-col ${resultObscured ? "vz-obscured" : ""}`} aria-label="Concentration-time graph panel">
+          {isPulse && displayResult?.adjustment_dosing_blocked && (
+            <p className="m-0 px-3 pt-2 text-xs"><LocalizedText text="Recorded single dose only — no maintenance regimen suggested." /></p>
+          )}
           <div className={`flex min-h-0 flex-1 flex-col p-2 ${resultObscured ? "vz-obscured-content" : ""}`}>
             <ConcentrationTimeGraph
               fill={graphFill}
