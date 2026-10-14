@@ -9740,9 +9740,9 @@
     "pt-BR": "Ajustar qualidade não_aplicável; incerteza baixa."
   },
   "Fit quality not_applicable; uncertainty population_only.": {
-    "es": "Calidad del ajuste no procede; incertidumbre solo poblacional.",
-    "fr": "Qualité de l’ajustement sans objet ; incertitude populationnelle uniquement.",
-    "pt-BR": "Ajustar a qualidade não_aplicável; population_only incerteza."
+    "es": "Calidad del ajuste no aplicable; incertidumbre basada únicamente en la población.",
+    "fr": "Qualité de l’ajustement sans objet ; incertitude fondée uniquement sur la population.",
+    "pt-BR": "Qualidade do ajuste não aplicável; incerteza baseada apenas na população."
   },
   "Set New Password": {
     "es": "Establecer nueva contraseña",
@@ -16538,5 +16538,60 @@
     "es": "Las propuestas automáticas de mantenimiento en adultos excluyen las dosis de 250 mg por política del producto. Las dosis no se aumentan automáticamente para compensar. No se encontró una pauta adecuada dentro de las restricciones de este flujo de trabajo; revise la dosis, el intervalo, la exposición y las concentraciones con farmacia. Esta política no modifica las dosis registradas ni establece una dosis mínima universal de prescripción.",
     "fr": "Les propositions automatiques d’entretien chez l’adulte excluent les doses de 250 mg selon la politique du produit. Les doses ne sont pas augmentées automatiquement pour compenser. Aucun schéma adapté n’a été trouvé dans les limites de ce parcours ; revoir la dose, l’intervalle, l’exposition et les concentrations avec l’équipe pharmaceutique. Cette politique ne modifie pas les doses enregistrées et ne définit pas de dose minimale universelle de prescription.",
     "pt-BR": "As sugestões automáticas de manutenção em adultos excluem doses de 250 mg por política do produto. As doses não são aumentadas automaticamente para compensar. Nenhum esquema adequado foi encontrado dentro das restrições deste fluxo; revise a dose, o intervalo, a exposição e as concentrações com a equipe de farmácia. Esta política não altera as doses registradas nem estabelece uma dose mínima universal para prescrição."
+  },
+  "When the level data support an individualized fit, the calculator compares doses of 500–2000 mg in 250 mg increments at q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor fit) it instead scales the current dose toward that midpoint at the current interval, within the same safety limits. Automatic adult maintenance suggestions exclude 250 mg doses by product policy; if no supported regimen meets the constraints and AUC target, pharmacy review is required.": {
+    "es": "Cuando los datos de concentraciones permiten un ajuste individualizado, la calculadora compara dosis de 500–2000 mg en incrementos de 250 mg cada 6, 8, 12, 18, 24, 36 o 48 h, descarta las pautas cuyos valores previstos de pico, valle o AUC₂₄ superan los límites de seguridad y elige aquella cuya AUC₂₄ prevista en estado estacionario se aproxima más al punto medio del objetivo de 400–600. Con datos de concentraciones escasos o poco sólidos (por ejemplo, una sola concentración o un ajuste deficiente), ajusta proporcionalmente la dosis actual hacia ese punto medio manteniendo el intervalo actual y los mismos límites de seguridad. Las propuestas automáticas de mantenimiento en adultos excluyen las dosis de 250 mg por política del producto; si ninguna pauta admitida cumple las restricciones y el objetivo de AUC, se requiere revisión farmacéutica.",
+    "fr": "Lorsque les concentrations permettent un ajustement individualisé, le calculateur compare des doses de 500–2000 mg par paliers de 250 mg toutes les 6, 8, 12, 18, 24, 36 ou 48 h, écarte les schémas dont le pic, la concentration résiduelle ou l’AUC₂₄ prévus dépassent les limites de sécurité et choisit celui dont l’AUC₂₄ prévue à l’état d’équilibre se rapproche le plus du milieu de la cible de 400–600. Lorsque les données de concentration sont limitées ou peu fiables (par exemple, une seule concentration ou un mauvais ajustement), il ajuste proportionnellement la dose actuelle vers ce milieu en conservant l’intervalle actuel et les mêmes limites de sécurité. Les propositions automatiques d’entretien chez l’adulte excluent les doses de 250 mg selon la politique du produit ; si aucun schéma pris en charge ne respecte les contraintes et la cible d’AUC, un avis pharmaceutique est requis.",
+    "pt-BR": "Quando os dados de concentração permitem um ajuste individualizado, a calculadora compara doses de 500–2000 mg em incrementos de 250 mg a cada 6, 8, 12, 18, 24, 36 ou 48 h, descarta os esquemas cujos valores previstos de pico, vale ou AUC₂₄ excedem os limites de segurança e escolhe aquele cuja AUC₂₄ prevista no estado de equilíbrio fica mais próxima do ponto médio da meta de 400–600. Com dados de concentração escassos ou pouco confiáveis (por exemplo, uma única concentração ou um ajuste ruim), ela ajusta proporcionalmente a dose atual em direção a esse ponto médio, mantendo o intervalo atual e os mesmos limites de segurança. As sugestões automáticas de manutenção em adultos excluem doses de 250 mg por política do produto; se nenhum esquema compatível atender às restrições e à meta de AUC, é necessária revisão farmacêutica."
+  },
+  "Current regimen (as entered)": {
+    "es": "Pauta actual (tal como se introdujo)",
+    "fr": "Schéma actuel (tel que saisi)",
+    "pt-BR": "Esquema atual (conforme inserido)"
+  },
+  "no automatic maintenance regimen": {
+    "es": "no se propone una pauta de mantenimiento automática",
+    "fr": "aucun schéma d’entretien automatique",
+    "pt-BR": "nenhum esquema de manutenção automático"
+  },
+  "Patient characteristics only": {
+    "es": "Solo características del paciente",
+    "fr": "Caractéristiques du patient uniquement",
+    "pt-BR": "Apenas características do paciente"
+  },
+  "No posterior update applied; outputs from Colin 2019 two-compartment adult population prior.": {
+    "es": "No se aplicó actualización a posteriori; los resultados proceden de la distribución poblacional a priori bicompartimental de Colin 2019 para adultos.",
+    "fr": "Aucune actualisation a posteriori appliquée ; résultats issus de la distribution populationnelle a priori bicompartimentale de Colin 2019 pour l’adulte.",
+    "pt-BR": "Nenhuma atualização a posteriori aplicada; resultados obtidos da distribuição populacional a priori bicompartimental de Colin 2019 para adultos."
+  },
+  "Loading dose simulation (single dose).": {
+    "es": "Simulación de dosis de carga (dosis única).",
+    "fr": "Simulation de la dose de charge (dose unique).",
+    "pt-BR": "Simulação da dose de ataque (dose única)."
+  },
+  "AUC₂₄ is the area under the first 24 hours of this one dose, not steady-state exposure.": {
+    "es": "El AUC₂₄ es el área bajo la curva durante las primeras 24 horas de esta dosis única, no la exposición en estado estacionario.",
+    "fr": "L’AUC₂₄ est l’aire sous la courbe pendant les premières 24 heures de cette dose unique, et non l’exposition à l’état d’équilibre.",
+    "pt-BR": "A AUC₂₄ é a área sob a curva nas primeiras 24 horas desta dose única, não a exposição no estado de equilíbrio."
+  },
+  "Fit quality: not_applicable (No measured levels were available for posterior fitting.).": {
+    "es": "Calidad del ajuste: no aplicable (no se disponía de concentraciones medidas para el ajuste a posteriori).",
+    "fr": "Qualité de l’ajustement : sans objet (aucune concentration mesurée n’était disponible pour l’ajustement a posteriori).",
+    "pt-BR": "Qualidade do ajuste: não aplicável (não havia concentrações medidas disponíveis para o ajuste a posteriori)."
+  },
+  "Posterior fit quality: not_applicable (No measured levels were available for posterior fitting.).": {
+    "es": "Calidad del ajuste a posteriori: no aplicable (no se disponía de concentraciones medidas para el ajuste a posteriori).",
+    "fr": "Qualité de l’ajustement a posteriori : sans objet (aucune concentration mesurée n’était disponible pour l’ajustement a posteriori).",
+    "pt-BR": "Qualidade do ajuste a posteriori: não aplicável (não havia concentrações medidas disponíveis para o ajuste a posteriori)."
+  },
+  "Posterior fit quality was not_applicable (No measured levels were available for posterior fitting.); uncertainty remains population-based.": {
+    "es": "La calidad del ajuste a posteriori no era aplicable (no se disponía de concentraciones medidas para el ajuste a posteriori); la incertidumbre sigue basándose en la población.",
+    "fr": "La qualité de l’ajustement a posteriori était sans objet (aucune concentration mesurée n’était disponible pour l’ajustement a posteriori) ; l’incertitude reste fondée sur la population.",
+    "pt-BR": "A qualidade do ajuste a posteriori não era aplicável (não havia concentrações medidas disponíveis para o ajuste a posteriori); a incerteza permanece baseada na população."
+  },
+  "Uncertainty: population_only.": {
+    "es": "Incertidumbre: basada únicamente en la población.",
+    "fr": "Incertitude : fondée uniquement sur la population.",
+    "pt-BR": "Incerteza: baseada apenas na população."
   }
 }

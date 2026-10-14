@@ -32,7 +32,7 @@ import DoseRecommendationCard, { LoadingDosePopover } from "@/components/calcula
 import TeachingNote from "@/components/calculator/TeachingNote";
 import Advisory from "@/components/calculator/Advisory";
 import InputSection from "@/components/calculator/InputSection";
-import RegimenComparisonTable from "@/components/calculator/RegimenComparisonTable";
+import { RegimenComparisonResult } from "@/components/calculator/RegimenComparisonTable";
 import ResultDetailTabs from "@/components/calculator/ResultDetailTabs";
 import InterpretationSummaryCard from "@/components/calculator/InterpretationSummaryCard";
 import LimitationsCard from "@/components/calculator/LimitationsCard";
@@ -1343,8 +1343,9 @@ export default function CalculatorWorkspace() {
               )}
             </div>
             <div className={resultObscured ? "vz-obscured-content" : ""}>
-              {displayResult && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked ? (
-                <RegimenComparisonTable
+              {displayResult ? (
+                <RegimenComparisonResult
+                  result={displayResult}
                   options={displayResult.frequency_options}
                   activeOption={activeIsCurrent ? null : activeOption}
                   onSelect={handleSelectFrequency}

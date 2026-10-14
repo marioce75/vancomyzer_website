@@ -70,3 +70,36 @@ test('Spanish generated warnings retain values, dose history and uncertainty wit
   }
   assert.match(translateGeneratedText(sources[2], 'es'), /incertidumbre sigue siendo alta/);
 });
+
+test('current-regimen report uses the exact localized heading', () => {
+  for (const locale of ['es', 'fr', 'pt-BR'] as const) {
+    const html = generateReportHTML({ ...fixture, regimen_is_current: true }, "free", locale);
+    assert.doesNotMatch(html, /Current regimen \(as entered\)/);
+    const expected = { es: 'Pauta actual (tal como se introdujo)', fr: 'Schéma actuel (tel que saisi)', 'pt-BR': 'Esquema atual (conforme inserido)' }[locale];
+    assert.ok(html.includes(expected));
+    assert.match(html, /1000 mg every 12 h|1000 mg cada 12 h|1000 mg toutes les 12 h|1000 mg a cada 12 h/);
+  }
+});
+
+test('no-level pulse reports translate explanatory prose while preserving every value', () => {
+  const patient = { age: 120, weight_kg: 30, height_cm: 140, serum_creatinine_mg_dl: 5 };
+  const result = runExistingRegimenPipeline({ patient,
+    regimen: { dose_mg: 250, interval_hours: 12, infusion_duration_hours: 1, doses_given: 1 }, levels: [] });
+  assert.ok(!('error_type' in result));
+  const r = result as unknown as CalculateResponse;
+  const data: ReportData = { ...patient, mode: 'existing_regimen', recommended_dose: '250',
+    recommended_interval_hours: 12, regimen_is_current: true,
+    auc24: r.auc24, peak: r.peak, trough: r.trough,
+    pk_parameters: r.pk_parameters, interpretation_summary: r.interpretation_summary,
+    assumptions: r.assumptions, limitations: r.limitations,
+    clinical_note: r.documentation_preview?.clinical_note,
+    recommendation_blocked: r.adjustment_dosing_blocked?.safety_message };
+  const en = generateReportHTML(data);
+  for (const locale of ['es', 'fr', 'pt-BR'] as const) {
+    const html = generateReportHTML(data, 'free', locale);
+    assert.doesNotMatch(html, /Patient characteristics only|No posterior update|No measured levels were available|Loading dose simulation|is the area under|Posterior fit quality was|uncertainty remains population-based|not_applicable|population_only/);
+    assert.deepEqual(html.match(/\d+(?:\.\d+)?/g), en.match(/\d+(?:\.\d+)?/g));
+    assert.match(html, /class="report-closing">\s*<div class="disclaimer">[\s\S]*class="footer">/);
+    assert.match(html, /\.report-closing \{ break-inside: avoid; \}/);
+  }
+});

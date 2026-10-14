@@ -4,7 +4,7 @@ import { LocalizedText } from "@/localization/LanguageProvider";
 import { LocalizedTable, LocalizedTh, LocalizedSpan, LocalizedButton } from "@/localization/LocalizedElements";
 
 
-import type { FrequencyOption } from "@/types/calculator";
+import type { CalculateResponse, FrequencyOption } from "@/types/calculator";
 import { aucRangeLabel } from "@/components/calculator/DoseRecommendationCard";
 import { fmt } from "@/lib/formatNumber";
 
@@ -155,4 +155,26 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
       </div>
     </div>
   );
+}
+
+/** Shared workspace boundary: review-needed may display history, never candidates. */
+export function RegimenComparisonResult({ result, ...props }: RegimenComparisonTableProps & {
+  result: Pick<CalculateResponse, "empiric_dosing_blocked" | "adjustment_dosing_blocked">;
+}) {
+  const reviewRequired = result.adjustment_dosing_blocked?.review_required === true;
+  const refused = result.empiric_dosing_blocked || (result.adjustment_dosing_blocked && !reviewRequired);
+  return <>
+    {(!refused && (!reviewRequired || props.current)) && (
+      <RegimenComparisonTable {...props}
+        options={reviewRequired ? [] : props.options}
+        activeOption={reviewRequired ? null : props.activeOption}
+        onApply={reviewRequired ? null : props.onApply}
+      />
+    )}
+    {(refused || reviewRequired) && (
+      <p className="px-3 py-3 text-xs" style={{ color: "var(--color-dim)" }}>
+        <LocalizedText text="No candidate regimens — see the safety state above." />
+      </p>
+    )}
+  </>;
 }

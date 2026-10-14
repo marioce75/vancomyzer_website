@@ -1,7 +1,7 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import DoseRecommendationCard from '../../../components/calculator/DoseRecommendationCard';
-import RegimenComparisonTable from '../../../components/calculator/RegimenComparisonTable';
+import RegimenComparisonTable, { RegimenComparisonResult } from '../../../components/calculator/RegimenComparisonTable';
 /** Synthetic product-policy regressions; no patient/screenshot inputs. */
 import assert from 'node:assert/strict';
 import { buildDocumentationPreview } from '../explain/buildDocumentationPreview';
@@ -12,6 +12,7 @@ import { computeInitialRegimen } from '../../initialRegimen';
 import { computeExposure, loadingDoseCurvePoints } from '../steadyStateTwoCompartment';
 import { DEFAULT_DOSE_POLICY } from '../dosePolicy';
 import { generateReportHTML } from '../../generateReport';
+import type { FrequencyOption } from '../../../types/calculator';
 import type { ExistingRegimenEngineOutput } from '../types';
 
 const patient = { age: 70, weight_kg: 50, height_cm: 160, sex: 'male' as const, serum_creatinine_mg_dl: 1.5 };
@@ -58,8 +59,8 @@ assert.ok(tight.adjustment_dosing_blocked?.review_required);
 const sparse = { ...output(0.5, false), level_count: 1 };
 assert.ok(buildAdjustmentRecommendation(sparse).adjustment_dosing_blocked, 'sparse same-interval250 must not be clamped or rescued by unrestricted grid');
 const increments = buildAdjustmentRecommendation(output(3));
-assert.ok(increments.frequency_options?.some(o => o.dose_mg === 750));
-assert.ok(increments.frequency_options?.some(o => o.dose_mg === 1250));
+assert.ok(increments.frequency_options?.some((o: FrequencyOption) => o.dose_mg === 750));
+assert.ok(increments.frequency_options?.some((o: FrequencyOption) => o.dose_mg === 1250));
 
 const pulse: any = runExistingRegimenPipeline({ patient, regimen, levels: [] });
 assert.ok(!pulse.error_type && !pulse.adjustment_dosing_blocked);
@@ -127,3 +128,63 @@ console.log('Shared UI card/table and high-clearance initial review/export asser
 const weakPulse: any = { ...seed, doses_given: 1, level_count: 1, auc24: 700, peak: 50, current_regimen_interval_hours: 12, posterior_fit: { ...seed.posterior_fit, fit_quality: 'weak', uncertainty_label: 'high' } };
 const weakPulseNote = buildDocumentationPreview({ engineOutput: weakPulse, recommendation: { ...buildAdjustmentRecommendation(seed), recommended_interval_hours: 24 } });
 assert.doesNotMatch(weakPulseNote.clinical_note, /interval extension|interval shortening|same-interval dose reduction/);
+
+// Exercise the workspace's rendering boundary, not only the inner table.
+const historyProps = {
+  options: [{ dose_mg: 750, interval_hours: 24, infusion_duration_hours: 1.25, auc24: 500, peak: 25, trough: 15, is_recommended: true }],
+  activeOption: null, onSelect: () => {}, onApply: () => {},
+  current: { dose_mg: 250, interval_hours: 24, auc24: 500, peak: 25, trough: 15, label: 'current' },
+};
+const renderBoundary = (result: any, current: any = historyProps.current) => renderToStaticMarkup(
+  React.createElement(RegimenComparisonResult, { ...historyProps, activeOption: historyProps.options[0], current, result }));
+const reviewMarkup = renderBoundary(blockedHistory);
+assert.match(reviewMarkup, /250 mg q24h/);
+assert.match(reviewMarkup, /No candidate regimens/);
+assert.doesNotMatch(reviewMarkup, /750 mg|Recommended|Use as draft/);
+const pulseMarkup = renderBoundary(blocked, { ...historyProps.current, single_dose: true, label: 'loading dose' });
+assert.match(pulseMarkup, /250 mg × 1/);
+assert.match(pulseMarkup, /First 24 h/);
+assert.doesNotMatch(pulseMarkup, /750 mg|Use as draft/);
+for (const refused of [
+  { adjustment_dosing_blocked: { ...blockedHistory.adjustment_dosing_blocked, review_required: false } },
+  { empiric_dosing_blocked: { review_required: true } },
+]) {
+  const markup = renderBoundary(refused);
+  assert.match(markup, /No candidate regimens/);
+  assert.doesNotMatch(markup, /role="radio"|250 mg|750 mg|Use as draft/);
+}
+assert.match(renderBoundary(blockedHistory, null), /No candidate regimens/);
+const normalMarkup = renderBoundary({});
+assert.match(normalMarkup, /250 mg q24h/);
+assert.match(normalMarkup, /750 mg q24h/);
+console.log('Workspace comparison boundary: review/history/pulse/refusal/normal cases passed.');
+
+// A rejected 250 mg recommendation must not discard other eligible alternatives.
+const mixedOptions = [250, 500, 750, 1250].map(dose_mg => ({
+  ...historyProps.options[0], dose_mg, is_recommended: dose_mg === 750,
+}));
+const mixedMarkup = renderToStaticMarkup(React.createElement(RegimenComparisonResult, {
+  ...historyProps, options: mixedOptions, result: {},
+}));
+assert.match(mixedMarkup, /500 mg q24h/);
+assert.match(mixedMarkup, /750 mg q24h/);
+assert.match(mixedMarkup, /1250 mg q24h/);
+assert.equal((mixedMarkup.match(/>250 mg q24h</g) ?? []).length, 1, '250 mg appears only as entered history');
+assert.equal((mixedMarkup.match(/role="radio"/g) ?? []).length, 4, 'one historical row and three allowed recommendations');
+assert.ok(pulse.frequency_options?.some((o: FrequencyOption) => o.dose_mg === 500));
+assert.ok(pulse.frequency_options?.some((o: FrequencyOption) => o.dose_mg === 750));
+assert.ok(pulse.frequency_options?.some((o: FrequencyOption) => o.dose_mg === 1250));
+assert.ok(pulse.frequency_options?.every((o: FrequencyOption) => o.dose_mg !== 250));
+for (const option of pulse.frequency_options ?? []) {
+  if (![500, 750, 1250].includes(option.dose_mg)) continue;
+  assert.ok(option.curve?.length, 'eligible alternative retains its own graph');
+  const html = generateReportHTML({ ...patient, mode: 'existing_regimen',
+    recommended_dose: String(option.dose_mg), recommended_interval_hours: option.interval_hours,
+    recommended_infusion_duration_hours: option.infusion_duration_hours,
+    auc24: option.auc24, peak: option.peak, trough: option.trough,
+    frequency_options: pulse.frequency_options,
+  });
+  assert.ok(html.includes(`${option.dose_mg} mg every ${option.interval_hours} h`));
+  assert.doesNotMatch(html, />250 mg</);
+}
+console.log('Mixed 250/500/750/1250 alternatives: allowed rows, API pipeline, graphs and reports passed.');
