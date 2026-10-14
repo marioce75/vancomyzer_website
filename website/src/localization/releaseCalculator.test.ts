@@ -36,3 +36,28 @@ test('adult automatic policy and pulse wording translate without changing dose n
     assert.doesNotMatch(translated, /Pharmacy review|Recorded single dose|Automatic adult maintenance|universal prescribing minimum|no prior maintenance interval/);
   }
 });
+
+test('exact live teaching source has translations with every numeric token preserved', () => {
+  const workspace = readFileSync(new URL('../components/calculator/CalculatorWorkspace.tsx', import.meta.url), 'utf8');
+  const source = workspace.match(/<LocalizedText text="(When the level data support an individualized fit,[^"]+)"/)?.[1];
+  assert.ok(source);
+  for (const locale of ['es', 'fr', 'pt-BR'] as const) {
+    const rendered = translate(source, locale);
+    assert.notEqual(rendered, source);
+    assert.doesNotMatch(rendered, /When the level data|With sparse|Automatic adult/);
+    assert.deepEqual(rendered.match(/\d+/g), source.match(/\d+/g));
+  }
+});
+
+test('committed coverage inventory matches the catalog entry count', () => {
+  const messages = JSON.parse(readFileSync(new URL('./messages.json', import.meta.url), 'utf8'));
+  const coverage = JSON.parse(readFileSync(new URL('./coverage.json', import.meta.url), 'utf8'));
+  assert.equal(coverage.summary.catalogEntries, Object.keys(messages).length);
+});
+
+test('composed review-needed note translates its lowercase no-regimen fragment', () => {
+  const source = 'Pharmacy review required — no automatic maintenance regimen — Automatic adult maintenance suggestions exclude 250 mg doses by product policy.';
+  for (const locale of ['es', 'fr', 'pt-BR'] as const) {
+    assert.doesNotMatch(translateGeneratedText(source, locale), /no automatic maintenance regimen/);
+  }
+});
