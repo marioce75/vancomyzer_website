@@ -16453,5 +16453,90 @@
     "es": "Pauta actual — proyección en estado estacionario (historial real: ? dosis administradas)",
     "fr": "Schéma actuel — projection à l’état d’équilibre (historique réel : ? doses administrées)",
     "pt-BR": "Esquema atual — projeção no estado de equilíbrio (histórico real: ? doses administradas)"
+  },
+  "Pharmacy review required — no automatic maintenance regimen": {
+    "es": "Se requiere revisión farmacéutica — no se propone una pauta de mantenimiento automática",
+    "fr": "Avis pharmaceutique requis — aucun schéma d’entretien automatique",
+    "pt-BR": "Revisão farmacêutica necessária — nenhum esquema de manutenção automático"
+  },
+  "Pharmacy review required": {
+    "es": "Se requiere revisión farmacéutica",
+    "fr": "Avis pharmaceutique requis",
+    "pt-BR": "Revisão farmacêutica necessária"
+  },
+  "No automatic maintenance regimen": {
+    "es": "No se propone una pauta de mantenimiento automática",
+    "fr": "Aucun schéma d’entretien automatique",
+    "pt-BR": "Nenhum esquema de manutenção automático"
+  },
+  "Recorded single dose only — no maintenance regimen suggested.": {
+    "es": "Solo la dosis única registrada — no se propone una pauta de mantenimiento.",
+    "fr": "Dose unique enregistrée uniquement — aucun schéma d’entretien proposé.",
+    "pt-BR": "Apenas a dose única registrada — nenhum esquema de manutenção sugerido."
+  },
+  "Current regimen exposure (no automatic recommendation)": {
+    "es": "Exposición de la pauta registrada (sin recomendación automática)",
+    "fr": "Exposition du schéma enregistré (sans recommandation automatique)",
+    "pt-BR": "Exposição do esquema registrado (sem recomendação automática)"
+  },
+  "No maintenance exposure predicted": {
+    "es": "No se predice exposición de mantenimiento",
+    "fr": "Aucune exposition d’entretien prédite",
+    "pt-BR": "Nenhuma exposição de manutenção prevista"
+  },
+  "Pharmacy review required; no automatic maintenance regimen is suggested.": {
+    "es": "Se requiere revisión farmacéutica; no se propone una pauta de mantenimiento automática.",
+    "fr": "Avis pharmaceutique requis ; aucun schéma d’entretien automatique n’est proposé.",
+    "pt-BR": "Revisão farmacêutica necessária; nenhum esquema de manutenção automático é sugerido."
+  },
+  "Automatic adult maintenance suggestions exclude 250 mg doses by product policy.": {
+    "es": "Las propuestas automáticas de mantenimiento en adultos excluyen las dosis de 250 mg por política del producto.",
+    "fr": "Les propositions automatiques d’entretien chez l’adulte excluent les doses de 250 mg selon la politique du produit.",
+    "pt-BR": "As sugestões automáticas de manutenção em adultos excluem doses de 250 mg por política do produto."
+  },
+  "Doses are not increased automatically to compensate.": {
+    "es": "Las dosis no se aumentan automáticamente para compensar.",
+    "fr": "Les doses ne sont pas augmentées automatiquement pour compenser.",
+    "pt-BR": "As doses não são aumentadas automaticamente para compensar."
+  },
+  "No suitable regimen was found within this workflow's constraints; review the dose, interval, exposure and level data with pharmacy.": {
+    "es": "No se encontró una pauta adecuada dentro de las restricciones de este flujo de trabajo; revise la dosis, el intervalo, la exposición y las concentraciones con farmacia.",
+    "fr": "Aucun schéma adapté n’a été trouvé dans les limites de ce parcours ; revoir la dose, l’intervalle, l’exposition et les concentrations avec l’équipe pharmaceutique.",
+    "pt-BR": "Nenhum esquema adequado foi encontrado dentro das restrições deste fluxo; revise a dose, o intervalo, a exposição e as concentrações com a equipe de farmácia."
+  },
+  "This policy does not change recorded doses or establish a universal prescribing minimum.": {
+    "es": "Esta política no modifica las dosis registradas ni establece una dosis mínima universal de prescripción.",
+    "fr": "Cette politique ne modifie pas les doses enregistrées et ne définit pas de dose minimale universelle de prescription.",
+    "pt-BR": "Esta política não altera as doses registradas nem estabelece uma dose mínima universal para prescrição."
+  },
+  "Steady-state predictions from the same PK parameters. Automatic candidates must have AUC₂₄ within 400–600 and doses of at least 500 mg by product policy": {
+    "es": "Predicciones en estado estacionario con los mismos parámetros farmacocinéticos. Las pautas automáticas deben tener un AUC₂₄ entre 400–600 y dosis de al menos 500 mg por política del producto",
+    "fr": "Prédictions à l’équilibre avec les mêmes paramètres pharmacocinétiques. Les schémas automatiques doivent avoir une AUC₂₄ entre 400–600 et des doses d’au moins 500 mg selon la politique du produit",
+    "pt-BR": "Previsões no estado de equilíbrio com os mesmos parâmetros farmacocinéticos. Os esquemas automáticos devem ter AUC₂₄ entre 400–600 e doses de pelo menos 500 mg por política do produto"
+  },
+  "No suitable automatic adult maintenance regimen meets the supported q6h/q8h/q12h/q24h dose and exposure constraints and AUC₂₄ target of 400–600 mg·h/L. Pharmacy review is required; no automatic maintenance regimen is suggested.": {
+    "es": "Ninguna pauta automática de mantenimiento para adultos cumple las restricciones de dosis y exposición de los intervalos admitidos de 6/8/12/24 h y el objetivo de AUC₂₄ de 400–600 mg·h/L. Se requiere revisión farmacéutica; no se propone una pauta de mantenimiento automática.",
+    "fr": "Aucun schéma automatique d’entretien chez l’adulte ne respecte les contraintes de dose et d’exposition des intervalles admis de 6/8/12/24 h et la cible d’AUC₂₄ de 400–600 mg·h/L. Un avis pharmaceutique est requis ; aucun schéma automatique d’entretien n’est proposé.",
+    "pt-BR": "Nenhum esquema automático de manutenção em adultos atende às restrições de dose e exposição dos intervalos permitidos de 6/8/12/24 h e à meta de AUC₂₄ de 400–600 mg·h/L. É necessária revisão farmacêutica; nenhum esquema de manutenção automático é sugerido."
+  },
+  "Automatic adult maintenance suggestions use 500–2000 mg doses in 250 mg increments as product policy, not a universal prescribing minimum.": {
+    "es": "Las propuestas automáticas de mantenimiento en adultos utilizan dosis de 500–2000 mg en incrementos de 250 mg por política del producto, no como dosis mínima universal de prescripción.",
+    "fr": "Les propositions automatiques d’entretien chez l’adulte utilisent des doses de 500–2000 mg par paliers de 250 mg selon la politique du produit, sans définir de dose minimale universelle de prescription.",
+    "pt-BR": "As sugestões automáticas de manutenção em adultos usam doses de 500–2000 mg em incrementos de 250 mg por política do produto, não como dose mínima universal para prescrição."
+  },
+  "Review dose, interval and exposure constraints with pharmacy.": {
+    "es": "Revise las restricciones de dosis, intervalo y exposición con farmacia.",
+    "fr": "Revoir les contraintes de dose, d’intervalle et d’exposition avec l’équipe pharmaceutique.",
+    "pt-BR": "Revise as restrições de dose, intervalo e exposição com a equipe de farmácia."
+  },
+  "Empiric search returned no suitable in-target candidate": {
+    "es": "La búsqueda empírica no encontró una pauta adecuada dentro del objetivo",
+    "fr": "La recherche probabiliste n’a trouvé aucun schéma adapté dans la cible",
+    "pt-BR": "A busca empírica não encontrou nenhum esquema adequado dentro da meta"
+  },
+  "Automatic adult maintenance suggestions exclude 250 mg doses by product policy. Doses are not increased automatically to compensate. No suitable regimen was found within this workflow's constraints; review the dose, interval, exposure and level data with pharmacy. This policy does not change recorded doses or establish a universal prescribing minimum.": {
+    "es": "Las propuestas automáticas de mantenimiento en adultos excluyen las dosis de 250 mg por política del producto. Las dosis no se aumentan automáticamente para compensar. No se encontró una pauta adecuada dentro de las restricciones de este flujo de trabajo; revise la dosis, el intervalo, la exposición y las concentraciones con farmacia. Esta política no modifica las dosis registradas ni establece una dosis mínima universal de prescripción.",
+    "fr": "Les propositions automatiques d’entretien chez l’adulte excluent les doses de 250 mg selon la politique du produit. Les doses ne sont pas augmentées automatiquement pour compenser. Aucun schéma adapté n’a été trouvé dans les limites de ce parcours ; revoir la dose, l’intervalle, l’exposition et les concentrations avec l’équipe pharmaceutique. Cette politique ne modifie pas les doses enregistrées et ne définit pas de dose minimale universelle de prescription.",
+    "pt-BR": "As sugestões automáticas de manutenção em adultos excluem doses de 250 mg por política do produto. As doses não são aumentadas automaticamente para compensar. Nenhum esquema adequado foi encontrado dentro das restrições deste fluxo; revise a dose, o intervalo, a exposição e as concentrações com a equipe de farmácia. Esta política não altera as doses registradas nem estabelece uma dose mínima universal para prescrição."
   }
 }

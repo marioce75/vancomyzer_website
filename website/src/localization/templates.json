@@ -783,5 +783,20 @@
     "es": "Pauta actual — proyección en estado estacionario (historial real: {n1} dosis administradas)",
     "fr": "Schéma actuel — projection à l’état d’équilibre (historique réel : {n1} doses administrées)",
     "pt-BR": "Esquema atual — projeção no estado de equilíbrio (histórico real: {n1} doses administradas)"
+  },
+  "Recorded single dose: {n1} mg.": {
+    "es": "Dosis única registrada: {n1} mg.",
+    "fr": "Dose unique enregistrée : {n1} mg.",
+    "pt-BR": "Dose única registrada: {n1} mg."
+  },
+  "Recorded single dose {n1} mg": {
+    "es": "Dosis única registrada {n1} mg",
+    "fr": "Dose unique enregistrée {n1} mg",
+    "pt-BR": "Dose única registrada {n1} mg"
+  },
+  "Maintenance projection after a recorded single dose of {n1} mg; no prior maintenance interval is implied.": {
+    "es": "Proyección de mantenimiento tras una dosis única registrada de {n1} mg; no se presupone un intervalo de mantenimiento previo.",
+    "fr": "Projection d’entretien après une dose unique enregistrée de {n1} mg ; aucun intervalle d’entretien antérieur n’est supposé.",
+    "pt-BR": "Projeção de manutenção após uma dose única registrada de {n1} mg; nenhum intervalo de manutenção anterior é presumido."
   }
 }

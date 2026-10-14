@@ -18,3 +18,21 @@ test('clinical review-status builder prose has reviewed translations', () => {
   assert.ok(prose.length >= 20);
   for (const s of prose) for (const lang of ['es', 'fr', 'pt-BR'] as const) assert.notEqual(translate(s, lang), s, s);
 });
+
+test('adult automatic policy and pulse wording translate without changing dose numbers', () => {
+  const samples = [
+    'Pharmacy review required — no automatic maintenance regimen',
+    'Recorded single dose only — no maintenance regimen suggested.',
+    'Automatic adult maintenance suggestions exclude 250 mg doses by product policy. Doses are not increased automatically to compensate. No suitable regimen was found within this workflow\'s constraints; review the dose, interval, exposure and level data with pharmacy. This policy does not change recorded doses or establish a universal prescribing minimum.',
+    'Recorded single dose: 1000 mg.',
+    'Recorded single dose 1000 mg',
+    'Maintenance projection after a recorded single dose of 1000 mg; no prior maintenance interval is implied.',
+    'No automatic maintenance regimen',
+  ];
+  for (const source of samples) for (const locale of ['es', 'fr', 'pt-BR'] as const) {
+    const translated = translateGeneratedText(source, locale);
+    assert.notEqual(translated, source);
+    assert.deepEqual(translated.match(/\d+(?:\.\d+)?/g), source.match(/\d+(?:\.\d+)?/g));
+    assert.doesNotMatch(translated, /Pharmacy review|Recorded single dose|Automatic adult maintenance|universal prescribing minimum|no prior maintenance interval/);
+  }
+});
