@@ -32,7 +32,7 @@ import DoseRecommendationCard, { LoadingDosePopover } from "@/components/calcula
 import TeachingNote from "@/components/calculator/TeachingNote";
 import Advisory from "@/components/calculator/Advisory";
 import InputSection from "@/components/calculator/InputSection";
-import { RegimenComparisonResult } from "@/components/calculator/RegimenComparisonTable";
+import { RegimenComparisonResult, shouldViewCurrentRegimen } from "@/components/calculator/RegimenComparisonTable";
 import ResultDetailTabs from "@/components/calculator/ResultDetailTabs";
 import InterpretationSummaryCard from "@/components/calculator/InterpretationSummaryCard";
 import LimitationsCard from "@/components/calculator/LimitationsCard";
@@ -612,7 +612,7 @@ export default function CalculatorWorkspace() {
   // placeholder interval the loading-dose form never asks for). Each
   // candidate's curve is loading  that maintenance. Nothing is recomputed.
   const currentRegimenOption: FrequencyOption | null =
-    viewCurrentRegimen && visibleResult?.recommendation_type === "existing_regimen"
+    visibleResult && shouldViewCurrentRegimen(visibleResult, viewCurrentRegimen)
       ? {
           dose_mg: regimen.dose_mg,
           interval_hours: regimen.interval_hours,

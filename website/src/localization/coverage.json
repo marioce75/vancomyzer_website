@@ -12621,7 +12621,7 @@
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 176,
+      "line": 185,
       "text": "No candidate regimens — see the safety state above.",
       "translated": true
     },

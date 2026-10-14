@@ -1,7 +1,7 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import DoseRecommendationCard from '../../../components/calculator/DoseRecommendationCard';
-import RegimenComparisonTable, { RegimenComparisonResult } from '../../../components/calculator/RegimenComparisonTable';
+import RegimenComparisonTable, { RegimenComparisonResult, shouldViewCurrentRegimen } from '../../../components/calculator/RegimenComparisonTable';
 /** Synthetic product-policy regressions; no patient/screenshot inputs. */
 import assert from 'node:assert/strict';
 import { buildDocumentationPreview } from '../explain/buildDocumentationPreview';
@@ -158,6 +158,25 @@ const normalMarkup = renderBoundary({});
 assert.match(normalMarkup, /250 mg q24h/);
 assert.match(normalMarkup, /750 mg q24h/);
 console.log('Workspace comparison boundary: review/history/pulse/refusal/normal cases passed.');
+
+// Before any click, review-needed exports and metrics use the selected history.
+for (const result of [blocked, blockedHistory]) {
+  const current = shouldViewCurrentRegimen(result, false);
+  assert.equal(current, true);
+  const html = generateReportHTML({ ...patient, mode: 'existing_regimen',
+    recommended_dose: '250', recommended_interval_hours: 24,
+    auc24: result.auc24, peak: result.peak, trough: result.trough,
+    regimen_is_current: current,
+    recommendation_blocked: result.adjustment_dosing_blocked.safety_message });
+  assert.match(html, /Current regimen \(as entered\)/);
+  assert.match(html, /No automatic maintenance regimen/);
+  assert.doesNotMatch(html, /<div class="section-title">Recommended Regimen/);
+}
+assert.equal(shouldViewCurrentRegimen(pulse, false), false, 'eligible result retains recommended default');
+assert.equal(shouldViewCurrentRegimen(pulse, true), true, 'manual history selection remains available');
+assert.equal(shouldViewCurrentRegimen(noInitial, false), false, 'empiric refusal has no current regimen');
+assert.equal(shouldViewCurrentRegimen({ ...blocked, adjustment_dosing_blocked: { ...blocked.adjustment_dosing_blocked, review_required: false } }, false), false);
+console.log('Review-needed default selection and pre-click current-regimen export passed.');
 
 // A rejected 250 mg recommendation must not discard other eligible alternatives.
 const mixedOptions = [250, 500, 750, 1250].map(dose_mg => ({

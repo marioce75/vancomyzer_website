@@ -157,6 +157,15 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
   );
 }
 
+/** Review-needed history is the effective selection before any row interaction. */
+export function shouldViewCurrentRegimen(
+  result: Pick<CalculateResponse, "recommendation_type" | "empiric_dosing_blocked" | "adjustment_dosing_blocked">,
+  requested: boolean,
+) {
+  return result.recommendation_type === "existing_regimen" &&
+    (requested || (!result.empiric_dosing_blocked && result.adjustment_dosing_blocked?.review_required === true));
+}
+
 /** Shared workspace boundary: review-needed may display history, never candidates. */
 export function RegimenComparisonResult({ result, ...props }: RegimenComparisonTableProps & {
   result: Pick<CalculateResponse, "empiric_dosing_blocked" | "adjustment_dosing_blocked">;
