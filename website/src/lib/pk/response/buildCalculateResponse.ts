@@ -146,7 +146,9 @@ export function buildCalculateResponse(
       key_inputs: [
         `SCr ${engineOutput.scr} mg/dL (${modelShortName(engineOutput.model_name)} renal covariate)`,
         `${engineOutput.level_count} measured level${engineOutput.level_count === 1 ? "" : "s"}`,
-        `Current regimen ${engineOutput.current_regimen_dose_mg} mg q${engineOutput.current_regimen_interval_hours}h`,
+        engineOutput.doses_given === 1
+          ? `Recorded single dose ${engineOutput.current_regimen_dose_mg} mg`
+          : `Current regimen ${engineOutput.current_regimen_dose_mg} mg q${engineOutput.current_regimen_interval_hours}h`,
       ],
       caution_flags: [
         ...(engineOutput.posterior_fit?.uncertainty_label === "high"

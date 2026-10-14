@@ -4,6 +4,7 @@ import DoseRecommendationCard from '../../../components/calculator/DoseRecommend
 import RegimenComparisonTable from '../../../components/calculator/RegimenComparisonTable';
 /** Synthetic product-policy regressions; no patient/screenshot inputs. */
 import assert from 'node:assert/strict';
+import { buildDocumentationPreview } from '../explain/buildDocumentationPreview';
 import { buildAdjustmentRecommendation } from '../recommend/buildAdjustmentRecommendation';
 import { runExistingRegimenEngine } from '../existing/existingRegimenEngine';
 import { runExistingRegimenPipeline } from '../runExistingRegimenPipeline';
@@ -84,6 +85,10 @@ assert.ok(blocked.curve.length > 0, 'recorded single-dose exposure remains inspe
 const afterInfusion = blocked.curve.filter((p: any) => p.time_hours >= regimen.infusion_duration_hours);
 assert.ok(afterInfusion.every((p: any, i: number) => i === 0 || p.concentration <= afterInfusion[i - 1].concentration), 'no maintenance-dose peaks after the recorded infusion');
 assert.deepEqual(blocked.frequency_options, []);
+assert.match(blocked.interpretation_summary, /Recorded single dose: 1000 mg/);
+assert.doesNotMatch(blocked.interpretation_summary, /Current regimen:.*every/);
+assert.match(pulse.documentation_preview.clinical_note, /no prior maintenance interval is implied/);
+assert.doesNotMatch(pulse.documentation_preview.clinical_note, /interval (extension|shortening) from/);
 const blockedHistory: any = runExistingRegimenPipeline({ patient, regimen: { ...regimen, dose_mg: 250, doses_given: 3, steady_state_confirmed: false }, levels: [{ value_mcg_ml: 8, time_since_last_dose_hours: 20 }], policy: { ...DEFAULT_DOSE_POLICY, maxSingleDoseMg: 250 } });
 assert.ok(blockedHistory.adjustment_dosing_blocked);
 assert.deepEqual(blockedHistory.curve, history.curve, 'blocked non-pulse history prediction remains unchanged');
@@ -118,3 +123,7 @@ const initialHtml = generateReportHTML({ ...patient, mode: 'initial_regimen', ..
 assert.match(initialHtml, /Not available/);
 assert.doesNotMatch(initialHtml, /mg every 0 h/);
 console.log('Shared UI card/table and high-clearance initial review/export assertions passed.');
+
+const weakPulse: any = { ...seed, doses_given: 1, level_count: 1, auc24: 700, peak: 50, current_regimen_interval_hours: 12, posterior_fit: { ...seed.posterior_fit, fit_quality: 'weak', uncertainty_label: 'high' } };
+const weakPulseNote = buildDocumentationPreview({ engineOutput: weakPulse, recommendation: { ...buildAdjustmentRecommendation(seed), recommended_interval_hours: 24 } });
+assert.doesNotMatch(weakPulseNote.clinical_note, /interval extension|interval shortening|same-interval dose reduction/);

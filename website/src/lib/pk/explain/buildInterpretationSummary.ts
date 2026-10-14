@@ -58,7 +58,7 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
   const blocked = recommendation.adjustment_dosing_blocked;
   if (blocked) {
     return (
-      `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. ` +
+      (isPulseDose ? `Recorded single dose: ${current_regimen_dose_mg} mg. ` : `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. `) +
       `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L. ` +
       `Two-compartment model (SCr ${scr} mg/dL). ` +
       `${blocked.safety_message} ${blocked.recommended_action} ` +

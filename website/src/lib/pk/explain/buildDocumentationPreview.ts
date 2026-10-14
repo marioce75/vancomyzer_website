@@ -9,6 +9,8 @@ function buildRecommendationDelta(input: ExplanationInput): string {
     parseInt(recommendation.recommended_dose.replace(/\D/g, ""), 10) || currentDose;
   const recommendedInterval = recommendation.recommended_interval_hours;
 
+  if (engineOutput.doses_given === 1) return `Maintenance projection after a recorded single dose of ${currentDose} mg; no prior maintenance interval is implied.`;
+
   const parts: string[] = [];
   if (recommendedDose > currentDose) {
     parts.push(`dose increase from ${currentDose} mg to ${recommendedDose} mg`);
@@ -30,6 +32,7 @@ function buildRecommendationDelta(input: ExplanationInput): string {
 
 function buildSparseHighExposureNote(input: ExplanationInput): string | null {
   const { engineOutput, recommendation } = input;
+  if (engineOutput.doses_given === 1) return null;
   if (
     engineOutput.level_count <= 1 &&
     (engineOutput.posterior_fit?.fit_quality === "weak" ||
