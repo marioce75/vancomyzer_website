@@ -12,7 +12,7 @@ import { curvePoints, type CredibleBandSpec } from "./pk/steadyStateTwoCompartme
 import { priorParameterUncertainty, summarizeParameterUncertainty } from "./pk/posterior/parameterUncertainty";
 import { buildInitialRegimenReviewStatus } from "./pk/response/buildReviewStatus";
 import { highBmiAdvisory, modelShortName, renalCovariateDescription } from "./pk/modelRegistry";
-import { DEFAULT_DOSE_POLICY, type DosePolicy } from "./pk/dosePolicy";
+import { DEFAULT_DOSE_POLICY, AUTOMATIC_ADULT_MAINTENANCE_DOSES_MG, type DosePolicy } from "./pk/dosePolicy";
 import {
   ARC_THRESHOLD_ML_MIN_1_73,
   crclOnTotalBodyWeight,
@@ -97,6 +97,7 @@ export interface InitialRegimenResult {
    * patients with severe renal impairment.
    */
   empiric_dosing_blocked?: {
+    review_required?: boolean;
     reason: string;
     recommended_pulse_dose_mg: number;
     safety_message: string;
@@ -108,10 +109,10 @@ const TARGET_AUC24_LOW = 400;
 const TARGET_AUC24_HIGH = 600;
 const TARGET_AUC24_MID = 500;
 
-// Dose grid: minimum 500 mg (clinical floor — sub-500 mg empiric dosing belongs
-// in the level-guided pulse-dose workflow, not fixed-interval). Capped at 2000 mg
+// Automatic adult maintenance product-policy grid, not a prescribing minimum.
+// Historical, manual and loading doses are separate. Capped at 2000 mg
 // per IDSA/ASHP 2020 guideline (15–20 mg/kg, institutional cap 2000 mg).
-const DOSE_OPTIONS_MG = [500, 750, 1000, 1250, 1500, 1750, 2000];
+const DOSE_OPTIONS_MG = AUTOMATIC_ADULT_MAINTENANCE_DOSES_MG;
 // Q6h added for high-clearance patients who need more frequent dosing.
 // Intervals beyond q24h are intentionally NOT in the grid — when the search
 // returns no safe candidate at q6/q8/q12/q24, the engine falls through to a
@@ -199,7 +200,7 @@ function chooseInitialCandidate(CL: number, V1: number, Q: number, V2: number, s
   }
 
   const inRangeCandidates = candidates.filter((c) => c.inRange);
-  const ranked = (inRangeCandidates.length > 0 ? inRangeCandidates : candidates).sort((a, b) => {
+  const ranked = inRangeCandidates.sort((a, b) => {
     const aucDelta = Math.abs(a.auc24 - TARGET_AUC24_MID) - Math.abs(b.auc24 - TARGET_AUC24_MID);
     if (aucDelta !== 0) return aucDelta;
     // On an exact AUC tie, prefer the conventional interval rather than the
@@ -400,6 +401,9 @@ export function computeInitialRegimen(
   // t½ > 50 h), we MUST NOT silently emit a guessed regimen. Refuse
   // the empiric workflow and direct the clinician to pulse-then-level.
   if (choice == null) {
+    if (candidates.length > 0 || policy.maxSingleDoseMg < 500 || policy.maxDailyDoseMg < 500) {
+      return buildEmpiricReviewResult({ patient, prior, loadingDose });
+    }
     return buildEmpiricRefusalResult({
       patient,
       prior,
@@ -758,4 +762,26 @@ function buildEmpiricRefusalResult(args: {
       estimated_cl_l_h: Math.round(prior.CL * 100) / 100,
     },
   };
+}
+
+/** @safety-checked-via: self (no suitable automatic regimen; no dosing advice) */
+function buildEmpiricReviewResult(args: Parameters<typeof buildEmpiricRefusalResult>[0]): InitialRegimenResult {
+  const result = buildEmpiricRefusalResult(args);
+  const message = "No suitable automatic adult maintenance regimen meets the supported q6h/q8h/q12h/q24h dose and exposure constraints and AUC₂₄ target of 400–600 mg·h/L. Pharmacy review is required; no automatic maintenance regimen is suggested.";
+  result.interpretation_summary = message;
+  result.assumptions = ["Automatic adult maintenance suggestions use 500–2000 mg doses in 250 mg increments as product policy, not a universal prescribing minimum."];
+  result.limitations = [message];
+  result.documentation_preview = { quick_summary: message, clinical_note: message };
+  result.calculation_details = {
+    ...result.calculation_details,
+    method: "Empiric search returned no suitable in-target candidate",
+    data_quality_summary: message,
+    caution_flags: [message],
+    review_status: { level: "caution", workflow_fit: "single_level", banner_title: "Pharmacy review required", banner_body: message, next_actions: ["Review dose, interval and exposure constraints with pharmacy."] },
+  };
+  result.empiric_dosing_blocked = {
+    review_required: true, reason: message, safety_message: message,
+    recommended_pulse_dose_mg: 0, estimated_cl_l_h: Math.round(args.prior.CL * 100) / 100,
+  };
+  return result;
 }

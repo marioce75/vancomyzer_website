@@ -46,6 +46,8 @@ export interface ReportData {
 
   // Regimen
   mode: "initial_regimen" | "existing_regimen";
+  recommendation_blocked?: string;
+  regimen_is_current?: boolean;
   recommended_dose: string;
   recommended_interval_hours: number;
   recommended_infusion_duration_hours?: number;
@@ -117,7 +119,7 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
   const posteriorLabel = data.pk_parameters?.used_posterior_refinement ? "Posterior-updated" : "Patient characteristics only";
   const watermark = buildExportWatermark(tier);
 
-  const freqRows = (data.frequency_options ?? []).map(o =>
+  const freqRows = (data.recommendation_blocked ? [] : data.frequency_options ?? []).map(o =>
     `<tr>
       <td>${o.dose_mg} mg</td>
       <td>q${o.interval_hours}h</td>
@@ -288,33 +290,33 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
   </div>
 
   <div class="section">
-    <div class="section-title">Recommended Regimen</div>
+    <div class="section-title">${data.regimen_is_current ? "Current regimen (as entered)" : "Recommended Regimen"}</div>
     <div class="dose-box">
-      <span class="dose-primary">${escapeHtml(data.recommended_dose)} mg every ${data.recommended_interval_hours} h</span>
-      ${data.recommended_infusion_duration_hours ? `<div class="dose-detail">Infuse over ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes</div>` : ""}
-      <div class="dose-detail" style="margin-top:6px">
+      ${data.recommendation_blocked ? `<span class="dose-primary">No automatic maintenance regimen</span><div class="dose-detail">${escapeHtml(data.recommendation_blocked)}</div>` : `<span class="dose-primary">${escapeHtml(data.recommended_dose.replace(/\s*mg$/i, ""))} mg every ${data.recommended_interval_hours} h</span>`}
+      ${!data.recommendation_blocked && data.recommended_infusion_duration_hours ? `<div class="dose-detail">Infuse over ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes</div>` : ""}
+      ${!data.recommendation_blocked ? `<div class="dose-detail" style="margin-top:6px">
         AUC\u2082\u2084: <strong>${fmt(data.auc24, 1)} mg\u00b7h/L</strong>
         ${data.auc24 >= 400 && data.auc24 <= 600 ? '<span class="range-badge">IN RANGE</span>' : ""}
-      </div>
+      </div>` : ""}
     </div>
   </div>
 
   <div class="section">
-    <div class="section-title">Predicted Pharmacokinetic Metrics</div>
+    <div class="section-title">${data.recommendation_blocked ? (data.mode === "initial_regimen" ? "No maintenance exposure predicted" : "Current regimen exposure (no automatic recommendation)") : "Predicted Pharmacokinetic Metrics"}</div>
     <div class="metrics-row">
       <div class="metric-card">
         <div class="metric-label">AUC\u2082\u2084</div>
-        <div class="metric-value">${fmt(data.auc24, 1)}</div>
+        <div class="metric-value">${data.recommendation_blocked && data.mode === "initial_regimen" ? "Not available" : fmt(data.auc24, 1)}</div>
         <div class="metric-unit">mg\u00b7h/L</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Peak</div>
-        <div class="metric-value">${fmt(data.peak, 2)}</div>
+        <div class="metric-value">${data.recommendation_blocked && data.mode === "initial_regimen" ? "Not available" : fmt(data.peak, 2)}</div>
         <div class="metric-unit">mg/L</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Trough</div>
-        <div class="metric-value">${fmt(data.trough, 2)}</div>
+        <div class="metric-value">${data.recommendation_blocked && data.mode === "initial_regimen" ? "Not available" : fmt(data.trough, 2)}</div>
         <div class="metric-unit">mg/L</div>
       </div>
     </div>

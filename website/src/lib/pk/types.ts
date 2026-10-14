@@ -213,6 +213,7 @@ export interface AdjustmentRecommendation {
    * don't crash.
    */
   adjustment_dosing_blocked?: {
+    review_required?: boolean;
     reason: string;
     recommended_action: string;
     safety_message: string;

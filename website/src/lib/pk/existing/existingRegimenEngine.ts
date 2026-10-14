@@ -5,7 +5,6 @@
 import { runPosteriorEngine } from "../posterior/posteriorEngine";
 import { computeExposure, curvePoints, finiteHistoryExposure, loadingDoseCurvePoints } from "../steadyStateTwoCompartment";
 import { assessSteadyStateApproach, resolveExposureHorizon, STEADY_STATE_HALF_LIVES } from "../exposureHorizon";
-import { computeSafeInfusionDurationHours } from "../recommend/infusionSafety";
 import type { ExistingRegimenEngineInput, ExistingRegimenEngineOutput } from "../types";
 import { modelShortName } from "../modelRegistry";
 import type { CredibleBandSpec } from "../steadyStateTwoCompartment";
@@ -67,7 +66,6 @@ export function runExistingRegimenEngine(
   // For loading dose: build a realistic curve showing loading → maintenance transition
   // For regular regimens: use standard multi-dose accumulation curve
   let curve: { time_hours: number; concentration: number }[];
-  let curve_engine_recommended: { time_hours: number; concentration: number }[] | undefined;
   let loading_dose_curve: { time_hours: number; concentration: number }[] | undefined;
   if (isPulseDose) {
     // The loading dose on its own (no maintenance), over the first 48 h. This
@@ -92,34 +90,6 @@ export function runExistingRegimenEngine(
       band,
     );
 
-    // Engine's optimized maintenance recommendation, computed as a separate
-    // curve so the UI can offer a toggle to compare.
-    const targetAuc = target_auc24 ?? 450;
-    const maintIntervals = [8, 12, 24];
-    let bestMaintDose = 500;
-    let bestMaintTau = 12;
-    let bestMaintTinf = 1;
-    let bestAucDiff = Infinity;
-    for (const mTau of maintIntervals) {
-      const idealDose = Math.round((targetAuc * CL * mTau / 24) / 250) * 250;
-      const clampedDose = Math.max(250, Math.min(2000, idealDose));
-      const mTinf = computeSafeInfusionDurationHours(clampedDose).infusion_duration_hours;
-      const mExposure = computeExposure({ CL, V1, Q, V2, dose_mg: clampedDose, tau: mTau, T_inf: mTinf });
-      const diff = Math.abs(mExposure.auc24 - targetAuc);
-      if (diff < bestAucDiff) {
-        bestAucDiff = diff;
-        bestMaintDose = clampedDose;
-        bestMaintTau = mTau;
-        bestMaintTinf = mTinf;
-      }
-    }
-    curve_engine_recommended = loadingDoseCurvePoints(
-      { CL, V1, Q, V2 },
-      dose_mg, T_inf,
-      bestMaintDose, bestMaintTau, bestMaintTinf,
-      undefined,
-      band,
-    );
   } else if (loading && doseHistory) {
     curve = loadingDoseCurvePoints(
       { CL, V1, Q, V2 },
@@ -239,7 +209,6 @@ export function runExistingRegimenEngine(
     current_regimen_dose_mg: dose_mg,
     current_regimen_interval_hours: interval_hours,
     curve,
-    curve_engine_recommended,
     loading_dose_curve,
     measured_levels,
     level_count: levels.length,

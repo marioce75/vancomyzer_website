@@ -748,6 +748,8 @@ export default function CalculatorWorkspace() {
       weight_kg: patient.weight_kg,
       serum_creatinine_mg_dl: patient.serum_creatinine_mg_dl,
       mode: visibleResult.recommendation_type,
+      recommendation_blocked: visibleResult.adjustment_dosing_blocked?.safety_message ?? visibleResult.empiric_dosing_blocked?.safety_message,
+      regimen_is_current: activeIsCurrent,
       recommended_dose: opt ? String(opt.dose_mg) : visibleResult.recommended_dose,
       recommended_interval_hours: opt?.interval_hours ?? visibleResult.recommended_interval_hours,
       recommended_infusion_duration_hours: opt?.infusion_duration_hours ?? visibleResult.recommended_infusion_duration_hours,
@@ -775,7 +777,7 @@ export default function CalculatorWorkspace() {
       })),
     };
     printReport(reportData, user?.subscriptionTier ?? "free", locale);
-  }, [visibleResult, activeOption, patient, user?.subscriptionTier, locale, resultRevision]);
+  }, [visibleResult, activeOption, activeIsCurrent, patient, user?.subscriptionTier, locale, resultRevision]);
 
   const leftColumn = (
     <div className="flex h-full flex-col">
@@ -919,11 +921,6 @@ export default function CalculatorWorkspace() {
           single_dose: isPulse,
         }
       : null;
-  // The engine's recommendation may fall outside the candidate list's display
-  // rule (dose ≥ 500 mg, AUC₂₄ ≤ 600). It is still shown as the recommendation
-  // — never swapped for an alternative — and flagged so the reviewer sees why.
-  const recommendedOutsideDisplayRule =
-    recommendedOption != null && !(recommendedOption.dose_mg >= 500 && recommendedOption.auc24 <= 600);
   // Dashed reference on the graph: the engine recommendation whenever something
   // else is selected (an alternative, the current regimen or the first dose).
   const comparisonCurve =
@@ -973,17 +970,6 @@ export default function CalculatorWorkspace() {
   if (displayResult?.steady_state_warning) {
     advisories.push(
       <Advisory key="ss-approach" severity="caution" title="Steady-state check" summary={displayResult.steady_state_warning} role="status" />,
-    );
-  }
-  if (recommendedOutsideDisplayRule && recommendedOption && !displayResult?.empiric_dosing_blocked && !displayResult?.adjustment_dosing_blocked) {
-    advisories.push(
-      <Advisory
-        key="display-floor"
-        severity="caution"
-        title="Recommendation outside the candidate display rule."
-        summary={`The calculator's recommendation (${recommendedOption.dose_mg} mg q${recommendedOption.interval_hours}h, AUC₂₄ ${recommendedOption.auc24}) is ${recommendedOption.dose_mg < 500 ? "below the 500 mg practical dose floor" : "above the 600 mg·h/L AUC₂₄ ceiling"} applied to the candidate list. It is shown as returned; verify against institutional protocol before use.`}
-        role="status"
-      />,
     );
   }
   if (displayResult?.calculation_details && (metricAuc ?? 0) > 600) {
@@ -1260,7 +1246,7 @@ export default function CalculatorWorkspace() {
                   />
                   <TeachingNote label="Why this dose?">
                     {displayResult.recommendation_type === "existing_regimen" ? (
-                      <><LocalizedText text="When the level data support an individualized fit, the calculator compares doses of 250–2000 mg at q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor fit) it instead scales the current dose toward that midpoint at the current interval, within the same safety limits." /></>
+                      <><LocalizedText text="When the level data support an individualized fit, the calculator compares doses of 500–2000 mg in 250 mg increments at q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor fit) it instead scales the current dose toward that midpoint at the current interval, within the same safety limits. Automatic adult maintenance suggestions exclude 250 mg doses by product policy; if no supported regimen meets the constraints and AUC target, pharmacy review is required." /></>
                     ) : (
                       <><LocalizedText text="The calculator compares doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target." /></>
                     )}{" "}<LocalizedText text="Peak and trough are forward-predicted from the patient’s posterior PK (or population prior if no level is fit) using the two-compartment model. The recommendation always favors options that stay within target rather than ones that hit midpoint exactly outside the window." /></TeachingNote>
@@ -1330,6 +1316,9 @@ export default function CalculatorWorkspace() {
 
         {/* ── Concentration-time graph ── */}
         <LocalizedSection className={`vz-area-graph vz-panel flex flex-col ${resultObscured ? "vz-obscured" : ""}`} aria-label="Concentration-time graph panel">
+          {isPulse && displayResult?.adjustment_dosing_blocked && (
+            <p className="m-0 px-3 pt-2 text-xs"><LocalizedText text="Recorded single dose only — no maintenance regimen suggested." /></p>
+          )}
           <div className={`flex min-h-0 flex-1 flex-col p-2 ${resultObscured ? "vz-obscured-content" : ""}`}>
             <ConcentrationTimeGraph
               fill={graphFill}
