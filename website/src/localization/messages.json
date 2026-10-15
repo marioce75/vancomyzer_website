@@ -16593,5 +16593,25 @@
     "es": "Incertidumbre: basada únicamente en la población.",
     "fr": "Incertitude : fondée uniquement sur la population.",
     "pt-BR": "Incerteza: baseada apenas na população."
+  },
+  "Use the site-specific Plausible script. Legacy scripts and Umami tracking are disabled.": {
+    "es": "Utilice el script específico del sitio de Plausible. Los scripts antiguos y el seguimiento de Umami están desactivados.",
+    "fr": "Utilisez le script Plausible propre au site. Les anciens scripts et le suivi Umami sont désactivés.",
+    "pt-BR": "Use o script do Plausible específico do site. Scripts antigos e o rastreamento do Umami estão desativados."
+  },
+  "Set NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC to the HTTPS pa- script URL from Plausible. NEXT_PUBLIC_ANALYTICS_DISABLED=true disables tracking.": {
+    "es": "Configure NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC con la URL HTTPS del script pa- de Plausible. NEXT_PUBLIC_ANALYTICS_DISABLED=true desactiva el seguimiento.",
+    "fr": "Définissez NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC sur l’URL HTTPS du script pa- de Plausible. NEXT_PUBLIC_ANALYTICS_DISABLED=true désactive le suivi.",
+    "pt-BR": "Defina NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC com a URL HTTPS do script pa- do Plausible. NEXT_PUBLIC_ANALYTICS_DISABLED=true desativa o rastreamento."
+  },
+  "Set ANALYTICS_DASHBOARD_URL to the shared dashboard link. Add the event names below as custom goals in Plausible.": {
+    "es": "Configure ANALYTICS_DASHBOARD_URL con el enlace compartido del panel. Añada los nombres de eventos siguientes como objetivos personalizados en Plausible.",
+    "fr": "Définissez ANALYTICS_DASHBOARD_URL sur le lien partagé du tableau de bord. Ajoutez les noms d’événements ci-dessous comme objectifs personnalisés dans Plausible.",
+    "pt-BR": "Defina ANALYTICS_DASHBOARD_URL com o link compartilhado do painel. Adicione os nomes de eventos abaixo como metas personalizadas no Plausible."
+  },
+  "On (Plausible)": {
+    "es": "Activado (Plausible)",
+    "fr": "Activé (Plausible)",
+    "pt-BR": "Ativado (Plausible)"
   }
 }

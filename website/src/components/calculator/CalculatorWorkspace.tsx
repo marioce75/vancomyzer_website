@@ -1,4 +1,5 @@
 "use client";
+import { isCalculationCompletion } from "@/lib/calculation-analytics";
 import { LocalizedSpan, LocalizedSection, LocalizedAside, LocalizedButton } from "@/localization/LocalizedElements";
 
 import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
@@ -470,7 +471,7 @@ export default function CalculatorWorkspace() {
       // (Calculate button, Cmd/Ctrl+Enter, loading-dose simulation), never the
       // debounced empiric auto-recalc (intent "auto"). The only prop is the
       // workflow label; no patient inputs or results are ever sent.
-      if (intent === "explicit") {
+      if (isCalculationCompletion(intent, data)) {
         track("Calculation Run", { mode: workflowMode });
       }
 

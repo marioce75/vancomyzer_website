@@ -1,3 +1,4 @@
+import { analyticsConfig } from "@/lib/analytics-config";
 
 import { LocalizedText } from "@/localization/LanguageProvider";
 
@@ -59,16 +60,13 @@ function readDashboard(): Dashboard {
  * reflects the settings the public pages were last published with.
  */
 function countingStatus(): string {
-  const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN?.trim();
-  if (plausibleDomain) return `On (Plausible, counting visits to ${plausibleDomain})`;
-  if (process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID?.trim()) return "On (Umami)";
-  return "Off";
+  const { status } = analyticsConfig(process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC, process.env.NEXT_PUBLIC_ANALYTICS_DISABLED);
+  return status === "configured" ? "On (Plausible)" : "Off";
 }
 
 const MEASURED: { label: string; event?: string }[] = [
   { label: "Visitors and page views" },
   { label: "Countries, regions and cities" },
-  { label: "New visitors (first visit from a browser)", event: "New Visitor" },
   { label: "Calculator opens", event: "Open Calculator" },
   { label: "Disclaimer acceptances", event: "Disclaimer Accepted" },
   { label: "Disclaimer declines", event: "Disclaimer Declined" },
@@ -91,7 +89,7 @@ export default function UsagePage() {
       <div className="bg-white border border-gray-200 rounded-lg p-5 mb-4">
         <dl className="grid grid-cols-[160px_1fr] gap-x-3 gap-y-1 text-xs text-gray-700">
           <dt className="text-gray-500"><LocalizedText text={"Visitor counting"} /></dt>
-          <dd>{countingStatus()}</dd>
+          <dd><LocalizedText text={countingStatus()} /></dd>
           <dt className="text-gray-500"><LocalizedText text={"Dashboard link"} /></dt>
           <dd>
             <LocalizedText text={dashboard.status === "ready" ? "Set" : dashboard.status === "invalid" ? "Saved, but not a valid web address" : "Not set"} />
@@ -138,19 +136,9 @@ function SetupSteps() {
     <div className="bg-white border border-gray-200 rounded-lg p-5 mb-4">
       <h2 className="text-base font-bold mb-3" style={{ color: BRAND }}><LocalizedText text={"Set up usage reporting"} /></h2>
       <ol className="list-decimal pl-5 space-y-2 text-sm text-gray-700">
-        <li><LocalizedText text={"Create an account with"} />{" "}<strong>Plausible</strong>{" "}<LocalizedText text={"(plausible.io) or"} />{" "}<strong>Umami</strong>{" "}<LocalizedText text={"(umami.is). Both count visitors without cookies."} /></li>
-        <li><LocalizedText text={"Add"} />{" "}<strong>vancomyzer.com</strong>{" "}<LocalizedText text={"as a website in that account."} /></li>
-        <li><LocalizedText text={"Plausible only: under"} />{" "}<em><LocalizedText text={"Goals"} /></em><LocalizedText text={", add a custom event goal for each event name listed below, spelled exactly as shown. Umami lists these events on its own."} /></li>
-        <li><LocalizedText text={"Create a shared link to the dashboard. In Plausible: site settings, then"} />{" "}<em><LocalizedText text={"Visibility"} /></em><LocalizedText text={", then"} />{" "}<em><LocalizedText text={"Shared links"} /></em><LocalizedText text={". Leave the password blank. In Umami: edit the website, then"} />{" "}<em><LocalizedText text={"Share URL"} /></em>.
-        </li>
-        <li><LocalizedText text={"In your hosting service's environment settings, add:"} /><ul className="list-disc pl-5 mt-1 space-y-1">
-            <li><LocalizedText text={"For Plausible:"} />{" "}<Code>NEXT_PUBLIC_PLAUSIBLE_DOMAIN</Code>{" "}<LocalizedText text={"set to"} />{" "}<Code>vancomyzer.com</Code><LocalizedText text={". If Plausible's installation page shows an address starting with"} />{" "}<Code>https://plausible.io/js/pa-</Code><LocalizedText text={", also add"} />{" "}<Code>NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC</Code>{" "}<LocalizedText text={"set to that address. This is recommended: with it, admin and research pages are left out and patient values that can appear in calculator page addresses are removed before anything is sent."} /></li>
-            <li><LocalizedText text={"For Umami:"} />{" "}<Code>NEXT_PUBLIC_UMAMI_WEBSITE_ID</Code>{" "}<LocalizedText text={"set to the website ID shown in Umami."} /></li>
-            <li>
-              <Code>ANALYTICS_DASHBOARD_URL</Code>{" "}<LocalizedText text={"set to the shared link from step 4."} /></li>
-          </ul>
-        </li>
-        <li><LocalizedText text={"Save the settings and republish the site. Visitor counting starts once the site has been republished."} /></li>
+        <li><LocalizedText text="Use the site-specific Plausible script. Legacy scripts and Umami tracking are disabled." /></li>
+        <li><LocalizedText text="Set NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC to the HTTPS pa- script URL from Plausible. NEXT_PUBLIC_ANALYTICS_DISABLED=true disables tracking." /></li>
+        <li><LocalizedText text="Set ANALYTICS_DASHBOARD_URL to the shared dashboard link. Add the event names below as custom goals in Plausible." /></li>
       </ol>
     </div>
   );

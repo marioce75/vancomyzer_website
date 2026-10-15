@@ -297,7 +297,7 @@ const GATE_CSS = `
 }
 /* Very short screens (e.g. a phone turned sideways): scroll the whole dialog
    as one so the legal text area never collapses to nothing. */
-@media (max-height: 560px) {
+@media (max-height: 700px) {
   .vmz-gate .vmz-gate-dialog { overflow-y: auto; }
   .vmz-gate .vmz-gate-body { flex: none; min-height: auto; overflow: visible; }
 }
