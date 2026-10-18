@@ -23,8 +23,11 @@ const englishMetadata: Metadata = {
   description:
     "Vancomycin dosing estimates for adults, with model assumptions, limitations and references.",
   icons: {
-    icon: { url: "/favicon.svg", type: "image/svg+xml" },
-    apple: "/favicon.svg",
+    icon: [
+      { url: "/favicon.ico", type: "image/x-icon", sizes: "16x16 32x32 48x48 64x64" },
+      { url: "/favicon.png", type: "image/png", sizes: "96x96" },
+    ],
+    apple: { url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" },
   },
 };
 
