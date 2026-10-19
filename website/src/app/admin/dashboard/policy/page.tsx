@@ -38,7 +38,7 @@ export default function PolicyPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1" style={{ color: "#1e4d8c" }}><LocalizedText text={"Policy Management"} /></h1>
-      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"Security policy library and compliance controls (SOC 2 Type I in progress, target Q4 2026)"} /></p>
+      <p className="text-sm text-gray-500 mb-6"><LocalizedText text={"Security policy library and compliance controls."} /></p>
 
       {/* Policies table */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-8">

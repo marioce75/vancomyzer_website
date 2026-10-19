@@ -31,7 +31,7 @@ Single source of truth: `src/lib/tiers.ts`.
 | `free` | Students / individual clinicians | Yes (no billing) | Calculator, watermarked exports |
 | `individual_pro` | Pharmacists / NPs / PAs | Yes (Stripe trial) | + unlimited calcs, history, custom institution name, no watermark |
 | `department` | Hospital pharmacy departments | Sales | + 5–20 user seats, `/team` admin panel, audit feed, priority support |
-| `hospital` | Health systems | Sales | + EMR/FHIR, SSO/SAML, SOC 2, BAA, custom branding, dedicated support |
+| `hospital` | Health systems | Sales | + EMR/FHIR, SSO/SAML, BAA, custom branding, dedicated support |
 
 ### Per-seat institutional role (`users.institutional_role`)
 
@@ -401,3 +401,6 @@ npx tsx scripts/manage-users.ts make-team --username NAME --institution "Hospita
 ```
 
 For ad-hoc DB queries, see Section 6 above.
+
+### SOC 2 wording
+The security-information page does not provide a SOC 2 report. Internal control labels and this runbook do not substantiate an auditor engagement, examination status or completion date. Any future audit-status statement requires documented approval based on the actual CPA engagement and scope.

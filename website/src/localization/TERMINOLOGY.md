@@ -36,7 +36,7 @@ Never substitute a laboratory sampling peak for the modeled end-of-infusion Cmax
 
 - Dosys pilot metadata promises full access, onboarding, outcomes tracking and a published case study at zero cost; verify this offer against the actual evaluation programme.
 - Dosys PN metadata mentions osmolarity although the current evaluation UI limits that capability; reconcile the English claim before publication, rather than silently inventing a different translated claim.
-- Vancomyzer compliance metadata advertises SOC 2 documentation; verify availability and status.
+- Security metadata describes information only; do not imply a SOC 2 report, certification or audit engagement.
 - Source peak/trough sampling claims, claims of highest accuracy and fixed timing suggestions require clinical review; translation does not validate them.
 - FDA/non-device CDS, warranty, liability, indemnification, privacy and consent wording require counsel review. No European regulatory status is implied by use of Spain/France terminology.
 - Legal translations preserve the English source meaning and current acceptance version. Counsel must determine the release version/renewed-consent policy before publishing translated legal text.
