@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 const englishMetadata: Metadata = {
   title: "Compliance documentation — Vancomyzer™",
-  description: "SOC 2 compliance documentation for Hospital Site subscribers.",
+  description: "Security and compliance information for Vancomyzer.",
   alternates: { canonical: "https://vancomyzer.com/compliance" },
 };
 

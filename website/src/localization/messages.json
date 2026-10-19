@@ -1169,10 +1169,10 @@
     "fr": "Documentation de conformité — Vancomyzer™",
     "pt-BR": "Documentação de conformidade — Vancomyzer™"
   },
-  "SOC 2 compliance documentation for Hospital Site subscribers.": {
-    "es": "Documentación de cumplimiento SOC 2 para suscriptores del plan Hospital Site.",
-    "fr": "Documentation de conformité SOC 2 pour les abonnés au forfait Hospital Site.",
-    "pt-BR": "Documentação de conformidade SOC 2 para assinantes do Site Hospitalar."
+  "Security and compliance information for Vancomyzer.": {
+    "es": "Información sobre seguridad y cumplimiento de Vancomyzer.",
+    "fr": "Informations sur la sécurité et la conformité de Vancomyzer.",
+    "pt-BR": "Informações sobre segurança e conformidade da Vancomyzer."
   },
   "Contact — Vancomyzer™": {
     "es": "Contacto — Vancomyzer™",
@@ -5214,20 +5214,20 @@
     "fr": "Chargement…",
     "pt-BR": "Carregando..."
   },
-  "SOC 2 Compliance Documentation": {
-    "es": "Documentación de conformidad SOC 2",
-    "fr": "Documentation de conformité SOC 2",
-    "pt-BR": "Documentação de conformidade SOC 2"
+  "Security and compliance information": {
+    "es": "Información sobre seguridad y cumplimiento",
+    "fr": "Informations sur la sécurité et la conformité",
+    "pt-BR": "Informações sobre segurança e conformidade"
   },
-  "Available to Hospital plan subscribers. Vancomyzer’s SOC 2 Type I audit is in progress, with a target completion of Q4 2026. The policy documents below are in preparation and are not yet available for download.": {
-    "es": "Disponible para suscriptores del plan Hospital. La auditoría SOC 2 de tipo I de Vancomyzer está en curso, con finalización prevista en el cuarto trimestre (Q4) de 2026. Los documentos de políticas que figuran a continuación están en preparación y aún no se pueden descargar.",
-    "fr": "Accessible aux abonnés du forfait Hospital. L’audit SOC 2 de type I de Vancomyzer est en cours, avec un objectif d’achèvement au quatrième trimestre (Q4) 2026. Les documents de politique ci-dessous sont en préparation et ne sont pas encore téléchargeables.",
-    "pt-BR": "Disponível para os assinantes do plano hospitalar. A auditoria SOC 2 Tipo I da Vancomyzer está em curso, com um objectivo de conclusão do Q4 2026. Os documentos de política abaixo estão em preparação e ainda não estão disponíveis para download."
+  "This page does not provide a SOC 2 report. Contact us with questions about security and compliance documentation.": {
+    "es": "Esta página no proporciona un informe SOC 2. Contáctenos si tiene preguntas sobre la documentación de seguridad y cumplimiento.",
+    "fr": "Cette page ne fournit pas de rapport SOC 2. Contactez-nous pour toute question sur la documentation relative à la sécurité et à la conformité.",
+    "pt-BR": "Esta página não fornece um relatório SOC 2. Entre em contato se tiver dúvidas sobre a documentação de segurança e conformidade."
   },
-  "Documentation in preparation": {
-    "es": "Documentación en preparación",
-    "fr": "Documentation en préparation",
-    "pt-BR": "Documentação em preparação"
+  "Not available for download": {
+    "es": "No disponible para descargar",
+    "fr": "Non disponible au téléchargement",
+    "pt-BR": "Não disponível para download"
   },
   "Platform Information": {
     "es": "Información de la plataforma",
@@ -5238,11 +5238,6 @@
     "es": "Versión de la aplicación:",
     "fr": "Version de l’application :",
     "pt-BR": "Versão da Aplicação:"
-  },
-  "SOC 2 Type I Target:": {
-    "es": "Objetivo SOC 2 de tipo I:",
-    "fr": "Objectif SOC 2 de type I :",
-    "pt-BR": "Alvo SOC 2 Tipo I:"
   },
   "Security controls in place today": {
     "es": "Controles de seguridad implantados actualmente",
@@ -11134,10 +11129,10 @@
     "fr": "Gestion des politiques",
     "pt-BR": "Gestão de Políticas"
   },
-  "Security policy library and compliance controls (SOC 2 Type I in progress, target Q4 2026)": {
-    "es": "Biblioteca de políticas de seguridad y controles de cumplimiento (SOC 2 Tipo I en curso, objetivo: Q4 2026)",
-    "fr": "Bibliothèque des politiques de sécurité et contrôles de conformité (SOC 2 Type I en cours, objectif : Q4 2026)",
-    "pt-BR": "Biblioteca de segurança e controlos de conformidade (SOC 2 Tipo I em curso, objectivo Q4 2026)"
+  "Security policy library and compliance controls.": {
+    "es": "Biblioteca de políticas de seguridad y controles de cumplimiento.",
+    "fr": "Bibliothèque des politiques de sécurité et contrôles de conformité.",
+    "pt-BR": "Biblioteca de políticas de segurança e controles de conformidade."
   },
   "Policy Title": {
     "es": "Título de la política",

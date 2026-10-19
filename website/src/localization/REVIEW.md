@@ -24,7 +24,7 @@ Owner review is required for these existing source claims; translations preserve
 
 - Dosys PN marketing references osmolarity despite the capability not being implemented; pilot/metadata promises need reconciliation with current product scope.
 - Dosys articles include fixed 48–72-hour monitoring language, efficacy/safety assertions, US cost estimates and a derived meta-analysis chart percentage. These need clinical/editorial review.
-- Vancomyzer SOC 2 “in progress Q4 2026” and sampling/accuracy statements require substantiation. Free/Pro/export and launch-period copy is inconsistent across surfaces.
+- Audit-status and completion-date claims were removed from the reviewed security copy; any future claim requires CPA engagement evidence. Sampling/accuracy statements require substantiation. Free/Pro/export and launch-period copy is inconsistent across surfaces.
 - Vancomyzer FAQ says Cockcroft–Gault is advisory, while another methods page describes a fitted-clearance cap. Resolve the source explanation without changing the algorithm.
 - Vancomyzer registration terms date (March 2026) differs from the embedded September 18, 2026 version. Counsel/owner must reconcile it before publication.
 - “Independent reference calculation” is a developer-run check. It must not imply independent methods review, real-patient validation or regulatory clearance. Those statuses remain explicitly pending/not reviewed.

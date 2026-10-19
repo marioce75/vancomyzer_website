@@ -1,9 +1,9 @@
 {
   "notice": "INCOMPLETE. Explicit bindings, unbound static text, and unreviewed child expressions are inventoried separately. No percentage is claimed. Dynamic API messages, report exports, imported datasets, metadata and rich text also require review. Article integrity is checked by articles.test.ts in Dosys. Citation language is retained. No clinical or legal review is implied.",
   "summary": {
-    "catalogEntries": 3323,
+    "catalogEntries": 3322,
     "files": 246,
-    "staticBindings": 1711,
+    "staticBindings": 1710,
     "dynamicBindingsRequiringRuntimeAudit": 430,
     "unboundCandidates": 117,
     "invariantCandidates": 13,
@@ -430,13 +430,13 @@
     {
       "file": "src/app/(site)/compliance/page.tsx",
       "line": 61,
-      "text": "SOC 2 Compliance Documentation",
+      "text": "Security and compliance information",
       "translated": true
     },
     {
       "file": "src/app/(site)/compliance/page.tsx",
       "line": 62,
-      "text": "Available to Hospital plan subscribers. Vancomyzer’s SOC 2 Type I audit is in progress, with a target completion of Q4 2026. The policy documents below are in preparation and are not yet available for download.",
+      "text": "This page does not provide a SOC 2 report. Contact us with questions about security and compliance documentation.",
       "translated": true
     },
     {
@@ -454,7 +454,7 @@
     {
       "file": "src/app/(site)/compliance/page.tsx",
       "line": 95,
-      "text": "Documentation in preparation",
+      "text": "Not available for download",
       "translated": true
     },
     {
@@ -471,37 +471,31 @@
     },
     {
       "file": "src/app/(site)/compliance/page.tsx",
-      "line": 114,
-      "text": "SOC 2 Type I Target:",
-      "translated": true
-    },
-    {
-      "file": "src/app/(site)/compliance/page.tsx",
-      "line": 127,
+      "line": 123,
       "text": "Security controls in place today",
       "translated": true
     },
     {
       "file": "src/app/(site)/compliance/page.tsx",
-      "line": 129,
+      "line": 125,
       "text": "HTTPS is enforced for all traffic in transit.",
       "translated": true
     },
     {
       "file": "src/app/(site)/compliance/page.tsx",
-      "line": 130,
+      "line": 126,
       "text": "Administrator accounts can enable TOTP multi-factor authentication; once enabled, it is required to access admin pages.",
       "translated": true
     },
     {
       "file": "src/app/(site)/compliance/page.tsx",
-      "line": 131,
+      "line": 127,
       "text": "Calculations and administrative actions are audit-logged.",
       "translated": true
     },
     {
       "file": "src/app/(site)/compliance/page.tsx",
-      "line": 133,
+      "line": 129,
       "text": "Business Associate Agreement: available after legal review — not yet available.",
       "translated": true
     },
@@ -7196,7 +7190,7 @@
     {
       "file": "src/app/admin/dashboard/policy/page.tsx",
       "line": 41,
-      "text": "Security policy library and compliance controls (SOC 2 Type I in progress, target Q4 2026)",
+      "text": "Security policy library and compliance controls.",
       "translated": true
     },
     {
@@ -18753,7 +18747,7 @@
     },
     {
       "file": "src/app/layout.tsx",
-      "line": 55,
+      "line": 58,
       "tag": "div",
       "expression": "children",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
