@@ -210,8 +210,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 (e.currentTarget as HTMLElement).style.background = "transparent";
                 (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
               }}
-              aria-label="Clinical settings"
-              title="Clinical settings"
+              title="Settings"
             >
               <LocalizedText text="Settings" />
             </LocalizedButton>
