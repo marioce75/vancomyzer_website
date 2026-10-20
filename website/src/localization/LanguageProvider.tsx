@@ -45,13 +45,16 @@ export function LocalizedText({ text }: { text: ReactNode }) {
 
 const subscribeHydration = () => () => {};
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ compact = false, hideOnCalculator = false }: { compact?: boolean; hideOnCalculator?: boolean }) {
   const hydrated = useSyncExternalStore(subscribeHydration, () => true, () => false);
   const { locale, setLocale } = useLanguage();
+  const pathname = usePathname();
   const id = useId();
   const label = { en: "Language", es: "Idioma", fr: "Langue", "pt-BR": "Idioma" }[locale];
-  return <div className="language-switcher" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: 8, padding: "8px 16px", fontSize: 14 }}>
-    <label htmlFor={id}>{label}</label>
+  // The calculator owns its header selector; keep the disclaimer's selector.
+  if (hideOnCalculator && pathname === "/calculator") return null;
+  return <div className={`language-switcher${compact ? " language-switcher--compact" : ""}`} style={compact ? undefined : { display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: 8, padding: "8px 16px", fontSize: 14 }}>
+    <label htmlFor={id} className={compact ? "sr-only" : undefined}>{label}</label>
     <select id={id} disabled={!hydrated} value={locale} onChange={event => setLocale(parseLocale(event.target.value))}
       style={{ maxWidth: "100%", padding: "6px 10px", border: "1px solid currentColor", background: "var(--color-bg, #fff)", color: "inherit" }}>
       <option value="en" lang="en">English</option>

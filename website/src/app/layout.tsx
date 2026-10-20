@@ -53,7 +53,7 @@ export default async function RootLayout({
       </head>
       <body className="theme-basic min-h-screen flex flex-col antialiased" suppressHydrationWarning>
         <LanguageProvider initialLocale={locale}>
-        <LanguageSwitcher />
+        <LanguageSwitcher hideOnCalculator />
         <Providers>
           <div className="flex-1">{children}</div>
           <RegulatoryFooter />
