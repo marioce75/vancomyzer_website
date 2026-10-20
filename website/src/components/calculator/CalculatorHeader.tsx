@@ -2,7 +2,7 @@
 import { LocalizedButton, LocalizedDiv } from "@/localization/LocalizedElements";
 
 
-import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
+import { LanguageSwitcher, LocalizedText, useLanguage } from "@/localization/LanguageProvider";
 
 
 import Link from "next/link";
@@ -25,7 +25,6 @@ interface CalculatorHeaderProps {
 
 export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen, userName, userRole, onLogout, showSignIn }: CalculatorHeaderProps) {
   const { t } = useLanguage();
-  const logoSrc = "/logo-signal.svg";
   return (
     <header
       className="shrink-0 border-b"
@@ -38,17 +37,17 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
       <div className="vz-calculator-header">
 
         {/* ── Brand ──────────────────────────────────────── */}
-        <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0 group" style={{ textDecoration: "none" }} aria-label={t("Vancomyzer home")}>
-          <span className="sm:hidden font-bold vancomyzer-title" style={{ fontSize: 16, letterSpacing: "2px", color: "var(--color-primary)" }}>VZ</span>
-          <div className="min-w-0 hidden sm:flex items-baseline gap-3">
+        <div className="vz-calculator-brand">
+          <Link href="/" style={{ textDecoration: "none" }} aria-label={t("Vancomyzer home")}>
             <h1
               className="font-bold whitespace-nowrap leading-none transition-colors vancomyzer-title"
-              style={{ fontSize: "18px", letterSpacing: "3px", color: "var(--color-primary)", textShadow: "0 0 10px var(--color-glow)" }}
+              style={{ color: "var(--color-primary)", textShadow: "0 0 10px var(--color-glow)" }}
             >
               VANCOMYZER{"\u2122"}
             </h1>
-            <p className="font-medium leading-none whitespace-nowrap hidden xl:block" style={{ fontSize: "10px", letterSpacing: "2px", color: "var(--color-secondary)" }}>
-                            <span style={{ fontSize: "11px", letterSpacing: "3px", color: "var(--color-dim)" }}><LocalizedText text="ENGINEERED BY" />{" "}
+          </Link>
+            <p className="vz-calculator-byline font-medium leading-none" style={{ color: "var(--color-secondary)" }}>
+              <span style={{ color: "var(--color-dim)" }}><LocalizedText text="ENGINEERED BY" />{" "}
                 <LocalizedButton
                   type="button"
                   aria-label="Visit dosys.health"
@@ -60,10 +59,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                   onMouseLeave={e => {
                     (e.currentTarget as HTMLElement).style.opacity = "1";
                   }}
-                  onClick={e => {
-                    // Stop propagation so the parent <Link href="/"> doesn't fire
-                    e.stopPropagation();
-                    e.preventDefault();
+                  onClick={() => {
                     window.open("https://dosys.health", "_blank", "noopener,noreferrer");
                   }}
                 >
@@ -71,12 +67,11 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 </LocalizedButton>
               </span>
             </p>
-          </div>
-        </Link>
+        </div>
 
-        {/* Clinical decision support badge — wide desktop only; the calculator gets the width */}
+        {/* Preserve the support label without adding another item to the bar. */}
         <span
-          className="hidden 2xl:inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap shrink-0"
+          className="sr-only"
           style={{
             border: "1px solid var(--color-primary-a40)",
             background: "var(--color-primary-a05)",
@@ -108,7 +103,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 role="tab"
                 aria-selected={viewMode === value}
                 onClick={() => onViewModeChange(value)}
-                className="px-2 sm:px-3.5 py-1 text-[11px] sm:text-[13px] font-semibold whitespace-normal transition-all"
+                className="px-2 py-1 text-[13px] font-semibold whitespace-normal transition-all"
                 style={
                   viewMode === value
                     ? {
@@ -132,7 +127,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
         </div>
 
         {/* ── Nav ───────────────────────────────────────── */}
-        <div className="hidden lg:flex min-w-0 flex-wrap items-center justify-end gap-2">
+        <div className="vz-calculator-nav">
           <Link
             href="/"
             className="vz-header-action px-2.5 py-1 text-[13px] font-medium transition"
@@ -218,14 +213,11 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               aria-label="Clinical settings"
               title="Clinical settings"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
+              <LocalizedText text="Settings" />
             </LocalizedButton>
           )}
           {userName && (
-            <span className="ml-2 text-[11px] font-medium" style={{ color: "var(--color-dim)" }}>
+            <span className="vz-header-user text-[11px] font-medium" title={userName} style={{ color: "var(--color-dim)" }}>
               {userName}
             </span>
           )}
@@ -276,44 +268,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           )}
         </div>
 
-        {/* ── Compact actions (below lg, where the nav is hidden) ─── */}
-        <div className="flex lg:hidden min-w-0 flex-wrap items-center justify-end gap-1">
-          {onSettingsOpen && (
-            <LocalizedButton
-              type="button"
-              onClick={onSettingsOpen}
-              className="p-1.5"
-              style={{ color: "var(--color-secondary)", border: "1px solid transparent", background: "transparent", cursor: "pointer" }}
-              aria-label="Clinical settings"
-              title="Clinical settings"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" aria-hidden="true">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </LocalizedButton>
-          )}
-          {userRole === "admin" && (
-            <Link
-              href="/admin/dashboard"
-              className="px-2 py-1.5 text-[10px] font-semibold"
-              style={{ color: "var(--color-secondary)", border: "1px solid var(--color-primary-a40)", background: "transparent", textDecoration: "none" }}
-            ><LocalizedText text="DASHBOARD" /></Link>
-          )}
-          {onLogout && (
-            <button type="button" onClick={onLogout}
-              className="px-2 py-1.5 text-[10px] font-semibold"
-              style={{ color: "var(--color-secondary)", border: "1px solid var(--color-border)", background: "transparent", cursor: "pointer" }}
-            ><LocalizedText text="LOGOUT" /></button>
-          )}
-          {!onLogout && showSignIn && (
-            <a
-              href="/login"
-              className="px-2 py-1.5 text-[10px] font-semibold"
-              style={{ color: "var(--color-secondary)", border: "1px solid var(--color-border)", background: "transparent", textDecoration: "none" }}
-            ><LocalizedText text="SIGN IN" /></a>
-          )}
-        </div>
+        <LanguageSwitcher compact />
 
       </div>
     </header>
