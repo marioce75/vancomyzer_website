@@ -1187,7 +1187,8 @@ body.theme-basic input:focus-visible, body.theme-basic select:focus-visible, bod
 
 /* The calculator keeps language in its header. At narrow widths, let the
    existing controls reflow instead of shrinking labels or scrolling sideways. */
-.vz-app > header { position: sticky; top: 0; z-index: 40; }
+/* Keep the sticky header below the loading-dose dialog (z-30). */
+.vz-app > header { position: sticky; top: 0; z-index: 20; }
 .vz-calculator-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
