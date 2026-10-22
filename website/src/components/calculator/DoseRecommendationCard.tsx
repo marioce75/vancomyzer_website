@@ -217,8 +217,8 @@ export function LoadingDosePopover({ weightKg, onSimulate }: LoadingDoseConfigur
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="vz-loading-dose-popover"
-        className="border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
-        style={{ borderColor: "#c6d6e6", background: open ? "#c6d6e6" : "#e6eef5", color: "#14232f", cursor: "pointer", ...FONT }}
+        className="vz-loading-dose-trigger font-semibold uppercase tracking-wider"
+        style={FONT}
       >
         <LocalizedText text={open ? "Hide loading dose" : "Loading dose"} />
       </button>
