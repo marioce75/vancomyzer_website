@@ -1255,3 +1255,37 @@ body.theme-basic .language-switcher--compact select[style] { font-family: 'Sourc
 .vz-kv { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .vz-kv dt { white-space: normal; overflow-wrap: anywhere; }
 .vz-regulatory-footer { height: auto; min-height: var(--vz-footer-h); overflow: visible; }
+/* Scoped colors override basic-theme disclosure styles; this is a secondary action. */
+:is(body, body.theme-basic) button.vz-loading-dose-trigger {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #397b83 !important;
+  border-radius: 4px;
+  background: #dff3f4 !important;
+  color: #16454d !important;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color 150ms, border-color 150ms;
+}
+:is(body, body.theme-basic) button.vz-loading-dose-trigger:hover:not(:disabled):not([aria-disabled="true"]):not([aria-disabled="true"] *) {
+  background: #c7e8eb !important;
+  border-color: #245f69 !important;
+}
+:is(body, body.theme-basic) button.vz-loading-dose-trigger:focus-visible {
+  outline: 3px solid #245f69 !important;
+  outline-offset: 3px !important;
+}
+:is(body, body.theme-basic) button.vz-loading-dose-trigger:active:not(:disabled):not([aria-disabled="true"]):not([aria-disabled="true"] *),
+:is(body, body.theme-basic) button.vz-loading-dose-trigger[aria-expanded="true"] {
+  background: #b4dce1 !important;
+  border-color: #245f69 !important;
+}
+:is(body, body.theme-basic) button.vz-loading-dose-trigger:disabled,
+:is(body, body.theme-basic) button.vz-loading-dose-trigger[aria-disabled="true"],
+:is(body, body.theme-basic) [aria-disabled="true"] button.vz-loading-dose-trigger {
+  background: #eef2f3 !important;
+  border-color: #9aa8ad !important;
+  color: #53646b !important;
+  cursor: not-allowed;
+}
