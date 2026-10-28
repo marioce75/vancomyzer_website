@@ -52,7 +52,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                   type="button"
                   aria-label="Visit dosys.health"
                   className="dosys-brand"
-                  style={{ background: "transparent", border: "none", padding: 0, color: "inherit", textDecoration: "none", letterSpacing: "0px", textTransform: "none" as const, cursor: "pointer", fontFamily: "'Inter', 'Helvetica Neue', sans-serif", fontWeight: 700, fontSize: "12px" }}
+                  style={{ background: "transparent", border: "none", padding: 0, color: "inherit", textDecoration: "none", letterSpacing: "0px", textTransform: "none" as const, cursor: "pointer", fontFamily: "'Inter', 'Helvetica Neue', sans-serif", fontWeight: 700, fontSize: "13px" }}
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLElement).style.opacity = "0.8";
                   }}
@@ -145,6 +145,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           ><LocalizedText text="Home" /></Link>
           <Link
             href="/faq"
+            aria-label={t("FAQ")} title={t("FAQ")}
             className="vz-header-action px-2.5 py-1 text-[13px] font-medium transition"
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
@@ -157,7 +158,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               (e.currentTarget as HTMLElement).style.background = "transparent";
               (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
             }}
-          ><LocalizedText text="FAQ" /></Link>
+          >FAQ</Link>
           <Link
             href="/transparent-dosing"
             className="vz-header-action px-2.5 py-1 text-[13px] font-medium transition"
@@ -210,9 +211,9 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 (e.currentTarget as HTMLElement).style.background = "transparent";
                 (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
               }}
-              title="Settings"
+              title="Settings" aria-label="Settings"
             >
-              <LocalizedText text="Settings" />
+              <span aria-hidden="true" style={{ fontSize: 18 }}>⚙</span>
             </LocalizedButton>
           )}
           {userName && (
@@ -246,7 +247,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           {!onLogout && showSignIn && (
             <a
               href="/login"
-              className="vz-header-action ml-1 px-2 py-1 text-[11px] font-semibold transition"
+              className="vz-header-action vz-header-signin ml-1 px-2 py-1 text-[11px] font-semibold transition"
               style={{
                 color: "var(--color-secondary)",
                 border: "1px solid var(--color-border)",
@@ -263,7 +264,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
                 (e.currentTarget as HTMLElement).style.borderColor = "var(--color-border)";
                 (e.currentTarget as HTMLElement).style.color = "var(--color-secondary)";
               }}
-            ><LocalizedText text="SIGN IN" /></a>
+            ><LocalizedText text="Sign in" /></a>
           )}
         </div>
 
