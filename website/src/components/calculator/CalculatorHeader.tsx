@@ -145,7 +145,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
           ><LocalizedText text="Home" /></Link>
           <Link
             href="/faq"
-            aria-label={t("FAQ")} title={t("FAQ")}
+            aria-label={t("FAQ") === "FAQ" ? "FAQ" : `FAQ — ${t("FAQ")}`} title={t("FAQ")}
             className="vz-header-action px-2.5 py-1 text-[13px] font-medium transition"
             style={{ color: "var(--color-secondary)", border: "1px solid transparent", fontFamily: "'Share Tech Mono', monospace" }}
             onMouseEnter={e => {
@@ -213,7 +213,7 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               }}
               title="Settings" aria-label="Settings"
             >
-              <span aria-hidden="true" style={{ fontSize: 18 }}>⚙</span>
+              <span className="vz-settings-gear" aria-hidden="true" style={{ fontSize: 18 }}>⚙</span>
             </LocalizedButton>
           )}
           {userName && (

@@ -1294,8 +1294,8 @@ body.theme-basic .language-switcher--compact select[style] { font-family: 'Sourc
 /* Keep sign-in visually consistent with the navigation and retain its hit area. */
 .vz-calculator-nav > .vz-header-signin { border-color: transparent !important; font-weight: 500; }
 
-/* Reserve deterministic navigation rows where the right rail is narrower. */
-@media (min-width: 1280px) and (max-width: 1599px) {
+/* Bound navigation for visitors, members and administrators at every desktop width. */
+@media (min-width: 1280px) {
   .vz-calculator-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 44px; }
   .vz-calculator-nav > .vz-header-action { min-width: 0; white-space: normal; }
 }
@@ -1306,4 +1306,11 @@ body.theme-basic .language-switcher--compact select[style] { font-family: 'Sourc
   .vz-mode-tabs > button { min-height: 44px; font-size: 11px; line-height: 16px; }
   .vz-calculator-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 44px; gap: 0; }
   .vz-calculator-nav > .vz-header-action { min-width: 0; }
+}
+
+/* The icon follows the control foreground in both normal and hover states. */
+body.theme-basic header.shrink-0 .vz-header-action .vz-settings-gear { color: inherit !important; }
+
+@media (min-width: 1280px) and (max-width: 1399px) {
+  .vz-calculator-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
