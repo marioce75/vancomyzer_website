@@ -1,4 +1,5 @@
 "use client";
+import { useId, useState } from "react";
 import { LocalizedButton, LocalizedDiv } from "@/localization/LocalizedElements";
 
 
@@ -24,7 +25,10 @@ interface CalculatorHeaderProps {
 }
 
 export default function CalculatorHeader({ viewMode, onViewModeChange, onSettingsOpen, userName, userRole, onLogout, showSignIn }: CalculatorHeaderProps) {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuId = useId();
+  const menuLabel = locale === "es" ? "Menú" : "Menu";
   return (
     <header
       className="shrink-0 border-b"
@@ -127,7 +131,8 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
         </div>
 
         {/* ── Nav ───────────────────────────────────────── */}
-        <div className="vz-calculator-nav">
+        <button type="button" className="vz-mobile-menu-toggle" aria-expanded={menuOpen} aria-controls={menuId} onClick={() => setMenuOpen(open => !open)}>{menuLabel} <span aria-hidden="true">{menuOpen ? "▴" : "▾"}</span></button>
+        <div id={menuId} className="vz-calculator-nav" data-menu-open={menuOpen}>
           <Link
             href="/"
             className="vz-header-action px-2.5 py-1 text-[13px] font-medium transition"
@@ -266,9 +271,8 @@ export default function CalculatorHeader({ viewMode, onViewModeChange, onSetting
               }}
             ><LocalizedText text="Sign in" /></a>
           )}
+          <LanguageSwitcher compact />
         </div>
-
-        <LanguageSwitcher compact />
 
       </div>
     </header>
