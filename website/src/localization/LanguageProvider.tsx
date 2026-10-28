@@ -56,11 +56,12 @@ export function LanguageSwitcher({ compact = false, hideOnCalculator = false }: 
   return <div className={`language-switcher${compact ? " language-switcher--compact" : ""}`} style={compact ? undefined : { display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: 8, padding: "8px 16px", fontSize: 14 }}>
     <label htmlFor={id} className={compact ? "sr-only" : undefined}>{label}</label>
     <select id={id} disabled={!hydrated} value={locale} onChange={event => setLocale(parseLocale(event.target.value))}
-      style={{ maxWidth: "100%", padding: "6px 10px", border: "1px solid currentColor", background: "var(--color-bg, #fff)", color: "inherit" }}>
-      <option value="en" lang="en">English</option>
-      <option value="es" lang="es-ES">Español</option>
-      <option value="fr" lang="fr-FR">Français</option>
-      <option value="pt-BR" lang="pt-BR">Português (Brasil)</option>
+      title={compact ? { en: "English", es: "Español", fr: "Français", "pt-BR": "Português (Brasil)" }[locale] : undefined}
+      style={{ maxWidth: "100%", padding: compact ? "4px 6px" : "6px 10px", border: "1px solid currentColor", background: "var(--color-bg, #fff)", color: "inherit" }}>
+      <option value="en" lang="en" aria-label="English">{compact ? "EN" : "English"}</option>
+      <option value="es" lang="es-ES" aria-label="Español">{compact ? "ES" : "Español"}</option>
+      <option value="fr" lang="fr-FR" aria-label="Français">{compact ? "FR" : "Français"}</option>
+      <option value="pt-BR" lang="pt-BR" aria-label="Português (Brasil)">{compact ? "PT 🇧🇷" : "Português 🇧🇷"}</option>
     </select>
   </div>;
 }

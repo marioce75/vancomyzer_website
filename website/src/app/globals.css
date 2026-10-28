@@ -1198,13 +1198,13 @@ body.theme-basic input:focus-visible, body.theme-basic select:focus-visible, bod
   min-height: var(--vz-header-h, 48px);
 }
 .vz-calculator-brand { min-width: 0; }
-.vz-calculator-brand h1 { font-size: 13px; letter-spacing: 1.5px; }
+.vz-calculator-brand h1 { font-size: 15px; letter-spacing: 1.5px; }
 .vz-calculator-brand > a { display: flex; align-items: center; min-height: 24px; }
-.vz-calculator-byline { font-size: 8px; white-space: nowrap; }
+.vz-calculator-byline { font-size: 9px; white-space: nowrap; }
 .vz-calculator-byline button { min-height: 24px; }
 .vz-calculator-header > .language-switcher--compact { grid-column: 2; grid-row: 1; }
 .language-switcher--compact { display: flex; align-items: center; min-width: 0; font-size: 13px; }
-.language-switcher--compact select { min-height: 44px; width: 160px; }
+.language-switcher--compact select { min-height: 32px; width: 72px; }
 body.theme-basic .language-switcher--compact select[style] { font-family: 'Source Sans 3', 'Inter', 'Helvetica Neue', sans-serif !important; }
 .vz-mode-switcher { grid-column: 1 / -1; grid-row: 2; min-width: 0; }
 .vz-mode-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1232,15 +1232,16 @@ body.theme-basic .language-switcher--compact select[style] { font-family: 'Sourc
 }
 .vz-header-user { max-width: 7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (min-width: 640px) {
-  .vz-calculator-brand h1 { font-size: 16px; letter-spacing: 2px; }
-  .vz-calculator-byline { font-size: 9px; }
+  .vz-calculator-brand h1 { font-size: 20px; letter-spacing: 2px; }
+  .vz-calculator-byline { font-size: 11px; }
   .vz-calculator-header { padding: 6px 12px; }
 }
 @media (min-width: 1280px) {
-  .vz-calculator-header { grid-template-columns: auto minmax(0, 1fr) auto auto; }
+  .vz-calculator-header { /* Match the patient rail and graph boundaries below (10px workspace padding). */
+    grid-template-columns: calc(var(--vz-rail-w) + 0.625rem - 20px) minmax(0, 1fr) minmax(0, calc(var(--vz-side-w) + 0.625rem - 92px)) 72px; }
   .vz-mode-switcher { grid-column: 2; grid-row: 1; }
-  .vz-calculator-nav { grid-column: 3; grid-row: 1; flex-wrap: nowrap; }
-  .vz-calculator-nav > .vz-header-action { max-width: 7.5rem; }
+  .vz-calculator-nav { grid-column: 3; grid-row: 1; flex-wrap: nowrap; gap: 0; }
+  .vz-calculator-nav > .vz-header-action { max-width: none; padding-inline: 4px; white-space: nowrap; }
   .vz-calculator-header > .language-switcher--compact { grid-column: 4; }
 }
 .vz-level-datetime {
@@ -1288,4 +1289,21 @@ body.theme-basic .language-switcher--compact select[style] { font-family: 'Sourc
   border-color: #9aa8ad !important;
   color: #53646b !important;
   cursor: not-allowed;
+}
+
+/* Keep sign-in visually consistent with the navigation and retain its hit area. */
+.vz-calculator-nav > .vz-header-signin { border-color: transparent !important; font-weight: 500; }
+
+/* Reserve deterministic navigation rows where the right rail is narrower. */
+@media (min-width: 1280px) and (max-width: 1599px) {
+  .vz-calculator-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 44px; }
+  .vz-calculator-nav > .vz-header-action { min-width: 0; white-space: normal; }
+}
+@media (pointer: coarse) {
+  .language-switcher--compact select { min-height: 44px; }
+}
+@media (max-width: 359px) {
+  .vz-mode-tabs > button { min-height: 44px; font-size: 11px; line-height: 16px; }
+  .vz-calculator-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 44px; gap: 0; }
+  .vz-calculator-nav > .vz-header-action { min-width: 0; }
 }
