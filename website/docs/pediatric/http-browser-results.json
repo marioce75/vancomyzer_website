@@ -1,5 +1,5 @@
 {
-  "fixture": "/var/folders/lx/gkr01r953lz0v44xy9skwjv00000gn/T/pediatric-auth-fixture-1eJken",
+  "fixture": "/var/folders/lx/gkr01r953lz0v44xy9skwjv00000gn/T/pediatric-auth-fixture-p5BV5O",
   "results": [
     "anonymous GET: 401",
     "anonymous POST: 401",
@@ -112,6 +112,11 @@
     "real MFA verify route: invalid code and stale session refused, valid code writes exact session proof, pediatric access allowed",
     "browser Etc/GMT+5 fallback=false: displayed zone and submitted offset match; year 0026 refused",
     "browser Europe/Paris fallback=true: displayed zone and submitted offset match; year 0026 refused",
+    "admin research shortlist: available",
+    "anonymous research shortlist denied",
+    "nonadmin research shortlist denied",
+    "browser delayed response: input changes prevent stale recommendations",
+    "browser shortlist: explicit assumptions, current comparison, q8 option, explicit apply preserves history/time, input changes invalidate options",
     "browser anonymous: preview denied",
     "browser admin: acknowledgement panel shown first, calculator unlocked after acknowledging",
     "browser admin: prior-only result rendered, ECMO refused",
