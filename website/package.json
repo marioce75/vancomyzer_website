@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p ${PORT:-10000}",
     "lint": "next lint",
-    "test": "npm run test:pk && npm run test:oracle && npm run test:horizon && npm run test:hmac && npm run test:baa && npm run test:cases && npm run test:safety-pattern && npm run test:predictive && npm run test:report-suite && npm run test:study-readiness && npm run test:market-intel && npm run test:timing && npm run test:contact && npm run test:security-copy",
+    "test": "npm run test:pk && npm run test:oracle && npm run test:horizon && npm run test:hmac && npm run test:baa && npm run test:cases && npm run test:safety-pattern && npm run test:predictive && npm run test:report-suite && npm run test:study-readiness && npm run test:market-intel && npm run test:timing && npm run test:contact && npm run test:security-copy && npm run test:pediatric",
     "test:pk": "node --import tsx src/lib/pk/__tests__/adultAutomaticDosePolicy.test.ts && node --import tsx src/lib/pk/__tests__/infusionSafety.test.ts && node --import tsx src/lib/pk/__tests__/existingRegimen.integration.test.ts && node --import tsx src/lib/pk/__tests__/initialRegimen.integration.test.ts && node --import tsx src/lib/pk/__tests__/credibleBand.test.ts && node --import tsx src/lib/pk/__tests__/loadingDose.test.ts",
     "test:report-suite": "node --import tsx src/lib/pk/__tests__/reportVerificationSuite.test.ts && node --import tsx src/lib/pk/__tests__/selectedRegimenReport.test.ts",
     "test:oracle": "node --import tsx src/lib/pk/__tests__/oracle/oracle.test.ts",
@@ -26,7 +26,11 @@
     "audit:localization:dynamic": "node src/localization/dynamic-review.mjs",
     "test:timing": "node --import tsx --test src/components/calculator/timing.test.ts",
     "test:contact": "node --import tsx --test src/lib/contact/*.test.ts",
-    "test:security-copy": "node --test scripts/security-copy.test.cjs"
+    "test:security-copy": "node --test scripts/security-copy.test.cjs",
+    "test:pediatric": "node --import tsx src/lib/pediatric/pediatric.test.ts && node --import tsx src/lib/pediatric/__tests__/engine.test.ts && node --import tsx src/lib/pediatric/__tests__/validation.test.ts && node --import tsx src/lib/pediatric/__tests__/localTime.test.ts && node --import tsx src/lib/pediatric/__tests__/reference.test.ts",
+    "test:pediatric:synthetic": "node --import tsx scripts/pediatric/synthetic-performance.ts",
+    "test:pediatric:http": "node scripts/pediatric/http-browser.mjs",
+    "test:pediatric:coverage": "node --import tsx scripts/pediatric/coverage-diagnostics.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

@@ -1,0 +1,137 @@
+{
+  "purpose": "source discrepancy audit only; not clinical validation",
+  "synthetic_reference": {
+    "postnatal_age_years": 35,
+    "pma_years": 35.76923076923077,
+    "weight_kg": 70,
+    "scr_mg_dl": 0.83,
+    "eta": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "study10": false,
+    "study13": false
+  },
+  "source_urls": {
+    "article": "https://link.springer.com/article/10.1007/s40262-018-0727-5",
+    "accepted_manuscript": "https://strathprints.strath.ac.uk/66504/10/Colin_etal_CP_2018_Vancomycin_pharmacokinetics_throughout_life.pdf",
+    "supplement": "https://media.springernature.com/original/springer-static/esm/art%3A10.1007%2Fs40262-018-0727-5/MediaObjects/40262_2018_727_MOESM2_ESM.txt",
+    "dosing_tables": "https://media.springernature.com/original/springer-static/esm/art%3A10.1007%2Fs40262-018-0727-5/MediaObjects/40262_2018_727_MOESM3_ESM.pdf",
+    "independent_implementation_documentation": "https://vanc.app/model-library/colin-2019/"
+  },
+  "article_table_with_narrative_decline_CL_L_h": 4.102381651824105,
+  "supplement_normalized_final_iteration_CL_L_h": 5.303352134100616,
+  "relative_difference_percent": 29.274957432166392,
+  "reference_maturation": 0.9999767011526303,
+  "reference_decline": 0.7716418631309231,
+  "normalization_multiplier_same_coefficients": 1.295968177948047,
+  "equivalent_normalized_theta_for_article": 4.0973228281017775,
+  "equivalent_unnormalized_theta_for_normalized_article": 6.881591024904129,
+  "side_by_side": [
+    {
+      "variant": "Article table + narrative-consistent decline; unnormalized",
+      "CL_L_h": 4.102381651824105
+    },
+    {
+      "variant": "Same article coefficients; ONLY add reference normalization",
+      "CL_L_h": 5.316556074561984
+    },
+    {
+      "variant": "Official NONMEM last iteration; normalized",
+      "CL_L_h": 5.303352134100616
+    },
+    {
+      "variant": "Same NONMEM coefficients; ONLY remove normalization (audit counterfactual)",
+      "CL_L_h": 4.082529799597259
+    },
+    {
+      "variant": "Chorus documented normalized equations; reference point",
+      "CL_L_h": 5.316989833370044
+    },
+    {
+      "variant": "Article; convert rounded 73.4 micromol/L to mg/dL using 88.4",
+      "CL_L_h": 4.101538429905552
+    },
+    {
+      "variant": "Article; change only SCr-standard equation precision",
+      "CL_L_h": 4.1011742654294725
+    },
+    {
+      "variant": "Article; incorrectly treat 35 chronological years as PMA (sensitivity only)",
+      "CL_L_h": 4.133253545333477
+    },
+    {
+      "variant": "Article; use literal online Eq 12 sign pattern (inconsistent with narrative)",
+      "CL_L_h": 1.7262272397886169e-07
+    }
+  ],
+  "article_worked_examples": [
+    {
+      "case": "Abstract reference: 35 y, 70 kg, SCr 0.83 mg/dL",
+      "published_CL_L_h": 4.1,
+      "article_transcription_CL_L_h": 4.102381651824105,
+      "fitted_nonmem_CL_L_h": 5.303352134100616,
+      "article_rel_error": 0.0005808906888062904,
+      "fitted_rel_error": 0.29350052051234554
+    },
+    {
+      "case": "Discussion: 60 y, 65 kg, SCr 0.97 mg/dL (85.7 umol/L)",
+      "published_CL_L_h": 2.55,
+      "article_transcription_CL_L_h": 2.5513948112108618,
+      "fitted_nonmem_CL_L_h": 3.288556776684453,
+      "article_rel_error": 0.0005469847885732904,
+      "fitted_rel_error": 0.2896301085037072
+    },
+    {
+      "case": "Discussion: 32-week PMA neonate, 1.5 kg, SCr 0.64 mg/dL",
+      "published_CL_L_h": 0.0756,
+      "article_transcription_CL_L_h": 0.07578536961652893,
+      "fitted_nonmem_CL_L_h": 0.0980490940922107,
+      "article_rel_error": 0.002451979054615583,
+      "fitted_rel_error": 0.2969456890504061
+    }
+  ],
+  "table4_optimised_dose_check": {
+    "fda_adult_optimised_daily_dose_mg": 3000,
+    "auc24_with_fitted_reference_CL": 565.6799556472905,
+    "auc24_with_article_reference_CL": 731.2825218653325,
+    "original_2000_mg_auc24_fitted": 377.119970431527,
+    "original_2000_mg_auc24_article": 487.521681243555,
+    "target_band": [
+      400,
+      700
+    ],
+    "smpc_adult_optimised_daily_dose_mg_per_kg": 43,
+    "smpc_auc24_fitted_70kg": 567.5655554994481,
+    "smpc_auc24_article_70kg": 733.7201302715503
+  },
+  "table3_equals_exp_of_run_output": {
+    "exp_1.67": 5.312167797181167,
+    "exp_3.76": 42.94842597876301,
+    "exp_3.73": 41.679108164029294,
+    "exp_1.17": 3.2219926385284996,
+    "exp_4.12": 61.55924226442852,
+    "exp_-0.113_x52_weeks": 46.44383432603281,
+    "exp_1.06": 2.8863709892679585,
+    "exp_0.807": 2.2411743681943785,
+    "exp_-0.433": 0.6485604918049761,
+    "eta_shrinkage_run_vs_table3": {
+      "run": [
+        29.832,
+        42.674,
+        47.015
+      ],
+      "table3": [
+        29.8,
+        42.7,
+        47.0
+      ]
+    }
+  },
+  "resolution": "The fitted model is the normalised supplementary run (Table 3 = exp of its printed estimates; eta shrinkage identical). The article transcription of Eq. 6 omitted /Fmat_R/Fage_R; the abstract value 4.10 L/h, both Discussion examples and Fig. 1 follow the transcription and are 0.7698x the fitted clearance. Table 4 optimised doses (3000 mg/day adults; 43 mg/kg/day SmPC) reach 400-700 only with the fitted clearance. Pediatric preview computes with the fitted parameterisation; the adult engine (article form) is unchanged and flagged for owner decision.",
+  "pediatric_calculation_enabled": true,
+  "pediatric_formulation": "fitted_nonmem",
+  "pediatric_research_only": true
+}

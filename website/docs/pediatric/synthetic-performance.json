@@ -1,0 +1,331 @@
+{
+ "purpose": "Synthetic self-consistency study: virtual patients simulated from Colin 2019 (fitted_nonmem) with published IIV and residual error; NOT clinical validation.",
+ "design": {
+  "per_stratum": 120,
+  "seed": 20261029,
+  "doses_before_sampling": 6,
+  "samples": "one-level = trough 0.5 h before dose 7; two-level = adds a level 1 h after the end of the dose-6 infusion",
+  "metric": "steady-state AUC24 of the simulated regimen (daily dose / CL); point estimate = MAP",
+  "interval": "90% credible interval from importance sampling of the exact posterior (engine method; 4000 draws), with the superseded Laplace interval reported for comparison; 90% population interval for the prior"
+ },
+ "overall": {
+  "prior_only": {
+   "n": 480,
+   "median_relative_error_pct": -2.5872197584258454,
+   "median_absolute_relative_error_pct": 22.182040808946663,
+   "rmse_pct": 35.256955753325265,
+   "p10_relative_error_pct": -34.27535762721496,
+   "p90_relative_error_pct": 50.6354610365181,
+   "posterior_median_bias_pct": null,
+   "coverage_90pct_interval": 0.8958333333333334,
+   "coverage_90pct_wilson95": [
+    0.8652900170142171,
+    0.9200909837099868
+   ],
+   "coverage_90pct_laplace_superseded": null,
+   "importance_sampling_ess": null,
+   "auc_category_agreement": 0.4791666666666667,
+   "auc_category_disagreement": 0.5208333333333333
+  },
+  "one_level": {
+   "n": 480,
+   "median_relative_error_pct": -6.142737242642453,
+   "median_absolute_relative_error_pct": 13.32962307188929,
+   "rmse_pct": 20.074907104170155,
+   "p10_relative_error_pct": -27.351912155804527,
+   "p90_relative_error_pct": 22.23160695765812,
+   "posterior_median_bias_pct": -2.7888958529111605,
+   "coverage_90pct_interval": 0.89375,
+   "coverage_90pct_wilson95": [
+    0.8629877992744017,
+    0.9182596172354645
+   ],
+   "coverage_90pct_laplace_superseded": 0.8375,
+   "importance_sampling_ess": {
+    "min": 1176.8769416246794,
+    "median": 2438.99085285821
+   },
+   "auc_category_agreement": 0.6833333333333333,
+   "auc_category_disagreement": 0.31666666666666665
+  },
+  "two_level": {
+   "n": 480,
+   "median_relative_error_pct": -4.802877681226956,
+   "median_absolute_relative_error_pct": 11.297658054356901,
+   "rmse_pct": 17.501303291522337,
+   "p10_relative_error_pct": -25.407956928594285,
+   "p90_relative_error_pct": 17.729880722050275,
+   "posterior_median_bias_pct": -1.0623597379898595,
+   "coverage_90pct_interval": 0.8979166666666667,
+   "coverage_90pct_wilson95": [
+    0.8675955337695135,
+    0.9219190511690284
+   ],
+   "coverage_90pct_laplace_superseded": 0.8291666666666667,
+   "importance_sampling_ess": {
+    "min": 687.7786533165784,
+    "median": 2054.783192494288
+   },
+   "auc_category_agreement": 0.7125,
+   "auc_category_disagreement": 0.2875
+  }
+ },
+ "by_stratum": [
+  {
+   "stratum": "preterm neonates (PMA 25-36 wk)",
+   "prior_only": {
+    "n": 120,
+    "median_relative_error_pct": -5.115533722404927,
+    "median_absolute_relative_error_pct": 23.25266056338421,
+    "rmse_pct": 37.38675706377693,
+    "p10_relative_error_pct": -35.05980251716813,
+    "p90_relative_error_pct": 63.103392191733164,
+    "posterior_median_bias_pct": null,
+    "coverage_90pct_interval": 0.875,
+    "coverage_90pct_wilson95": [
+     0.8039690855177497,
+     0.9227657111903032
+    ],
+    "coverage_90pct_laplace_superseded": null,
+    "importance_sampling_ess": null,
+    "auc_category_agreement": 0.5666666666666667,
+    "auc_category_disagreement": 0.43333333333333335
+   },
+   "one_level": {
+    "n": 120,
+    "median_relative_error_pct": -2.3520345511440963,
+    "median_absolute_relative_error_pct": 13.433455143521567,
+    "rmse_pct": 21.273716748534838,
+    "p10_relative_error_pct": -28.997837502990787,
+    "p90_relative_error_pct": 24.44016243204471,
+    "posterior_median_bias_pct": -0.0500237456392666,
+    "coverage_90pct_interval": 0.8583333333333333,
+    "coverage_90pct_wilson95": [
+     0.7848035127258367,
+     0.9096319596840804
+    ],
+    "coverage_90pct_laplace_superseded": 0.8083333333333333,
+    "importance_sampling_ess": {
+     "min": 1283.0427106516856,
+     "median": 2442.8788158501106
+    },
+    "auc_category_agreement": 0.6666666666666666,
+    "auc_category_disagreement": 0.33333333333333337
+   },
+   "two_level": {
+    "n": 120,
+    "median_relative_error_pct": -4.6188377427199985,
+    "median_absolute_relative_error_pct": 11.346091550484577,
+    "rmse_pct": 17.7905894449234,
+    "p10_relative_error_pct": -24.908284995173364,
+    "p90_relative_error_pct": 19.73655028380024,
+    "posterior_median_bias_pct": -0.836768752482972,
+    "coverage_90pct_interval": 0.8833333333333333,
+    "coverage_90pct_wilson95": [
+     0.8136649880680831,
+     0.9292194707890375
+    ],
+    "coverage_90pct_laplace_superseded": 0.8083333333333333,
+    "importance_sampling_ess": {
+     "min": 687.7786533165784,
+     "median": 2019.6268956470644
+    },
+    "auc_category_agreement": 0.7333333333333333,
+    "auc_category_disagreement": 0.2666666666666667
+   }
+  },
+  {
+   "stratum": "term neonates / young infants (PMA 37-52 wk)",
+   "prior_only": {
+    "n": 120,
+    "median_relative_error_pct": -2.212933694146581,
+    "median_absolute_relative_error_pct": 23.35108967791574,
+    "rmse_pct": 31.36067464303424,
+    "p10_relative_error_pct": -34.05735996751219,
+    "p90_relative_error_pct": 50.21881253296186,
+    "posterior_median_bias_pct": null,
+    "coverage_90pct_interval": 0.9416666666666667,
+    "coverage_90pct_wilson95": [
+     0.8844727405319686,
+     0.9714593533686271
+    ],
+    "coverage_90pct_laplace_superseded": null,
+    "importance_sampling_ess": null,
+    "auc_category_agreement": 0.425,
+    "auc_category_disagreement": 0.575
+   },
+   "one_level": {
+    "n": 120,
+    "median_relative_error_pct": -5.9238591758366805,
+    "median_absolute_relative_error_pct": 12.616063991277704,
+    "rmse_pct": 19.964323537474506,
+    "p10_relative_error_pct": -28.42503343121095,
+    "p90_relative_error_pct": 22.23160695765812,
+    "posterior_median_bias_pct": -1.772377340137498,
+    "coverage_90pct_interval": 0.8833333333333333,
+    "coverage_90pct_wilson95": [
+     0.8136649880680831,
+     0.9292194707890375
+    ],
+    "coverage_90pct_laplace_superseded": 0.8333333333333334,
+    "importance_sampling_ess": {
+     "min": 1181.0610246526678,
+     "median": 2462.7829119012986
+    },
+    "auc_category_agreement": 0.6916666666666667,
+    "auc_category_disagreement": 0.30833333333333335
+   },
+   "two_level": {
+    "n": 120,
+    "median_relative_error_pct": -3.495611059284159,
+    "median_absolute_relative_error_pct": 10.76866399942986,
+    "rmse_pct": 17.74954986144522,
+    "p10_relative_error_pct": -24.38717211608862,
+    "p90_relative_error_pct": 17.615116399281927,
+    "posterior_median_bias_pct": 0.667189272450754,
+    "coverage_90pct_interval": 0.8916666666666667,
+    "coverage_90pct_wilson95": [
+     0.8234449199472613,
+     0.9355892010589275
+    ],
+    "coverage_90pct_laplace_superseded": 0.825,
+    "importance_sampling_ess": {
+     "min": 1106.4166604415689,
+     "median": 2064.668131485899
+    },
+    "auc_category_agreement": 0.7083333333333334,
+    "auc_category_disagreement": 0.29166666666666663
+   }
+  },
+  {
+   "stratum": "children 2-11 y",
+   "prior_only": {
+    "n": 120,
+    "median_relative_error_pct": -4.246522779159748,
+    "median_absolute_relative_error_pct": 23.515613488113786,
+    "rmse_pct": 36.81687182736331,
+    "p10_relative_error_pct": -40.86707177456511,
+    "p90_relative_error_pct": 45.304435732630076,
+    "posterior_median_bias_pct": null,
+    "coverage_90pct_interval": 0.8583333333333333,
+    "coverage_90pct_wilson95": [
+     0.7848035127258367,
+     0.9096319596840804
+    ],
+    "coverage_90pct_laplace_superseded": null,
+    "importance_sampling_ess": null,
+    "auc_category_agreement": 0.425,
+    "auc_category_disagreement": 0.575
+   },
+   "one_level": {
+    "n": 120,
+    "median_relative_error_pct": -8.368560970278049,
+    "median_absolute_relative_error_pct": 14.766371782396545,
+    "rmse_pct": 20.78596934794429,
+    "p10_relative_error_pct": -30.62728252743999,
+    "p90_relative_error_pct": 22.057479032816218,
+    "posterior_median_bias_pct": -4.819004540991332,
+    "coverage_90pct_interval": 0.875,
+    "coverage_90pct_wilson95": [
+     0.8039690855177497,
+     0.9227657111903032
+    ],
+    "coverage_90pct_laplace_superseded": 0.825,
+    "importance_sampling_ess": {
+     "min": 1176.8769416246794,
+     "median": 2379.8177563907543
+    },
+    "auc_category_agreement": 0.6666666666666666,
+    "auc_category_disagreement": 0.33333333333333337
+   },
+   "two_level": {
+    "n": 120,
+    "median_relative_error_pct": -5.829051910501603,
+    "median_absolute_relative_error_pct": 12.122041446106202,
+    "rmse_pct": 18.291193675466722,
+    "p10_relative_error_pct": -26.95457181024945,
+    "p90_relative_error_pct": 18.6625946976967,
+    "posterior_median_bias_pct": -1.9278041676473412,
+    "coverage_90pct_interval": 0.875,
+    "coverage_90pct_wilson95": [
+     0.8039690855177497,
+     0.9227657111903032
+    ],
+    "coverage_90pct_laplace_superseded": 0.8166666666666667,
+    "importance_sampling_ess": {
+     "min": 1164.1836613016937,
+     "median": 2042.9556782469142
+    },
+    "auc_category_agreement": 0.6833333333333333,
+    "auc_category_disagreement": 0.31666666666666665
+   }
+  },
+  {
+   "stratum": "adolescents 12-17 y",
+   "prior_only": {
+    "n": 120,
+    "median_relative_error_pct": 0.4217584926646074,
+    "median_absolute_relative_error_pct": 18.46819615200716,
+    "rmse_pct": 35.14922683364629,
+    "p10_relative_error_pct": -32.17467401872215,
+    "p90_relative_error_pct": 49.83877873776492,
+    "posterior_median_bias_pct": null,
+    "coverage_90pct_interval": 0.9083333333333333,
+    "coverage_90pct_wilson95": [
+     0.843290092093749,
+     0.9480433532105753
+    ],
+    "coverage_90pct_laplace_superseded": null,
+    "importance_sampling_ess": null,
+    "auc_category_agreement": 0.5,
+    "auc_category_disagreement": 0.5
+   },
+   "one_level": {
+    "n": 120,
+    "median_relative_error_pct": -8.968018612455367,
+    "median_absolute_relative_error_pct": 12.988946190243182,
+    "rmse_pct": 18.133003629424344,
+    "p10_relative_error_pct": -24.934028758343747,
+    "p90_relative_error_pct": 16.571334166357257,
+    "posterior_median_bias_pct": -4.907722540148803,
+    "coverage_90pct_interval": 0.9583333333333334,
+    "coverage_90pct_wilson95": [
+     0.9061578707045692,
+     0.9820735474941622
+    ],
+    "coverage_90pct_laplace_superseded": 0.8833333333333333,
+    "importance_sampling_ess": {
+     "min": 1251.9096836855965,
+     "median": 2421.4639460301505
+    },
+    "auc_category_agreement": 0.7083333333333334,
+    "auc_category_disagreement": 0.29166666666666663
+   },
+   "two_level": {
+    "n": 120,
+    "median_relative_error_pct": -6.693180407652741,
+    "median_absolute_relative_error_pct": 11.464787743886077,
+    "rmse_pct": 16.095437504219028,
+    "p10_relative_error_pct": -25.407956928594285,
+    "p90_relative_error_pct": 11.464787743886077,
+    "posterior_median_bias_pct": -2.359487026963041,
+    "coverage_90pct_interval": 0.9416666666666667,
+    "coverage_90pct_wilson95": [
+     0.8844727405319686,
+     0.9714593533686271
+    ],
+    "coverage_90pct_laplace_superseded": 0.8666666666666667,
+    "importance_sampling_ess": {
+     "min": 1227.988990215006,
+     "median": 2073.73565894532
+    },
+    "auc_category_agreement": 0.725,
+    "auc_category_disagreement": 0.275
+   }
+  }
+ ],
+ "fit_failures": {
+  "one_level": 0,
+  "two_level": 0
+ }
+}
