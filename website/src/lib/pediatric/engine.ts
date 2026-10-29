@@ -1,3 +1,4 @@
+import { researchRegimens, type ResearchRegimens } from './researchRegimens';
 /**
  * Pediatric vancomycin research engine (Colin 2019, admin-only preview).
  *
@@ -55,6 +56,7 @@ export interface PediatricRequest {
    * forecast and is required with a dose history. No next-dose time is inferred, and
    * any level at or after that time is rejected rather than forecast over.
    */
+  research_regimen_context?: { serious_mrsa_mic1: boolean; normal_stable_renal_function: boolean };
   regimen: { dose_mg: number; interval_hours: number; infusion_minutes: number; next_dose_start?: string };
   /** Actual administrations; order in the array is irrelevant (timestamps are absolute); required when levels are supplied. */
   doses?: Array<{ start: string; dose_mg: number; infusion_minutes: number }>;
@@ -156,6 +158,7 @@ export interface PediatricResult {
   };
   target: { auc24_low: number; auc24_high: number; statement: string };
   candidate_regimens: CandidateRegimen[];
+  research_regimens?: ResearchRegimens;
   /** Input review: unusual values to verify, model-population boundaries crossed, and inputs whose clinical validity is unknown. */
   input_review: { items: InputReviewItem[]; verified: boolean };
   timeline?: {
@@ -705,6 +708,7 @@ export function runPediatricEngine(raw: unknown, formulation: Colin2019Formulati
   // Defence in depth: a successful result must never carry NaN, Infinity or a missing required number.
   const bad = [...nonFinitePaths(result), ...missingRequiredNumbers(result)];
   if (bad.length) return { status: "invalid", message: "The calculation produced a non-finite or missing value and was discarded.", field_errors: { request: `Non-finite or missing result fields: ${Array.from(new Set(bad)).slice(0, 8).join(", ")}.` } };
+  result.research_regimens = researchRegimens(result, raw as PediatricRequest, c => exposureFor(bestParams, history, c, anchorHours).forecast_auc24_next24h);
   return result;
 }
 

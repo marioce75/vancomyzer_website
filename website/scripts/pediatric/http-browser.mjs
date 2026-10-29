@@ -205,6 +205,37 @@ try {
     assert.equal(sent.doses[0].start,'2026-10-29T08:00:00'+offset);await page.getByRole('heading',{name:'Result',exact:true}).waitFor();
     results.push(`browser ${zone} fallback=${fallback}: displayed zone and submitted offset match; year 0026 refused`);await context.close();
   }
+  const searchBody={...child,research_regimen_context:{serious_mrsa_mic1:true,normal_stable_renal_function:true}};
+  {const {r,body}=await request('research shortlist',tokens.admin,'POST','/api/admin/pediatric',{},searchBody,adminAck.ack);assert.equal(r.status,200);assert.equal(JSON.parse(body).research_regimens.status,'available');results.push('admin research shortlist: available');}
+  for(const [name,token,status] of [['anonymous',null,401],['nonadmin',tokens.pharmacist,403]]){const {r,body}=await request(name,token,'POST','/api/admin/pediatric',{},searchBody,adminAck.ack);assert.equal(r.status,status);assert.doesNotMatch(body,/research_regimens/);results.push(`${name} research shortlist denied`);}
+  {
+    const context=await browser.newContext({timezoneId:'UTC'});
+    await context.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
+    await context.addCookies([{name:'next-auth.session-token',value:tokens.admin,url:base},{name:'pediatric_research_ack',value:adminAck.ack,url:base}]);
+    const page=await context.newPage();await page.goto(base+'/admin/dashboard/pediatric',{waitUntil:'networkidle'});
+    const search=page.getByRole('button',{name:'Find research regimens'});await search.waitFor();assert.equal(await search.isDisabled(),true);
+    await page.getByLabel('Serious MRSA research scenario, MIC assumed 1 mg/L').check();
+    await page.getByLabel('Normal, stable renal function independently confirmed for this research scenario').check();
+    await page.getByRole('button',{name:'+ Add dose'}).click();await page.getByLabel('Dose 1 start').fill('2026-10-29T08:00');await page.getByLabel('Next planned dose start').fill('2026-10-29T14:00');
+    await search.click();await page.getByRole('heading',{name:'Research regimen comparison'}).waitFor();
+    await page.getByRole('heading',{name:'Research regimen comparison'}).scrollIntoViewIfNeeded();
+    await page.screenshot({path:path.join(source,'docs/pediatric/research-regimens.png'),fullPage:true});
+    await page.getByRole('button',{name:'Current entered regimen',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Apply selected research regimen'}).count(),0);
+    await page.getByRole('button',{name:'400 mg q8h',exact:true}).click();await page.getByRole('button',{name:'Apply selected research regimen'}).click();
+    assert.equal(await page.getByLabel('Regimen dose mg').inputValue(),'400');assert.equal(await page.getByLabel('Regimen interval hours').inputValue(),'8');assert.equal(await page.getByLabel('Regimen infusion minutes').inputValue(),'60');
+    assert.equal(await page.getByLabel('Dose 1 start').inputValue(),'2026-10-29T08:00');assert.equal(await page.getByLabel('Next planned dose start').inputValue(),'2026-10-29T14:00');assert.equal(await page.getByRole('heading',{name:'Research regimen comparison'}).count(),0);
+    await search.click();await page.getByRole('heading',{name:'Research regimen comparison'}).waitFor();
+    await page.getByLabel('Weight',{exact:true}).fill('21');assert.equal(await page.getByRole('heading',{name:'Research regimen comparison'}).count(),0);assert.equal(await search.isDisabled(),true);
+    await page.getByLabel('Serious MRSA research scenario, MIC assumed 1 mg/L').check();
+    await page.getByLabel('Normal, stable renal function independently confirmed for this research scenario').check();
+    let release; const held=new Promise(resolve=>{release=resolve;}); let intercepted; const seen=new Promise(resolve=>{intercepted=resolve;});
+    await page.route('**/api/admin/pediatric',async route=>{if(route.request().method()==='POST'){intercepted();await held;}await route.continue();});
+    await search.click();await seen;await page.getByLabel('Weight',{exact:true}).fill('22');release();await page.waitForLoadState('networkidle');
+    assert.equal(await page.getByRole('heading',{name:'Research regimen comparison'}).count(),0,'late response cannot restore stale choices');
+    results.push('browser delayed response: input changes prevent stale recommendations');
+    results.push('browser shortlist: explicit assumptions, current comparison, q8 option, explicit apply preserves history/time, input changes invalidate options');
+    await context.close();
+  }
   for(const [name,token,allowed] of [['anonymous',null,false],['admin',tokens.admin,true],['pharmacist',tokens.pharmacist,false],['disabled',tokens.disabled,false],['pending MFA',tokens.pendingMfa,false],['verified MFA',tokens.verifiedMfa,true],['demoted',tokens.admin,false],['revoked',tokens.admin,false]]) {
     if(name==='demoted')db.exec("UPDATE users SET role='pharmacist' WHERE id=1");
     if(name==='revoked')db.exec("UPDATE users SET role='admin',session_token=NULL WHERE id=1");
@@ -233,7 +264,7 @@ try {
         await page.getByRole('button',{name:'Calculate (research only)'}).click();
         await page.getByRole('heading',{name:'Result',exact:true}).waitFor({timeout:20000});
         const text=await page.locator('body').innerText();
-        assert.match(text,/Population prior only/); assert.match(text,/Steady-state AUC24/); assert.match(text,/RESEARCH ONLY/); assert.match(text,/Candidate regimens/); assert.match(text,/research candidate pending/);
+        assert.match(text,/Population prior only/); assert.match(text,/Steady-state AUC24/); assert.match(text,/RESEARCH ONLY/); assert.match(text,/Research regimen comparison/); assert.match(text,/research candidate pending/);
         await page.screenshot({path:path.join(fixture,'admin-preview.png'),fullPage:true});
         await page.getByLabel('ECMO (excluded)').check();
         await page.getByRole('button',{name:'Calculate (research only)'}).click();

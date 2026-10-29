@@ -27,7 +27,7 @@
     "test:timing": "node --import tsx --test src/components/calculator/timing.test.ts",
     "test:contact": "node --import tsx --test src/lib/contact/*.test.ts",
     "test:security-copy": "node --test scripts/security-copy.test.cjs",
-    "test:pediatric": "node --import tsx src/lib/pediatric/pediatric.test.ts && node --import tsx src/lib/pediatric/__tests__/engine.test.ts && node --import tsx src/lib/pediatric/__tests__/validation.test.ts && node --import tsx src/lib/pediatric/__tests__/localTime.test.ts && node --import tsx src/lib/pediatric/__tests__/reference.test.ts && node --import tsx src/lib/pediatric/__tests__/requestBody.test.ts",
+    "test:pediatric": "node --import tsx src/lib/pediatric/pediatric.test.ts && node --import tsx src/lib/pediatric/__tests__/engine.test.ts && node --import tsx src/lib/pediatric/__tests__/validation.test.ts && node --import tsx src/lib/pediatric/__tests__/localTime.test.ts && node --import tsx src/lib/pediatric/__tests__/reference.test.ts && node --import tsx src/lib/pediatric/__tests__/requestBody.test.ts && node --import tsx src/lib/pediatric/__tests__/researchRegimens.test.ts",
     "test:pediatric:synthetic": "node --import tsx scripts/pediatric/synthetic-performance.ts",
     "test:pediatric:http": "node scripts/pediatric/http-browser.mjs",
     "test:pediatric:coverage": "node --import tsx scripts/pediatric/coverage-diagnostics.ts"
