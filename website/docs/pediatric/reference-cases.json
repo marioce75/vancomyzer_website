@@ -1,0 +1,1234 @@
+{
+ "typical": [
+  {
+   "label": "reference 35 y 70 kg SCr 0.83 (abstract: 4.10 L/h)",
+   "pma_years": 35.76923076923077,
+   "weight_kg": 70,
+   "scr_mg_dl": 0.83,
+   "published_article_value": 4.1,
+   "fitted": {
+    "CL": 5.303352134100616,
+    "V1": 42.755592263125564,
+    "Q": 3.210735375994871,
+    "V2": 41.85871420538064
+   },
+   "article": {
+    "CL": 4.102381651824105,
+    "V1": 42.9,
+    "Q": 3.22,
+    "V2": 41.7
+   },
+   "scr_std_fitted": 0.8314476844814986,
+   "scr_std_article": 0.8319012389364068
+  },
+  {
+   "label": "article example: 60 y 65 kg SCr 0.97 (2.55 L/h)",
+   "pma_years": 60.76923076923077,
+   "weight_kg": 65,
+   "scr_mg_dl": 0.97,
+   "published_article_value": 2.55,
+   "fitted": {
+    "CL": 3.2885567766844535,
+    "V1": 39.70162138718803,
+    "Q": 3.0371483149731096,
+    "V2": 38.868806047853454
+   },
+   "article": {
+    "CL": 2.5513948112108618,
+    "V1": 39.83571428571429,
+    "Q": 3.045912050968425,
+    "V2": 38.721428571428575
+   },
+   "scr_std_fitted": 0.9705106567270779,
+   "scr_std_article": 0.9710624210787431
+  },
+  {
+   "label": "article example: 32 wk PMA neonate 1.5 kg SCr 0.64 (0.0756 L/h)",
+   "pma_years": 0.6153846153846154,
+   "weight_kg": 1.5,
+   "scr_mg_dl": 0.64,
+   "published_article_value": 0.0756,
+   "fitted": {
+    "CL": 0.09804909409221069,
+    "V1": 0.9161912627812621,
+    "Q": 0.1798247343578188,
+    "V2": 0.8969724472581566
+   },
+   "article": {
+    "CL": 0.07578536961652893,
+    "V1": 0.9192857142857143,
+    "Q": 0.18034362126550463,
+    "V2": 0.8935714285714287
+   },
+   "scr_std_fitted": 0.6409551083416798,
+   "scr_std_article": 0.6409565593561551
+  },
+  {
+   "label": "preterm 26 wk GA + 14 d, 0.9 kg, SCr 0.9",
+   "pma_years": 0.5384615384615384,
+   "weight_kg": 0.9,
+   "scr_mg_dl": 0.9,
+   "published_article_value": null,
+   "fitted": {
+    "CL": 0.046082435597218134,
+    "V1": 0.5497147576687572,
+    "Q": 0.12259220744833633,
+    "V2": 0.538183468354894
+   },
+   "article": {
+    "CL": 0.03562064969128934,
+    "V1": 0.5515714285714285,
+    "Q": 0.12294594906044777,
+    "V2": 0.5361428571428571
+   },
+   "scr_std_fitted": 0.7915663371247171,
+   "scr_std_article": 0.791528037728268
+  },
+  {
+   "label": "term neonate 40 wk + 7 d, 3.4 kg, SCr 0.5",
+   "pma_years": 0.7884615384615384,
+   "weight_kg": 3.4,
+   "scr_mg_dl": 0.5,
+   "published_article_value": null,
+   "fitted": {
+    "CL": 0.28674035341787996,
+    "V1": 2.0767001956375273,
+    "Q": 0.3321927660857531,
+    "V2": 2.0331375471184883
+   },
+   "article": {
+    "CL": 0.22156373555910344,
+    "V1": 2.0837142857142856,
+    "Q": 0.33315131318309976,
+    "V2": 2.0254285714285714
+   },
+   "scr_std_fitted": 0.46881098956235645,
+   "scr_std_article": 0.4688623502930793
+  },
+  {
+   "label": "infant 38 wk GA + 90 d, 5.5 kg, SCr 0.3",
+   "pma_years": 0.9780219780219781,
+   "weight_kg": 5.5,
+   "scr_mg_dl": 0.3,
+   "published_article_value": null,
+   "fitted": {
+    "CL": 0.612972811839648,
+    "V1": 3.359367963531294,
+    "Q": 0.4764891328408138,
+    "V2": 3.2888989732799074
+   },
+   "article": {
+    "CL": 0.47349915231069856,
+    "V1": 3.3707142857142856,
+    "Q": 0.4778640492201907,
+    "V2": 3.2764285714285717
+   },
+   "scr_std_fitted": 0.39248376787724365,
+   "scr_std_article": 0.3925642942060765
+  },
+  {
+   "label": "toddler 2.0 y postnatal (GA 40), 12 kg, SCr 0.35",
+   "pma_years": 2.769230769230769,
+   "weight_kg": 12,
+   "scr_mg_dl": 0.35,
+   "published_article_value": null,
+   "fitted": {
+    "CL": 1.8165658538718492,
+    "V1": 7.3295301022500965,
+    "Q": 0.8553954142071695,
+    "V2": 7.175779578065253
+   },
+   "article": {
+    "CL": 1.4018133097112084,
+    "V1": 7.354285714285714,
+    "Q": 0.8578636702171765,
+    "V2": 7.1485714285714295
+   },
+   "scr_std_fitted": 0.39454316094035313,
+   "scr_std_article": 0.3947137623137184
+  },
+  {
+   "label": "child 6 y, 20 kg, SCr 0.4",
+   "pma_years": 6.769230769230769,
+   "weight_kg": 20,
+   "scr_mg_dl": 0.4,
+   "published_article_value": null,
+   "fitted": {
+    "CL": 2.862745635745549,
+    "V1": 12.21588350375016,
+    "Q": 1.2547392394049603,
+    "V2": 11.959632630108754
+   },
+   "article": {
+    "CL": 2.2091724339557444,
+    "V1": 12.257142857142856,
+    "Q": 1.25835980787799,
+    "V2": 11.914285714285715
+   },
+   "scr_std_fitted": 0.5115291906666523,
+   "scr_std_article": 0.5117712287961945
+  },
+  {
+   "label": "child 10 y, 32 kg, SCr 0.6",
+   "pma_years": 10.76923076923077,
+   "weight_kg": 32,
+   "scr_mg_dl": 0.6,
+   "published_article_value": null,
+   "fitted": {
+    "CL": 3.713062987094124,
+    "V1": 19.545413606000256,
+    "Q": 1.7850215635213915,
+    "V2": 19.135412208174007
+   },
+   "article": {
+    "CL": 2.8656673761041014,
+    "V1": 19.61142857142857,
+    "Q": 1.7901722694159716,
+    "V2": 19.062857142857144
+   },
+   "scr_std_fitted": 0.5857482956758674,
+   "scr_std_article": 0.5860372688106771
+  },
+  {
+   "label": "adolescent 15 y, 55 kg, SCr 0.8",
+   "pma_years": 15.76923076923077,
+   "weight_kg": 55,
+   "scr_mg_dl": 0.8,
+   "published_article_value": null,
+   "fitted": {
+    "CL": 4.987981066878201,
+    "V1": 33.593679635312945,
+    "Q": 2.679495304005035,
+    "V2": 32.888989732799075
+   },
+   "article": {
+    "CL": 3.850551684660238,
+    "V1": 33.707142857142856,
+    "Q": 2.687227026993082,
+    "V2": 32.76428571428571
+   },
+   "scr_std_fitted": 0.6546980649476359,
+   "scr_std_article": 0.6550319027000411
+  },
+  {
+   "label": "adolescent 17.9 y, 90 kg, SCr 1.4 (reduced renal function)",
+   "pma_years": 18.66923076923077,
+   "weight_kg": 90,
+   "scr_mg_dl": 1.4,
+   "published_article_value": null,
+   "fitted": {
+    "CL": 4.893917640977238,
+    "V1": 54.97147576687573,
+    "Q": 3.876705989246016,
+    "V2": 53.8183468354894
+   },
+   "article": {
+    "CL": 3.778073358173055,
+    "V1": 55.15714285714286,
+    "Q": 3.8878922812205357,
+    "V2": 53.61428571428572
+   },
+   "scr_std_fitted": 0.6877566873558246,
+   "scr_std_article": 0.6881124270045609
+  },
+  {
+   "label": "child 4 y, 16 kg, SCr 3.0 (severe renal impairment)",
+   "pma_years": 4.769230769230769,
+   "weight_kg": 16,
+   "scr_mg_dl": 3.0,
+   "published_article_value": null,
+   "fitted": {
+    "CL": 0.43364596747470174,
+    "V1": 9.772706803000128,
+    "Q": 1.0613801718864602,
+    "V2": 9.567706104087003
+   },
+   "article": {
+    "CL": 0.334355579865513,
+    "V1": 9.805714285714284,
+    "Q": 1.0644427999350208,
+    "V2": 9.531428571428572
+   },
+   "scr_std_fitted": 0.4618392983423426,
+   "scr_std_article": 0.46205079446056985
+  },
+  {
+   "label": "child 8 y, 25 kg, SCr 0.15 (lowest dataset creatinine)",
+   "pma_years": 8.76923076923077,
+   "weight_kg": 25,
+   "scr_mg_dl": 0.15,
+   "published_article_value": null,
+   "fitted": {
+    "CL": 4.06849675825959,
+    "V1": 15.269854379687702,
+    "Q": 1.483323883942835,
+    "V2": 14.949540787635945
+   },
+   "article": {
+    "CL": 3.1401300993908388,
+    "V1": 15.321428571428571,
+    "Q": 1.487604036759322,
+    "V2": 14.892857142857144
+   },
+   "scr_std_fitted": 0.551665072929411,
+   "scr_std_article": 0.5519323069052101
+  }
+ ],
+ "eta_and_study_effects": [
+  {
+   "pma_years": 0.6538461538461539,
+   "weight_kg": 2.0,
+   "scr_mg_dl": 0.7,
+   "eta": [
+    0.2,
+    -0.3,
+    0.5
+   ],
+   "heel": true,
+   "cancer": false,
+   "fitted": {
+    "CL": 0.0946140765410904,
+    "V1": 0.6224688910592878,
+    "Q": 0.1309016754003442,
+    "V2": 1.9718100707019621
+   }
+  },
+  {
+   "pma_years": 12.76923076923077,
+   "weight_kg": 40,
+   "scr_mg_dl": 0.5,
+   "eta": [
+    -0.4,
+    0.25,
+    -0.1
+   ],
+   "heel": false,
+   "cancer": true,
+   "fitted": {
+    "CL": 4.952747734704263,
+    "V1": 31.37100981222341,
+    "Q": 1.9577349339961372,
+    "V2": 21.643046219372433
+   }
+  }
+ ],
+ "ode_profiles": [
+  {
+   "label": "neonate 15 mg/kg q12h x4, 1 h infusions",
+   "pma_years": 0.6428571428571429,
+   "weight_kg": 1.5,
+   "scr_mg_dl": 0.64,
+   "schedule": [
+    {
+     "start_h": 0,
+     "dose_mg": 22.5,
+     "duration_h": 1
+    },
+    {
+     "start_h": 12,
+     "dose_mg": 22.5,
+     "duration_h": 1
+    },
+    {
+     "start_h": 24,
+     "dose_mg": 22.5,
+     "duration_h": 1
+    },
+    {
+     "start_h": 36,
+     "dose_mg": 22.5,
+     "duration_h": 1
+    }
+   ],
+   "parameters": {
+    "CL": 0.10486287679118678,
+    "V1": 0.9161912627812621,
+    "Q": 0.1798247343578188,
+    "V2": 0.8969724472581566
+   },
+   "points": [
+    {
+     "time_h": 0.5,
+     "concentration": 11.390947516179695,
+     "cumulative_auc": 2.919103208477026
+    },
+    {
+     "time_h": 1.0,
+     "concentration": 21.24063031657627,
+     "cumulative_auc": 11.134493278695075
+    },
+    {
+     "time_h": 1.5,
+     "concentration": 18.455900508730142,
+     "cumulative_auc": 21.03372221118426
+    },
+    {
+     "time_h": 6.0,
+     "concentration": 8.081645749595475,
+     "cumulative_auc": 74.29594785873968
+    },
+    {
+     "time_h": 12.0,
+     "concentration": 5.154074427444839,
+     "cumulative_auc": 112.30433482780153
+    },
+    {
+     "time_h": 24.0,
+     "concentration": 7.949596356989649,
+     "cumulative_auc": 270.65239333896915
+    },
+    {
+     "time_h": 37.0,
+     "concentration": 30.24404841716843,
+     "cumulative_auc": 474.640049586346
+    },
+    {
+     "time_h": 47.5,
+     "concentration": 10.614825871585603,
+     "cumulative_auc": 646.5452944724432
+    },
+    {
+     "time_h": 48.0,
+     "concentration": 10.336320363043022,
+     "cumulative_auc": 651.7826187233004
+    }
+   ]
+  },
+  {
+   "label": "child 15 mg/kg q6h x8 incl. 1.5 h infusions",
+   "pma_years": 6.769230769230769,
+   "weight_kg": 20,
+   "scr_mg_dl": 0.4,
+   "schedule": [
+    {
+     "start_h": 0,
+     "dose_mg": 300,
+     "duration_h": 1.5
+    },
+    {
+     "start_h": 6,
+     "dose_mg": 300,
+     "duration_h": 1.5
+    },
+    {
+     "start_h": 12,
+     "dose_mg": 300,
+     "duration_h": 1.5
+    },
+    {
+     "start_h": 18,
+     "dose_mg": 300,
+     "duration_h": 1.5
+    },
+    {
+     "start_h": 24,
+     "dose_mg": 300,
+     "duration_h": 1.5
+    },
+    {
+     "start_h": 30,
+     "dose_mg": 300,
+     "duration_h": 1.5
+    },
+    {
+     "start_h": 36,
+     "dose_mg": 300,
+     "duration_h": 1.5
+    },
+    {
+     "start_h": 42,
+     "dose_mg": 300,
+     "duration_h": 1.5
+    }
+   ],
+   "parameters": {
+    "CL": 2.862745635745549,
+    "V1": 12.21588350375016,
+    "Q": 1.2547392394049603,
+    "V2": 11.959632630108754
+   },
+   "points": [
+    {
+     "time_h": 1.5,
+     "concentration": 19.35089838666654,
+     "cumulative_auc": 15.699953230783494
+    },
+    {
+     "time_h": 3.0,
+     "concentration": 12.005473874451305,
+     "cumulative_auc": 38.717260927439476
+    },
+    {
+     "time_h": 5.9,
+     "concentration": 5.355639774058629,
+     "cumulative_auc": 62.268487968034705
+    },
+    {
+     "time_h": 6.0,
+     "concentration": 5.225724301295317,
+     "cumulative_auc": 62.797519162333394
+    },
+    {
+     "time_h": 24.0,
+     "concentration": 8.776593404611575,
+     "cumulative_auc": 327.2043819466132
+    },
+    {
+     "time_h": 43.5,
+     "concentration": 27.070376388677406,
+     "cumulative_auc": 655.1414080355953
+    },
+    {
+     "time_h": 47.0,
+     "concentration": 11.886046038014676,
+     "cumulative_auc": 718.1900399995097
+    },
+    {
+     "time_h": 47.9,
+     "concentration": 10.08071232005922,
+     "cumulative_auc": 728.0376334948918
+    }
+   ]
+  },
+  {
+   "label": "adolescent loading 25 mg/kg then 15 mg/kg q8h, irregular timing",
+   "pma_years": 15.76923076923077,
+   "weight_kg": 55,
+   "scr_mg_dl": 0.8,
+   "schedule": [
+    {
+     "start_h": 0,
+     "dose_mg": 1375,
+     "duration_h": 2.0
+    },
+    {
+     "start_h": 8.5,
+     "dose_mg": 825,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 16.0,
+     "dose_mg": 825,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 25.0,
+     "dose_mg": 825,
+     "duration_h": 1.0
+    }
+   ],
+   "parameters": {
+    "CL": 4.987981066878201,
+    "V1": 33.593679635312945,
+    "Q": 2.679495304005035,
+    "V2": 32.888989732799075
+   },
+   "points": [
+    {
+     "time_h": 2.0,
+     "concentration": 32.99753466588926,
+     "cumulative_auc": 35.42461105950055
+    },
+    {
+     "time_h": 4.0,
+     "concentration": 21.527260448817337,
+     "cumulative_auc": 88.98564186628172
+    },
+    {
+     "time_h": 8.0,
+     "concentration": 10.316760217550714,
+     "cumulative_auc": 149.07870762018013
+    },
+    {
+     "time_h": 9.5,
+     "concentration": 30.189095752851834,
+     "cumulative_auc": 174.28370414576298
+    },
+    {
+     "time_h": 20.0,
+     "concentration": 18.18592599592052,
+     "cumulative_auc": 381.7724403078828
+    },
+    {
+     "time_h": 26.0,
+     "concentration": 30.503991383289343,
+     "cumulative_auc": 467.25026716995234
+    },
+    {
+     "time_h": 33.0,
+     "concentration": 10.764555064589647,
+     "cumulative_auc": 593.9410275212583
+    }
+   ]
+  }
+ ],
+ "map_fits": [
+  {
+   "label": "child two levels (peak + trough after dose 6)",
+   "pma_years": 6.769230769230769,
+   "weight_kg": 20,
+   "scr_mg_dl": 0.4,
+   "schedule": [
+    {
+     "start_h": 0,
+     "dose_mg": 300,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 6,
+     "dose_mg": 300,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 12,
+     "dose_mg": 300,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 18,
+     "dose_mg": 300,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 24,
+     "dose_mg": 300,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 30,
+     "dose_mg": 300,
+     "duration_h": 1.0
+    }
+   ],
+   "observations": [
+    {
+     "time_h": 32.0,
+     "concentration": 22.0
+    },
+    {
+     "time_h": 35.5,
+     "concentration": 9.0
+    }
+   ],
+   "objective_at_eta": [
+    {
+     "eta": [
+      0,
+      0,
+      0
+     ],
+     "objective": 4.3862959298453505
+    },
+    {
+     "eta": [
+      0.3,
+      -0.2,
+      0.1
+     ],
+     "objective": 5.523291600717684
+    },
+    {
+     "eta": [
+      -0.5,
+      0.4,
+      -0.6
+     ],
+     "objective": 9.49817651198937
+    }
+   ],
+   "map_eta": [
+    0.06078174446628312,
+    0.0053286716246126326,
+    -0.0009967078131081094
+   ],
+   "map_objective": 4.269100342266547,
+   "map_parameters": {
+    "CL": 3.0543274619411513,
+    "V1": 12.281151677439397,
+    "Q": 1.2538016335907656,
+    "V2": 11.947718309359045
+   }
+  },
+  {
+   "label": "neonate one trough after dose 3",
+   "pma_years": 0.6318681318681318,
+   "weight_kg": 1.2,
+   "scr_mg_dl": 1.1,
+   "schedule": [
+    {
+     "start_h": 0,
+     "dose_mg": 18,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 18,
+     "dose_mg": 18,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 36,
+     "dose_mg": 18,
+     "duration_h": 1.0
+    }
+   ],
+   "observations": [
+    {
+     "time_h": 53.5,
+     "concentration": 14.0
+    }
+   ],
+   "objective_at_eta": [
+    {
+     "eta": [
+      0,
+      0,
+      0
+     ],
+     "objective": 4.499063305422581
+    },
+    {
+     "eta": [
+      0.3,
+      -0.2,
+      0.1
+     ],
+     "objective": 8.913576604678738
+    },
+    {
+     "eta": [
+      -0.5,
+      0.4,
+      -0.6
+     ],
+     "objective": 5.402890854167911
+    }
+   ],
+   "map_eta": [
+    -0.1976752649251875,
+    -0.1306533908409469,
+    -0.07257299801654873
+   ],
+   "map_objective": 2.596725608707511,
+   "map_parameters": {
+    "CL": 0.047690896531098606,
+    "V1": 0.6431823026089988,
+    "Q": 0.1440550137471605,
+    "V2": 0.6673459624045864
+   }
+  },
+  {
+   "label": "adolescent two levels, loading dose",
+   "pma_years": 15.76923076923077,
+   "weight_kg": 55,
+   "scr_mg_dl": 0.8,
+   "schedule": [
+    {
+     "start_h": 0,
+     "dose_mg": 1375,
+     "duration_h": 2.0
+    },
+    {
+     "start_h": 8.5,
+     "dose_mg": 825,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 16.0,
+     "dose_mg": 825,
+     "duration_h": 1.0
+    },
+    {
+     "start_h": 25.0,
+     "dose_mg": 825,
+     "duration_h": 1.0
+    }
+   ],
+   "observations": [
+    {
+     "time_h": 27.0,
+     "concentration": 30.0
+    },
+    {
+     "time_h": 33.0,
+     "concentration": 11.0
+    }
+   ],
+   "objective_at_eta": [
+    {
+     "eta": [
+      0,
+      0,
+      0
+     ],
+     "objective": 4.864086694065767
+    },
+    {
+     "eta": [
+      0.3,
+      -0.2,
+      0.1
+     ],
+     "objective": 6.873695575237938
+    },
+    {
+     "eta": [
+      -0.5,
+      0.4,
+      -0.6
+     ],
+     "objective": 9.140307755683457
+    }
+   ],
+   "map_eta": [
+    0.008891518433535143,
+    -0.06559521583362371,
+    -0.05089116192336471
+   ],
+   "map_objective": 4.786859521017573,
+   "map_parameters": {
+    "CL": 4.790938583289281,
+    "V1": 31.460812613465702,
+    "Q": 2.579150512370446,
+    "V2": 31.257107216744735
+   }
+  }
+ ],
+ "age_convention": {
+  "convention": "PMA_years = postnatal_days/365.25 + gestational_weeks/52",
+  "reference_pma_years": 35.76923076923077,
+  "reference_reproduced": true,
+  "gap_open_interval_years": [
+   0.88,
+   2.58
+  ],
+  "gap_postnatal_days_for_term_birth": [
+   40.45846153846153,
+   661.3834615384616
+  ],
+  "gap_postnatal_days_for_ga_24": [
+   152.84307692307692,
+   773.7680769230769
+  ],
+  "max_abs_deviation_days_neonatal_range": {
+   "clinical_over_52": 0.32623626373627423,
+   "control_stream_identity": 0.8460484720758671
+  },
+  "max_abs_deviation_days_to_18y": {
+   "control_stream_identity": 3.7330743809260882
+  },
+  "cl_relative_change_per_day_of_pma": {
+   "pma_23_4_wk": 0.007436436334828054,
+   "pma_30_wk": 0.007263658194481408,
+   "pma_40_wk": 0.005031847091045254,
+   "pma_6_y": 3.604575075813928e-05,
+   "pma_17_y": -4.1648137911345044e-07
+  },
+  "cases": [
+   {
+    "label": "reference individual: 35 y, GA 40 (PMA_R = 35 + 40/52)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 12783.75,
+    "weight_kg": 70,
+    "scr_mg_dl": 0.83,
+    "pma_years": 35.76923076923077,
+    "pma_weeks_model": 1859.9999999999998,
+    "pma_weeks_clinical": 1866.25,
+    "deviation_days": {
+     "clinical_over_52": 43.90024038461758,
+     "control_stream_identity": 7.98623551106485
+    },
+    "expected_status": "unsupported",
+    "expected_field": "patient.postnatal_age",
+    "fitted": null
+   },
+   {
+    "label": "PMA floor: GA 22 wk + 10 d (23.42 wk, accepted)",
+    "gestational_age_weeks": 22,
+    "postnatal_days": 10,
+    "weight_kg": 0.5,
+    "scr_mg_dl": 0.9,
+    "pma_years": 0.4504554309482441,
+    "pma_weeks_model": 23.423682409308693,
+    "pma_weeks_clinical": 23.428571428571427,
+    "deviation_days": {
+     "clinical_over_52": 0.03434065934064444,
+     "control_stream_identity": -0.4165173867228692
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 0.023217181099665956,
+     "V1": 0.305397087593754,
+     "Q": 0.07888755325813684,
+     "V2": 0.29899081575271885
+    }
+   },
+   {
+    "label": "below PMA floor: GA 22 wk + 1 d (22.14 wk, refused)",
+    "gestational_age_weeks": 22,
+    "postnatal_days": 1,
+    "weight_kg": 0.5,
+    "scr_mg_dl": 0.9,
+    "pma_years": 0.4258147738640552,
+    "pma_weeks_model": 22.14236824093087,
+    "pma_weeks_clinical": 22.142857142857142,
+    "deviation_days": {
+     "clinical_over_52": 0.003434065934054306,
+     "control_stream_identity": -0.42268177028452514
+    },
+    "expected_status": "unsupported",
+    "expected_field": "patient.gestational_age_weeks",
+    "fitted": null
+   },
+   {
+    "label": "GA 23.4 wk + 0 d (exactly the floor, accepted)",
+    "gestational_age_weeks": 23.4,
+    "postnatal_days": 0,
+    "weight_kg": 0.5,
+    "scr_mg_dl": 0.9,
+    "pma_years": 0.44999999999999996,
+    "pma_weeks_model": 23.4,
+    "pma_weeks_clinical": 23.4,
+    "deviation_days": {
+     "clinical_over_52": 0.0,
+     "control_stream_identity": -0.4503082191780743
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 0.02318864187256516,
+     "V1": 0.305397087593754,
+     "Q": 0.07888755325813684,
+     "V2": 0.29899081575271885
+    }
+   },
+   {
+    "label": "preterm: GA 28 wk + 84 d (clinical PMA 40.0 wk)",
+    "gestational_age_weeks": 28,
+    "postnatal_days": 84,
+    "weight_kg": 2.0,
+    "scr_mg_dl": 0.6,
+    "pma_years": 0.7684410045806349,
+    "pma_weeks_model": 39.958932238193015,
+    "pma_weeks_clinical": 40.0,
+    "deviation_days": {
+     "clinical_over_52": 0.2884615384615755,
+     "control_stream_identity": -0.481296101159109
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 0.17410827269955162,
+     "V1": 1.221588350375016,
+     "Q": 0.22312769544017394,
+     "V2": 1.1959632630108754
+    }
+   },
+   {
+    "label": "term neonate: GA 40 wk + 1 d",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 1,
+    "weight_kg": 3.4,
+    "scr_mg_dl": 0.7,
+    "pma_years": 0.7719686200179013,
+    "pma_weeks_model": 40.14236824093087,
+    "pma_weeks_clinical": 40.142857142857146,
+    "deviation_days": {
+     "clinical_over_52": 0.0034340659340745816,
+     "control_stream_identity": -0.7690727081138271
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 0.24450906196468059,
+     "V1": 2.0767001956375273,
+     "Q": 0.3321927660857531,
+     "V2": 2.0331375471184883
+    }
+   },
+   {
+    "label": "Oudin upper edge: GA 40 + 40 d (PMA 0.8787, accepted)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 40,
+    "weight_kg": 4.0,
+    "scr_mg_dl": 0.4,
+    "pma_years": 0.8787448007160533,
+    "pma_weeks_model": 45.69472963723477,
+    "pma_weeks_clinical": 45.714285714285715,
+    "deviation_days": {
+     "clinical_over_52": 0.1373626373626183,
+     "control_stream_identity": -0.7423603793467122
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 0.39889660894246554,
+     "V1": 2.443176700750032,
+     "Q": 0.3752545584789297,
+     "V2": 2.391926526021751
+    }
+   },
+   {
+    "label": "gap, term infant: GA 40 + 41 d (PMA 0.8815, refused)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 41,
+    "weight_kg": 4.0,
+    "scr_mg_dl": 0.4,
+    "pma_years": 0.8814826515031854,
+    "pma_weeks_model": 45.83709787816564,
+    "pma_weeks_clinical": 45.857142857142854,
+    "deviation_days": {
+     "clinical_over_52": 0.1407967032966929,
+     "control_stream_identity": -0.7416754478398142
+    },
+    "expected_status": "unsupported",
+    "expected_field": "patient.postnatal_age",
+    "fitted": null
+   },
+   {
+    "label": "gap, preterm infant: GA 24 + 150 d (PMA 0.872, accepted; 5 months postnatal)",
+    "gestational_age_weeks": 24,
+    "postnatal_days": 150,
+    "weight_kg": 3.0,
+    "scr_mg_dl": 0.4,
+    "pma_years": 0.8722160796082767,
+    "pma_weeks_model": 45.35523613963039,
+    "pma_weeks_clinical": 45.42857142857143,
+    "deviation_days": {
+     "clinical_over_52": 0.5151098901098896,
+     "control_stream_identity": -0.35911485774500657
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 0.31848161385061535,
+     "V1": 1.8323825255625241,
+     "Q": 0.3024279489908826,
+     "V2": 1.7939448945163132
+    }
+   },
+   {
+    "label": "gap, preterm infant: GA 24 + 160 d (PMA 0.900, refused)",
+    "gestational_age_weeks": 24,
+    "postnatal_days": 160,
+    "weight_kg": 3.2,
+    "scr_mg_dl": 0.4,
+    "pma_years": 0.8995945874795978,
+    "pma_weeks_model": 46.77891854893908,
+    "pma_weeks_clinical": 46.85714285714286,
+    "deviation_days": {
+     "clinical_over_52": 0.5494505494505949,
+     "control_stream_identity": -0.3522655426765135
+    },
+    "expected_status": "unsupported",
+    "expected_field": "patient.postnatal_age",
+    "fitted": null
+   },
+   {
+    "label": "gap, 12 months GA 40 (PMA 1.769, refused)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 365.25,
+    "weight_kg": 9,
+    "scr_mg_dl": 0.3,
+    "pma_years": 1.7692307692307692,
+    "pma_weeks_model": 92.0,
+    "pma_weeks_clinical": 92.17857142857143,
+    "deviation_days": {
+     "clinical_over_52": 1.254292582417659,
+     "control_stream_identity": -0.5195864067439224
+    },
+    "expected_status": "unsupported",
+    "expected_field": "patient.postnatal_age",
+    "fitted": null
+   },
+   {
+    "label": "gap, 18 months GA 40 (PMA 2.269, refused)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 547.875,
+    "weight_kg": 11,
+    "scr_mg_dl": 0.3,
+    "pma_years": 2.269230769230769,
+    "pma_weeks_model": 118.0,
+    "pma_weeks_clinical": 118.26785714285714,
+    "deviation_days": {
+     "clinical_over_52": 1.8814388736264074,
+     "control_stream_identity": -0.3945007903055212
+    },
+    "expected_status": "unsupported",
+    "expected_field": "patient.postnatal_age",
+    "fitted": null
+   },
+   {
+    "label": "van der Meer lower edge: GA 40 + 661 d (PMA 2.5789, refused)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 661,
+    "weight_kg": 12,
+    "scr_mg_dl": 0.35,
+    "pma_years": 2.5789501395250882,
+    "pma_weeks_model": 134.10540725530458,
+    "pma_weeks_clinical": 134.42857142857144,
+    "deviation_days": {
+     "clinical_over_52": 2.269917582417621,
+     "control_stream_identity": -0.3170179135932035
+    },
+    "expected_status": "unsupported",
+    "expected_field": "patient.postnatal_age",
+    "fitted": null
+   },
+   {
+    "label": "van der Meer lower edge: GA 40 + 662 d (PMA 2.5816, accepted)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 662,
+    "weight_kg": 12,
+    "scr_mg_dl": 0.35,
+    "pma_years": 2.5816879903122203,
+    "pma_weeks_model": 134.24777549623545,
+    "pma_weeks_clinical": 134.57142857142856,
+    "deviation_days": {
+     "clinical_over_52": 2.2733516483515337,
+     "control_stream_identity": -0.31633298208646776
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 1.7930870070994065,
+     "V1": 7.3295301022500965,
+     "Q": 0.8553954142071695,
+     "V2": 7.175779578065253
+    }
+   },
+   {
+    "label": "2.0 y postnatal, GA 40 (PMA 2.769 \u2014 above the gap, accepted)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 730.5,
+    "weight_kg": 12,
+    "scr_mg_dl": 0.35,
+    "pma_years": 2.769230769230769,
+    "pma_weeks_model": 144.0,
+    "pma_weeks_clinical": 144.35714285714286,
+    "deviation_days": {
+     "clinical_over_52": 2.508585164835156,
+     "control_stream_identity": -0.26941517386720104
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 1.8165658538718492,
+     "V1": 7.3295301022500965,
+     "Q": 0.8553954142071695,
+     "V2": 7.175779578065253
+    }
+   },
+   {
+    "label": "6 y postnatal, GA 40 (6 + 40/52)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 2191.5,
+    "weight_kg": 20,
+    "scr_mg_dl": 0.4,
+    "pma_years": 6.769230769230769,
+    "pma_weeks_model": 352.0,
+    "pma_weeks_clinical": 353.07142857142856,
+    "deviation_days": {
+     "clinical_over_52": 7.525755494505305,
+     "control_stream_identity": 0.7312697576396847
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 2.862745635745549,
+     "V1": 12.21588350375016,
+     "Q": 1.2547392394049603,
+     "V2": 11.959632630108754
+    }
+   },
+   {
+    "label": "72 months postnatal, GA 40 (same as 6 y)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 2191.5,
+    "weight_kg": 20,
+    "scr_mg_dl": 0.4,
+    "pma_years": 6.769230769230769,
+    "pma_weeks_model": 352.0,
+    "pma_weeks_clinical": 353.07142857142856,
+    "deviation_days": {
+     "clinical_over_52": 7.525755494505305,
+     "control_stream_identity": 0.7312697576396847
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 2.862745635745549,
+     "V1": 12.21588350375016,
+     "Q": 1.2547392394049603,
+     "V2": 11.959632630108754
+    }
+   },
+   {
+    "label": "17.999 y postnatal, GA 40 (accepted)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 6574.134749999999,
+    "weight_kg": 70,
+    "scr_mg_dl": 0.8,
+    "pma_years": 18.76823076923077,
+    "pma_weeks_model": 975.948,
+    "pma_weeks_clinical": 979.162107142857,
+    "deviation_days": {
+     "clinical_over_52": 22.576012190933582,
+     "control_stream_identity": 3.7330743809260882
+    },
+    "expected_status": "ok",
+    "expected_field": null,
+    "fitted": {
+     "CL": 5.9812934526563515,
+     "V1": 42.755592263125564,
+     "Q": 3.210735375994871,
+     "V2": 41.85871420538064
+    }
+   },
+   {
+    "label": "18.0 y postnatal, GA 40 (refused: adult)",
+    "gestational_age_weeks": 40,
+    "postnatal_days": 6574.5,
+    "weight_kg": 70,
+    "scr_mg_dl": 0.8,
+    "pma_years": 18.76923076923077,
+    "pma_weeks_model": 976.0,
+    "pma_weeks_clinical": 979.2142857142857,
+    "deviation_days": {
+     "clinical_over_52": 22.57726648351624,
+     "control_stream_identity": 3.733324552160342
+    },
+    "expected_status": "unsupported",
+    "expected_field": "patient.postnatal_age",
+    "fitted": null
+   }
+  ]
+ },
+ "_meta": {
+  "purpose": "independent reference for src/lib/pediatric (synthetic covariates only)",
+  "ode": "RK4, dt=0.002 h for profiles and 0.01 h inside the MAP objective, infusion edges aligned",
+  "nonmem_final_iteration": {
+   "lnCL": 1.6674,
+   "lnV1": 3.7555,
+   "lnV2": 3.7343,
+   "lnQ": 1.1665,
+   "lnDEG50": 4.1159,
+   "lnMAT50": -0.11302,
+   "lnGAM": 1.0611,
+   "lnGAM2": 0.80677,
+   "lnEXPO2": -0.4328,
+   "heelV1": 0.31217,
+   "heelQ": 0.59679,
+   "cancerCL": 0.29422
+  },
+  "omega": {
+   "CL": 0.074619,
+   "V1": 0.071637,
+   "V2": 0.68444
+  },
+  "sigma": {
+   "prop": 0.045986,
+   "add": 1.5166
+  }
+ }
+}
