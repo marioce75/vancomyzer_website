@@ -62,6 +62,7 @@ function getDb(): Database.Database {
   try { _db.exec("ALTER TABLE users ADD COLUMN mfa_secret TEXT"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE users ADD COLUMN mfa_enabled INTEGER DEFAULT 0"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE users ADD COLUMN mfa_verified_at TEXT"); } catch { /* exists */ }
+  try { _db.exec("ALTER TABLE users ADD COLUMN mfa_verified_session_token TEXT"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE users ADD COLUMN failed_login_attempts INTEGER DEFAULT 0"); } catch { /* exists */ }
   try { _db.exec("ALTER TABLE users ADD COLUMN locked_until TEXT"); } catch { /* exists */ }
 
@@ -333,6 +334,7 @@ export interface UserRow {
   mfa_secret: string | null;
   mfa_enabled: number;
   mfa_verified_at: string | null;
+  mfa_verified_session_token: string | null;
   failed_login_attempts: number;
   locked_until: string | null;
   // Subscription fields
@@ -921,11 +923,12 @@ export function enableMfa(id: number) {
 }
 
 export function disableMfa(id: number) {
-  getDb().prepare("UPDATE users SET mfa_enabled = 0, mfa_secret = NULL, mfa_verified_at = NULL WHERE id = ?").run(id);
+  getDb().prepare("UPDATE users SET mfa_enabled = 0, mfa_secret = NULL, mfa_verified_at = NULL, mfa_verified_session_token = NULL WHERE id = ?").run(id);
 }
 
-export function setMfaVerifiedAt(id: number) {
-  getDb().prepare("UPDATE users SET mfa_verified_at = datetime('now') WHERE id = ?").run(id);
+export function setMfaVerifiedAt(id: number, sessionToken: string): boolean {
+  if (!sessionToken) return false;
+  return getDb().prepare("UPDATE users SET mfa_verified_at = datetime('now'), mfa_verified_session_token = ? WHERE id = ? AND session_token = ? AND status = 'active'").run(sessionToken, id, sessionToken).changes === 1;
 }
 
 // ---------------------------------------------------------------------------

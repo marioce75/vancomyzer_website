@@ -1,5 +1,5 @@
 {
-  "fixture": "/var/folders/lx/gkr01r953lz0v44xy9skwjv00000gn/T/pediatric-auth-fixture-rA805B",
+  "fixture": "/var/folders/lx/gkr01r953lz0v44xy9skwjv00000gn/T/pediatric-auth-fixture-1eJken",
   "results": [
     "anonymous GET: 401",
     "anonymous POST: 401",
@@ -106,6 +106,12 @@
     "admin missing planned time \"   \": 400",
     "admin invalid JSON: 400",
     "admin oversized body: 413",
+    "UTF8 90KB calculation: 413",
+    "UTF8 90KB acknowledgement: 413",
+    "MFA same-second binding accepted; previous-session proof denied by pediatric gate and session refresh",
+    "real MFA verify route: invalid code and stale session refused, valid code writes exact session proof, pediatric access allowed",
+    "browser Etc/GMT+5 fallback=false: displayed zone and submitted offset match; year 0026 refused",
+    "browser Europe/Paris fallback=true: displayed zone and submitted offset match; year 0026 refused",
     "browser anonymous: preview denied",
     "browser admin: acknowledgement panel shown first, calculator unlocked after acknowledging",
     "browser admin: prior-only result rendered, ECMO refused",

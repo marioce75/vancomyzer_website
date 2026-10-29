@@ -43,9 +43,14 @@ export function parseWallClock(s: string): WallClock | null {
   const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(s);
   if (!m) return null;
   const w = { year: +m[1], month: +m[2], day: +m[3], hour: +m[4], minute: +m[5], second: m[6] === undefined ? 0 : +m[6] };
-  const dim = new Date(Date.UTC(w.year, w.month, 0)).getUTCDate();
-  if (w.month < 1 || w.month > 12 || w.day < 1 || w.day > dim || w.hour > 23 || w.minute > 59 || w.second > 59) return null;
+  if (!validWallClock(w)) return null;
   return w;
+}
+
+function validWallClock(w: WallClock): boolean {
+  if (![w.year, w.month, w.day, w.hour, w.minute, w.second ?? 0].every(Number.isInteger) || w.year < 1900 || w.year > 2199) return false;
+  const dim = new Date(Date.UTC(w.year, w.month, 0)).getUTCDate();
+  return w.month >= 1 && w.month <= 12 && w.day >= 1 && w.day <= dim && w.hour >= 0 && w.hour <= 23 && w.minute >= 0 && w.minute <= 59 && (w.second ?? 0) >= 0 && (w.second ?? 0) <= 59;
 }
 
 export function isValidZone(zone: string): boolean {
@@ -81,6 +86,7 @@ function instant(ms: number, zone: string): ResolvedInstant {
  * at that instant maps it back to the same wall-clock fields.
  */
 export function resolveLocal(w: WallClock, zone: string): LocalResolution {
+  if (!validWallClock(w)) return { kind: "invalid", message: "Enter a valid date/time with a year from 1900 through 2199." };
   if (!isValidZone(zone)) return { kind: "invalid", message: `Unknown time zone "${zone}".` };
   const guess = Date.UTC(w.year, w.month - 1, w.day, w.hour, w.minute, w.second ?? 0);
   if (!Number.isFinite(guess)) return { kind: "invalid", message: "Invalid date/time." };
@@ -115,11 +121,15 @@ export function resolveLocalWithChoice(w: WallClock, zone: string, chosenOffsetM
 }
 
 /** Zone list for the selector: IANA zones from the runtime plus UTC and fixed offsets. */
-export function zoneChoices(): string[] {
+export function defaultZone(): string {
+  try { const zone = Intl.DateTimeFormat().resolvedOptions().timeZone; return zone && isValidZone(zone) ? zone : "UTC"; } catch { return "UTC"; }
+}
+
+export function zoneChoices(selectedZone = defaultZone()): string[] {
   const iana = (typeof (Intl as unknown as { supportedValuesOf?: (k: string) => string[] }).supportedValuesOf === "function")
     ? (Intl as unknown as { supportedValuesOf: (k: string) => string[] }).supportedValuesOf("timeZone")
     : ["UTC", "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles", "Europe/London", "Europe/Brussels", "Asia/Tokyo"];
   const fixed: string[] = ["UTC"];
   for (let h = -12; h <= 14; h++) for (const m of [0, 30]) { if (h === 14 && m) continue; if (h === -12 && m) continue; fixed.push(`${h < 0 ? "-" : "+"}${pad(h)}:${pad(m)}`); }
-  return [...iana, ...fixed];
+  return Array.from(new Set([...(isValidZone(selectedZone) ? [selectedZone] : []), ...iana, ...fixed]));
 }

@@ -27,13 +27,14 @@ const db = new Database(path.join(fixture,'data/users.db'));
 const code = fs.readFileSync('src/lib/db.ts','utf8');
 const schema = code.match(/CREATE TABLE IF NOT EXISTS users \([\s\S]*?\n    \);/)[0];
 db.exec(schema);
-for(const q of ['ALTER TABLE users ADD COLUMN mfa_enabled INTEGER DEFAULT 0','ALTER TABLE users ADD COLUMN mfa_verified_at TEXT']) db.exec(q);
+for(const q of ['ALTER TABLE users ADD COLUMN mfa_enabled INTEGER DEFAULT 0','ALTER TABLE users ADD COLUMN mfa_verified_at TEXT','ALTER TABLE users ADD COLUMN mfa_verified_session_token TEXT']) db.exec(q);
 const now = Date.now();
 const date = ms => new Date(ms).toISOString().replace('T',' ').slice(0,19);
 const insert = db.prepare(`INSERT INTO users (id,username,email,password_hash,full_name,credentials,role,status,session_token,last_login,mfa_enabled,mfa_verified_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`);
 for(const [id,role,status,mfa,verified] of [[1,'admin','active',0,null],[2,'pharmacist','active',0,null],[3,'admin','disabled',0,null],[4,'admin','active',1,null],[5,'admin','active',1,date(now-60000)]]) {
   insert.run(id,`fixture${id}`,`fixture${id}@example.invalid`,'NO_LOGIN_PASSWORD','Synthetic fixture','Fixture',role,status,`fixture-session-${id}`,date(now-120000),mfa,verified);
 }
+db.prepare("UPDATE users SET mfa_verified_session_token=session_token WHERE id=5").run();
 const secret=randomBytes(32).toString('hex');
 const port=process.env.PEDIATRIC_TEST_PORT || '3217';
 const base=`http://127.0.0.1:${port}`;
@@ -158,7 +159,52 @@ try {
     else {assert(!/NaN|Infinity/.test(text),`${name}: result contains NaN/Infinity`); for(const k of ['pma_years','weight_kg','scr_mg_dl'])assert(typeof j.derived[k]==='number'&&Number.isFinite(j.derived[k]),`${name}: derived.${k}`); for(const k of ['CL','V1','V2','Q'])assert(Number.isFinite(j.prior.parameters[k]),`${name}: prior ${k}`); assert(Number.isFinite(j.prior.exposure.steady_state_auc24));}
     results.push(`admin ${name}: ${r.status}`);
   }
+  // Regression: byte limits apply after authorization/acknowledgement, before calculations.
+  { const {r}=await request('UTF8 oversized',tokens.admin,'POST','/api/admin/pediatric',{}, {...child,padding:'€'.repeat(30000)},adminAck.ack);assert.equal(r.status,413);results.push('UTF8 90KB calculation: 413'); }
+  { const a=await acknowledge(tokens.admin,{acknowledge:true,version:ACK_VERSION,padding:'€'.repeat(30000)});assert.equal(a.r.status,413);results.push('UTF8 90KB acknowledgement: 413'); }
+  // Equal timestamps accepted only with matching session proof; timestamp-only proof is denied.
+  db.exec("UPDATE users SET mfa_verified_at=last_login WHERE id=5");
+  assert.equal((await request('same-second bound MFA',tokens.verifiedMfa)).r.status,200);
+  db.exec("UPDATE users SET mfa_verified_session_token='previous-session' WHERE id=5");
+  assert.equal((await request('stale-session MFA',tokens.verifiedMfa)).r.status,403);
+  db.exec("UPDATE users SET mfa_verified_session_token=session_token WHERE id=5");
+  const pending5=await cookie(5,{mfaPending:true,mfaVerified:false});
+  assert.equal(JSON.parse((await request('bound MFA refresh',pending5,'GET','/api/auth/session')).body).user.mfaPending,false);
+  db.exec("UPDATE users SET mfa_verified_session_token='previous-session' WHERE id=5");
+  assert.equal(JSON.parse((await request('stale MFA refresh',pending5,'GET','/api/auth/session')).body).user.mfaPending,true);
+  db.exec("UPDATE users SET mfa_verified_session_token=session_token WHERE id=5");
+  results.push('MFA same-second binding accepted; previous-session proof denied by pediatric gate and session refresh');
+  { const {generateSecret,generateSync}=require('otplib');const mfaSecret=generateSecret();
+    db.prepare("UPDATE users SET mfa_secret=?, mfa_verified_at=NULL, mfa_verified_session_token=NULL WHERE id=4").run(mfaSecret);
+    const code=generateSync({secret:mfaSecret});
+    assert.equal((await request('invalid MFA code',tokens.pendingMfa,'POST','/api/auth/mfa/verify',{}, {token:'abcdef'})).r.status,401);
+    db.exec("UPDATE users SET session_token='changed-session' WHERE id=4");
+    assert.equal((await request('stale MFA session',tokens.pendingMfa,'POST','/api/auth/mfa/verify',{}, {token:code})).r.status,401);
+    assert.equal(db.prepare('SELECT mfa_verified_session_token FROM users WHERE id=4').get().mfa_verified_session_token,null);
+    db.exec("UPDATE users SET session_token='fixture-session-4' WHERE id=4");
+    assert.equal((await request('valid MFA current session',tokens.pendingMfa,'POST','/api/auth/mfa/verify',{}, {token:generateSync({secret:mfaSecret})})).r.status,200);
+    assert.equal(db.prepare('SELECT mfa_verified_session_token FROM users WHERE id=4').get().mfa_verified_session_token,'fixture-session-4');
+    assert.equal((await request('MFA verified current session',tokens.pendingMfa)).r.status,200);
+    db.exec("UPDATE users SET mfa_secret=NULL,mfa_verified_at=NULL,mfa_verified_session_token=NULL WHERE id=4");
+    results.push('real MFA verify route: invalid code and stale session refused, valid code writes exact session proof, pediatric access allowed');
+  }
   browser=await chromium.launch({headless:true});
+  for (const [zone,fallback,offset] of [['Etc/GMT+5',false,'-05:00'],['Europe/Paris',true,'+01:00']]) {
+    const context=await browser.newContext({timezoneId:zone});
+    await context.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
+    if(fallback)await context.addInitScript(()=>{Intl.supportedValuesOf=undefined;});
+    await context.addCookies([{name:'next-auth.session-token',value:tokens.admin,url:base},{name:'pediatric_research_ack',value:adminAck.ack,url:base}]);
+    const page=await context.newPage();await page.goto(base+'/admin/dashboard/pediatric',{waitUntil:'networkidle'});
+    await page.getByLabel('Time zone').waitFor();assert.equal(await page.getByLabel('Time zone').inputValue(),zone);
+    assert.equal(await page.getByLabel('Time zone').locator('option:checked').innerText(),zone);
+    await page.getByRole('button',{name:'+ Add dose'}).click();await page.getByLabel('Dose 1 start').fill('0026-10-29T08:00');
+    await page.getByRole('button',{name:'Calculate (research only)'}).click();assert.equal(await page.getByRole('heading',{name:'Result',exact:true}).count(),0);
+    await page.getByLabel('Dose 1 start').fill('2026-10-29T08:00');await page.getByLabel('Next planned dose start').fill('2026-10-29T14:00');
+    const pending=page.waitForRequest(req=>req.url().endsWith('/api/admin/pediatric')&&req.method()==='POST');
+    await page.getByRole('button',{name:'Calculate (research only)'}).click();const sent=JSON.parse((await pending).postData());
+    assert.equal(sent.doses[0].start,'2026-10-29T08:00:00'+offset);await page.getByRole('heading',{name:'Result',exact:true}).waitFor();
+    results.push(`browser ${zone} fallback=${fallback}: displayed zone and submitted offset match; year 0026 refused`);await context.close();
+  }
   for(const [name,token,allowed] of [['anonymous',null,false],['admin',tokens.admin,true],['pharmacist',tokens.pharmacist,false],['disabled',tokens.disabled,false],['pending MFA',tokens.pendingMfa,false],['verified MFA',tokens.verifiedMfa,true],['demoted',tokens.admin,false],['revoked',tokens.admin,false]]) {
     if(name==='demoted')db.exec("UPDATE users SET role='pharmacist' WHERE id=1");
     if(name==='revoked')db.exec("UPDATE users SET role='admin',session_token=NULL WHERE id=1");

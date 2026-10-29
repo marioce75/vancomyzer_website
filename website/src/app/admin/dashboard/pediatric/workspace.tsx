@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { pediatricStatus } from '@/lib/pediatric/status';
 import type { PediatricRequest, PediatricResult, PediatricRefusal, PediatricVerificationRequired, ExposureBlock, InputReviewItem } from '@/lib/pediatric/engine';
-import { formatOffset, parseWallClock, resolveLocalWithChoice, zoneChoices } from '@/lib/pediatric/localTime';
+import { defaultZone, formatOffset, parseWallClock, resolveLocalWithChoice, zoneChoices } from '@/lib/pediatric/localTime';
 
 type AgeUnit = PediatricRequest['patient']['postnatal_age']['unit'];
 interface DoseRow { start: string; dose: string; minutes: string; offset?: number }
@@ -50,10 +50,10 @@ export default function PediatricWorkspace() {
   const [dose, setDose] = useState('300'); const [interval, setInterval_] = useState('6'); const [infusion, setInfusion] = useState('60'); const [nextDose, setNextDose] = useState('');
   const [doses, setDoses] = useState<DoseRow[]>([]); const [levels, setLevels] = useState<LevelRow[]>([]);
   const [busy, setBusy] = useState(false); const [result, setResult] = useState<ApiResult | null>(null); const [netError, setNetError] = useState<string | null>(null);
-  const [zone, setZone] = useState<string>(() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch { return 'UTC'; } });
+  const [zone, setZone] = useState<string>(defaultZone);
   const [nextDoseOffset, setNextDoseOffset] = useState<number | undefined>(undefined);
   const [verified, setVerified] = useState(false);
-  const zones = useMemo(() => zoneChoices(), []);
+  const zones = useMemo(() => zoneChoices(zone), [zone]);
   const nextDoseRes = useMemo(() => resolve(nextDose, zone, nextDoseOffset), [nextDose, zone, nextDoseOffset]);
   const doseRes = useMemo(() => doses.map((d) => resolve(d.start, zone, d.offset)), [doses, zone]);
   const levelRes = useMemo(() => levels.map((l) => resolve(l.time, zone, l.offset)), [levels, zone]);

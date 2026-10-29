@@ -3,9 +3,9 @@ import { getPediatricAdmin } from '@/lib/pediatric/requireAdmin';
 import { ACK_COOKIE_NAME, verifyAcknowledgementToken, type AckVerdict } from '@/lib/pediatric/acknowledgement';
 import { pediatricStatus } from '@/lib/pediatric/status';
 import { pediatricCurve, runPediatricEngine, type PediatricRequest } from '@/lib/pediatric/engine';
+import { readBoundedJson, BodyTooLarge } from '@/lib/pediatric/requestBody';
 export const dynamic = 'force-dynamic';
 const headers = { 'Cache-Control': 'private, no-store' };
-const MAX_BODY_BYTES = 64 * 1024;
 
 function acknowledgement(request: NextRequest, admin: { id: number; sessionToken: string }): AckVerdict {
   const secret = process.env.NEXTAUTH_SECRET;
@@ -34,10 +34,9 @@ export async function POST(request: NextRequest) {
   const started = Date.now();
   let body: unknown;
   try {
-    const text = await request.text();
-    if (text.length > MAX_BODY_BYTES) return NextResponse.json({ status: 'invalid', message: 'Request too large.', field_errors: { request: 'Body exceeds 64 KB.' } }, { status: 413, headers });
-    body = JSON.parse(text);
-  } catch {
+    body = await readBoundedJson(request);
+  } catch (error) {
+    if (error instanceof BodyTooLarge) return NextResponse.json({ status: 'invalid', message: 'Request too large.', field_errors: { request: 'Body exceeds 64 KB.' } }, { status: 413, headers });
     return NextResponse.json({ status: 'invalid', message: 'Invalid JSON body.', field_errors: { request: 'Invalid JSON.' } }, { status: 400, headers });
   }
   const outcome = runPediatricEngine(body);
