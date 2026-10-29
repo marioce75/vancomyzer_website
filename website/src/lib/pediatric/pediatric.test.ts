@@ -21,7 +21,7 @@ check(allow({...token,id:'2'},user,'test-session',now),false);
 check(allow({...token,role:'pharmacist'},user,'test-session',now),false);
 check(allow({...token,mfaPending:true},user,'test-session',now),false);
 for(const mfa_verified_at of [null,'invalid','2026-10-29 11:57:00','2026-10-29 12:01:00']) check(allow({...token,mfaVerified:true},{...user,mfa_enabled:1,mfa_verified_at},'test-session',now),false);
-check(allow(token,{...user,mfa_enabled:1,mfa_verified_at:'2026-10-29 11:59:00'},'test-session',now),true);
+check(allow(token,{...user,mfa_enabled:1,mfa_verified_at:'2026-10-29 11:59:00',mfa_verified_session_token:'test-session'},'test-session',now),true);
 // Research preview: enabled, research-only, scope and formulation declared; never clinical.
 assert.equal(pediatricStatus.model,'colin_2019');
 assert.equal(pediatricStatus.calculationsEnabled,true);
@@ -54,11 +54,11 @@ assert.match(pediatricStatus.message,/Research preview only/);
 // Wiring: every handler authorizes, then checks the acknowledgement, before reading the body; nothing is persisted; the adult engine is never imported.
 const route=readFileSync('src/app/api/admin/pediatric/route.ts','utf8');
 assert.equal((route.match(/await getPediatricAdmin\(\)/g)||[]).length,2);
-assert.ok(route.indexOf('await getPediatricAdmin()') < route.indexOf('acknowledgement(request, admin)') && route.lastIndexOf('acknowledgement(request, admin)') < route.indexOf('request.text()'));
+assert.ok(route.indexOf('await getPediatricAdmin()') < route.indexOf('acknowledgement(request, admin)') && route.lastIndexOf('acknowledgement(request, admin)') < route.indexOf('readBoundedJson(request)'));
 assert.match(route,/acknowledgement_required/);
 assert.match(route,/no-store/);
 const ackRoute=readFileSync('src/app/api/admin/pediatric/acknowledge/route.ts','utf8');
-assert.ok(ackRoute.indexOf('await getPediatricAdmin()') < ackRoute.indexOf('request.json()'));
+assert.ok(ackRoute.indexOf('await getPediatricAdmin()') < ackRoute.indexOf('readBoundedJson(request)'));
 assert.match(ackRoute,/acknowledge !== true/); assert.match(ackRoute,/PEDIATRIC_ACK_STATEMENT_VERSION/);
 assert.doesNotMatch(ackRoute,/logCalculation|getDb|INSERT|UPDATE/);
 assert.doesNotMatch(route,/logCalculation|logCalculationEntry|getDb|initialRegimen|runExistingRegimenPipeline|buildPriorParameters/);
@@ -69,4 +69,8 @@ assert.doesNotMatch(readFileSync('src/lib/pediatric/engine.ts','utf8'),/gapAckno
 for (const f of ['src/lib/pediatric/engine.ts','src/lib/pediatric/colin2019/prior.ts','src/lib/pediatric/colin2019/fit.ts','src/lib/pediatric/colin2019/manifest.ts']) {
   assert.doesNotMatch(readFileSync(f,'utf8'),/import[^\n]*(buildPriorParameters|modelRegistry|posteriorEngine|fitPosteriorParameters)/, `${f} must not import the adult prior/posterior modules`);
 }
+
+for (const binding of [null, undefined, '', 'previous-session']) check(allow(token, {...user, mfa_enabled:1, mfa_verified_at:user.last_login, mfa_verified_session_token:binding}, 'test-session', now), false);
+check(allow(token, {...user, mfa_enabled:1, mfa_verified_at:user.last_login, mfa_verified_session_token:'test-session'}, 'test-session', now), true);
+check(allow({...token,sessionToken:'new-session'}, {...user,mfa_enabled:1,mfa_verified_at:user.last_login,mfa_verified_session_token:'test-session'},'new-session',now),false);
 console.log(`${count} authorization/acknowledgement policy cases and research-preview status/wiring assertions passed. Run scripts/pediatric/http-browser.mjs for HTTP/browser integration.`);

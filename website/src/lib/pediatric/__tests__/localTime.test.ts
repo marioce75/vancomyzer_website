@@ -56,6 +56,16 @@ const w = (s: string) => { const p = parseWallClock(s); assert.ok(p, s); return 
   ok(offsetAt("America/New_York", Date.UTC(2026, 6, 1)) === -240 && offsetAt("America/New_York", Date.UTC(2026, 0, 1)) === -300, "offsetAt");
   ok(zoneChoices().includes("America/New_York") && zoneChoices().includes("UTC") && zoneChoices().includes("+05:30"), "zone choices");
 }
+for (const year of [0, 26, 99, 1899, 2200, 9999]) {
+  ok(parseWallClock(`${String(year).padStart(4,'0')}-10-29T08:00`) === null, `parser rejects ${year}`);
+  ok(resolveLocal({year,month:10,day:29,hour:8,minute:0},'UTC').kind === 'invalid', `resolver rejects ${year}`);
+}
+for (const year of [1900, 2000, 2199]) ok(resolveLocal({year,month:10,day:29,hour:8,minute:0},'UTC').kind === 'ok', `valid boundary ${year}`);
+ok(resolveLocal({year:2026,month:2,day:30,hour:8,minute:0},'UTC').kind === 'invalid', 'direct resolver refuses impossible day');
+for (const zone of ['Etc/GMT+5','Asia/Kathmandu','Europe/Paris']) ok(zoneChoices(zone).includes(zone), `selected zone retained ${zone}`);
+const savedSupported = Intl.supportedValuesOf;
+try { (Intl as any).supportedValuesOf = undefined; ok(zoneChoices('Europe/Paris').includes('Europe/Paris'), 'fallback retains selected zone'); }
+finally { (Intl as any).supportedValuesOf = savedSupported; }
 console.log(`${n} local-time checks passed under TZ=${process.env.TZ ?? "unset"}.`);
 
 // Re-run under other process zones unless this is already a child run.

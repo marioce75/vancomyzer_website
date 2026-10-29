@@ -245,11 +245,10 @@ export const authOptions: NextAuthOptions = {
         try {
           const { findUserById } = require("@/lib/db");
           const dbUser = findUserById(Number(token.id));
-          if (dbUser?.mfa_verified_at) {
-            const verifiedAt = new Date(dbUser.mfa_verified_at).getTime();
-            const loginTime = (token.lastActivity as number) || 0;
-            // MFA was verified after login (within last 5 min)
-            if (verifiedAt > loginTime - 300000) {
+          if (dbUser?.mfa_verified_at && typeof token.sessionToken === "string" && token.sessionToken &&
+              dbUser.session_token === token.sessionToken && dbUser.mfa_verified_session_token === token.sessionToken) {
+            const verifiedAt = Date.parse(dbUser.mfa_verified_at.replace(" ", "T") + (dbUser.mfa_verified_at.endsWith("Z") ? "" : "Z"));
+            if (Number.isFinite(verifiedAt) && verifiedAt <= Date.now()) {
               token.mfaVerified = true;
               token.mfaPending = false;
             }

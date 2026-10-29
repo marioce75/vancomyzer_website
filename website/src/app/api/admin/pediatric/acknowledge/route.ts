@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPediatricAdmin } from '@/lib/pediatric/requireAdmin';
 import { ACK_COOKIE_NAME, ackCookieOptions, issueAcknowledgementToken } from '@/lib/pediatric/acknowledgement';
 import { PEDIATRIC_ACK_STATEMENT_VERSION } from '@/lib/pediatric/colin2019/manifest';
+import { readBoundedJson, BodyTooLarge } from '@/lib/pediatric/requestBody';
 export const dynamic = 'force-dynamic';
 const headers = { 'Cache-Control': 'private, no-store' };
 
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
   const secret = process.env.NEXTAUTH_SECRET;
   if (!secret) return NextResponse.json({ error: 'Server not configured.' }, { status: 500, headers });
   let body: unknown;
-  try { body = await request.json(); } catch { return NextResponse.json({ error: 'JSON body required.' }, { status: 400, headers }); }
+  try { body = await readBoundedJson(request); } catch (error) { if (error instanceof BodyTooLarge) return NextResponse.json({ error: 'Body exceeds 64 KB.' }, { status: 413, headers }); return NextResponse.json({ error: 'JSON body required.' }, { status: 400, headers }); }
   const b = body as { acknowledge?: unknown; version?: unknown } | null;
   if (!b || b.acknowledge !== true) return NextResponse.json({ error: 'Set "acknowledge": true to acknowledge the research statement.' }, { status: 400, headers });
   if (b.version !== PEDIATRIC_ACK_STATEMENT_VERSION) return NextResponse.json({ error: 'The research statement has changed; reload and acknowledge the current version.', version: PEDIATRIC_ACK_STATEMENT_VERSION }, { status: 409, headers });

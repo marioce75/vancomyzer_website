@@ -1,9 +1,10 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import ResearchRegimenPanel from './researchRegimenPanel';
 import { useSession } from 'next-auth/react';
 import { pediatricStatus } from '@/lib/pediatric/status';
 import type { PediatricRequest, PediatricResult, PediatricRefusal, PediatricVerificationRequired, ExposureBlock, InputReviewItem } from '@/lib/pediatric/engine';
-import { formatOffset, parseWallClock, resolveLocalWithChoice, zoneChoices } from '@/lib/pediatric/localTime';
+import { defaultZone, formatOffset, parseWallClock, resolveLocalWithChoice, zoneChoices } from '@/lib/pediatric/localTime';
 
 type AgeUnit = PediatricRequest['patient']['postnatal_age']['unit'];
 interface DoseRow { start: string; dose: string; minutes: string; offset?: number }
@@ -42,6 +43,9 @@ const FoldChoice = ({ r, value, onChange, label }: { r: Resolution; value?: numb
 export default function PediatricWorkspace() {
   const { data: session, status } = useSession();
   const user = session?.user as Record<string, unknown> | undefined;
+  const [targetConfirmed,setTargetConfirmed] = useState(false);
+  const [renalConfirmed,setRenalConfirmed] = useState(false);
+  const [searchVersion,setSearchVersion] = useState(0);
   const [age, setAge] = useState('6'); const [ageUnit, setAgeUnit] = useState<AgeUnit>('years');
   const [ga, setGa] = useState(''); const [weight, setWeight] = useState('20'); const [weightUnit, setWeightUnit] = useState<'kg' | 'g'>('kg');
   const [scr, setScr] = useState('0.4'); const [scrUnit, setScrUnit] = useState<'mg/dL' | 'umol/L'>('mg/dL');
@@ -50,10 +54,10 @@ export default function PediatricWorkspace() {
   const [dose, setDose] = useState('300'); const [interval, setInterval_] = useState('6'); const [infusion, setInfusion] = useState('60'); const [nextDose, setNextDose] = useState('');
   const [doses, setDoses] = useState<DoseRow[]>([]); const [levels, setLevels] = useState<LevelRow[]>([]);
   const [busy, setBusy] = useState(false); const [result, setResult] = useState<ApiResult | null>(null); const [netError, setNetError] = useState<string | null>(null);
-  const [zone, setZone] = useState<string>(() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch { return 'UTC'; } });
+  const [zone, setZone] = useState<string>(defaultZone);
   const [nextDoseOffset, setNextDoseOffset] = useState<number | undefined>(undefined);
   const [verified, setVerified] = useState(false);
-  const zones = useMemo(() => zoneChoices(), []);
+  const zones = useMemo(() => zoneChoices(zone), [zone]);
   const nextDoseRes = useMemo(() => resolve(nextDose, zone, nextDoseOffset), [nextDose, zone, nextDoseOffset]);
   const doseRes = useMemo(() => doses.map((d) => resolve(d.start, zone, d.offset)), [doses, zone]);
   const levelRes = useMemo(() => levels.map((l) => resolve(l.time, zone, l.offset)), [levels, zone]);
@@ -61,6 +65,12 @@ export default function PediatricWorkspace() {
   const ageDays = useMemo(() => { const v = Number(age); const k = { days: 1, weeks: 7, months: 365.25 / 12, years: 365.25 }[ageUnit]; return Number.isFinite(v) ? v * k : NaN; }, [age, ageUnit]);
   const gaRequired = Number.isFinite(ageDays) && ageDays < 365.25;
   useEffect(() => { setResult(null); setVerified(false); }, [age, ageUnit, ga, weight, weightUnit, scr, scrUnit, rrt, ecmo, nonIv, unstable, dose, interval, infusion, nextDose, doses, levels, zone]);
+  useEffect(() => { setTargetConfirmed(false); setRenalConfirmed(false); }, [age,ageUnit,ga,weight,weightUnit,scr,scrUnit,rrt,ecmo,nonIv,unstable]);
+  useEffect(() => { setResult(null); }, [targetConfirmed,renalConfirmed]);
+  const requestSequence = useRef(0);
+  const inputSignature = JSON.stringify([age,ageUnit,ga,weight,weightUnit,scr,scrUnit,rrt,ecmo,nonIv,unstable,dose,interval,infusion,nextDose,doses,levels,zone,nextDoseOffset,verified,targetConfirmed,renalConfirmed]);
+  const latestInputs = useRef(inputSignature);
+  latestInputs.current = inputSignature;
   const authed = status === 'authenticated' && user?.role === 'admin' && user?.mfaPending !== true;
   useEffect(() => {
     if (!authed) return;
@@ -76,6 +86,7 @@ export default function PediatricWorkspace() {
 
   const errors: Record<string, string> = result && 'field_errors' in result ? result.field_errors : {};
   const buildRequest = (): PediatricRequest => ({
+    research_regimen_context: { serious_mrsa_mic1:targetConfirmed, normal_stable_renal_function:renalConfirmed },
     patient: {
       postnatal_age: { value: Number(age), unit: ageUnit },
       ...(ga.trim() !== '' ? { gestational_age_weeks: Number(ga) } : {}),
@@ -90,14 +101,17 @@ export default function PediatricWorkspace() {
   });
   const submit = async () => {
     if (timeProblems > 0) { setNetError('Resolve the highlighted date/time entries first: enter every dose and sample time and, with a dose history, the next planned dose time. Non-existent or repeated local times need the zone or offset chosen.'); return; }
+    const sequence = ++requestSequence.current;
+    const submittedInputs = inputSignature;
     setBusy(true); setNetError(null);
     try {
       const res = await fetch('/api/admin/pediatric', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(buildRequest()) });
       const j = (await res.json()) as ApiResult;
+      if (sequence !== requestSequence.current || submittedInputs !== latestInputs.current) return;
       if ('status' in j && j.status === 'acknowledgement_required') { setAck('required'); setAckChecked(false); setResult(null); }
-      else setResult(j);
-    } catch { setNetError('The calculation request failed. Check the connection and sign-in.'); }
-    setBusy(false);
+      else { setResult(j); setSearchVersion(v=>v+1); }
+    } catch { if (sequence === requestSequence.current && submittedInputs === latestInputs.current) setNetError('The calculation request failed. Check the connection and sign-in.'); }
+    finally { if (sequence === requestSequence.current) setBusy(false); }
   };
   const acknowledge = async () => {
     setAckError(null);
@@ -163,6 +177,14 @@ export default function PediatricWorkspace() {
         <div><label className={label}>Interval (h)</label><input aria-label="Regimen interval hours" className={errors['regimen.interval_hours'] ? fieldErr : field} inputMode="decimal" value={interval} onChange={(e) => setInterval_(e.target.value)} />{errors['regimen.interval_hours'] && <span className="text-xs text-red-600">{errors['regimen.interval_hours']}</span>}</div>
         <div><label className={label}>Infusion (min)</label><input aria-label="Regimen infusion minutes" className={errors['regimen.infusion_minutes'] ? fieldErr : field} inputMode="decimal" value={infusion} onChange={(e) => setInfusion(e.target.value)} />{errors['regimen.infusion_minutes'] && <span className="text-xs text-red-600">{errors['regimen.infusion_minutes']}</span>}</div>
       </div>
+      <div className="rounded-lg border p-3 space-y-2">
+        <p className="text-sm">Find and compare pediatric research regimens, then explicitly apply an option. Uses a limited pediatric search, not adult dose rules.</p>
+        <label className="flex gap-2 text-sm"><input type="checkbox" checked={targetConfirmed} onChange={e=>setTargetConfirmed(e.target.checked)} />Serious MRSA research scenario, MIC assumed 1 mg/L</label>
+        <label className="flex gap-2 text-sm"><input type="checkbox" checked={renalConfirmed} onChange={e=>setRenalConfirmed(e.target.checked)} />Normal, stable renal function independently confirmed for this research scenario</label>
+        <p className="text-xs text-gray-600">Creatinine alone cannot establish normal renal function. No automatic selection for infants below 3 months, renal impairment, unstable function or flagged population inputs.</p>
+        <button type="button" disabled={busy || !targetConfirmed || !renalConfirmed} onClick={submit} className="rounded border border-blue-700 px-3 py-2 text-sm disabled:opacity-50">Find research regimens</button>
+      </div>
+      {!busy && result && 'status' in result && result.status==='ok' && <ResearchRegimenPanel key={searchVersion} result={result} onApply={c=>{setDose(String(c.dose_mg));setInterval_(String(c.interval_hours));setInfusion(String(c.infusion_minutes));setResult(null);}} />}
       <h2 className="text-lg font-semibold">Time zone of the entries</h2>
       <div className="max-w-xl"><label className={label}>Zone in which the dose and level times below were recorded</label><select aria-label="Time zone" className={field} value={zone} onChange={(e) => setZone(e.target.value)}>{zones.map((z) => <option key={z} value={z}>{z}</option>)}</select><p className="text-xs text-gray-600 mt-1">Every time is sent to the server as an instant with an explicit offset. A local time that did not exist (clocks skipped forward) is refused; one that occurred twice (clocks went back) needs the offset chosen. The resolved offset and UTC instant are shown beside each entry.</p></div>
       <div className="max-w-xl"><label className={label}>Next planned dose start <span className="font-normal">(required with a dose history; must be after the last infusion and after every level)</span></label><input aria-label="Next planned dose start" type="datetime-local" className={errors['regimen.next_dose_start'] ? fieldErr : field} value={nextDose} onChange={(e) => { setNextDose(e.target.value); setNextDoseOffset(undefined); }} /> {nextDose && <Resolved r={nextDoseRes} />}<FoldChoice r={nextDoseRes} value={nextDoseOffset} onChange={setNextDoseOffset} label="Next planned dose offset" />{errors['regimen.next_dose_start'] && <span className="block text-xs text-red-600">{errors['regimen.next_dose_start']}</span>}<p className="text-xs text-gray-600 mt-1">Enter the next planned dose time; it is never filled in or inferred. Forecast AUC24 covers the 24 h from that time. A level at or after that time is refused: record the doses actually given, or set this field.</p></div>
@@ -197,7 +219,7 @@ export default function PediatricWorkspace() {
         <button type="submit" disabled={busy} className="h-10 px-5 rounded-md text-white font-semibold disabled:opacity-50" style={{ background: '#1e4d8c' }}>{busy ? 'Calculating…' : 'Calculate (research only)'}</button>
         {netError && <span className="text-sm text-red-700">{netError}</span>}
         {result && 'error' in result && <span className="text-sm text-red-700">{result.error}</span>}
-        {result && 'status' in result && result.status !== 'ok' && result.status !== 'needs_verification' && <span className="text-sm text-red-700">{(result as PediatricRefusal).message}</span>}
+        {!busy && result && 'status' in result && result.status !== 'ok' && result.status !== 'needs_verification' && <span className="text-sm text-red-700">{(result as PediatricRefusal).message}</span>}
       </div>
     </form>
 
@@ -262,15 +284,6 @@ function Results({ r }: { r: PediatricResult & { curve?: Array<{ time_hours: num
       </div>}
       <p className="text-sm text-gray-700">Sensitivity (article transcription of Eq. 6): CL {f3(r.sensitivity.article_transcription.CL)} L/h, steady-state AUC24 {f1(r.sensitivity.article_transcription.steady_state_auc24, 0)}; fitted/article clearance ratio {f3(r.sensitivity.clearance_ratio_fitted_to_article)}.</p>
       {r.curve && r.curve.length > 1 && <Curve curve={r.curve} />}
-    </div>
-
-    <div className="rounded-xl border bg-white p-5 space-y-2">
-      <h2 className="text-lg font-semibold">Candidate regimens <span className="text-sm font-normal text-gray-500">(steady state, {r.posterior ? 'posterior' : 'prior'} parameters; research only)</span></h2>
-      <p className="text-sm">{r.target.statement}</p>
-      <div className="overflow-x-auto"><table className="text-sm w-full"><thead><tr className="text-left text-gray-500"><th>mg/kg</th><th>Dose (mg)</th><th>Interval</th><th>Infusion</th><th>mg/kg/day</th><th>AUC24</th><th>Peak</th><th>Trough</th><th>Flags</th></tr></thead><tbody>
-        {r.candidate_regimens.map((c, i) => <tr key={i} className={'border-t ' + (c.in_target ? 'bg-green-50' : '')}><td>{c.dose_mg_per_kg}</td><td>{c.dose_mg}</td><td>q{c.interval_hours}h</td><td>{c.infusion_minutes} min</td><td>{f1(c.daily_dose_mg_per_kg, 0)}</td><td className="font-semibold">{f1(c.auc24, 0)}</td><td>{f1(c.peak)}</td><td>{f1(c.trough)}</td><td className="text-xs text-amber-700">{c.flags.join('; ')}</td></tr>)}
-      </tbody></table></div>
-      <p className="text-xs text-gray-500">Current regimen with {r.posterior ? 'posterior' : 'prior'} parameters: AUC24 {f1(best.exposure.steady_state_auc24, 0)} ({inBand(best.exposure.steady_state_auc24)}).</p>
     </div>
 
     {r.input_review.items.length > 0 && <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm"><p className="font-semibold">Input review{r.input_review.verified ? ' (flagged values verified by the administrator)' : ''}</p><ReviewList items={r.input_review.items} /></div>}
