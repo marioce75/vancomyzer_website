@@ -31,7 +31,8 @@
     "test:pediatric:synthetic": "node --import tsx scripts/pediatric/synthetic-performance.ts",
     "test:pediatric:http": "node scripts/pediatric/http-browser.mjs",
     "test:pediatric:coverage": "node --import tsx scripts/pediatric/coverage-diagnostics.ts",
-    "test:signin-navigation": "EXPECT_FIXED=1 node scripts/auth/signin-navigation.mjs"
+    "test:signin-navigation": "EXPECT_FIXED=1 node scripts/auth/signin-navigation.mjs",
+    "test:admin-tier": "EXPECT_FIXED=1 node scripts/auth/admin-tier.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

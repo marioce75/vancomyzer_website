@@ -641,13 +641,7 @@ function ActionMenu({
             }
           }}
         />
-        <ActionItem
-          label="Change tier…"
-          onClick={() => {
-            const tier = prompt(`New tier for ${user.username}? (free, individual_pro, department, hospital)`, user.subscription_tier);
-            if (tier) fire("set_tier", { tier });
-          }}
-        />
+        <TierChangeControl currentTier={user.subscription_tier} onSave={tier => fire("set_tier", { tier })} />
         <hr className="my-1 border-gray-100" />
         <ActionItem
           label="Delete user"
@@ -749,13 +743,7 @@ function UserDetailDrawer({
               )}
               <DrawerActionBtn label="Force PW reset" onClick={() => onAction(user.id, "force_reset")} />
               <DrawerActionBtn label="Resend approval" onClick={() => onAction(user.id, "resend_approval")} />
-              <DrawerActionBtn
-                label="Change tier"
-                onClick={() => {
-                  const tier = prompt(`New tier? (free, individual_pro, department, hospital)`, user.subscription_tier);
-                  if (tier) onAction(user.id, "set_tier", { tier });
-                }}
-              />
+              <TierChangeControl currentTier={user.subscription_tier} onSave={tier => onAction(user.id, "set_tier", { tier })} />
               <DrawerActionBtn
                 label={user.role === "admin" ? "Demote" : "Promote to admin"}
                 onClick={() => {
@@ -779,6 +767,21 @@ function UserDetailDrawer({
       </aside>
     </>
   );
+}
+
+function TierChangeControl({ currentTier, onSave }: { currentTier: string; onSave: (tier: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [tier, setTier] = useState(currentTier);
+  if (!editing) return <button type="button" className="px-3 py-2 text-xs font-semibold text-gray-700" onClick={() => { setTier(currentTier); setEditing(true); }}><LocalizedText text="Change tier" /></button>;
+  return <div className="p-3 space-y-2 text-xs">
+    <label className="block"><LocalizedText text="New tier" />
+      <select aria-label="New tier" value={tier} onChange={event => setTier(event.target.value)} className="block w-full border rounded p-2 mt-1">
+        {["free", "individual_pro", "department", "hospital"].map(value => <option key={value} value={value}>{tierLabel(value)}</option>)}
+      </select>
+    </label>
+    <button type="button" className="border rounded px-2 py-1 mr-2" onClick={() => { onSave(tier); setEditing(false); }}><LocalizedText text="Save tier" /></button>
+    <button type="button" className="border rounded px-2 py-1" onClick={() => setEditing(false)}><LocalizedText text="Cancel" /></button>
+  </div>;
 }
 
 function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
