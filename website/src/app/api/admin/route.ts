@@ -16,7 +16,7 @@ import {
   logSecurityEvent,
 } from "@/lib/db";
 import { sendApprovalNotification, sendRejectionNotification } from "@/lib/email";
-import { normalizeTier } from "@/lib/tiers";
+import { type TierId } from "@/lib/tiers";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -228,7 +228,10 @@ export async function POST(request: NextRequest) {
   }
 
   if (action === "set_tier") {
-    const tier = normalizeTier(body.tier);
+    if (!body.tier || !["free", "individual_pro", "department", "hospital"].includes(body.tier)) {
+      return NextResponse.json({ error: "Choose a valid tier: free, individual_pro, department, or hospital." }, { status: 400 });
+    }
+    const tier = body.tier as TierId;
     setUserTier(userId, tier);
     logSecurityEvent({
       user_id: adminId,

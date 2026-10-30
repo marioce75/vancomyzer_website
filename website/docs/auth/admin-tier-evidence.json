@@ -1,0 +1,116 @@
+{
+  "before": [
+    {
+      "input": "individual_pro",
+      "status": 200,
+      "stored": "individual_pro"
+    },
+    {
+      "input": "department",
+      "status": 200,
+      "stored": "department"
+    },
+    {
+      "input": "hospital",
+      "status": 200,
+      "stored": "hospital"
+    },
+    {
+      "input": "free",
+      "status": 200,
+      "stored": "free"
+    },
+    {
+      "input": "Individual Pro",
+      "status": 200,
+      "stored": "free"
+    },
+    {
+      "input": "pro",
+      "status": 200,
+      "stored": "free"
+    },
+    {
+      "input": " hospital ",
+      "status": 200,
+      "stored": "free"
+    },
+    {
+      "input": null,
+      "status": 200,
+      "stored": "free"
+    },
+    {
+      "name": "anonymous",
+      "status": 401
+    },
+    {
+      "name": "pharmacist",
+      "status": 403
+    },
+    {
+      "name": "stale",
+      "status": 403
+    }
+  ],
+  "after": [
+    {
+      "input": "individual_pro",
+      "status": 200,
+      "stored": "individual_pro"
+    },
+    {
+      "input": "department",
+      "status": 200,
+      "stored": "department"
+    },
+    {
+      "input": "hospital",
+      "status": 200,
+      "stored": "hospital"
+    },
+    {
+      "input": "free",
+      "status": 200,
+      "stored": "free"
+    },
+    {
+      "input": "Individual Pro",
+      "status": 400,
+      "stored": "free"
+    },
+    {
+      "input": "pro",
+      "status": 400,
+      "stored": "free"
+    },
+    {
+      "input": " hospital ",
+      "status": 400,
+      "stored": "free"
+    },
+    {
+      "input": null,
+      "status": 400,
+      "stored": "free"
+    },
+    {
+      "name": "anonymous",
+      "status": 401
+    },
+    {
+      "name": "pharmacist",
+      "status": 403
+    },
+    {
+      "name": "stale",
+      "status": 403
+    },
+    {
+      "browser": "drawer selected Individual Pro, cancelled without mutation, then saved successfully"
+    },
+    {
+      "browser": "row menu saved Department successfully"
+    }
+  ]
+}
