@@ -771,8 +771,10 @@ function UserDetailDrawer({
 
 function TierChangeControl({ currentTier, onSave }: { currentTier: string; onSave: (tier: string) => void }) {
   const [editing, setEditing] = useState(false);
-  const [tier, setTier] = useState(currentTier);
-  if (!editing) return <button type="button" className="px-3 py-2 text-xs font-semibold text-gray-700" onClick={() => { setTier(currentTier); setEditing(true); }}><LocalizedText text="Change tier" /></button>;
+  // Legacy Enterprise accounts retain Hospital entitlements; write the canonical ID.
+  const editableTier = currentTier === "enterprise" ? "hospital" : currentTier;
+  const [tier, setTier] = useState(editableTier);
+  if (!editing) return <button type="button" className="px-3 py-2 text-xs font-semibold text-gray-700" onClick={() => { setTier(editableTier); setEditing(true); }}><LocalizedText text="Change tier" /></button>;
   return <div className="p-3 space-y-2 text-xs">
     <label className="block"><LocalizedText text="New tier" />
       <select aria-label="New tier" value={tier} onChange={event => setTier(event.target.value)} className="block w-full border rounded p-2 mt-1">

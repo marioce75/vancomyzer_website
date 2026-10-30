@@ -97,6 +97,25 @@ try {
     await row.getByRole('button',{name:'Save tier',exact:true}).click();assert.equal((await menuSaved).status(),200);
     assert.equal(db.prepare('SELECT subscription_tier FROM users WHERE id=2').get().subscription_tier,'department');
     output.push({browser:'row menu saved Department successfully'});
+    db.prepare("UPDATE users SET subscription_tier='enterprise' WHERE id=2").run();
+    await page.reload({waitUntil:'networkidle'});
+    await page.getByText('fixture2@example.invalid',{exact:true}).click();
+    await drawer.getByRole('button',{name:'Change tier',exact:true}).click();
+    if(process.env.EXPECT_LEGACY_FIXED!=='0') {
+      assert.equal(await drawer.getByLabel('New tier',{exact:true}).inputValue(),'hospital');
+      await drawer.getByLabel('New tier',{exact:true}).selectOption('free');
+      await drawer.getByRole('button',{name:'Cancel',exact:true}).click();
+      assert.equal(db.prepare('SELECT subscription_tier FROM users WHERE id=2').get().subscription_tier,'enterprise');
+      await drawer.getByRole('button',{name:'Change tier',exact:true}).click();
+      assert.equal(await drawer.getByLabel('New tier',{exact:true}).inputValue(),'hospital');
+    }
+    const legacySaved=page.waitForResponse(r=>r.url()===base+'/api/admin' && r.request().method()==='POST');
+    await drawer.getByRole('button',{name:'Save tier',exact:true}).click();
+    const legacyResponse=await legacySaved;
+    const legacyResult={browser:'legacy enterprise save without changing selection',status:legacyResponse.status(),submitted:legacyResponse.request().postDataJSON().tier,stored:db.prepare('SELECT subscription_tier FROM users WHERE id=2').get().subscription_tier};
+    output.push(legacyResult);
+    assert.equal(legacyResult.status,process.env.EXPECT_LEGACY_FIXED!=='0'?200:400);
+    assert.equal(legacyResult.stored,process.env.EXPECT_LEGACY_FIXED!=='0'?'hospital':'enterprise');
     await context.close();
   }
   console.log(JSON.stringify(output,null,2));
