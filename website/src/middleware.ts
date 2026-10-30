@@ -31,12 +31,11 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET ?? "vancomyzer-dev-secret-change-in-production",
   });
 
-  // Already logged in → redirect away from login/register
-  // Exception: allow /login?magic=... through so the magic-link sign-in
-  // can replace the existing session (handles the case where a user
-  // clicks a link from a different account or a re-issued link).
-  const isMagicLinkAttempt = pathname === "/login" && request.nextUrl.searchParams.has("magic");
-  if (token && !isMagicLinkAttempt && (pathname === "/login" || pathname === "/register")) {
+  // Keep the public login form reachable even when a signed cookie remains.
+  // The session callback can reject an inactive or superseded session while
+  // getToken still decodes its cookie; redirecting /login would trap that user
+  // on the calculator. Opening this form does not grant or refresh access.
+  if (token && pathname === "/register") {
     return NextResponse.redirect(new URL("/calculator", request.url));
   }
 

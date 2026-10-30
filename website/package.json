@@ -30,7 +30,8 @@
     "test:pediatric": "node --import tsx src/lib/pediatric/pediatric.test.ts && node --import tsx src/lib/pediatric/__tests__/engine.test.ts && node --import tsx src/lib/pediatric/__tests__/validation.test.ts && node --import tsx src/lib/pediatric/__tests__/localTime.test.ts && node --import tsx src/lib/pediatric/__tests__/reference.test.ts && node --import tsx src/lib/pediatric/__tests__/requestBody.test.ts && node --import tsx src/lib/pediatric/__tests__/researchRegimens.test.ts",
     "test:pediatric:synthetic": "node --import tsx scripts/pediatric/synthetic-performance.ts",
     "test:pediatric:http": "node scripts/pediatric/http-browser.mjs",
-    "test:pediatric:coverage": "node --import tsx scripts/pediatric/coverage-diagnostics.ts"
+    "test:pediatric:coverage": "node --import tsx scripts/pediatric/coverage-diagnostics.ts",
+    "test:signin-navigation": "EXPECT_FIXED=1 node scripts/auth/signin-navigation.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

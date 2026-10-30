@@ -1,0 +1,130 @@
+{
+  "productionCommit": "9e2b376073d2b30787239f49a4ac5444b45c162a",
+  "before": [
+    {
+      "name": "anonymous",
+      "signInVisible": true,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 401
+    },
+    {
+      "name": "expired-admin",
+      "signInVisible": true,
+      "destination": "/calculator",
+      "loginFormVisible": false,
+      "pediatricStatus": 403
+    },
+    {
+      "name": "superseded-admin",
+      "signInVisible": true,
+      "destination": "/calculator",
+      "loginFormVisible": false,
+      "pediatricStatus": 403
+    },
+    {
+      "name": "valid-admin",
+      "signInVisible": false,
+      "destination": "/calculator",
+      "loginFormVisible": false,
+      "pediatricStatus": 200
+    },
+    {
+      "name": "pending-mfa",
+      "signInVisible": false,
+      "destination": "/calculator",
+      "loginFormVisible": false,
+      "pediatricStatus": 403
+    }
+  ],
+  "after": [
+    {
+      "name": "anonymous",
+      "signInVisible": true,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 401
+    },
+    {
+      "name": "expired-admin",
+      "signInVisible": true,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 403
+    },
+    {
+      "name": "superseded-admin",
+      "signInVisible": true,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 403
+    },
+    {
+      "name": "valid-admin",
+      "signInVisible": false,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 200
+    },
+    {
+      "name": "pending-mfa",
+      "signInVisible": false,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 403
+    }
+  ],
+  "finalSevenScenarioRun": [
+    {
+      "name": "anonymous",
+      "signInVisible": false,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 401
+    },
+    {
+      "name": "expired-admin",
+      "signInVisible": true,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 403
+    },
+    {
+      "name": "superseded-admin",
+      "signInVisible": true,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 403
+    },
+    {
+      "name": "valid-admin",
+      "signInVisible": false,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 200
+    },
+    {
+      "name": "pending-mfa",
+      "signInVisible": false,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 403
+    },
+    {
+      "name": "calculator-expired",
+      "signInVisible": false,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 403
+    },
+    {
+      "name": "calculator-superseded",
+      "signInVisible": false,
+      "destination": "/login",
+      "loginFormVisible": true,
+      "pediatricStatus": 403
+    }
+  ],
+  "magicFormHTTP": 200,
+  "authenticatedRegistrationHTTP": 307
+}
