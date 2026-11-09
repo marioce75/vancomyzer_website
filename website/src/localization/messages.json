@@ -16608,5 +16608,100 @@
     "es": "Activado (Plausible)",
     "fr": "Activé (Plausible)",
     "pt-BR": "Ativado (Plausible)"
+  },
+  "Confirm the loading dose actually given. It will be recorded in the dosing history; the suggestion is not copied.": {
+    "es": "Confirme la dosis de carga realmente administrada. Se registrará en el historial de dosis; la sugerencia no se copia.",
+    "fr": "Confirmez la dose de charge réellement administrée. Elle sera enregistrée dans l’historique d’administration ; la suggestion n’est pas copiée.",
+    "pt-BR": "Confirme a dose de ataque realmente administrada. Ela será registrada no histórico de doses; a sugestão não é copiada."
+  },
+  "Do not count the loading dose here. Choose 0 if the level was drawn after the loading dose alone.": {
+    "es": "No cuente aquí la dosis de carga. Elija 0 si la muestra se extrajo solo después de la dosis de carga.",
+    "fr": "Ne comptez pas la dose de charge ici. Choisissez 0 si le prélèvement a été fait après la seule dose de charge.",
+    "pt-BR": "Não conte a dose de ataque aqui. Escolha 0 se o nível foi coletado apenas após a dose de ataque."
+  },
+  "Enter each level's time from the start of the last dose given.": {
+    "es": "Introduzca el tiempo de cada nivel desde el inicio de la última dosis administrada.",
+    "fr": "Saisissez l’heure de chaque prélèvement à partir du début de la dernière dose administrée.",
+    "pt-BR": "Informe o tempo de cada nível a partir do início da última dose administrada."
+  },
+  "Exact number of maintenance doses given": {
+    "es": "Número exacto de dosis de mantenimiento administradas",
+    "fr": "Nombre exact de doses d’entretien administrées",
+    "pt-BR": "Número exato de doses de manutenção administradas"
+  },
+  "Graph shows this dose followed by the selected maintenance regimen. Suggested maintenance to follow:": {
+    "es": "El gráfico muestra esta dosis seguida de la pauta de mantenimiento seleccionada. Mantenimiento sugerido a continuación:",
+    "fr": "Le graphique montre cette dose suivie du schéma d’entretien sélectionné. Entretien suggéré ensuite :",
+    "pt-BR": "O gráfico mostra esta dose seguida do esquema de manutenção selecionado. Manutenção sugerida a seguir:"
+  },
+  "History entered:": {
+    "es": "Historial introducido:",
+    "fr": "Historique saisi :",
+    "pt-BR": "Histórico informado:"
+  },
+  "LOADING DOSE GIVEN:": {
+    "es": "DOSIS DE CARGA ADMINISTRADA:",
+    "fr": "DOSE DE CHARGE ADMINISTRÉE :",
+    "pt-BR": "DOSE DE ATAQUE ADMINISTRADA:"
+  },
+  "Loading dose given (mg)": {
+    "es": "Dosis de carga administrada (mg)",
+    "fr": "Dose de charge administrée (mg)",
+    "pt-BR": "Dose de ataque administrada (mg)"
+  },
+  "Loading dose given?": {
+    "es": "¿Se administró dosis de carga?",
+    "fr": "Dose de charge administrée ?",
+    "pt-BR": "Foi administrada dose de ataque?"
+  },
+  "Loading dose given? Enter a level": {
+    "es": "¿Se administró la dosis de carga? Introducir un nivel",
+    "fr": "Dose de charge administrée ? Saisir un prélèvement",
+    "pt-BR": "Dose de ataque administrada? Informar um nível"
+  },
+  "Maintenance dose (mg)": {
+    "es": "Dosis de mantenimiento (mg)",
+    "fr": "Dose d’entretien (mg)",
+    "pt-BR": "Dose de manutenção (mg)"
+  },
+  "Maintenance doses given before the level": {
+    "es": "Dosis de mantenimiento administradas antes del nivel",
+    "fr": "Doses d’entretien administrées avant le prélèvement",
+    "pt-BR": "Doses de manutenção administradas antes do nível"
+  },
+  "One level: treat this estimate as provisional": {
+    "es": "Un nivel: considere esta estimación provisional",
+    "fr": "Un seul prélèvement : estimation provisoire",
+    "pt-BR": "Um nível: considere esta estimativa provisória"
+  },
+  "Preview only. Graph shows this suggested loading dose followed by the selected maintenance regimen. It is not part of the dosing history until you confirm the dose actually given.": {
+    "es": "Solo vista previa. El gráfico muestra esta dosis de carga sugerida seguida de la pauta de mantenimiento seleccionada. No forma parte del historial de dosis hasta que confirme la dosis realmente administrada.",
+    "fr": "Aperçu uniquement. Le graphique montre cette dose de charge suggérée suivie du schéma d’entretien sélectionné. Elle ne fait pas partie de l’historique d’administration tant que vous n’avez pas confirmé la dose réellement administrée.",
+    "pt-BR": "Apenas pré-visualização. O gráfico mostra esta dose de ataque sugerida seguida do esquema de manutenção selecionado. Ela não faz parte do histórico de doses até que você confirme a dose realmente administrada."
+  },
+  "Record as given and enter level": {
+    "es": "Registrar como administrada e introducir nivel",
+    "fr": "Enregistrer comme administrée et saisir le prélèvement",
+    "pt-BR": "Registrar como administrada e informar nível"
+  },
+  "SINGLE DOSE GIVEN:": {
+    "es": "DOSIS ÚNICA ADMINISTRADA:",
+    "fr": "DOSE UNIQUE ADMINISTRÉE :",
+    "pt-BR": "DOSE ÚNICA ADMINISTRADA:"
+  },
+  "SUGGESTED LOADING DOSE (NOT GIVEN):": {
+    "es": "DOSIS DE CARGA SUGERIDA (NO ADMINISTRADA):",
+    "fr": "DOSE DE CHARGE SUGGÉRÉE (NON ADMINISTRÉE) :",
+    "pt-BR": "DOSE DE ATAQUE SUGERIDA (NÃO ADMINISTRADA):"
+  },
+  "The level is fitted to the actual doses (loading dose, then the maintenance doses), so a loading dose is not mistaken for slow clearance. Steady-state confirmation is not used when a loading dose is entered.": {
+    "es": "El nivel se ajusta a las dosis reales (dosis de carga y luego dosis de mantenimiento), de modo que la dosis de carga no se confunde con un aclaramiento lento. La confirmación del estado estacionario no se utiliza cuando se introduce una dosis de carga.",
+    "fr": "Le prélèvement est ajusté aux doses réelles (dose de charge, puis doses d’entretien), afin qu’une dose de charge ne soit pas prise pour une clairance lente. La confirmation de l’état d’équilibre n’est pas utilisée lorsqu’une dose de charge est saisie.",
+    "pt-BR": "O nível é ajustado às doses reais (dose de ataque e depois doses de manutenção), para que a dose de ataque não seja confundida com depuração lenta. A confirmação do estado de equilíbrio não é usada quando uma dose de ataque é informada."
+  },
+  "With one measured level, the patient's estimated clearance is pulled toward the population estimate from age, weight and serum creatinine. If renal function is changing (for example, evolving acute kidney injury), serum creatinine lags behind, true clearance may be lower than estimated and exposure may be under-predicted. Confirm with a second level and reassess renal function before relying on this dose.": {
+    "es": "Con un solo nivel medido, el aclaramiento estimado del paciente tiende hacia la estimación poblacional basada en edad, peso y creatinina sérica. Si la función renal está cambiando (por ejemplo, una lesión renal aguda en evolución), la creatinina sérica se retrasa, el aclaramiento real puede ser menor que el estimado y la exposición puede estar infraestimada. Confirme con un segundo nivel y reevalúe la función renal antes de basarse en esta dosis.",
+    "fr": "Avec un seul prélèvement mesuré, la clairance estimée du patient est attirée vers l’estimation de population fondée sur l’âge, le poids et la créatinine sérique. Si la fonction rénale évolue (par exemple, insuffisance rénale aiguë en cours), la créatinine sérique est en retard, la clairance réelle peut être inférieure à l’estimation et l’exposition peut être sous-estimée. Confirmez avec un deuxième prélèvement et réévaluez la fonction rénale avant de vous fier à cette dose.",
+    "pt-BR": "Com um único nível medido, a depuração estimada do paciente é puxada em direção à estimativa populacional baseada em idade, peso e creatinina sérica. Se a função renal estiver mudando (por exemplo, lesão renal aguda em evolução), a creatinina sérica fica defasada, a depuração real pode ser menor que a estimada e a exposição pode ser subestimada. Confirme com um segundo nível e reavalie a função renal antes de confiar nesta dose."
   }
 }

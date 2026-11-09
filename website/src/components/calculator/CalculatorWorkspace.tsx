@@ -24,12 +24,13 @@ import CalculatorLayout from "@/components/calculator/CalculatorLayout";
 import PatientCharacteristicsForm from "@/components/calculator/PatientCharacteristicsForm";
 import CalculationMethodPanel from "@/components/calculator/CalculationMethodPanel";
 import RegimenForm from "@/components/calculator/RegimenForm";
+import { requestRegimen } from "@/components/calculator/dosingHistory";
 import LevelEntryTable, { manualHoursCollectionTime } from "@/components/calculator/LevelEntryTable";
 import { isEnteredLevel, requestLevel, timingIsValid, restoreLevelDrafts, type LevelDraft } from "./levelTiming";
 import { nextInputRevision, resultIsCurrent, responseIsCurrent } from "./inputRevision";
 import CalculatorActionBar from "@/components/calculator/CalculatorActionBar";
 import PrimaryMetricsCard from "@/components/calculator/PrimaryMetricsCard";
-import DoseRecommendationCard, { LoadingDosePopover } from "@/components/calculator/DoseRecommendationCard";
+import DoseRecommendationCard, { LoadingDosePopover, type SingleDoseStatus } from "@/components/calculator/DoseRecommendationCard";
 import TeachingNote from "@/components/calculator/TeachingNote";
 import Advisory from "@/components/calculator/Advisory";
 import InputSection from "@/components/calculator/InputSection";
@@ -90,6 +91,10 @@ function useMediaQuery(query: string): boolean {
   return matches;
 }
 
+/** Shown with a one-level result (see the review advisory). Wording only. */
+const ONE_LEVEL_UNCERTAINTY_SUMMARY =
+  "With one measured level, the patient's estimated clearance is pulled toward the population estimate from age, weight and serum creatinine. If renal function is changing (for example, evolving acute kidney injury), serum creatinine lags behind, true clearance may be lower than estimated and exposure may be under-predicted. Confirm with a second level and reassess renal function before relying on this dose.";
+
 const SESSION_KEY = "vancomyzer_calculator_state";
 const EIGHT_HOURS = 8 * 60 * 60 * 1000;
 
@@ -135,6 +140,12 @@ export default function CalculatorWorkspace() {
     result: CalculateResponse | null;
     selectedFrequencyOption: FrequencyOption | null;
   } | null>(null);
+  // Empiric loading-dose PREVIEW: the suggested loading dose is calculated and
+  // plotted on the Empiric tab, but it is not part of the dosing history. It
+  // enters the history only through handleConfirmLoadingDoseGiven, with the
+  // dose the clinician confirms was actually given.
+  const [loadingPreview, setLoadingPreview] = useState(false);
+  const pendingLoadingDoseCalc = useRef(false);
 
   // Optional clinician-supplied tracking string for calculation history.
   // Persisted only if the user has the history.calculation feature (Pro+).
@@ -194,7 +205,7 @@ export default function CalculatorWorkspace() {
       if (s.levels) setLevels(restoreLevelDrafts(s.levels, s.timingDraftVersion));
       if (s.bedbound !== undefined) setBedbound(s.bedbound);
       if (s.viewMode) setViewMode(s.viewMode);
-      if (s.mode) setMode(s.mode);
+      if (s.mode) setMode(s.viewMode === "empiric" ? "initial_regimen" : s.mode);
       if (s.activeSection) setActiveSection(s.activeSection);
       // Restore drafts only: cached results cannot prove they match these inputs.
     } catch { /* corrupted — ignore */ }
@@ -209,14 +220,23 @@ export default function CalculatorWorkspace() {
       return;
     }
     try {
+      // During an Empiric loading-dose preview, persist the history as it was
+      // before the preview: the suggested dose was not given.
+      const preview = loadingPreview ? preLoadingDoseState.current : null;
       sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-        patient, rrt, regimen, levels, bedbound, timingDraftVersion: 1,
-        viewMode, mode, activeSection,
-        result, selectedFrequencyOption,
+        patient, rrt,
+        regimen: preview ? preview.regimen : regimen,
+        levels: preview ? preview.levels : levels,
+        bedbound, timingDraftVersion: 1,
+        viewMode,
+        mode: preview ? preview.mode : mode,
+        activeSection,
+        result: preview ? null : result,
+        selectedFrequencyOption: preview ? null : selectedFrequencyOption,
         timestamp: Date.now(),
       }, clinicalDraftReplacer));
     } catch { /* storage full — ignore */ }
-  }, [patient, rrt, regimen, levels, bedbound, viewMode, mode, activeSection, result, selectedFrequencyOption]);
+  }, [patient, rrt, regimen, levels, bedbound, viewMode, mode, activeSection, result, selectedFrequencyOption, loadingPreview]);
 
   // Pre-fill patient state from URL query params (overrides session restore)
   const didPreFillRef = useRef(false);
@@ -316,15 +336,20 @@ export default function CalculatorWorkspace() {
     // Loading-dose fields travel only with a multi-dose level workflow where
     // "Loading dose" is selected (an unfilled 0 is sent so the server rejects
     // it visibly); otherwise they are dropped so a stale entry cannot change the fit.
-    const hasLoading = (regimen.doses_given ?? 0) >= 2 && regimen.loading_dose_mg !== undefined;
-    const { loading_dose_mg, loading_infusion_duration_hours, loading_to_maintenance_hours, ...maintenance } = regimen;
-    const sentRegimen = hasLoading
-      ? { ...maintenance, loading_dose_mg, loading_infusion_duration_hours, ...(loading_to_maintenance_hours !== undefined ? { loading_to_maintenance_hours } : {}) }
-      : maintenance;
-    return { ...base, regimen: sentRegimen, levels: validLevels };
+    return { ...base, regimen: requestRegimen(regimen), levels: validLevels };
   }, [mode, patient, rrt, regimen, levels, canSaveHistory]);
 
   const applyViewMode = useCallback((next: WorkspaceViewMode) => {
+    // A tab switch ends an Empiric loading-dose preview. The suggested dose was
+    // never given, so it must not carry into the 1 Level / 2 Levels history.
+    const preview = preLoadingDoseState.current;
+    if (preview) {
+      setRegimen(preview.regimen);
+      setLevels(preview.levels);
+      preLoadingDoseState.current = null;
+    }
+    pendingLoadingDoseCalc.current = false;
+    setLoadingPreview(false);
     setViewMode(next);
     setError(null);
     setResult(null);
@@ -547,6 +572,11 @@ export default function CalculatorWorkspace() {
       doses_given: 1,
       interval_hours: prev.interval_hours > 0 ? prev.interval_hours : 12,
       target_auc24: prev.target_auc24 ?? 450,
+      // Recorded as "Loading dose given: yes, 0 maintenance doses" in the form.
+      // The request is unchanged: loading fields are only sent when doses_given ≥ 2.
+      loading_dose_mg: bedboundDoseData.dose_mg,
+      loading_infusion_duration_hours: bedboundDoseData.infusion_duration_hours,
+      loading_to_maintenance_hours: undefined,
     }));
     // Phase 1  open Drug Levels section so the pharmacist can enter the level when drawn
     setActiveSection("levels");
@@ -590,6 +620,9 @@ export default function CalculatorWorkspace() {
     setActiveSection("patient");
     setBedbound(false);
     setBedboundDoseData(null);
+    preLoadingDoseState.current = null;
+    pendingLoadingDoseCalc.current = false;
+    setLoadingPreview(false);
   }, []);
 
   const fieldErrors = getModeScopedFieldErrors(mode, error?.field_errors);
@@ -680,8 +713,6 @@ export default function CalculatorWorkspace() {
     setSelectedFrequencyOption(option);
   }, []);
 
-  const pendingLoadingDoseCalc = useRef(false);
-
   const handleSimulateLoadingDose = useCallback((doseMg: number, intervalHours: number, infusionHours: number) => {
     // Snapshot current state so we can undo back to initial regimen results
     preLoadingDoseState.current = {
@@ -692,9 +723,11 @@ export default function CalculatorWorkspace() {
       result,
       selectedFrequencyOption,
     };
-    // Switch to existing_regimen mode with doses_given=1 (pulse/loading dose)
-    // This tells the engine to show a single-dose PK curve, not steady state
-    setViewMode("one_level");
+    // Calculate the suggested loading dose with the single-dose workflow
+    // (existing_regimen, doses_given=1, no levels) but stay on the Empiric tab:
+    // this is a preview, not a dose given. The dosing history and level
+    // sections stay hidden until the clinician confirms the dose given.
+    setLoadingPreview(true);
     setMode("existing_regimen");
     setRegimen({
       dose_mg: doseMg,
@@ -708,8 +741,6 @@ export default function CalculatorWorkspace() {
     setSelectedFrequencyOption(null);
     setResult(null);
     setError(null);
-    // Don't jump to levels tab — keep user in context, results appear in the right panel
-    // The left panel stays where it is so the user isn't disoriented
     pendingLoadingDoseCalc.current = true;
   }, [viewMode, mode, regimen, levels, result, selectedFrequencyOption]);
 
@@ -724,6 +755,36 @@ export default function CalculatorWorkspace() {
     setSelectedFrequencyOption(snap.selectedFrequencyOption);
     setError(null);
     preLoadingDoseState.current = null;
+    pendingLoadingDoseCalc.current = false;
+    setLoadingPreview(false);
+  }, []);
+
+  // The clinician confirms the loading dose ACTUALLY given (entered by hand in
+  // the preview banner, never copied from the suggestion). It is recorded as
+  // "Loading dose given: yes, 0 maintenance doses" in the 1 Level history; the
+  // clinician then sets the maintenance doses given and the level.
+  const handleConfirmLoadingDoseGiven = useCallback((doseMg: number, infusionHours: number) => {
+    preLoadingDoseState.current = null;
+    pendingLoadingDoseCalc.current = false;
+    setLoadingPreview(false);
+    setViewMode("one_level");
+    setMode("existing_regimen");
+    setRegimen({
+      dose_mg: doseMg,
+      interval_hours: 12,
+      infusion_duration_hours: infusionHours,
+      doses_given: 1,
+      target_auc24: 450,
+      steady_state_confirmed: false,
+      loading_dose_mg: doseMg,
+      loading_infusion_duration_hours: infusionHours,
+    });
+    setLevels([{ ...defaultLevel }]);
+    setResult(null);
+    setResultRevision(null);
+    setError(null);
+    setSelectedFrequencyOption(null);
+    setActiveSection("regimen");
   }, []);
 
   // Auto-trigger calculation after loading dose state is set
@@ -815,14 +876,14 @@ export default function CalculatorWorkspace() {
         </InputSection>
 
         {/* Regimen — only in existing_regimen mode */}
-        {mode === "existing_regimen" && (
+        {mode === "existing_regimen" && !loadingPreview && (
           <InputSection id="regimen" title="Dosing history" completed={regimenReady} focusSection={activeSection}>
             <RegimenForm value={regimen} onChange={setRegimen} fieldErrors={fieldErrors} />
           </InputSection>
         )}
 
         {/* Levels — only in existing_regimen mode */}
-        {mode === "existing_regimen" && (
+        {mode === "existing_regimen" && !loadingPreview && (
           <InputSection id="levels" title="Drug levels" completed={levelReady} focusSection={activeSection}>
             {bedbound && (
               <div className="mb-2">
@@ -895,7 +956,15 @@ export default function CalculatorWorkspace() {
   );
 
   // ── Derived display values shared by the band, the table and the graph ──
-  const isPulse = regimen.doses_given === 1;
+  // The single-dose state belongs to the level workflow (or the Empiric
+  // loading-dose preview, which runs on it). On the plain Empiric path the
+  // request carries no regimen, so a leftover doses_given === 1 must not label
+  // the empiric result as "after a loading dose".
+  const isPulse = mode === "existing_regimen" && regimen.doses_given === 1;
+  const singleDoseStatus: SingleDoseStatus = loadingPreview
+    ? "suggested"
+    : regimen.loading_dose_mg !== undefined ? "given" : "single";
+  const singleDoseNoun = singleDoseStatus === "single" ? "Single dose" : singleDoseStatus === "suggested" ? "Suggested loading dose" : "Loading dose";
   // One rule for every path: the active option's exposure, else the response's
   // top-level exposure (the regimen as entered).
   const metricAuc = activeOption?.auc24 ?? displayResult?.auc24;
@@ -903,8 +972,8 @@ export default function CalculatorWorkspace() {
   const metricTrough = activeOption?.trough ?? displayResult?.trough;
   const metricsCaption = isPulse
     ? activeIsCurrent
-      ? `Loading dose — ${regimen.dose_mg} mg × 1 · first 24 h, not steady state`
-      : `Maintenance after loading dose${activeOption ? ` — ${activeOption.dose_mg} mg q${activeOption.interval_hours}h` : ""} — steady-state PK`
+      ? `${singleDoseNoun} — ${regimen.dose_mg} mg × 1 · first 24 h, not steady state`
+      : `Maintenance after ${singleDoseNoun.toLowerCase()}${activeOption ? ` — ${activeOption.dose_mg} mg q${activeOption.interval_hours}h` : ""} — steady-state PK`
     : activeIsCurrent
       ? (displayResult?.exposure_horizon === "actual_history"
           ? `Current regimen — steady-state projection (actual history: ${displayResult.actual_history_exposure?.doses_given ?? "?"} doses given)`
@@ -982,8 +1051,21 @@ export default function CalculatorWorkspace() {
   if (displayResult?.calculation_details && !priorOnlyEmpiric) {
     const rs = displayResult.calculation_details.review_status;
     const sev = rs.level === "supported" ? "success" : rs.level === "caution" ? "caution" : "info";
+    // One measured level: say plainly what "limited certainty" means. Wording
+    // only; the calculation and the review status itself are unchanged.
+    const oneLevel =
+      displayResult.recommendation_type === "existing_regimen" &&
+      rs.level === "caution" &&
+      levels.filter(isEnteredLevel).length === 1;
     advisories.push(
-      <Advisory key="review" severity={sev} title={rs.banner_title} summary={rs.banner_body} collapsible>
+      <Advisory
+        key="review"
+        severity={sev}
+        title={oneLevel ? "One level: treat this estimate as provisional" : rs.banner_title}
+        summary={oneLevel ? ONE_LEVEL_UNCERTAINTY_SUMMARY : rs.banner_body}
+        collapsible
+      >
+        {oneLevel && <p className="m-0 mb-1"><strong><LocalizedText text={rs.banner_title} />.</strong> <LocalizedText text={rs.banner_body} /></p>}
         <p className="m-0"><strong><LocalizedText text="Evidence:" /></strong> <LocalizedText text={displayResult.calculation_details.evidence_strength} />. <LocalizedText text={displayResult.calculation_details.data_quality_summary} /></p>
         {rs.next_actions.length > 0 && (
           <ul className="mt-1 list-disc pl-4">{rs.next_actions.map((a, i) => <li key={i}><LocalizedText text={a} /></li>)}</ul>
@@ -1148,7 +1230,7 @@ export default function CalculatorWorkspace() {
           <div className="vz-panel-head">
             <div className="flex min-w-0 items-center gap-2">
               <h2 id="vz-band-title" className="vz-panel-title m-0">
-                <LocalizedText text={displayResult?.recommendation_type === "existing_regimen" ? "Dosing adjustment" : "Dosing recommendation"} />
+                <LocalizedText text={displayResult?.recommendation_type === "existing_regimen" && !loadingPreview ? "Dosing adjustment" : "Dosing recommendation"} />
               </h2>
               {displayResult && (
                 <span className="hidden md:inline">
@@ -1171,7 +1253,8 @@ export default function CalculatorWorkspace() {
               {displayResult && (
                 <div className={exportsDisabled ? "pointer-events-none opacity-40" : ""} aria-disabled={exportsDisabled}>
                   <div className="flex flex-wrap items-center gap-1.5">
-                    {!isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (
+                    {/* Loading-dose preview is an Empiric-tab tool; on the level tabs a loading dose is entered as given in the dosing history. */}
+                    {viewMode === "empiric" && !isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (
                       <LoadingDosePopover weightKg={patient.weight_kg > 0 ? patient.weight_kg : null} onSimulate={handleSimulateLoadingDose} />
                     )}
                     <PdfExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? "free"} onExport={handleExportPDF} />
@@ -1236,7 +1319,9 @@ export default function CalculatorWorkspace() {
                     predicted_auc24={displayResult.predicted_auc24}
                     isPulseDose={isPulse}
                     loadingDoseMg={isPulse ? regimen.dose_mg : null}
-                    onUndoLoadingDose={preLoadingDoseState.current ? handleUndoLoadingDose : undefined}
+                    loadingDoseStatus={singleDoseStatus}
+                    onUndoLoadingDose={loadingPreview ? handleUndoLoadingDose : undefined}
+                    onConfirmLoadingDoseGiven={loadingPreview ? handleConfirmLoadingDoseGiven : null}
                     empiricDosingBlocked={displayResult.empiric_dosing_blocked}
                     adjustmentDosingBlocked={displayResult.adjustment_dosing_blocked}
                     metricsSlot={
