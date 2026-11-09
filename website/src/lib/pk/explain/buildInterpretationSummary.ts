@@ -72,15 +72,24 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
     ? ` ${recommendation.infusion_safety_note}`
     : "";
 
-  // Single dose (a loading dose, or one maintenance dose) — different interpretation format
+  // Single dose (a loading dose, or one maintenance dose) — different interpretation format.
+  // The engine cannot tell a loading dose from a single maintenance dose here
+  // (the loading-dose fields travel only with multi-dose histories), so the
+  // wording names neither; and it must not ask for a "first level" when the
+  // estimate already rests on one.
   if (isPulseDose) {
+    const levelCount = engineOutput.level_count;
+    const levelNote =
+      levelCount >= 1
+        ? `Estimate based on ${levelCount === 1 ? "one measured level" : `${levelCount} measured levels`} after this single dose; confirm with a follow-up level after further doses.`
+        : "No level entered yet: draw the first level 1.5–6 h after the end of this dose's infusion for early Bayesian estimation.";
     return (
       `Single-dose analysis: ${current_regimen_dose_mg} mg, one dose only. ` +
       `${estimateType}: first-dose AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L (SCr ${scr} mg/dL). ` +
       `Suggested maintenance regimen: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${Number((infusionDuration * 60).toFixed(6))} minutes. ` +
       `Maintenance dose targets steady-state AUC24 400–600 mg·h/L.` +
       `${infusionSafetyNote} ` +
-      `${data_quality_note} Draw first level 1.5–6h post-loading-dose infusion end for early Bayesian estimation. Intended to support review, not replace clinician judgment.`
+      `${data_quality_note} ${levelNote} Intended to support review, not replace clinician judgment.`
     );
   }
 

@@ -25,6 +25,19 @@ export interface CurveSelection {
   /** Pulse-dose toggle: the engine-recommended curve is shown instead of the entered regimen. */
   showEngineRecommended: boolean;
   hasEngineRecommendedCurve: boolean;
+  /** The engine's recommended maintenance regimen, when the response carries one (names the toggle's curve). */
+  engineRecommended?: { dose_mg: number; interval_hours: number } | null;
+}
+
+/** Which row the single-dose banner describes: the dose as entered, a candidate regimen, or no regimen at all. */
+export type SingleDoseView = "current" | "option" | "none";
+
+export function singleDoseView(s: Pick<CurveSelection, "viewingCurrent" | "activeOption"> & {
+  /** False when the response proposes no regimen (blocked or held): there is no candidate to select. */
+  regimenProposed: boolean;
+}): SingleDoseView {
+  if (!s.regimenProposed || !s.activeOption) return "none";
+  return s.viewingCurrent ? "current" : "option";
 }
 
 export function singleDoseNoun(status: SingleDoseStatus): string {
@@ -54,10 +67,19 @@ export function describeSelectedCurve(s: CurveSelection): string {
     const regimenText = `${activeOption.dose_mg} mg q${activeOption.interval_hours}h`;
     return s.singleDose ? `${single}, then ${regimenText}` : `${regimenText}, from the first dose (no loading dose)`;
   }
-  if (s.showEngineRecommended && s.hasEngineRecommendedCurve) return "suggested regimen";
-  return s.singleDose
-    ? `${single} repeated every ${regimen.interval_hours} h (illustrative)`
-    : `your regimen ${regimen.dose_mg} mg q${regimen.interval_hours}h`;
+  if (s.showEngineRecommended && s.hasEngineRecommendedCurve) {
+    const rec = s.engineRecommended;
+    return rec ? `${single}, then ${rec.dose_mg} mg q${rec.interval_hours}h (suggested regimen)` : "suggested regimen";
+  }
+  // No regimen is selected or proposed (for example the recommendation is
+  // blocked). The workspace then draws the single dose on its own whenever the
+  // response carries that curve, so the legend must not imply repeats.
+  if (s.singleDose) {
+    return s.hasSingleDoseCurve
+      ? `${single} × 1, no further doses`
+      : `${single} repeated every ${regimen.interval_hours} h (illustrative)`;
+  }
+  return `your regimen ${regimen.dose_mg} mg q${regimen.interval_hours}h`;
 }
 
 export interface SingleDoseBannerCaption {
@@ -73,15 +95,18 @@ export interface SingleDoseBannerCaption {
 export function singleDoseBannerCaption(
   status: SingleDoseStatus,
   curveDescription: string,
-  viewingCurrent: boolean,
+  view: SingleDoseView | boolean,
 ): SingleDoseBannerCaption {
+  const v: SingleDoseView = typeof view === "boolean" ? (view ? "current" : "option") : view;
   const before = status === "suggested" ? ["Preview only.", "Graph shows:"] : ["Graph shows:"];
   const after =
     status === "suggested"
       ? ["It is not part of the dosing history until you confirm the dose actually given."]
-      : viewingCurrent
+      : v === "current"
         ? ["Select a candidate regimen to see it continued with maintenance doses."]
-        : ["The maintenance regimen below is a projection after this dose."];
+        : v === "option"
+          ? ["The maintenance regimen below is a projection after this dose."]
+          : ["No maintenance regimen is shown; the graph has only this dose."];
   return { before, curve: curveDescription, after };
 }
 

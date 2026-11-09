@@ -4,7 +4,7 @@
  */
 import test from "node:test";
 import assert from "node:assert/strict";
-import { describeSelectedCurve, singleDoseBannerCaption, singleDoseBannerCaptionText, type CurveSelection } from "./curveDescription";
+import { describeSelectedCurve, singleDoseBannerCaption, singleDoseBannerCaptionText, singleDoseView, type CurveSelection } from "./curveDescription";
 
 const loadOnly: CurveSelection = {
   singleDose: true,
@@ -77,4 +77,43 @@ test("multi-dose histories describe the entered history on the current row and t
     describeSelectedCurve({ ...base, regimen: { dose_mg: 1000, interval_hours: 12, doses_given: 3 }, viewingCurrent: false, activeOption: { dose_mg: 1000, interval_hours: 18 } }),
     "1000 mg q18h, from the first dose (no loading dose)",
   );
+});
+
+test("no regimen selected or proposed: legend says the single dose is drawn alone, banner says no regimen is shown", () => {
+  // Reached when the recommendation is blocked (no candidate carries is_recommended) and no row is selected.
+  const sel: CurveSelection = { ...loadOnly, viewingCurrent: false, activeOption: null };
+  const legend = describeSelectedCurve(sel);
+  assert.equal(legend, "loading dose 2000 mg × 1, no further doses");
+  const caption = singleDoseBannerCaption("given", legend, "none");
+  assert.equal(caption.curve, legend);
+  const text = singleDoseBannerCaptionText(caption);
+  assert.equal(text, "Graph shows: loading dose 2000 mg × 1, no further doses. No maintenance regimen is shown; the graph has only this dose.");
+  assert.ok(!/repeated|projection after|Select a candidate/.test(text));
+  // Only when the response has no single-dose curve at all may the legend admit the illustrative repeat.
+  assert.equal(describeSelectedCurve({ ...sel, hasSingleDoseCurve: false }), "loading dose 2000 mg repeated every 12 h (illustrative)");
+  // A single maintenance dose in the same state is never called a loading dose.
+  assert.equal(
+    describeSelectedCurve({ ...sel, singleDoseStatus: "single", regimen: { dose_mg: 1000, interval_hours: 12, doses_given: 1 } }),
+    "single dose 1000 mg × 1, no further doses",
+  );
+});
+
+test("engine-recommended toggle names the suggested regimen after the dose given", () => {
+  const sel: CurveSelection = { ...loadOnly, viewingCurrent: false, activeOption: null, showEngineRecommended: true, engineRecommended: { dose_mg: 1000, interval_hours: 12 } };
+  assert.equal(describeSelectedCurve(sel), "loading dose 2000 mg, then 1000 mg q12h (suggested regimen)");
+  assert.equal(describeSelectedCurve({ ...sel, engineRecommended: null }), "suggested regimen");
+});
+
+test("the boolean form of the banner view still maps to current / option", () => {
+  assert.deepEqual(singleDoseBannerCaption("given", "x", true).after, singleDoseBannerCaption("given", "x", "current").after);
+  assert.deepEqual(singleDoseBannerCaption("given", "x", false).after, singleDoseBannerCaption("given", "x", "option").after);
+});
+
+test("banner view: no regimen proposed means 'none' even when the 'as entered' row is the only row", () => {
+  const opt = { dose_mg: 2000, interval_hours: 12 };
+  assert.equal(singleDoseView({ viewingCurrent: true, activeOption: opt, regimenProposed: true }), "current");
+  assert.equal(singleDoseView({ viewingCurrent: false, activeOption: opt, regimenProposed: true }), "option");
+  assert.equal(singleDoseView({ viewingCurrent: false, activeOption: null, regimenProposed: true }), "none");
+  // Review-required refusal: the workspace shows the entered row by itself; there is no candidate to select.
+  assert.equal(singleDoseView({ viewingCurrent: true, activeOption: opt, regimenProposed: false }), "none");
 });

@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { CalculationDetails, FrequencyOption, AucRangeStatus, ArcAdvisory } from "@/types/calculator";
 import { fmt } from "@/lib/formatNumber";
 import { computeSafeInfusionDurationMinutes } from "@/lib/pk/recommend/infusionSafety";
-import { singleDoseBannerCaption } from "./curveDescription";
+import { singleDoseBannerCaption, type SingleDoseView } from "./curveDescription";
 
 interface DoseRecommendationCardProps {
   recommended_dose?: string | null;
@@ -47,6 +47,8 @@ interface DoseRecommendationCardProps {
   onConfirmLoadingDoseGiven?: ((doseMg: number, infusionHours: number) => void) | null;
   /** The graph legend's description of the curve drawn (curveDescription.ts); the banner repeats it. */
   curveDescription?: string | null;
+  /** Which row that curve belongs to (defaults from activeIsCurrent); "none" when no regimen is selected or proposed. */
+  singleDoseView?: SingleDoseView;
   /** When set, replaces the standard dose card with a pulse-dose safety state. */
   empiricDosingBlocked?: {
     review_required?: boolean;
@@ -279,14 +281,14 @@ function SingleDoseBanner({
   onUndo,
   onConfirmGiven,
   curveDescription,
-  viewingCurrent,
+  view,
 }: {
   doseMg: number;
   status: SingleDoseStatus;
   onUndo?: () => void;
   onConfirmGiven?: ((doseMg: number, infusionHours: number) => void) | null;
   curveDescription?: string | null;
-  viewingCurrent: boolean;
+  view: SingleDoseView;
 }) {
   const [confirming, setConfirming] = useState(false);
   const [givenMg, setGivenMg] = useState<number>(0);
@@ -299,7 +301,7 @@ function SingleDoseBanner({
   const caption = singleDoseBannerCaption(
     status,
     curveDescription ?? `${status === "single" ? "single dose" : status === "suggested" ? "suggested loading dose" : "loading dose"} ${doseMg} mg`,
-    viewingCurrent,
+    view,
   );
   const fieldStyle: React.CSSProperties = { width: "100%", padding: "4px 6px", fontSize: 12, border: "1px solid var(--color-border)", background: "var(--color-card)", color: "var(--color-primary)" };
   return (
@@ -397,6 +399,7 @@ export default function DoseRecommendationCard({
   loadingDoseStatus = "given",
   onConfirmLoadingDoseGiven,
   curveDescription,
+  singleDoseView,
   empiricDosingBlocked,
   adjustmentDosingBlocked,
   activeOption,
@@ -519,7 +522,7 @@ export default function DoseRecommendationCard({
           onUndo={onUndoLoadingDose}
           onConfirmGiven={onConfirmLoadingDoseGiven}
           curveDescription={curveDescription}
-          viewingCurrent={activeIsCurrent}
+          view={singleDoseView ?? (activeIsCurrent ? "current" : "option")}
         />
       )}
 

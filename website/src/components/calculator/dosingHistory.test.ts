@@ -111,3 +111,79 @@ test("summary reads the history back in plain language", () => {
   );
   assert.equal(summarizeDosingHistory(empty), null);
 });
+
+// ── Exact maintenance count ("6 or more") ────────────────────────────────────
+// The field emits 0 when cleared and NaN when the entry is partial or out of
+// range (ClinicalNumberInput). Neither may change the history.
+import { EXACT_COUNT_MIN, maintenanceCountMissing, setExactMaintenanceCount } from "./dosingHistory";
+
+test("with a loading dose: clearing the exact count keeps every detail and never becomes loading-only", () => {
+  let r = loadThenOneMaintenance();
+  r = setMaintenanceDosesGiven(r, 6);
+  assert.equal(r.doses_given, 7);
+  const cleared = setExactMaintenanceCount(r, 0); // field emptied
+  assert.ok(maintenanceCountMissing(cleared));
+  assert.equal(onlyLoadingDoseGiven(cleared), false, "must not collapse to the loading-dose-only history");
+  assert.equal(cleared.dose_mg, 750);
+  assert.equal(cleared.interval_hours, 12);
+  assert.equal(cleared.infusion_duration_hours, 75 / 60);
+  assert.equal(cleared.loading_dose_mg, 2000);
+  assert.equal(cleared.loading_infusion_duration_hours, 200 / 60);
+  assert.equal(maintenanceDosesGiven(cleared), undefined);
+  assert.equal(summarizeDosingHistory(cleared), null);
+  // A partial entry below the field's minimum (typing "1" on the way to "12") is NaN from the field.
+  const partial = setExactMaintenanceCount(cleared, NaN);
+  assert.ok(maintenanceCountMissing(partial));
+  assert.equal(partial.dose_mg, 750);
+  assert.equal(partial.loading_dose_mg, 2000);
+  // Re-entering a valid count restores a complete history with the same doses.
+  const twelve = setExactMaintenanceCount(partial, 12);
+  assert.equal(twelve.doses_given, 13);
+  assert.equal(maintenanceDosesGiven(twelve), 12);
+  assert.equal(twelve.dose_mg, 750);
+  assert.equal(twelve.loading_dose_mg, 2000);
+  const sent = requestRegimen(twelve);
+  assert.equal(sent.doses_given, 13);
+  assert.equal(sent.loading_dose_mg, 2000);
+  assert.equal(summarizeDosingHistory(twelve), "2,000 mg loading dose at 0 h → 750 mg at 12 h, then every 12 h (12 maintenance doses). Level drawn after the last 750 mg dose (dose 13 of 13).");
+});
+
+test("without a loading dose: clearing the exact count keeps the dose and interval; re-entering restores n equal doses", () => {
+  let r: CalculateRequestRegimen = { ...empty, dose_mg: 1000, interval_hours: 8, infusion_duration_hours: 1.5 };
+  r = setMaintenanceDosesGiven(r, 3);
+  r = setMaintenanceDosesGiven(r, 6);
+  assert.equal(r.doses_given, 6);
+  const cleared = setExactMaintenanceCount(r, 0);
+  assert.ok(maintenanceCountMissing(cleared));
+  assert.equal(cleared.doses_given !== 0, true, "a blank field is not zero doses");
+  assert.equal(cleared.dose_mg, 1000);
+  assert.equal(cleared.interval_hours, 8);
+  assert.equal(cleared.infusion_duration_hours, 1.5);
+  assert.equal(cleared.loading_dose_mg, undefined);
+  const eight = setExactMaintenanceCount(cleared, 8);
+  assert.equal(eight.doses_given, 8);
+  assert.equal(eight.target_auc24, undefined);
+  assert.deepEqual(requestRegimen(eight), { ...empty, dose_mg: 1000, interval_hours: 8, infusion_duration_hours: 1.5, doses_given: 8, steady_state_confirmed: false, target_auc24: undefined });
+});
+
+test("values below the field's minimum or non-integers never change the history; only the explicit 0 button makes loading-only", () => {
+  const base = setMaintenanceDosesGiven(loadThenOneMaintenance(), 6);
+  for (const n of [1, 5, EXACT_COUNT_MIN - 1, 6.5, -2, Infinity]) {
+    const next = setExactMaintenanceCount(base, n);
+    assert.ok(maintenanceCountMissing(next), `${n} must leave the count missing`);
+    assert.equal(next.dose_mg, 750);
+    assert.equal(next.loading_dose_mg, 2000);
+  }
+  // The explicit button: loading dose only, maintenance fields mirror the loading dose (unchanged behaviour).
+  const loadOnly = setMaintenanceDosesGiven(base, 0);
+  assert.ok(onlyLoadingDoseGiven(loadOnly));
+  assert.equal(loadOnly.dose_mg, 2000);
+});
+
+test("a missing count is flagged for the Calculate guard and is not a usable request", () => {
+  const cleared = setExactMaintenanceCount(setMaintenanceDosesGiven(loadThenOneMaintenance(), 6), 0);
+  assert.ok(maintenanceCountMissing(cleared));
+  assert.ok(Number.isNaN(requestRegimen(cleared).doses_given), "NaN travels to the guard, not a silent default");
+  assert.equal(maintenanceCountMissing(loadThenOneMaintenance()), false);
+  assert.equal(maintenanceCountMissing(empty), false, "no count chosen yet is not the same as a cleared field");
+});

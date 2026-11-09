@@ -116,6 +116,31 @@ export function setMaintenanceDosesGiven(r: Regimen, m: number): Regimen {
   };
 }
 
+/** Smallest count the exact-count field accepts; smaller counts have their own buttons. */
+export const EXACT_COUNT_MIN = 6;
+
+/**
+ * True while the exact-count field is blank or holds an unusable entry. The
+ * history stays exactly as entered and no calculation may run until a count
+ * is typed (the Calculate guard checks this; see CalculatorWorkspace).
+ */
+export function maintenanceCountMissing(r: Regimen): boolean {
+  return r.doses_given !== undefined && !Number.isFinite(r.doses_given);
+}
+
+/**
+ * The exact-count field ("6 or more"). Only a whole number ≥ EXACT_COUNT_MIN
+ * changes the history. A blank or partial entry (the field emits 0 when empty
+ * and NaN when out of range) marks the count as missing and leaves every dose,
+ * interval, infusion and loading-dose field untouched: clearing the field must
+ * never turn the history into "loading dose only", which is reachable only
+ * through the explicit 0 button.
+ */
+export function setExactMaintenanceCount(r: Regimen, n: number): Regimen {
+  if (Number.isInteger(n) && n >= EXACT_COUNT_MIN) return setMaintenanceDosesGiven(r, n);
+  return { ...r, doses_given: NaN, steady_state_confirmed: false };
+}
+
 /** Edit the loading dose; while it is the only dose given, it is also the dose the model fits. */
 export function updateLoadingDose(
   r: Regimen,

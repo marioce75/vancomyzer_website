@@ -7,9 +7,12 @@ import { CalculateRequestRegimen } from "@/types/calculator";
 import { parseClinicalNumber } from "@/lib/parseClinicalNumber";
 import ClinicalNumberInput from "./ClinicalNumberInput";
 import {
+  EXACT_COUNT_MIN,
   loadingDoseGiven,
+  maintenanceCountMissing,
   maintenanceDosesGiven,
   onlyLoadingDoseGiven,
+  setExactMaintenanceCount,
   setLoadingDoseGiven,
   setMaintenanceDosesGiven,
   summarizeDosingHistory,
@@ -66,6 +69,11 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
   const hasLoading = loadingDoseGiven(value);
   const loadOnly = onlyLoadingDoseGiven(value);
   const maintenanceCount = maintenanceDosesGiven(value);
+  // "6 or more": the exact count is typed. While the field is blank or holds a
+  // partial entry the count is missing (NaN), the history is kept as entered
+  // and Calculate is refused (CalculatorWorkspace); the field stays visible.
+  const countMissing = maintenanceCountMissing(value);
+  const exactCount = (maintenanceCount ?? 0) >= EXACT_COUNT_MIN || countMissing;
   const isPulseDose = value.doses_given === 1;
   const summary = summarizeDosingHistory(value);
   const fe = (key: string) => fieldErrors[`regimen.${key}`] ?? fieldErrors[key];
@@ -140,7 +148,7 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
                 className={(invalidText) => inputClass(Boolean(fe("loading_infusion_duration_hours") || invalidText))}
               />
             </InputGroup>
-            {!loadOnly && maintenanceCount !== undefined && (
+            {!loadOnly && (maintenanceCount !== undefined || countMissing) && (
               <div className="col-span-2">
                 <InputGroup label="Hours from start of loading dose to first maintenance dose" error={fe("loading_to_maintenance_hours")}>
                   <ClinicalNumberInput
@@ -168,17 +176,20 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
           ))}
           <button
             type="button"
-            onClick={() => onChange(setMaintenanceDosesGiven(value, 6))}
-            className={segClass((maintenanceCount ?? 0) >= 6)}
+            onClick={() => onChange(setMaintenanceDosesGiven(value, EXACT_COUNT_MIN))}
+            className={segClass(exactCount)}
           ><LocalizedText text="6 or more" /></button>
         </div>
         {hasLoading && <p className="mt-1 text-[10px] text-slate-500"><LocalizedText text="Do not count the loading dose here. Choose 0 if the level was drawn after the loading dose alone." /></p>}
-        {((maintenanceCount ?? 0) >= 6 || Number.isNaN(value.doses_given)) && (
-          <label className="mt-2 block text-xs text-slate-600"><LocalizedText text="Exact number of maintenance doses given" /><ClinicalNumberInput aria-label="Exact number of maintenance doses given" min={6} max={1000} step={1}
-              className={inputClass(Boolean(fieldErrors.doses_given))} value={maintenanceCount ?? 6}
-              onValueChange={(n) => onChange(Number.isFinite(n) ? setMaintenanceDosesGiven(value, n) : { ...value, doses_given: n, steady_state_confirmed: false })} />
+        {exactCount && (
+          <label className="mt-2 block text-xs text-slate-600"><LocalizedText text="Exact number of maintenance doses given" /><ClinicalNumberInput aria-label="Exact number of maintenance doses given" inputMode="numeric" min={EXACT_COUNT_MIN} max={1000} step={1}
+              className={inputClass(Boolean(fe("doses_given")) || countMissing)}
+              value={maintenanceCount !== undefined && maintenanceCount >= EXACT_COUNT_MIN ? maintenanceCount : NaN}
+              emptyError="Enter the exact number of maintenance doses given (6 or more). The doses entered below are kept until you do."
+              onValueChange={(n) => onChange(setExactMaintenanceCount(value, n))} />
           </label>
         )}
+        {fe("doses_given") && !countMissing && <p className="mt-1 text-xs text-red-600"><LocalizedText text={fe("doses_given")} /></p>}
       </div>
 
       {/* 3. Maintenance dose (hidden while the loading dose is the only dose given) */}
@@ -269,7 +280,6 @@ export default function RegimenForm({ value, onChange, fieldErrors = {} }: Regim
           </div>
         )}
         <p className="mt-1 text-xs text-slate-500"><LocalizedText text="Without confirmation, the exact dose count is used. Levels must follow the last dose given. A loading dose as dose 1 is supported; changed, held or missed maintenance doses are not." /></p>
-        {fieldErrors.doses_given && <p className="text-xs text-red-600"><LocalizedText text={fieldErrors.doses_given} /></p>}
       </div>
     </div>
   );

@@ -19,6 +19,7 @@
  */
 
 import { type Locale, translate } from "@/localization/catalog";
+import type { ExposureSummary } from "@/components/calculator/clinicalNote";
 import { localizeReportMarkup } from "@/localization/reportMarkup";
 import { buildExportWatermark } from "./watermark";
 import {
@@ -61,6 +62,13 @@ export interface ReportData {
    * (regimen_is_current), it is one dose, not a regimen: no interval is printed.
    */
   single_dose?: { dose_mg: number; kind: "loading" | "single" };
+  /**
+   * Level workflows: the exposure of the dose(s) already given and the regimen
+   * proposed (or why none is), as printed in the clinical note (clinicalNote.ts).
+   */
+  exposure_summary?: ExposureSummary;
+  /** Level workflows: the one-level / changing renal function caution shown on screen. */
+  one_level_caution?: string;
 
   // PK Metrics
   auc24: number;
@@ -121,6 +129,24 @@ function formatDate(): string {
     year: "numeric", month: "long", day: "numeric",
     hour: "2-digit", minute: "2-digit", timeZoneName: "short",
   });
+}
+
+/** "Dose already given" vs. "proposed regimen": the same facts as the clinical note, as a table. */
+function exposureSummarySection(s: ExposureSummary): string {
+  // One text node per cell so the sentence can be localized as a whole (reportMarkup.ts).
+  const figures = (f: { auc24: number; peak: number; trough: number }) =>
+    `AUC\u2082\u2084 ${fmt(f.auc24, 1)} mg\u00b7h/L; peak ${fmt(f.peak, 2)} mg/L; trough ${fmt(f.trough, 2)} mg/L`;
+  const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+  const given = `<tr><th>${escapeHtml(s.given.title)}</th><td>${escapeHtml(s.given.regimen)}<span class="period">${escapeHtml(cap(s.given.period))}</span>${s.given.atLastDose ? `<span class="period">${escapeHtml(s.given.atLastDose)}</span>` : ""}</td><td>${figures(s.given.figures)}</td></tr>`;
+  const p = s.proposed;
+  const proposed = p
+    ? `<tr><th>${escapeHtml(p.title)}</th><td>${escapeHtml(p.regimen)}<span class="period">${escapeHtml(cap(p.period))}</span><span class="period">${p.origin === "selected" ? escapeHtml(`Candidate selected by the clinician${p.engineRecommendation ? `; the engine recommendation is ${p.engineRecommendation}` : ""}.`) : "Engine recommendation."}</span></td><td>${p.figures ? figures(p.figures) : "\u2014"}</td></tr>`
+    : `<tr><th>Proposed maintenance regimen</th><td colspan="2">None.${s.noneReason ? ` ${escapeHtml(s.noneReason)}` : ""}</td></tr>`;
+  return `
+  <div class="section">
+    <div class="section-title">Dose already given vs. proposed regimen</div>
+    <table class="exposure-table"><tbody>${given}${proposed}</tbody></table>
+  </div>`;
 }
 
 export function generateReportHTML(data: ReportData, tier: string = "free", locale: Locale = "en"): string {
@@ -198,6 +224,11 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
       padding-bottom: 3px;
       margin-bottom: 8px;
     }
+    .exposure-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+    .exposure-table th, .exposure-table td { text-align: left; vertical-align: top; padding: 5px 6px; border: 1px solid #cbd5e0; }
+    .exposure-table th { width: 32%; background: #f0f5fb; color: #1e4d8c; font-weight: 700; }
+    .exposure-table .period { display: block; margin-top: 2px; color: #4a5568; font-size: 9.5px; }
+    .caution-box { border: 1px solid #f6ad55; background: #fffaf0; color: #7b341e; padding: 8px 10px; font-size: 10.5px; line-height: 1.5; }
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -310,8 +341,16 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
     ${data.entered_levels && data.entered_levels.length > 0 ? `<div class="interpretation" style="margin-top:4px">${data.entered_levels.map((l, i) => `Level ${i + 1}: ${fmt(l.value_mg_l, 1)} mg/L at ${fmt(l.hours_after_last_dose, 2)} h after the start of the last dose`).join("<br/>")}</div>` : ""}
   </div>` : ""}
 
+  ${data.exposure_summary ? exposureSummarySection(data.exposure_summary) : ""}
+
+  ${data.one_level_caution ? `
   <div class="section">
-    <div class="section-title">${data.regimen_is_current ? (data.single_dose ? (data.single_dose.kind === "loading" ? "Loading dose given (single dose)" : "Single dose given") : "Current regimen (as entered)") : "Recommended Regimen"}</div>
+    <div class="section-title">One measured level: provisional estimate</div>
+    <div class="caution-box">${escapeHtml(data.one_level_caution)}</div>
+  </div>` : ""}
+
+  <div class="section">
+    <div class="section-title">${data.regimen_is_current ? (data.single_dose ? (data.single_dose.kind === "loading" ? "Loading dose given (single dose)" : "Single dose given") : "Current regimen (as entered)") : data.exposure_summary ? "Proposed regimen (not yet given)" : "Recommended Regimen"}</div>
     <div class="dose-box">
       ${data.recommendation_blocked ? `<span class="dose-primary">No automatic maintenance regimen</span><div class="dose-detail">${escapeHtml(data.recommendation_blocked)}</div>` : data.regimen_is_current && data.single_dose ? `<span class="dose-primary">${data.single_dose.dose_mg} mg \u00d7 1</span><div class="dose-detail">One dose, not a regimen. Exposure is that dose over its first 24 h, not steady state.</div>` : `<span class="dose-primary">${escapeHtml(data.recommended_dose.replace(/\s*mg$/i, ""))} mg every ${data.recommended_interval_hours} h</span>`}
       ${!data.recommendation_blocked && data.recommended_infusion_duration_hours ? `<div class="dose-detail">Infuse over ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes</div>` : ""}
@@ -323,7 +362,7 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
   </div>
 
   <div class="section">
-    <div class="section-title">${data.recommendation_blocked ? (data.mode === "initial_regimen" ? "No maintenance exposure predicted" : "Current regimen exposure (no automatic recommendation)") : "Predicted Pharmacokinetic Metrics"}</div>
+    <div class="section-title">${data.recommendation_blocked ? (data.mode === "initial_regimen" ? "No maintenance exposure predicted" : data.single_dose ? "Exposure of the dose already given (first 24 h; no automatic recommendation)" : "Current regimen exposure (no automatic recommendation)") : data.exposure_summary ? (data.regimen_is_current ? (data.single_dose ? "Exposure of the dose already given (first 24 h, not steady state)" : "Steady-state projection of the current regimen (as entered)") : "Projected steady-state exposure of the proposed regimen (not yet given)") : "Predicted Pharmacokinetic Metrics"}</div>
     <div class="metrics-row">
       <div class="metric-card">
         <div class="metric-label">AUC\u2082\u2084</div>

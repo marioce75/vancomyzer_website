@@ -7804,11 +7804,6 @@
     "fr": "Aucune concentration mesurée ; réévaluer lorsque des concentrations seront disponibles.",
     "pt-BR": "Não existem níveis medidos; reavaliar após os níveis disponíveis."
   },
-  "Draw first level 1.5–6h post-loading-dose infusion end for early Bayesian estimation.": {
-    "es": "Obtener la primera concentración 1.5–6h después de finalizar la perfusión de la dosis de carga para una estimación bayesiana temprana.",
-    "fr": "Prélever la première concentration 1.5–6h après la fin de la perfusion de la dose de charge pour une estimation bayésienne précoce.",
-    "pt-BR": "Desenhe o primeiro nível 1.5–6h após a infusão de dose para estimativa bayesiana precoce."
-  },
   "Vancomycin initial regimen suggestion (no levels).": {
     "es": "Pauta inicial sugerida de vancomicina (sin concentraciones).",
     "fr": "Schéma initial de vancomycine proposé (sans concentrations).",
@@ -16689,11 +16684,6 @@
     "fr": "Le prélèvement est ajusté aux doses réelles (dose de charge, puis doses d’entretien), afin qu’une dose de charge ne soit pas prise pour une clairance lente. La confirmation de l’état d’équilibre n’est pas utilisée lorsqu’une dose de charge est saisie.",
     "pt-BR": "O nível é ajustado às doses reais (dose de ataque e depois doses de manutenção), para que a dose de ataque não seja confundida com depuração lenta. A confirmação do estado de equilíbrio não é usada quando uma dose de ataque é informada."
   },
-  "With one measured level, the patient's estimated clearance is pulled toward the population estimate from age, weight and serum creatinine. If renal function is changing (for example, evolving acute kidney injury), serum creatinine lags behind, true clearance may be lower than estimated and exposure may be under-predicted. Confirm with a second level and reassess renal function before relying on this dose.": {
-    "es": "Con un solo nivel medido, el aclaramiento estimado del paciente tiende hacia la estimación poblacional basada en edad, peso y creatinina sérica. Si la función renal está cambiando (por ejemplo, una lesión renal aguda en evolución), la creatinina sérica se retrasa, el aclaramiento real puede ser menor que el estimado y la exposición puede estar infraestimada. Confirme con un segundo nivel y reevalúe la función renal antes de basarse en esta dosis.",
-    "fr": "Avec un seul prélèvement mesuré, la clairance estimée du patient est attirée vers l’estimation de population fondée sur l’âge, le poids et la créatinine sérique. Si la fonction rénale évolue (par exemple, insuffisance rénale aiguë en cours), la créatinine sérique est en retard, la clairance réelle peut être inférieure à l’estimation et l’exposition peut être sous-estimée. Confirmez avec un deuxième prélèvement et réévaluez la fonction rénale avant de vous fier à cette dose.",
-    "pt-BR": "Com um único nível medido, a depuração estimada do paciente é puxada em direção à estimativa populacional baseada em idade, peso e creatinina sérica. Se a função renal estiver mudando (por exemplo, lesão renal aguda em evolução), a creatinina sérica fica defasada, a depuração real pode ser menor que a estimada e a exposição pode ser subestimada. Confirme com um segundo nível e reavalie a função renal antes de confiar nesta dose."
-  },
   "Dosing history entered": {
     "es": "Historial de dosis introducido",
     "fr": "Historique d’administration saisi",
@@ -16773,5 +16763,185 @@
     "es": "pauta sugerida",
     "fr": "schéma suggéré",
     "pt-BR": "esquema sugerido"
+  },
+  "Enter the exact number of maintenance doses given (6 or more). The doses entered below are kept until you do.": {
+    "es": "Introduzca el número exacto de dosis de mantenimiento administradas (6 o más). Las dosis introducidas abajo se conservan hasta que lo haga.",
+    "fr": "Saisissez le nombre exact de doses d’entretien administrées (6 ou plus). Les doses saisies ci-dessous sont conservées jusque-là.",
+    "pt-BR": "Informe o número exato de doses de manutenção administradas (6 ou mais). As doses informadas abaixo são mantidas até lá."
+  },
+  "Enter the exact number of maintenance doses given (6 or more) before calculating. The doses you entered are kept.": {
+    "es": "Introduzca el número exacto de dosis de mantenimiento administradas (6 o más) antes de calcular. Las dosis que introdujo se conservan.",
+    "fr": "Saisissez le nombre exact de doses d’entretien administrées (6 ou plus) avant de calculer. Les doses saisies sont conservées.",
+    "pt-BR": "Informe o número exato de doses de manutenção administradas (6 ou mais) antes de calcular. As doses informadas são mantidas."
+  },
+  "No maintenance regimen is shown; the graph has only this dose.": {
+    "es": "No se muestra ningún régimen de mantenimiento; el gráfico solo contiene esta dosis.",
+    "fr": "Aucun schéma d’entretien n’est affiché ; le graphique ne contient que cette dose.",
+    "pt-BR": "Nenhum esquema de manutenção é mostrado; o gráfico contém apenas esta dose."
+  },
+  "Dose already given vs. proposed regimen": {
+    "es": "Dosis ya administrada frente a régimen propuesto",
+    "fr": "Dose déjà administrée vs schéma proposé",
+    "pt-BR": "Dose já administrada vs. esquema proposto"
+  },
+  "One measured level: provisional estimate": {
+    "es": "Un solo nivel medido: estimación provisional",
+    "fr": "Un seul prélèvement mesuré : estimation provisoire",
+    "pt-BR": "Um único nível medido: estimativa provisória"
+  },
+  "Proposed regimen (not yet given)": {
+    "es": "Régimen propuesto (aún no administrado)",
+    "fr": "Schéma proposé (pas encore administré)",
+    "pt-BR": "Esquema proposto (ainda não administrado)"
+  },
+  "Exposure of the dose already given (first 24 h, not steady state)": {
+    "es": "Exposición de la dosis ya administrada (primeras 24 h, no en estado estacionario)",
+    "fr": "Exposition de la dose déjà administrée (24 premières heures, pas à l’état d’équilibre)",
+    "pt-BR": "Exposição da dose já administrada (primeiras 24 h, não em estado de equilíbrio)"
+  },
+  "Steady-state projection of the current regimen (as entered)": {
+    "es": "Proyección en estado estacionario del régimen actual (según lo introducido)",
+    "fr": "Projection à l’état d’équilibre du schéma actuel (tel que saisi)",
+    "pt-BR": "Projeção em estado de equilíbrio do esquema atual (conforme informado)"
+  },
+  "Projected steady-state exposure of the proposed regimen (not yet given)": {
+    "es": "Exposición proyectada en estado estacionario del régimen propuesto (aún no administrado)",
+    "fr": "Exposition projetée à l’état d’équilibre du schéma proposé (pas encore administré)",
+    "pt-BR": "Exposição projetada em estado de equilíbrio do esquema proposto (ainda não administrado)"
+  },
+  "Exposure of the dose already given (first 24 h; no automatic recommendation)": {
+    "es": "Exposición de la dosis ya administrada (primeras 24 h; sin recomendación automática)",
+    "fr": "Exposition de la dose déjà administrée (24 premières heures ; aucune recommandation automatique)",
+    "pt-BR": "Exposição da dose já administrada (primeiras 24 h; sem recomendação automática)"
+  },
+  "Proposed maintenance regimen": {
+    "es": "Régimen de mantenimiento propuesto",
+    "fr": "Schéma d’entretien proposé",
+    "pt-BR": "Esquema de manutenção proposto"
+  },
+  "None.": {
+    "es": "Ninguno.",
+    "fr": "Aucun.",
+    "pt-BR": "Nenhum."
+  },
+  "Engine recommendation.": {
+    "es": "Recomendación del motor de cálculo.",
+    "fr": "Recommandation du moteur de calcul.",
+    "pt-BR": "Recomendação do mecanismo de cálculo."
+  },
+  "Dose already given": {
+    "es": "Dosis ya administrada",
+    "fr": "Dose déjà administrée",
+    "pt-BR": "Dose já administrada"
+  },
+  "Current regimen as entered": {
+    "es": "Régimen actual según lo introducido",
+    "fr": "Schéma actuel tel que saisi",
+    "pt-BR": "Esquema atual conforme informado"
+  },
+  "Proposed maintenance regimen (not yet given)": {
+    "es": "Régimen de mantenimiento propuesto (aún no administrado)",
+    "fr": "Schéma d’entretien proposé (pas encore administré)",
+    "pt-BR": "Esquema de manutenção proposto (ainda não administrado)"
+  },
+  "Proposed adjustment (not yet given)": {
+    "es": "Ajuste propuesto (aún no administrado)",
+    "fr": "Ajustement proposé (pas encore administré)",
+    "pt-BR": "Ajuste proposto (ainda não administrado)"
+  },
+  "Suggested dose (not given)": {
+    "es": "Dosis sugerida (no administrada)",
+    "fr": "Dose suggérée (non administrée)",
+    "pt-BR": "Dose sugerida (não administrada)"
+  },
+  "Exposure of this one dose over its first 24 h, not steady state": {
+    "es": "Exposición de esta única dosis durante sus primeras 24 h, no en estado estacionario",
+    "fr": "Exposition de cette seule dose sur ses 24 premières heures, pas à l’état d’équilibre",
+    "pt-BR": "Exposição desta única dose nas suas primeiras 24 h, não em estado de equilíbrio"
+  },
+  "Steady-state projection if this regimen is continued unchanged": {
+    "es": "Proyección en estado estacionario si este régimen continúa sin cambios",
+    "fr": "Projection à l’état d’équilibre si ce schéma est poursuivi sans changement",
+    "pt-BR": "Projeção em estado de equilíbrio se este esquema for mantido sem alterações"
+  },
+  "Steady-state exposure of this regimen": {
+    "es": "Exposición en estado estacionario de este régimen",
+    "fr": "Exposition à l’état d’équilibre de ce schéma",
+    "pt-BR": "Exposição em estado de equilíbrio deste esquema"
+  },
+  "Projected steady-state exposure if this regimen is given": {
+    "es": "Exposición proyectada en estado estacionario si se administra este régimen",
+    "fr": "Exposition projetée à l’état d’équilibre si ce schéma est administré",
+    "pt-BR": "Exposição projetada em estado de equilíbrio se este esquema for administrado"
+  },
+  "Candidate selected by the clinician.": {
+    "es": "Candidato seleccionado por el clínico.",
+    "fr": "Candidat sélectionné par le clinicien.",
+    "pt-BR": "Candidato selecionado pelo clínico."
+  },
+  "No dose adjustment is presented until the entered levels are reconciled (see the review hold).": {
+    "es": "No se presenta ningún ajuste de dosis hasta que se concilien los niveles introducidos (véase la retención para revisión).",
+    "fr": "Aucun ajustement de dose n’est présenté tant que les prélèvements saisis ne sont pas réconciliés (voir la mise en attente pour révision).",
+    "pt-BR": "Nenhum ajuste de dose é apresentado até que os níveis informados sejam conciliados (ver a retenção para revisão)."
+  },
+  "No maintenance regimen is proposed.": {
+    "es": "No se propone ningún régimen de mantenimiento.",
+    "fr": "Aucun schéma d’entretien n’est proposé.",
+    "pt-BR": "Nenhum esquema de manutenção é proposto."
+  },
+  "Proposed maintenance regimen: none.": {
+    "es": "Régimen de mantenimiento propuesto: ninguno.",
+    "fr": "Schéma d’entretien proposé : aucun.",
+    "pt-BR": "Esquema de manutenção proposto: nenhum."
+  },
+  "One measured level": {
+    "es": "Un solo nivel medido",
+    "fr": "Un seul prélèvement mesuré",
+    "pt-BR": "Um único nível medido"
+  },
+  "Estimate based on one measured level after this single dose; confirm with a follow-up level after further doses.": {
+    "es": "Estimación basada en un solo nivel medido tras esta dosis única; confirme con un nivel de seguimiento después de dosis adicionales.",
+    "fr": "Estimation fondée sur un seul prélèvement mesuré après cette dose unique ; à confirmer par un prélèvement de suivi après d’autres doses.",
+    "pt-BR": "Estimativa baseada em um único nível medido após esta dose única; confirme com um nível de acompanhamento após doses adicionais."
+  },
+  "No level entered yet: draw the first level 1.5–6 h after the end of this dose's infusion for early Bayesian estimation.": {
+    "es": "Aún no se ha introducido ningún nivel: extraiga el primer nivel 1.5–6 h después del final de la perfusión de esta dosis para una estimación bayesiana temprana.",
+    "fr": "Aucun prélèvement saisi pour l’instant : prélevez le premier 1.5–6 h après la fin de la perfusion de cette dose pour une estimation bayésienne précoce.",
+    "pt-BR": "Nenhum nível informado ainda: colete o primeiro nível 1.5–6 h após o término da infusão desta dose para estimativa bayesiana precoce."
+  },
+  "With one measured level, the patient's estimated clearance is pulled toward the population estimate from age, weight and serum creatinine. One level does not establish the patient's true renal function or predict how it will change. If renal function is changing (for example, evolving acute kidney injury), serum creatinine lags behind, true clearance may be lower than estimated and exposure may be under-predicted. Confirm with a second level and reassess renal function before relying on this dose.": {
+    "es": "Con un solo nivel medido, el aclaramiento estimado del paciente tiende hacia la estimación poblacional basada en edad, peso y creatinina sérica. Un solo nivel no establece la verdadera función renal del paciente ni predice cómo cambiará. Si la función renal está cambiando (por ejemplo, una lesión renal aguda en evolución), la creatinina sérica se retrasa, el aclaramiento real puede ser menor que el estimado y la exposición puede estar infraestimada. Confirme con un segundo nivel y reevalúe la función renal antes de basarse en esta dosis.",
+    "fr": "Avec un seul prélèvement mesuré, la clairance estimée du patient est attirée vers l’estimation de population fondée sur l’âge, le poids et la créatinine sérique. Un seul prélèvement n’établit pas la fonction rénale réelle du patient et ne prédit pas son évolution. Si la fonction rénale évolue (par exemple, insuffisance rénale aiguë en cours), la créatinine sérique est en retard, la clairance réelle peut être inférieure à l’estimation et l’exposition peut être sous-estimée. Confirmez avec un deuxième prélèvement et réévaluez la fonction rénale avant de vous fier à cette dose.",
+    "pt-BR": "Com um único nível medido, a depuração estimada do paciente é puxada em direção à estimativa populacional baseada em idade, peso e creatinina sérica. Um único nível não estabelece a verdadeira função renal do paciente nem prevê como ela mudará. Se a função renal estiver mudando (por exemplo, lesão renal aguda em evolução), a creatinina sérica fica defasada, a depuração real pode ser menor que a estimada e a exposição pode ser subestimada. Confirme com um segundo nível e reavalie a função renal antes de confiar nesta dose."
+  },
+  "With one measured level, the patient's estimated clearance is pulled toward the population estimate from age, weight and serum creatinine.": {
+    "es": "Con un solo nivel medido, el aclaramiento estimado del paciente tiende hacia la estimación poblacional basada en edad, peso y creatinina sérica.",
+    "fr": "Avec un seul prélèvement mesuré, la clairance estimée du patient est attirée vers l’estimation de population fondée sur l’âge, le poids et la créatinine sérique.",
+    "pt-BR": "Com um único nível medido, a depuração estimada do paciente é puxada em direção à estimativa populacional baseada em idade, peso e creatinina sérica."
+  },
+  "One level does not establish the patient's true renal function or predict how it will change.": {
+    "es": "Un solo nivel no establece la verdadera función renal del paciente ni predice cómo cambiará.",
+    "fr": "Un seul prélèvement n’établit pas la fonction rénale réelle du patient et ne prédit pas son évolution.",
+    "pt-BR": "Um único nível não estabelece a verdadeira função renal do paciente nem prevê como ela mudará."
+  },
+  "If renal function is changing (for example, evolving acute kidney injury), serum creatinine lags behind, true clearance may be lower than estimated and exposure may be under-predicted.": {
+    "es": "Si la función renal está cambiando (por ejemplo, una lesión renal aguda en evolución), la creatinina sérica se retrasa, el aclaramiento real puede ser menor que el estimado y la exposición puede estar infraestimada.",
+    "fr": "Si la fonction rénale évolue (par exemple, insuffisance rénale aiguë en cours), la créatinine sérique est en retard, la clairance réelle peut être inférieure à l’estimation et l’exposition peut être sous-estimée.",
+    "pt-BR": "Se a função renal estiver mudando (por exemplo, lesão renal aguda em evolução), a creatinina sérica fica defasada, a depuração real pode ser menor que a estimada e a exposição pode ser subestimada."
+  },
+  "Confirm with a second level and reassess renal function before relying on this dose.": {
+    "es": "Confirme con un segundo nivel y reevalúe la función renal antes de basarse en esta dosis.",
+    "fr": "Confirmez avec un deuxième prélèvement et réévaluez la fonction rénale avant de vous fier à cette dose.",
+    "pt-BR": "Confirme com um segundo nível e reavalie a função renal antes de confiar nesta dose."
+  },
+  "Proposed regimen (continue as entered)": {
+    "es": "Régimen propuesto (continuar según lo introducido)",
+    "fr": "Schéma proposé (poursuivre tel que saisi)",
+    "pt-BR": "Esquema proposto (continuar conforme informado)"
+  },
+  "Projected steady-state exposure if this regimen is continued": {
+    "es": "Exposición proyectada en estado estacionario si este régimen continúa",
+    "fr": "Exposition projetée à l’état d’équilibre si ce schéma est poursuivi",
+    "pt-BR": "Exposição projetada em estado de equilíbrio se este esquema for mantido"
   }
 }
