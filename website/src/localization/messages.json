@@ -16629,11 +16629,6 @@
     "fr": "Nombre exact de doses d’entretien administrées",
     "pt-BR": "Número exato de doses de manutenção administradas"
   },
-  "Graph shows this dose followed by the selected maintenance regimen. Suggested maintenance to follow:": {
-    "es": "El gráfico muestra esta dosis seguida de la pauta de mantenimiento seleccionada. Mantenimiento sugerido a continuación:",
-    "fr": "Le graphique montre cette dose suivie du schéma d’entretien sélectionné. Entretien suggéré ensuite :",
-    "pt-BR": "O gráfico mostra esta dose seguida do esquema de manutenção selecionado. Manutenção sugerida a seguir:"
-  },
   "History entered:": {
     "es": "Historial introducido:",
     "fr": "Historique saisi :",
@@ -16673,11 +16668,6 @@
     "es": "Un nivel: considere esta estimación provisional",
     "fr": "Un seul prélèvement : estimation provisoire",
     "pt-BR": "Um nível: considere esta estimativa provisória"
-  },
-  "Preview only. Graph shows this suggested loading dose followed by the selected maintenance regimen. It is not part of the dosing history until you confirm the dose actually given.": {
-    "es": "Solo vista previa. El gráfico muestra esta dosis de carga sugerida seguida de la pauta de mantenimiento seleccionada. No forma parte del historial de dosis hasta que confirme la dosis realmente administrada.",
-    "fr": "Aperçu uniquement. Le graphique montre cette dose de charge suggérée suivie du schéma d’entretien sélectionné. Elle ne fait pas partie de l’historique d’administration tant que vous n’avez pas confirmé la dose réellement administrée.",
-    "pt-BR": "Apenas pré-visualização. O gráfico mostra esta dose de ataque sugerida seguida do esquema de manutenção selecionado. Ela não faz parte do histórico de doses até que você confirme a dose realmente administrada."
   },
   "Record as given and enter level": {
     "es": "Registrar como administrada e introducir nivel",
@@ -16753,5 +16743,35 @@
     "es": "Fila de dosis única: esa dosis durante sus primeras 24 h. Otras filas: ",
     "fr": "Ligne de dose unique : cette dose sur ses 24 premières heures. Autres lignes : ",
     "pt-BR": "Linha de dose única: essa dose nas primeiras 24 h. Outras linhas: "
+  },
+  "Preview only.": {
+    "es": "Solo vista previa.",
+    "fr": "Aperçu uniquement.",
+    "pt-BR": "Apenas pré-visualização."
+  },
+  "Graph shows:": {
+    "es": "El gráfico muestra:",
+    "fr": "Le graphique montre :",
+    "pt-BR": "O gráfico mostra:"
+  },
+  "It is not part of the dosing history until you confirm the dose actually given.": {
+    "es": "No forma parte del historial de dosis hasta que confirme la dosis realmente administrada.",
+    "fr": "Elle ne fait pas partie de l’historique d’administration tant que vous n’avez pas confirmé la dose réellement administrée.",
+    "pt-BR": "Não faz parte do histórico de doses até que você confirme a dose realmente administrada."
+  },
+  "Select a candidate regimen to see it continued with maintenance doses.": {
+    "es": "Seleccione una pauta candidata para verla continuada con dosis de mantenimiento.",
+    "fr": "Sélectionnez un schéma candidat pour le voir poursuivi avec des doses d’entretien.",
+    "pt-BR": "Selecione um esquema candidato para vê-lo continuado com doses de manutenção."
+  },
+  "The maintenance regimen below is a projection after this dose.": {
+    "es": "La pauta de mantenimiento de abajo es una proyección después de esta dosis.",
+    "fr": "Le schéma d’entretien ci-dessous est une projection après cette dose.",
+    "pt-BR": "O esquema de manutenção abaixo é uma projeção após esta dose."
+  },
+  "suggested regimen": {
+    "es": "pauta sugerida",
+    "fr": "schéma suggéré",
+    "pt-BR": "esquema sugerido"
   }
 }

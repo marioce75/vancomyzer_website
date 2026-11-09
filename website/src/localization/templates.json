@@ -828,5 +828,75 @@
     "es": "Nivel {n1}: {n2} mg/L a las {n3} h del inicio de la última dosis",
     "fr": "Prélèvement {n1} : {n2} mg/L à {n3} h après le début de la dernière dose",
     "pt-BR": "Nível {n1}: {n2} mg/L às {n3} h após o início da última dose"
+  },
+  "loading dose {n1} mg × 1, no further doses": {
+    "es": "dosis de carga de {n1} mg × 1, sin más dosis",
+    "fr": "dose de charge de {n1} mg × 1, sans autre dose",
+    "pt-BR": "dose de ataque de {n1} mg × 1, sem mais doses"
+  },
+  "loading dose {n1} mg repeated every {n2} h (illustrative)": {
+    "es": "dosis de carga de {n1} mg repetida cada {n2} h (ilustrativo)",
+    "fr": "dose de charge de {n1} mg répétée toutes les {n2} h (à titre indicatif)",
+    "pt-BR": "dose de ataque de {n1} mg repetida a cada {n2} h (ilustrativo)"
+  },
+  "loading dose {n1} mg, then {n2} mg q{n3}h": {
+    "es": "dosis de carga de {n1} mg, luego {n2} mg c/{n3}h",
+    "fr": "dose de charge de {n1} mg, puis {n2} mg q{n3}h",
+    "pt-BR": "dose de ataque de {n1} mg, depois {n2} mg q{n3}h"
+  },
+  "single dose {n1} mg × 1, no further doses": {
+    "es": "dosis única de {n1} mg × 1, sin más dosis",
+    "fr": "dose unique de {n1} mg × 1, sans autre dose",
+    "pt-BR": "dose única de {n1} mg × 1, sem mais doses"
+  },
+  "single dose {n1} mg repeated every {n2} h (illustrative)": {
+    "es": "dosis única de {n1} mg repetida cada {n2} h (ilustrativo)",
+    "fr": "dose unique de {n1} mg répétée toutes les {n2} h (à titre indicatif)",
+    "pt-BR": "dose única de {n1} mg repetida a cada {n2} h (ilustrativo)"
+  },
+  "single dose {n1} mg, then {n2} mg q{n3}h": {
+    "es": "dosis única de {n1} mg, luego {n2} mg c/{n3}h",
+    "fr": "dose unique de {n1} mg, puis {n2} mg q{n3}h",
+    "pt-BR": "dose única de {n1} mg, depois {n2} mg q{n3}h"
+  },
+  "suggested loading dose {n1} mg (not given) × 1, no further doses": {
+    "es": "dosis de carga sugerida de {n1} mg (no administrada) × 1, sin más dosis",
+    "fr": "dose de charge suggérée de {n1} mg (non administrée) × 1, sans autre dose",
+    "pt-BR": "dose de ataque sugerida de {n1} mg (não administrada) × 1, sem mais doses"
+  },
+  "suggested loading dose {n1} mg (not given) repeated every {n2} h (illustrative)": {
+    "es": "dosis de carga sugerida de {n1} mg (no administrada) repetida cada {n2} h (ilustrativo)",
+    "fr": "dose de charge suggérée de {n1} mg (non administrée) répétée toutes les {n2} h (à titre indicatif)",
+    "pt-BR": "dose de ataque sugerida de {n1} mg (não administrada) repetida a cada {n2} h (ilustrativo)"
+  },
+  "suggested loading dose {n1} mg (not given), then {n2} mg q{n3}h": {
+    "es": "dosis de carga sugerida de {n1} mg (no administrada), luego {n2} mg c/{n3}h",
+    "fr": "dose de charge suggérée de {n1} mg (non administrée), puis {n2} mg q{n3}h",
+    "pt-BR": "dose de ataque sugerida de {n1} mg (não administrada), depois {n2} mg q{n3}h"
+  },
+  "entered history: {n1} mg loading dose, then {n2} mg q{n3}h × {n4}": {
+    "es": "historial introducido: dosis de carga de {n1} mg, luego {n2} mg c/{n3}h × {n4}",
+    "fr": "historique saisi : dose de charge de {n1} mg, puis {n2} mg q{n3}h × {n4}",
+    "pt-BR": "histórico informado: dose de ataque de {n1} mg, depois {n2} mg q{n3}h × {n4}"
+  },
+  "entered history: {n1} mg q{n2}h × {n3}": {
+    "es": "historial introducido: {n1} mg c/{n2}h × {n3}",
+    "fr": "historique saisi : {n1} mg q{n2}h × {n3}",
+    "pt-BR": "histórico informado: {n1} mg q{n2}h × {n3}"
+  },
+  "current regimen {n1} mg q{n2}h, from the first dose": {
+    "es": "pauta actual {n1} mg c/{n2}h, desde la primera dosis",
+    "fr": "schéma actuel {n1} mg q{n2}h, depuis la première dose",
+    "pt-BR": "esquema atual {n1} mg q{n2}h, desde a primeira dose"
+  },
+  "{n1} mg q{n2}h, from the first dose (no loading dose)": {
+    "es": "{n1} mg c/{n2}h, desde la primera dosis (sin dosis de carga)",
+    "fr": "{n1} mg q{n2}h, depuis la première dose (sans dose de charge)",
+    "pt-BR": "{n1} mg q{n2}h, desde a primeira dose (sem dose de ataque)"
+  },
+  "your regimen {n1} mg q{n2}h": {
+    "es": "su pauta {n1} mg c/{n2}h",
+    "fr": "votre schéma {n1} mg q{n2}h",
+    "pt-BR": "seu esquema {n1} mg q{n2}h"
   }
 }

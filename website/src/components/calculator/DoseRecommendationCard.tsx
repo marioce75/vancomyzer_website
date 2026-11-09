@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import { CalculationDetails, FrequencyOption, AucRangeStatus, ArcAdvisory } from "@/types/calculator";
 import { fmt } from "@/lib/formatNumber";
 import { computeSafeInfusionDurationMinutes } from "@/lib/pk/recommend/infusionSafety";
+import { singleDoseBannerCaption } from "./curveDescription";
 
 interface DoseRecommendationCardProps {
   recommended_dose?: string | null;
@@ -44,6 +45,8 @@ interface DoseRecommendationCardProps {
   loadingDoseStatus?: SingleDoseStatus;
   /** Empiric preview only: record the loading dose actually given and open the level workflow. */
   onConfirmLoadingDoseGiven?: ((doseMg: number, infusionHours: number) => void) | null;
+  /** The graph legend's description of the curve drawn (curveDescription.ts); the banner repeats it. */
+  curveDescription?: string | null;
   /** When set, replaces the standard dose card with a pulse-dose safety state. */
   empiricDosingBlocked?: {
     review_required?: boolean;
@@ -275,11 +278,15 @@ function SingleDoseBanner({
   status,
   onUndo,
   onConfirmGiven,
+  curveDescription,
+  viewingCurrent,
 }: {
   doseMg: number;
   status: SingleDoseStatus;
   onUndo?: () => void;
   onConfirmGiven?: ((doseMg: number, infusionHours: number) => void) | null;
+  curveDescription?: string | null;
+  viewingCurrent: boolean;
 }) {
   const [confirming, setConfirming] = useState(false);
   const [givenMg, setGivenMg] = useState<number>(0);
@@ -288,12 +295,12 @@ function SingleDoseBanner({
   const canConfirm = givenMg > 0 && givenMin > 0;
   const title =
     status === "suggested" ? "SUGGESTED LOADING DOSE (NOT GIVEN):" : status === "single" ? "SINGLE DOSE GIVEN:" : "LOADING DOSE GIVEN:";
-  const caption =
-    status === "suggested"
-      ? "Preview only. Graph shows this suggested loading dose followed by the selected maintenance regimen. It is not part of the dosing history until you confirm the dose actually given."
-      : status === "single"
-        ? "Graph shows this dose followed by the selected maintenance regimen. Suggested maintenance to follow:"
-        : "Graph shows the loading dose followed by the selected maintenance regimen. Suggested maintenance to follow:";
+  // The caption names the curve the graph is drawing, in the legend's words.
+  const caption = singleDoseBannerCaption(
+    status,
+    curveDescription ?? `${status === "single" ? "single dose" : status === "suggested" ? "suggested loading dose" : "loading dose"} ${doseMg} mg`,
+    viewingCurrent,
+  );
   const fieldStyle: React.CSSProperties = { width: "100%", padding: "4px 6px", fontSize: 12, border: "1px solid var(--color-border)", background: "var(--color-card)", color: "var(--color-primary)" };
   return (
     <div className="px-4 py-2 rounded-lg border" style={{ borderColor: c.border, background: c.bg }}>
@@ -326,7 +333,11 @@ function SingleDoseBanner({
           )}
         </div>
       </div>
-      <p className="mt-1 text-[10px]" style={{ color: c.sub, margin: 0, ...FONT }}><LocalizedText text={caption} /></p>
+      <p className="mt-1 text-[10px]" style={{ color: c.sub, margin: 0, ...FONT }} data-testid="single-dose-banner-caption">
+        {caption.before.map((part, i) => <React.Fragment key={`b${i}`}><LocalizedText text={part} />{" "}</React.Fragment>)}
+        <LocalizedText text={caption.curve} />{"."}
+        {caption.after.map((part, i) => <React.Fragment key={`a${i}`}>{" "}<LocalizedText text={part} /></React.Fragment>)}
+      </p>
       {confirming && onConfirmGiven && (
         <form
           className="mt-2 grid grid-cols-2 gap-2 border-t pt-2"
@@ -385,6 +396,7 @@ export default function DoseRecommendationCard({
   onUndoLoadingDose,
   loadingDoseStatus = "given",
   onConfirmLoadingDoseGiven,
+  curveDescription,
   empiricDosingBlocked,
   adjustmentDosingBlocked,
   activeOption,
@@ -506,6 +518,8 @@ export default function DoseRecommendationCard({
           status={loadingDoseStatus}
           onUndo={onUndoLoadingDose}
           onConfirmGiven={onConfirmLoadingDoseGiven}
+          curveDescription={curveDescription}
+          viewingCurrent={activeIsCurrent}
         />
       )}
 

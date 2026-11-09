@@ -25,6 +25,7 @@ import PatientCharacteristicsForm from "@/components/calculator/PatientCharacter
 import CalculationMethodPanel from "@/components/calculator/CalculationMethodPanel";
 import RegimenForm from "@/components/calculator/RegimenForm";
 import { requestRegimen, summarizeDosingHistory } from "@/components/calculator/dosingHistory";
+import { describeSelectedCurve, singleDoseNoun as singleDoseNounFor } from "@/components/calculator/curveDescription";
 import LevelEntryTable, { manualHoursCollectionTime } from "@/components/calculator/LevelEntryTable";
 import { isEnteredLevel, requestLevel, timingIsValid, restoreLevelDrafts, type LevelDraft } from "./levelTiming";
 import { nextInputRevision, resultIsCurrent, responseIsCurrent } from "./inputRevision";
@@ -979,7 +980,7 @@ export default function CalculatorWorkspace() {
   const singleDoseStatus: SingleDoseStatus = loadingPreview
     ? "suggested"
     : regimen.loading_dose_mg !== undefined ? "given" : "single";
-  const singleDoseNoun = singleDoseStatus === "single" ? "Single dose" : singleDoseStatus === "suggested" ? "Suggested loading dose" : "Loading dose";
+  const singleDoseNoun = singleDoseNounFor(singleDoseStatus);
   // One rule for every path: the active option's exposure, else the response's
   // top-level exposure (the regimen as entered).
   const metricAuc = activeOption?.auc24 ?? displayResult?.auc24;
@@ -1133,36 +1134,21 @@ export default function CalculatorWorkspace() {
     );
   }
 
-  // Legend text for the solid curve: always describes the curve actually drawn.
-  const graphCurveLabel: string | null = (() => {
-    if (!displayResult) return null;
-    const notGiven = singleDoseStatus === "suggested" ? " (not given)" : "";
-    const single = `${singleDoseNoun.toLowerCase()} ${regimen.dose_mg} mg${notGiven}`;
-    if (activeOption && activeIsCurrent) {
-      if (isPulse) {
-        return displayResult.loading_dose_curve
-          ? `${single} × 1, no further doses`
-          : `${single} repeated every ${regimen.interval_hours} h (illustrative)`;
-      }
-      const n = regimen.doses_given;
-      if (regimen.loading_dose_mg !== undefined && n !== undefined && n >= 2) {
-        return `entered history: ${regimen.loading_dose_mg} mg loading dose, then ${regimen.dose_mg} mg q${regimen.interval_hours}h × ${n - 1}`;
-      }
-      return displayResult.exposure_horizon === "actual_history" && n !== undefined
-        ? `entered history: ${regimen.dose_mg} mg q${regimen.interval_hours}h × ${n}`
-        : `current regimen ${regimen.dose_mg} mg q${regimen.interval_hours}h, from the first dose`;
-    }
-    if (activeOption) {
-      const regimenText = `${activeOption.dose_mg} mg q${activeOption.interval_hours}h`;
-      return isPulse
-        ? `${single}, then ${regimenText}`
-        : `${regimenText}, from the first dose (no loading dose)`;
-    }
-    if (showEngineRecommended && displayResult.curve_engine_recommended) return "suggested regimen";
-    return isPulse
-      ? `${single} repeated every ${regimen.interval_hours} h (illustrative)`
-      : `your regimen ${regimen.dose_mg} mg q${regimen.interval_hours}h`;
-  })();
+  // One description of the solid curve, shared by the legend and the
+  // single-dose banner (curveDescription.ts) so they always name the same curve.
+  const graphCurveLabel: string | null = displayResult
+    ? describeSelectedCurve({
+        singleDose: isPulse,
+        singleDoseStatus,
+        regimen,
+        viewingCurrent: activeIsCurrent,
+        activeOption,
+        hasSingleDoseCurve: Boolean(displayResult.loading_dose_curve),
+        actualHistory: displayResult.exposure_horizon === "actual_history",
+        showEngineRecommended,
+        hasEngineRecommendedCurve: Boolean(displayResult.curve_engine_recommended),
+      })
+    : null;
   const graphCurve =
     activeOption?.curve
     ?? (showEngineRecommended && displayResult?.curve_engine_recommended
@@ -1371,6 +1357,7 @@ export default function CalculatorWorkspace() {
                     isPulseDose={isPulse}
                     loadingDoseMg={isPulse ? regimen.dose_mg : null}
                     loadingDoseStatus={singleDoseStatus}
+                    curveDescription={graphCurveLabel}
                     onUndoLoadingDose={loadingPreview ? handleUndoLoadingDose : undefined}
                     onConfirmLoadingDoseGiven={loadingPreview ? handleConfirmLoadingDoseGiven : null}
                     empiricDosingBlocked={displayResult.empiric_dosing_blocked}
