@@ -45,6 +45,8 @@ interface ConcentrationTimeGraphProps {
   comparison_curve?: CurvePoint[] | null;
   /** Legend label for the comparison curve (e.g. "Recommended 1250 mg q12h"). */
   comparison_label?: string | null;
+  /** What the solid predicted curve shows (e.g. "2000 mg loading dose, then 750 mg q12h"). */
+  curve_label?: string | null;
 }
 
 /** True when the curve carries engine-computed band edges. */
@@ -610,6 +612,7 @@ export default function ConcentrationTimeGraph({
   band_info,
   comparison_curve,
   comparison_label,
+  curve_label,
 }: ConcentrationTimeGraphProps) {
   const { locale } = useLanguage();
   const band = bandDescription(band_info);
@@ -765,7 +768,7 @@ export default function ConcentrationTimeGraph({
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 px-1 pt-1.5 shrink-0" style={{ fontFamily: FONT }}>
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-          <span className="inline-block w-4 h-0.5" style={{ background: getCSSColor("--color-primary", "#00ff41") }} />{" "}<LocalizedText text="Predicted" /></span>
+          <span className="inline-block w-4 h-0.5" style={{ background: getCSSColor("--color-primary", "#00ff41") }} />{" "}<LocalizedText text="Predicted" />{curve_label ? <>{": "}<LocalizedText text={curve_label} /></> : null}</span>
         {comparisonData.length > 1 && (
           <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
             <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44"), borderTopWidth: 1.5 }} /> <LocalizedText text={comparison_label ?? "Reference"} />

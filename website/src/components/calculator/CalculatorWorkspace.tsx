@@ -24,7 +24,7 @@ import CalculatorLayout from "@/components/calculator/CalculatorLayout";
 import PatientCharacteristicsForm from "@/components/calculator/PatientCharacteristicsForm";
 import CalculationMethodPanel from "@/components/calculator/CalculationMethodPanel";
 import RegimenForm from "@/components/calculator/RegimenForm";
-import { requestRegimen } from "@/components/calculator/dosingHistory";
+import { requestRegimen, summarizeDosingHistory } from "@/components/calculator/dosingHistory";
 import LevelEntryTable, { manualHoursCollectionTime } from "@/components/calculator/LevelEntryTable";
 import { isEnteredLevel, requestLevel, timingIsValid, restoreLevelDrafts, type LevelDraft } from "./levelTiming";
 import { nextInputRevision, resultIsCurrent, responseIsCurrent } from "./inputRevision";
@@ -796,13 +796,15 @@ export default function CalculatorWorkspace() {
   }, [mode, regimen, handleCalculate]);
 
   const handleCopyNote = useCallback(() => {
+    if (loadingPreview) return; // a suggested dose was never given
     if (!visibleResult || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
     const note = activeOption?.clinical_note ?? visibleResult?.documentation_preview?.clinical_note;
     if (!note) return;
     navigator.clipboard.writeText(translateGeneratedText(note, locale)).catch(() => {/* clipboard not available */});
-  }, [activeOption, visibleResult, locale, resultRevision]);
+  }, [activeOption, visibleResult, locale, resultRevision, loadingPreview]);
 
   const handleExportPDF = useCallback(() => {
+    if (loadingPreview) return; // a suggested dose was never given
     if (!visibleResult || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
     const opt = activeOption;
     const reportData: ReportData = {
@@ -830,6 +832,19 @@ export default function CalculatorWorkspace() {
       assumptions: visibleResult.assumptions,
       limitations: visibleResult.limitations,
       clinical_note: opt?.clinical_note ?? visibleResult.documentation_preview?.clinical_note,
+      // What was entered and modelled, so the report can be checked against the form.
+      ...(visibleResult.recommendation_type === "existing_regimen"
+        ? {
+            dosing_history: summarizeDosingHistory(regimen) ?? undefined,
+            entered_levels: levels.filter(isEnteredLevel).map((l) => ({
+              value_mg_l: l.value_mcg_ml,
+              hours_after_last_dose: l.time_since_last_dose_hours,
+            })),
+            single_dose: regimen.doses_given === 1
+              ? { dose_mg: regimen.dose_mg, kind: regimen.loading_dose_mg !== undefined ? "loading" as const : "single" as const }
+              : undefined,
+          }
+        : {}),
       frequency_options: visibleResult.frequency_options?.filter(o => o.auc24 >= 400 && o.auc24 <= 600).map(o => ({
         dose_mg: o.dose_mg,
         interval_hours: o.interval_hours,
@@ -839,7 +854,7 @@ export default function CalculatorWorkspace() {
       })),
     };
     printReport(reportData, user?.subscriptionTier ?? "free", locale);
-  }, [visibleResult, activeOption, activeIsCurrent, patient, user?.subscriptionTier, locale, resultRevision]);
+  }, [visibleResult, activeOption, activeIsCurrent, patient, user?.subscriptionTier, locale, resultRevision, loadingPreview, regimen, levels]);
 
   const leftColumn = (
     <div className="flex h-full flex-col">
@@ -987,8 +1002,9 @@ export default function CalculatorWorkspace() {
           auc24: displayResult.auc24,
           peak: displayResult.peak,
           trough: displayResult.trough,
-          label: isPulse ? "loading dose" : "current",
+          label: isPulse ? singleDoseNoun.toLowerCase() + (singleDoseStatus === "suggested" ? " (not given)" : "") : "current",
           single_dose: isPulse,
+          single_dose_kind: isPulse ? singleDoseStatus : undefined,
         }
       : null;
   // Dashed reference on the graph: the engine recommendation whenever something
@@ -998,10 +1014,12 @@ export default function CalculatorWorkspace() {
       ? recommendedOption.curve
       : null;
   const comparisonLabel = recommendedOption
-    ? `Recommended ${recommendedOption.dose_mg} mg q${recommendedOption.interval_hours}h${isPulse ? " after loading dose" : " (steady state)"}`
+    ? `Recommended ${recommendedOption.dose_mg} mg q${recommendedOption.interval_hours}h${isPulse ? ` after ${singleDoseNoun.toLowerCase()} ${regimen.dose_mg} mg` : " (steady state)"}`
     : null;
   const clinicalNote = translateGeneratedText(activeOption?.clinical_note ?? displayResult?.documentation_preview?.clinical_note ?? "", locale);
-  const exportsDisabled = resultObscured || !visibleResult;
+  // A suggested loading dose was never given: no clinical note or PDF can be
+  // produced from the preview. Exports come back once the dose given is recorded.
+  const exportsDisabled = resultObscured || !visibleResult || loadingPreview;
 
   const advisories: ReactNode[] = [];
   if (displayResult?.review_hold) {
@@ -1115,6 +1133,36 @@ export default function CalculatorWorkspace() {
     );
   }
 
+  // Legend text for the solid curve: always describes the curve actually drawn.
+  const graphCurveLabel: string | null = (() => {
+    if (!displayResult) return null;
+    const notGiven = singleDoseStatus === "suggested" ? " (not given)" : "";
+    const single = `${singleDoseNoun.toLowerCase()} ${regimen.dose_mg} mg${notGiven}`;
+    if (activeOption && activeIsCurrent) {
+      if (isPulse) {
+        return displayResult.loading_dose_curve
+          ? `${single} × 1, no further doses`
+          : `${single} repeated every ${regimen.interval_hours} h (illustrative)`;
+      }
+      const n = regimen.doses_given;
+      if (regimen.loading_dose_mg !== undefined && n !== undefined && n >= 2) {
+        return `entered history: ${regimen.loading_dose_mg} mg loading dose, then ${regimen.dose_mg} mg q${regimen.interval_hours}h × ${n - 1}`;
+      }
+      return displayResult.exposure_horizon === "actual_history" && n !== undefined
+        ? `entered history: ${regimen.dose_mg} mg q${regimen.interval_hours}h × ${n}`
+        : `current regimen ${regimen.dose_mg} mg q${regimen.interval_hours}h, from the first dose`;
+    }
+    if (activeOption) {
+      const regimenText = `${activeOption.dose_mg} mg q${activeOption.interval_hours}h`;
+      return isPulse
+        ? `${single}, then ${regimenText}`
+        : `${regimenText}, from the first dose (no loading dose)`;
+    }
+    if (showEngineRecommended && displayResult.curve_engine_recommended) return "suggested regimen";
+    return isPulse
+      ? `${single} repeated every ${regimen.interval_hours} h (illustrative)`
+      : `your regimen ${regimen.dose_mg} mg q${regimen.interval_hours}h`;
+  })();
   const graphCurve =
     activeOption?.curve
     ?? (showEngineRecommended && displayResult?.curve_engine_recommended
@@ -1264,6 +1312,9 @@ export default function CalculatorWorkspace() {
                   </div>
                 </div>
               )}
+              {displayResult && loadingPreview && (
+                <span className="text-[10px] font-semibold" style={{ color: "#1d4ed8" }} role="note"><LocalizedText text="PDF and note are off for a suggested dose that was not given." /></span>
+              )}
             </div>
           </div>
 
@@ -1277,7 +1328,7 @@ export default function CalculatorWorkspace() {
                       <span style={{ color: "var(--color-secondary)" }}><LocalizedText text="Curve:" /></span>
                       <div className="vz-seg">
                         <button type="button" aria-pressed={!showEngineRecommended} onClick={() => setShowEngineRecommended(false)}>
-                          <LocalizedText text={isPulse ? `Loading dose continued (${regimen.dose_mg} mg q${regimen.interval_hours}h)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`} />
+                          <LocalizedText text={isPulse ? `${singleDoseNoun} ${regimen.dose_mg} mg repeated every ${regimen.interval_hours} h (illustrative)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`} />
                         </button>
                         <button type="button" aria-pressed={showEngineRecommended} onClick={() => setShowEngineRecommended(true)}><LocalizedText text="Suggested regimen" /></button>
                       </div>
@@ -1411,6 +1462,7 @@ export default function CalculatorWorkspace() {
               curve={graphCurve}
               comparison_curve={comparisonCurve}
               comparison_label={comparisonLabel}
+              curve_label={graphCurveLabel}
               measured_levels={displayResult?.measured_levels ?? []}
               calculationDetails={displayResult?.calculation_details ?? null}
               pk_model_name={displayResult?.pk_parameters?.pk_model_name}

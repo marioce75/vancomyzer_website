@@ -72,10 +72,10 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
     ? ` ${recommendation.infusion_safety_note}`
     : "";
 
-  // Loading dose simulation — different interpretation format
+  // Single dose (a loading dose, or one maintenance dose) — different interpretation format
   if (isPulseDose) {
     return (
-      `Loading dose simulation: ${current_regimen_dose_mg} mg single dose. ` +
+      `Single-dose analysis: ${current_regimen_dose_mg} mg, one dose only. ` +
       `${estimateType}: first-dose AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L (SCr ${scr} mg/dL). ` +
       `Suggested maintenance regimen: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${Number((infusionDuration * 60).toFixed(6))} minutes. ` +
       `Maintenance dose targets steady-state AUC24 400–600 mg·h/L.` +

@@ -16559,10 +16559,10 @@
     "fr": "Aucune actualisation a posteriori appliquée ; résultats issus de la distribution populationnelle a priori bicompartimentale de Colin 2019 pour l’adulte.",
     "pt-BR": "Nenhuma atualização a posteriori aplicada; resultados obtidos da distribuição populacional a priori bicompartimental de Colin 2019 para adultos."
   },
-  "Loading dose simulation (single dose).": {
-    "es": "Simulación de dosis de carga (dosis única).",
-    "fr": "Simulation de la dose de charge (dose unique).",
-    "pt-BR": "Simulação da dose de ataque (dose única)."
+  "Single-dose analysis (one dose only).": {
+    "es": "Análisis de dosis única (una sola dosis).",
+    "fr": "Analyse à dose unique (une seule dose).",
+    "pt-BR": "Análise de dose única (apenas uma dose)."
   },
   "AUC₂₄ is the area under the first 24 hours of this one dose, not steady-state exposure.": {
     "es": "El AUC₂₄ es el área bajo la curva durante las primeras 24 horas de esta dosis única, no la exposición en estado estacionario.",
@@ -16703,5 +16703,55 @@
     "es": "Con un solo nivel medido, el aclaramiento estimado del paciente tiende hacia la estimación poblacional basada en edad, peso y creatinina sérica. Si la función renal está cambiando (por ejemplo, una lesión renal aguda en evolución), la creatinina sérica se retrasa, el aclaramiento real puede ser menor que el estimado y la exposición puede estar infraestimada. Confirme con un segundo nivel y reevalúe la función renal antes de basarse en esta dosis.",
     "fr": "Avec un seul prélèvement mesuré, la clairance estimée du patient est attirée vers l’estimation de population fondée sur l’âge, le poids et la créatinine sérique. Si la fonction rénale évolue (par exemple, insuffisance rénale aiguë en cours), la créatinine sérique est en retard, la clairance réelle peut être inférieure à l’estimation et l’exposition peut être sous-estimée. Confirmez avec un deuxième prélèvement et réévaluez la fonction rénale avant de vous fier à cette dose.",
     "pt-BR": "Com um único nível medido, a depuração estimada do paciente é puxada em direção à estimativa populacional baseada em idade, peso e creatinina sérica. Se a função renal estiver mudando (por exemplo, lesão renal aguda em evolução), a creatinina sérica fica defasada, a depuração real pode ser menor que a estimada e a exposição pode ser subestimada. Confirme com um segundo nível e reavalie a função renal antes de confiar nesta dose."
+  },
+  "Dosing history entered": {
+    "es": "Historial de dosis introducido",
+    "fr": "Historique d’administration saisi",
+    "pt-BR": "Histórico de doses informado"
+  },
+  "Loading dose given (single dose)": {
+    "es": "Dosis de carga administrada (dosis única)",
+    "fr": "Dose de charge administrée (dose unique)",
+    "pt-BR": "Dose de ataque administrada (dose única)"
+  },
+  "Single dose given": {
+    "es": "Dosis única administrada",
+    "fr": "Dose unique administrée",
+    "pt-BR": "Dose única administrada"
+  },
+  "One dose, not a regimen. Exposure is that dose over its first 24 h, not steady state.": {
+    "es": "Una dosis, no una pauta. La exposición es la de esa dosis durante sus primeras 24 h, no en estado estacionario.",
+    "fr": "Une dose, pas un schéma. L’exposition est celle de cette dose sur ses 24 premières heures, pas à l’état d’équilibre.",
+    "pt-BR": "Uma dose, não um esquema. A exposição é a dessa dose nas primeiras 24 h, não em estado de equilíbrio."
+  },
+  "PDF and note are off for a suggested dose that was not given.": {
+    "es": "El PDF y la nota están desactivados para una dosis sugerida que no se administró.",
+    "fr": "Le PDF et la note sont désactivés pour une dose suggérée qui n’a pas été administrée.",
+    "pt-BR": "O PDF e a nota estão desativados para uma dose sugerida que não foi administrada."
+  },
+  "SUGGESTED LOADING DOSE (NOT GIVEN)": {
+    "es": "DOSIS DE CARGA SUGERIDA (NO ADMINISTRADA)",
+    "fr": "DOSE DE CHARGE SUGGÉRÉE (NON ADMINISTRÉE)",
+    "pt-BR": "DOSE DE ATAQUE SUGERIDA (NÃO ADMINISTRADA)"
+  },
+  "SINGLE DOSE GIVEN": {
+    "es": "DOSIS ÚNICA ADMINISTRADA",
+    "fr": "DOSE UNIQUE ADMINISTRÉE",
+    "pt-BR": "DOSE ÚNICA ADMINISTRADA"
+  },
+  "LOADING DOSE GIVEN (SINGLE DOSE)": {
+    "es": "DOSIS DE CARGA ADMINISTRADA (DOSIS ÚNICA)",
+    "fr": "DOSE DE CHARGE ADMINISTRÉE (DOSE UNIQUE)",
+    "pt-BR": "DOSE DE ATAQUE ADMINISTRADA (DOSE ÚNICA)"
+  },
+  "Suggested loading-dose row (not given): that single dose over its first 24 h. Other rows: ": {
+    "es": "Fila de dosis de carga sugerida (no administrada): esa dosis única durante sus primeras 24 h. Otras filas: ",
+    "fr": "Ligne de dose de charge suggérée (non administrée) : cette dose unique sur ses 24 premières heures. Autres lignes : ",
+    "pt-BR": "Linha de dose de ataque sugerida (não administrada): essa dose única nas primeiras 24 h. Outras linhas: "
+  },
+  "Single-dose row: that one dose over its first 24 h. Other rows: ": {
+    "es": "Fila de dosis única: esa dosis durante sus primeras 24 h. Otras filas: ",
+    "fr": "Ligne de dose unique : cette dose sur ses 24 premières heures. Autres lignes : ",
+    "pt-BR": "Linha de dose única: essa dose nas primeiras 24 h. Outras linhas: "
   }
 }

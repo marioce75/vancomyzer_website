@@ -35,6 +35,8 @@ export interface CurrentRegimenRow {
    * against the 400–600 steady-state target.
    */
   single_dose?: boolean;
+  /** What that single dose is, for the footnote: a suggested (not given) loading dose, a loading dose given, or one maintenance dose given. */
+  single_dose_kind?: "suggested" | "given" | "single";
 }
 
 interface RegimenComparisonTableProps {
@@ -141,7 +143,7 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
       </LocalizedTable>
       <div className="flex items-start justify-between gap-2 px-2 pt-1.5">
         <p className="m-0 text-[10px] leading-4" style={{ color: "var(--color-dim)" }}>
-          <LocalizedText text={current?.single_dose ? "Loading-dose row: that single dose over its first 24 h. Other rows: " : ""} /><LocalizedText text="Steady-state predictions from the same PK parameters. Automatic candidates must have AUC₂₄ within 400–600 and doses of at least 500 mg by product policy" />.
+          <LocalizedText text={!current?.single_dose ? "" : current.single_dose_kind === "suggested" ? "Suggested loading-dose row (not given): that single dose over its first 24 h. Other rows: " : current.single_dose_kind === "single" ? "Single-dose row: that one dose over its first 24 h. Other rows: " : "Loading-dose row: that single dose over its first 24 h. Other rows: "} /><LocalizedText text="Steady-state predictions from the same PK parameters. Automatic candidates must have AUC₂₄ within 400–600 and doses of at least 500 mg by product policy" />.
         </p>
         {onApply && activeOption && (
           <LocalizedButton

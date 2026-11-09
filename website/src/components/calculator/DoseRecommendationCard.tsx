@@ -522,7 +522,9 @@ export default function DoseRecommendationCard({
           >
             <p className="vz-kicker" style={{ margin: "0 0 2px 0", ...FONT }}>
               <LocalizedText text={activeIsCurrent
-                ? (isPulseDose ? "LOADING DOSE (SINGLE DOSE)" : "CURRENT REGIMEN (AS ENTERED)")
+                ? (isPulseDose
+                    ? (loadingDoseStatus === "suggested" ? "SUGGESTED LOADING DOSE (NOT GIVEN)" : loadingDoseStatus === "single" ? "SINGLE DOSE GIVEN" : "LOADING DOSE GIVEN (SINGLE DOSE)")
+                    : "CURRENT REGIMEN (AS ENTERED)")
                 : isPulseDose
                   ? (active?.is_recommended || !active ? "SUGGESTED MAINTENANCE REGIMEN" : "SELECTED MAINTENANCE ALTERNATIVE")
                   : active?.is_recommended || !active ? "RECOMMENDED REGIMEN" : "SELECTED ALTERNATIVE"} />

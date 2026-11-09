@@ -52,6 +52,16 @@ export interface ReportData {
   recommended_interval_hours: number;
   recommended_infusion_duration_hours?: number;
 
+  /** Level workflows: the dosing history as entered, in plain language (dosingHistory.ts). */
+  dosing_history?: string;
+  /** Level workflows: the measured levels sent to the calculation. */
+  entered_levels?: Array<{ value_mg_l: number; hours_after_last_dose: number }>;
+  /**
+   * Only one dose given before the level. When the report shows that dose
+   * (regimen_is_current), it is one dose, not a regimen: no interval is printed.
+   */
+  single_dose?: { dose_mg: number; kind: "loading" | "single" };
+
   // PK Metrics
   auc24: number;
   peak: number;
@@ -293,14 +303,21 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
     </div>
   </div>
 
+  ${data.dosing_history ? `
   <div class="section">
-    <div class="section-title">${data.regimen_is_current ? "Current regimen (as entered)" : "Recommended Regimen"}</div>
+    <div class="section-title">Dosing history entered</div>
+    <div class="interpretation">${escapeHtml(data.dosing_history)}</div>
+    ${data.entered_levels && data.entered_levels.length > 0 ? `<div class="interpretation" style="margin-top:4px">${data.entered_levels.map((l, i) => `Level ${i + 1}: ${fmt(l.value_mg_l, 1)} mg/L at ${fmt(l.hours_after_last_dose, 2)} h after the start of the last dose`).join("<br/>")}</div>` : ""}
+  </div>` : ""}
+
+  <div class="section">
+    <div class="section-title">${data.regimen_is_current ? (data.single_dose ? (data.single_dose.kind === "loading" ? "Loading dose given (single dose)" : "Single dose given") : "Current regimen (as entered)") : "Recommended Regimen"}</div>
     <div class="dose-box">
-      ${data.recommendation_blocked ? `<span class="dose-primary">No automatic maintenance regimen</span><div class="dose-detail">${escapeHtml(data.recommendation_blocked)}</div>` : `<span class="dose-primary">${escapeHtml(data.recommended_dose.replace(/\s*mg$/i, ""))} mg every ${data.recommended_interval_hours} h</span>`}
+      ${data.recommendation_blocked ? `<span class="dose-primary">No automatic maintenance regimen</span><div class="dose-detail">${escapeHtml(data.recommendation_blocked)}</div>` : data.regimen_is_current && data.single_dose ? `<span class="dose-primary">${data.single_dose.dose_mg} mg \u00d7 1</span><div class="dose-detail">One dose, not a regimen. Exposure is that dose over its first 24 h, not steady state.</div>` : `<span class="dose-primary">${escapeHtml(data.recommended_dose.replace(/\s*mg$/i, ""))} mg every ${data.recommended_interval_hours} h</span>`}
       ${!data.recommendation_blocked && data.recommended_infusion_duration_hours ? `<div class="dose-detail">Infuse over ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes</div>` : ""}
       ${!data.recommendation_blocked ? `<div class="dose-detail" style="margin-top:6px">
         AUC\u2082\u2084: <strong>${fmt(data.auc24, 1)} mg\u00b7h/L</strong>
-        ${data.auc24 >= 400 && data.auc24 <= 600 ? '<span class="range-badge">IN RANGE</span>' : ""}
+        ${data.auc24 >= 400 && data.auc24 <= 600 && !(data.regimen_is_current && data.single_dose) ? '<span class="range-badge">IN RANGE</span>' : ""}
       </div>` : ""}
     </div>
   </div>

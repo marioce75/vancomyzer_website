@@ -162,7 +162,7 @@ export function runExistingRegimenEngine(
     ? ` Dose history: ${loading.dose_mg} mg loading dose over ${loading.infusion_duration_hours} h, first maintenance dose ${loading.hours_to_first_maintenance} h later; the level fit uses these actual doses.`
     : "";
   const steadyStateNote = (isPulseDose
-    ? "Loading dose simulation (single dose). AUC₂₄ is the area under the first 24 hours of this one dose, not steady-state exposure."
+    ? "Single-dose analysis (one dose only). AUC₂₄ is the area under the first 24 hours of this one dose, not steady-state exposure."
     : isNonSteadyState
       ? `Actual-history analysis: the level was fitted after exactly ${doses_given} dose${doses_given === 1 ? "" : "s"}; exposure of the current regimen is reported as its steady-state projection, with dose-${doses_given} peak/trough shown separately.`
       : steady_state_warning

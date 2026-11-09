@@ -9,10 +9,10 @@
     "fr": "Schéma actuel : {n1} mg toutes les {n2} h.",
     "pt-BR": "Esquema atual: {n1} mg a cada {n2} h."
   },
-  "Loading dose simulation: {n1} mg single dose.": {
-    "es": "Simulación de dosis de carga: {n1} mg en dosis única.",
-    "fr": "Simulation de dose de charge : {n1} mg en dose unique.",
-    "pt-BR": "Simulação da dose de ataque: {n1} mg em dose única."
+  "Single-dose analysis: {n1} mg, one dose only.": {
+    "es": "Análisis de dosis única: {n1} mg, una sola dosis.",
+    "fr": "Analyse à dose unique : {n1} mg, une seule dose.",
+    "pt-BR": "Análise de dose única: {n1} mg, apenas uma dose."
   },
   "Two-compartment model (SCr {n1} mg/dL).": {
     "es": "Modelo bicompartimental (creatinina sérica {n1} mg/dL).",
@@ -798,5 +798,35 @@
     "es": "Proyección de mantenimiento tras una dosis única registrada de {n1} mg; no se presupone un intervalo de mantenimiento previo.",
     "fr": "Projection d’entretien après une dose unique enregistrée de {n1} mg ; aucun intervalle d’entretien antérieur n’est supposé.",
     "pt-BR": "Projeção de manutenção após uma dose única registrada de {n1} mg; nenhum intervalo de manutenção anterior é presumido."
+  },
+  "{n1} mg loading dose only, no maintenance dose yet. Level drawn after the loading dose.": {
+    "es": "Solo dosis de carga de {n1} mg, sin dosis de mantenimiento todavía. Nivel extraído después de la dosis de carga.",
+    "fr": "Dose de charge de {n1} mg seule, pas encore de dose d’entretien. Prélèvement effectué après la dose de charge.",
+    "pt-BR": "Apenas dose de ataque de {n1} mg, sem dose de manutenção ainda. Nível coletado após a dose de ataque."
+  },
+  "{n1} mg loading dose at 0 h → {n2} mg at {n3} h. Level drawn after the last {n4} mg dose (dose {n5} of {n6}).": {
+    "es": "Dosis de carga de {n1} mg a las 0 h → {n2} mg a las {n3} h. Nivel extraído después de la última dosis de {n4} mg (dosis {n5} de {n6}).",
+    "fr": "Dose de charge de {n1} mg à 0 h → {n2} mg à {n3} h. Prélèvement effectué après la dernière dose de {n4} mg (dose {n5} sur {n6}).",
+    "pt-BR": "Dose de ataque de {n1} mg às 0 h → {n2} mg às {n3} h. Nível coletado após a última dose de {n4} mg (dose {n5} de {n6})."
+  },
+  "{n1} mg loading dose at 0 h → {n2} mg at {n3} h, then every {n4} h ({n5} maintenance doses). Level drawn after the last {n6} mg dose (dose {n7} of {n8}).": {
+    "es": "Dosis de carga de {n1} mg a las 0 h → {n2} mg a las {n3} h, luego cada {n4} h ({n5} dosis de mantenimiento). Nivel extraído después de la última dosis de {n6} mg (dosis {n7} de {n8}).",
+    "fr": "Dose de charge de {n1} mg à 0 h → {n2} mg à {n3} h, puis toutes les {n4} h ({n5} doses d’entretien). Prélèvement effectué après la dernière dose de {n6} mg (dose {n7} sur {n8}).",
+    "pt-BR": "Dose de ataque de {n1} mg às 0 h → {n2} mg às {n3} h, depois a cada {n4} h ({n5} doses de manutenção). Nível coletado após a última dose de {n6} mg (dose {n7} de {n8})."
+  },
+  "One {n1} mg dose, no loading dose. Level drawn after that dose.": {
+    "es": "Una dosis de {n1} mg, sin dosis de carga. Nivel extraído después de esa dosis.",
+    "fr": "Une dose de {n1} mg, sans dose de charge. Prélèvement effectué après cette dose.",
+    "pt-BR": "Uma dose de {n1} mg, sem dose de ataque. Nível coletado após essa dose."
+  },
+  "{n1} doses of {n2} mg every {n3} h, no loading dose. Level drawn after dose {n4}.": {
+    "es": "{n1} dosis de {n2} mg cada {n3} h, sin dosis de carga. Nivel extraído después de la dosis {n4}.",
+    "fr": "{n1} doses de {n2} mg toutes les {n3} h, sans dose de charge. Prélèvement effectué après la dose {n4}.",
+    "pt-BR": "{n1} doses de {n2} mg a cada {n3} h, sem dose de ataque. Nível coletado após a dose {n4}."
+  },
+  "Level {n1}: {n2} mg/L at {n3} h after the start of the last dose": {
+    "es": "Nivel {n1}: {n2} mg/L a las {n3} h del inicio de la última dosis",
+    "fr": "Prélèvement {n1} : {n2} mg/L à {n3} h après le début de la dernière dose",
+    "pt-BR": "Nível {n1}: {n2} mg/L às {n3} h após o início da última dose"
   }
 }

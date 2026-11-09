@@ -1,13 +1,13 @@
 {
   "notice": "INCOMPLETE. Explicit bindings, unbound static text, and unreviewed child expressions are inventoried separately. No percentage is claimed. Dynamic API messages, report exports, imported datasets, metadata and rich text also require review. Article integrity is checked by articles.test.ts in Dosys. Citation language is retained. No clinical or legal review is implied.",
   "summary": {
-    "catalogEntries": 3341,
+    "catalogEntries": 3351,
     "files": 264,
-    "staticBindings": 1713,
-    "dynamicBindingsRequiringRuntimeAudit": 435,
+    "staticBindings": 1714,
+    "dynamicBindingsRequiringRuntimeAudit": 436,
     "unboundCandidates": 296,
     "invariantCandidates": 15,
-    "unreviewedChildExpressions": 1234,
+    "unreviewedChildExpressions": 1236,
     "publishedArticlesWithBothTranslations": 0,
     "missingBoundTranslations": 2
   },
@@ -10214,720 +10214,726 @@
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 849,
+      "line": 864,
       "kind": "Shared component text",
       "text": "Patient",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 880,
+      "line": 895,
       "kind": "Shared component text",
       "text": "Dosing history",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 887,
+      "line": 902,
       "kind": "Shared component text",
       "text": "Drug levels",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 891,
+      "line": 906,
       "kind": "Shared component text",
       "text": "Phase 1 complete — awaiting level",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 891,
+      "line": 906,
       "text": "Loading dose recorded. Draw the vancomycin level per the timing in the Bedbound panel, then enter the concentration, date and time below.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 891,
+      "line": 906,
       "text": "Calculate",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 891,
+      "line": 906,
       "text": "unlocks once the level is entered.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 893,
+      "line": 908,
       "kind": "Shared component text",
       "text": "Phase 2 — level entered, ready to calculate",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 893,
+      "line": 908,
       "text": "Press",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 893,
+      "line": 908,
       "text": "Calculate",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 893,
+      "line": 908,
       "text": "to calculate the Bayesian estimate and receive a maintenance regimen recommendation.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 911,
+      "line": 926,
       "text": "Vancomyzer™ is designed to meet the criteria for non-device clinical decision support in section 520(o)(1)(E) of the Federal Food, Drug, and Cosmetic Act (added by section 3060 of the 21st Century Cures Act). It has not been cleared, approved or otherwise reviewed by the FDA. It is intended for licensed healthcare professionals, who must independently review the basis for each recommendation. Vancomyzer has not yet been validated in real patients. Its equations are checked against published values and synthetic test cases; external validation with patient data is planned. It is not a substitute for clinical judgment, institutional protocols, or therapeutic drug monitoring.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 918,
+      "line": 933,
       "text": "[See Full Disclaimer]",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 929,
+      "line": 944,
       "text": "label",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 933,
+      "line": 948,
       "text": "Engineered by",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1009,
+      "line": 1027,
       "kind": "Shared component text",
       "text": "Review required — no dose adjustment presented.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1009,
+      "line": 1027,
       "text": "{displayResult.review_hold.message}",
       "dynamic": true,
       "kind": "Shared component text"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1019,
+      "line": 1037,
       "text": "{`Actual history — dose ${a.doses_given}:`}",
       "dynamic": true,
       "kind": "Shared component text"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1020,
+      "line": 1038,
       "text": "{`modeled peak ${fmt(a.peak, 1)} / trough ${fmt(a.trough, 1)} mg/L; AUC over that interval ${a.auc_interval_n.toFixed(0)} mg·h/L (not a daily AUC)${ap ? `; ${(ap.fraction_of_steady_state * 100).toFixed(0)}% of steady state (t½ ${fmt(ap.terminal_half_life_hours, 1)} h)` : \"\"}. These history values describe the entered dosing history. The AUC₂₄/peak/trough above describe the selected regimen at steady state.`}",
       "dynamic": true,
       "kind": "Shared component text"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1027,
+      "line": 1045,
       "kind": "Shared component text",
       "text": "Lab timing advisory",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1028,
+      "line": 1046,
       "text": "w",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1035,
+      "line": 1053,
       "kind": "Shared component text",
       "text": "Fit quality advisory",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1036,
+      "line": 1054,
       "text": "w",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1042,
+      "line": 1060,
       "kind": "Shared component text",
       "text": "Steady-state check",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1042,
+      "line": 1060,
       "text": "{displayResult.steady_state_warning}",
       "dynamic": true,
       "kind": "Shared component text"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1047,
+      "line": 1065,
       "kind": "Shared component text",
       "text": "Predicted AUC₂₄ > 600",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1047,
+      "line": 1065,
       "kind": "Shared component text",
       "text": "Potential for elevated nephrotoxicity risk. Proceed with extreme caution.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1064,
+      "line": 1082,
       "text": "{oneLevel ? \"One level: treat this estimate as provisional\" : rs.banner_title}",
       "dynamic": true,
       "kind": "Shared component text"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1065,
+      "line": 1083,
       "text": "{oneLevel ? ONE_LEVEL_UNCERTAINTY_SUMMARY : rs.banner_body}",
       "dynamic": true,
       "kind": "Shared component text"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1068,
+      "line": 1086,
       "text": "rs.banner_title",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1068,
+      "line": 1086,
       "text": "rs.banner_body",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1069,
+      "line": 1087,
       "text": "Evidence:",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1069,
+      "line": 1087,
       "text": "displayResult.calculation_details.evidence_strength",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1069,
+      "line": 1087,
       "text": "displayResult.calculation_details.data_quality_summary",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1071,
+      "line": 1089,
       "text": "a",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1081,
+      "line": 1099,
       "text": "{displayResult.calculation_details?.review_status.banner_title ?? \"Estimate without measured levels\"}",
       "dynamic": true,
       "kind": "Shared component text"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1082,
+      "line": 1100,
       "kind": "Shared component text",
       "text": "Based on patient characteristics, without measured levels. Enter a measured vancomycin level to refine the estimate.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1090,
+      "line": 1108,
       "text": "Enter a measured level",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1094,
+      "line": 1112,
       "text": "displayResult.calculation_details.review_status.banner_body",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1097,
+      "line": 1115,
       "text": "Earliest meaningful:",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1097,
+      "line": 1115,
       "text": "1.5–6 h after dose 1 post-infusion end (single-level fit).",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1098,
+      "line": 1116,
       "text": "Highest AUC accuracy:",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1098,
+      "line": 1116,
       "text": "peak + trough near dose 3–4 at steady state (ASHP/IDSA 2020).",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1099,
+      "line": 1117,
       "text": "Target AUC₂₄ 400–600 mg·h/L within 48 h per ASHP/IDSA 2020.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1106,
+      "line": 1124,
       "kind": "Shared component text",
       "text": "Age > 65 — enhanced monitoring",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1106,
+      "line": 1124,
       "kind": "Shared component text",
       "text": "Renal function may decline faster than SCr reflects.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1107,
+      "line": 1125,
       "text": "The",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1107,
+      "line": 1125,
       "text": "model includes an age-decline function (FDecline), but renal function in older adults may decline faster than SCr reflects — especially with low muscle mass. Consider:",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1109,
+      "line": 1127,
       "text": "More frequent vancomycin level monitoring (every 24–48 h rather than 72 h)",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1110,
+      "line": 1128,
       "text": "Daily SCr to detect early renal deterioration",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1111,
+      "line": 1129,
       "text": "If SCr appears low relative to clinical status, rely on early measured levels rather than rounding SCr up (routine rounding to 1 mg/dL reduced dose-prediction accuracy in older adults; Bukhari 2024)",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1112,
+      "line": 1130,
       "text": "Measured levels with Bayesian refinement, rather than population estimates alone, to individualize dosing in patients >65",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1133,
+      "line": 1181,
       "text": "No pharmacokinetic estimates are available.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1137,
+      "line": 1185,
       "text": "Key inputs",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1139,
+      "line": 1187,
       "text": "k",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1144,
+      "line": 1192,
       "text": "Vancomycin distributes through two compartments: a central one (the bloodstream + well-perfused organs) and a peripheral one (less-perfused tissues). The four PK parameters describe this:",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1146,
+      "line": 1194,
       "text": "— clearance (L/h). How fast the body eliminates the drug. Falls with renal impairment and with age (",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1146,
+      "line": 1194,
       "text": "FDecline).",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1147,
+      "line": 1195,
       "text": "— central volume (L). Initial dilution space at the end of infusion; drives peak concentration.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1148,
+      "line": 1196,
       "text": "— intercompartmental clearance (L/h). Speed of redistribution between central and peripheral.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1149,
+      "line": 1197,
       "text": "— peripheral volume (L). Where the drug temporarily “hides”; it slowly returns to central as the central level falls.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1151,
+      "line": 1199,
       "text": "When you enter a measured level, the Bayesian MAP fit shifts these parameters from the population prior toward your patient’s individual values — bounded so a single observation can’t over-fit.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1171,
+      "line": 1219,
       "text": "is the area under the concentration-time curve over 24 hours (mg·h/L). For vancomycin, it’s the exposure metric that best correlates with both efficacy against MRSA and the risk of acute kidney injury.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1172,
+      "line": 1220,
       "text": "The 2020 ASHP/IDSA/PIDS/SIDP consensus guideline recommends a target of",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1172,
+      "line": 1220,
       "text": ". Below 400 underdosed (risk of treatment failure and resistance selection). Above 600 significant nephrotoxicity risk, especially if sustained beyond 48 hours. The trough number alone is no longer the recommended target — AUC integrates the entire dosing interval and is more clinically meaningful.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1176,
+      "line": 1224,
       "text": "The calculator starts with a population prior — what we’d expect for an “average” patient with this age, weight, and SCr, from the",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1176,
+      "line": 1224,
       "text": "model. Model source:",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1177,
+      "line": 1225,
       "text": "COLIN_2019.sourcePopulation",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1178,
+      "line": 1226,
       "text": "When you enter a measured level, MAP-Bayesian estimation shifts the patient’s individual PK parameters toward values that better explain the measurement, while a log-normal prior penalty keeps the shift bounded — a single observation cannot move the estimates far from what the population model considers plausible.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1179,
+      "line": 1227,
       "text": "With one level the fit is bounded by the prior; with two or more well-timed levels (peak + trough) the fit becomes much more individualized and the recommendation can deviate further from population averages. If the residual stays large, you’ll see a Fit Quality Advisory — that’s a signal to draw a confirmatory level rather than over-trust the recommendation.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1194,
+      "line": 1242,
       "text": "Feature access",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1195,
+      "line": 1243,
       "text": "This feature is not available for your current account access. Contact us to discuss availability.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1196,
+      "line": 1244,
       "text": "Contact",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1211,
+      "line": 1259,
       "text": "Clinical note preview",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1233,
-      "text": "displayResult?.recommendation_type === \"existing_regimen\" ? \"Dosing adjustment\" : \"Dosing recommendation\"",
+      "line": 1281,
+      "text": "displayResult?.recommendation_type === \"existing_regimen\" && !loadingPreview ? \"Dosing adjustment\" : \"Dosing recommendation\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1237,
+      "line": 1285,
       "kind": "Accessible attribute",
       "text": "Population PK model",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1238,
+      "line": 1286,
       "text": "· 2-compartment",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1244,
+      "line": 1292,
       "text": "displayResult.pk_parameters.used_posterior_refinement ? \"Fitted to levels\" : \"Before levels\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1249,
+      "line": 1297,
       "text": "Running PK model",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1276,
+      "line": 1316,
+      "text": "PDF and note are off for a suggested dose that was not given.",
+      "translated": true
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1328,
       "text": "Curve:",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1279,
-      "text": "isPulse ? `Loading dose continued (${regimen.dose_mg} mg q${regimen.interval_hours}h)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`",
+      "line": 1331,
+      "text": "isPulse ? `${singleDoseNoun} ${regimen.dose_mg} mg repeated every ${regimen.interval_hours} h (illustrative)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1281,
+      "line": 1333,
       "text": "Suggested regimen",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1288,
+      "line": 1340,
       "text": "Recommendation withheld",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1289,
+      "line": 1341,
       "text": "Reconcile the discordant same-time levels, then recalculate.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1334,
+      "line": 1386,
       "text": "When the level data support an individualized fit, the calculator compares doses of 500–2000 mg in 250 mg increments at q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor fit) it instead scales the current dose toward that midpoint at the current interval, within the same safety limits. Automatic adult maintenance suggestions exclude 250 mg doses by product policy; if no supported regimen meets the constraints and AUC target, pharmacy review is required.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1336,
+      "line": 1388,
       "text": "The calculator compares doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1337,
+      "line": 1389,
       "text": "Peak and trough are forward-predicted from the patient’s posterior PK (or population prior if no level is fit) using the two-compartment model. The recommendation always favors options that stay within target rather than ones that hit midpoint exactly outside the window.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1345,
+      "line": 1397,
       "text": "Recommended regimen",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1349,
+      "line": 1401,
       "text": "every",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1359,
+      "line": 1411,
       "kind": "Shared component text",
       "text": "Running PK model",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1359,
+      "line": 1411,
       "kind": "Shared component text",
       "text": "Calculating exposure metrics and regimen guidance…",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1363,
+      "line": 1415,
       "text": "{rrt === true ? \"Calculator blocked for RRT.\" : patientReady ? \"Ready.\" : \"Enter patient data to begin.\"}",
       "dynamic": true,
       "kind": "Shared component text"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1364,
+      "line": 1416,
       "text": "{\n                        rrt === true\n                          ? \"The model is not validated for renal replacement therapy.\"\n                          : mode === \"initial_regimen\"\n                            ? \"Enter age, weight, serum creatinine and renal replacement therapy status. The population-model estimate starts automatically when the required inputs are valid.\"\n                            : \"Enter the current regimen and measured level(s), then press Calculate.\"\n                      }",
       "dynamic": true,
       "kind": "Shared component text"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1378,
+      "line": 1430,
       "text": "Scope:",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1378,
+      "line": 1430,
       "text": "Adults receiving intermittent IV vancomycin only. Not for children, dialysis or continuous infusion.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1378,
+      "line": 1430,
       "text": "mode === \"initial_regimen\" ? \"Starting maintenance estimates use patient characteristics without measured levels; review infection severity separately.\" : \"Enter accurate dose and sample times from the same dosing interval and a consistent prior dosing schedule.\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1380,
+      "line": 1432,
       "text": "Evidence",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1389,
+      "line": 1441,
       "text": "loading ? \"Running PK model…\" : autoRecalcArmed ? \"Inputs changed — recalculating…\" : \"Inputs changed — press Calculate to refresh these results.\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1395,
+      "line": 1447,
       "text": "Adults receiving intermittent IV vancomycin only · not for pediatrics, dialysis-specific or continuous infusion ·",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1396,
+      "line": 1448,
       "text": "displayResult.recommendation_type === \"initial_regimen\" ? \"estimates without levels do not account for illness severity\" : \"requires interpretable same-interval timing and routine dose history\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1397,
+      "line": 1449,
       "text": "Evidence",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1403,
+      "line": 1455,
       "kind": "Accessible attribute",
       "text": "Concentration-time graph panel",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1405,
+      "line": 1457,
       "text": "Recorded single dose only — no maintenance regimen suggested.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1422,
+      "line": 1475,
       "kind": "Accessible attribute",
       "text": "Regimen comparison and calculation details",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1425,
+      "line": 1478,
       "text": "Candidate regimens",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1427,
+      "line": 1480,
       "text": "select a row to preview",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1449,
+      "line": 1502,
       "text": "displayResult ? \"No candidate regimens — see the safety state above.\" : \"Candidate regimens with predicted AUC₂₄, peak and trough appear here after calculation.\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1455,
+      "line": 1508,
       "kind": "Accessible attribute",
       "text": "Calculation details",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1461,
+      "line": 1514,
       "text": "Calculation details",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1462,
+      "line": 1515,
       "text": "Enter patient details to view calculations. Parameters and substituted equations appear after a valid result is available.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1463,
+      "line": 1516,
       "text": "Review model equations and references",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1497,
+      "line": 1550,
       "text": "📚 Loaded from literature case:",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1497,
+      "line": 1550,
       "text": ". Edit inputs freely — the case stays linked until you reset.",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1501,
+      "line": 1554,
       "text": "View case page",
       "translated": true
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1505,
+      "line": 1558,
       "kind": "Accessible attribute",
       "text": "Dismiss case banner",
       "translated": true
@@ -10976,87 +10982,93 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 695,
+      "line": 698,
       "kind": "Accessible attribute",
       "text": "Concentration-time graph",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 702,
+      "line": 705,
       "text": "CONCENTRATION-TIME PROFILE",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 708,
+      "line": 711,
       "text": "Two-Compartment",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 714,
+      "line": 717,
       "text": "evidenceLabel",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 718,
+      "line": 721,
       "kind": "Accessible attribute",
       "text": "Time window",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 768,
+      "line": 771,
       "text": "Predicted",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
       "line": 771,
+      "text": "curve_label",
+      "dynamic": true
+    },
+    {
+      "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
+      "line": 774,
       "text": "comparison_label ?? \"Reference\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 781,
+      "line": 784,
       "text": "band.label",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 785,
+      "line": 788,
       "text": "No uncertainty band:",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 785,
+      "line": 788,
       "text": "band_info.reason",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 789,
+      "line": 792,
       "text": "Trough reference 10–20 mg/L (not the dosing target; target is AUC₂₄ 400–600)",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 793,
+      "line": 796,
       "text": "◆ Trough",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 795,
+      "line": 798,
       "text": "Peak",
       "translated": true
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 798,
+      "line": 801,
       "text": "Measured",
       "translated": true
     },
@@ -11422,252 +11434,252 @@
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
       "line": 524,
-      "text": "activeIsCurrent\n                ? (isPulseDose ? \"LOADING DOSE (SINGLE DOSE)\" : \"CURRENT REGIMEN (AS ENTERED)\")\n                : isPulseDose\n                  ? (active?.is_recommended || !active ? \"SUGGESTED MAINTENANCE REGIMEN\" : \"SELECTED MAINTENANCE ALTERNATIVE\")\n                  : active?.is_recommended || !active ? \"RECOMMENDED REGIMEN\" : \"SELECTED ALTERNATIVE\"",
+      "text": "activeIsCurrent\n                ? (isPulseDose\n                    ? (loadingDoseStatus === \"suggested\" ? \"SUGGESTED LOADING DOSE (NOT GIVEN)\" : loadingDoseStatus === \"single\" ? \"SINGLE DOSE GIVEN\" : \"LOADING DOSE GIVEN (SINGLE DOSE)\")\n                    : \"CURRENT REGIMEN (AS ENTERED)\")\n                : isPulseDose\n                  ? (active?.is_recommended || !active ? \"SUGGESTED MAINTENANCE REGIMEN\" : \"SELECTED MAINTENANCE ALTERNATIVE\")\n                  : active?.is_recommended || !active ? \"RECOMMENDED REGIMEN\" : \"SELECTED ALTERNATIVE\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 542,
+      "line": 544,
       "text": "every",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 552,
+      "line": 554,
       "text": "subline",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 560,
+      "line": 562,
       "text": "range.label",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 574,
+      "line": 576,
       "text": "APPLY RECOMMENDED",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 582,
+      "line": 584,
       "text": "⚠ POSSIBLE AUGMENTED RENAL CLEARANCE",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 586,
+      "line": 588,
       "text": "Estimated CrCl:",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 586,
+      "line": 588,
       "text": "mL/min/1.73 m² (threshold 130)",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 588,
+      "line": 590,
       "text": "Estimated CrCl:",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 588,
+      "line": 590,
       "text": "mL/min absolute — height not entered, so it could not be indexed",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 591,
+      "line": 593,
       "text": "Required TDD:",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 593,
+      "line": 595,
       "text": "Estimating equations detect augmented renal clearance poorly. Confirm with a measured 8–24 hour urinary creatinine clearance before acting on this.",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 593,
+      "line": 595,
       "text": "auc_range_status === \"below_target\"\n                ? \" The best available intermittent regimen for this patient is already below the 400–600 mg·h/L target.\"\n                : \"\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 598,
+      "line": 600,
       "text": "If confirmed:",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 600,
+      "line": 602,
       "text": "Obtain two vancomycin levels early (2–4h and 6–8h post-dose) to confirm individual PK parameters before proceeding",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 601,
+      "line": 603,
       "text": "Consult Infectious Diseases and/or nephrology. Continuous infusion is outside this calculator’s scope — it is not modeled or dosed here, so manage it per local protocol rather than from these numbers",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 604,
+      "line": 606,
       "text": "Threshold and definition: Udy 2013 (Crit Care 17:R35); Barletta 2017 (J Trauma Acute Care Surg 82:665–71); Cucci 2023 (Pharmacotherapy 43:1131–8). The 2020 ASHP/IDSA/SIDP vancomycin guideline does not define an adult ARC threshold.",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 612,
+      "line": 614,
       "text": "AUC₂₄ BELOW TARGET",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 613,
+      "line": 615,
       "text": "The recommended regimen is predicted to achieve AUC₂₄ of",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 613,
+      "line": 615,
       "text": "mg·h/L, which is below the target range of 400–600 mg·h/L. Clinical review is required — consider more frequent dosing, higher doses, or continuous infusion.",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 619,
+      "line": 621,
       "text": "Note:",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 619,
+      "line": 621,
       "text": "infusion_safety_note",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 621,
+      "line": 623,
       "text": "FDA Label",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 634,
+      "line": 636,
       "text": "calculationDetails.review_status.banner_body",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 635,
+      "line": 637,
       "text": "Draw first level 1.5–6h post-infusion end (dose 1 acceptable) or peak + trough near dose 3–4 for highest AUC accuracy — target AUC₂₄ 400–600 mg·h/L within 48h per ASHP/IDSA 2020.",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 663,
+      "line": 665,
       "text": "⚠ Empiric dosing refused",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 664,
+      "line": 666,
       "text": "Pulse-then-level required",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 667,
+      "line": 669,
       "text": "data.safety_message",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 673,
+      "line": 675,
       "text": "Recommended pulse dose",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 675,
+      "line": 677,
       "text": "× 1 (single dose)",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 677,
+      "line": 679,
       "text": "Estimated CL:",
-      "translated": true
-    },
-    {
-      "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 677,
-      "text": ". Draw a vancomycin level after the pulse dose and switch to the",
-      "translated": true
-    },
-    {
-      "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 677,
-      "text": "1 Level",
-      "translated": true
-    },
-    {
-      "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 677,
-      "text": "tab above to compute level-guided redose timing.",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
       "line": 679,
+      "text": ". Draw a vancomycin level after the pulse dose and switch to the",
+      "translated": true
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 679,
+      "text": "1 Level",
+      "translated": true
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 679,
+      "text": "tab above to compute level-guided redose timing.",
+      "translated": true
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 681,
       "text": "This is decision-support output only. The pulse-dose value is a weight-based estimate (15–20 mg/kg, capped at 3000 mg); confirm against institutional protocol and patient-specific factors before administration.",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 708,
+      "line": 710,
       "text": "⚠ No safe adjustment exists",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 709,
+      "line": 711,
       "text": "Hold & recheck",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 712,
+      "line": 714,
       "text": "data.safety_message",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 718,
+      "line": 720,
       "text": "Recommended action",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 720,
+      "line": 722,
       "text": "data.recommended_action",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 722,
+      "line": 724,
       "text": "Estimated CL:",
       "translated": true
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 725,
+      "line": 727,
       "text": "This is decision-support output only. Holding maintenance dosing is the calculator's safety recommendation when no acceptable dose-down or interval-extension exists in its search grid; clinical context (infection severity, hemodynamics, institutional protocol) remains the clinician's judgment.",
       "translated": true
     },
@@ -12429,128 +12441,128 @@
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 60,
+      "line": 62,
       "text": "short",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 61,
+      "line": 63,
       "text": "r.label",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 82,
+      "line": 84,
       "kind": "Accessible attribute",
       "text": "Candidate regimens",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 85,
+      "line": 87,
       "text": "Regimen",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 86,
+      "line": 88,
       "kind": "Accessible attribute",
       "text": "Predicted steady-state AUC₂₄ (mg·h/L)",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 87,
+      "line": 89,
       "kind": "Accessible attribute",
       "text": "Predicted peak (mg/L)",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 87,
+      "line": 89,
       "text": "Peak",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 88,
+      "line": 90,
       "kind": "Accessible attribute",
       "text": "Predicted trough (mg/L)",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 88,
+      "line": 90,
       "text": "Trough",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 89,
+      "line": 91,
       "text": "Target",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 103,
+      "line": 105,
       "text": "current.label ?? \"current\"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 110,
+      "line": 112,
       "kind": "Accessible attribute",
       "text": "Single dose, first 24 h — not graded against the steady-state target",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 110,
+      "line": 112,
       "text": "First 24 h",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 129,
+      "line": 131,
       "kind": "Accessible attribute",
       "text": "Suggested regimen",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 129,
+      "line": 131,
       "text": "Recommended",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 144,
-      "text": "current?.single_dose ? \"Loading-dose row: that single dose over its first 24 h. Other rows: \" : \"\"",
+      "line": 146,
+      "text": "!current?.single_dose ? \"\" : current.single_dose_kind === \"suggested\" ? \"Suggested loading-dose row (not given): that single dose over its first 24 h. Other rows: \" : current.single_dose_kind === \"single\" ? \"Single-dose row: that one dose over its first 24 h. Other rows: \" : \"Loading-dose row: that single dose over its first 24 h. Other rows: \"",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 144,
+      "line": 146,
       "text": "Steady-state predictions from the same PK parameters. Automatic candidates must have AUC₂₄ within 400–600 and doses of at least 500 mg by product policy",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 152,
+      "line": 154,
       "kind": "Accessible attribute",
       "text": "Copy the selected regimen into the dosing-history draft",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 153,
+      "line": 155,
       "text": "Use as draft",
       "translated": true
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 185,
+      "line": 187,
       "text": "No candidate regimens — see the safety state above.",
       "translated": true
     },
@@ -14856,37 +14868,37 @@
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 933,
+      "line": 948,
       "kind": "Unbound JSX text",
       "text": "2026 Vancomyzer"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 935,
+      "line": 950,
       "kind": "Unbound JSX text",
       "text": "sys"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1171,
+      "line": 1219,
       "kind": "Unbound JSX text",
       "text": "AUC₂₄"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1172,
+      "line": 1220,
       "kind": "Unbound JSX text",
       "text": "400–600 mg·h/L"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1348,
+      "line": 1400,
       "kind": "Unbound JSX text",
       "text": "mg"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 791,
+      "line": 794,
       "kind": "Unbound JSX text",
       "text": "AUC₂₄"
     },
@@ -14952,37 +14964,37 @@
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 537,
+      "line": 539,
       "kind": "Unbound JSX text",
       "text": "mg"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 556,
+      "line": 558,
       "kind": "Unbound JSX text",
       "text": "AUC24"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 590,
+      "line": 592,
       "kind": "Unbound JSX text",
       "text": "CL:"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 591,
+      "line": 593,
       "kind": "Unbound JSX text",
       "text": "mg/day"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 622,
+      "line": 624,
       "kind": "Unbound JSX text",
       "text": "ASHP/IDSA 2020"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 675,
+      "line": 677,
       "kind": "Unbound JSX text",
       "text": "mg"
     },
@@ -15072,13 +15084,13 @@
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 86,
+      "line": 88,
       "kind": "Unbound JSX text",
       "text": "AUC₂₄"
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 127,
+      "line": 129,
       "kind": "Unbound JSX text",
       "text": "mg q"
     },
@@ -15228,14 +15240,14 @@
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1146,
+      "line": 1194,
       "kind": "Unbound JSX text",
       "text": "CL",
       "reason": "Untranslated proper name, citation, address, symbol or unit"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 558,
+      "line": 560,
       "kind": "Unbound JSX text",
       "text": "mg·h/L",
       "reason": "Untranslated proper name, citation, address, symbol or unit"
@@ -21579,266 +21591,168 @@
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 879,
+      "line": 894,
       "tag": "div",
       "expression": "mode === \"existing_regimen\" && !loadingPreview && (\n          <InputSection id=\"regimen\" title=\"Dosing history\" completed={regimenReady} focusSection={activeSection}>\n            <RegimenForm value={regimen} onChange={setRegimen} fieldErrors={fieldErrors} />\n          </InputSection>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 886,
+      "line": 901,
       "tag": "div",
       "expression": "mode === \"existing_regimen\" && !loadingPreview && (\n          <InputSection id=\"levels\" title=\"Drug levels\" completed={levelReady} focusSection={activeSection}>\n            {bedbound && (\n              <div className=\"mb-2\">\n                {!bedboundLevelComplete ? (\n                  <Advisory severity=\"caution\" title=\"Phase 1 complete — awaiting level\" role=\"status\"><LocalizedText text=\"Loading dose recorded. Draw the vancomycin level per the timing in the Bedbound panel, then enter the concentration, date and time below.\" />{\" \"}<strong><LocalizedText text=\"Calculate\" /></strong>{\" \"}<LocalizedText text=\"unlocks once the level is entered.\" /></Advisory>\n                ) : (\n                  <Advisory severity=\"success\" title=\"Phase 2 — level entered, ready to calculate\" role=\"status\"><LocalizedText text=\"Press\" />{\" \"}<strong><LocalizedText text=\"Calculate\" /></strong>{\" \"}<LocalizedText text=\"to calculate the Bayesian estimate and receive a maintenance regimen recommendation.\" /></Advisory>\n                )}\n              </div>\n            )}\n            <LevelEntryTable\n              levels={levels}\n              onChange={setLevels}\n              fieldErrors={fieldErrors}\n              intervalHours={regimen.interval_hours || undefined}\n              prefillDoseDate={bedboundDoseData?.adminDate}\n              prefillDoseTime={bedboundDoseData?.adminTime}\n            />\n          </InputSection>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 888,
+      "line": 903,
       "tag": "InputSection",
       "expression": "bedbound && (\n              <div className=\"mb-2\">\n                {!bedboundLevelComplete ? (\n                  <Advisory severity=\"caution\" title=\"Phase 1 complete — awaiting level\" role=\"status\"><LocalizedText text=\"Loading dose recorded. Draw the vancomycin level per the timing in the Bedbound panel, then enter the concentration, date and time below.\" />{\" \"}<strong><LocalizedText text=\"Calculate\" /></strong>{\" \"}<LocalizedText text=\"unlocks once the level is entered.\" /></Advisory>\n                ) : (\n                  <Advisory severity=\"success\" title=\"Phase 2 — level entered, ready to calculate\" role=\"status\"><LocalizedText text=\"Press\" />{\" \"}<strong><LocalizedText text=\"Calculate\" /></strong>{\" \"}<LocalizedText text=\"to calculate the Bayesian estimate and receive a maintenance regimen recommendation.\" /></Advisory>\n                )}\n              </div>\n            )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 890,
+      "line": 905,
       "tag": "div",
       "expression": "!bedboundLevelComplete ? (\n                  <Advisory severity=\"caution\" title=\"Phase 1 complete — awaiting level\" role=\"status\"><LocalizedText text=\"Loading dose recorded. Draw the vancomycin level per the timing in the Bedbound panel, then enter the concentration, date and time below.\" />{\" \"}<strong><LocalizedText text=\"Calculate\" /></strong>{\" \"}<LocalizedText text=\"unlocks once the level is entered.\" /></Advisory>\n                ) : (\n                  <Advisory severity=\"success\" title=\"Phase 2 — level entered, ready to calculate\" role=\"status\"><LocalizedText text=\"Press\" />{\" \"}<strong><LocalizedText text=\"Calculate\" /></strong>{\" \"}<LocalizedText text=\"to calculate the Bayesian estimate and receive a maintenance regimen recommendation.\" /></Advisory>\n                )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 891,
+      "line": 906,
       "tag": "Advisory",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 891,
+      "line": 906,
       "tag": "Advisory",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 893,
+      "line": 908,
       "tag": "Advisory",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 893,
+      "line": 908,
       "tag": "Advisory",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 911,
+      "line": 926,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 933,
+      "line": 948,
       "tag": "span",
       "expression": "\"©\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 933,
+      "line": 948,
       "tag": "span",
       "expression": "\"™\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 933,
+      "line": 948,
       "tag": "span",
       "expression": "\"·\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 933,
+      "line": 948,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 933,
+      "line": 948,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 935,
+      "line": 950,
       "tag": "a",
       "expression": "\"ō\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 935,
+      "line": 950,
       "tag": "a",
       "expression": "\"™\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1068,
+      "line": 1086,
       "tag": "Advisory",
       "expression": "oneLevel && <p className=\"m-0 mb-1\"><strong><LocalizedText text={rs.banner_title} />.</strong> <LocalizedText text={rs.banner_body} /></p>",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1070,
+      "line": 1088,
       "tag": "Advisory",
       "expression": "rs.next_actions.length > 0 && (\n          <ul className=\"mt-1 list-disc pl-4\">{rs.next_actions.map((a, i) => <li key={i}><LocalizedText text={a} /></li>)}</ul>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1093,
+      "line": 1111,
       "tag": "Advisory",
       "expression": "displayResult.calculation_details?.review_status.banner_body && (\n          <p className=\"m-0 mb-1\"><LocalizedText text={displayResult.calculation_details.review_status.banner_body} /></p>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1097,
+      "line": 1115,
       "tag": "li",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1098,
+      "line": 1116,
       "tag": "li",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1107,
+      "line": 1125,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1107,
-      "tag": "p",
-      "expression": "COLIN_2019.shortName",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1107,
-      "tag": "p",
-      "expression": "\" \"",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1130,
-      "tag": "div",
-      "expression": "displayResult.pk_parameters ? (\n            <PKParametersMath params={displayResult.pk_parameters} />\n          ) : (\n            <p className=\"text-xs\" style={{ color: \"var(--color-dim)\" }}><LocalizedText text=\"No pharmacokinetic estimates are available.\" /></p>\n          )",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1135,
-      "tag": "div",
-      "expression": "displayResult.calculation_details?.key_inputs && displayResult.calculation_details.key_inputs.length > 0 && (\n            <div>\n              <p className=\"vz-kicker m-0 mb-1\"><LocalizedText text=\"Key inputs\" /></p>\n              <ul className=\"list-disc pl-4 text-[11.5px] leading-5\" style={{ color: \"var(--color-secondary)\" }}>\n                {displayResult.calculation_details.key_inputs.map((k, i) => <li key={i}><LocalizedText text={k} /></li>)}\n              </ul>\n            </div>\n          )",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1146,
-      "tag": "li",
-      "expression": "\" \"",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1146,
-      "tag": "li",
-      "expression": "COLIN_2019.shortName",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1146,
-      "tag": "li",
-      "expression": "\" \"",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1147,
-      "tag": "li",
-      "expression": "\" \"",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1148,
-      "tag": "li",
-      "expression": "\" \"",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1149,
-      "tag": "li",
-      "expression": "\" \"",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1171,
-      "tag": "p",
-      "expression": "\" \"",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1174,
-      "tag": "div",
-      "expression": "displayResult.pk_parameters?.used_posterior_refinement && (\n            <TeachingNote label=\"How does Bayesian feedback work?\">\n              <p style={{ marginTop: 0 }}><LocalizedText text=\"The calculator starts with a population prior — what we’d expect for an “average” patient with this age, weight, and SCr, from the\" />{\" \"}{COLIN_2019.shortName}{\" \"}<LocalizedText text=\"model. Model source:\" />{\" \"}\n                <LocalizedText text={COLIN_2019.sourcePopulation} />\n                {\" \"}<LocalizedText text=\"When you enter a measured level, MAP-Bayesian estimation shifts the patient’s individual PK parameters toward values that better explain the measurement, while a log-normal prior penalty keeps the shift bounded — a single observation cannot move the estimates far from what the population model considers plausible.\" /></p>\n              <p style={{ marginTop: 6 }}><LocalizedText text=\"With one level the fit is bounded by the prior; with two or more well-timed levels (peak + trough) the fit becomes much more individualized and the recommendation can deviate further from population averages. If the residual stays large, you’ll see a Fit Quality Advisory — that’s a signal to draw a confirmatory level rather than over-trust the recommendation.\" /></p>\n            </TeachingNote>\n          )",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1176,
-      "tag": "p",
-      "expression": "\" \"",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1176,
+      "line": 1125,
       "tag": "p",
       "expression": "COLIN_2019.shortName",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1176,
-      "tag": "p",
-      "expression": "\" \"",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1176,
+      "line": 1125,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
@@ -21846,216 +21760,321 @@
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
       "line": 1178,
+      "tag": "div",
+      "expression": "displayResult.pk_parameters ? (\n            <PKParametersMath params={displayResult.pk_parameters} />\n          ) : (\n            <p className=\"text-xs\" style={{ color: \"var(--color-dim)\" }}><LocalizedText text=\"No pharmacokinetic estimates are available.\" /></p>\n          )",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1183,
+      "tag": "div",
+      "expression": "displayResult.calculation_details?.key_inputs && displayResult.calculation_details.key_inputs.length > 0 && (\n            <div>\n              <p className=\"vz-kicker m-0 mb-1\"><LocalizedText text=\"Key inputs\" /></p>\n              <ul className=\"list-disc pl-4 text-[11.5px] leading-5\" style={{ color: \"var(--color-secondary)\" }}>\n                {displayResult.calculation_details.key_inputs.map((k, i) => <li key={i}><LocalizedText text={k} /></li>)}\n              </ul>\n            </div>\n          )",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1194,
+      "tag": "li",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1194,
+      "tag": "li",
+      "expression": "COLIN_2019.shortName",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1194,
+      "tag": "li",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1195,
+      "tag": "li",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1196,
+      "tag": "li",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1197,
+      "tag": "li",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1219,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1212,
+      "line": 1222,
+      "tag": "div",
+      "expression": "displayResult.pk_parameters?.used_posterior_refinement && (\n            <TeachingNote label=\"How does Bayesian feedback work?\">\n              <p style={{ marginTop: 0 }}><LocalizedText text=\"The calculator starts with a population prior — what we’d expect for an “average” patient with this age, weight, and SCr, from the\" />{\" \"}{COLIN_2019.shortName}{\" \"}<LocalizedText text=\"model. Model source:\" />{\" \"}\n                <LocalizedText text={COLIN_2019.sourcePopulation} />\n                {\" \"}<LocalizedText text=\"When you enter a measured level, MAP-Bayesian estimation shifts the patient’s individual PK parameters toward values that better explain the measurement, while a log-normal prior penalty keeps the shift bounded — a single observation cannot move the estimates far from what the population model considers plausible.\" /></p>\n              <p style={{ marginTop: 6 }}><LocalizedText text=\"With one level the fit is bounded by the prior; with two or more well-timed levels (peak + trough) the fit becomes much more individualized and the recommendation can deviate further from population averages. If the residual stays large, you’ll see a Fit Quality Advisory — that’s a signal to draw a confirmatory level rather than over-trust the recommendation.\" /></p>\n            </TeachingNote>\n          )",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1224,
+      "tag": "p",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1224,
+      "tag": "p",
+      "expression": "COLIN_2019.shortName",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1224,
+      "tag": "p",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1224,
+      "tag": "p",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1226,
+      "tag": "p",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1260,
       "tag": "pre",
       "expression": "clinicalNote",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1221,
+      "line": 1269,
       "tag": "div",
       "expression": "!loading && error && (\n        <div className=\"shrink-0\">\n          <CalculatorErrorState message={error.message} details={error.details} limitations={error.limitations} recoveryGuidance={error.recovery_guidance} fallbackWorkflow={error.fallback_workflow} onSwitchToInitialRegimen={handleSwitchToInitialRegimen} />\n        </div>\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1235,
+      "line": 1283,
       "tag": "div",
       "expression": "displayResult && (\n                <span className=\"hidden md:inline\">\n                  <LocalizedSpan className=\"vz-chip vz-chip--neutral\" title=\"Population PK model\">\n                    {modelShortName(displayResult.pk_parameters?.pk_model_name)}{\" \"}<LocalizedText text=\"· 2-compartment\" /></LocalizedSpan>\n                </span>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1238,
+      "line": 1286,
       "tag": "LocalizedSpan",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1241,
+      "line": 1289,
       "tag": "div",
       "expression": "displayResult?.pk_parameters && (\n                <span className=\"hidden sm:inline\">\n                  <span className={`vz-chip ${displayResult.pk_parameters.used_posterior_refinement ? \"vz-chip--ok\" : \"vz-chip--neutral\"}`}>\n                    <LocalizedText text={displayResult.pk_parameters.used_posterior_refinement ? \"Fitted to levels\" : \"Before levels\"} />\n                  </span>\n                </span>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1248,
+      "line": 1296,
       "tag": "div",
       "expression": "loading && (\n                <span className=\"vz-chip vz-chip--neutral\" role=\"status\"><LocalizedText text=\"Running PK model\" /><span className=\"mx-blink\">_</span></span>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1253,
+      "line": 1301,
       "tag": "div",
-      "expression": "displayResult && (\n                <div className={exportsDisabled ? \"pointer-events-none opacity-40\" : \"\"} aria-disabled={exportsDisabled}>\n                  <div className=\"flex flex-wrap items-center gap-1.5\">\n                    {!isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (\n                      <LoadingDosePopover weightKg={patient.weight_kg > 0 ? patient.weight_kg : null} onSimulate={handleSimulateLoadingDose} />\n                    )}\n                    <PdfExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? \"free\"} onExport={handleExportPDF} />\n                    {clinicalNote && (\n                      <NoteExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? \"free\"} onCopy={handleCopyNote} noteText={clinicalNote} />\n                    )}\n                  </div>\n                </div>\n              )",
+      "expression": "displayResult && (\n                <div className={exportsDisabled ? \"pointer-events-none opacity-40\" : \"\"} aria-disabled={exportsDisabled}>\n                  <div className=\"flex flex-wrap items-center gap-1.5\">\n                    {/* Loading-dose preview is an Empiric-tab tool; on the level tabs a loading dose is entered as given in the dosing history. */}\n                    {viewMode === \"empiric\" && !isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (\n                      <LoadingDosePopover weightKg={patient.weight_kg > 0 ? patient.weight_kg : null} onSimulate={handleSimulateLoadingDose} />\n                    )}\n                    <PdfExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? \"free\"} onExport={handleExportPDF} />\n                    {clinicalNote && (\n                      <NoteExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? \"free\"} onCopy={handleCopyNote} noteText={clinicalNote} />\n                    )}\n                  </div>\n                </div>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1256,
+      "line": 1305,
       "tag": "div",
-      "expression": "!isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (\n                      <LoadingDosePopover weightKg={patient.weight_kg > 0 ? patient.weight_kg : null} onSimulate={handleSimulateLoadingDose} />\n                    )",
+      "expression": "viewMode === \"empiric\" && !isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (\n                      <LoadingDosePopover weightKg={patient.weight_kg > 0 ? patient.weight_kg : null} onSimulate={handleSimulateLoadingDose} />\n                    )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1260,
+      "line": 1309,
       "tag": "div",
       "expression": "clinicalNote && (\n                      <NoteExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? \"free\"} onCopy={handleCopyNote} noteText={clinicalNote} />\n                    )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1271,
+      "line": 1315,
       "tag": "div",
-      "expression": "displayResult ? (\n                <div className=\"flex flex-col gap-2\">\n                  {/* Pulse-dose curve toggle */}\n                  {displayResult.curve_engine_recommended && !activeOption && !displayResult.adjustment_dosing_blocked && (\n                    <div className=\"flex items-center gap-2 text-xs\">\n                      <span style={{ color: \"var(--color-secondary)\" }}><LocalizedText text=\"Curve:\" /></span>\n                      <div className=\"vz-seg\">\n                        <button type=\"button\" aria-pressed={!showEngineRecommended} onClick={() => setShowEngineRecommended(false)}>\n                          <LocalizedText text={isPulse ? `Loading dose continued (${regimen.dose_mg} mg q${regimen.interval_hours}h)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`} />\n                        </button>\n                        <button type=\"button\" aria-pressed={showEngineRecommended} onClick={() => setShowEngineRecommended(true)}><LocalizedText text=\"Suggested regimen\" /></button>\n                      </div>\n                    </div>\n                  )}\n                  {displayResult.review_hold && (\n                    <div className=\"flex flex-wrap items-stretch gap-2\">\n                      <div className=\"flex-1 min-w-[260px] px-3 py-2\" style={{ background: \"var(--color-bg)\", border: \"1px solid #fca5a5\" }}>\n                        <p className=\"vz-kicker m-0 mb-0.5\"><LocalizedText text=\"Recommendation withheld\" /></p>\n                        <p className=\"m-0 text-xs\" style={{ color: \"#7f1d1d\" }}><LocalizedText text=\"Reconcile the discordant same-time levels, then recalculate.\" /></p>\n                      </div>\n                      <div className=\"flex-[1.4] min-w-[300px]\">\n                        <PrimaryMetricsCard compact caption={metricsCaption} ungraded={isPulse && activeIsCurrent} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />\n                      </div>\n                    </div>\n                  )}\n                  <DoseRecommendationCard\n                    layout=\"band\"\n                    showOptionTabs={false}\n                    showLoadingDose={false}\n                    activeOption={activeOption}\n                    activeIsCurrent={activeIsCurrent}\n                    recommended_dose={displayResult.recommended_dose}\n                    recommended_interval_hours={displayResult.recommended_interval_hours}\n                    recommendation_type={displayResult.recommendation_type}\n                    calculationDetails={displayResult.calculation_details}\n                    recommended_infusion_duration_hours={displayResult.recommended_infusion_duration_hours}\n                    infusion_duration_adjusted_for_safety={displayResult.infusion_duration_adjusted_for_safety}\n                    infusion_safety_note={displayResult.infusion_safety_note}\n                    frequency_options={displayResult.frequency_options}\n                    draftDiffersFromCalculated={hasStaleResult}\n                    onApplyRecommendation={handleApplyRecommendedRegimen}\n                    onSelectFrequency={handleSelectFrequency}\n                    onSimulateLoadingDose={handleSimulateLoadingDose}\n                    patientWeightKg={patient.weight_kg > 0 ? patient.weight_kg : null}\n                    auc_range_status={displayResult.auc_range_status}\n                    arc_advisory={displayResult.arc_advisory}\n                    auc24={displayResult.auc24}\n                    predicted_auc24={displayResult.predicted_auc24}\n                    isPulseDose={isPulse}\n                    loadingDoseMg={isPulse ? regimen.dose_mg : null}\n                    loadingDoseStatus={singleDoseStatus}\n                    onUndoLoadingDose={loadingPreview ? handleUndoLoadingDose : undefined}\n                    onConfirmLoadingDoseGiven={loadingPreview ? handleConfirmLoadingDoseGiven : null}\n                    empiricDosingBlocked={displayResult.empiric_dosing_blocked}\n                    adjustmentDosingBlocked={displayResult.adjustment_dosing_blocked}\n                    metricsSlot={\n                      <div className=\"flex-[1.4] min-w-[300px]\">\n                        <PrimaryMetricsCard compact caption={metricsCaption} ungraded={isPulse && activeIsCurrent} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />\n                      </div>\n                    }\n                  />\n                  <TeachingNote label=\"Why this dose?\">\n                    {displayResult.recommendation_type === \"existing_regimen\" ? (\n                      <><LocalizedText text=\"When the level data support an individualized fit, the calculator compares doses of 500–2000 mg in 250 mg increments at q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor fit) it instead scales the current dose toward that midpoint at the current interval, within the same safety limits. Automatic adult maintenance suggestions exclude 250 mg doses by product policy; if no supported regimen meets the constraints and AUC target, pharmacy review is required.\" /></>\n                    ) : (\n                      <><LocalizedText text=\"The calculator compares doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target.\" /></>\n                    )}{\" \"}<LocalizedText text=\"Peak and trough are forward-predicted from the patient’s posterior PK (or population prior if no level is fit) using the two-compartment model. The recommendation always favors options that stay within target rather than ones that hit midpoint exactly outside the window.\" /></TeachingNote>\n                  {advisories.length > 0 && <div className=\"flex flex-col gap-1.5\">{advisories}</div>}\n                </div>\n              ) : (\n                /* ── Empty state: zeroed band mirroring the populated layout ── */\n                <div className=\"flex flex-col gap-2\">\n                  <div className=\"flex flex-wrap items-stretch gap-2\" style={{ opacity: 0.45 }} aria-hidden=\"true\">\n                    <div className=\"flex-1 min-w-[260px] px-3 py-2\" style={{ background: \"var(--color-bg)\", border: \"1px solid var(--color-primary-a40)\" }}>\n                      <p className=\"vz-kicker m-0 mb-0.5\"><LocalizedText text=\"Recommended regimen\" /></p>\n                      <div className=\"flex items-baseline gap-x-1.5\">\n                        <span className=\"text-[34px] leading-none font-extrabold tabular-nums\" style={{ color: \"var(--color-primary)\", fontFamily: \"'Share Tech Mono', monospace\" }}>&mdash;</span>\n                        <span className=\"text-lg font-semibold\" style={{ color: \"var(--color-secondary)\" }}>mg</span>\n                        <span className=\"text-sm mx-1\" style={{ color: \"var(--color-dim)\" }}><LocalizedText text=\"every\" /></span>\n                        <span className=\"text-[34px] leading-none font-extrabold tabular-nums\" style={{ color: \"var(--color-primary)\", fontFamily: \"'Share Tech Mono', monospace\" }}>&mdash;</span>\n                        <span className=\"text-lg font-semibold\" style={{ color: \"var(--color-secondary)\" }}>h</span>\n                      </div>\n                    </div>\n                    <div className=\"flex-[1.4] min-w-[300px]\">\n                      <PrimaryMetricsCard compact caption=\"Predicted steady-state exposure\" auc24={null} peak={null} trough={null} />\n                    </div>\n                  </div>\n                  {loading ? (\n                    <Advisory severity=\"info\" title=\"Running PK model\" summary=\"Calculating exposure metrics and regimen guidance…\" role=\"status\" />\n                  ) : !error ? (\n                    <Advisory\n                      severity=\"info\"\n                      title={rrt === true ? \"Calculator blocked for RRT.\" : patientReady ? \"Ready.\" : \"Enter patient data to begin.\"}\n                      summary={\n                        rrt === true\n                          ? \"The model is not validated for renal replacement therapy.\"\n                          : mode === \"initial_regimen\"\n                            ? \"Enter age, weight, serum creatinine and renal replacement therapy status. The population-model estimate starts automatically when the required inputs are valid.\"\n                            : \"Enter the current regimen and measured level(s), then press Calculate.\"\n                      }\n                      role=\"status\"\n                    />\n                  ) : null}\n                  <div className=\"vz-advisory vz-advisory--caution\" role=\"note\">\n                    <div className=\"vz-advisory-row\">\n                      <span aria-hidden=\"true\" className=\"inline-flex h-4 min-w-4 items-center justify-center px-1 text-[10px] font-black leading-none\" style={{ border: \"1px solid currentColor\", borderRadius: 3, marginTop: 2 }}>!</span>\n                      <span className=\"min-w-0\">\n                        <span className=\"font-bold\"><LocalizedText text=\"Scope:\" /></span>{\" \"}<LocalizedText text=\"Adults receiving intermittent IV vancomycin only. Not for children, dialysis or continuous infusion.\" />{\" \"}<LocalizedText text={mode === \"initial_regimen\" ? \"Starting maintenance estimates use patient characteristics without measured levels; review infection severity separately.\" : \"Enter accurate dose and sample times from the same dosing interval and a consistent prior dosing schedule.\"} />\n                      </span>\n                      <a href=\"/transparent-dosing\" className=\"text-[11px] font-semibold underline\" style={{ color: \"inherit\" }}><LocalizedText text=\"Evidence\" /></a>\n                    </div>\n                  </div>\n                </div>\n              )",
+      "expression": "displayResult && loadingPreview && (\n                <span className=\"text-[10px] font-semibold\" style={{ color: \"#1d4ed8\" }} role=\"note\"><LocalizedText text=\"PDF and note are off for a suggested dose that was not given.\" /></span>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1274,
+      "line": 1323,
       "tag": "div",
-      "expression": "displayResult.curve_engine_recommended && !activeOption && !displayResult.adjustment_dosing_blocked && (\n                    <div className=\"flex items-center gap-2 text-xs\">\n                      <span style={{ color: \"var(--color-secondary)\" }}><LocalizedText text=\"Curve:\" /></span>\n                      <div className=\"vz-seg\">\n                        <button type=\"button\" aria-pressed={!showEngineRecommended} onClick={() => setShowEngineRecommended(false)}>\n                          <LocalizedText text={isPulse ? `Loading dose continued (${regimen.dose_mg} mg q${regimen.interval_hours}h)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`} />\n                        </button>\n                        <button type=\"button\" aria-pressed={showEngineRecommended} onClick={() => setShowEngineRecommended(true)}><LocalizedText text=\"Suggested regimen\" /></button>\n                      </div>\n                    </div>\n                  )",
+      "expression": "displayResult ? (\n                <div className=\"flex flex-col gap-2\">\n                  {/* Pulse-dose curve toggle */}\n                  {displayResult.curve_engine_recommended && !activeOption && !displayResult.adjustment_dosing_blocked && (\n                    <div className=\"flex items-center gap-2 text-xs\">\n                      <span style={{ color: \"var(--color-secondary)\" }}><LocalizedText text=\"Curve:\" /></span>\n                      <div className=\"vz-seg\">\n                        <button type=\"button\" aria-pressed={!showEngineRecommended} onClick={() => setShowEngineRecommended(false)}>\n                          <LocalizedText text={isPulse ? `${singleDoseNoun} ${regimen.dose_mg} mg repeated every ${regimen.interval_hours} h (illustrative)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`} />\n                        </button>\n                        <button type=\"button\" aria-pressed={showEngineRecommended} onClick={() => setShowEngineRecommended(true)}><LocalizedText text=\"Suggested regimen\" /></button>\n                      </div>\n                    </div>\n                  )}\n                  {displayResult.review_hold && (\n                    <div className=\"flex flex-wrap items-stretch gap-2\">\n                      <div className=\"flex-1 min-w-[260px] px-3 py-2\" style={{ background: \"var(--color-bg)\", border: \"1px solid #fca5a5\" }}>\n                        <p className=\"vz-kicker m-0 mb-0.5\"><LocalizedText text=\"Recommendation withheld\" /></p>\n                        <p className=\"m-0 text-xs\" style={{ color: \"#7f1d1d\" }}><LocalizedText text=\"Reconcile the discordant same-time levels, then recalculate.\" /></p>\n                      </div>\n                      <div className=\"flex-[1.4] min-w-[300px]\">\n                        <PrimaryMetricsCard compact caption={metricsCaption} ungraded={isPulse && activeIsCurrent} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />\n                      </div>\n                    </div>\n                  )}\n                  <DoseRecommendationCard\n                    layout=\"band\"\n                    showOptionTabs={false}\n                    showLoadingDose={false}\n                    activeOption={activeOption}\n                    activeIsCurrent={activeIsCurrent}\n                    recommended_dose={displayResult.recommended_dose}\n                    recommended_interval_hours={displayResult.recommended_interval_hours}\n                    recommendation_type={displayResult.recommendation_type}\n                    calculationDetails={displayResult.calculation_details}\n                    recommended_infusion_duration_hours={displayResult.recommended_infusion_duration_hours}\n                    infusion_duration_adjusted_for_safety={displayResult.infusion_duration_adjusted_for_safety}\n                    infusion_safety_note={displayResult.infusion_safety_note}\n                    frequency_options={displayResult.frequency_options}\n                    draftDiffersFromCalculated={hasStaleResult}\n                    onApplyRecommendation={handleApplyRecommendedRegimen}\n                    onSelectFrequency={handleSelectFrequency}\n                    onSimulateLoadingDose={handleSimulateLoadingDose}\n                    patientWeightKg={patient.weight_kg > 0 ? patient.weight_kg : null}\n                    auc_range_status={displayResult.auc_range_status}\n                    arc_advisory={displayResult.arc_advisory}\n                    auc24={displayResult.auc24}\n                    predicted_auc24={displayResult.predicted_auc24}\n                    isPulseDose={isPulse}\n                    loadingDoseMg={isPulse ? regimen.dose_mg : null}\n                    loadingDoseStatus={singleDoseStatus}\n                    onUndoLoadingDose={loadingPreview ? handleUndoLoadingDose : undefined}\n                    onConfirmLoadingDoseGiven={loadingPreview ? handleConfirmLoadingDoseGiven : null}\n                    empiricDosingBlocked={displayResult.empiric_dosing_blocked}\n                    adjustmentDosingBlocked={displayResult.adjustment_dosing_blocked}\n                    metricsSlot={\n                      <div className=\"flex-[1.4] min-w-[300px]\">\n                        <PrimaryMetricsCard compact caption={metricsCaption} ungraded={isPulse && activeIsCurrent} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />\n                      </div>\n                    }\n                  />\n                  <TeachingNote label=\"Why this dose?\">\n                    {displayResult.recommendation_type === \"existing_regimen\" ? (\n                      <><LocalizedText text=\"When the level data support an individualized fit, the calculator compares doses of 500–2000 mg in 250 mg increments at q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor fit) it instead scales the current dose toward that midpoint at the current interval, within the same safety limits. Automatic adult maintenance suggestions exclude 250 mg doses by product policy; if no supported regimen meets the constraints and AUC target, pharmacy review is required.\" /></>\n                    ) : (\n                      <><LocalizedText text=\"The calculator compares doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target.\" /></>\n                    )}{\" \"}<LocalizedText text=\"Peak and trough are forward-predicted from the patient’s posterior PK (or population prior if no level is fit) using the two-compartment model. The recommendation always favors options that stay within target rather than ones that hit midpoint exactly outside the window.\" /></TeachingNote>\n                  {advisories.length > 0 && <div className=\"flex flex-col gap-1.5\">{advisories}</div>}\n                </div>\n              ) : (\n                /* ── Empty state: zeroed band mirroring the populated layout ── */\n                <div className=\"flex flex-col gap-2\">\n                  <div className=\"flex flex-wrap items-stretch gap-2\" style={{ opacity: 0.45 }} aria-hidden=\"true\">\n                    <div className=\"flex-1 min-w-[260px] px-3 py-2\" style={{ background: \"var(--color-bg)\", border: \"1px solid var(--color-primary-a40)\" }}>\n                      <p className=\"vz-kicker m-0 mb-0.5\"><LocalizedText text=\"Recommended regimen\" /></p>\n                      <div className=\"flex items-baseline gap-x-1.5\">\n                        <span className=\"text-[34px] leading-none font-extrabold tabular-nums\" style={{ color: \"var(--color-primary)\", fontFamily: \"'Share Tech Mono', monospace\" }}>&mdash;</span>\n                        <span className=\"text-lg font-semibold\" style={{ color: \"var(--color-secondary)\" }}>mg</span>\n                        <span className=\"text-sm mx-1\" style={{ color: \"var(--color-dim)\" }}><LocalizedText text=\"every\" /></span>\n                        <span className=\"text-[34px] leading-none font-extrabold tabular-nums\" style={{ color: \"var(--color-primary)\", fontFamily: \"'Share Tech Mono', monospace\" }}>&mdash;</span>\n                        <span className=\"text-lg font-semibold\" style={{ color: \"var(--color-secondary)\" }}>h</span>\n                      </div>\n                    </div>\n                    <div className=\"flex-[1.4] min-w-[300px]\">\n                      <PrimaryMetricsCard compact caption=\"Predicted steady-state exposure\" auc24={null} peak={null} trough={null} />\n                    </div>\n                  </div>\n                  {loading ? (\n                    <Advisory severity=\"info\" title=\"Running PK model\" summary=\"Calculating exposure metrics and regimen guidance…\" role=\"status\" />\n                  ) : !error ? (\n                    <Advisory\n                      severity=\"info\"\n                      title={rrt === true ? \"Calculator blocked for RRT.\" : patientReady ? \"Ready.\" : \"Enter patient data to begin.\"}\n                      summary={\n                        rrt === true\n                          ? \"The model is not validated for renal replacement therapy.\"\n                          : mode === \"initial_regimen\"\n                            ? \"Enter age, weight, serum creatinine and renal replacement therapy status. The population-model estimate starts automatically when the required inputs are valid.\"\n                            : \"Enter the current regimen and measured level(s), then press Calculate.\"\n                      }\n                      role=\"status\"\n                    />\n                  ) : null}\n                  <div className=\"vz-advisory vz-advisory--caution\" role=\"note\">\n                    <div className=\"vz-advisory-row\">\n                      <span aria-hidden=\"true\" className=\"inline-flex h-4 min-w-4 items-center justify-center px-1 text-[10px] font-black leading-none\" style={{ border: \"1px solid currentColor\", borderRadius: 3, marginTop: 2 }}>!</span>\n                      <span className=\"min-w-0\">\n                        <span className=\"font-bold\"><LocalizedText text=\"Scope:\" /></span>{\" \"}<LocalizedText text=\"Adults receiving intermittent IV vancomycin only. Not for children, dialysis or continuous infusion.\" />{\" \"}<LocalizedText text={mode === \"initial_regimen\" ? \"Starting maintenance estimates use patient characteristics without measured levels; review infection severity separately.\" : \"Enter accurate dose and sample times from the same dosing interval and a consistent prior dosing schedule.\"} />\n                      </span>\n                      <a href=\"/transparent-dosing\" className=\"text-[11px] font-semibold underline\" style={{ color: \"inherit\" }}><LocalizedText text=\"Evidence\" /></a>\n                    </div>\n                  </div>\n                </div>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1285,
+      "line": 1326,
+      "tag": "div",
+      "expression": "displayResult.curve_engine_recommended && !activeOption && !displayResult.adjustment_dosing_blocked && (\n                    <div className=\"flex items-center gap-2 text-xs\">\n                      <span style={{ color: \"var(--color-secondary)\" }}><LocalizedText text=\"Curve:\" /></span>\n                      <div className=\"vz-seg\">\n                        <button type=\"button\" aria-pressed={!showEngineRecommended} onClick={() => setShowEngineRecommended(false)}>\n                          <LocalizedText text={isPulse ? `${singleDoseNoun} ${regimen.dose_mg} mg repeated every ${regimen.interval_hours} h (illustrative)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`} />\n                        </button>\n                        <button type=\"button\" aria-pressed={showEngineRecommended} onClick={() => setShowEngineRecommended(true)}><LocalizedText text=\"Suggested regimen\" /></button>\n                      </div>\n                    </div>\n                  )",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/CalculatorWorkspace.tsx",
+      "line": 1337,
       "tag": "div",
       "expression": "displayResult.review_hold && (\n                    <div className=\"flex flex-wrap items-stretch gap-2\">\n                      <div className=\"flex-1 min-w-[260px] px-3 py-2\" style={{ background: \"var(--color-bg)\", border: \"1px solid #fca5a5\" }}>\n                        <p className=\"vz-kicker m-0 mb-0.5\"><LocalizedText text=\"Recommendation withheld\" /></p>\n                        <p className=\"m-0 text-xs\" style={{ color: \"#7f1d1d\" }}><LocalizedText text=\"Reconcile the discordant same-time levels, then recalculate.\" /></p>\n                      </div>\n                      <div className=\"flex-[1.4] min-w-[300px]\">\n                        <PrimaryMetricsCard compact caption={metricsCaption} ungraded={isPulse && activeIsCurrent} auc24={metricAuc} peak={metricPeak} trough={metricTrough} />\n                      </div>\n                    </div>\n                  )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1333,
+      "line": 1385,
       "tag": "TeachingNote",
       "expression": "displayResult.recommendation_type === \"existing_regimen\" ? (\n                      <><LocalizedText text=\"When the level data support an individualized fit, the calculator compares doses of 500–2000 mg in 250 mg increments at q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor fit) it instead scales the current dose toward that midpoint at the current interval, within the same safety limits. Automatic adult maintenance suggestions exclude 250 mg doses by product policy; if no supported regimen meets the constraints and AUC target, pharmacy review is required.\" /></>\n                    ) : (\n                      <><LocalizedText text=\"The calculator compares doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target.\" /></>\n                    )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1337,
+      "line": 1389,
       "tag": "TeachingNote",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1338,
+      "line": 1390,
       "tag": "div",
       "expression": "advisories.length > 0 && <div className=\"flex flex-col gap-1.5\">{advisories}</div>",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1338,
+      "line": 1390,
       "tag": "div",
       "expression": "advisories",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1358,
+      "line": 1410,
       "tag": "div",
       "expression": "loading ? (\n                    <Advisory severity=\"info\" title=\"Running PK model\" summary=\"Calculating exposure metrics and regimen guidance…\" role=\"status\" />\n                  ) : !error ? (\n                    <Advisory\n                      severity=\"info\"\n                      title={rrt === true ? \"Calculator blocked for RRT.\" : patientReady ? \"Ready.\" : \"Enter patient data to begin.\"}\n                      summary={\n                        rrt === true\n                          ? \"The model is not validated for renal replacement therapy.\"\n                          : mode === \"initial_regimen\"\n                            ? \"Enter age, weight, serum creatinine and renal replacement therapy status. The population-model estimate starts automatically when the required inputs are valid.\"\n                            : \"Enter the current regimen and measured level(s), then press Calculate.\"\n                      }\n                      role=\"status\"\n                    />\n                  ) : null",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1378,
+      "line": 1430,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1378,
+      "line": 1430,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1386,
+      "line": 1438,
       "tag": "div",
       "expression": "resultObscured && (\n              <div className=\"vz-obscured-overlay\" role=\"status\" aria-live=\"polite\">\n                <div className=\"rounded-md border px-4 py-2 text-center text-xs font-semibold shadow-md\" style={{ background: \"#fffbeb\", borderColor: \"#fcd34d\", color: \"#78350f\" }}>\n                  <LocalizedText text={loading ? \"Running PK model…\" : autoRecalcArmed ? \"Inputs changed — recalculating…\" : \"Inputs changed — press Calculate to refresh these results.\"} />\n                </div>\n              </div>\n            )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1394,
+      "line": 1446,
       "tag": "section",
       "expression": "displayResult && !resultObscured && (\n            <div className=\"border-t px-2 py-1 text-[10.5px]\" style={{ borderTopColor: \"var(--color-border)\", color: \"var(--color-dim)\" }}><LocalizedText text=\"Adults receiving intermittent IV vancomycin only · not for pediatrics, dialysis-specific or continuous infusion ·\" />{\" \"}\n              <LocalizedText text={displayResult.recommendation_type === \"initial_regimen\" ? \"estimates without levels do not account for illness severity\" : \"requires interpretable same-interval timing and routine dose history\"} />.{\" \"}\n              <a href=\"/transparent-dosing\" className=\"underline\"><LocalizedText text=\"Evidence\" /></a>\n            </div>\n          )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1395,
+      "line": 1447,
       "tag": "div",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1396,
+      "line": 1448,
       "tag": "div",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1404,
+      "line": 1456,
       "tag": "LocalizedSection",
       "expression": "isPulse && displayResult?.adjustment_dosing_blocked && (\n            <p className=\"m-0 px-3 pt-2 text-xs\"><LocalizedText text=\"Recorded single dose only — no maintenance regimen suggested.\" /></p>\n          )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1426,
+      "line": 1479,
       "tag": "div",
       "expression": "displayResult && (\n                <span className=\"text-[10px]\" style={{ color: \"var(--color-dim)\" }}><LocalizedText text=\"select a row to preview\" /></span>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1431,
+      "line": 1484,
       "tag": "div",
       "expression": "displayResult ? (\n                <RegimenComparisonResult\n                  result={displayResult}\n                  options={displayResult.frequency_options}\n                  activeOption={activeIsCurrent ? null : activeOption}\n                  onSelect={handleSelectFrequency}\n                  current={currentRegimenRow}\n                  onApply={displayResult.recommendation_type === \"existing_regimen\" && !isPulse ? (option) => {\n                    setRegimen((current) => ({\n                      ...current,\n                      dose_mg: option.dose_mg,\n                      interval_hours: option.interval_hours,\n                      infusion_duration_hours: option.infusion_duration_hours || (current.infusion_duration_hours > 0 ? current.infusion_duration_hours : 1),\n                    }));\n                  } : null}\n                />\n              ) : (\n                <p className=\"px-3 py-3 text-xs\" style={{ color: \"var(--color-dim)\" }}>\n                  <LocalizedText text={displayResult ? \"No candidate regimens — see the safety state above.\" : \"Candidate regimens with predicted AUC₂₄, peak and trough appear here after calculation.\"} />\n                </p>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1457,
+      "line": 1510,
       "tag": "div",
       "expression": "displayResult ? (\n                <ResultDetailTabs tabs={detailTabs} storageKey=\"vancomyzer_detail_tab\" />\n              ) : (\n                <div className=\"p-3 text-sm\" style={{ color: \"var(--color-secondary)\" }}>\n                  <h3 className=\"mb-2 font-semibold\"><LocalizedText text=\"Calculation details\" /></h3>\n                  <p><LocalizedText text=\"Enter patient details to view calculations. Parameters and substituted equations appear after a valid result is available.\" /></p>\n                  <a href=\"/transparent-dosing/equations\" className=\"mt-3 inline-block underline\"><LocalizedText text=\"Review model equations and references\" /></a>\n                </div>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1481,
+      "line": 1534,
       "tag": "div",
       "expression": "loadedCase && (\n        <div\n          role=\"status\"\n          className=\"shrink-0\"\n          style={{\n            padding: \"4px 12px\",\n            background: \"#e6eef5\",\n            borderBottom: \"1px solid #c6d6e6\",\n            color: \"#14232f\",\n            fontSize: 12,\n            display: \"flex\",\n            alignItems: \"center\",\n            gap: 12,\n            flexWrap: \"wrap\",\n          }}\n        >\n          <span><LocalizedText text=\"📚 Loaded from literature case:\" />{\" \"}<strong>{loadedCase.reference}</strong><LocalizedText text=\". Edit inputs freely — the case stays linked until you reset.\" /></span>\n          <a\n            href={`/transparent-dosing/cases#${loadedCase.id}`}\n            style={{ marginLeft: \"auto\", color: \"#14232f\", textDecoration: \"underline\", fontWeight: 600 }}\n          ><LocalizedText text=\"View case page\" /></a>\n          <LocalizedButton\n            type=\"button\"\n            onClick={() => setLoadedCase(null)}\n            aria-label=\"Dismiss case banner\"\n            style={{ background: \"transparent\", border: \"none\", color: \"#14232f\", cursor: \"pointer\", fontSize: 16, padding: \"0 4px\" }}\n          >\n            ×\n          </LocalizedButton>\n        </div>\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1497,
+      "line": 1550,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/CalculatorWorkspace.tsx",
-      "line": 1497,
+      "line": 1550,
       "tag": "strong",
       "expression": "loadedCase.reference",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
@@ -22083,112 +22102,119 @@
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 703,
+      "line": 706,
       "tag": "div",
       "expression": "modelLabel && (\n          <span className=\"hidden md:contents\">\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{\"\\u00B7\"}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{modelLabel}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{\"\\u00B7\"}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}><LocalizedText text=\"Two-Compartment\" /></span>\n          </span>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 705,
+      "line": 708,
       "tag": "span",
       "expression": "\"\\u00B7\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 706,
+      "line": 709,
       "tag": "span",
       "expression": "modelLabel",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 707,
+      "line": 710,
       "tag": "span",
       "expression": "\"\\u00B7\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 711,
+      "line": 714,
       "tag": "div",
       "expression": "evidenceLabel && (\n          <span className=\"hidden md:contents\">\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}>{\"\\u00B7\"}</span>\n            <span style={{ fontSize: 9, color: getCSSColor(\"--color-dim\", \"#009933\") }}><LocalizedText text={evidenceLabel} /></span>\n          </span>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 713,
+      "line": 716,
       "tag": "span",
       "expression": "\"\\u00B7\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 750,
+      "line": 753,
       "tag": "button",
       "expression": "z",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 768,
+      "line": 771,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 769,
+      "line": 771,
+      "tag": "span",
+      "expression": "curve_label ? <>{\": \"}<LocalizedText text={curve_label} /></> : null",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
+      "line": 772,
       "tag": "div",
       "expression": "comparisonData.length > 1 && (\n          <span className=\"flex items-center gap-1 text-[10px]\" style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }}>\n            <span className=\"inline-block w-4 h-0.5 border-t border-dashed\" style={{ borderColor: getCSSColor(\"--color-secondary\", \"#00cc44\"), borderTopWidth: 1.5 }} /> <LocalizedText text={comparison_label ?? \"Reference\"} />\n          </span>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 774,
+      "line": 777,
       "tag": "div",
       "expression": "band && curveHasBand(curveData) && (\n          <LocalizedSpan\n            className=\"flex items-center gap-1 text-[10px]\"\n            style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }}\n            title={band.title}\n          >\n            <span className=\"inline-block w-3 h-3\" style={{ background: \"rgba(30, 77, 140, 0.10)\", border: \"1px solid rgba(30, 77, 140, 0.25)\" }} />\n            <LocalizedText text={band.label} />\n          </LocalizedSpan>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 784,
+      "line": 787,
       "tag": "div",
       "expression": "band_info?.method === \"unavailable\" && curveData.length > 1 && (\n          <span className=\"flex items-center gap-1 text-[10px]\" style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }} title={band_info.detail ?? band_info.reason}><LocalizedText text=\"No uncertainty band:\" />{\" \"}<LocalizedText text={band_info.reason} />\n          </span>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 785,
+      "line": 788,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 789,
+      "line": 792,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 795,
+      "line": 798,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 796,
+      "line": 799,
       "tag": "div",
       "expression": "measuredData.length > 0 && (\n          <span className=\"flex items-center gap-1 text-[10px]\" style={{ color: getCSSColor(\"--color-dim\", \"#009933\") }}>\n            <span className=\"inline-block w-2 h-2\" style={{ background: \"#fff\", border: `1px solid ${getCSSColor(\"--color-primary\", \"#00ff41\")}` }} />{\" \"}<LocalizedText text=\"Measured\" /></span>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/ConcentrationTimeGraph.tsx",
-      "line": 798,
+      "line": 801,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
@@ -22426,86 +22452,72 @@
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 535,
+      "line": 537,
       "tag": "span",
       "expression": "displayDose",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 538,
+      "line": 540,
       "tag": "div",
       "expression": "isSingleLoadingDose ? (\n                <span className=\"text-lg font-semibold mx-1\" style={{ color: \"var(--color-secondary)\", fontFamily: \"'Share Tech Mono', monospace\" }}>× 1</span>\n              ) : (\n                <>\n                  <span className=\"text-sm font-medium mx-1\" style={{ color: \"var(--color-dim)\", fontFamily: \"'Share Tech Mono', monospace\" }}><LocalizedText text=\"every\" /></span>\n                  <span\n                    className={`${isBand ? \"text-[34px] leading-none\" : \"text-4xl\"} font-extrabold tabular-nums mx-glow`}\n                    style={{ color: \"var(--color-primary)\", fontFamily: \"'Share Tech Mono', monospace\", textShadow: \"0 0 12px var(--color-glow-strong)\" }}\n                  >\n                    {displayInterval}\n                  </span>\n                  <span className=\"text-lg font-semibold\" style={{ color: \"var(--color-secondary)\", fontFamily: \"'Share Tech Mono', monospace\" }}>h</span>\n                </>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 547,
+      "line": 549,
       "tag": "span",
       "expression": "displayInterval",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 554,
+      "line": 556,
       "tag": "div",
       "expression": "!isBand && displayAUC != null && range && (\n              <div className=\"mt-2 flex items-center gap-2\">\n                <span className=\"text-xs\" style={{ color: \"var(--color-dim)\", fontFamily: \"'Share Tech Mono', monospace\" }}>AUC24</span>\n                <span className=\"tabular-nums text-sm font-bold\" style={{ color: \"var(--color-primary)\", fontFamily: \"'Share Tech Mono', monospace\" }}>{displayAUC}</span>\n                <span className=\"text-xs\" style={{ color: \"var(--color-dim)\", fontFamily: \"'Share Tech Mono', monospace\" }}>mg·h/L</span>\n                <span className=\"inline-flex border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider\" style={{ ...range.badgeStyle }}>\n                  <LocalizedText text={range.label} />\n                </span>\n              </div>\n            )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 557,
+      "line": 559,
       "tag": "span",
       "expression": "displayAUC",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 566,
+      "line": 568,
       "tag": "div",
       "expression": "isBand && metricsSlot",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 567,
+      "line": 569,
       "tag": "div",
       "expression": "draftDiffersFromCalculated && onApplyRecommendation && (\n          <div className=\"flex flex-col gap-2 shrink-0\">\n            <button\n              type=\"button\"\n              onClick={onApplyRecommendation}\n              className=\"px-3 py-1.5 text-xs font-semibold transition\"\n              style={{ border: \"1px solid var(--color-primary-a40)\", background: \"var(--color-primary-a05)\", color: \"var(--color-secondary)\", fontFamily: \"'Share Tech Mono', monospace\" }}\n            ><LocalizedText text=\"APPLY RECOMMENDED\" /></button>\n          </div>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 580,
+      "line": 582,
       "tag": "div",
       "expression": "arc_advisory?.detected && (\n        <div className=\"rounded-lg border-2 px-4 py-3\" style={{ borderColor: \"#dc2626\", background: \"#fef2f2\" }}>\n          <p className=\"text-sm font-bold\" style={{ color: \"#991b1b\", margin: 0 }}><LocalizedText text=\"⚠ POSSIBLE AUGMENTED RENAL CLEARANCE\" /></p>\n          <div className=\"mt-2 space-y-1.5 text-xs\" style={{ color: \"#7f1d1d\" }}>\n            <div className=\"flex flex-wrap gap-x-4 gap-y-1\">\n              {arc_advisory.crcl_indexed_ml_min_1_73 != null ? (\n                <span><strong><LocalizedText text=\"Estimated CrCl:\" /></strong> {arc_advisory.crcl_indexed_ml_min_1_73}{\" \"}<LocalizedText text=\"mL/min/1.73 m² (threshold 130)\" /></span>\n              ) : (\n                <span><strong><LocalizedText text=\"Estimated CrCl:\" /></strong> {arc_advisory.crcl_ml_min}{\" \"}<LocalizedText text=\"mL/min absolute — height not entered, so it could not be indexed\" /></span>\n              )}\n              <span><strong>CL:</strong> {arc_advisory.cl_l_h} L/h</span>\n              <span><strong><LocalizedText text=\"Required TDD:\" /></strong> ~{arc_advisory.required_tdd_mg?.toLocaleString()} mg/day</span>\n            </div>\n            <p style={{ margin: 0, lineHeight: 1.6 }}><LocalizedText text=\"Estimating equations detect augmented renal clearance poorly. Confirm with a measured 8–24 hour urinary creatinine clearance before acting on this.\" /><LocalizedText text={auc_range_status === \"below_target\"\n                ? \" The best available intermittent regimen for this patient is already below the 400–600 mg·h/L target.\"\n                : \"\"} />\n            </p>\n            <div style={{ margin: 0, lineHeight: 1.6 }}>\n              <strong><LocalizedText text=\"If confirmed:\" /></strong>\n              <ul style={{ margin: \"4px 0 0 16px\", padding: 0, listStyleType: \"disc\" }}>\n                <li><LocalizedText text=\"Obtain two vancomycin levels early (2–4h and 6–8h post-dose) to confirm individual PK parameters before proceeding\" /></li>\n                <li><LocalizedText text=\"Consult Infectious Diseases and/or nephrology. Continuous infusion is outside this calculator’s scope — it is not modeled or dosed here, so manage it per local protocol rather than from these numbers\" /></li>\n              </ul>\n            </div>\n            <p style={{ margin: 0, fontSize: 10, fontStyle: \"italic\" }}><LocalizedText text=\"Threshold and definition: Udy 2013 (Crit Care 17:R35); Barletta 2017 (J Trauma Acute Care Surg 82:665–71); Cucci 2023 (Pharmacotherapy 43:1131–8). The 2020 ASHP/IDSA/SIDP vancomycin guideline does not define an adult ARC threshold.\" /></p>\n          </div>\n        </div>\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 585,
+      "line": 587,
       "tag": "div",
       "expression": "arc_advisory.crcl_indexed_ml_min_1_73 != null ? (\n                <span><strong><LocalizedText text=\"Estimated CrCl:\" /></strong> {arc_advisory.crcl_indexed_ml_min_1_73}{\" \"}<LocalizedText text=\"mL/min/1.73 m² (threshold 130)\" /></span>\n              ) : (\n                <span><strong><LocalizedText text=\"Estimated CrCl:\" /></strong> {arc_advisory.crcl_ml_min}{\" \"}<LocalizedText text=\"mL/min absolute — height not entered, so it could not be indexed\" /></span>\n              )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 586,
-      "tag": "span",
-      "expression": "arc_advisory.crcl_indexed_ml_min_1_73",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 586,
-      "tag": "span",
-      "expression": "\" \"",
-      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
-    },
-    {
-      "file": "src/components/calculator/DoseRecommendationCard.tsx",
       "line": 588,
       "tag": "span",
-      "expression": "arc_advisory.crcl_ml_min",
+      "expression": "arc_advisory.crcl_indexed_ml_min_1_73",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
@@ -22519,96 +22531,110 @@
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
       "line": 590,
       "tag": "span",
+      "expression": "arc_advisory.crcl_ml_min",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 590,
+      "tag": "span",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/DoseRecommendationCard.tsx",
+      "line": 592,
+      "tag": "span",
       "expression": "arc_advisory.cl_l_h",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 610,
+      "line": 612,
       "tag": "div",
       "expression": "!arc_advisory?.detected && auc_range_status === \"below_target\" && (predicted_auc24 ?? rawAuc24) != null && (\n        <div className=\"rounded-lg border px-4 py-3\" style={{ borderColor: \"#fca5a5\", background: \"#fff1f2\" }}>\n          <p className=\"text-sm font-bold\" style={{ color: \"#991b1b\", margin: 0 }}><LocalizedText text=\"AUC₂₄ BELOW TARGET\" /></p>\n          <p className=\"mt-1 text-xs\" style={{ color: \"#7f1d1d\", margin: 0 }}><LocalizedText text=\"The recommended regimen is predicted to achieve AUC₂₄ of\" />{\" \"}{predicted_auc24 ?? rawAuc24}{\" \"}<LocalizedText text=\"mg·h/L, which is below the target range of 400–600 mg·h/L. Clinical review is required — consider more frequent dosing, higher doses, or continuous infusion.\" /></p>\n        </div>\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 613,
+      "line": 615,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 613,
+      "line": 615,
       "tag": "p",
       "expression": "predicted_auc24 ?? rawAuc24",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 613,
+      "line": 615,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 617,
+      "line": 619,
       "tag": "div",
       "expression": "infusion_safety_note && (\n        <div className=\"rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800\">\n          <strong><LocalizedText text=\"Note:\" /></strong> <LocalizedText text={infusion_safety_note} />{\" \"}\n          <span style={{ fontSize: 10 }}>\n            [<a href=\"https://www.accessdata.fda.gov/drugsatfda_docs/label/2017/050671s023lbl.pdf\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"underline hover:no-underline\" style={{ color: \"inherit\" }}><LocalizedText text=\"FDA Label\" /></a>{\" · \"}\n            <a href=\"https://pubmed.ncbi.nlm.nih.gov/32191793/\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"underline hover:no-underline\" style={{ color: \"inherit\" }}>ASHP/IDSA 2020</a>]\n          </span>\n        </div>\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 619,
+      "line": 621,
       "tag": "div",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 621,
+      "line": 623,
       "tag": "span",
       "expression": "\" · \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 628,
+      "line": 630,
       "tag": "div",
       "expression": "showLoadingDose && active && (\n        <LoadingDoseGuidance weightKg={patientWeightKg ?? null} onSimulate={onSimulateLoadingDose} />\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 632,
+      "line": 634,
       "tag": "div",
       "expression": "!isBand && calculationDetails?.review_status?.banner_body && (\n        <div className=\"text-xs leading-5 pt-2\" style={{ color: \"var(--color-dim)\", borderTop: \"1px solid var(--color-border)\", fontFamily: \"'Share Tech Mono', monospace\" }}>\n          <p style={{ margin: 0 }}><LocalizedText text={calculationDetails.review_status.banner_body} /></p>\n          <p style={{ margin: \"4px 0 0 0\" }}><LocalizedText text=\"Draw first level 1.5–6h post-infusion end (dose 1 acceptable) or peak + trough near dose 3–4 for highest AUC accuracy — target AUC₂₄ 400–600 mg·h/L within 48h per ASHP/IDSA 2020.\" /></p>\n        </div>\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 677,
+      "line": 679,
       "tag": "div",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 677,
+      "line": 679,
       "tag": "div",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 677,
+      "line": 679,
       "tag": "div",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/DoseRecommendationCard.tsx",
-      "line": 722,
+      "line": 724,
       "tag": "div",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
@@ -23175,56 +23201,56 @@
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 61,
+      "line": 63,
       "tag": "LocalizedSpan",
       "expression": "short !== r.label && <span className=\"sr-only\"> (<LocalizedText text={r.label} />)</span>",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 93,
+      "line": 95,
       "tag": "tbody",
       "expression": "current && (\n            <tr\n              role=\"radio\"\n              aria-checked={currentActive}\n              tabIndex={0}\n              onClick={() => onSelect(null)}\n              onKeyDown={(e) => handleKey(e, () => onSelect(null))}\n            >\n              <td>\n                <span className=\"font-semibold\" style={MONO}>{current.single_dose ? `${current.dose_mg} mg × 1` : `${current.dose_mg} mg q${current.interval_hours}h`}</span>\n                <span className=\"ml-1.5 text-[10px] font-semibold uppercase tracking-wider\" style={{ color: \"var(--color-dim)\" }}><LocalizedText text={current.label ?? \"current\"} /></span>\n              </td>\n              <td style={MONO}>{current.auc24.toFixed(0)}</td>\n              <td style={MONO}>{fmt(current.peak, 1)}</td>\n              <td style={MONO}>{fmt(current.trough, 1)}</td>\n              <td>\n                {current.single_dose ? (\n                  <LocalizedSpan className=\"vz-chip vz-chip--neutral\" title=\"Single dose, first 24 h — not graded against the steady-state target\" style={{ padding: \"0 5px\", fontSize: 10 }}><LocalizedText text=\"First 24 h\" /></LocalizedSpan>\n                ) : statusChip(current.auc24)}\n              </td>\n            </tr>\n          )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 102,
+      "line": 104,
       "tag": "span",
       "expression": "current.single_dose ? `${current.dose_mg} mg × 1` : `${current.dose_mg} mg q${current.interval_hours}h`",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 109,
+      "line": 111,
       "tag": "td",
       "expression": "current.single_dose ? (\n                  <LocalizedSpan className=\"vz-chip vz-chip--neutral\" title=\"Single dose, first 24 h — not graded against the steady-state target\" style={{ padding: \"0 5px\", fontSize: 10 }}><LocalizedText text=\"First 24 h\" /></LocalizedSpan>\n                ) : statusChip(current.auc24)",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 127,
+      "line": 129,
       "tag": "span",
       "expression": "o.dose_mg",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 127,
+      "line": 129,
       "tag": "span",
       "expression": "o.interval_hours",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 128,
+      "line": 130,
       "tag": "td",
       "expression": "o.is_recommended && (\n                    <LocalizedSpan className=\"block text-[9px] font-semibold\" style={{ color: \"var(--color-primary)\" }} title=\"Suggested regimen\"><LocalizedText text=\"Recommended\" /></LocalizedSpan>\n                  )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/RegimenComparisonTable.tsx",
-      "line": 146,
+      "line": 148,
       "tag": "div",
       "expression": "onApply && activeOption && (\n          <LocalizedButton\n            type=\"button\"\n            onClick={() => onApply(activeOption)}\n            className=\"shrink-0 rounded border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider\"\n            style={{ borderColor: \"#1f5e96\", color: \"#14232f\", background: \"#fff\", cursor: \"pointer\" }}\n            title=\"Copy the selected regimen into the dosing-history draft\"\n          ><LocalizedText text=\"Use as draft\" /></LocalizedButton>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
