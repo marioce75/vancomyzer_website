@@ -14,6 +14,46 @@ export interface ExistingRegimenExplainOutput {
   documentation_preview: { quick_summary: string; clinical_note: string };
 }
 
+/**
+ * The candidate rows, with the engine's own recommendation always among them.
+ *
+ * The candidate grid keeps one dose per interval (the one closest to the AUC
+ * midpoint), so a recommendation reached another way (the conservative
+ * same-interval dose kept under sparse evidence, for example 1500 mg q24h when
+ * the grid's q24h row is 1750 mg) had no row. The band then named the
+ * recommended regimen beside the CURRENT regimen's exposure, and the PDF
+ * printed that exposure under "Proposed regimen".
+ *
+ * The row added here is the recommendation as already decided and
+ * safety-checked: its dose, interval and infusion duration, and the exposure
+ * finalizeRecommendation predicted for it (predicted_auc24/peak/trough).
+ * Nothing is selected or re-ranked here and no existing row changes.
+ */
+function withRecommendedRow(recommendation: AdjustmentRecommendation): NonNullable<AdjustmentRecommendation["frequency_options"]> {
+  const rows = recommendation.frequency_options ?? [];
+  if (recommendation.adjustment_dosing_blocked || rows.some((o) => o.is_recommended)) return rows;
+  const dose_mg = Number.parseFloat(recommendation.recommended_dose);
+  const interval_hours = recommendation.recommended_interval_hours;
+  const { predicted_auc24: auc24, predicted_peak: peak, predicted_trough: trough } = recommendation;
+  if (
+    !Number.isFinite(dose_mg) || dose_mg <= 0 || !(interval_hours > 0) ||
+    auc24 === undefined || peak === undefined || trough === undefined ||
+    ![auc24, peak, trough].every(Number.isFinite)
+  ) {
+    return rows;
+  }
+  const row = {
+    dose_mg,
+    interval_hours,
+    auc24,
+    peak,
+    trough,
+    infusion_duration_hours: recommendation.recommended_infusion_duration_hours ?? computeSafeInfusionDurationHours(dose_mg).infusion_duration_hours,
+    is_recommended: true,
+  };
+  return [...rows, row].sort((a, b) => a.interval_hours - b.interval_hours || a.dose_mg - b.dose_mg);
+}
+
 export function buildCalculateResponse(
   recommendation_type: "existing_regimen",
   engineOutput: ExistingRegimenEngineOutput,
@@ -31,7 +71,7 @@ export function buildCalculateResponse(
   const isPulseDose = engineOutput.doses_given === 1;
   const pu = engineOutput.parameter_uncertainty;
   const band = pu && pu.method !== "unavailable" ? { draws: pu.draws, level: pu.level } : undefined;
-  const enrichedFrequencyOptions = (recommendation.frequency_options ?? []).map((opt) => {
+  const enrichedFrequencyOptions = withRecommendedRow(recommendation).map((opt) => {
     const optInput: ExplanationInput = {
       engineOutput: {
         ...engineOutput,

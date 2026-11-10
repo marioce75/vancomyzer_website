@@ -16943,5 +16943,220 @@
     "es": "Exposición proyectada en estado estacionario si este régimen continúa",
     "fr": "Exposition projetée à l’état d’équilibre si ce schéma est poursuivi",
     "pt-BR": "Exposição projetada em estado de equilíbrio se este esquema for mantido"
+  },
+  "Proposed regimen (same dose and interval, different infusion duration; not yet given)": {
+    "es": "Régimen propuesto (misma dosis e intervalo, distinta duración de perfusión; aún no administrado)",
+    "fr": "Schéma proposé (même dose et même intervalle, durée de perfusion différente ; pas encore administré)",
+    "pt-BR": "Esquema proposto (mesma dose e mesmo intervalo, duração de infusão diferente; ainda não administrado)"
+  },
+  "Change from the regimen entered": {
+    "es": "Cambio respecto al régimen introducido",
+    "fr": "Changement par rapport au schéma saisi",
+    "pt-BR": "Mudança em relação ao esquema informado"
+  },
+  "No change from the regimen entered: same dose, interval and infusion duration.": {
+    "es": "Sin cambios respecto al régimen introducido: misma dosis, mismo intervalo y misma duración de perfusión.",
+    "fr": "Aucun changement par rapport au schéma saisi : même dose, même intervalle et même durée de perfusion.",
+    "pt-BR": "Sem mudança em relação ao esquema informado: mesma dose, mesmo intervalo e mesma duração de infusão."
+  },
+  "dose and interval unchanged.": {
+    "es": "dosis e intervalo sin cambios.",
+    "fr": "dose et intervalle inchangés.",
+    "pt-BR": "dose e intervalo inalterados."
+  },
+  "infusion duration not stated for both regimens": {
+    "es": "duración de perfusión no indicada para ambos regímenes",
+    "fr": "durée de perfusion non indiquée pour les deux schémas",
+    "pt-BR": "duração de infusão não informada para os dois esquemas"
+  },
+  "infusion duration not stated for both regimens.": {
+    "es": "duración de perfusión no indicada para ambos regímenes.",
+    "fr": "durée de perfusion non indiquée pour les deux schémas.",
+    "pt-BR": "duração de infusão não informada para os dois esquemas."
+  },
+  "Recommendation withheld until the entered levels are reconciled.": {
+    "es": "Recomendación no emitida hasta que se concilien los niveles introducidos.",
+    "fr": "Recommandation non émise tant que les prélèvements saisis ne sont pas réconciliés.",
+    "pt-BR": "Recomendação retida até que os níveis informados sejam conciliados."
+  },
+  "Review required, recommendation withheld": {
+    "es": "Revisión necesaria, recomendación no emitida",
+    "fr": "Examen requis, recommandation non émise",
+    "pt-BR": "Revisão necessária, recomendação retida"
+  },
+  "Predicted AUC24 above 600 mg·h/L": {
+    "es": "AUC24 previsto superior a 600 mg·h/L",
+    "fr": "AUC24 prédit supérieur à 600 mg·h/L",
+    "pt-BR": "AUC24 prevista acima de 600 mg·h/L"
+  },
+  "AUC24 below target": {
+    "es": "AUC24 por debajo del objetivo",
+    "fr": "AUC24 inférieur à la cible",
+    "pt-BR": "AUC24 abaixo do alvo"
+  },
+  "Infusion note": {
+    "es": "Nota sobre la perfusión",
+    "fr": "Note sur la perfusion",
+    "pt-BR": "Nota sobre a infusão"
+  },
+  "Warnings and advisories": {
+    "es": "Advertencias y avisos",
+    "fr": "Avertissements et avis",
+    "pt-BR": "Advertências e avisos"
+  },
+  "Recommendation withheld.": {
+    "es": "Recomendación no emitida.",
+    "fr": "Recommandation non émise.",
+    "pt-BR": "Recomendação retida."
+  },
+  "No dose adjustment is presented until the entered levels are reconciled; see Warnings and advisories.": {
+    "es": "No se presenta ningún ajuste de dosis hasta que se concilien los niveles introducidos; véase Advertencias y avisos.",
+    "fr": "Aucun ajustement de dose n’est présenté tant que les prélèvements saisis ne sont pas réconciliés ; voir Avertissements et avis.",
+    "pt-BR": "Nenhum ajuste de dose é apresentado até que os níveis informados sejam conciliados; ver Advertências e avisos."
+  },
+  "No regimen is presented": {
+    "es": "No se presenta ningún régimen",
+    "fr": "Aucun schéma n’est présenté",
+    "pt-BR": "Nenhum esquema é apresentado"
+  },
+  "Recommendation withheld: no dose adjustment is presented until the entered levels are reconciled.": {
+    "es": "Recomendación no emitida: no se presenta ningún ajuste de dosis hasta que se concilien los niveles introducidos.",
+    "fr": "Recommandation non émise : aucun ajustement de dose n’est présenté tant que les prélèvements saisis ne sont pas réconciliés.",
+    "pt-BR": "Recomendação retida: nenhum ajuste de dose é apresentado até que os níveis informados sejam conciliados."
+  },
+  "Same-time entries are not independent samples and cannot separate clearance from volume; the fit averaged through the conflict.": {
+    "es": "Las entradas con la misma hora no son muestras independientes y no permiten separar el aclaramiento del volumen; el ajuste promedió los valores en conflicto.",
+    "fr": "Des saisies à la même heure ne sont pas des prélèvements indépendants et ne permettent pas de distinguer la clairance du volume ; l’ajustement a fait la moyenne des valeurs en conflit.",
+    "pt-BR": "Entradas no mesmo horário não são amostras independentes e não permitem separar a depuração do volume; o ajuste fez a média dos valores em conflito."
+  },
+  "Confirm whether these are assay replicates of one draw (enter one reconciled value) or a data-entry error (correct the time), then recalculate.": {
+    "es": "Confirme si se trata de réplicas analíticas de una misma extracción (introduzca un único valor conciliado) o de un error de introducción de datos (corrija la hora) y, a continuación, recalcule.",
+    "fr": "Confirmez s’il s’agit de réplicats analytiques d’un même prélèvement (saisissez une seule valeur réconciliée) ou d’une erreur de saisie (corrigez l’heure), puis recalculez.",
+    "pt-BR": "Confirme se são réplicas do ensaio de uma mesma coleta (informe um único valor conciliado) ou um erro de digitação (corrija o horário) e recalcule."
+  },
+  "No dose adjustment is presented until the observations are reconciled.": {
+    "es": "No se presenta ningún ajuste de dosis hasta que se concilien las observaciones.",
+    "fr": "Aucun ajustement de dose n’est présenté tant que les observations ne sont pas réconciliées.",
+    "pt-BR": "Nenhum ajuste de dose é apresentado até que as observações sejam conciliadas."
+  },
+  "Two levels were entered at the same time with discordant values": {
+    "es": "Se introdujeron dos niveles a la misma hora con valores discordantes",
+    "fr": "Deux prélèvements ont été saisis à la même heure avec des valeurs discordantes",
+    "pt-BR": "Dois níveis foram informados no mesmo horário com valores discordantes"
+  },
+  "Patient PK appears to differ substantially from the population prior.": {
+    "es": "La farmacocinética del paciente parece diferir sustancialmente de la distribución poblacional a priori.",
+    "fr": "La pharmacocinétique du patient semble différer sensiblement de la distribution a priori de population.",
+    "pt-BR": "A farmacocinética do paciente parece diferir substancialmente do modelo populacional a priori."
+  },
+  "Recommend a confirmatory level before adjusting the dose.": {
+    "es": "Se recomienda un nivel de confirmación antes de ajustar la dosis.",
+    "fr": "Un prélèvement de confirmation est recommandé avant d’ajuster la dose.",
+    "pt-BR": "Recomenda-se um nível de confirmação antes de ajustar a dose."
+  },
+  "Estimated clearance was raised to the lowest physiologically plausible non-renal value.": {
+    "es": "El aclaramiento estimado se elevó al valor no renal más bajo fisiológicamente plausible.",
+    "fr": "La clairance estimée a été relevée à la plus faible valeur non rénale physiologiquement plausible.",
+    "pt-BR": "A depuração estimada foi elevada ao menor valor não renal fisiologicamente plausível."
+  },
+  "At this serum creatinine the population model extrapolates below what an anuric adult still clears, so the prior cannot be trusted here — rely on measured levels, and repeat one before adjusting the dose.": {
+    "es": "Con esta creatinina sérica, el modelo poblacional extrapola por debajo de lo que un adulto anúrico todavía elimina, por lo que aquí no se puede confiar en la distribución a priori: apóyese en los niveles medidos y repita uno antes de ajustar la dosis.",
+    "fr": "À cette créatinine sérique, le modèle de population extrapole en dessous de ce qu’un adulte anurique élimine encore ; la distribution a priori n’est donc pas fiable ici : appuyez-vous sur les prélèvements mesurés et répétez-en un avant d’ajuster la dose.",
+    "pt-BR": "Com esta creatinina sérica, o modelo populacional extrapola abaixo do que um adulto anúrico ainda elimina, portanto o modelo a priori não é confiável aqui: baseie-se nos níveis medidos e repita um antes de ajustar a dose."
+  },
+  "Estimated clearance was capped: the fit implied a vancomycin clearance more than twice this patient's estimated creatinine clearance, which is not plausible for a renally cleared drug.": {
+    "es": "El aclaramiento estimado se limitó: el ajuste implicaba un aclaramiento de vancomicina superior al doble del aclaramiento de creatinina estimado de este paciente, lo que no es plausible para un fármaco de eliminación renal.",
+    "fr": "La clairance estimée a été plafonnée : l’ajustement impliquait une clairance de la vancomycine supérieure au double de la clairance de la créatinine estimée de ce patient, ce qui n’est pas plausible pour un médicament à élimination rénale.",
+    "pt-BR": "A depuração estimada foi limitada: o ajuste implicava uma depuração de vancomicina superior ao dobro da depuração de creatinina estimada deste paciente, o que não é plausível para um fármaco de eliminação renal."
+  },
+  "Check that the level was drawn from the correct lumen, after the infusion finished, and correctly labelled — repeat it before escalating the dose.": {
+    "es": "Compruebe que la muestra se extrajo de la luz correcta, después de finalizar la perfusión, y que se etiquetó correctamente; repítala antes de aumentar la dosis.",
+    "fr": "Vérifiez que le prélèvement a été effectué sur la bonne lumière, après la fin de la perfusion, et correctement étiqueté ; répétez-le avant d’augmenter la dose.",
+    "pt-BR": "Verifique se o nível foi coletado do lúmen correto, após o término da infusão, e corretamente identificado; repita-o antes de aumentar a dose."
+  },
+  "If dosing history is incomplete or irregular, use the actual-history mode.": {
+    "es": "Si el historial de dosis es incompleto o irregular, utilice el modo de historial real.",
+    "fr": "Si l’historique des doses est incomplet ou irrégulier, utilisez le mode d’historique réel.",
+    "pt-BR": "Se o histórico de doses estiver incompleto ou irregular, use o modo de histórico real."
+  },
+  "Common nursing-handoff variability.": {
+    "es": "Variabilidad habitual en los relevos de enfermería.",
+    "fr": "Variabilité courante lors des transmissions infirmières.",
+    "pt-BR": "Variabilidade comum nas passagens de plantão da enfermagem."
+  },
+  "Treated as an extended trough; the posterior fit will rely heavily on the population prior.": {
+    "es": "Se trata como un valle prolongado; el ajuste a posteriori dependerá en gran medida de la distribución poblacional a priori.",
+    "fr": "Traité comme une concentration résiduelle prolongée ; l’ajustement a posteriori reposera largement sur la distribution a priori de population.",
+    "pt-BR": "Tratado como um vale prolongado; o ajuste a posteriori dependerá fortemente do modelo populacional a priori."
+  },
+  "Verify the dose times if this is unexpected.": {
+    "es": "Verifique las horas de las dosis si esto no era lo esperado.",
+    "fr": "Vérifiez les heures des doses si cela est inattendu.",
+    "pt-BR": "Verifique os horários das doses se isso for inesperado."
+  },
+  "Potential for elevated nephrotoxicity risk.": {
+    "es": "Posible aumento del riesgo de nefrotoxicidad.",
+    "fr": "Risque potentiel accru de néphrotoxicité.",
+    "pt-BR": "Potencial risco elevado de nefrotoxicidade."
+  },
+  "Proceed with extreme caution.": {
+    "es": "Proceda con extrema cautela.",
+    "fr": "Procédez avec une extrême prudence.",
+    "pt-BR": "Proceda com extrema cautela."
+  },
+  "Clinical review is required — consider more frequent dosing, higher doses, or continuous infusion.": {
+    "es": "Se requiere revisión clínica: considere mayor frecuencia de administración, dosis superiores o perfusión continua.",
+    "fr": "Un examen clinique est requis : envisagez des administrations plus fréquentes, des doses plus élevées ou une perfusion continue.",
+    "pt-BR": "É necessária uma revisão clínica — considere doses mais frequentes, doses mais elevadas ou infusão contínua."
+  },
+  "Measured (entered history)": {
+    "es": "Medido (historial introducido)",
+    "fr": "Mesuré (historique saisi)",
+    "pt-BR": "Medida (histórico informado)"
+  },
+  "Measured (on the dotted entered-history curve, not on the projection)": {
+    "es": "Medido (en la curva punteada del historial introducido, no en la proyección)",
+    "fr": "Mesuré (sur la courbe en pointillé de l’historique saisi, pas sur la projection)",
+    "pt-BR": "Medida (na curva pontilhada do histórico informado, não na projeção)"
+  },
+  "Measured (not plotted)": {
+    "es": "Medido (no representado)",
+    "fr": "Mesuré (non tracé)",
+    "pt-BR": "Medida (não plotada)"
+  },
+  "The solid curve is a projection of a regimen not yet given. Measured levels were drawn under the entered history and are plotted on its dotted curve at their own times, not on the projection.": {
+    "es": "La curva continua es una proyección de un régimen aún no administrado. Los niveles medidos se extrajeron bajo el historial introducido y se representan en su curva punteada en sus propios tiempos, no en la proyección.",
+    "fr": "La courbe pleine est une projection d’un schéma pas encore administré. Les prélèvements mesurés ont été réalisés sous l’historique saisi et sont tracés sur sa courbe en pointillé à leurs propres temps, pas sur la projection.",
+    "pt-BR": "A curva contínua é uma projeção de um esquema ainda não administrado. Os níveis medidos foram coletados sob o histórico informado e são plotados em sua curva pontilhada nos seus próprios tempos, não na projeção."
+  },
+  "The solid curve is a projection of a regimen not yet given. Measured levels were drawn under the entered history and are not plotted on the projection.": {
+    "es": "La curva continua es una proyección de un régimen aún no administrado. Los niveles medidos se extrajeron bajo el historial introducido y no se representan en la proyección.",
+    "fr": "La courbe pleine est une projection d’un schéma pas encore administré. Les prélèvements mesurés ont été réalisés sous l’historique saisi et ne sont pas tracés sur la projection.",
+    "pt-BR": "A curva contínua é uma projeção de um esquema ainda não administrado. Os níveis medidos foram coletados sob o histórico informado e não são plotados na projeção."
+  },
+  "Levels measured under": {
+    "es": "Niveles medidos bajo",
+    "fr": "Prélèvements mesurés sous",
+    "pt-BR": "Níveis medidos sob"
+  },
+  "Not available": {
+    "es": "No disponible",
+    "fr": "Non disponible",
+    "pt-BR": "Não disponível"
+  },
+  "Level drawn after that dose.": {
+    "es": "Nivel extraído después de esa dosis.",
+    "fr": "Prélèvement effectué après cette dose.",
+    "pt-BR": "Nível coletado após essa dose."
+  },
+  "Level drawn after the loading dose.": {
+    "es": "Nivel extraído después de la dosis de carga.",
+    "fr": "Prélèvement effectué après la dose de charge.",
+    "pt-BR": "Nível coletado após a dose de ataque."
+  },
+  "Fit quality advisory: Estimated clearance was capped: the fit implied a vancomycin clearance more than twice this patient's estimated creatinine clearance, which is not plausible for a renally cleared drug.": {
+    "es": "Aviso sobre la calidad del ajuste: El aclaramiento estimado se limitó: el ajuste implicaba un aclaramiento de vancomicina superior al doble del aclaramiento de creatinina estimado de este paciente, lo que no es plausible para un fármaco de eliminación renal.",
+    "fr": "Avis sur la qualité de l’ajustement : La clairance estimée a été plafonnée : l’ajustement impliquait une clairance de la vancomycine supérieure au double de la clairance de la créatinine estimée de ce patient, ce qui n’est pas plausible pour un médicament à élimination rénale.",
+    "pt-BR": "Consultoria de qualidade adequada: A depuração estimada foi limitada: o ajuste implicava uma depuração de vancomicina superior ao dobro da depuração de creatinina estimada deste paciente, o que não é plausível para um fármaco de eliminação renal."
   }
 }

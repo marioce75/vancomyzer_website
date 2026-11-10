@@ -7,6 +7,7 @@ import { LocalizedTable, LocalizedTh, LocalizedSpan, LocalizedButton } from "@/l
 import type { CalculateResponse, FrequencyOption } from "@/types/calculator";
 import { aucRangeLabel } from "@/components/calculator/DoseRecommendationCard";
 import { fmt } from "@/lib/formatNumber";
+import { infusionMinutes, sameInfusionDuration, sameRegimen } from "@/lib/pk/regimenIdentity";
 
 /**
  * Compact, selectable comparison of the engine's candidate regimens.
@@ -24,6 +25,8 @@ import { fmt } from "@/lib/formatNumber";
 export interface CurrentRegimenRow {
   dose_mg: number;
   interval_hours: number;
+  /** Infusion duration as entered (hours); part of the regimen's identity. */
+  infusion_duration_hours?: number;
   auc24: number;
   peak: number;
   trough: number;
@@ -71,9 +74,22 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
   const rows = (options ?? []).filter((o) => o.dose_mg >= 500 && o.auc24 >= 400 && o.auc24 <= 600);
   if (rows.length === 0 && !current) return null;
 
-  const isActive = (o: FrequencyOption) =>
-    activeOption != null && activeOption.dose_mg === o.dose_mg && activeOption.interval_hours === o.interval_hours;
+  // A row is the active one only when dose, interval AND infusion duration
+  // match (regimenIdentity.ts).
+  const isActive = (o: FrequencyOption) => activeOption != null && sameRegimen(activeOption, o);
   const currentActive = current != null && activeOption == null;
+  // A candidate with the entered dose and interval but another infusion
+  // duration is not the regimen as entered. Both rows then print their
+  // infusion duration, so "1000 mg q12h" never names two different regimens.
+  const sameDoseAndInterval = (o: FrequencyOption) =>
+    current != null && !current.single_dose && o.dose_mg === current.dose_mg && o.interval_hours === current.interval_hours;
+  const infusionDiffers = (o: FrequencyOption) =>
+    sameDoseAndInterval(o) && !sameInfusionDuration(o.infusion_duration_hours, current?.infusion_duration_hours);
+  const currentNeedsInfusion = rows.some(infusionDiffers);
+  const infusionLabel = (hours: number | undefined) => {
+    const m = infusionMinutes(hours);
+    return m === undefined ? null : `over ${m} min`;
+  };
 
   const handleKey = (e: React.KeyboardEvent, fn: () => void) => {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fn(); }
@@ -103,6 +119,9 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
               <td>
                 <span className="font-semibold" style={MONO}>{current.single_dose ? `${current.dose_mg} mg × 1` : `${current.dose_mg} mg q${current.interval_hours}h`}</span>
                 <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--color-dim)" }}><LocalizedText text={current.label ?? "current"} /></span>
+                {currentNeedsInfusion && infusionLabel(current.infusion_duration_hours) && (
+                  <span className="block text-[9px]" style={{ color: "var(--color-dim)" }} data-testid="current-infusion"><LocalizedText text={infusionLabel(current.infusion_duration_hours)!} /></span>
+                )}
               </td>
               <td style={MONO}>{current.auc24.toFixed(0)}</td>
               <td style={MONO}>{fmt(current.peak, 1)}</td>
@@ -118,7 +137,7 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
             const active = isActive(o);
             return (
               <tr
-                key={`${o.dose_mg}-${o.interval_hours}`}
+                key={`${o.dose_mg}-${o.interval_hours}-${o.infusion_duration_hours}`}
                 role="radio"
                 aria-checked={active}
                 tabIndex={0}
@@ -129,6 +148,9 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
                   <span className="font-semibold" style={MONO}>{o.dose_mg} mg q{o.interval_hours}h</span>
                   {o.is_recommended && (
                     <LocalizedSpan className="block text-[9px] font-semibold" style={{ color: "var(--color-primary)" }} title="Suggested regimen"><LocalizedText text="Recommended" /></LocalizedSpan>
+                  )}
+                  {infusionDiffers(o) && infusionLabel(o.infusion_duration_hours) && (
+                    <span className="block text-[9px]" style={{ color: "var(--color-dim)" }} data-testid="candidate-infusion"><LocalizedText text={`${infusionLabel(o.infusion_duration_hours)!} (infusion duration differs from the regimen entered)`} /></span>
                   )}
 
                 </td>
@@ -161,11 +183,13 @@ export default function RegimenComparisonTable({ options, activeOption, onSelect
 
 /** Review-needed history is the effective selection before any row interaction. */
 export function shouldViewCurrentRegimen(
-  result: Pick<CalculateResponse, "recommendation_type" | "empiric_dosing_blocked" | "adjustment_dosing_blocked">,
+  result: Pick<CalculateResponse, "recommendation_type" | "empiric_dosing_blocked" | "adjustment_dosing_blocked" | "review_hold">,
   requested: boolean,
 ) {
+  // A withheld recommendation (review hold) has no candidate to view: the
+  // figures on screen are the history as entered and must be labelled so.
   return result.recommendation_type === "existing_regimen" &&
-    (requested || (!result.empiric_dosing_blocked && result.adjustment_dosing_blocked?.review_required === true));
+    (requested || result.review_hold != null || (!result.empiric_dosing_blocked && result.adjustment_dosing_blocked?.review_required === true));
 }
 
 /** Shared workspace boundary: review-needed may display history, never candidates. */

@@ -224,6 +224,12 @@ export interface AdjustmentRecommendation {
 export interface ExplanationInput {
   engineOutput: ExistingRegimenEngineOutput;
   recommendation: AdjustmentRecommendation;
+  /**
+   * Set when the actionable adjustment is withheld until the clinician
+   * reconciles the observations (runExistingRegimenPipeline). The explanation
+   * text must then state the hold and must not state a recommendation.
+   */
+  review_hold?: { message: string };
 }
 
 // ... more types

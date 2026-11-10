@@ -9,6 +9,7 @@ import { CalculationDetails, FrequencyOption, AucRangeStatus, ArcAdvisory } from
 import { fmt } from "@/lib/formatNumber";
 import { computeSafeInfusionDurationMinutes } from "@/lib/pk/recommend/infusionSafety";
 import { singleDoseBannerCaption, type SingleDoseView } from "./curveDescription";
+import { sameRegimen } from "@/lib/pk/regimenIdentity";
 
 interface DoseRecommendationCardProps {
   recommended_dose?: string | null;
@@ -420,8 +421,9 @@ export default function DoseRecommendationCard({
   const [activeIdx, setActiveIdx] = useState<number>(() => {
     if (!recommended_dose || !recommended_interval_hours) return 0;
     const recDose = Number.parseFloat(recommended_dose);
+    // The recommended row: dose, interval and infusion duration (regimenIdentity.ts).
     const idx = options.findIndex(
-      (o) => o.dose_mg === recDose && o.interval_hours === recommended_interval_hours
+      (o) => sameRegimen(o, { dose_mg: recDose, interval_hours: recommended_interval_hours, infusion_duration_hours: recommended_infusion_duration_hours ?? o.infusion_duration_hours })
     );
     return idx >= 0 ? idx : 0;
   });

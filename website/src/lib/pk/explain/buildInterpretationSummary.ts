@@ -1,4 +1,5 @@
 import type { ExplanationInput } from "../types";
+import { infusionChangeText } from "../regimenIdentity";
 
 function buildRegimenChangeExplanation(input: ExplanationInput): string {
   const { engineOutput, recommendation } = input;
@@ -14,6 +15,15 @@ function buildRegimenChangeExplanation(input: ExplanationInput): string {
   if (recommendedInterval < currentInterval) changeParts.push("shorter interval");
 
   if (changeParts.length === 0) {
+    // Same dose and interval is the same regimen only when the infusion
+    // duration is also unchanged (regimenIdentity.ts). Wording only.
+    const infusionChange = infusionChangeText(
+      { dose_mg: currentDose, interval_hours: currentInterval, infusion_duration_hours: engineOutput.current_regimen_infusion_hours },
+      { dose_mg: recommendedDose, interval_hours: recommendedInterval, infusion_duration_hours: recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours },
+    );
+    if (infusionChange) {
+      return `Change rationale: dose and interval are unchanged; ${infusionChange}.`;
+    }
     return "Recommendation remains on the same practical regimen step after bounded review of exposure and timing semantics.";
   }
 
@@ -62,6 +72,22 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
       `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L. ` +
       `Two-compartment model (SCr ${scr} mg/dL). ` +
       `${blocked.safety_message} ${blocked.recommended_action} ` +
+      `Fit quality ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty ${posterior_fit?.uncertainty_label ?? "population_only"}. ` +
+      `${data_quality_note} Intended to support review, not replace clinician judgment.`
+    );
+  }
+
+  // Recommendation withheld for review (discordant same-time levels). The
+  // adjustment was computed before the hold and is withdrawn from the response,
+  // so this text must not state it either: report what was entered and
+  // estimated, then the hold and its reason, and stop.
+  const hold = input.review_hold;
+  if (hold) {
+    return (
+      (isPulseDose
+        ? `Single-dose analysis: ${current_regimen_dose_mg} mg, one dose only. ${estimateType}: first-dose AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L (SCr ${scr} mg/dL). `
+        : `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. ${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L. Two-compartment model (SCr ${scr} mg/dL). `) +
+      `Recommendation withheld. ${hold.message} ` +
       `Fit quality ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty ${posterior_fit?.uncertainty_label ?? "population_only"}. ` +
       `${data_quality_note} Intended to support review, not replace clinician judgment.`
     );

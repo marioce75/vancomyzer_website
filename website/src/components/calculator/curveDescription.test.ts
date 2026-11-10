@@ -4,7 +4,7 @@
  */
 import test from "node:test";
 import assert from "node:assert/strict";
-import { describeSelectedCurve, singleDoseBannerCaption, singleDoseBannerCaptionText, singleDoseView, type CurveSelection } from "./curveDescription";
+import { describeMeasuredLevels, describeSelectedCurve, MEASURED_REFERENCE_PREFIX, singleDoseBannerCaption, singleDoseBannerCaptionText, singleDoseView, type CurveSelection } from "./curveDescription";
 
 const loadOnly: CurveSelection = {
   singleDose: true,
@@ -116,4 +116,62 @@ test("banner view: no regimen proposed means 'none' even when the 'as entered' r
   assert.equal(singleDoseView({ viewingCurrent: false, activeOption: null, regimenProposed: true }), "none");
   // Review-required refusal: the workspace shows the entered row by itself; there is no candidate to select.
   assert.equal(singleDoseView({ viewingCurrent: true, activeOption: opt, regimenProposed: false }), "none");
+});
+
+// ── Measured levels vs. projected candidates (second review, item 5) ────────
+
+const enteredLabel = "current regimen 1000 mg q12h, from the first dose";
+const oneLevel = { levels: [{ time_hours: 71, concentration: 9 }], hoursAfterLastDose: [11], enteredHistoryLabel: enteredLabel, dosesGiven: 6 };
+
+test("the entered-history curve carries its measured levels on the solid line, with their time anchor", () => {
+  const d = describeMeasuredLevels({ ...oneLevel, solidIsEnteredHistory: true, hasEnteredHistoryCurve: true })!;
+  assert.equal(d.placement, "solid");
+  assert.equal(d.legend, "Measured (entered history)");
+  assert.equal(d.referenceLabel, null);
+  assert.equal(d.note, null);
+  assert.deepEqual(d.anchors, ["Level 1: 9 mg/L, 11 h after the start of dose 6 (T+71 h on this curve)"]);
+});
+
+test("a candidate projection never carries the measured levels: they move to a dotted entered-history curve", () => {
+  const d = describeMeasuredLevels({ ...oneLevel, solidIsEnteredHistory: false, hasEnteredHistoryCurve: true })!;
+  assert.equal(d.placement, "reference");
+  assert.equal(d.legend, "Measured (on the dotted entered-history curve, not on the projection)");
+  // The legend prints this after "Levels measured under:".
+  assert.equal(d.referenceLabel, enteredLabel);
+  assert.equal(MEASURED_REFERENCE_PREFIX, "Levels measured under");
+  assert.match(d.note!, /^The solid curve is a projection of a regimen not yet given\. Measured levels were drawn under the entered history and are plotted on its dotted curve at their own times, not on the projection\.$/);
+  // The anchor is the level's own time on the entered history's axis, and says which curve that is.
+  assert.deepEqual(d.anchors, ["Level 1: 9 mg/L, 11 h after the start of dose 6 (T+71 h on the dotted entered-history curve)"]);
+});
+
+test("without an entered-history curve the levels are not plotted on a projection at all, and the legend says so", () => {
+  const d = describeMeasuredLevels({ ...oneLevel, solidIsEnteredHistory: false, hasEnteredHistoryCurve: false })!;
+  assert.equal(d.placement, "hidden");
+  assert.equal(d.legend, "Measured (not plotted)");
+  assert.match(d.note!, /are not plotted on the projection\.$/);
+  assert.deepEqual(d.anchors, ["Level 1: 9 mg/L, 11 h after the start of dose 6"]);
+});
+
+test("a level after one dose is anchored to the dose given; several levels each keep their own anchor", () => {
+  const single = describeMeasuredLevels({ levels: [{ time_hours: 6, concentration: 22 }], hoursAfterLastDose: [6], solidIsEnteredHistory: false, hasEnteredHistoryCurve: true, enteredHistoryLabel: "loading dose 2000 mg × 1, no further doses", dosesGiven: 1 })!;
+  assert.deepEqual(single.anchors, ["Level 1: 22 mg/L, 6 h after the start of the dose given (T+6 h on the dotted entered-history curve)"]);
+  assert.equal(single.referenceLabel, "loading dose 2000 mg × 1, no further doses");
+  const two = describeMeasuredLevels({ levels: [{ time_hours: 26, concentration: 30 }, { time_hours: 35.5, concentration: 12 }], hoursAfterLastDose: [2, 11.5], solidIsEnteredHistory: true, hasEnteredHistoryCurve: true, enteredHistoryLabel: enteredLabel, dosesGiven: 3 })!;
+  assert.deepEqual(two.anchors, [
+    "Level 1: 30 mg/L, 2 h after the start of dose 3 (T+26 h on this curve)",
+    "Level 2: 12 mg/L, 11.5 h after the start of dose 3 (T+35.5 h on this curve)",
+  ]);
+});
+
+test("no measured level, nothing to describe", () => {
+  assert.equal(describeMeasuredLevels({ levels: [], hoursAfterLastDose: [], solidIsEnteredHistory: false, hasEnteredHistoryCurve: true, enteredHistoryLabel: enteredLabel }), null);
+});
+
+test("stale state: without the entered time after the dose, the anchor carries only what the response holds", () => {
+  // While inputs are being edited the form's hours and dose count no longer
+  // belong to the result on screen; the workspace then passes neither.
+  const d = describeMeasuredLevels({ levels: [{ time_hours: 71, concentration: 9 }], hoursAfterLastDose: [], solidIsEnteredHistory: true, hasEnteredHistoryCurve: true, enteredHistoryLabel: enteredLabel })!;
+  assert.deepEqual(d.anchors, ["Level 1: 9 mg/L (T+71 h on this curve)"]);
+  const hidden = describeMeasuredLevels({ levels: [{ time_hours: 71, concentration: 9 }], hoursAfterLastDose: [undefined], solidIsEnteredHistory: false, hasEnteredHistoryCurve: false, enteredHistoryLabel: enteredLabel })!;
+  assert.deepEqual(hidden.anchors, ["Level 1: 9 mg/L"]);
 });

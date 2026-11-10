@@ -129,7 +129,7 @@ test("multi-dose history: current regimen as entered vs. proposed adjustment, wi
   };
   const s = buildExposureSummary({ regimen, response, selectedOption: null, singleDoseStatus: "given", levels: level });
   assert.equal(s.given.title, "Current regimen as entered");
-  assert.equal(s.given.regimen, "750 mg every 12 h after a 2000 mg loading dose (2 doses given, including the loading dose)");
+  assert.equal(s.given.regimen, "750 mg every 12 h infused over 75 minutes after a 2000 mg loading dose (2 doses given, including the loading dose)");
   assert.equal(s.given.period, "steady-state projection if this regimen is continued unchanged");
   assert.equal(s.given.atLastDose, "Modelled exposure at dose 2: peak 31.5 mg/L; trough 12.3 mg/L; AUC over that interval 389 mg·h/L.");
   assert.equal(s.proposed?.title, "Proposed adjustment (not yet given)");
@@ -143,9 +143,18 @@ test("multi-dose history: current regimen as entered vs. proposed adjustment, wi
   // The same regimen chosen as a candidate reads the same way.
   const sameSelected = buildExposureSummary({ regimen: { ...regimen, dose_mg: 1000, infusion_duration_hours: 1.5 }, response, selectedOption: response.frequency_options[0], singleDoseStatus: "given", levels: level });
   assert.equal(sameSelected.proposed?.title, "Proposed regimen (continue as entered)");
+  assert.equal(sameSelected.proposed?.changeNote, "No change from the regimen entered: same dose, interval and infusion duration.");
+  // Same dose and interval over a different infusion duration is NOT "continue as entered".
+  const infusionOnly = buildExposureSummary({ regimen: { ...regimen, dose_mg: 1000, infusion_duration_hours: 1 }, response, selectedOption: null, singleDoseStatus: "given", levels: level });
+  assert.equal(infusionOnly.proposed?.change, "infusion_only");
+  assert.equal(infusionOnly.proposed?.title, "Proposed regimen (same dose and interval, different infusion duration; not yet given)");
+  assert.equal(infusionOnly.proposed?.period, "projected steady-state exposure if this regimen is given");
+  assert.equal(infusionOnly.proposed?.changeNote, "Change from the regimen entered: infusion duration from 60 to 90 minutes; dose and interval unchanged.");
   const note = composeClinicalNote("Vancomycin existing regimen evaluation (Posterior-updated estimate).\nAUC24: 410.2 mg·h/L; peak 27.1 mg/L; trough 8.3 mg/L.\nRecommendation: 1000 every 12 h infused over 90 minutes\nChange summary: dose increase from 750 mg to 1000 mg.\nSCr: 1 mg/dL.", s);
-  assert.ok(note.includes("Current regimen as entered: 750 mg every 12 h after a 2000 mg loading dose (2 doses given, including the loading dose). Steady-state projection if this regimen is continued unchanged: AUC24 410.2 mg·h/L; peak 27.1 mg/L; trough 8.3 mg/L. Modelled exposure at dose 2: peak 31.5 mg/L; trough 12.3 mg/L; AUC over that interval 389 mg·h/L."));
-  assert.ok(note.includes("Change summary: dose increase from 750 mg to 1000 mg."));
+  assert.ok(note.includes("Current regimen as entered: 750 mg every 12 h infused over 75 minutes after a 2000 mg loading dose (2 doses given, including the loading dose). Steady-state projection if this regimen is continued unchanged: AUC24 410.2 mg·h/L; peak 27.1 mg/L; trough 8.3 mg/L. Modelled exposure at dose 2: peak 31.5 mg/L; trough 12.3 mg/L; AUC over that interval 389 mg·h/L."));
+  // The change is stated once, by the note itself, with all three attributes; the engine's own summary line is replaced.
+  assert.ok(note.includes("Change from the regimen entered: dose from 750 mg to 1000 mg; interval unchanged at 12 h; infusion duration from 75 to 90 minutes."));
+  assert.ok(!note.includes("Change summary:"));
 });
 
 test("the caution follows the on-screen rule: existing regimen, review level caution, exactly one level", () => {
@@ -182,6 +191,6 @@ test("real engine output: every figure in the note is copied from the response",
   assert.ok(note.includes(`${rec.dose_mg} mg every ${rec.interval_hours} h`));
   assert.ok(note.includes(`Dosing history entered: 2,000 mg loading dose at 0 h → 750 mg at 12 h.`));
   assert.ok(note.includes("One measured level:"), "one entered level carries the caution");
-  const engineLines = rec.clinical_note!.split("\n").filter((l) => !/^(AUC24:|Recommendation:|Vancomycin)/.test(l));
+  const engineLines = rec.clinical_note!.split("\n").filter((l) => !/^(AUC24:|Recommendation:|Change summary:|Vancomycin)/.test(l));
   for (const l of engineLines) assert.ok(note.includes(l), `engine line kept: ${l.slice(0, 40)}`);
 });

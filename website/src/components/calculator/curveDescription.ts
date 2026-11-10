@@ -114,3 +114,91 @@ export function singleDoseBannerCaption(
 export function singleDoseBannerCaptionText(caption: SingleDoseBannerCaption): string {
   return [...caption.before, `${caption.curve}.`, ...caption.after].join(" ");
 }
+
+/**
+ * Where the measured levels are drawn, and how they are labelled.
+ *
+ * A measured level is an observation made under the dosing history as entered.
+ * Its place on the time axis is counted from that history's own doses (the
+ * response's measured_levels[].time_hours). It belongs on the fitted curve of
+ * that history and nowhere else: drawn on a candidate regimen's projection it
+ * would sit at a time that means nothing on that curve (a level taken 11 h
+ * after dose 6 of q12h lands 5 h into a q6h candidate's interval) and would
+ * read as a point the projection was fitted to.
+ *
+ * Display only. Nothing here touches the PK calculation.
+ */
+export interface MeasuredLevelsInput {
+  /** The response's measured levels: value and absolute time on the entered history's axis. */
+  levels: { time_hours: number; concentration: number }[];
+  /** Hours after the start of the last dose, as entered (same order as `levels`). */
+  hoursAfterLastDose: (number | undefined)[];
+  /** The solid curve is the entered history itself (the "as entered" row, or no candidate). */
+  solidIsEnteredHistory: boolean;
+  /** The entered history's own curve is available to carry the markers. */
+  hasEnteredHistoryCurve: boolean;
+  /** Legend phrase of the entered history's curve (describeSelectedCurve with the "as entered" row). */
+  enteredHistoryLabel: string;
+  /** Doses given before the level (undefined when not stated). */
+  dosesGiven?: number;
+}
+
+export interface MeasuredLevelsDisplay {
+  /**
+   * "solid": markers on the solid curve, which is the entered history.
+   * "reference": the solid curve is a projection of a regimen not given; the
+   * markers sit on a separate dotted curve of the entered history.
+   * "hidden": no entered-history curve is available, so no marker is drawn.
+   */
+  placement: "solid" | "reference" | "hidden";
+  /** Legend label for the markers. */
+  legend: string;
+  /**
+   * Legend phrase of the dotted entered-history curve ("reference" only): the
+   * same phrase the legend uses when that history is the solid curve. The
+   * legend prints it after MEASURED_REFERENCE_PREFIX.
+   */
+  referenceLabel: string | null;
+  /** Sentence that separates the observations from the projection (null when the solid curve is the history). */
+  note: string | null;
+  /** One line per level: value, time after the dose it followed, and where that is on the axis. */
+  anchors: string[];
+}
+
+/** Legend prefix of the dotted entered-history curve: "Levels measured under: <that history>". */
+export const MEASURED_REFERENCE_PREFIX = "Levels measured under";
+
+export function describeMeasuredLevels(s: MeasuredLevelsInput): MeasuredLevelsDisplay | null {
+  if (s.levels.length === 0) return null;
+  const placement: MeasuredLevelsDisplay["placement"] = s.solidIsEnteredHistory ? "solid" : s.hasEnteredHistoryCurve ? "reference" : "hidden";
+  const dose = s.dosesGiven !== undefined && Number.isFinite(s.dosesGiven) && s.dosesGiven >= 1
+    ? (s.dosesGiven === 1 ? "the dose given" : `dose ${s.dosesGiven}`)
+    : "the last dose";
+  const axis = placement === "hidden" ? null : placement === "solid" ? "on this curve" : "on the dotted entered-history curve";
+  const anchors = s.levels.map((l, i) => {
+    const after = s.hoursAfterLastDose[i];
+    // The time after the dose is stated only when it is known for this level;
+    // the value and the place on the axis always come from the response.
+    const when = after !== undefined && Number.isFinite(after) ? `, ${after} h after the start of ${dose}` : "";
+    return `Level ${i + 1}: ${l.concentration} mg/L${when}${axis ? ` (T+${Number(l.time_hours.toFixed(2))} h ${axis})` : ""}`;
+  });
+  if (placement === "solid") {
+    return { placement, legend: "Measured (entered history)", referenceLabel: null, note: null, anchors };
+  }
+  if (placement === "reference") {
+    return {
+      placement,
+      legend: "Measured (on the dotted entered-history curve, not on the projection)",
+      referenceLabel: s.enteredHistoryLabel,
+      note: "The solid curve is a projection of a regimen not yet given. Measured levels were drawn under the entered history and are plotted on its dotted curve at their own times, not on the projection.",
+      anchors,
+    };
+  }
+  return {
+    placement,
+    legend: "Measured (not plotted)",
+    referenceLabel: null,
+    note: "The solid curve is a projection of a regimen not yet given. Measured levels were drawn under the entered history and are not plotted on the projection.",
+    anchors,
+  };
+}
