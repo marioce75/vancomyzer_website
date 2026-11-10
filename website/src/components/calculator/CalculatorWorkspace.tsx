@@ -1159,6 +1159,11 @@ export default function CalculatorWorkspace() {
   // when it is the entered history, otherwise on a separate dotted curve of
   // the entered history, never on a candidate's projection (curveDescription.ts).
   const solidIsEnteredHistory = activeIsCurrent || !activeOption?.curve;
+  // A candidate with the same dose, interval and infusion duration as the
+  // regimen entered is that regimen continued, not a regimen "not yet given".
+  // The classification is the one the note and the PDF print (clinicalNote.ts).
+  const projectionIsEnteredRegimen =
+    !solidIsEnteredHistory && visibleResult != null && composeNote(visibleResult).summary?.proposed?.change === "none";
   const measuredDisplay = displayResult && displayResult.recommendation_type === "existing_regimen"
     ? describeMeasuredLevels({
         levels: displayResult.measured_levels ?? [],
@@ -1180,6 +1185,7 @@ export default function CalculatorWorkspace() {
           hasEngineRecommendedCurve: false,
         }),
         dosesGiven: resultObscured ? undefined : regimen.doses_given,
+        projectionIsEnteredRegimen,
       })
     : null;
 

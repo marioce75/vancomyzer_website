@@ -9,6 +9,10 @@
  *     and no regimen to give;
  *  3. infusion duration is part of regimen identity;
  *  4. every warning shown on screen is in the note and the PDF.
+ *
+ * Regression from the third review:
+ *  5. the regimen box and the exposure heading say "continue as entered" for a
+ *     proposal that is the regimen entered, and "not yet given" for any other.
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -42,9 +46,10 @@ function report(patient: typeof std, regimen: CalculateRequestRegimen, levels: L
 }
 /** The text of the report from one section title up to the title that follows it in the layout. */
 const NEXT_SECTION: Record<string, string[]> = {
-  "Warnings and advisories": ["One measured level: provisional estimate", "Proposed regimen (not yet given)", "Current regimen (as entered)", "Loading dose given (single dose)", "Single dose given"],
+  "Warnings and advisories": ["One measured level: provisional estimate", "Proposed regimen (not yet given)", "Proposed regimen (continue as entered)", "Current regimen (as entered)", "Loading dose given (single dose)", "Single dose given"],
   // The regimen box and the exposure metrics printed under it.
   "Proposed regimen (not yet given)": ["PK Parameters ("],
+  "Proposed regimen (continue as entered)": ["PK Parameters ("],
   "Current regimen (as entered)": ["PK Parameters ("],
   "Clinical Note (for Medical Record)": [" Assumptions ", " Limitations ", " Model Colin"],
 };
@@ -297,3 +302,197 @@ test("Empiric reports are built as before: the active option, else the engine's 
   assert.equal(opt.exposure_summary, undefined);
   assert.equal(opt.warnings, undefined);
 });
+
+// ── 5. Headings and captions follow the proposal (third review) ─────────────
+//
+// 30a1814 headed every candidate "Proposed regimen (not yet given)" and
+// "Projected steady-state exposure of the proposed regimen (not yet given)",
+// including the candidate that is the regimen entered, continued, directly
+// above a table row and a note line that said "continue as entered".
+
+const UNCHANGED = { patient: std, regimen: ss(1000, 12, 100 / 60), levels: [lvl(13, 11)] };
+/** The same, after three doses: the history's own figures are an actual-history projection. */
+const UNCHANGED_EARLY = { patient: std, regimen: ss(1000, 12, 100 / 60, 3), levels: [lvl(11, 11)] };
+const CHANGED = { patient: std, regimen: ss(1000, 12, 1), levels: [lvl(9, 11)] };
+const INFUSION_ONLY = { patient: { ...std, age: 30, weight_kg: 55, serum_creatinine_mg_dl: 0.7 }, regimen: ss(1500, 24, 1), levels: [lvl(25, 6)] };
+const HOLD = { patient: std, regimen: ss(1000, 12, 1), levels: [lvl(28, 3), lvl(12.9, 3)] };
+const BLOCKED = { patient: { ...std, age: 80, weight_kg: 60, height_cm: 165, sex: "female", serum_creatinine_mg_dl: 6 }, regimen: ss(750, 24, 1, 3), levels: [lvl(30, 20)] };
+/** One dose given; the engine then suggests the same dose, interval and infusion duration as maintenance. */
+const SINGLE: { patient: typeof std; regimen: CalculateRequestRegimen; levels: Level[] } = {
+  patient: std,
+  regimen: { dose_mg: 1000, interval_hours: 12, infusion_duration_hours: 100 / 60, doses_given: 1, target_auc24: 450 },
+  levels: [lvl(7, 8)],
+};
+
+const CONTINUE_BOX = "Proposed regimen (continue as entered)";
+const CONTINUE_EXPOSURE = "Projected steady-state exposure if the regimen is continued as entered";
+const NOT_YET_BOX = "Proposed regimen (not yet given)";
+const NOT_YET_EXPOSURE = "Projected steady-state exposure of the proposed regimen (not yet given)";
+const CONTINUE = /continued? as entered/i;
+const NOT_YET = /not yet given/i;
+
+/** The headings and captions that label the regimen box, the exposure metrics and the comparison table. */
+function headings(html: string) {
+  const titles = Array.from(html.matchAll(/<div class="section-title">([^<]*)<\/div>/g), (m) => m[1]);
+  const infusion = /<div class="dose-detail">(Infused? over [^<]*)<\/div>/.exec(html)?.[1] ?? null;
+  const table = /<table class="exposure-table">[\s\S]*?<\/table>/.exec(html)?.[0] ?? "";
+  const rows = Array.from(table.matchAll(/<tr><th>([^<]*)<\/th>/g), (m) => m[1]);
+  return { titles, infusion, rows };
+}
+const minutes = (hours: number) => Number((hours * 60).toFixed(6));
+
+test("unchanged regimen: the box, its infusion line, the exposure heading, the table and the note say continue as entered; nothing says not yet given", () => {
+  for (const c of [UNCHANGED, UNCHANGED_EARLY]) {
+    const r = run(c.patient, c.regimen, c.levels);
+    const rec = r.frequency_options!.find((o) => o.is_recommended)!;
+    assert.deepEqual(
+      { dose: rec.dose_mg, interval: rec.interval_hours, infusion: minutes(rec.infusion_duration_hours) },
+      { dose: 1000, interval: 12, infusion: 100 },
+      "the fixture's recommendation is the regimen entered",
+    );
+    const { data, html, text, note } = report(c.patient, c.regimen, c.levels, r, rec, false);
+    assert.equal(data.regimen_is_current, false, "the candidate row is exported, not the 'as entered' row");
+    const h = headings(html);
+    assert.ok(h.titles.includes(CONTINUE_BOX), `regimen box heading: ${h.titles.join(" | ")}`);
+    assert.ok(h.titles.includes(CONTINUE_EXPOSURE), `exposure heading: ${h.titles.join(" | ")}`);
+    assert.equal(h.infusion, "Infuse over 100 minutes (as entered)");
+    assert.deepEqual(h.rows, ["Current regimen as entered", CONTINUE_BOX]);
+    // The contradiction itself: no heading, caption, table cell or note line calls this regimen "not yet given".
+    assert.doesNotMatch(text, NOT_YET, "PDF");
+    assert.doesNotMatch(note, NOT_YET, "note");
+    // The box is still the selected row, with that row's figures.
+    const box = section(text, CONTINUE_BOX);
+    assert.ok(box.includes("1000 mg every 12 h"), box);
+    assert.ok(box.includes(`AUC₂₄: ${fmt(rec.auc24, 1)} mg·h/L`), box);
+    assert.ok(box.includes(`${CONTINUE_EXPOSURE} AUC₂₄ ${fmt(rec.auc24, 1)} mg·h/L Peak ${fmt(rec.peak, 2)} mg/L Trough ${fmt(rec.trough, 2)} mg/L`), box);
+    assert.ok(note.includes(`Proposed regimen (continue as entered): 1000 mg every 12 h infused over 100 minutes. Projected steady-state exposure if this regimen is continued: AUC24 ${rec.auc24} mg·h/L`), note);
+  }
+});
+
+test("changed and alternative proposals stay 'not yet given' in every heading and never say continue", () => {
+  let recommendedSeen = 0, alternativesSeen = 0, infusionOnlySeen = 0;
+  for (const c of [CHANGED, UNCHANGED, INFUSION_ONLY]) {
+    const r = run(c.patient, c.regimen, c.levels);
+    for (const o of r.frequency_options!) {
+      const { data, html, text, note } = report(c.patient, c.regimen, c.levels, r, o, false);
+      const change = data.exposure_summary!.proposed!.change;
+      if (change === "none") continue; // the unchanged row has its own test
+      if (o.is_recommended) recommendedSeen++; else alternativesSeen++;
+      if (change === "infusion_only") infusionOnlySeen++;
+      const label = `${o.dose_mg} mg q${o.interval_hours}h over ${minutes(o.infusion_duration_hours)} min (${change})`;
+      const h = headings(html);
+      assert.ok(h.titles.includes(NOT_YET_BOX) && h.titles.includes(NOT_YET_EXPOSURE), `${label}: ${h.titles.join(" | ")}`);
+      assert.equal(h.infusion, `Infuse over ${minutes(o.infusion_duration_hours)} minutes`, label);
+      assert.match(h.rows[1], /not yet given\)$/, label);
+      assert.ok(!h.titles.some((t) => CONTINUE.test(t)) && !h.rows.some((t) => CONTINUE.test(t)), `${label}: no heading says continue`);
+      assert.doesNotMatch(text, CONTINUE, `${label}: PDF`);
+      assert.doesNotMatch(note, CONTINUE, `${label}: note`);
+      if (!o.is_recommended) assert.ok(text.includes("Candidate selected by the clinician"), `${label}: named as the clinician's selection`);
+    }
+  }
+  assert.ok(recommendedSeen >= 2 && alternativesSeen >= 8 && infusionOnlySeen >= 1, `coverage: ${recommendedSeen} recommended, ${alternativesSeen} alternatives, ${infusionOnlySeen} infusion-only`);
+});
+
+test("after a single dose a maintenance candidate is never 'continue as entered', even with the same dose, interval and infusion duration", () => {
+  const r = run(SINGLE.patient, SINGLE.regimen, SINGLE.levels);
+  const rec = r.frequency_options!.find((o) => o.is_recommended)!;
+  assert.deepEqual({ dose: rec.dose_mg, interval: rec.interval_hours, infusion: minutes(rec.infusion_duration_hours) }, { dose: 1000, interval: 12, infusion: 100 }, "the fixture's suggestion repeats the dose given");
+  const { data, html, text, note } = report(SINGLE.patient, SINGLE.regimen, SINGLE.levels, r, rec, false);
+  assert.equal(data.exposure_summary!.proposed!.change, "after_single_dose");
+  const h = headings(html);
+  assert.ok(h.titles.includes(NOT_YET_BOX) && h.titles.includes(NOT_YET_EXPOSURE), h.titles.join(" | "));
+  assert.equal(h.infusion, "Infuse over 100 minutes");
+  assert.equal(h.rows[1], "Proposed maintenance regimen (not yet given)");
+  assert.doesNotMatch(text, CONTINUE);
+  assert.doesNotMatch(note, CONTINUE);
+});
+
+test("review hold and blocked recommendation: nothing is headed as proposed, continued or not yet given", () => {
+  for (const [name, c] of [["hold", HOLD], ["blocked", BLOCKED]] as const) {
+    const r = run(c.patient, c.regimen, c.levels);
+    assert.ok(name === "hold" ? r.review_hold : r.adjustment_dosing_blocked, `${name}: the fixture produces that state`);
+    for (const [activeOption, activeIsCurrent] of [[null, true], [null, false]] as const) {
+      const { html, text, note } = report(c.patient, c.regimen, c.levels, r, activeOption, activeIsCurrent);
+      const h = headings(html);
+      assert.ok(h.titles.includes("Current regimen (as entered)"), `${name}: ${h.titles.join(" | ")}`);
+      assert.ok(!h.titles.some((t) => NOT_YET.test(t) || CONTINUE.test(t)), `${name}: ${h.titles.join(" | ")}`);
+      assert.deepEqual(h.rows, ["Current regimen as entered", "Proposed maintenance regimen"], name);
+      for (const [label, out] of [["PDF", text], ["note", note]] as const) {
+        assert.doesNotMatch(out, NOT_YET, `${name} ${label}`);
+        assert.doesNotMatch(out, CONTINUE, `${name} ${label}`);
+        assert.doesNotMatch(out, /Proposed (regimen|adjustment|maintenance regimen) \(/, `${name} ${label}: no proposal is titled`);
+      }
+      if (name === "hold") {
+        assert.match(text, /Recommendation withheld/);
+        assert.ok(text.includes(r.review_hold!.message), "the review reason is preserved");
+      } else {
+        assert.ok(text.includes("No automatic maintenance regimen"), "the blocked state is stated");
+      }
+    }
+  }
+});
+
+test("the 'as entered' view of an unchanged recommendation: the box is the current regimen and the table says continue", () => {
+  const r = run(UNCHANGED.patient, UNCHANGED.regimen, UNCHANGED.levels);
+  const { html, text, note } = report(UNCHANGED.patient, UNCHANGED.regimen, UNCHANGED.levels, r, null, true);
+  const h = headings(html);
+  assert.ok(h.titles.includes("Current regimen (as entered)") && h.titles.includes("Steady-state projection of the current regimen (as entered)"), h.titles.join(" | "));
+  assert.equal(h.infusion, "Infused over 100 minutes (as entered)");
+  assert.deepEqual(h.rows, ["Current regimen as entered", CONTINUE_BOX]);
+  assert.doesNotMatch(text, NOT_YET);
+  assert.doesNotMatch(note, NOT_YET);
+});
+
+test("one rule across unchanged, changed, alternative, hold and blocked: headings say continue exactly when the proposal is the regimen entered", () => {
+  let continued = 0, notYet = 0, history = 0;
+  for (const c of [UNCHANGED, UNCHANGED_EARLY, CHANGED, INFUSION_ONLY, SINGLE, HOLD, BLOCKED]) {
+    const r = run(c.patient, c.regimen, c.levels);
+    const views: [FrequencyOption | null, boolean][] = [[null, true], ...(r.frequency_options ?? []).map((o): [FrequencyOption, boolean] => [o, false])];
+    for (const [activeOption, activeIsCurrent] of views) {
+      const { data, html } = report(c.patient, c.regimen, c.levels, r, activeOption, activeIsCurrent);
+      const h = headings(html);
+      const proposal = data.exposure_summary!.proposed;
+      const label = `${c.regimen.dose_mg} mg q${c.regimen.interval_hours}h × ${c.regimen.doses_given}, view ${activeOption ? `${activeOption.dose_mg} mg q${activeOption.interval_hours}h` : "as entered"}`;
+      // The table row (the summary the verifier found correct) says continue exactly for an unchanged proposal.
+      if (proposal) assert.equal(CONTINUE.test(proposal.title), proposal.change === "none", `${label}: row title "${proposal.title}"`);
+      const box = h.titles.filter((t) => t === CONTINUE_BOX || t === NOT_YET_BOX);
+      const exposure = h.titles.filter((t) => t === CONTINUE_EXPOSURE || t === NOT_YET_EXPOSURE);
+      if (activeOption && proposal?.change === "none") {
+        continued++;
+        assert.deepEqual([box, exposure], [[CONTINUE_BOX], [CONTINUE_EXPOSURE]], label);
+        assert.equal(box[0], h.rows[1], `${label}: the box heading is the table row's title`);
+        assert.match(h.infusion ?? "", /\(as entered\)$/, label);
+      } else if (activeOption) {
+        notYet++;
+        assert.deepEqual([box, exposure], [[NOT_YET_BOX], [NOT_YET_EXPOSURE]], label);
+        assert.doesNotMatch(h.infusion ?? "", /as entered/, label);
+      } else {
+        history++;
+        assert.deepEqual([box, exposure], [[], []], `${label}: the entered history carries no proposed heading`);
+      }
+    }
+  }
+  assert.ok(continued >= 2 && notYet >= 15 && history >= 7, `coverage: ${continued} continued, ${notYet} not yet given, ${history} as entered`);
+});
+
+test("the continue heading is never borrowed: another regimen in the box, a hold or a blocked result keeps the cautious wording", () => {
+  const r = run(UNCHANGED.patient, UNCHANGED.regimen, UNCHANGED.levels);
+  const rec = r.frequency_options!.find((o) => o.is_recommended)!;
+  const { data } = report(UNCHANGED.patient, UNCHANGED.regimen, UNCHANGED.levels, r, rec, false);
+  assert.ok(headings(generateReportHTML(data, "pro", "en")).titles.includes(CONTINUE_BOX), "the unmodified report is the continue case");
+  const variants: [string, typeof data][] = [
+    ["another dose in the box", { ...data, recommended_dose: "1250" }],
+    ["another interval in the box", { ...data, recommended_interval_hours: 8 }],
+    ["another infusion duration in the box", { ...data, recommended_infusion_duration_hours: 1 }],
+    ["a review hold", { ...data, review_hold: { message: "Levels disagree." } }],
+    ["a blocked recommendation", { ...data, recommendation_blocked: "No safe regimen." }],
+    ["a summary that classifies the proposal as a change", { ...data, exposure_summary: { ...data.exposure_summary!, proposed: { ...data.exposure_summary!.proposed!, change: "dose_or_interval" } } }],
+    ["a summary with no proposal", { ...data, exposure_summary: { ...data.exposure_summary!, proposed: null } }],
+  ];
+  for (const [name, d] of variants) {
+    const h = headings(generateReportHTML(d, "pro", "en"));
+    assert.ok(!h.titles.includes(CONTINUE_BOX) && !h.titles.includes(CONTINUE_EXPOSURE), `${name}: ${h.titles.join(" | ")}`);
+    assert.doesNotMatch(h.infusion ?? "", /as entered/, name);
+  }
+});
+

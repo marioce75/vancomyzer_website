@@ -935,17 +935,17 @@
     "pt-BR": "Exposição desta única dose nas suas primeiras 24 h, não em estado de equilíbrio: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
   "Projected steady-state exposure if this regimen is given: AUC24 {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
-    "es": "Exposición proyectada en estado estacionario si se administra este régimen: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
+    "es": "Exposición proyectada en estado estacionario si se administra esta pauta: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
     "fr": "Exposition projetée à l’état d’équilibre si ce schéma est administré : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
     "pt-BR": "Exposição projetada em estado de equilíbrio se este esquema for administrado: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
   "Steady-state projection if this regimen is continued unchanged: AUC24 {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
-    "es": "Proyección en estado estacionario si este régimen continúa sin cambios: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
+    "es": "Proyección en estado estacionario si esta pauta continúa sin cambios: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
     "fr": "Projection à l’état d’équilibre si ce schéma est poursuivi sans changement : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
     "pt-BR": "Projeção em estado de equilíbrio se este esquema for mantido sem alterações: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
   "Steady-state exposure of this regimen: AUC24 {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
-    "es": "Exposición en estado estacionario de este régimen: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
+    "es": "Exposición en estado estacionario de esta pauta: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
     "fr": "Exposition à l’état d’équilibre de ce schéma : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
     "pt-BR": "Exposição em estado de equilíbrio deste esquema: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
@@ -955,7 +955,7 @@
     "pt-BR": "AUC₂₄ {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L"
   },
   "Proposed maintenance regimen (not yet given): {n1} mg every {n2} h infused over {n3} minutes.": {
-    "es": "Régimen de mantenimiento propuesto (aún no administrado): {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
+    "es": "Pauta de mantenimiento propuesta (aún no administrada): {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
     "fr": "Schéma d’entretien proposé (pas encore administré) : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes.",
     "pt-BR": "Esquema de manutenção proposto (ainda não administrado): {n1} mg a cada {n2} h, com infusão em {n3} minutos."
   },
@@ -980,14 +980,14 @@
     "pt-BR": "Exposição modelada na dose {n1}: pico {n2} mg/L; vale {n3} mg/L; AUC nesse intervalo {n4} mg·h/L."
   },
   "Current regimen as entered: {n1} mg every {n2} h ({n3} doses given).": {
-    "es": "Régimen actual según lo introducido: {n1} mg cada {n2} h ({n3} dosis administradas).",
+    "es": "Pauta actual tal como se introdujo: {n1} mg cada {n2} h ({n3} dosis administradas).",
     "fr": "Schéma actuel tel que saisi : {n1} mg toutes les {n2} h ({n3} doses administrées).",
-    "pt-BR": "Esquema atual conforme informado: {n1} mg a cada {n2} h ({n3} doses administradas)."
+    "pt-BR": "Esquema atual conforme inserido: {n1} mg a cada {n2} h ({n3} doses administradas)."
   },
   "Current regimen as entered: {n1} mg every {n2} h after a {n3} mg loading dose ({n4} doses given, including the loading dose).": {
-    "es": "Régimen actual según lo introducido: {n1} mg cada {n2} h tras una dosis de carga de {n3} mg ({n4} dosis administradas, incluida la dosis de carga).",
+    "es": "Pauta actual tal como se introdujo: {n1} mg cada {n2} h tras una dosis de carga de {n3} mg ({n4} dosis administradas, incluida la dosis de carga).",
     "fr": "Schéma actuel tel que saisi : {n1} mg toutes les {n2} h après une dose de charge de {n3} mg ({n4} doses administrées, dose de charge comprise).",
-    "pt-BR": "Esquema atual conforme informado: {n1} mg a cada {n2} h após uma dose de ataque de {n3} mg ({n4} doses administradas, incluindo a dose de ataque)."
+    "pt-BR": "Esquema atual conforme inserido: {n1} mg a cada {n2} h após uma dose de ataque de {n3} mg ({n4} doses administradas, incluindo a dose de ataque)."
   },
   "{n1} mg every {n2} h ({n3} doses given)": {
     "es": "{n1} mg cada {n2} h ({n3} dosis administradas)",
@@ -1020,29 +1020,29 @@
     "pt-BR": "dose de ataque sugerida de {n1} mg (não administrada), depois {n2} mg q{n3}h (esquema sugerido)"
   },
   "Proposed regimen (continue as entered): {n1} mg every {n2} h infused over {n3} minutes.": {
-    "es": "Régimen propuesto (continuar según lo introducido): {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
+    "es": "Pauta propuesta (continuar tal como se introdujo): {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
     "fr": "Schéma proposé (poursuivre tel que saisi) : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes.",
-    "pt-BR": "Esquema proposto (continuar conforme informado): {n1} mg a cada {n2} h, com infusão em {n3} minutos."
+    "pt-BR": "Esquema proposto (continuar conforme inserido): {n1} mg a cada {n2} h, com infusão em {n3} minutos."
   },
   "Projected steady-state exposure if this regimen is continued: AUC24 {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
-    "es": "Exposición proyectada en estado estacionario si este régimen continúa: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
+    "es": "Exposición proyectada en estado estacionario si esta pauta continúa: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
     "fr": "Exposition projetée à l’état d’équilibre si ce schéma est poursuivi : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
     "pt-BR": "Exposição projetada em estado de equilíbrio se este esquema for mantido: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   },
   "Current regimen as entered: {n1} mg every {n2} h infused over {n3} minutes ({n4} doses given).": {
-    "es": "Régimen actual según lo introducido: {n1} mg cada {n2} h en perfusión durante {n3} minutos ({n4} dosis administradas).",
+    "es": "Pauta actual tal como se introdujo: {n1} mg cada {n2} h en perfusión durante {n3} minutos ({n4} dosis administradas).",
     "fr": "Schéma actuel tel que saisi : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes ({n4} doses administrées).",
-    "pt-BR": "Esquema atual conforme informado: {n1} mg a cada {n2} h, com infusão em {n3} minutos ({n4} doses administradas)."
+    "pt-BR": "Esquema atual conforme inserido: {n1} mg a cada {n2} h, com infusão em {n3} minutos ({n4} doses administradas)."
   },
   "Current regimen as entered: {n1} mg every {n2} h infused over {n3} minutes after a {n4} mg loading dose ({n5} doses given, including the loading dose).": {
-    "es": "Régimen actual según lo introducido: {n1} mg cada {n2} h en perfusión durante {n3} minutos tras una dosis de carga de {n4} mg ({n5} dosis administradas, incluida la dosis de carga).",
+    "es": "Pauta actual tal como se introdujo: {n1} mg cada {n2} h en perfusión durante {n3} minutos tras una dosis de carga de {n4} mg ({n5} dosis administradas, incluida la dosis de carga).",
     "fr": "Schéma actuel tel que saisi : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes après une dose de charge de {n4} mg ({n5} doses administrées, dose de charge comprise).",
-    "pt-BR": "Esquema atual conforme informado: {n1} mg a cada {n2} h, com infusão em {n3} minutos, após uma dose de ataque de {n4} mg ({n5} doses administradas, incluindo a dose de ataque)."
+    "pt-BR": "Esquema atual conforme inserido: {n1} mg a cada {n2} h, com infusão em {n3} minutos, após uma dose de ataque de {n4} mg ({n5} doses administradas, incluindo a dose de ataque)."
   },
   "Current regimen as entered: {n1} mg every {n2} h infused over {n3} minutes.": {
-    "es": "Régimen actual según lo introducido: {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
+    "es": "Pauta actual tal como se introdujo: {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
     "fr": "Schéma actuel tel que saisi : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes.",
-    "pt-BR": "Esquema atual conforme informado: {n1} mg a cada {n2} h, com infusão em {n3} minutos."
+    "pt-BR": "Esquema atual conforme inserido: {n1} mg a cada {n2} h, com infusão em {n3} minutos."
   },
   "{n1} mg every {n2} h infused over {n3} minutes ({n4} doses given)": {
     "es": "{n1} mg cada {n2} h en perfusión durante {n3} minutos ({n4} dosis administradas)",
@@ -1055,7 +1055,7 @@
     "pt-BR": "{n1} mg a cada {n2} h, com infusão em {n3} minutos, após uma dose de ataque de {n4} mg ({n5} doses administradas, incluindo a dose de ataque)"
   },
   "Proposed regimen (same dose and interval, different infusion duration; not yet given): {n1} mg every {n2} h infused over {n3} minutes.": {
-    "es": "Régimen propuesto (misma dosis e intervalo, distinta duración de perfusión; aún no administrado): {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
+    "es": "Pauta propuesta (misma dosis e intervalo, distinta duración de perfusión; aún no administrada): {n1} mg cada {n2} h en perfusión durante {n3} minutos.",
     "fr": "Schéma proposé (même dose et même intervalle, durée de perfusion différente ; pas encore administré) : {n1} mg toutes les {n2} h en perfusion sur {n3} minutes.",
     "pt-BR": "Esquema proposto (mesma dose e mesmo intervalo, duração de infusão diferente; ainda não administrado): {n1} mg a cada {n2} h, com infusão em {n3} minutos."
   },
@@ -1130,7 +1130,7 @@
     "pt-BR": "O ajuste a posteriori não explica totalmente o nível medido (previsto {n1} mg/L vs. observado {n2} mg/L; erro de {n3}%)."
   },
   "Steady state was confirmed for this regimen, but with a terminal half-life of {n1} h the model predicts only {n2}% of the steady-state plateau after {n3} doses ({n4} of {n5} half-lives).": {
-    "es": "Se confirmó el estado estacionario para este régimen, pero con una semivida terminal de {n1} h el modelo predice solo el {n2}% de la meseta del estado estacionario tras {n3} dosis ({n4} de {n5} semividas).",
+    "es": "Se confirmó el estado estacionario para esta pauta, pero con una semivida terminal de {n1} h el modelo predice solo el {n2}% de la meseta del estado estacionario tras {n3} dosis ({n4} de {n5} semividas).",
     "fr": "L’état d’équilibre a été confirmé pour ce schéma, mais avec une demi-vie terminale de {n1} h le modèle ne prédit que {n2}% du plateau d’équilibre après {n3} doses ({n4} demi-vies sur {n5}).",
     "pt-BR": "O estado de equilíbrio foi confirmado para este esquema, mas com uma meia-vida terminal de {n1} h o modelo prevê apenas {n2}% do platô do estado de equilíbrio após {n3} doses ({n4} de {n5} meias-vidas)."
   },
@@ -1145,12 +1145,12 @@
     "pt-BR": "Nível {n1} coletado {n2} h além do intervalo entre doses."
   },
   "The recommended regimen is predicted to achieve AUC24 of {n1} mg·h/L, which is below the target range of 400–600 mg·h/L.": {
-    "es": "Se prevé que el régimen recomendado alcance un AUC24 de {n1} mg·h/L, por debajo del rango objetivo de 400–600 mg·h/L.",
+    "es": "Se prevé que la pauta recomendada alcance un AUC24 de {n1} mg·h/L, por debajo del rango objetivo de 400–600 mg·h/L.",
     "fr": "Le schéma recommandé devrait atteindre un AUC24 de {n1} mg·h/L, en dessous de la plage cible de 400–600 mg·h/L.",
     "pt-BR": "Prevê-se que o esquema recomendado atinja uma AUC24 de {n1} mg·h/L, abaixo do intervalo-alvo de 400–600 mg·h/L."
   },
   "over {n1} min (infusion duration differs from the regimen entered)": {
-    "es": "en {n1} min (la duración de perfusión difiere de la del régimen introducido)",
+    "es": "en {n1} min (la duración de perfusión difiere de la de la pauta introducida)",
     "fr": "sur {n1} min (la durée de perfusion diffère de celle du schéma saisi)",
     "pt-BR": "em {n1} min (a duração de infusão difere da do esquema informado)"
   },
@@ -1160,9 +1160,9 @@
     "pt-BR": "em {n1} min"
   },
   "Infused over {n1} minutes (as entered)": {
-    "es": "Perfundido durante {n1} minutos (según lo introducido)",
+    "es": "En perfusión durante {n1} minutos (tal como se introdujo)",
     "fr": "Perfusé sur {n1} minutes (tel que saisi)",
-    "pt-BR": "Infundido em {n1} minutos (conforme informado)"
+    "pt-BR": "Infundido em {n1} minutos (conforme inserido)"
   },
   "{n1} doses of {n2} mg every {n3} h, no loading dose.": {
     "es": "{n1} dosis de {n2} mg cada {n3} h, sin dosis de carga.",
@@ -1268,5 +1268,10 @@
     "es": "Aviso sobre la cronología de las muestras: Nivel {n1} extraído {n2} h después del intervalo de dosificación; se interpreta como un valle tardío.",
     "fr": "Avis sur la chronologie des prélèvements : Prélèvement {n1} effectué {n2} h après l’intervalle posologique ; interprété comme une concentration résiduelle tardive.",
     "pt-BR": "Consultoria de temporização do laboratório: Nível {n1} coletado {n2} h após o intervalo entre doses; interpretado como um vale tardio."
+  },
+  "Infuse over {n1} minutes (as entered)": {
+    "es": "Perfundir durante {n1} minutos (tal como se introdujo)",
+    "fr": "Perfuser sur {n1} minutes (tel que saisi)",
+    "pt-BR": "Infundir em {n1} minutos (conforme inserido)"
   }
 }

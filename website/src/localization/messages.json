@@ -16775,12 +16775,12 @@
     "pt-BR": "Informe o número exato de doses de manutenção administradas (6 ou mais) antes de calcular. As doses informadas são mantidas."
   },
   "No maintenance regimen is shown; the graph has only this dose.": {
-    "es": "No se muestra ningún régimen de mantenimiento; el gráfico solo contiene esta dosis.",
+    "es": "No se muestra ninguna pauta de mantenimiento; el gráfico solo contiene esta dosis.",
     "fr": "Aucun schéma d’entretien n’est affiché ; le graphique ne contient que cette dose.",
     "pt-BR": "Nenhum esquema de manutenção é mostrado; o gráfico contém apenas esta dose."
   },
   "Dose already given vs. proposed regimen": {
-    "es": "Dosis ya administrada frente a régimen propuesto",
+    "es": "Dosis ya administrada frente a pauta propuesta",
     "fr": "Dose déjà administrée vs schéma proposé",
     "pt-BR": "Dose já administrada vs. esquema proposto"
   },
@@ -16790,7 +16790,7 @@
     "pt-BR": "Um único nível medido: estimativa provisória"
   },
   "Proposed regimen (not yet given)": {
-    "es": "Régimen propuesto (aún no administrado)",
+    "es": "Pauta propuesta (aún no administrada)",
     "fr": "Schéma proposé (pas encore administré)",
     "pt-BR": "Esquema proposto (ainda não administrado)"
   },
@@ -16800,12 +16800,12 @@
     "pt-BR": "Exposição da dose já administrada (primeiras 24 h, não em estado de equilíbrio)"
   },
   "Steady-state projection of the current regimen (as entered)": {
-    "es": "Proyección en estado estacionario del régimen actual (según lo introducido)",
+    "es": "Proyección en estado estacionario de la pauta actual (tal como se introdujo)",
     "fr": "Projection à l’état d’équilibre du schéma actuel (tel que saisi)",
-    "pt-BR": "Projeção em estado de equilíbrio do esquema atual (conforme informado)"
+    "pt-BR": "Projeção em estado de equilíbrio do esquema atual (conforme inserido)"
   },
   "Projected steady-state exposure of the proposed regimen (not yet given)": {
-    "es": "Exposición proyectada en estado estacionario del régimen propuesto (aún no administrado)",
+    "es": "Exposición proyectada en estado estacionario de la pauta propuesta (aún no administrada)",
     "fr": "Exposition projetée à l’état d’équilibre du schéma proposé (pas encore administré)",
     "pt-BR": "Exposição projetada em estado de equilíbrio do esquema proposto (ainda não administrado)"
   },
@@ -16815,7 +16815,7 @@
     "pt-BR": "Exposição da dose já administrada (primeiras 24 h; sem recomendação automática)"
   },
   "Proposed maintenance regimen": {
-    "es": "Régimen de mantenimiento propuesto",
+    "es": "Pauta de mantenimiento propuesta",
     "fr": "Schéma d’entretien proposé",
     "pt-BR": "Esquema de manutenção proposto"
   },
@@ -16835,12 +16835,12 @@
     "pt-BR": "Dose já administrada"
   },
   "Current regimen as entered": {
-    "es": "Régimen actual según lo introducido",
+    "es": "Pauta actual tal como se introdujo",
     "fr": "Schéma actuel tel que saisi",
-    "pt-BR": "Esquema atual conforme informado"
+    "pt-BR": "Esquema atual conforme inserido"
   },
   "Proposed maintenance regimen (not yet given)": {
-    "es": "Régimen de mantenimiento propuesto (aún no administrado)",
+    "es": "Pauta de mantenimiento propuesta (aún no administrada)",
     "fr": "Schéma d’entretien proposé (pas encore administré)",
     "pt-BR": "Esquema de manutenção proposto (ainda não administrado)"
   },
@@ -16860,17 +16860,17 @@
     "pt-BR": "Exposição desta única dose nas suas primeiras 24 h, não em estado de equilíbrio"
   },
   "Steady-state projection if this regimen is continued unchanged": {
-    "es": "Proyección en estado estacionario si este régimen continúa sin cambios",
+    "es": "Proyección en estado estacionario si esta pauta continúa sin cambios",
     "fr": "Projection à l’état d’équilibre si ce schéma est poursuivi sans changement",
     "pt-BR": "Projeção em estado de equilíbrio se este esquema for mantido sem alterações"
   },
   "Steady-state exposure of this regimen": {
-    "es": "Exposición en estado estacionario de este régimen",
+    "es": "Exposición en estado estacionario de esta pauta",
     "fr": "Exposition à l’état d’équilibre de ce schéma",
     "pt-BR": "Exposição em estado de equilíbrio deste esquema"
   },
   "Projected steady-state exposure if this regimen is given": {
-    "es": "Exposición proyectada en estado estacionario si se administra este régimen",
+    "es": "Exposición proyectada en estado estacionario si se administra esta pauta",
     "fr": "Exposition projetée à l’état d’équilibre si ce schéma est administré",
     "pt-BR": "Exposição projetada em estado de equilíbrio se este esquema for administrado"
   },
@@ -16885,12 +16885,12 @@
     "pt-BR": "Nenhum ajuste de dose é apresentado até que os níveis informados sejam conciliados (ver a retenção para revisão)."
   },
   "No maintenance regimen is proposed.": {
-    "es": "No se propone ningún régimen de mantenimiento.",
+    "es": "No se propone ninguna pauta de mantenimiento.",
     "fr": "Aucun schéma d’entretien n’est proposé.",
     "pt-BR": "Nenhum esquema de manutenção é proposto."
   },
   "Proposed maintenance regimen: none.": {
-    "es": "Régimen de mantenimiento propuesto: ninguno.",
+    "es": "Pauta de mantenimiento propuesta: ninguna.",
     "fr": "Schéma d’entretien proposé : aucun.",
     "pt-BR": "Esquema de manutenção proposto: nenhum."
   },
@@ -16935,27 +16935,27 @@
     "pt-BR": "Confirme com um segundo nível e reavalie a função renal antes de confiar nesta dose."
   },
   "Proposed regimen (continue as entered)": {
-    "es": "Régimen propuesto (continuar según lo introducido)",
+    "es": "Pauta propuesta (continuar tal como se introdujo)",
     "fr": "Schéma proposé (poursuivre tel que saisi)",
-    "pt-BR": "Esquema proposto (continuar conforme informado)"
+    "pt-BR": "Esquema proposto (continuar conforme inserido)"
   },
   "Projected steady-state exposure if this regimen is continued": {
-    "es": "Exposición proyectada en estado estacionario si este régimen continúa",
+    "es": "Exposición proyectada en estado estacionario si esta pauta continúa",
     "fr": "Exposition projetée à l’état d’équilibre si ce schéma est poursuivi",
     "pt-BR": "Exposição projetada em estado de equilíbrio se este esquema for mantido"
   },
   "Proposed regimen (same dose and interval, different infusion duration; not yet given)": {
-    "es": "Régimen propuesto (misma dosis e intervalo, distinta duración de perfusión; aún no administrado)",
+    "es": "Pauta propuesta (misma dosis e intervalo, distinta duración de perfusión; aún no administrada)",
     "fr": "Schéma proposé (même dose et même intervalle, durée de perfusion différente ; pas encore administré)",
     "pt-BR": "Esquema proposto (mesma dose e mesmo intervalo, duração de infusão diferente; ainda não administrado)"
   },
   "Change from the regimen entered": {
-    "es": "Cambio respecto al régimen introducido",
+    "es": "Cambio respecto a la pauta introducida",
     "fr": "Changement par rapport au schéma saisi",
     "pt-BR": "Mudança em relação ao esquema informado"
   },
   "No change from the regimen entered: same dose, interval and infusion duration.": {
-    "es": "Sin cambios respecto al régimen introducido: misma dosis, mismo intervalo y misma duración de perfusión.",
+    "es": "Sin cambios respecto a la pauta introducida: misma dosis, mismo intervalo y misma duración de perfusión.",
     "fr": "Aucun changement par rapport au schéma saisi : même dose, même intervalle et même durée de perfusion.",
     "pt-BR": "Sem mudança em relação ao esquema informado: mesma dose, mesmo intervalo e mesma duração de infusão."
   },
@@ -17015,7 +17015,7 @@
     "pt-BR": "Nenhum ajuste de dose é apresentado até que os níveis informados sejam conciliados; ver Advertências e avisos."
   },
   "No regimen is presented": {
-    "es": "No se presenta ningún régimen",
+    "es": "No se presenta ninguna pauta",
     "fr": "Aucun schéma n’est présenté",
     "pt-BR": "Nenhum esquema é apresentado"
   },
@@ -17125,12 +17125,12 @@
     "pt-BR": "Medida (não plotada)"
   },
   "The solid curve is a projection of a regimen not yet given. Measured levels were drawn under the entered history and are plotted on its dotted curve at their own times, not on the projection.": {
-    "es": "La curva continua es una proyección de un régimen aún no administrado. Los niveles medidos se extrajeron bajo el historial introducido y se representan en su curva punteada en sus propios tiempos, no en la proyección.",
+    "es": "La curva continua es una proyección de una pauta aún no administrada. Los niveles medidos se extrajeron bajo el historial introducido y se representan en su curva punteada en sus propios tiempos, no en la proyección.",
     "fr": "La courbe pleine est une projection d’un schéma pas encore administré. Les prélèvements mesurés ont été réalisés sous l’historique saisi et sont tracés sur sa courbe en pointillé à leurs propres temps, pas sur la projection.",
     "pt-BR": "A curva contínua é uma projeção de um esquema ainda não administrado. Os níveis medidos foram coletados sob o histórico informado e são plotados em sua curva pontilhada nos seus próprios tempos, não na projeção."
   },
   "The solid curve is a projection of a regimen not yet given. Measured levels were drawn under the entered history and are not plotted on the projection.": {
-    "es": "La curva continua es una proyección de un régimen aún no administrado. Los niveles medidos se extrajeron bajo el historial introducido y no se representan en la proyección.",
+    "es": "La curva continua es una proyección de una pauta aún no administrada. Los niveles medidos se extrajeron bajo el historial introducido y no se representan en la proyección.",
     "fr": "La courbe pleine est une projection d’un schéma pas encore administré. Les prélèvements mesurés ont été réalisés sous l’historique saisi et ne sont pas tracés sur la projection.",
     "pt-BR": "A curva contínua é uma projeção de um esquema ainda não administrado. Os níveis medidos foram coletados sob o histórico informado e não são plotados na projeção."
   },
@@ -17158,5 +17158,20 @@
     "es": "Aviso sobre la calidad del ajuste: El aclaramiento estimado se limitó: el ajuste implicaba un aclaramiento de vancomicina superior al doble del aclaramiento de creatinina estimado de este paciente, lo que no es plausible para un fármaco de eliminación renal.",
     "fr": "Avis sur la qualité de l’ajustement : La clairance estimée a été plafonnée : l’ajustement impliquait une clairance de la vancomycine supérieure au double de la clairance de la créatinine estimée de ce patient, ce qui n’est pas plausible pour un médicament à élimination rénale.",
     "pt-BR": "Consultoria de qualidade adequada: A depuração estimada foi limitada: o ajuste implicava uma depuração de vancomicina superior ao dobro da depuração de creatinina estimada deste paciente, o que não é plausível para um fármaco de eliminação renal."
+  },
+  "Projected steady-state exposure if the regimen is continued as entered": {
+    "es": "Exposición proyectada en estado estacionario si la pauta continúa tal como se introdujo",
+    "fr": "Exposition projetée à l’état d’équilibre si le schéma est poursuivi tel que saisi",
+    "pt-BR": "Exposição projetada em estado de equilíbrio se o esquema for mantido conforme inserido"
+  },
+  "The solid curve is a projection of the regimen as entered, continued unchanged. Measured levels were drawn under the entered history and are plotted on its dotted curve at their own times, not on the projection.": {
+    "es": "La curva continua es una proyección de la pauta tal como se introdujo, continuada sin cambios. Los niveles medidos se extrajeron bajo el historial introducido y se representan en su curva punteada en sus propios tiempos, no en la proyección.",
+    "fr": "La courbe pleine est une projection du schéma tel que saisi, poursuivi sans changement. Les prélèvements mesurés ont été réalisés sous l’historique saisi et sont tracés sur sa courbe en pointillé à leurs propres temps, pas sur la projection.",
+    "pt-BR": "A curva contínua é uma projeção do esquema conforme inserido, mantido sem alterações. Os níveis medidos foram coletados sob o histórico informado e são plotados em sua curva pontilhada nos seus próprios tempos, não na projeção."
+  },
+  "The solid curve is a projection of the regimen as entered, continued unchanged. Measured levels were drawn under the entered history and are not plotted on the projection.": {
+    "es": "La curva continua es una proyección de la pauta tal como se introdujo, continuada sin cambios. Los niveles medidos se extrajeron bajo el historial introducido y no se representan en la proyección.",
+    "fr": "La courbe pleine est une projection du schéma tel que saisi, poursuivi sans changement. Les prélèvements mesurés ont été réalisés sous l’historique saisi et ne sont pas tracés sur la projection.",
+    "pt-BR": "A curva contínua é uma projeção do esquema conforme inserido, mantido sem alterações. Os níveis medidos foram coletados sob o histórico informado e não são plotados na projeção."
   }
 }

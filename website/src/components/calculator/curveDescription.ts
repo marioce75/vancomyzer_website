@@ -141,6 +141,13 @@ export interface MeasuredLevelsInput {
   enteredHistoryLabel: string;
   /** Doses given before the level (undefined when not stated). */
   dosesGiven?: number;
+  /**
+   * The solid projection is the regimen as entered, continued: a candidate
+   * with the same dose, interval and infusion duration (regimenIdentity.ts),
+   * after more than one dose. Only then does the note say "continued"; any
+   * other projection is a regimen not yet given.
+   */
+  projectionIsEnteredRegimen?: boolean;
 }
 
 export interface MeasuredLevelsDisplay {
@@ -185,12 +192,17 @@ export function describeMeasuredLevels(s: MeasuredLevelsInput): MeasuredLevelsDi
   if (placement === "solid") {
     return { placement, legend: "Measured (entered history)", referenceLabel: null, note: null, anchors };
   }
+  // What the solid projection is, in the same terms as the note and the PDF:
+  // the regimen entered, continued, or a regimen not yet given.
+  const projection = s.projectionIsEnteredRegimen === true
+    ? "The solid curve is a projection of the regimen as entered, continued unchanged."
+    : "The solid curve is a projection of a regimen not yet given.";
   if (placement === "reference") {
     return {
       placement,
       legend: "Measured (on the dotted entered-history curve, not on the projection)",
       referenceLabel: s.enteredHistoryLabel,
-      note: "The solid curve is a projection of a regimen not yet given. Measured levels were drawn under the entered history and are plotted on its dotted curve at their own times, not on the projection.",
+      note: `${projection} Measured levels were drawn under the entered history and are plotted on its dotted curve at their own times, not on the projection.`,
       anchors,
     };
   }
@@ -198,7 +210,7 @@ export function describeMeasuredLevels(s: MeasuredLevelsInput): MeasuredLevelsDi
     placement,
     legend: "Measured (not plotted)",
     referenceLabel: null,
-    note: "The solid curve is a projection of a regimen not yet given. Measured levels were drawn under the entered history and are not plotted on the projection.",
+    note: `${projection} Measured levels were drawn under the entered history and are not plotted on the projection.`,
     anchors,
   };
 }

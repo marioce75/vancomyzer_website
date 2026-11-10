@@ -193,6 +193,25 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
   ).join("");
 
   const regimenPrintable = hasPrintableRegimen(data);
+  // A candidate is shown (not the history as entered). It is headed "continue
+  // as entered" only when the summary that fills the comparison table
+  // (clinicalNote.ts, by regimenIdentity.ts) classifies its proposal as the
+  // regimen entered with the same dose, interval and infusion duration, AND
+  // the regimen printed in the box is that proposal. Any other candidate, and
+  // any case without that classification, keeps "not yet given". Never under a
+  // hold or a blocked recommendation: nothing is proposed there.
+  const boxRegimenText = regimenPrintable
+    ? `${data.recommended_dose.replace(/\s*mg$/i, "")} mg every ${data.recommended_interval_hours} h${data.recommended_infusion_duration_hours ? ` infused over ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes` : ""}`
+    : null;
+  const summaryProposal = data.exposure_summary?.proposed ?? null;
+  const proposedContinuesEntered =
+    !data.regimen_is_current && !data.recommendation_blocked && !data.review_hold &&
+    summaryProposal?.change === "none" && summaryProposal.regimen === boxRegimenText;
+  // The continue heading is the table row's own title, so the two are one string.
+  const proposedBoxTitle = proposedContinuesEntered && summaryProposal ? escapeHtml(summaryProposal.title) : "Proposed regimen (not yet given)";
+  const proposedExposureTitle = proposedContinuesEntered
+    ? "Projected steady-state exposure if the regimen is continued as entered"
+    : "Projected steady-state exposure of the proposed regimen (not yet given)";
   const assumptionsList = (data.assumptions ?? []).map(a => `<li>${escapeHtml(a)}</li>`).join("");
   const limitationsList = (data.limitations ?? []).map(l => `<li>${escapeHtml(l)}</li>`).join("");
 
@@ -382,10 +401,10 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
   </div>` : ""}
 
   <div class="section">
-    <div class="section-title">${data.regimen_is_current ? (data.single_dose ? (data.single_dose.kind === "loading" ? "Loading dose given (single dose)" : "Single dose given") : "Current regimen (as entered)") : data.exposure_summary ? "Proposed regimen (not yet given)" : "Recommended Regimen"}</div>
+    <div class="section-title">${data.regimen_is_current ? (data.single_dose ? (data.single_dose.kind === "loading" ? "Loading dose given (single dose)" : "Single dose given") : "Current regimen (as entered)") : data.exposure_summary ? proposedBoxTitle : "Recommended Regimen"}</div>
     <div class="dose-box">
       ${data.recommendation_blocked ? `<span class="dose-primary">No automatic maintenance regimen</span><div class="dose-detail">${escapeHtml(data.recommendation_blocked)}</div>` : data.regimen_is_current && data.single_dose ? `<span class="dose-primary">${data.single_dose.dose_mg} mg \u00d7 1</span><div class="dose-detail">One dose, not a regimen. Exposure is that dose over its first 24 h, not steady state.</div>` : regimenPrintable ? `<span class="dose-primary">${escapeHtml(data.recommended_dose.replace(/\s*mg$/i, ""))} mg every ${data.recommended_interval_hours} h</span>` : `<span class="dose-primary">No regimen is presented</span>`}
-      ${!data.recommendation_blocked && (regimenPrintable || (data.regimen_is_current && data.single_dose)) && data.recommended_infusion_duration_hours ? `<div class="dose-detail">${data.regimen_is_current ? "Infused over" : "Infuse over"} ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes${data.regimen_is_current ? " (as entered)" : ""}</div>` : ""}
+      ${!data.recommendation_blocked && (regimenPrintable || (data.regimen_is_current && data.single_dose)) && data.recommended_infusion_duration_hours ? `<div class="dose-detail">${data.regimen_is_current ? "Infused over" : "Infuse over"} ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes${data.regimen_is_current || proposedContinuesEntered ? " (as entered)" : ""}</div>` : ""}
       ${data.review_hold ? `<div class="dose-detail"><strong>Recommendation withheld.</strong> No dose adjustment is presented until the entered levels are reconciled; see Warnings and advisories.</div>` : ""}
       ${!data.recommendation_blocked && (regimenPrintable || (data.regimen_is_current && data.single_dose)) ? `<div class="dose-detail" style="margin-top:6px">
         AUC\u2082\u2084: <strong>${fmt(data.auc24, 1)} mg\u00b7h/L</strong>
@@ -395,7 +414,7 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
   </div>
 
   <div class="section">
-    <div class="section-title">${data.recommendation_blocked ? (data.mode === "initial_regimen" ? "No maintenance exposure predicted" : data.single_dose ? "Exposure of the dose already given (first 24 h; no automatic recommendation)" : "Current regimen exposure (no automatic recommendation)") : data.exposure_summary ? (data.regimen_is_current ? (data.single_dose ? "Exposure of the dose already given (first 24 h, not steady state)" : "Steady-state projection of the current regimen (as entered)") : "Projected steady-state exposure of the proposed regimen (not yet given)") : "Predicted Pharmacokinetic Metrics"}</div>
+    <div class="section-title">${data.recommendation_blocked ? (data.mode === "initial_regimen" ? "No maintenance exposure predicted" : data.single_dose ? "Exposure of the dose already given (first 24 h; no automatic recommendation)" : "Current regimen exposure (no automatic recommendation)") : data.exposure_summary ? (data.regimen_is_current ? (data.single_dose ? "Exposure of the dose already given (first 24 h, not steady state)" : "Steady-state projection of the current regimen (as entered)") : proposedExposureTitle) : "Predicted Pharmacokinetic Metrics"}</div>
     <div class="metrics-row">
       <div class="metric-card">
         <div class="metric-label">AUC\u2082\u2084</div>

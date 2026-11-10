@@ -175,3 +175,29 @@ test("stale state: without the entered time after the dose, the anchor carries o
   const hidden = describeMeasuredLevels({ levels: [{ time_hours: 71, concentration: 9 }], hoursAfterLastDose: [undefined], solidIsEnteredHistory: false, hasEnteredHistoryCurve: false, enteredHistoryLabel: enteredLabel })!;
   assert.deepEqual(hidden.anchors, ["Level 1: 9 mg/L"]);
 });
+
+// Third review: a candidate with the same dose, interval and infusion duration
+// as the regimen entered is that regimen continued. The caption under the graph
+// said "a regimen not yet given" for it, against the note and the PDF.
+test("the projection of an unchanged regimen is captioned as the regimen entered, continued; any other projection is not yet given", () => {
+  const continued = "The solid curve is a projection of the regimen as entered, continued unchanged.";
+  const notYet = "The solid curve is a projection of a regimen not yet given.";
+  const dotted = "Measured levels were drawn under the entered history and are plotted on its dotted curve at their own times, not on the projection.";
+  const hidden = "Measured levels were drawn under the entered history and are not plotted on the projection.";
+  const candidate = { ...oneLevel, solidIsEnteredHistory: false };
+  // Unchanged regimen selected as a candidate: continued, never "not yet given".
+  assert.equal(describeMeasuredLevels({ ...candidate, hasEnteredHistoryCurve: true, projectionIsEnteredRegimen: true })!.note, `${continued} ${dotted}`);
+  assert.equal(describeMeasuredLevels({ ...candidate, hasEnteredHistoryCurve: false, projectionIsEnteredRegimen: true })!.note, `${continued} ${hidden}`);
+  // A changed or alternative candidate, and a caller that does not say: not yet given.
+  for (const projectionIsEnteredRegimen of [false, undefined]) {
+    assert.equal(describeMeasuredLevels({ ...candidate, hasEnteredHistoryCurve: true, projectionIsEnteredRegimen })!.note, `${notYet} ${dotted}`);
+    assert.equal(describeMeasuredLevels({ ...candidate, hasEnteredHistoryCurve: false, projectionIsEnteredRegimen })!.note, `${notYet} ${hidden}`);
+  }
+  // The entered history as the solid curve (the "as entered" row, a hold, a blocked result) has no projection to caption.
+  assert.equal(describeMeasuredLevels({ ...oneLevel, solidIsEnteredHistory: true, hasEnteredHistoryCurve: true, projectionIsEnteredRegimen: true })!.note, null);
+  // Only the caption changes: placement, legend, reference label and anchors are the same for both.
+  const a = describeMeasuredLevels({ ...candidate, hasEnteredHistoryCurve: true, projectionIsEnteredRegimen: true })!;
+  const b = describeMeasuredLevels({ ...candidate, hasEnteredHistoryCurve: true, projectionIsEnteredRegimen: false })!;
+  assert.deepEqual({ ...a, note: null }, { ...b, note: null });
+});
+
