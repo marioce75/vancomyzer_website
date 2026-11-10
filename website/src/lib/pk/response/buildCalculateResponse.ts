@@ -187,7 +187,9 @@ export function buildCalculateResponse(
         `SCr ${engineOutput.scr} mg/dL (${modelShortName(engineOutput.model_name)} renal covariate)`,
         `${engineOutput.level_count} measured level${engineOutput.level_count === 1 ? "" : "s"}`,
         engineOutput.doses_given === 1
-          ? `Recorded single dose ${engineOutput.current_regimen_dose_mg} mg`
+          ? engineOutput.suggested_dose_not_given === true
+            ? `Suggested single dose ${engineOutput.current_regimen_dose_mg} mg (not given)`
+            : `Recorded single dose ${engineOutput.current_regimen_dose_mg} mg`
           : `Current regimen ${engineOutput.current_regimen_dose_mg} mg q${engineOutput.current_regimen_interval_hours}h`,
       ],
       caution_flags: [

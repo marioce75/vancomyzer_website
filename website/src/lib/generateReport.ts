@@ -60,8 +60,10 @@ export interface ReportData {
   /**
    * Only one dose given before the level. When the report shows that dose
    * (regimen_is_current), it is one dose, not a regimen: no interval is printed.
+   * "suggested" is a dose that has NOT been given (the Empiric loading-dose
+   * simulation): the report then never calls it given, recorded or entered.
    */
-  single_dose?: { dose_mg: number; kind: "loading" | "single" };
+  single_dose?: { dose_mg: number; kind: "loading" | "single" | "suggested" };
   /**
    * Level workflows: the exposure of the dose(s) already given and the regimen
    * proposed (or why none is), as printed in the clinical note (clinicalNote.ts).
@@ -152,7 +154,7 @@ function exposureSummarySection(s: ExposureSummary): string {
     : `<tr><th>Proposed maintenance regimen</th><td colspan="2">None.${s.noneReason ? ` ${escapeHtml(s.noneReason)}` : ""}</td></tr>`;
   return `
   <div class="section">
-    <div class="section-title">Dose already given vs. proposed regimen</div>
+    <div class="section-title">${s.given.notGiven ? "Suggested dose (not given) vs. proposed regimen" : "Dose already given vs. proposed regimen"}</div>
     <table class="exposure-table"><tbody>${given}${proposed}</tbody></table>
   </div>`;
 }
@@ -177,7 +179,18 @@ function hasPrintableRegimen(data: ReportData): boolean {
 
 export function generateReportHTML(data: ReportData, tier: string = "free", locale: Locale = "en"): string {
   const now = formatDate();
-  const modeLabel = data.mode === "initial_regimen" ? "Initial Regimen (Prior-Based)" : "Existing Regimen (Bayesian)";
+  // A suggested dose that was not given, and a result with no measured level,
+  // are prior-based: the subtitle must not present either as a Bayesian
+  // evaluation of an existing regimen.
+  const suggestedDose = data.single_dose?.kind === "suggested";
+  const noMeasuredLevel = data.mode === "existing_regimen" && data.entered_levels !== undefined && data.entered_levels.length === 0;
+  const modeLabel = data.mode === "initial_regimen"
+    ? "Initial Regimen (Prior-Based)"
+    : suggestedDose
+      ? "Suggested Dose Simulation (Prior-Based, Dose Not Given)"
+      : noMeasuredLevel
+        ? "Existing Regimen (Prior-Based, No Measured Level)"
+        : "Existing Regimen (Bayesian)";
   const posteriorLabel = data.pk_parameters?.used_posterior_refinement ? "Posterior-updated" : "Patient characteristics only";
   const watermark = buildExportWatermark(tier);
 
@@ -401,10 +414,10 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
   </div>` : ""}
 
   <div class="section">
-    <div class="section-title">${data.regimen_is_current ? (data.single_dose ? (data.single_dose.kind === "loading" ? "Loading dose given (single dose)" : "Single dose given") : "Current regimen (as entered)") : data.exposure_summary ? proposedBoxTitle : "Recommended Regimen"}</div>
+    <div class="section-title">${data.regimen_is_current ? (data.single_dose ? (data.single_dose.kind === "loading" ? "Loading dose given (single dose)" : suggestedDose ? "Suggested loading dose (not given)" : "Single dose given") : "Current regimen (as entered)") : data.exposure_summary ? proposedBoxTitle : "Recommended Regimen"}</div>
     <div class="dose-box">
-      ${data.recommendation_blocked ? `<span class="dose-primary">No automatic maintenance regimen</span><div class="dose-detail">${escapeHtml(data.recommendation_blocked)}</div>` : data.regimen_is_current && data.single_dose ? `<span class="dose-primary">${data.single_dose.dose_mg} mg \u00d7 1</span><div class="dose-detail">One dose, not a regimen. Exposure is that dose over its first 24 h, not steady state.</div>` : regimenPrintable ? `<span class="dose-primary">${escapeHtml(data.recommended_dose.replace(/\s*mg$/i, ""))} mg every ${data.recommended_interval_hours} h</span>` : `<span class="dose-primary">No regimen is presented</span>`}
-      ${!data.recommendation_blocked && (regimenPrintable || (data.regimen_is_current && data.single_dose)) && data.recommended_infusion_duration_hours ? `<div class="dose-detail">${data.regimen_is_current ? "Infused over" : "Infuse over"} ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes${data.regimen_is_current || proposedContinuesEntered ? " (as entered)" : ""}</div>` : ""}
+      ${data.recommendation_blocked ? `<span class="dose-primary">No automatic maintenance regimen</span><div class="dose-detail">${escapeHtml(data.recommendation_blocked)}</div>` : data.regimen_is_current && data.single_dose ? `<span class="dose-primary">${data.single_dose.dose_mg} mg \u00d7 1</span><div class="dose-detail">${suggestedDose ? "A suggested dose that has not been given, not a regimen. Projected exposure is that dose over its first 24 h if it is given, not steady state." : "One dose, not a regimen. Exposure is that dose over its first 24 h, not steady state."}</div>` : regimenPrintable ? `<span class="dose-primary">${escapeHtml(data.recommended_dose.replace(/\s*mg$/i, ""))} mg every ${data.recommended_interval_hours} h</span>` : `<span class="dose-primary">No regimen is presented</span>`}
+      ${!data.recommendation_blocked && (regimenPrintable || (data.regimen_is_current && data.single_dose)) && data.recommended_infusion_duration_hours ? `<div class="dose-detail">${data.regimen_is_current && suggestedDose ? `Suggested infusion over ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes (not given)` : `${data.regimen_is_current ? "Infused over" : "Infuse over"} ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes${data.regimen_is_current || proposedContinuesEntered ? " (as entered)" : ""}`}</div>` : ""}
       ${data.review_hold ? `<div class="dose-detail"><strong>Recommendation withheld.</strong> No dose adjustment is presented until the entered levels are reconciled; see Warnings and advisories.</div>` : ""}
       ${!data.recommendation_blocked && (regimenPrintable || (data.regimen_is_current && data.single_dose)) ? `<div class="dose-detail" style="margin-top:6px">
         AUC\u2082\u2084: <strong>${fmt(data.auc24, 1)} mg\u00b7h/L</strong>
@@ -414,7 +427,7 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
   </div>
 
   <div class="section">
-    <div class="section-title">${data.recommendation_blocked ? (data.mode === "initial_regimen" ? "No maintenance exposure predicted" : data.single_dose ? "Exposure of the dose already given (first 24 h; no automatic recommendation)" : "Current regimen exposure (no automatic recommendation)") : data.exposure_summary ? (data.regimen_is_current ? (data.single_dose ? "Exposure of the dose already given (first 24 h, not steady state)" : "Steady-state projection of the current regimen (as entered)") : proposedExposureTitle) : "Predicted Pharmacokinetic Metrics"}</div>
+    <div class="section-title">${data.recommendation_blocked ? (data.mode === "initial_regimen" ? "No maintenance exposure predicted" : data.single_dose ? (suggestedDose ? "Projected exposure of the suggested dose, not given (first 24 h; no automatic recommendation)" : "Exposure of the dose already given (first 24 h; no automatic recommendation)") : "Current regimen exposure (no automatic recommendation)") : data.exposure_summary ? (data.regimen_is_current ? (data.single_dose ? (suggestedDose ? "Projected exposure of the suggested dose, not given (first 24 h, not steady state)" : "Exposure of the dose already given (first 24 h, not steady state)") : "Steady-state projection of the current regimen (as entered)") : proposedExposureTitle) : "Predicted Pharmacokinetic Metrics"}</div>
     <div class="metrics-row">
       <div class="metric-card">
         <div class="metric-label">AUC\u2082\u2084</div>

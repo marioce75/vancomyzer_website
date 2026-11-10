@@ -52,6 +52,11 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
   const { auc24, peak, trough, scr, current_regimen_dose_mg, current_regimen_interval_hours, data_quality_note, used_posterior_refinement, posterior_fit, doses_given } = engineOutput;
 
   const isPulseDose = doses_given === 1;
+  // The single dose is a suggestion that has not been given (loading-dose
+  // simulation). The text must then say so and must not call the dose
+  // "recorded", nor refer to a level: there is neither. Wording only.
+  const notGiven = isPulseDose && engineOutput.suggested_dose_not_given === true;
+  const notGivenNote = "No dose has been recorded and no level has been measured.";
 
   const estimateType = used_posterior_refinement
     ? posterior_fit?.uncertainty_label === "high"
@@ -65,15 +70,25 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
   // followed by a rationale claiming a SHORTER interval was being recommended —
   // pointing the opposite way from the hold the safety card states, for a patient
   // in severe AKI. Report the estimates, then the refusal, and stop.
+  //
+  // A result can be blocked AND on review hold (discordant same-time levels in
+  // a patient with no suitable automatic regimen). Both reasons apply, so both
+  // are stated: the block, then the hold. Neither restores any dose advice.
   const blocked = recommendation.adjustment_dosing_blocked;
+  const hold = input.review_hold;
   if (blocked) {
     return (
-      (isPulseDose ? `Recorded single dose: ${current_regimen_dose_mg} mg. ` : `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. `) +
+      (isPulseDose
+        ? notGiven
+          ? `Suggested dose, not given: ${current_regimen_dose_mg} mg. `
+          : `Recorded single dose: ${current_regimen_dose_mg} mg. `
+        : `Current regimen: ${current_regimen_dose_mg} mg every ${current_regimen_interval_hours} h. `) +
       `${estimateType}: AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L. ` +
       `Two-compartment model (SCr ${scr} mg/dL). ` +
       `${blocked.safety_message} ${blocked.recommended_action} ` +
+      (hold ? `Recommendation withheld. ${hold.message} ` : "") +
       `Fit quality ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty ${posterior_fit?.uncertainty_label ?? "population_only"}. ` +
-      `${data_quality_note} Intended to support review, not replace clinician judgment.`
+      `${data_quality_note}${notGiven ? ` ${notGivenNote}` : ""} Intended to support review, not replace clinician judgment.`
     );
   }
 
@@ -81,7 +96,6 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
   // adjustment was computed before the hold and is withdrawn from the response,
   // so this text must not state it either: report what was entered and
   // estimated, then the hold and its reason, and stop.
-  const hold = input.review_hold;
   if (hold) {
     return (
       (isPulseDose
@@ -108,9 +122,13 @@ export function buildInterpretationSummary(input: ExplanationInput): string {
     const levelNote =
       levelCount >= 1
         ? `Estimate based on ${levelCount === 1 ? "one measured level" : `${levelCount} measured levels`} after this single dose; confirm with a follow-up level after further doses.`
-        : "No level entered yet: draw the first level 1.5–6 h after the end of this dose's infusion for early Bayesian estimation.";
+        : notGiven
+          ? `${notGivenNote} If this dose is given, draw the first level 1.5–6 h after the end of its infusion for early Bayesian estimation.`
+          : "No level entered yet: draw the first level 1.5–6 h after the end of this dose's infusion for early Bayesian estimation.";
     return (
-      `Single-dose analysis: ${current_regimen_dose_mg} mg, one dose only. ` +
+      (notGiven
+        ? `Suggested dose, not given: ${current_regimen_dose_mg} mg, one dose only. `
+        : `Single-dose analysis: ${current_regimen_dose_mg} mg, one dose only. `) +
       `${estimateType}: first-dose AUC24 ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L (SCr ${scr} mg/dL). ` +
       `Suggested maintenance regimen: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${Number((infusionDuration * 60).toFixed(6))} minutes. ` +
       `Maintenance dose targets steady-state AUC24 400–600 mg·h/L.` +

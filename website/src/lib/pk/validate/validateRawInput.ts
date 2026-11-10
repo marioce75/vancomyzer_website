@@ -71,6 +71,22 @@ export function validateRawInput(
     check(r, "target_auc24", "regimen", 400, 600, true);
     if (r.dose_unit !== undefined && r.dose_unit !== "mg")
       errors["regimen.dose_unit"] = "Dose must be supplied in mg.";
+    // A suggested dose that has not been given (the loading-dose simulation).
+    // It changes the explanation text only, never a calculation, and it cannot
+    // be combined with anything that only exists once a dose was given.
+    if (
+      r.suggested_dose_not_given !== undefined &&
+      typeof r.suggested_dose_not_given !== "boolean"
+    )
+      errors["regimen.suggested_dose_not_given"] = "Must be true or false.";
+    else if (r.suggested_dose_not_given === true) {
+      if (r.doses_given !== 1)
+        errors["regimen.suggested_dose_not_given"] =
+          "A suggested dose that was not given is supported only as a single-dose simulation (doses_given = 1).";
+      else if (Array.isArray(input.levels) && input.levels.length > 0)
+        errors["regimen.suggested_dose_not_given"] =
+          "A suggested dose that was not given cannot have measured levels. Record the dose actually given before entering a level.";
+    }
   }
   // Loading dose (dose 1 differs from maintenance): supported in the level
   // workflows as regimen.loading_dose_mg; see pk/doseHistory.ts.

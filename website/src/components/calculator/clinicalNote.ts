@@ -23,6 +23,14 @@ export interface ExposureFigures {
   trough: number;
 }
 
+/**
+ * Printed as the second line of the note for a suggested dose that has not
+ * been given (the Empiric loading-dose simulation), so that the text cannot be
+ * read as a record of a dose or of a level. Wording only.
+ */
+export const SUGGESTED_DOSE_SIMULATION_NOTICE =
+  "Simulation only: no dose has been given and no level has been measured. This text is not a record of administration.";
+
 /** The dose or doses already given, exactly as entered. */
 export interface GivenExposure {
   title: string;
@@ -32,6 +40,12 @@ export interface GivenExposure {
   figures: ExposureFigures;
   /** Modelled exposure at the last dose actually given (actual-history fits only). */
   atLastDose?: string;
+  /**
+   * The dose is a suggestion that has NOT been given (the Empiric loading-dose
+   * simulation). Nothing printed from this summary may then call it given,
+   * recorded or administered, or refer to a level drawn after it.
+   */
+  notGiven?: boolean;
 }
 
 /** A regimen that is proposed and has not been given. */
@@ -190,8 +204,12 @@ export function buildExposureSummary(input: ExposureSummaryInput): ExposureSumma
     given = {
       title: singleDoseStatus === "suggested" ? "Suggested dose (not given)" : "Dose already given",
       regimen: `${regimen.dose_mg} mg × 1 (${noun})`,
-      period: "exposure of this one dose over its first 24 h, not steady state",
+      period:
+        singleDoseStatus === "suggested"
+          ? "projected exposure of this one dose over its first 24 h if it is given, not steady state"
+          : "exposure of this one dose over its first 24 h, not steady state",
       figures: topLevel,
+      ...(singleDoseStatus === "suggested" ? { notGiven: true } : {}),
     };
   } else {
     const n = regimen.doses_given;
@@ -296,7 +314,9 @@ export function buildExposureSummary(input: ExposureSummaryInput): ExposureSumma
     given,
     proposed,
     noneReason,
-    history: summarizeDosingHistory(regimen),
+    // The history line states what the result knows: a suggested dose was not
+    // given, and with no level entered none was drawn.
+    history: summarizeDosingHistory(regimen, { levelCount: input.levels.length, notGiven: single && singleDoseStatus === "suggested" }),
     levels: input.levels.map((l, i) => `Measured level ${i + 1}: ${l.value_mcg_ml} mg/L, ${l.time_since_last_dose_hours} h after the start of the last dose.`),
     caution: oneLevelCautionApplies(response, input.levels.length) ? ONE_LEVEL_UNCERTAINTY_SUMMARY : null,
     warnings: collectExportWarnings(response, { given, proposed, single, viewingProposed: Boolean(selectedOption) }),
@@ -381,14 +401,20 @@ const REPLACED_ENGINE_LINES = /^(AUC24:|Recommendation:|Recommendation withheld|
  */
 export function composeClinicalNote(engineNote: string, s: ExposureSummary): string {
   const lines = engineNote.split("\n").filter((l) => l.trim().length > 0);
-  const header = lines[0]?.startsWith("Vancomycin") ? lines.shift()! : "Vancomycin existing regimen evaluation.";
+  const engineHeader = lines[0]?.startsWith("Vancomycin") ? lines.shift()! : "Vancomycin existing regimen evaluation.";
+  // A suggested dose that was not given is a simulation, whatever the engine
+  // note it arrives with says: it is never headed as the evaluation of an
+  // existing regimen, and no line may call the dose recorded.
+  const notGiven = s.given.notGiven === true;
+  const header = notGiven ? engineHeader.replace("existing regimen evaluation", "suggested-dose simulation") : engineHeader;
   const warnings = warningLines(s);
   const warningTexts = new Set(s.warnings.map((w) => w.text));
   // A warning the engine note already carries verbatim is printed once, under its title.
-  const rest = lines.filter((l) => !REPLACED_ENGINE_LINES.test(l) && !warningTexts.has(l.trim()));
+  const rest = lines.filter((l) => !REPLACED_ENGINE_LINES.test(l) && !warningTexts.has(l.trim()) && !(notGiven && /recorded single dose/i.test(l)));
   const { given, proposed } = exposureSummaryLines(s);
   return [
     header,
+    notGiven ? SUGGESTED_DOSE_SIMULATION_NOTICE : null,
     s.history ? `Dosing history entered: ${s.history}` : null,
     ...s.levels,
     given,

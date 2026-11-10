@@ -126,6 +126,13 @@ export interface ExistingRegimenEngineOutput {
   current_regimen_interval_hours: number;
   current_regimen_infusion_hours?: number;
   doses_given?: number;
+  /**
+   * The single dose of this request is a suggestion that has NOT been given
+   * (regimen.suggested_dose_not_given: the Empiric loading-dose simulation).
+   * Set by the pipeline from the request for the explanation text only; no
+   * calculation reads it, so the numbers are the same with or without it.
+   */
+  suggested_dose_not_given?: boolean;
   target_auc24?: number;
   curve: { time_hours: number; concentration: number; lower?: number; upper?: number }[];
   /** Loading dose used as dose 1 in the fit (doseHistory.ts), when entered. */

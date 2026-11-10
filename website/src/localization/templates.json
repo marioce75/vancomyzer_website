@@ -1273,5 +1273,40 @@
     "es": "Perfundir durante {n1} minutos (tal como se introdujo)",
     "fr": "Perfuser sur {n1} minutes (tel que saisi)",
     "pt-BR": "Infundir em {n1} minutos (conforme inserido)"
+  },
+  "Suggested dose, not given: {n1} mg, one dose only.": {
+    "es": "Dosis sugerida, no administrada: {n1} mg, una sola dosis.",
+    "fr": "Dose suggérée, non administrée : {n1} mg, une seule dose.",
+    "pt-BR": "Dose sugerida, não administrada: {n1} mg, apenas uma dose."
+  },
+  "Suggested dose, not given: {n1} mg.": {
+    "es": "Dosis sugerida, no administrada: {n1} mg.",
+    "fr": "Dose suggérée, non administrée : {n1} mg.",
+    "pt-BR": "Dose sugerida, não administrada: {n1} mg."
+  },
+  "Maintenance projection after a suggested single dose of {n1} mg that has not been given; no prior maintenance interval is implied.": {
+    "es": "Proyección de mantenimiento tras una dosis única sugerida de {n1} mg que no se ha administrado; no se presupone un intervalo de mantenimiento previo.",
+    "fr": "Projection d’entretien après une dose unique suggérée de {n1} mg qui n’a pas été administrée ; aucun intervalle d’entretien antérieur n’est supposé.",
+    "pt-BR": "Projeção de manutenção após uma dose única sugerida de {n1} mg que não foi administrada; nenhum intervalo de manutenção anterior é presumido."
+  },
+  "Suggested single dose {n1} mg (not given)": {
+    "es": "Dosis única sugerida {n1} mg (no administrada)",
+    "fr": "Dose unique suggérée {n1} mg (non administrée)",
+    "pt-BR": "Dose única sugerida {n1} mg (não administrada)"
+  },
+  "The {n1} mg dose is a suggestion only.": {
+    "es": "La dosis de {n1} mg es solo una sugerencia.",
+    "fr": "La dose de {n1} mg n’est qu’une suggestion.",
+    "pt-BR": "A dose de {n1} mg é apenas uma sugestão."
+  },
+  "Suggested infusion over {n1} minutes (not given)": {
+    "es": "Perfusión sugerida durante {n1} minutos (no administrada)",
+    "fr": "Perfusion suggérée sur {n1} minutes (non administrée)",
+    "pt-BR": "Infusão sugerida em {n1} minutos (não administrada)"
+  },
+  "Projected exposure of this one dose over its first 24 h if it is given, not steady state: AUC24 {n1} mg·h/L; peak {n2} mg/L; trough {n3} mg/L.": {
+    "es": "Exposición proyectada de esta única dosis durante sus primeras 24 h si se administra, no en estado estacionario: AUC24 {n1} mg·h/L; concentración máxima {n2} mg/L; concentración valle {n3} mg/L.",
+    "fr": "Exposition projetée de cette seule dose sur ses 24 premières heures si elle est administrée, pas à l’état d’équilibre : AUC24 {n1} mg·h/L ; concentration maximale {n2} mg/L ; concentration résiduelle {n3} mg/L.",
+    "pt-BR": "Exposição projetada desta única dose nas suas primeiras 24 h se for administrada, não em estado de equilíbrio: AUC24 {n1} mg·h/L; pico {n2} mg/L; vale {n3} mg/L."
   }
 }

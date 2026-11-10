@@ -18,7 +18,6 @@ import type { CalculateRequestRegimen, CalculateResponse, FrequencyOption } from
 import type { ReportData } from "@/lib/generateReport";
 import type { SingleDoseStatus } from "./DoseRecommendationCard";
 import { buildClinicalNote, resolveCandidate } from "./clinicalNote";
-import { summarizeDosingHistory } from "./dosingHistory";
 
 export interface ReportSelection {
   patient: { age: number; weight_kg: number; serum_creatinine_mg_dl: number };
@@ -112,10 +111,17 @@ export function buildReportData(sel: ReportSelection): ReportData {
     // What was entered and modelled, so the report can be checked against the form.
     ...(levelWorkflow
       ? {
-          dosing_history: summarizeDosingHistory(regimen) ?? undefined,
+          // The same history line as the note: it says when no level was
+          // entered and when the dose is a suggestion that was not given.
+          dosing_history: summary?.history ?? undefined,
           entered_levels: levels.map((l) => ({ value_mg_l: l.value_mcg_ml, hours_after_last_dose: l.time_since_last_dose_hours })),
           single_dose: regimen.doses_given === 1
-            ? { dose_mg: regimen.dose_mg, kind: regimen.loading_dose_mg !== undefined ? ("loading" as const) : ("single" as const) }
+            ? {
+                dose_mg: regimen.dose_mg,
+                kind: sel.singleDoseStatus === "suggested"
+                  ? ("suggested" as const)
+                  : regimen.loading_dose_mg !== undefined ? ("loading" as const) : ("single" as const),
+              }
             : undefined,
           // The dose(s) given vs. the regimen proposed, every warning shown on
           // screen and the one-level caution, as in the note.
