@@ -19,6 +19,7 @@
  */
 
 import { type Locale, translate } from "@/localization/catalog";
+import type { ExposureSummary } from "@/components/calculator/clinicalNote";
 import { localizeReportMarkup } from "@/localization/reportMarkup";
 import { buildExportWatermark } from "./watermark";
 import {
@@ -51,6 +52,31 @@ export interface ReportData {
   recommended_dose: string;
   recommended_interval_hours: number;
   recommended_infusion_duration_hours?: number;
+
+  /** Level workflows: the dosing history as entered, in plain language (dosingHistory.ts). */
+  dosing_history?: string;
+  /** Level workflows: the measured levels sent to the calculation. */
+  entered_levels?: Array<{ value_mg_l: number; hours_after_last_dose: number }>;
+  /**
+   * Only one dose given before the level. When the report shows that dose
+   * (regimen_is_current), it is one dose, not a regimen: no interval is printed.
+   */
+  single_dose?: { dose_mg: number; kind: "loading" | "single" };
+  /**
+   * Level workflows: the exposure of the dose(s) already given and the regimen
+   * proposed (or why none is), as printed in the clinical note (clinicalNote.ts).
+   */
+  exposure_summary?: ExposureSummary;
+  /** Level workflows: the one-level / changing renal function caution shown on screen. */
+  one_level_caution?: string;
+  /**
+   * Level workflows: every other warning and advisory shown on screen (review
+   * hold, lab timing, fit quality, steady-state check, AUC above 600 or below
+   * target, infusion-rate note), with its on-screen title.
+   */
+  warnings?: Array<{ title: string; text: string }>;
+  /** The recommendation is withheld for review; the reason is printed and no regimen is proposed. */
+  review_hold?: { message: string };
 
   // PK Metrics
   auc24: number;
@@ -113,6 +139,42 @@ function formatDate(): string {
   });
 }
 
+/** "Dose already given" vs. "proposed regimen": the same facts as the clinical note, as a table. */
+function exposureSummarySection(s: ExposureSummary): string {
+  // One text node per cell so the sentence can be localized as a whole (reportMarkup.ts).
+  const figures = (f: { auc24: number; peak: number; trough: number }) =>
+    `AUC\u2082\u2084 ${fmt(f.auc24, 1)} mg\u00b7h/L; peak ${fmt(f.peak, 2)} mg/L; trough ${fmt(f.trough, 2)} mg/L`;
+  const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+  const given = `<tr><th>${escapeHtml(s.given.title)}</th><td>${escapeHtml(s.given.regimen)}<span class="period">${escapeHtml(cap(s.given.period))}</span>${s.given.atLastDose ? `<span class="period">${escapeHtml(s.given.atLastDose)}</span>` : ""}</td><td>${figures(s.given.figures)}</td></tr>`;
+  const p = s.proposed;
+  const proposed = p
+    ? `<tr><th>${escapeHtml(p.title)}</th><td>${escapeHtml(p.regimen)}<span class="period">${escapeHtml(cap(p.period))}</span><span class="period">${p.origin === "selected" ? escapeHtml(`Candidate selected by the clinician${p.engineRecommendation ? `; the engine recommendation is ${p.engineRecommendation}` : ""}.`) : "Engine recommendation."}</span>${p.changeNote ? `<span class="period">${escapeHtml(p.changeNote)}</span>` : ""}</td><td>${p.figures ? figures(p.figures) : "Not available"}</td></tr>`
+    : `<tr><th>Proposed maintenance regimen</th><td colspan="2">None.${s.noneReason ? ` ${escapeHtml(s.noneReason)}` : ""}</td></tr>`;
+  return `
+  <div class="section">
+    <div class="section-title">Dose already given vs. proposed regimen</div>
+    <table class="exposure-table"><tbody>${given}${proposed}</tbody></table>
+  </div>`;
+}
+
+/** Every warning and advisory shown with the result on screen, under its on-screen title. */
+function warningsSection(warnings: NonNullable<ReportData["warnings"]>): string {
+  return `
+  <div class="section">
+    <div class="section-title">Warnings and advisories</div>
+    ${warnings.map((w) => `<div class="caution-box warning-item"><strong>${escapeHtml(w.title)}</strong><span class="warning-text">${escapeHtml(w.text)}</span></div>`).join("")}
+  </div>`;
+}
+
+/**
+ * The regimen box prints a dose and an interval only when both are real. A
+ * withheld or absent recommendation has neither (an empty dose and interval
+ * 0); it must read as "no regimen", never as " mg every 0 h".
+ */
+function hasPrintableRegimen(data: ReportData): boolean {
+  return /\d/.test(data.recommended_dose ?? "") && Number.isFinite(data.recommended_interval_hours) && data.recommended_interval_hours > 0;
+}
+
 export function generateReportHTML(data: ReportData, tier: string = "free", locale: Locale = "en"): string {
   const now = formatDate();
   const modeLabel = data.mode === "initial_regimen" ? "Initial Regimen (Prior-Based)" : "Existing Regimen (Bayesian)";
@@ -130,6 +192,26 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
     </tr>`
   ).join("");
 
+  const regimenPrintable = hasPrintableRegimen(data);
+  // A candidate is shown (not the history as entered). It is headed "continue
+  // as entered" only when the summary that fills the comparison table
+  // (clinicalNote.ts, by regimenIdentity.ts) classifies its proposal as the
+  // regimen entered with the same dose, interval and infusion duration, AND
+  // the regimen printed in the box is that proposal. Any other candidate, and
+  // any case without that classification, keeps "not yet given". Never under a
+  // hold or a blocked recommendation: nothing is proposed there.
+  const boxRegimenText = regimenPrintable
+    ? `${data.recommended_dose.replace(/\s*mg$/i, "")} mg every ${data.recommended_interval_hours} h${data.recommended_infusion_duration_hours ? ` infused over ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes` : ""}`
+    : null;
+  const summaryProposal = data.exposure_summary?.proposed ?? null;
+  const proposedContinuesEntered =
+    !data.regimen_is_current && !data.recommendation_blocked && !data.review_hold &&
+    summaryProposal?.change === "none" && summaryProposal.regimen === boxRegimenText;
+  // The continue heading is the table row's own title, so the two are one string.
+  const proposedBoxTitle = proposedContinuesEntered && summaryProposal ? escapeHtml(summaryProposal.title) : "Proposed regimen (not yet given)";
+  const proposedExposureTitle = proposedContinuesEntered
+    ? "Projected steady-state exposure if the regimen is continued as entered"
+    : "Projected steady-state exposure of the proposed regimen (not yet given)";
   const assumptionsList = (data.assumptions ?? []).map(a => `<li>${escapeHtml(a)}</li>`).join("");
   const limitationsList = (data.limitations ?? []).map(l => `<li>${escapeHtml(l)}</li>`).join("");
 
@@ -188,6 +270,14 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
       padding-bottom: 3px;
       margin-bottom: 8px;
     }
+    .exposure-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+    .exposure-table th, .exposure-table td { text-align: left; vertical-align: top; padding: 5px 6px; border: 1px solid #cbd5e0; }
+    .exposure-table th { width: 32%; background: #f0f5fb; color: #1e4d8c; font-weight: 700; }
+    .exposure-table .period { display: block; margin-top: 2px; color: #4a5568; font-size: 9.5px; }
+    .caution-box { border: 1px solid #f6ad55; background: #fffaf0; color: #7b341e; padding: 8px 10px; font-size: 10.5px; line-height: 1.5; }
+    .warning-item { margin-bottom: 4px; }
+    .warning-item strong { display: block; }
+    .warning-item .warning-text { display: block; }
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -293,20 +383,38 @@ export function generateReportHTML(data: ReportData, tier: string = "free", loca
     </div>
   </div>
 
+  ${data.dosing_history ? `
   <div class="section">
-    <div class="section-title">${data.regimen_is_current ? "Current regimen (as entered)" : "Recommended Regimen"}</div>
+    <div class="section-title">Dosing history entered</div>
+    <div class="interpretation">${escapeHtml(data.dosing_history)}</div>
+    ${data.entered_levels && data.entered_levels.length > 0 ? `<div class="interpretation" style="margin-top:4px">${data.entered_levels.map((l, i) => `Level ${i + 1}: ${fmt(l.value_mg_l, 1)} mg/L at ${fmt(l.hours_after_last_dose, 2)} h after the start of the last dose`).join("<br/>")}</div>` : ""}
+  </div>` : ""}
+
+  ${data.exposure_summary ? exposureSummarySection(data.exposure_summary) : ""}
+
+  ${data.warnings && data.warnings.length > 0 ? warningsSection(data.warnings) : ""}
+
+  ${data.one_level_caution ? `
+  <div class="section">
+    <div class="section-title">One measured level: provisional estimate</div>
+    <div class="caution-box">${escapeHtml(data.one_level_caution)}</div>
+  </div>` : ""}
+
+  <div class="section">
+    <div class="section-title">${data.regimen_is_current ? (data.single_dose ? (data.single_dose.kind === "loading" ? "Loading dose given (single dose)" : "Single dose given") : "Current regimen (as entered)") : data.exposure_summary ? proposedBoxTitle : "Recommended Regimen"}</div>
     <div class="dose-box">
-      ${data.recommendation_blocked ? `<span class="dose-primary">No automatic maintenance regimen</span><div class="dose-detail">${escapeHtml(data.recommendation_blocked)}</div>` : `<span class="dose-primary">${escapeHtml(data.recommended_dose.replace(/\s*mg$/i, ""))} mg every ${data.recommended_interval_hours} h</span>`}
-      ${!data.recommendation_blocked && data.recommended_infusion_duration_hours ? `<div class="dose-detail">Infuse over ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes</div>` : ""}
-      ${!data.recommendation_blocked ? `<div class="dose-detail" style="margin-top:6px">
+      ${data.recommendation_blocked ? `<span class="dose-primary">No automatic maintenance regimen</span><div class="dose-detail">${escapeHtml(data.recommendation_blocked)}</div>` : data.regimen_is_current && data.single_dose ? `<span class="dose-primary">${data.single_dose.dose_mg} mg \u00d7 1</span><div class="dose-detail">One dose, not a regimen. Exposure is that dose over its first 24 h, not steady state.</div>` : regimenPrintable ? `<span class="dose-primary">${escapeHtml(data.recommended_dose.replace(/\s*mg$/i, ""))} mg every ${data.recommended_interval_hours} h</span>` : `<span class="dose-primary">No regimen is presented</span>`}
+      ${!data.recommendation_blocked && (regimenPrintable || (data.regimen_is_current && data.single_dose)) && data.recommended_infusion_duration_hours ? `<div class="dose-detail">${data.regimen_is_current ? "Infused over" : "Infuse over"} ${Number((data.recommended_infusion_duration_hours * 60).toFixed(6))} minutes${data.regimen_is_current || proposedContinuesEntered ? " (as entered)" : ""}</div>` : ""}
+      ${data.review_hold ? `<div class="dose-detail"><strong>Recommendation withheld.</strong> No dose adjustment is presented until the entered levels are reconciled; see Warnings and advisories.</div>` : ""}
+      ${!data.recommendation_blocked && (regimenPrintable || (data.regimen_is_current && data.single_dose)) ? `<div class="dose-detail" style="margin-top:6px">
         AUC\u2082\u2084: <strong>${fmt(data.auc24, 1)} mg\u00b7h/L</strong>
-        ${data.auc24 >= 400 && data.auc24 <= 600 ? '<span class="range-badge">IN RANGE</span>' : ""}
+        ${data.auc24 >= 400 && data.auc24 <= 600 && !(data.regimen_is_current && data.single_dose) ? '<span class="range-badge">IN RANGE</span>' : ""}
       </div>` : ""}
     </div>
   </div>
 
   <div class="section">
-    <div class="section-title">${data.recommendation_blocked ? (data.mode === "initial_regimen" ? "No maintenance exposure predicted" : "Current regimen exposure (no automatic recommendation)") : "Predicted Pharmacokinetic Metrics"}</div>
+    <div class="section-title">${data.recommendation_blocked ? (data.mode === "initial_regimen" ? "No maintenance exposure predicted" : data.single_dose ? "Exposure of the dose already given (first 24 h; no automatic recommendation)" : "Current regimen exposure (no automatic recommendation)") : data.exposure_summary ? (data.regimen_is_current ? (data.single_dose ? "Exposure of the dose already given (first 24 h, not steady state)" : "Steady-state projection of the current regimen (as entered)") : proposedExposureTitle) : "Predicted Pharmacokinetic Metrics"}</div>
     <div class="metrics-row">
       <div class="metric-card">
         <div class="metric-label">AUC\u2082\u2084</div>

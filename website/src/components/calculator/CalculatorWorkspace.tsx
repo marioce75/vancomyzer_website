@@ -24,12 +24,16 @@ import CalculatorLayout from "@/components/calculator/CalculatorLayout";
 import PatientCharacteristicsForm from "@/components/calculator/PatientCharacteristicsForm";
 import CalculationMethodPanel from "@/components/calculator/CalculationMethodPanel";
 import RegimenForm from "@/components/calculator/RegimenForm";
+import { maintenanceCountMissing, requestRegimen } from "@/components/calculator/dosingHistory";
+import { describeMeasuredLevels, describeSelectedCurve, singleDoseNoun as singleDoseNounFor, singleDoseView } from "@/components/calculator/curveDescription";
+import { buildClinicalNote, ONE_LEVEL_UNCERTAINTY_SUMMARY, resolveCandidate } from "@/components/calculator/clinicalNote";
+import { buildReportData } from "@/components/calculator/exportReport";
 import LevelEntryTable, { manualHoursCollectionTime } from "@/components/calculator/LevelEntryTable";
 import { isEnteredLevel, requestLevel, timingIsValid, restoreLevelDrafts, type LevelDraft } from "./levelTiming";
 import { nextInputRevision, resultIsCurrent, responseIsCurrent } from "./inputRevision";
 import CalculatorActionBar from "@/components/calculator/CalculatorActionBar";
 import PrimaryMetricsCard from "@/components/calculator/PrimaryMetricsCard";
-import DoseRecommendationCard, { LoadingDosePopover } from "@/components/calculator/DoseRecommendationCard";
+import DoseRecommendationCard, { LoadingDosePopover, type SingleDoseStatus } from "@/components/calculator/DoseRecommendationCard";
 import TeachingNote from "@/components/calculator/TeachingNote";
 import Advisory from "@/components/calculator/Advisory";
 import InputSection from "@/components/calculator/InputSection";
@@ -49,7 +53,7 @@ import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFeature } from "@/hooks/useFeature";
 import { translateGeneratedText } from "@/localization/generatedText";
-import { printReport, type ReportData } from "@/lib/generateReport";
+import { printReport } from "@/lib/generateReport";
 import { track } from "@/lib/analytics";
 import { parseClinicalNumber, hasInvalidNumericValues, INVALID_NUMBER, clinicalDraftReplacer, clinicalDraftReviver } from "@/lib/parseClinicalNumber";
 import { COLIN_2019, modelDisplayName, modelShortName } from "@/lib/pk/modelRegistry";
@@ -90,6 +94,10 @@ function useMediaQuery(query: string): boolean {
   return matches;
 }
 
+/** Calculate is refused while the exact maintenance-dose count is blank or unusable (see dosingHistory.ts). */
+const MISSING_COUNT_MESSAGE =
+  "Enter the exact number of maintenance doses given (6 or more) before calculating. The doses you entered are kept.";
+
 const SESSION_KEY = "vancomyzer_calculator_state";
 const EIGHT_HOURS = 8 * 60 * 60 * 1000;
 
@@ -122,9 +130,6 @@ export default function CalculatorWorkspace() {
   // of the engine's recommendation. The response's top-level auc24/peak/trough
   // and curve describe the current regimen; frequency_options carry their own.
   const [viewCurrentRegimen, setViewCurrentRegimen] = useState(false);
-  // Pulse-dose only: lets the user flip the chart between their entered
-  // regimen (default) and the engine's auto-recommended adjustment.
-  const [showEngineRecommended, setShowEngineRecommended] = useState(false);
 
   // Snapshot of state before loading dose simulation — enables undo
   const preLoadingDoseState = useRef<{
@@ -135,6 +140,12 @@ export default function CalculatorWorkspace() {
     result: CalculateResponse | null;
     selectedFrequencyOption: FrequencyOption | null;
   } | null>(null);
+  // Empiric loading-dose PREVIEW: the suggested loading dose is calculated and
+  // plotted on the Empiric tab, but it is not part of the dosing history. It
+  // enters the history only through handleConfirmLoadingDoseGiven, with the
+  // dose the clinician confirms was actually given.
+  const [loadingPreview, setLoadingPreview] = useState(false);
+  const pendingLoadingDoseCalc = useRef(false);
 
   // Optional clinician-supplied tracking string for calculation history.
   // Persisted only if the user has the history.calculation feature (Pro+).
@@ -194,7 +205,7 @@ export default function CalculatorWorkspace() {
       if (s.levels) setLevels(restoreLevelDrafts(s.levels, s.timingDraftVersion));
       if (s.bedbound !== undefined) setBedbound(s.bedbound);
       if (s.viewMode) setViewMode(s.viewMode);
-      if (s.mode) setMode(s.mode);
+      if (s.mode) setMode(s.viewMode === "empiric" ? "initial_regimen" : s.mode);
       if (s.activeSection) setActiveSection(s.activeSection);
       // Restore drafts only: cached results cannot prove they match these inputs.
     } catch { /* corrupted — ignore */ }
@@ -209,14 +220,23 @@ export default function CalculatorWorkspace() {
       return;
     }
     try {
+      // During an Empiric loading-dose preview, persist the history as it was
+      // before the preview: the suggested dose was not given.
+      const preview = loadingPreview ? preLoadingDoseState.current : null;
       sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-        patient, rrt, regimen, levels, bedbound, timingDraftVersion: 1,
-        viewMode, mode, activeSection,
-        result, selectedFrequencyOption,
+        patient, rrt,
+        regimen: preview ? preview.regimen : regimen,
+        levels: preview ? preview.levels : levels,
+        bedbound, timingDraftVersion: 1,
+        viewMode,
+        mode: preview ? preview.mode : mode,
+        activeSection,
+        result: preview ? null : result,
+        selectedFrequencyOption: preview ? null : selectedFrequencyOption,
         timestamp: Date.now(),
       }, clinicalDraftReplacer));
     } catch { /* storage full — ignore */ }
-  }, [patient, rrt, regimen, levels, bedbound, viewMode, mode, activeSection, result, selectedFrequencyOption]);
+  }, [patient, rrt, regimen, levels, bedbound, viewMode, mode, activeSection, result, selectedFrequencyOption, loadingPreview]);
 
   // Pre-fill patient state from URL query params (overrides session restore)
   const didPreFillRef = useRef(false);
@@ -316,15 +336,20 @@ export default function CalculatorWorkspace() {
     // Loading-dose fields travel only with a multi-dose level workflow where
     // "Loading dose" is selected (an unfilled 0 is sent so the server rejects
     // it visibly); otherwise they are dropped so a stale entry cannot change the fit.
-    const hasLoading = (regimen.doses_given ?? 0) >= 2 && regimen.loading_dose_mg !== undefined;
-    const { loading_dose_mg, loading_infusion_duration_hours, loading_to_maintenance_hours, ...maintenance } = regimen;
-    const sentRegimen = hasLoading
-      ? { ...maintenance, loading_dose_mg, loading_infusion_duration_hours, ...(loading_to_maintenance_hours !== undefined ? { loading_to_maintenance_hours } : {}) }
-      : maintenance;
-    return { ...base, regimen: sentRegimen, levels: validLevels };
+    return { ...base, regimen: requestRegimen(regimen), levels: validLevels };
   }, [mode, patient, rrt, regimen, levels, canSaveHistory]);
 
   const applyViewMode = useCallback((next: WorkspaceViewMode) => {
+    // A tab switch ends an Empiric loading-dose preview. The suggested dose was
+    // never given, so it must not carry into the 1 Level / 2 Levels history.
+    const preview = preLoadingDoseState.current;
+    if (preview) {
+      setRegimen(preview.regimen);
+      setLevels(preview.levels);
+      preLoadingDoseState.current = null;
+    }
+    pendingLoadingDoseCalc.current = false;
+    setLoadingPreview(false);
     setViewMode(next);
     setError(null);
     setResult(null);
@@ -352,10 +377,17 @@ export default function CalculatorWorkspace() {
     setLoading(true);
     const request = { ...buildRequest(), intent };
     const seq = ++requestSeqRef.current;
-    if (invalidTiming || hasInvalidNumericValues(request)) {
+    // A blank or partial exact dose count (NaN) must never reach the engine as a
+    // different history; the form keeps what was entered and the count is asked for.
+    const countMissing = request.regimen !== undefined && maintenanceCountMissing(request.regimen);
+    if (invalidTiming || countMissing || hasInvalidNumericValues(request)) {
       const timingMessage = "Complete valid sample timing. In date/time mode, the sample must not precede the dose.";
-      setError({ error_type: "validation_error", message: invalidTiming ? timingMessage : INVALID_NUMBER,
-        ...(invalidTiming ? { field_errors: Object.fromEntries(levels.flatMap((level, i) => isEnteredLevel(level) && !timingIsValid(level) ? [[`levels[${i}].collection_time`, timingMessage]] : [])) } : {}),
+      const fieldErrors = {
+        ...(invalidTiming ? Object.fromEntries(levels.flatMap((level, i) => isEnteredLevel(level) && !timingIsValid(level) ? [[`levels[${i}].collection_time`, timingMessage]] : [])) : {}),
+        ...(countMissing ? { "regimen.doses_given": MISSING_COUNT_MESSAGE } : {}),
+      };
+      setError({ error_type: "validation_error", message: invalidTiming ? timingMessage : countMissing ? MISSING_COUNT_MESSAGE : INVALID_NUMBER,
+        ...(Object.keys(fieldErrors).length ? { field_errors: fieldErrors } : {}),
       });
       setResult(null);
       setLoading(false);
@@ -547,6 +579,11 @@ export default function CalculatorWorkspace() {
       doses_given: 1,
       interval_hours: prev.interval_hours > 0 ? prev.interval_hours : 12,
       target_auc24: prev.target_auc24 ?? 450,
+      // Recorded as "Loading dose given: yes, 0 maintenance doses" in the form.
+      // The request is unchanged: loading fields are only sent when doses_given ≥ 2.
+      loading_dose_mg: bedboundDoseData.dose_mg,
+      loading_infusion_duration_hours: bedboundDoseData.infusion_duration_hours,
+      loading_to_maintenance_hours: undefined,
     }));
     // Phase 1  open Drug Levels section so the pharmacist can enter the level when drawn
     setActiveSection("levels");
@@ -590,6 +627,9 @@ export default function CalculatorWorkspace() {
     setActiveSection("patient");
     setBedbound(false);
     setBedboundDoseData(null);
+    preLoadingDoseState.current = null;
+    pendingLoadingDoseCalc.current = false;
+    setLoadingPreview(false);
   }, []);
 
   const fieldErrors = getModeScopedFieldErrors(mode, error?.field_errors);
@@ -612,8 +652,19 @@ export default function CalculatorWorkspace() {
   // single-dose curve to match (the top-level curve is the dose continued at a
   // placeholder interval the loading-dose form never asks for). Each
   // candidate's curve is loading  that maintenance. Nothing is recomputed.
+  // The candidate selected by the clinician is the row of THIS response with
+  // that identity (dose, interval and infusion duration). A selection kept
+  // from another result (restored session, undo) that has no such row here is
+  // ignored, so no figure of another result can reach the band, graph, note or PDF.
+  const selectedCandidate = visibleResult ? resolveCandidate(visibleResult.frequency_options, selectedFrequencyOption) : null;
+  // Level workflows with no candidate to show (recommendation blocked or
+  // withheld, or none flagged): the figures on screen are the response's
+  // top-level ones, which describe the history as entered. They are shown and
+  // exported as the entered history, never under a "recommended" or
+  // "proposed" label.
+  const noCandidate = visibleResult?.recommendation_type === "existing_regimen" && !selectedCandidate && !recommendedOption;
   const currentRegimenOption: FrequencyOption | null =
-    visibleResult && shouldViewCurrentRegimen(visibleResult, viewCurrentRegimen)
+    visibleResult && (shouldViewCurrentRegimen(visibleResult, viewCurrentRegimen) || noCandidate)
       ? {
           dose_mg: regimen.dose_mg,
           interval_hours: regimen.interval_hours,
@@ -627,8 +678,27 @@ export default function CalculatorWorkspace() {
           clinical_note: visibleResult.documentation_preview?.clinical_note,
         }
       : null;
-  const activeOption = visibleResult ? currentRegimenOption ?? (selectedFrequencyOption ?? recommendedOption) : null;
+  const activeOption = visibleResult ? currentRegimenOption ?? (selectedCandidate ?? recommendedOption) : null;
   const activeIsCurrent = currentRegimenOption != null;
+  // The single-dose state belongs to the level workflow (or the Empiric
+  // loading-dose preview, which runs on it). On the plain Empiric path the
+  // request carries no regimen, so a leftover doses_given === 1 must not label
+  // the empiric result as "after a loading dose".
+  const isPulse = mode === "existing_regimen" && regimen.doses_given === 1;
+  const singleDoseStatus: SingleDoseStatus = loadingPreview
+    ? "suggested"
+    : regimen.loading_dose_mg !== undefined ? "given" : "single";
+  // The clinical note for the active row (NOTE tab, Copy Note and the PDF all
+  // use this one text): what was given, what is proposed, the one-level caution.
+  const composeNote = (result: CalculateResponse) =>
+    buildClinicalNote({
+      regimen,
+      response: result,
+      activeOption,
+      activeIsCurrent,
+      singleDoseStatus,
+      levels: levels.filter(isEnteredLevel).map((l) => ({ value_mcg_ml: l.value_mcg_ml, time_since_last_dose_hours: l.time_since_last_dose_hours })),
+    });
   // Estimated CrCl is reported by the engine as context text in key_inputs; it
   // is parsed for display on the renal row and never used in any calculation.
   const estimatedCrCl = (() => {
@@ -680,8 +750,6 @@ export default function CalculatorWorkspace() {
     setSelectedFrequencyOption(option);
   }, []);
 
-  const pendingLoadingDoseCalc = useRef(false);
-
   const handleSimulateLoadingDose = useCallback((doseMg: number, intervalHours: number, infusionHours: number) => {
     // Snapshot current state so we can undo back to initial regimen results
     preLoadingDoseState.current = {
@@ -692,9 +760,11 @@ export default function CalculatorWorkspace() {
       result,
       selectedFrequencyOption,
     };
-    // Switch to existing_regimen mode with doses_given=1 (pulse/loading dose)
-    // This tells the engine to show a single-dose PK curve, not steady state
-    setViewMode("one_level");
+    // Calculate the suggested loading dose with the single-dose workflow
+    // (existing_regimen, doses_given=1, no levels) but stay on the Empiric tab:
+    // this is a preview, not a dose given. The dosing history and level
+    // sections stay hidden until the clinician confirms the dose given.
+    setLoadingPreview(true);
     setMode("existing_regimen");
     setRegimen({
       dose_mg: doseMg,
@@ -708,8 +778,6 @@ export default function CalculatorWorkspace() {
     setSelectedFrequencyOption(null);
     setResult(null);
     setError(null);
-    // Don't jump to levels tab — keep user in context, results appear in the right panel
-    // The left panel stays where it is so the user isn't disoriented
     pendingLoadingDoseCalc.current = true;
   }, [viewMode, mode, regimen, levels, result, selectedFrequencyOption]);
 
@@ -724,6 +792,36 @@ export default function CalculatorWorkspace() {
     setSelectedFrequencyOption(snap.selectedFrequencyOption);
     setError(null);
     preLoadingDoseState.current = null;
+    pendingLoadingDoseCalc.current = false;
+    setLoadingPreview(false);
+  }, []);
+
+  // The clinician confirms the loading dose ACTUALLY given (entered by hand in
+  // the preview banner, never copied from the suggestion). It is recorded as
+  // "Loading dose given: yes, 0 maintenance doses" in the 1 Level history; the
+  // clinician then sets the maintenance doses given and the level.
+  const handleConfirmLoadingDoseGiven = useCallback((doseMg: number, infusionHours: number) => {
+    preLoadingDoseState.current = null;
+    pendingLoadingDoseCalc.current = false;
+    setLoadingPreview(false);
+    setViewMode("one_level");
+    setMode("existing_regimen");
+    setRegimen({
+      dose_mg: doseMg,
+      interval_hours: 12,
+      infusion_duration_hours: infusionHours,
+      doses_given: 1,
+      target_auc24: 450,
+      steady_state_confirmed: false,
+      loading_dose_mg: doseMg,
+      loading_infusion_duration_hours: infusionHours,
+    });
+    setLevels([{ ...defaultLevel }]);
+    setResult(null);
+    setResultRevision(null);
+    setError(null);
+    setSelectedFrequencyOption(null);
+    setActiveSection("regimen");
   }, []);
 
   // Auto-trigger calculation after loading dose state is set
@@ -735,50 +833,31 @@ export default function CalculatorWorkspace() {
   }, [mode, regimen, handleCalculate]);
 
   const handleCopyNote = useCallback(() => {
+    if (loadingPreview) return; // a suggested dose was never given
     if (!visibleResult || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
-    const note = activeOption?.clinical_note ?? visibleResult?.documentation_preview?.clinical_note;
+    const { note } = composeNote(visibleResult);
     if (!note) return;
     navigator.clipboard.writeText(translateGeneratedText(note, locale)).catch(() => {/* clipboard not available */});
-  }, [activeOption, visibleResult, locale, resultRevision]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- composeNote is rebuilt every render from these inputs
+  }, [activeOption, activeIsCurrent, visibleResult, locale, resultRevision, loadingPreview, regimen, levels, singleDoseStatus]);
 
   const handleExportPDF = useCallback(() => {
+    if (loadingPreview) return; // a suggested dose was never given
     if (!visibleResult || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
-    const opt = activeOption;
-    const reportData: ReportData = {
-      age: patient.age,
-      weight_kg: patient.weight_kg,
-      serum_creatinine_mg_dl: patient.serum_creatinine_mg_dl,
-      mode: visibleResult.recommendation_type,
-      recommendation_blocked: visibleResult.adjustment_dosing_blocked?.safety_message ?? visibleResult.empiric_dosing_blocked?.safety_message,
-      regimen_is_current: activeIsCurrent,
-      recommended_dose: opt ? String(opt.dose_mg) : visibleResult.recommended_dose,
-      recommended_interval_hours: opt?.interval_hours ?? visibleResult.recommended_interval_hours,
-      recommended_infusion_duration_hours: opt?.infusion_duration_hours ?? visibleResult.recommended_infusion_duration_hours,
-      auc24: opt?.auc24 ?? visibleResult.auc24,
-      peak: opt?.peak ?? visibleResult.peak,
-      trough: opt?.trough ?? visibleResult.trough,
-      pk_parameters: visibleResult.pk_parameters ? {
-        CL: visibleResult.pk_parameters.CL,
-        V1: visibleResult.pk_parameters.V1,
-        Q: visibleResult.pk_parameters.Q,
-        V2: visibleResult.pk_parameters.V2,
-        used_posterior_refinement: visibleResult.pk_parameters.used_posterior_refinement,
-      } : undefined,
-      pk_model_name: visibleResult.pk_parameters?.pk_model_name,
-      interpretation_summary: opt?.interpretation_summary ?? visibleResult.interpretation_summary,
-      assumptions: visibleResult.assumptions,
-      limitations: visibleResult.limitations,
-      clinical_note: opt?.clinical_note ?? visibleResult.documentation_preview?.clinical_note,
-      frequency_options: visibleResult.frequency_options?.filter(o => o.auc24 >= 400 && o.auc24 <= 600).map(o => ({
-        dose_mg: o.dose_mg,
-        interval_hours: o.interval_hours,
-        auc24: o.auc24,
-        peak: o.peak,
-        trough: o.trough,
-      })),
-    };
+    // One builder for the whole report (exportReport.ts): a proposed regimen's
+    // dose, interval, infusion duration and exposure all come from one
+    // candidate row of this response, or the report shows the history as entered.
+    const reportData = buildReportData({
+      patient,
+      regimen,
+      levels: levels.filter(isEnteredLevel).map((l) => ({ value_mcg_ml: l.value_mcg_ml, time_since_last_dose_hours: l.time_since_last_dose_hours })),
+      response: visibleResult,
+      activeOption,
+      activeIsCurrent,
+      singleDoseStatus,
+    });
     printReport(reportData, user?.subscriptionTier ?? "free", locale);
-  }, [visibleResult, activeOption, activeIsCurrent, patient, user?.subscriptionTier, locale, resultRevision]);
+  }, [visibleResult, activeOption, activeIsCurrent, patient, user?.subscriptionTier, locale, resultRevision, loadingPreview, regimen, levels, singleDoseStatus]);
 
   const leftColumn = (
     <div className="flex h-full flex-col">
@@ -815,14 +894,14 @@ export default function CalculatorWorkspace() {
         </InputSection>
 
         {/* Regimen — only in existing_regimen mode */}
-        {mode === "existing_regimen" && (
+        {mode === "existing_regimen" && !loadingPreview && (
           <InputSection id="regimen" title="Dosing history" completed={regimenReady} focusSection={activeSection}>
             <RegimenForm value={regimen} onChange={setRegimen} fieldErrors={fieldErrors} />
           </InputSection>
         )}
 
         {/* Levels — only in existing_regimen mode */}
-        {mode === "existing_regimen" && (
+        {mode === "existing_regimen" && !loadingPreview && (
           <InputSection id="levels" title="Drug levels" completed={levelReady} focusSection={activeSection}>
             {bedbound && (
               <div className="mb-2">
@@ -895,7 +974,7 @@ export default function CalculatorWorkspace() {
   );
 
   // ── Derived display values shared by the band, the table and the graph ──
-  const isPulse = regimen.doses_given === 1;
+  const singleDoseNoun = singleDoseNounFor(singleDoseStatus);
   // One rule for every path: the active option's exposure, else the response's
   // top-level exposure (the regimen as entered).
   const metricAuc = activeOption?.auc24 ?? displayResult?.auc24;
@@ -903,8 +982,8 @@ export default function CalculatorWorkspace() {
   const metricTrough = activeOption?.trough ?? displayResult?.trough;
   const metricsCaption = isPulse
     ? activeIsCurrent
-      ? `Loading dose — ${regimen.dose_mg} mg × 1 · first 24 h, not steady state`
-      : `Maintenance after loading dose${activeOption ? ` — ${activeOption.dose_mg} mg q${activeOption.interval_hours}h` : ""} — steady-state PK`
+      ? `${singleDoseNoun} — ${regimen.dose_mg} mg × 1 · first 24 h, not steady state`
+      : `Maintenance after ${singleDoseNoun.toLowerCase()}${activeOption ? ` — ${activeOption.dose_mg} mg q${activeOption.interval_hours}h` : ""} — steady-state PK`
     : activeIsCurrent
       ? (displayResult?.exposure_horizon === "actual_history"
           ? `Current regimen — steady-state projection (actual history: ${displayResult.actual_history_exposure?.doses_given ?? "?"} doses given)`
@@ -915,11 +994,13 @@ export default function CalculatorWorkspace() {
       ? {
           dose_mg: regimen.dose_mg,
           interval_hours: regimen.interval_hours,
+          infusion_duration_hours: regimen.infusion_duration_hours,
           auc24: displayResult.auc24,
           peak: displayResult.peak,
           trough: displayResult.trough,
-          label: isPulse ? "loading dose" : "current",
+          label: isPulse ? singleDoseNoun.toLowerCase() + (singleDoseStatus === "suggested" ? " (not given)" : "") : "current",
           single_dose: isPulse,
+          single_dose_kind: isPulse ? singleDoseStatus : undefined,
         }
       : null;
   // Dashed reference on the graph: the engine recommendation whenever something
@@ -929,10 +1010,12 @@ export default function CalculatorWorkspace() {
       ? recommendedOption.curve
       : null;
   const comparisonLabel = recommendedOption
-    ? `Recommended ${recommendedOption.dose_mg} mg q${recommendedOption.interval_hours}h${isPulse ? " after loading dose" : " (steady state)"}`
+    ? `Recommended ${recommendedOption.dose_mg} mg q${recommendedOption.interval_hours}h${isPulse ? ` after ${singleDoseNoun.toLowerCase()} ${regimen.dose_mg} mg` : " (steady state)"}`
     : null;
-  const clinicalNote = translateGeneratedText(activeOption?.clinical_note ?? displayResult?.documentation_preview?.clinical_note ?? "", locale);
-  const exportsDisabled = resultObscured || !visibleResult;
+  const clinicalNote = translateGeneratedText(displayResult ? composeNote(displayResult).note : "", locale);
+  // A suggested loading dose was never given: no clinical note or PDF can be
+  // produced from the preview. Exports come back once the dose given is recorded.
+  const exportsDisabled = resultObscured || !visibleResult || loadingPreview;
 
   const advisories: ReactNode[] = [];
   if (displayResult?.review_hold) {
@@ -982,8 +1065,21 @@ export default function CalculatorWorkspace() {
   if (displayResult?.calculation_details && !priorOnlyEmpiric) {
     const rs = displayResult.calculation_details.review_status;
     const sev = rs.level === "supported" ? "success" : rs.level === "caution" ? "caution" : "info";
+    // One measured level: say plainly what "limited certainty" means. Wording
+    // only; the calculation and the review status itself are unchanged.
+    const oneLevel =
+      displayResult.recommendation_type === "existing_regimen" &&
+      rs.level === "caution" &&
+      levels.filter(isEnteredLevel).length === 1;
     advisories.push(
-      <Advisory key="review" severity={sev} title={rs.banner_title} summary={rs.banner_body} collapsible>
+      <Advisory
+        key="review"
+        severity={sev}
+        title={oneLevel ? "One level: treat this estimate as provisional" : rs.banner_title}
+        summary={oneLevel ? ONE_LEVEL_UNCERTAINTY_SUMMARY : rs.banner_body}
+        collapsible
+      >
+        {oneLevel && <p className="m-0 mb-1"><strong><LocalizedText text={rs.banner_title} />.</strong> <LocalizedText text={rs.banner_body} /></p>}
         <p className="m-0"><strong><LocalizedText text="Evidence:" /></strong> <LocalizedText text={displayResult.calculation_details.evidence_strength} />. <LocalizedText text={displayResult.calculation_details.data_quality_summary} /></p>
         {rs.next_actions.length > 0 && (
           <ul className="mt-1 list-disc pl-4">{rs.next_actions.map((a, i) => <li key={i}><LocalizedText text={a} /></li>)}</ul>
@@ -1033,11 +1129,65 @@ export default function CalculatorWorkspace() {
     );
   }
 
-  const graphCurve =
-    activeOption?.curve
-    ?? (showEngineRecommended && displayResult?.curve_engine_recommended
-        ? displayResult.curve_engine_recommended
-        : displayResult?.curve ?? []);
+  // One description of the solid curve, shared by the legend and the
+  // single-dose banner (curveDescription.ts) so they always name the same curve.
+  const graphCurveLabel: string | null = displayResult
+    ? describeSelectedCurve({
+        singleDose: isPulse,
+        singleDoseStatus,
+        regimen,
+        viewingCurrent: activeIsCurrent,
+        activeOption,
+        hasSingleDoseCurve: Boolean(displayResult.loading_dose_curve),
+        actualHistory: displayResult.exposure_horizon === "actual_history",
+        // The engine's recommendation is always a candidate row now
+        // (buildCalculateResponse), so there is no separate curve toggle.
+        showEngineRecommended: false,
+        hasEngineRecommendedCurve: false,
+        engineRecommended: recommendedOption ? { dose_mg: recommendedOption.dose_mg, interval_hours: recommendedOption.interval_hours } : null,
+      })
+    : null;
+  // With no regimen selected or proposed (for example a blocked recommendation)
+  // a single dose is drawn on its own, never continued at a placeholder interval.
+  const enteredHistoryCurve =
+    displayResult?.recommendation_type === "existing_regimen"
+      ? (isPulse ? displayResult.loading_dose_curve ?? null : displayResult.curve ?? null)
+      : null;
+  const graphCurve = activeOption?.curve ?? enteredHistoryCurve ?? displayResult?.curve ?? [];
+  // Measured levels are observations made under the history as entered. They
+  // are drawn on that history's curve at their own times: on the solid curve
+  // when it is the entered history, otherwise on a separate dotted curve of
+  // the entered history, never on a candidate's projection (curveDescription.ts).
+  const solidIsEnteredHistory = activeIsCurrent || !activeOption?.curve;
+  // A candidate with the same dose, interval and infusion duration as the
+  // regimen entered is that regimen continued, not a regimen "not yet given".
+  // The classification is the one the note and the PDF print (clinicalNote.ts).
+  const projectionIsEnteredRegimen =
+    !solidIsEnteredHistory && visibleResult != null && composeNote(visibleResult).summary?.proposed?.change === "none";
+  const measuredDisplay = displayResult && displayResult.recommendation_type === "existing_regimen"
+    ? describeMeasuredLevels({
+        levels: displayResult.measured_levels ?? [],
+        // The form's time after the dose and dose count describe this result
+        // only while it is current. A result kept on screen while inputs are
+        // being edited gets neither, so its anchors hold response values only.
+        hoursAfterLastDose: resultObscured ? [] : levels.filter(isEnteredLevel).map((l) => l.time_since_last_dose_hours),
+        solidIsEnteredHistory,
+        hasEnteredHistoryCurve: (enteredHistoryCurve?.length ?? 0) > 1,
+        enteredHistoryLabel: describeSelectedCurve({
+          singleDose: isPulse,
+          singleDoseStatus,
+          regimen,
+          viewingCurrent: true,
+          activeOption: { dose_mg: regimen.dose_mg, interval_hours: regimen.interval_hours },
+          hasSingleDoseCurve: Boolean(displayResult.loading_dose_curve),
+          actualHistory: displayResult.exposure_horizon === "actual_history",
+          showEngineRecommended: false,
+          hasEngineRecommendedCurve: false,
+        }),
+        dosesGiven: resultObscured ? undefined : regimen.doses_given,
+        projectionIsEnteredRegimen,
+      })
+    : null;
 
   const detailTabs = displayResult ? [
     {
@@ -1148,7 +1298,7 @@ export default function CalculatorWorkspace() {
           <div className="vz-panel-head">
             <div className="flex min-w-0 items-center gap-2">
               <h2 id="vz-band-title" className="vz-panel-title m-0">
-                <LocalizedText text={displayResult?.recommendation_type === "existing_regimen" ? "Dosing adjustment" : "Dosing recommendation"} />
+                <LocalizedText text={displayResult?.recommendation_type === "existing_regimen" && !loadingPreview ? "Dosing adjustment" : "Dosing recommendation"} />
               </h2>
               {displayResult && (
                 <span className="hidden md:inline">
@@ -1171,7 +1321,8 @@ export default function CalculatorWorkspace() {
               {displayResult && (
                 <div className={exportsDisabled ? "pointer-events-none opacity-40" : ""} aria-disabled={exportsDisabled}>
                   <div className="flex flex-wrap items-center gap-1.5">
-                    {!isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (
+                    {/* Loading-dose preview is an Empiric-tab tool; on the level tabs a loading dose is entered as given in the dosing history. */}
+                    {viewMode === "empiric" && !isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (
                       <LoadingDosePopover weightKg={patient.weight_kg > 0 ? patient.weight_kg : null} onSimulate={handleSimulateLoadingDose} />
                     )}
                     <PdfExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? "free"} onExport={handleExportPDF} />
@@ -1181,6 +1332,9 @@ export default function CalculatorWorkspace() {
                   </div>
                 </div>
               )}
+              {displayResult && loadingPreview && (
+                <span className="text-[10px] font-semibold" style={{ color: "#1d4ed8" }} role="note"><LocalizedText text="PDF and note are off for a suggested dose that was not given." /></span>
+              )}
             </div>
           </div>
 
@@ -1188,18 +1342,6 @@ export default function CalculatorWorkspace() {
             <div className={resultObscured ? "vz-obscured-content" : ""} aria-hidden={resultObscured}>
               {displayResult ? (
                 <div className="flex flex-col gap-2">
-                  {/* Pulse-dose curve toggle */}
-                  {displayResult.curve_engine_recommended && !activeOption && !displayResult.adjustment_dosing_blocked && (
-                    <div className="flex items-center gap-2 text-xs">
-                      <span style={{ color: "var(--color-secondary)" }}><LocalizedText text="Curve:" /></span>
-                      <div className="vz-seg">
-                        <button type="button" aria-pressed={!showEngineRecommended} onClick={() => setShowEngineRecommended(false)}>
-                          <LocalizedText text={isPulse ? `Loading dose continued (${regimen.dose_mg} mg q${regimen.interval_hours}h)` : `Your regimen (${regimen.dose_mg} mg q${regimen.interval_hours}h)`} />
-                        </button>
-                        <button type="button" aria-pressed={showEngineRecommended} onClick={() => setShowEngineRecommended(true)}><LocalizedText text="Suggested regimen" /></button>
-                      </div>
-                    </div>
-                  )}
                   {displayResult.review_hold && (
                     <div className="flex flex-wrap items-stretch gap-2">
                       <div className="flex-1 min-w-[260px] px-3 py-2" style={{ background: "var(--color-bg)", border: "1px solid #fca5a5" }}>
@@ -1223,7 +1365,15 @@ export default function CalculatorWorkspace() {
                     calculationDetails={displayResult.calculation_details}
                     recommended_infusion_duration_hours={displayResult.recommended_infusion_duration_hours}
                     infusion_duration_adjusted_for_safety={displayResult.infusion_duration_adjusted_for_safety}
-                    infusion_safety_note={displayResult.infusion_safety_note}
+                    // The infusion-rate note describes the engine's recommended
+                    // regimen (buildCalculateResponse keeps it off every other
+                    // candidate's text). In the level workflow it is shown, and
+                    // exported (clinicalNote.ts), only with that row.
+                    infusion_safety_note={
+                      displayResult.recommendation_type === "existing_regimen" && !(activeOption?.is_recommended === true && !activeIsCurrent)
+                        ? undefined
+                        : displayResult.infusion_safety_note
+                    }
                     frequency_options={displayResult.frequency_options}
                     draftDiffersFromCalculated={hasStaleResult}
                     onApplyRecommendation={handleApplyRecommendedRegimen}
@@ -1236,7 +1386,11 @@ export default function CalculatorWorkspace() {
                     predicted_auc24={displayResult.predicted_auc24}
                     isPulseDose={isPulse}
                     loadingDoseMg={isPulse ? regimen.dose_mg : null}
-                    onUndoLoadingDose={preLoadingDoseState.current ? handleUndoLoadingDose : undefined}
+                    loadingDoseStatus={singleDoseStatus}
+                    curveDescription={graphCurveLabel}
+                    singleDoseView={singleDoseView({ viewingCurrent: activeIsCurrent, activeOption, regimenProposed: !displayResult.adjustment_dosing_blocked && !displayResult.review_hold })}
+                    onUndoLoadingDose={loadingPreview ? handleUndoLoadingDose : undefined}
+                    onConfirmLoadingDoseGiven={loadingPreview ? handleConfirmLoadingDoseGiven : null}
                     empiricDosingBlocked={displayResult.empiric_dosing_blocked}
                     adjustmentDosingBlocked={displayResult.adjustment_dosing_blocked}
                     metricsSlot={
@@ -1326,7 +1480,14 @@ export default function CalculatorWorkspace() {
               curve={graphCurve}
               comparison_curve={comparisonCurve}
               comparison_label={comparisonLabel}
+              curve_label={graphCurveLabel}
               measured_levels={displayResult?.measured_levels ?? []}
+              measured_placement={measuredDisplay?.placement ?? "solid"}
+              observed_curve={measuredDisplay?.placement === "reference" ? enteredHistoryCurve : null}
+              observed_label={measuredDisplay?.referenceLabel}
+              measured_label={measuredDisplay?.legend}
+              measured_note={measuredDisplay?.note}
+              measured_anchors={measuredDisplay?.anchors}
               calculationDetails={displayResult?.calculation_details ?? null}
               pk_model_name={displayResult?.pk_parameters?.pk_model_name}
               band_info={displayResult?.parameter_uncertainty}

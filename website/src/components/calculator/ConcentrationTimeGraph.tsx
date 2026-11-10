@@ -9,6 +9,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { CalculationDetails, ParameterUncertaintySummary } from "@/types/calculator";
 import { modelShortName } from "@/lib/pk/modelRegistry";
 import { fmt } from "@/lib/formatNumber";
+import { MEASURED_REFERENCE_PREFIX } from "./curveDescription";
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -45,9 +46,33 @@ interface ConcentrationTimeGraphProps {
   comparison_curve?: CurvePoint[] | null;
   /** Legend label for the comparison curve (e.g. "Recommended 1250 mg q12h"). */
   comparison_label?: string | null;
+  /**
+   * How the measured levels relate to the solid curve (curveDescription.ts).
+   * "solid" (default): the solid curve is the entered history the levels were
+   * drawn under, and the markers sit on it. "reference": the solid curve is a
+   * projection of a regimen not given; the markers are drawn on
+   * `observed_curve` (the entered history, dotted) instead. "hidden": no
+   * marker is drawn.
+   */
+  measured_placement?: "solid" | "reference" | "hidden";
+  /** The entered history's own curve, drawn dotted to carry the markers when the solid curve is a projection. */
+  observed_curve?: CurvePoint[] | null;
+  /** Legend phrase of `observed_curve` (the entered history), printed after "Levels measured under:". */
+  observed_label?: string | null;
+  /** Legend label for the markers. */
+  measured_label?: string | null;
+  /** Sentence separating observations from the projection, shown under the legend. */
+  measured_note?: string | null;
+  /** One line per measured level with its time anchor, shown under the legend. */
+  measured_anchors?: string[] | null;
+  /** What the solid predicted curve shows (e.g. "2000 mg loading dose, then 750 mg q12h"). */
+  curve_label?: string | null;
 }
 
 /** True when the curve carries engine-computed band edges. */
+/** Dotted entered-history curve and the measured markers on it (muted slate, distinct from the solid projection). */
+const OBSERVED_COLOR = "#475569";
+
 function curveHasBand(curve: CurvePoint[]): boolean {
   return curve.length > 1 && curve.every((p) => Number.isFinite(p.lower) && Number.isFinite(p.upper));
 }
@@ -180,6 +205,8 @@ function drawGraph(
   bandLevel: number,
   comparison: CurvePoint[] = [],
   locale: Locale = "en",
+  observed: CurvePoint[] = [],
+  measuredOnReference: boolean = false,
 ) {
   const label = (source: string) => translate(source, locale);
   const ctx = canvas.getContext("2d");
@@ -205,7 +232,7 @@ function drawGraph(
   const crossV = getCSSColor("--color-primary-a40", "rgba(0,255,65,0.4)");
   const crossH = getCSSColor("--color-primary-a20", "rgba(0,255,65,0.2)");
 
-  const { xMin, xMax, yMin, yMax } = calcDomains([...curve, ...comparison], measured, zoom);
+  const { xMin, xMax, yMin, yMax } = calcDomains([...curve, ...comparison, ...observed], measured, zoom);
   const gw = w - PAD.left - PAD.right;
   const gh = h - PAD.top - PAD.bottom;
 
@@ -402,6 +429,23 @@ function drawGraph(
     ctx.restore();
   }
 
+  // ─── Entered history (dotted, muted) — carries the measured levels while
+  //      the solid curve is a projection of a regimen that was not given ───
+  if (observed.length > 1) {
+    ctx.save();
+    ctx.strokeStyle = OBSERVED_COLOR;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([2, 3]);
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(toX(observed[0].time_hours), toY(observed[0].concentration));
+    for (let i = 1; i < observed.length; i++) {
+      ctx.lineTo(toX(observed[i].time_hours), toY(observed[i].concentration));
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
   // ─── Glow path ───
   if (curve.length > 1) {
     const drawLen = Math.floor(curve.length * animProgress);
@@ -448,7 +492,10 @@ function drawGraph(
     ctx.arc(mx, my, 5, 0, Math.PI * 2);
     ctx.fillStyle = "#ffffff";
     ctx.fill();
-    ctx.strokeStyle = primary;
+    // On the solid curve the marker takes the curve's colour. On the dotted
+    // entered-history curve it takes that curve's muted colour, so it never
+    // reads as a point on the projection.
+    ctx.strokeStyle = measuredOnReference ? OBSERVED_COLOR : primary;
     ctx.lineWidth = 2;
     ctx.stroke();
   }
@@ -610,6 +657,13 @@ export default function ConcentrationTimeGraph({
   band_info,
   comparison_curve,
   comparison_label,
+  curve_label,
+  measured_placement = "solid",
+  observed_curve,
+  observed_label,
+  measured_label,
+  measured_note,
+  measured_anchors,
 }: ConcentrationTimeGraphProps) {
   const { locale } = useLanguage();
   const band = bandDescription(band_info);
@@ -634,8 +688,14 @@ export default function ConcentrationTimeGraph({
 
   // Stable references so the draw-loop effect only restarts when data changes.
   const curveData = useMemo(() => curve ?? [], [curve]);
-  const measuredData = useMemo(() => measured_levels ?? [], [measured_levels]);
+  // Markers are drawn only where they belong: on the solid curve when it is
+  // the entered history, on the dotted entered-history curve when the solid
+  // curve is a projection, and not at all when that curve is unavailable.
+  const measuredOnReference = measured_placement === "reference" && (observed_curve?.length ?? 0) > 1;
+  const measuredHidden = measured_placement === "hidden" || (measured_placement === "reference" && !measuredOnReference);
+  const measuredData = useMemo(() => (measuredHidden ? [] : measured_levels ?? []), [measured_levels, measuredHidden]);
   const comparisonData = useMemo(() => comparison_curve ?? [], [comparison_curve]);
+  const observedData = useMemo(() => (measuredOnReference ? observed_curve ?? [] : []), [observed_curve, measuredOnReference]);
 
   // Animate curve on new data
   useEffect(() => {
@@ -673,13 +733,13 @@ export default function ConcentrationTimeGraph({
       if (!running) return;
       const canvas = canvasRef.current;
       if (canvas) {
-        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandLevel, comparisonData, locale);
+        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandLevel, comparisonData, locale, observedData, measuredOnReference);
       }
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
     return () => { running = false; };
-  }, [curveData, measuredData, zoom, mouse, bandLevel, comparisonData, locale]);
+  }, [curveData, measuredData, zoom, mouse, bandLevel, comparisonData, locale, observedData, measuredOnReference]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -765,7 +825,7 @@ export default function ConcentrationTimeGraph({
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 px-1 pt-1.5 shrink-0" style={{ fontFamily: FONT }}>
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-          <span className="inline-block w-4 h-0.5" style={{ background: getCSSColor("--color-primary", "#00ff41") }} />{" "}<LocalizedText text="Predicted" /></span>
+          <span className="inline-block w-4 h-0.5" style={{ background: getCSSColor("--color-primary", "#00ff41") }} />{" "}<LocalizedText text="Predicted" />{curve_label ? <>{": "}<LocalizedText text={curve_label} /></> : null}</span>
         {comparisonData.length > 1 && (
           <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
             <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44"), borderTopWidth: 1.5 }} /> <LocalizedText text={comparison_label ?? "Reference"} />
@@ -793,11 +853,34 @@ export default function ConcentrationTimeGraph({
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}><LocalizedText text="◆ Trough" /></span>
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span style={{ color: getCSSColor("--color-primary", "#00ff41") }}>▲</span>{" "}<LocalizedText text="Peak" /></span>
-        {measuredData.length > 0 && (
-          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
-            <span className="inline-block w-2 h-2" style={{ background: "#fff", border: `1px solid ${getCSSColor("--color-primary", "#00ff41")}` }} />{" "}<LocalizedText text="Measured" /></span>
+        {observedData.length > 1 && (
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} data-testid="graph-observed-legend">
+            <span className="inline-block w-4 h-0.5 border-t border-dotted" style={{ borderColor: OBSERVED_COLOR, borderTopWidth: 2 }} />{" "}<LocalizedText text={MEASURED_REFERENCE_PREFIX} />{observed_label ? <>{": "}<LocalizedText text={observed_label} /></> : null}
+          </span>
+        )}
+        {(measured_levels?.length ?? 0) > 0 && (
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} data-testid="graph-measured-legend">
+            {!measuredHidden && (
+              <span className="inline-block w-2 h-2 rounded-full" style={{ background: "#fff", border: `1px solid ${measuredOnReference ? OBSERVED_COLOR : getCSSColor("--color-primary", "#00ff41")}` }} />
+            )}{" "}<LocalizedText text={measured_label ?? "Measured"} /></span>
         )}
       </div>
+      {/* Observations vs. projection: what the markers are, and when each was drawn */}
+      {(measured_levels?.length ?? 0) > 0 && (measured_note || (measured_anchors && measured_anchors.length > 0)) && (
+        <div
+          className="px-1 pt-1 text-[10px] leading-4 shrink-0"
+          style={{ fontFamily: FONT, color: getCSSColor("--color-dim", "#009933") }}
+          data-testid="graph-measured-context"
+          data-measured-placement={measuredHidden ? "hidden" : measuredOnReference ? "reference" : "solid"}
+          data-measured-markers={measuredData.length}
+          data-observed-curve-points={observedData.length}
+        >
+          {measured_note && <p className="m-0" data-testid="graph-measured-note"><LocalizedText text={measured_note} /></p>}
+          {(measured_anchors ?? []).map((a, i) => (
+            <p key={i} className="m-0" data-testid="graph-measured-anchor"><LocalizedText text={a} /></p>
+          ))}
+        </div>
+      )}
     </LocalizedDiv>
   );
 }

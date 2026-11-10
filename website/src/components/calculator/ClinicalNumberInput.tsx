@@ -26,6 +26,12 @@ export interface ClinicalNumberInputProps extends NativeInputProps {
   onBlurValue?: (value: number | null, raw: string, error: string | null) => void;
   /** Class names, or a function that receives whether the text is not a usable number. */
   className?: string | ((invalidText: boolean) => string);
+  /**
+   * Message for a blank field whose parent holds NaN (a required entry the form
+   * cannot default, such as an exact dose count). Without it the generic
+   * invalid-number message is shown.
+   */
+  emptyError?: string;
 }
 
 export const INVALID_NUMBER_MESSAGE = INVALID_NUMBER;
@@ -45,6 +51,7 @@ export default function ClinicalNumberInput({
   onBlurValue,
 
   className,
+  emptyError,
   inputMode = "decimal",
   autoComplete = "off",
   min, max, step,
@@ -73,7 +80,7 @@ export default function ClinicalNumberInput({
 
   const parsed = describe(raw, interpretation);
   const rangeError = parsed.value !== null && ((min !== undefined && parsed.value < Number(min)) || (max !== undefined && parsed.value > Number(max)) || (String(step) === "1" && !Number.isInteger(parsed.value)));
-  const error = parsed.error || (!Number.isFinite(value) && raw.trim() === "" ? INVALID_NUMBER : null) || (rangeError ? NUMBER_RANGE : null);
+  const error = parsed.error || (!Number.isFinite(value) && raw.trim() === "" ? emptyError ?? INVALID_NUMBER : null) || (rangeError ? NUMBER_RANGE : null);
   const invalidText = error !== null;
   // Existing form wrappers display callback errors on blur; avoid repeating them.
   const showInlineError = Boolean(error && (!onBlurValue || (raw.trim() === "" && !Number.isFinite(value))));

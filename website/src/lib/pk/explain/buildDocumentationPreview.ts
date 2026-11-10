@@ -1,5 +1,6 @@
 import type { ExplanationInput } from "../types";
 import { COLIN_2019, modelShortName } from "../modelRegistry";
+import { infusionChangeText } from "../regimenIdentity";
 
 function buildRecommendationDelta(input: ExplanationInput): string {
   const { engineOutput, recommendation } = input;
@@ -25,8 +26,15 @@ function buildRecommendationDelta(input: ExplanationInput): string {
     parts.push(`interval shortening from q${currentInterval}h to q${recommendedInterval}h`);
   }
 
-  return parts.length > 0
-    ? `Change summary: ${parts.join("; ")}.`
+  if (parts.length > 0) return `Change summary: ${parts.join("; ")}.`;
+  // Same dose and interval is the same regimen only when the infusion duration
+  // is also unchanged (regimenIdentity.ts). Wording only.
+  const infusionChange = infusionChangeText(
+    { dose_mg: currentDose, interval_hours: currentInterval, infusion_duration_hours: engineOutput.current_regimen_infusion_hours },
+    { dose_mg: recommendedDose, interval_hours: recommendedInterval, infusion_duration_hours: recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours },
+  );
+  return infusionChange
+    ? `Change summary: ${infusionChange}; dose and interval unchanged.`
     : "Change summary: same practical regimen step retained after bounded review of exposure and timing semantics.";
 }
 
@@ -69,9 +77,16 @@ export function buildDocumentationPreview(input: ExplanationInput): {
   // "Recommendation: — every 0 h infused over 0 h" and "Change summary: interval
   // shortening from q6h to q0h" — advice pointing the opposite way from the hold
   // the safety card gives, in the permanent record.
+  //
+  // The same holds for a review hold (discordant same-time levels): the
+  // adjustment computed before the hold is withdrawn from the response, so the
+  // note states the hold and its reason instead of the withdrawn regimen.
   const blocked = recommendation.adjustment_dosing_blocked;
+  const hold = input.review_hold;
   const recommendationLines = blocked
     ? [`${blocked.review_required ? "Pharmacy review required — no automatic maintenance regimen" : "Maintenance dosing held"} — ${blocked.safety_message}`, blocked.recommended_action]
+    : hold
+      ? ["Recommendation withheld: no dose adjustment is presented until the entered levels are reconciled.", hold.message]
     : [
         `Recommendation: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${Number(((recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1) * 60).toFixed(6))} minutes`,
         changeSummary,
@@ -80,8 +95,8 @@ export function buildDocumentationPreview(input: ExplanationInput): {
   const quick_summary = [
     `AUC24: ${auc24} mg·h/L; peak ${peak}; trough ${trough} mg/L (${estimateLabel})`,
     ...recommendationLines,
-    ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
-    ...(recommendation.infusion_duration_adjusted_for_safety && recommendation.infusion_safety_note ? [recommendation.infusion_safety_note] : []),
+    ...(sparseHighExposureNote && !hold ? [sparseHighExposureNote] : []),
+    ...(!hold && recommendation.infusion_duration_adjusted_for_safety && recommendation.infusion_safety_note ? [recommendation.infusion_safety_note] : []),
     `SCr: ${scr} mg/dL (${modelShortName(engineOutput.model_name)} renal covariate). Fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Assumptions and limitations apply.`,
   ].join("\n");
 
@@ -89,7 +104,7 @@ export function buildDocumentationPreview(input: ExplanationInput): {
     `Vancomycin existing regimen evaluation (${estimateLabel} estimate).`,
     `AUC24: ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L.`,
     ...recommendationLines,
-    ...(sparseHighExposureNote ? [sparseHighExposureNote] : []),
+    ...(sparseHighExposureNote && !hold ? [sparseHighExposureNote] : []),
     // Must name the prior that actually ran — this line goes into the chart.
     engineOutput.model_name === COLIN_2019.id
       ? `SCr: ${scr} mg/dL (direct ${COLIN_2019.shortName} covariate in the population prior; separate fitted-clearance cap uses Cockcroft-Gault). Explicit adult prior model: ${COLIN_2019.shortName} two-compartment; ${used_posterior_refinement ? "bounded initial posterior update from level(s)." : "no posterior update."}`

@@ -8,6 +8,8 @@ import React, { useState } from "react";
 import { CalculationDetails, FrequencyOption, AucRangeStatus, ArcAdvisory } from "@/types/calculator";
 import { fmt } from "@/lib/formatNumber";
 import { computeSafeInfusionDurationMinutes } from "@/lib/pk/recommend/infusionSafety";
+import { singleDoseBannerCaption, type SingleDoseView } from "./curveDescription";
+import { sameRegimen } from "@/lib/pk/regimenIdentity";
 
 interface DoseRecommendationCardProps {
   recommended_dose?: string | null;
@@ -36,6 +38,18 @@ interface DoseRecommendationCardProps {
   isPulseDose?: boolean;
   loadingDoseMg?: number | null;
   onUndoLoadingDose?: (() => void);
+  /**
+   * What the single dose in `loadingDoseMg` is: a loading dose only suggested
+   * in the Empiric preview (not given), a loading dose recorded as given, or a
+   * single maintenance dose given without a loading dose.
+   */
+  loadingDoseStatus?: SingleDoseStatus;
+  /** Empiric preview only: record the loading dose actually given and open the level workflow. */
+  onConfirmLoadingDoseGiven?: ((doseMg: number, infusionHours: number) => void) | null;
+  /** The graph legend's description of the curve drawn (curveDescription.ts); the banner repeats it. */
+  curveDescription?: string | null;
+  /** Which row that curve belongs to (defaults from activeIsCurrent); "none" when no regimen is selected or proposed. */
+  singleDoseView?: SingleDoseView;
   /** When set, replaces the standard dose card with a pulse-dose safety state. */
   empiricDosingBlocked?: {
     review_required?: boolean;
@@ -254,6 +268,115 @@ export function aucRangeLabel(auc: number): { label: string; color: string; badg
   };
 }
 
+export type SingleDoseStatus = "suggested" | "given" | "single";
+
+const BANNER_STYLE: Record<SingleDoseStatus, { border: string; bg: string; fg: string; sub: string }> = {
+  suggested: { border: "#93c5fd", bg: "#eff6ff", fg: "#1d4ed8", sub: "#1e3a8a" },
+  given: { border: "#6ee7b7", bg: "#ecfdf5", fg: "#047857", sub: "#065f46" },
+  single: { border: "#6ee7b7", bg: "#ecfdf5", fg: "#047857", sub: "#065f46" },
+};
+
+function SingleDoseBanner({
+  doseMg,
+  status,
+  onUndo,
+  onConfirmGiven,
+  curveDescription,
+  view,
+}: {
+  doseMg: number;
+  status: SingleDoseStatus;
+  onUndo?: () => void;
+  onConfirmGiven?: ((doseMg: number, infusionHours: number) => void) | null;
+  curveDescription?: string | null;
+  view: SingleDoseView;
+}) {
+  const [confirming, setConfirming] = useState(false);
+  const [givenMg, setGivenMg] = useState<number>(0);
+  const [givenMin, setGivenMin] = useState<number>(0);
+  const c = BANNER_STYLE[status];
+  const canConfirm = givenMg > 0 && givenMin > 0;
+  const title =
+    status === "suggested" ? "SUGGESTED LOADING DOSE (NOT GIVEN):" : status === "single" ? "SINGLE DOSE GIVEN:" : "LOADING DOSE GIVEN:";
+  // The caption names the curve the graph is drawing, in the legend's words.
+  const caption = singleDoseBannerCaption(
+    status,
+    curveDescription ?? `${status === "single" ? "single dose" : status === "suggested" ? "suggested loading dose" : "loading dose"} ${doseMg} mg`,
+    view,
+  );
+  const fieldStyle: React.CSSProperties = { width: "100%", padding: "4px 6px", fontSize: 12, border: "1px solid var(--color-border)", background: "var(--color-card)", color: "var(--color-primary)" };
+  return (
+    <div className="px-4 py-2 rounded-lg border" style={{ borderColor: c.border, background: c.bg }}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: c.fg, ...FONT }}><LocalizedText text={title} />{" "}{doseMg}{" "}<LocalizedText text="mg (single dose)" /></span>
+        <div className="flex shrink-0 items-center gap-1.5">
+          {status === "suggested" && onConfirmGiven && !confirming && (
+            <button
+              type="button"
+              onClick={() => setConfirming(true)}
+              className="border px-2 py-0.5 text-[10px] font-semibold"
+              style={{ borderColor: c.border, background: "#fff", color: c.fg, ...FONT }}
+            ><LocalizedText text="Loading dose given? Enter a level" /></button>
+          )}
+          {onUndo && (
+            <button
+              type="button"
+              onClick={onUndo}
+              className="border px-2 py-0.5 text-[10px] font-semibold transition-colors"
+              style={{ borderColor: "#fca5a5", background: "#fff1f2", color: "#991b1b", ...FONT }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.background = "#991b1b";
+                (e.currentTarget as HTMLElement).style.color = "#fff";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.background = "#fff1f2";
+                (e.currentTarget as HTMLElement).style.color = "#991b1b";
+              }}
+            ><LocalizedText text="UNDO" /></button>
+          )}
+        </div>
+      </div>
+      <p className="mt-1 text-[10px]" style={{ color: c.sub, margin: 0, ...FONT }} data-testid="single-dose-banner-caption">
+        {caption.before.map((part, i) => <React.Fragment key={`b${i}`}><LocalizedText text={part} />{" "}</React.Fragment>)}
+        <LocalizedText text={caption.curve} />{"."}
+        {caption.after.map((part, i) => <React.Fragment key={`a${i}`}>{" "}<LocalizedText text={part} /></React.Fragment>)}
+      </p>
+      {confirming && onConfirmGiven && (
+        <form
+          className="mt-2 grid grid-cols-2 gap-2 border-t pt-2"
+          style={{ borderTopColor: c.border }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (canConfirm) onConfirmGiven(givenMg, givenMin / 60);
+          }}
+        >
+          <p className="col-span-2 m-0 text-[11px] font-semibold" style={{ color: c.sub }}><LocalizedText text="Confirm the loading dose actually given. It will be recorded in the dosing history; the suggestion is not copied." /></p>
+          <label className="text-[10px]" style={{ color: c.sub }}>
+            <LocalizedText text="Loading dose given (mg)" />
+            <input type="number" inputMode="decimal" min={1} placeholder={`${doseMg}`} aria-label="Loading dose given (mg)"
+              value={givenMg > 0 ? givenMg : ""} onChange={(e) => setGivenMg(Number(e.target.value) || 0)} style={fieldStyle} />
+          </label>
+          <label className="text-[10px]" style={{ color: c.sub }}>
+            <LocalizedText text="Loading infusion (minutes)" />
+            <input type="number" inputMode="decimal" min={1} aria-label="Loading infusion (minutes)"
+              value={givenMin > 0 ? givenMin : ""} onChange={(e) => setGivenMin(Number(e.target.value) || 0)} style={fieldStyle} />
+          </label>
+          <div className="col-span-2 flex gap-1.5">
+            <button type="submit" disabled={!canConfirm}
+              className="flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider"
+              style={{ background: canConfirm ? c.fg : "#cbd5e1", color: "#fff", border: "none", cursor: canConfirm ? "pointer" : "not-allowed", ...FONT }}
+            ><LocalizedText text="Record as given and enter level" /></button>
+            <button type="button" onClick={() => setConfirming(false)}
+              className="border px-2 py-1.5 text-[10px] font-semibold"
+              style={{ borderColor: c.border, background: "#fff", color: c.sub, ...FONT }}
+            ><LocalizedText text="Cancel" /></button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function DoseRecommendationCard({
   recommended_dose,
   recommended_interval_hours,
@@ -274,6 +397,10 @@ export default function DoseRecommendationCard({
   isPulseDose,
   loadingDoseMg,
   onUndoLoadingDose,
+  loadingDoseStatus = "given",
+  onConfirmLoadingDoseGiven,
+  curveDescription,
+  singleDoseView,
   empiricDosingBlocked,
   adjustmentDosingBlocked,
   activeOption,
@@ -294,8 +421,9 @@ export default function DoseRecommendationCard({
   const [activeIdx, setActiveIdx] = useState<number>(() => {
     if (!recommended_dose || !recommended_interval_hours) return 0;
     const recDose = Number.parseFloat(recommended_dose);
+    // The recommended row: dose, interval and infusion duration (regimenIdentity.ts).
     const idx = options.findIndex(
-      (o) => o.dose_mg === recDose && o.interval_hours === recommended_interval_hours
+      (o) => sameRegimen(o, { dose_mg: recDose, interval_hours: recommended_interval_hours, infusion_duration_hours: recommended_infusion_duration_hours ?? o.infusion_duration_hours })
     );
     return idx >= 0 ? idx : 0;
   });
@@ -386,30 +514,18 @@ export default function DoseRecommendationCard({
         </div>
       )}
 
-      {/* Loading dose label — shown above maintenance recommendation */}
+      {/* Single-dose label — shown above maintenance recommendation. A SUGGESTED
+          loading dose (Empiric preview) is labelled as not given and can only
+          enter the dosing history after the clinician confirms what was given. */}
       {isPulseDose && loadingDoseMg && (
-        <div className="px-4 py-2 rounded-lg border" style={{ borderColor: "#6ee7b7", background: "#ecfdf5" }}>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "#047857", ...FONT }}><LocalizedText text="LOADING DOSE:" />{" "}{loadingDoseMg}{" "}<LocalizedText text="mg (single dose)" /></span>
-            {onUndoLoadingDose && (
-              <button
-                type="button"
-                onClick={onUndoLoadingDose}
-                className="shrink-0 border px-2 py-0.5 text-[10px] font-semibold transition-colors"
-                style={{ borderColor: "#fca5a5", background: "#fff1f2", color: "#991b1b", ...FONT }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.background = "#991b1b";
-                  (e.currentTarget as HTMLElement).style.color = "#fff";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.background = "#fff1f2";
-                  (e.currentTarget as HTMLElement).style.color = "#991b1b";
-                }}
-              ><LocalizedText text="UNDO" /></button>
-            )}
-          </div>
-          <p className="mt-1 text-[10px]" style={{ color: "#065f46", margin: 0, ...FONT }}><LocalizedText text="Graph shows the loading dose followed by the selected maintenance regimen. Suggested maintenance to follow:" /></p>
-        </div>
+        <SingleDoseBanner
+          doseMg={loadingDoseMg}
+          status={loadingDoseStatus}
+          onUndo={onUndoLoadingDose}
+          onConfirmGiven={onConfirmLoadingDoseGiven}
+          curveDescription={curveDescription}
+          view={singleDoseView ?? (activeIsCurrent ? "current" : "option")}
+        />
       )}
 
       {/* Active dose display */}
@@ -425,7 +541,9 @@ export default function DoseRecommendationCard({
           >
             <p className="vz-kicker" style={{ margin: "0 0 2px 0", ...FONT }}>
               <LocalizedText text={activeIsCurrent
-                ? (isPulseDose ? "LOADING DOSE (SINGLE DOSE)" : "CURRENT REGIMEN (AS ENTERED)")
+                ? (isPulseDose
+                    ? (loadingDoseStatus === "suggested" ? "SUGGESTED LOADING DOSE (NOT GIVEN)" : loadingDoseStatus === "single" ? "SINGLE DOSE GIVEN" : "LOADING DOSE GIVEN (SINGLE DOSE)")
+                    : "CURRENT REGIMEN (AS ENTERED)")
                 : isPulseDose
                   ? (active?.is_recommended || !active ? "SUGGESTED MAINTENANCE REGIMEN" : "SELECTED MAINTENANCE ALTERNATIVE")
                   : active?.is_recommended || !active ? "RECOMMENDED REGIMEN" : "SELECTED ALTERNATIVE"} />
