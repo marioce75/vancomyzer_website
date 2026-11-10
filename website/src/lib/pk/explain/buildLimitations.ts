@@ -14,16 +14,25 @@ export function buildLimitations(input: ExplanationInput): string[] {
     : [
         "Simple two-compartment adult population prior model only; no refinement from levels in this pass.",
         "Population prior comes from an adult literature model and may fit poorly outside typical adult populations or when physiology is changing quickly.",
-        "Measured levels are displayed but not used to refine parameters in this pass.",
+        // With no level entered there is no measured level to display.
+        ...(engineOutput.level_count > 0 ? ["Measured levels are displayed but not used to refine parameters in this pass."] : []),
         "Clinical judgment and levels-based reassessment remain essential.",
       ];
 
   const isPulseDose = engineOutput.doses_given === 1;
+  const noLevel = engineOutput.level_count <= 0;
 
   if (engineOutput.level_count === 1 && !usedRefinement) {
     items.unshift("Single level limits precision; adjustment is an initial estimate.");
   }
-  if (isPulseDose) {
+  if (isPulseDose && noLevel) {
+    // No level was entered: nothing here was estimated from a level.
+    items.unshift("Population estimate only: no measured level was entered. Confirm with a measured level after a dose has been given.");
+    items.unshift("Pulse-dose / single-dose workflow: projected AUC24 and recommended maintenance dose assume steady-state PK will match the population estimate; no level was measured to individualise it.");
+    if (engineOutput.suggested_dose_not_given === true) {
+      items.unshift("Simulation of a suggested dose: no dose has been recorded as given, and this result does not document an administered dose.");
+    }
+  } else if (isPulseDose) {
     items.unshift("Bayesian estimate based on single pre-steady-state level — monitor and confirm with a follow-up level after additional doses.");
     items.unshift("Pulse-dose / single-dose workflow: projected AUC24 and recommended maintenance dose assume steady-state PK will match the individual parameters estimated from this one level.");
   } else {

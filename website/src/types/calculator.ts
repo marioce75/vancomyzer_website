@@ -53,6 +53,13 @@ export interface CalculateRequestRegimen {
   loading_infusion_duration_hours?: number;
   /** Hours from the start of the loading dose to the start of the first maintenance dose (default: the interval). */
   loading_to_maintenance_hours?: number;
+  /**
+   * The single dose is a suggestion that has NOT been given: the Empiric
+   * loading-dose simulation (doses_given = 1, no levels). Sent only by that
+   * preview. Wording only: the engine's text then says "suggested, not given"
+   * instead of "recorded"; no calculation reads it.
+   */
+  suggested_dose_not_given?: boolean;
 }
 
 export interface CalculateRequestLevel {

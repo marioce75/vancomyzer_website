@@ -25,7 +25,7 @@
     "audit:localization": "node src/localization/coverage.mjs",
     "audit:localization:dynamic": "node src/localization/dynamic-review.mjs",
     "test:timing": "node --import tsx --test src/components/calculator/timing.test.ts",
-    "test:dosing-history": "node --import tsx --test src/components/calculator/dosingHistory.test.ts src/components/calculator/curveDescription.test.ts src/components/calculator/clinicalNote.test.ts src/lib/pk/__tests__/singleDoseWording.test.ts src/lib/pk/__tests__/regimenIdentity.test.ts src/lib/pk/__tests__/reviewRound2.engine.test.ts src/components/calculator/exportReport.test.ts",
+    "test:dosing-history": "node --import tsx --test src/components/calculator/dosingHistory.test.ts src/components/calculator/curveDescription.test.ts src/components/calculator/clinicalNote.test.ts src/lib/pk/__tests__/singleDoseWording.test.ts src/lib/pk/__tests__/regimenIdentity.test.ts src/lib/pk/__tests__/reviewRound2.engine.test.ts src/components/calculator/exportReport.test.ts src/lib/pk/__tests__/postRelease.engine.test.ts src/components/calculator/postRelease.test.ts",
     "test:contact": "node --import tsx --test src/lib/contact/*.test.ts",
     "test:security-copy": "node --test scripts/security-copy.test.cjs",
     "test:pediatric": "node --import tsx src/lib/pediatric/pediatric.test.ts && node --import tsx src/lib/pediatric/__tests__/engine.test.ts && node --import tsx src/lib/pediatric/__tests__/validation.test.ts && node --import tsx src/lib/pediatric/__tests__/localTime.test.ts && node --import tsx src/lib/pediatric/__tests__/reference.test.ts && node --import tsx src/lib/pediatric/__tests__/requestBody.test.ts && node --import tsx src/lib/pediatric/__tests__/researchRegimens.test.ts",

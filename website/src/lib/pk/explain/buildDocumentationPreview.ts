@@ -10,7 +10,12 @@ function buildRecommendationDelta(input: ExplanationInput): string {
     parseInt(recommendation.recommended_dose.replace(/\D/g, ""), 10) || currentDose;
   const recommendedInterval = recommendation.recommended_interval_hours;
 
-  if (engineOutput.doses_given === 1) return `Maintenance projection after a recorded single dose of ${currentDose} mg; no prior maintenance interval is implied.`;
+  if (engineOutput.doses_given === 1) {
+    // A suggested dose that has not been given is never called "recorded".
+    return engineOutput.suggested_dose_not_given === true
+      ? `Maintenance projection after a suggested single dose of ${currentDose} mg that has not been given; no prior maintenance interval is implied.`
+      : `Maintenance projection after a recorded single dose of ${currentDose} mg; no prior maintenance interval is implied.`;
+  }
 
   const parts: string[] = [];
   if (recommendedDose > currentDose) {
@@ -81,12 +86,18 @@ export function buildDocumentationPreview(input: ExplanationInput): {
   // The same holds for a review hold (discordant same-time levels): the
   // adjustment computed before the hold is withdrawn from the response, so the
   // note states the hold and its reason instead of the withdrawn regimen.
+  //
+  // A result can be blocked and on review hold at once. Both reasons apply and
+  // both are stated (the block, then the hold); no recommendation is restored.
   const blocked = recommendation.adjustment_dosing_blocked;
   const hold = input.review_hold;
+  const holdLines = hold
+    ? ["Recommendation withheld: no dose adjustment is presented until the entered levels are reconciled.", hold.message]
+    : [];
   const recommendationLines = blocked
-    ? [`${blocked.review_required ? "Pharmacy review required — no automatic maintenance regimen" : "Maintenance dosing held"} — ${blocked.safety_message}`, blocked.recommended_action]
+    ? [`${blocked.review_required ? "Pharmacy review required — no automatic maintenance regimen" : "Maintenance dosing held"} — ${blocked.safety_message}`, blocked.recommended_action, ...holdLines]
     : hold
-      ? ["Recommendation withheld: no dose adjustment is presented until the entered levels are reconciled.", hold.message]
+      ? holdLines
     : [
         `Recommendation: ${recommendation.recommended_dose} every ${recommendation.recommended_interval_hours} h infused over ${Number(((recommendation.recommended_infusion_duration_hours ?? engineOutput.current_regimen_infusion_hours ?? 1) * 60).toFixed(6))} minutes`,
         changeSummary,
@@ -100,8 +111,13 @@ export function buildDocumentationPreview(input: ExplanationInput): {
     `SCr: ${scr} mg/dL (${modelShortName(engineOutput.model_name)} renal covariate). Fit quality: ${posterior_fit?.fit_quality ?? "not_applicable"}; uncertainty: ${posterior_fit?.uncertainty_label ?? "population_only"}. Assumptions and limitations apply.`,
   ].join("\n");
 
+  // A suggested dose that has not been given is a simulation: there is no
+  // existing regimen to evaluate, no recorded dose and no measured level.
+  const notGiven = engineOutput.doses_given === 1 && engineOutput.suggested_dose_not_given === true;
   const clinical_note = [
-    `Vancomycin existing regimen evaluation (${estimateLabel} estimate).`,
+    notGiven
+      ? `Vancomycin suggested-dose simulation (${estimateLabel} estimate).`
+      : `Vancomycin existing regimen evaluation (${estimateLabel} estimate).`,
     `AUC24: ${auc24} mg·h/L; peak ${peak} mg/L; trough ${trough} mg/L.`,
     ...recommendationLines,
     ...(sparseHighExposureNote && !hold ? [sparseHighExposureNote] : []),

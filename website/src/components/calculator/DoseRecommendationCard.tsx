@@ -10,6 +10,8 @@ import { fmt } from "@/lib/formatNumber";
 import { computeSafeInfusionDurationMinutes } from "@/lib/pk/recommend/infusionSafety";
 import { singleDoseBannerCaption, type SingleDoseView } from "./curveDescription";
 import { sameRegimen } from "@/lib/pk/regimenIdentity";
+import ClinicalNumberInput from "./ClinicalNumberInput";
+import { confirmedGivenDose, GIVEN_DOSE_MIN_MG, GIVEN_INFUSION_MIN_MINUTES } from "./dosingHistory";
 
 interface DoseRecommendationCardProps {
   recommended_dose?: string | null;
@@ -295,7 +297,10 @@ function SingleDoseBanner({
   const [givenMg, setGivenMg] = useState<number>(0);
   const [givenMin, setGivenMin] = useState<number>(0);
   const c = BANNER_STYLE[status];
-  const canConfirm = givenMg > 0 && givenMin > 0;
+  // What would be recorded, or null. The button is enabled exactly when this
+  // is not null (dosingHistory.ts), so an enabled button always submits.
+  const confirmed = confirmedGivenDose(givenMg, givenMin);
+  const canConfirm = confirmed !== null;
   const title =
     status === "suggested" ? "SUGGESTED LOADING DOSE (NOT GIVEN):" : status === "single" ? "SINGLE DOSE GIVEN:" : "LOADING DOSE GIVEN:";
   // The caption names the curve the graph is drawing, in the legend's words.
@@ -347,26 +352,29 @@ function SingleDoseBanner({
           style={{ borderTopColor: c.border }}
           onSubmit={(e) => {
             e.preventDefault();
-            if (canConfirm) onConfirmGiven(givenMg, givenMin / 60);
+            if (confirmed) onConfirmGiven(confirmed.dose_mg, confirmed.infusion_duration_hours);
           }}
         >
           <p className="col-span-2 m-0 text-[11px] font-semibold" style={{ color: c.sub }}><LocalizedText text="Confirm the loading dose actually given. It will be recorded in the dosing history; the suggestion is not copied." /></p>
           <label className="text-[10px]" style={{ color: c.sub }}>
             <LocalizedText text="Loading dose given (mg)" />
-            <input type="number" inputMode="decimal" min={1} placeholder={`${doseMg}`} aria-label="Loading dose given (mg)"
-              value={givenMg > 0 ? givenMg : ""} onChange={(e) => setGivenMg(Number(e.target.value) || 0)} style={fieldStyle} />
+            {/* The calculator's own number field (text, decimal point or comma),
+                not a native number input: a native one applies an integer step
+                and refused 90.5 minutes while the button stayed enabled. */}
+            <ClinicalNumberInput inputMode="decimal" min={GIVEN_DOSE_MIN_MG} placeholder={`${doseMg}`} aria-label="Loading dose given (mg)"
+              value={givenMg} onValueChange={setGivenMg} style={fieldStyle} />
           </label>
           <label className="text-[10px]" style={{ color: c.sub }}>
             <LocalizedText text="Loading infusion (minutes)" />
-            <input type="number" inputMode="decimal" min={1} aria-label="Loading infusion (minutes)"
-              value={givenMin > 0 ? givenMin : ""} onChange={(e) => setGivenMin(Number(e.target.value) || 0)} style={fieldStyle} />
+            <ClinicalNumberInput inputMode="decimal" min={GIVEN_INFUSION_MIN_MINUTES} aria-label="Loading infusion (minutes)"
+              value={givenMin} onValueChange={setGivenMin} style={fieldStyle} />
           </label>
           <div className="col-span-2 flex gap-1.5">
             <button type="submit" disabled={!canConfirm}
               className="flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider"
               style={{ background: canConfirm ? c.fg : "#cbd5e1", color: "#fff", border: "none", cursor: canConfirm ? "pointer" : "not-allowed", ...FONT }}
             ><LocalizedText text="Record as given and enter level" /></button>
-            <button type="button" onClick={() => setConfirming(false)}
+            <button type="button" onClick={() => { setConfirming(false); setGivenMg(0); setGivenMin(0); }}
               className="border px-2 py-1.5 text-[10px] font-semibold"
               style={{ borderColor: c.border, background: "#fff", color: c.sub, ...FONT }}
             ><LocalizedText text="Cancel" /></button>

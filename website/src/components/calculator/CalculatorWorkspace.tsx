@@ -336,8 +336,15 @@ export default function CalculatorWorkspace() {
     // Loading-dose fields travel only with a multi-dose level workflow where
     // "Loading dose" is selected (an unfilled 0 is sent so the server rejects
     // it visibly); otherwise they are dropped so a stale entry cannot change the fit.
-    return { ...base, regimen: requestRegimen(regimen), levels: validLevels };
-  }, [mode, patient, rrt, regimen, levels, canSaveHistory]);
+    // The Empiric loading-dose preview simulates a suggested dose that has not
+    // been given. The request says so (dosingHistory.ts), so the engine's text
+    // never calls that dose "recorded". Wording only.
+    return {
+      ...base,
+      regimen: requestRegimen(regimen, { suggestedDoseNotGiven: loadingPreview && validLevels.length === 0 }),
+      levels: validLevels,
+    };
+  }, [mode, patient, rrt, regimen, levels, canSaveHistory, loadingPreview]);
 
   const applyViewMode = useCallback((next: WorkspaceViewMode) => {
     // A tab switch ends an Empiric loading-dose preview. The suggested dose was
@@ -1471,9 +1478,12 @@ export default function CalculatorWorkspace() {
 
         {/* ── Concentration-time graph ── */}
         <LocalizedSection className={`vz-area-graph vz-panel flex flex-col ${resultObscured ? "vz-obscured" : ""}`} aria-label="Concentration-time graph panel">
-          {isPulse && displayResult?.adjustment_dosing_blocked && (
+          {isPulse && displayResult?.adjustment_dosing_blocked && (loadingPreview ? (
+            // A suggested dose in the Empiric preview was not given, so it is not "recorded".
+            <p className="m-0 px-3 pt-2 text-xs"><LocalizedText text="Suggested dose only (not given) — no maintenance regimen suggested." /></p>
+          ) : (
             <p className="m-0 px-3 pt-2 text-xs"><LocalizedText text="Recorded single dose only — no maintenance regimen suggested." /></p>
-          )}
+          ))}
           <div className={`flex min-h-0 flex-1 flex-col p-2 ${resultObscured ? "vz-obscured-content" : ""}`}>
             <ConcentrationTimeGraph
               fill={graphFill}

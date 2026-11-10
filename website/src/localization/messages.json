@@ -17173,5 +17173,115 @@
     "es": "La curva continua es una proyección de la pauta tal como se introdujo, continuada sin cambios. Los niveles medidos se extrajeron bajo el historial introducido y no se representan en la proyección.",
     "fr": "La courbe pleine est une projection du schéma tel que saisi, poursuivi sans changement. Les prélèvements mesurés ont été réalisés sous l’historique saisi et ne sont pas tracés sur la projection.",
     "pt-BR": "A curva contínua é uma projeção do esquema conforme inserido, mantido sem alterações. Os níveis medidos foram coletados sob o histórico informado e não são plotados na projeção."
+  },
+  "No dose has been recorded and no level has been measured.": {
+    "es": "No se ha registrado ninguna dosis y no se ha medido ningún nivel.",
+    "fr": "Aucune dose n’a été enregistrée et aucune concentration n’a été mesurée.",
+    "pt-BR": "Nenhuma dose foi registrada e nenhum nível foi medido."
+  },
+  "If this dose is given, draw the first level 1.5–6 h after the end of its infusion for early Bayesian estimation.": {
+    "es": "Si se administra esta dosis, extraiga el primer nivel 1.5–6 h después del final de su perfusión para una estimación bayesiana temprana.",
+    "fr": "Si cette dose est administrée, effectuez le premier prélèvement 1.5–6 h après la fin de sa perfusion pour une estimation bayésienne précoce.",
+    "pt-BR": "Se esta dose for administrada, colete o primeiro nível 1.5–6 h após o término da sua infusão para estimativa bayesiana precoce."
+  },
+  "Vancomycin suggested-dose simulation (Initial population estimate).": {
+    "es": "Simulación de dosis sugerida de vancomicina (estimación poblacional inicial).",
+    "fr": "Simulation d’une dose suggérée de vancomycine (estimation populationnelle initiale).",
+    "pt-BR": "Simulação de dose sugerida de vancomicina (estimativa populacional inicial)."
+  },
+  "Vancomycin suggested-dose simulation.": {
+    "es": "Simulación de dosis sugerida de vancomicina.",
+    "fr": "Simulation d’une dose suggérée de vancomycine.",
+    "pt-BR": "Simulação de dose sugerida de vancomicina."
+  },
+  "Single-dose (pulse dose) projection from the population prior: no measured level was entered, so AUC24 and the maintenance recommendation are not fitted to this patient. Steady-state is NOT assumed.": {
+    "es": "Proyección de dosis única (dosis aislada) a partir del modelo poblacional a priori: no se introdujo ningún nivel medido, por lo que el AUC24 y la recomendación de mantenimiento no están ajustados a este paciente. NO se presupone el estado estacionario.",
+    "fr": "Projection après dose unique (dose isolée) à partir du modèle populationnel a priori : aucune concentration mesurée n’a été saisie ; l’AUC24 et la recommandation d’entretien ne sont donc pas ajustées à ce patient. L’état d’équilibre N’EST PAS supposé.",
+    "pt-BR": "Projeção de dose única (dose de impulso) a partir do modelo populacional a priori: nenhum nível medido foi informado, portanto a AUC24 e a recomendação de manutenção não estão ajustadas a este paciente. O estado de equilíbrio NÃO é assumido."
+  },
+  "Suggested dose, not given: this is a simulation. If the dose is given, a level drawn in the post-distributive elimination phase (≥2 h after infusion completion) is needed for single-dose PK estimation per ASHP/IDSA/SIDP 2020.": {
+    "es": "Dosis sugerida, no administrada: esto es una simulación. Si se administra la dosis, se necesita un nivel obtenido en la fase de eliminación posdistributiva (≥2 h después de finalizar la perfusión) para la estimación farmacocinética tras dosis única según ASHP/IDSA/SIDP 2020.",
+    "fr": "Dose suggérée, non administrée : il s’agit d’une simulation. Si la dose est administrée, une concentration prélevée pendant la phase d’élimination post-distributive (≥2 h après la fin de la perfusion) est nécessaire pour l’estimation pharmacocinétique après dose unique selon ASHP/IDSA/SIDP 2020.",
+    "pt-BR": "Dose sugerida, não administrada: isto é uma simulação. Se a dose for administrada, é necessário um nível coletado na fase de eliminação pós-distributiva (≥2 h após a conclusão da infusão) para a estimativa farmacocinética de dose única segundo ASHP/IDSA/SIDP 2020."
+  },
+  "Population estimate only: no measured level was entered. Confirm with a measured level after a dose has been given.": {
+    "es": "Solo estimación poblacional: no se introdujo ningún nivel medido. Confirme con un nivel medido después de administrar una dosis.",
+    "fr": "Estimation populationnelle uniquement : aucune concentration mesurée n’a été saisie. Confirmez par une concentration mesurée après l’administration d’une dose.",
+    "pt-BR": "Apenas estimativa populacional: nenhum nível medido foi informado. Confirme com um nível medido após a administração de uma dose."
+  },
+  "Pulse-dose / single-dose workflow: projected AUC24 and recommended maintenance dose assume steady-state PK will match the population estimate; no level was measured to individualise it.": {
+    "es": "Tras una dosis aislada, el AUC24 previsto y la dosis de mantenimiento recomendada suponen que la farmacocinética en estado estacionario coincidirá con la estimación poblacional; no se midió ningún nivel para individualizarla.",
+    "fr": "Parcours après dose isolée / unique : l’AUC24 projetée et la dose d’entretien recommandée supposent que la pharmacocinétique à l’état d’équilibre correspondra à l’estimation populationnelle ; aucune concentration n’a été mesurée pour l’individualiser.",
+    "pt-BR": "Fluxo de trabalho da dose de pulso/dose única: a AUC24 projetada e a dose de manutenção recomendada assumem que a PK no estado de equilíbrio corresponderá à estimativa populacional; nenhum nível foi medido para individualizá-la."
+  },
+  "Simulation of a suggested dose: no dose has been recorded as given, and this result does not document an administered dose.": {
+    "es": "Simulación de una dosis sugerida: no se ha registrado ninguna dosis como administrada y este resultado no documenta una dosis administrada.",
+    "fr": "Simulation d’une dose suggérée : aucune dose n’a été enregistrée comme administrée et ce résultat ne documente pas une dose administrée.",
+    "pt-BR": "Simulação de uma dose sugerida: nenhuma dose foi registrada como administrada e este resultado não documenta uma dose administrada."
+  },
+  "No dose has been given.": {
+    "es": "No se ha administrado ninguna dosis.",
+    "fr": "Aucune dose n’a été administrée.",
+    "pt-BR": "Nenhuma dose foi administrada."
+  },
+  "No measured level entered.": {
+    "es": "No se ha introducido ningún nivel medido.",
+    "fr": "Aucune concentration mesurée saisie.",
+    "pt-BR": "Nenhum nível medido informado."
+  },
+  "Simulation only: no dose has been given and no level has been measured.": {
+    "es": "Solo simulación: no se ha administrado ninguna dosis y no se ha medido ningún nivel.",
+    "fr": "Simulation uniquement : aucune dose n’a été administrée et aucune concentration n’a été mesurée.",
+    "pt-BR": "Apenas simulação: nenhuma dose foi administrada e nenhum nível foi medido."
+  },
+  "This text is not a record of administration.": {
+    "es": "Este texto no es un registro de administración.",
+    "fr": "Ce texte n’est pas un enregistrement d’administration.",
+    "pt-BR": "Este texto não é um registro de administração."
+  },
+  "Projected exposure of this one dose over its first 24 h if it is given, not steady state": {
+    "es": "Exposición proyectada de esta única dosis durante sus primeras 24 h si se administra, no en estado estacionario",
+    "fr": "Exposition projetée de cette seule dose sur ses 24 premières heures si elle est administrée, pas à l’état d’équilibre",
+    "pt-BR": "Exposição projetada desta única dose nas suas primeiras 24 h se for administrada, não em estado de equilíbrio"
+  },
+  "Suggested dose only (not given) — no maintenance regimen suggested.": {
+    "es": "Solo la dosis sugerida (no administrada) — no se propone una pauta de mantenimiento.",
+    "fr": "Dose suggérée uniquement (non administrée) — aucun schéma d’entretien proposé.",
+    "pt-BR": "Apenas a dose sugerida (não administrada) — nenhum esquema de manutenção sugerido."
+  },
+  "Suggested dose (not given) vs. proposed regimen": {
+    "es": "Dosis sugerida (no administrada) frente a pauta propuesta",
+    "fr": "Dose suggérée (non administrée) vs schéma proposé",
+    "pt-BR": "Dose sugerida (não administrada) vs. esquema proposto"
+  },
+  "Suggested Dose Simulation (Prior-Based, Dose Not Given)": {
+    "es": "Simulación de dosis sugerida (basada en la distribución a priori, dosis no administrada)",
+    "fr": "Simulation d’une dose suggérée (fondée sur la distribution a priori, dose non administrée)",
+    "pt-BR": "Simulação de dose sugerida (baseada na distribuição a priori, dose não administrada)"
+  },
+  "Existing Regimen (Prior-Based, No Measured Level)": {
+    "es": "Pauta actual (basada en la distribución a priori, sin nivel medido)",
+    "fr": "Schéma actuel (fondé sur la distribution a priori, sans concentration mesurée)",
+    "pt-BR": "Esquema existente (baseado na distribuição a priori, sem nível medido)"
+  },
+  "Suggested loading dose (not given)": {
+    "es": "Dosis de carga sugerida (no administrada)",
+    "fr": "Dose de charge suggérée (non administrée)",
+    "pt-BR": "Dose de ataque sugerida (não administrada)"
+  },
+  "A suggested dose that has not been given, not a regimen. Projected exposure is that dose over its first 24 h if it is given, not steady state.": {
+    "es": "Una dosis sugerida que no se ha administrado, no una pauta. La exposición proyectada es la de esa dosis durante sus primeras 24 h si se administra, no en estado estacionario.",
+    "fr": "Une dose suggérée qui n’a pas été administrée, pas un schéma. L’exposition projetée est celle de cette dose sur ses 24 premières heures si elle est administrée, pas à l’état d’équilibre.",
+    "pt-BR": "Uma dose sugerida que não foi administrada, não um esquema. A exposição projetada é a dessa dose nas primeiras 24 h se for administrada, não em estado de equilíbrio."
+  },
+  "Projected exposure of the suggested dose, not given (first 24 h; no automatic recommendation)": {
+    "es": "Exposición proyectada de la dosis sugerida, no administrada (primeras 24 h; sin recomendación automática)",
+    "fr": "Exposition projetée de la dose suggérée, non administrée (24 premières heures ; aucune recommandation automatique)",
+    "pt-BR": "Exposição projetada da dose sugerida, não administrada (primeiras 24 h; sem recomendação automática)"
+  },
+  "Projected exposure of the suggested dose, not given (first 24 h, not steady state)": {
+    "es": "Exposición proyectada de la dosis sugerida, no administrada (primeras 24 h, no en estado estacionario)",
+    "fr": "Exposition projetée de la dose suggérée, non administrée (24 premières heures, pas à l’état d’équilibre)",
+    "pt-BR": "Exposição projetada da dose sugerida, não administrada (primeiras 24 h, não em estado de equilíbrio)"
   }
 }

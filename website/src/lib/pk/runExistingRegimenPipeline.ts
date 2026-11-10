@@ -36,6 +36,13 @@ export interface ExistingRegimenPipelineInput {
     loading_dose_mg?: unknown;
     loading_infusion_duration_hours?: unknown;
     loading_to_maintenance_hours?: unknown;
+    /**
+     * The single dose is a suggestion that has not been given (loading-dose
+     * simulation; doses_given must be 1 and there can be no levels). Wording
+     * only: the explanation text says "suggested, not given" instead of
+     * "recorded". No calculation reads it.
+     */
+    suggested_dose_not_given?: unknown;
     /** Not modelled — refused by validateRawInput rather than silently reinterpreted. */
     administration_history?: unknown;
     dose_history?: unknown;
@@ -89,6 +96,9 @@ export function runExistingRegimenPipeline(
 
   const engineOutput = runExistingRegimenEngine({ patient, regimen, levels });
   const recommendation = buildAdjustmentRecommendation(engineOutput, input.policy);
+  // Wording only, set after the engine and the recommendation have run: the
+  // explanation text must not call a suggested dose "recorded" or "given".
+  if (input.regimen.suggested_dose_not_given === true) engineOutput.suggested_dose_not_given = true;
 
   // A blocked single-dose result must not plot an implied maintenance plan.
   // The engine's default pulse curve continues the entered dose repeatedly;
