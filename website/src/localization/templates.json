@@ -1,4 +1,9 @@
 {
+  "Entered infusion duration: {n1} minutes. Record the actual collection time and use the sampling plan selected by your clinical team.": {
+    "es": "Duración de la perfusión registrada: {n1} minutos. Anote la hora real de la toma de la muestra y siga el plan de muestreo elegido por su equipo clínico.",
+    "fr": "Durée de perfusion saisie : {n1} minutes. Notez l’heure réelle du prélèvement et suivez le plan de prélèvement choisi par votre équipe clinique.",
+    "pt-BR": "Duração da infusão informada: {n1} minutos. Registre o horário real da coleta e siga o plano de coleta escolhido pela sua equipe clínica."
+  },
   "{n1} answers. Open any question; the references are listed under each answer.": {
     "es": "{n1} respuestas. Abra cualquier pregunta; las referencias figuran debajo de cada respuesta.",
     "fr": "{n1} réponses. Ouvrez une question ; les références figurent sous chaque réponse.",

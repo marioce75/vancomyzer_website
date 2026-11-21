@@ -4,7 +4,7 @@ import { LocalizedText } from "@/localization/LanguageProvider";
 import { LocalizedInput, LocalizedButton } from "@/localization/LocalizedElements";
 
 
-import React, { useState, useRef, useEffect } from "react"; // useRef kept for todayRef
+import React, { useState, useRef, useEffect, useId } from "react"; // useRef kept for todayRef
 import ClinicalNumberInput from "./ClinicalNumberInput";
 import DatePartInput from "./DatePartInput";
 
@@ -45,8 +45,8 @@ const inputCls = (hasError: boolean) =>
       : "border-[var(--navy-border-strong)] bg-[rgba(255,255,255,0.05)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:ring-[var(--teal)] focus:border-[var(--teal)]"
   }`;
 
-const Label = ({ children }: { children: React.ReactNode }) => (
-  <label className="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wide">
+const Label = ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) => (
+  <label htmlFor={htmlFor} className="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wide">
     {children}
   </label>
 );
@@ -61,10 +61,10 @@ export default function BedboundAdvisoryPanel({
   const scrLow = scrMgDl != null && scrMgDl > 0 && scrMgDl < 0.7;
 
 
-  // Infusion end time for level draw recommendation (shown once infusion duration entered)
+  const infusionId = useId();
   const numericEdited = useRef(false);
   const [doseGiven, setDoseGiven] = useState<number>(0);
-  const [infusionHours, setInfusionHours] = useState<number>(0);
+  const [infusionMinutes, setInfusionMinutes] = useState<number>(0);
   const [adminDate, setAdminDate] = useState<string>(today);
   const [adminTime, setAdminTime] = useState<string>("");
   const [adminTimeErr, setAdminTimeErr] = useState<string>("");
@@ -72,10 +72,11 @@ export default function BedboundAdvisoryPanel({
 
   // Fire callback whenever form values change
   useEffect(() => {
-    if (numericEdited.current || (doseGiven > 0 && infusionHours > 0)) {
+    if (numericEdited.current || (doseGiven > 0 && infusionMinutes > 0)) {
       onLoadingDoseChange?.({
         dose_mg: doseGiven,
-        infusion_duration_hours: infusionHours,
+        // The calculator, API and saved draft still use hours.
+        infusion_duration_hours: infusionMinutes / 60,
         adminDate,
         adminTime,
       });
@@ -83,7 +84,7 @@ export default function BedboundAdvisoryPanel({
       onLoadingDoseChange?.(null);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doseGiven, infusionHours, adminDate, adminTime]);
+  }, [doseGiven, infusionMinutes, adminDate, adminTime]);
 
   const handleAdminTimeChange = (raw: string) => {
     const formatted = formatTimeDisplay(raw);
@@ -95,8 +96,8 @@ export default function BedboundAdvisoryPanel({
   };
 
   // Report entered infusion duration without prescribing a universal sampling time.
-  const levelDrawNote = infusionHours > 0
-    ? `Entered infusion duration: ${infusionHours} hours. Record the actual collection time and use the sampling plan selected by your clinical team.`
+  const levelDrawNote = infusionMinutes > 0
+    ? `Entered infusion duration: ${infusionMinutes} minutes. Record the actual collection time and use the sampling plan selected by your clinical team.`
     : "Enter the actual infusion duration and collection time. Sampling depends on the monitoring method and clinical circumstances.";
 
   return (
@@ -150,12 +151,13 @@ export default function BedboundAdvisoryPanel({
 
           {/* Infusion duration */}
           <div>
-            <Label><LocalizedText text="Infusion duration (h)" /></Label>
+            <Label htmlFor={infusionId}><LocalizedText text="Infusion Duration (minutes)" /></Label>
             <ClinicalNumberInput
+              id={infusionId}
               inputMode="decimal"
-              placeholder="e.g. 1.5"
-              value={infusionHours}
-              onValueChange={(n) => { numericEdited.current = true; setInfusionHours(n); }}
+              placeholder="e.g. 90"
+              value={infusionMinutes}
+              onValueChange={(n) => { numericEdited.current = true; setInfusionMinutes(n); }}
               onBlurValue={(_v, _raw, parseError) => setParseErrors((prev) => ({ ...prev, infusion: parseError ?? undefined }))}
               className={(invalidText) => inputCls(invalidText)}
             />
@@ -215,9 +217,9 @@ export default function BedboundAdvisoryPanel({
         </ul>
       </div>
 
-      {doseGiven > 0 && infusionHours > 0 && adminDate && adminTime && (
+      {doseGiven > 0 && infusionMinutes > 0 && adminDate && adminTime && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
-          <p className="text-xs font-semibold text-emerald-800"><LocalizedText text="Dosing History pre-filled:" />{" "}{doseGiven}{" "}<LocalizedText text="mg over" />{" "}{infusionHours}<LocalizedText text="h on" />{" "}{adminDate}{" "}<LocalizedText text="at" />{" "}{adminTime}
+          <p className="text-xs font-semibold text-emerald-800"><LocalizedText text="Dosing History pre-filled:" />{" "}{doseGiven}{" "}<LocalizedText text="mg over" />{" "}{infusionMinutes}{" "}<LocalizedText text="min on" />{" "}{adminDate}{" "}<LocalizedText text="at" />{" "}{adminTime}
           </p>
           <p className="text-[11px] text-emerald-700 mt-0.5"><LocalizedText text="Enter the measured level and its actual collection time below. A second appropriately timed level may be needed." /></p>
         </div>
