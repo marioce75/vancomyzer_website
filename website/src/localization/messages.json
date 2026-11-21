@@ -1474,15 +1474,10 @@
     "fr": "p. ex. 1000",
     "pt-BR": "Por exemplo, 1000"
   },
-  "Infusion duration (h)": {
-    "es": "Duración de la perfusión (h)",
-    "fr": "Durée de perfusion (h)",
-    "pt-BR": "Duração da infusão (h)"
-  },
-  "e.g. 1.5": {
-    "es": "p. ej., 1.5",
-    "fr": "p. ex. 1.5",
-    "pt-BR": "Por exemplo, 1.5"
+  "e.g. 90": {
+    "es": "p. ej., 90",
+    "fr": "p. ex. 90",
+    "pt-BR": "Por exemplo, 90"
   },
   "Date administered": {
     "es": "Fecha de administración",
@@ -1554,10 +1549,10 @@
     "fr": "mg sur",
     "pt-BR": "mg mais"
   },
-  "h on": {
-    "es": "h el",
-    "fr": "h le",
-    "pt-BR": "h sobre"
+  "min on": {
+    "es": "min el",
+    "fr": "min le",
+    "pt-BR": "min em"
   },
   "at": {
     "es": "a las",

@@ -1,13 +1,13 @@
 {
   "notice": "INCOMPLETE. Explicit bindings, unbound static text, and unreviewed child expressions are inventoried separately. No percentage is claimed. Dynamic API messages, report exports, imported datasets, metadata and rich text also require review. Article integrity is checked by articles.test.ts in Dosys. Citation language is retained. No clinical or legal review is implied.",
   "summary": {
-    "catalogEntries": 3457,
+    "catalogEntries": 3456,
     "files": 272,
     "staticBindings": 1714,
     "dynamicBindingsRequiringRuntimeAudit": 444,
     "unboundCandidates": 294,
     "invariantCandidates": 15,
-    "unreviewedChildExpressions": 1246,
+    "unreviewedChildExpressions": 1247,
     "publishedArticlesWithBothTranslations": 0,
     "missingBoundTranslations": 2
   },
@@ -9587,245 +9587,245 @@
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 106,
+      "line": 107,
       "text": "Bedbound or frail patient — dosing and monitoring review",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 112,
+      "line": 113,
       "text": "⚠ SCr",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 112,
+      "line": 113,
       "text": "mg/dL — Low Muscle Mass Warning",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 113,
+      "line": 114,
       "text": "Low SCr in bedbound patients may reflect reduced muscle mass rather than preserved renal function, so the estimate may overstate clearance. Routinely rounding SCr up to a fixed value is not recommended: rounding to 1 mg/dL reduced dose-prediction accuracy in a retrospective study of older adults (Bukhari 2024). Plan early therapeutic drug monitoring to help individualize dosing. Cystatin C or a measured creatinine clearance can inform your clinical assessment but cannot be entered into the Colin 2019 model.",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 119,
+      "line": 120,
       "text": "Individualize the loading dose",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 120,
+      "line": 121,
       "text": "Bedbound status or frailty alone does not establish a specific loading dose or a 2,000 mg maximum. Review infection severity, actual body weight, fluid status, renal trajectory, prior doses and your institutional protocol. Select maintenance dosing separately, with early therapeutic drug monitoring when indicated.",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 122,
+      "line": 123,
       "text": "What the guideline supports",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 123,
+      "line": 124,
       "text": "For intermittent IV therapy in critically ill adults with suspected or documented serious MRSA infection, the 2020 consensus guideline allows consideration of 20–35 mg/kg actual body weight, maximum 3,000 mg. In adults with obesity and serious infection, it allows consideration of 20–25 mg/kg actual body weight, maximum 3,000 mg. These are conditional recommendations, not a default dose for every frail patient.",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 124,
+      "line": 125,
       "text": "For Bayesian AUC assessment, the guideline prefers two concentrations, typically 1–2 hours after infusion and at the end of the dosing interval. A single early post-load level is not a universally validated sampling strategy for bedbound patients. Follow the selected method and local protocol.",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 125,
+      "line": 126,
       "text": "Read the 2020 ASHP/IDSA/PIDS/SIDP consensus guideline",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 126,
+      "line": 127,
       "text": "The small 2022 bedridden-patient study evaluated AUC prediction, not loading doses, and used a different model. It does not validate a bedbound dose rule or Vancomyzer.",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 127,
+      "line": 128,
       "text": "Read Sonoda et al., 2022",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 133,
+      "line": 134,
       "text": "Loading Dose Administered",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 134,
+      "line": 135,
       "text": "Enter details below. Dosing History will be pre-filled automatically — do not re-enter.",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 139,
+      "line": 140,
       "text": "Dose given (mg)",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 142,
+      "line": 143,
       "kind": "Accessible attribute",
       "text": "e.g. 1000",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 148,
+      "line": 149,
       "text": "parseErrors.dose",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 153,
-      "text": "Infusion duration (h)",
+      "line": 154,
+      "text": "Infusion Duration (minutes)",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 156,
+      "line": 158,
       "kind": "Accessible attribute",
-      "text": "e.g. 1.5",
+      "text": "e.g. 90",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 162,
+      "line": 164,
       "text": "parseErrors.infusion",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 168,
+      "line": 170,
       "text": "Date administered",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 173,
+      "line": 175,
       "text": "MM / DD / YYYY",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 178,
+      "line": 180,
       "text": "Time administered (military)",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 186,
+      "line": 188,
       "kind": "Accessible attribute",
       "text": "e.g. 0800",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 195,
+      "line": 197,
       "kind": "Accessible attribute",
       "text": "Stamp current time",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 196,
+      "line": 198,
       "text": "Now",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 198,
+      "line": 200,
       "text": "adminTimeErr",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 204,
+      "line": 206,
       "text": "Level collection and timing",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 205,
+      "line": 207,
       "text": "levelDrawNote",
       "dynamic": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 206,
+      "line": 208,
       "text": "Enter measured concentrations and actual collection times in",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 206,
+      "line": 208,
       "text": "Drug Levels",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 206,
+      "line": 208,
       "text": ". Review whether the available history and levels support a maintenance estimate before using the result.",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 211,
+      "line": 213,
       "text": "Monitoring",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 213,
+      "line": 215,
       "text": "Individualize repeat levels to renal stability, exposure, clinical status and your institutional protocol.",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 214,
+      "line": 216,
       "text": "Frequent or daily monitoring may be appropriate when renal function or hemodynamics are unstable; bedbound status alone does not set the schedule.",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "text": "Dosing History pre-filled:",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "text": "mg over",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
-      "text": "h on",
-      "translated": true
-    },
-    {
-      "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
-      "text": "at",
+      "line": 222,
+      "text": "min on",
       "translated": true
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
       "line": 222,
+      "text": "at",
+      "translated": true
+    },
+    {
+      "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
+      "line": 224,
       "text": "Enter the measured level and its actual collection time below. A second appropriately timed level may be needed.",
       "translated": true
     },
@@ -21280,133 +21280,140 @@
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 110,
+      "line": 111,
       "tag": "div",
       "expression": "scrLow && (\n        <div className=\"rounded-lg border border-red-200 bg-red-50 px-3 py-2.5\">\n          <p className=\"text-xs font-semibold text-red-800\"><LocalizedText text=\"⚠ SCr\" />{\" \"}{scrMgDl}{\" \"}<LocalizedText text=\"mg/dL — Low Muscle Mass Warning\" /></p>\n          <p className=\"mt-1 text-xs text-red-700 leading-5\"><LocalizedText text=\"Low SCr in bedbound patients may reflect reduced muscle mass rather than preserved renal function, so the estimate may overstate clearance. Routinely rounding SCr up to a fixed value is not recommended: rounding to 1 mg/dL reduced dose-prediction accuracy in a retrospective study of older adults (Bukhari 2024). Plan early therapeutic drug monitoring to help individualize dosing. Cystatin C or a measured creatinine clearance can inform your clinical assessment but cannot be entered into the Colin 2019 model.\" /></p>\n        </div>\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 112,
+      "line": 113,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 112,
+      "line": 113,
       "tag": "p",
       "expression": "scrMgDl",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 112,
+      "line": 113,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 148,
+      "line": 149,
       "tag": "div",
       "expression": "parseErrors.dose && <p className=\"mt-1 text-[11px] text-red-600\"><LocalizedText text={parseErrors.dose} /></p>",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 162,
+      "line": 164,
       "tag": "div",
       "expression": "parseErrors.infusion && <p className=\"mt-1 text-[11px] text-red-600\"><LocalizedText text={parseErrors.infusion} /></p>",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 198,
+      "line": 200,
       "tag": "div",
       "expression": "adminTimeErr && <p className=\"text-[10px] text-red-600 mt-0.5\"><LocalizedText text={adminTimeErr} /></p>",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 206,
+      "line": 208,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 218,
+      "line": 220,
       "tag": "div",
-      "expression": "doseGiven > 0 && infusionHours > 0 && adminDate && adminTime && (\n        <div className=\"rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2\">\n          <p className=\"text-xs font-semibold text-emerald-800\"><LocalizedText text=\"Dosing History pre-filled:\" />{\" \"}{doseGiven}{\" \"}<LocalizedText text=\"mg over\" />{\" \"}{infusionHours}<LocalizedText text=\"h on\" />{\" \"}{adminDate}{\" \"}<LocalizedText text=\"at\" />{\" \"}{adminTime}\n          </p>\n          <p className=\"text-[11px] text-emerald-700 mt-0.5\"><LocalizedText text=\"Enter the measured level and its actual collection time below. A second appropriately timed level may be needed.\" /></p>\n        </div>\n      )",
+      "expression": "doseGiven > 0 && infusionMinutes > 0 && adminDate && adminTime && (\n        <div className=\"rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2\">\n          <p className=\"text-xs font-semibold text-emerald-800\"><LocalizedText text=\"Dosing History pre-filled:\" />{\" \"}{doseGiven}{\" \"}<LocalizedText text=\"mg over\" />{\" \"}{infusionMinutes}{\" \"}<LocalizedText text=\"min on\" />{\" \"}{adminDate}{\" \"}<LocalizedText text=\"at\" />{\" \"}{adminTime}\n          </p>\n          <p className=\"text-[11px] text-emerald-700 mt-0.5\"><LocalizedText text=\"Enter the measured level and its actual collection time below. A second appropriately timed level may be needed.\" /></p>\n        </div>\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "tag": "p",
       "expression": "doseGiven",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "tag": "p",
-      "expression": "infusionHours",
+      "expression": "infusionMinutes",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
+      "tag": "p",
+      "expression": "\" \"",
+      "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
+    },
+    {
+      "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
+      "line": 222,
       "tag": "p",
       "expression": "adminDate",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/components/calculator/BedboundAdvisoryPanel.tsx",
-      "line": 220,
+      "line": 222,
       "tag": "p",
       "expression": "adminTime",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
