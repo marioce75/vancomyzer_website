@@ -61,6 +61,7 @@ export default function BedboundAdvisoryPanel({
   const scrLow = scrMgDl != null && scrMgDl > 0 && scrMgDl < 0.7;
 
 
+  const doseId = useId();
   const infusionId = useId();
   const numericEdited = useRef(false);
   const [doseGiven, setDoseGiven] = useState<number>(0);
@@ -134,11 +135,14 @@ export default function BedboundAdvisoryPanel({
         <p className="text-xs font-semibold text-amber-900"><LocalizedText text="Loading Dose Administered" /></p>
         <p className="text-[11px] text-amber-700"><LocalizedText text="Enter details below. Dosing History will be pre-filled automatically — do not re-enter." /></p>
 
-        <div className="grid grid-cols-2 gap-3">
-          {/* Dose given */}
-          <div>
-            <Label><LocalizedText text="Dose given (mg)" /></Label>
+        {/* One shared label row keeps the fields aligned when either label wraps. */}
+        <div className="grid grid-cols-2 items-start gap-x-3 break-words">
+          <Label htmlFor={doseId}><LocalizedText text="Dose given (mg)" /></Label>
+          <Label htmlFor={infusionId}><LocalizedText text="Infusion Duration (minutes)" /></Label>
+
+          <div className="min-w-0">
             <ClinicalNumberInput
+              id={doseId}
               inputMode="decimal"
               placeholder="e.g. 1000"
               value={doseGiven}
@@ -149,9 +153,7 @@ export default function BedboundAdvisoryPanel({
             {parseErrors.dose && <p className="mt-1 text-[11px] text-red-600"><LocalizedText text={parseErrors.dose} /></p>}
           </div>
 
-          {/* Infusion duration */}
-          <div>
-            <Label htmlFor={infusionId}><LocalizedText text="Infusion Duration (minutes)" /></Label>
+          <div className="min-w-0">
             <ClinicalNumberInput
               id={infusionId}
               inputMode="decimal"
