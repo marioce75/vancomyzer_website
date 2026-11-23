@@ -96,7 +96,7 @@ export default function AdminCalculationsPage() {
     <div>
       <div className="mb-4">
         <h1 className="text-xl font-bold text-slate-900"><LocalizedText text={"Calculations Audit"} /></h1>
-        <p className="text-sm text-slate-600 mt-1"><LocalizedText text={"System-wide feed of calculation events. De-identified — no patient data is stored. Department admins see their own subset at"} />{" "}<code className="text-xs bg-slate-100 px-1 py-0.5 rounded">/team</code>.
+        <p className="text-sm text-slate-600 mt-1"><LocalizedText text={"Historical calculation audit records. Department admins see their own subset at"} />{" "}<code className="text-xs bg-slate-100 px-1 py-0.5 rounded">/team</code>.
         </p>
       </div>
 

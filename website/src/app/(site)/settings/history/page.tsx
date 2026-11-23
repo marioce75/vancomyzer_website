@@ -63,9 +63,7 @@ function HistoryUpgradeCard() {
       <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}><LocalizedText text={"Feature access"} /></div>
       <p style={{ fontSize: 14, color: "var(--color-secondary)", margin: "0 0 16px", lineHeight: 1.6 }}><LocalizedText text={"This feature is not available for your current account access. Contact us to discuss availability."} /></p>
       <ul style={{ margin: "0 0 16px", padding: 0, listStyle: "none", fontSize: 13, color: "var(--color-secondary)", lineHeight: 1.7 }}>
-        <li style={{ paddingLeft: 18, position: "relative" }}><LocalizedText text={"Optional case IDs (do not enter patient identifiers)"} /></li>
-        <li style={{ paddingLeft: 18, position: "relative" }}><LocalizedText text={"Filter by calculation type, date, case ID"} /></li>
-        <li style={{ paddingLeft: 18, position: "relative" }}><LocalizedText text={"90-day retention, automatically purged"} /></li>
+        <li style={{ paddingLeft: 18, position: "relative" }}><LocalizedText text={"Filter previously saved calculations by type, date or case ID"} /></li>
       </ul>
       <Link
         href="/contact?topic=restricted_access"
@@ -145,7 +143,6 @@ export default function HistoryPage() {
       </div>
 
       <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}><LocalizedText text="Calculation History" /></h1>
-      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 24 }}><LocalizedText text={"90-day de-identified record of your Vancomyzer™ calculations. No patient identifiers stored."} /></p>
 
       {!allowed ? (
         <HistoryUpgradeCard />
@@ -204,7 +201,7 @@ export default function HistoryPage() {
             <div style={{
               padding: 32, textAlign: "center", color: "var(--color-dim)", fontSize: 13,
               border: "1px dashed var(--color-border)", borderRadius: 6,
-            }}><LocalizedText text={"No calculations yet. New calculations will appear here."} /></div>
+            }}><LocalizedText text={"No calculations to display."} /></div>
           ) : (
             <div style={{ overflowX: "auto", border: "1px solid var(--color-border)", borderRadius: 6, background: "var(--color-card)" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>

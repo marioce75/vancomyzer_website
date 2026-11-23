@@ -133,23 +133,23 @@ export default function PilotDashboardPage() {
         {currentPhase === 'PHASE_1' && !isExpired && (
           <>
             <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={"Phase 1 — Familiarization (Days 1–14)"} /></div>
-            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Every case you calculate is being logged automatically. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases."} /></p>
+            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases."} /></p>
           </>
         )}
         {currentPhase === 'PHASE_2' && !isExpired && (
           <>
             <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={"Phase 2 — Active Use (Days 15–75)"} /></div>
-            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Use Vancomyzer as your primary dosing support tool. Your case data is accumulating. At day 75, a personalized summary report will be generated showing your AUC attainment rate, case volume and key insights from your logged cases — a document you can share with your pharmacy director for institutional review."} /></p>
+            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Continue evaluating Vancomyzer alongside your current workflow."} /></p>
           </>
         )}
         {(currentPhase === 'PHASE_3' || isExpired) && !isConverted && (
           <>
             <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={"Phase 3 — Value Review (Days 76–90)"} /></div>
-            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"Your pilot data is complete. Generate your personalized summary report below and share it with your pharmacy director or P&T committee. Contact us about continued access to your case log."} /></p>
+            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={"If available, generate your pilot summary report below for institutional review."} /></p>
           </>
         )}
         {isConverted && (
-          <p style={{ fontSize: 13, color: GREEN, margin: 0 }}><LocalizedText text={"You are an active subscriber. Your case history is fully preserved."} /></p>
+          <p style={{ fontSize: 13, color: GREEN, margin: 0 }}><LocalizedText text={"You are an active subscriber."} /></p>
         )}
       </div>
 
@@ -208,7 +208,6 @@ export default function PilotDashboardPage() {
           <div style={{ fontSize: 13, fontWeight: 600, color: NAVY, marginBottom: 12 }}><LocalizedText text={"What is included after the pilot"} /></div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 16rem), 1fr))', gap: '8px 32px' }}>
             {([
-              ['Calculation history (90-day retention)', true],
               ['Pilot summary report PDF', true],
               ['PDF export and clinical-note copy', true],
               ['Email support', true],

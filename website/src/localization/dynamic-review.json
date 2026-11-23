@@ -10,10 +10,11 @@
     "typed numeric/boolean presentation": 132,
     "explicit localization expression": 1,
     "formatted numeric or punctuation expression": 18,
+    "finite copy catalogued": 129,
+    "localized open text — runtime/source domain review": 313,
     "display unit — retain source": 4,
     "scientific citation/formula/version identifier": 11,
     "published platform or test-section identity — source spelling retained": 5,
-    "finite copy catalogued": 129,
     "verified citation or program identity": 8,
     "formula invariant": 2,
     "source-traced numeric/price/range display": 5,
@@ -36,8 +37,7 @@
     "verified scientific symbol or unit": 3,
     "unpublished or unused component": 3,
     "finite domain needs review": 6,
-    "unresolved data flow — contextual review": 1,
-    "localized open text — runtime/source domain review": 313
+    "unresolved data flow — contextual review": 1
   },
   "records": [
     {
@@ -326,7 +326,7 @@
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 34,
+      "line": 33,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -338,7 +338,7 @@
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 34,
+      "line": 33,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -350,7 +350,7 @@
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 62,
+      "line": 61,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -362,7 +362,7 @@
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 62,
+      "line": 61,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -371,6 +371,14 @@
         " "
       ],
       "uncatalogued": []
+    },
+    {
+      "file": "src/app/(site)/privacy/page.tsx",
+      "line": 20,
+      "surface": "bound",
+      "expression": "{<span className=\"text-[15px]\"><LocalizedText text=\"Last updated: September 21, 2026\" /></span>}",
+      "category": "structural JSX — descendants inventoried separately",
+      "type": "Element"
     },
     {
       "file": "src/app/(site)/register/page.tsx",
@@ -734,7 +742,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 132,
+      "line": 130,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -746,7 +754,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 132,
+      "line": 130,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -758,15 +766,15 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 150,
+      "line": 147,
       "surface": "child",
-      "expression": "!allowed ? (\n        <HistoryUpgradeCard />\n      ) : (\n        <>\n          {/* Filters */}\n          <div style={{ display: \"flex\", gap: 12, marginBottom: 16, flexWrap: \"wrap\", alignItems: \"center\" }}>\n            <div>\n              <label style={{ display: \"block\", fontSize: 11, fontWeight: 600, color: \"var(--color-secondary)\", marginBottom: 4 }}><LocalizedText text={\"Workflow\"} /></label>\n              <select\n                value={workflowFilter}\n                onChange={e => { setOffset(0); setWorkflowFilter(e.target.value); }}\n                style={{\n                  padding: \"6px 10px\", fontSize: 13,\n                  border: \"1px solid var(--color-border)\", background: \"var(--color-card)\", color: \"var(--color-primary)\",\n                  borderRadius: 4,\n                }}\n              >\n                <option value=\"\"><LocalizedText text=\"All\" /></option>\n                <option value=\"empiric\"><LocalizedText text={\"Initial regimen\"} /></option>\n                <option value=\"existing\"><LocalizedText text={\"Adjustment\"} /></option>\n              </select>\n            </div>\n            <div style={{ flex: 1, minWidth: 200 }}>\n              <label style={{ display: \"block\", fontSize: 11, fontWeight: 600, color: \"var(--color-secondary)\", marginBottom: 4 }}><LocalizedText text={\"Case ID search\"} /></label>\n              <LocalizedInput\n                type=\"text\"\n                value={caseIdFilter}\n                onChange={e => { setOffset(0); setCaseIdFilter(e.target.value); }}\n                placeholder=\"e.g. ICU bed 12\"\n                style={{\n                  width: \"100%\", padding: \"6px 10px\", fontSize: 13,\n                  border: \"1px solid var(--color-border)\", background: \"var(--color-card)\", color: \"var(--color-primary)\",\n                  borderRadius: 4, boxSizing: \"border-box\",\n                }}\n              />\n            </div>\n            <div style={{ alignSelf: \"flex-end\", fontSize: 12, color: \"var(--color-dim)\" }}>\n              {total} <LocalizedText text={total === 1 ? \"entry\" : \"entries\"} />\n            </div>\n          </div>\n\n          {error && (\n            <div style={{\n              padding: \"10px 14px\", marginBottom: 16,\n              background: \"#fff5f5\", border: \"1px solid #fca5a5\", color: \"#991b1b\", fontSize: 13, borderRadius: 4,\n            }}>\n              <LocalizedText text={error} />\n            </div>\n          )}\n\n          {/* Table */}\n          {loading && rows.length === 0 ? (\n            <div style={{ padding: 40, textAlign: \"center\", color: \"var(--color-dim)\" }}><LocalizedText text={\"Loading history...\"} /></div>\n          ) : rows.length === 0 ? (\n            <div style={{\n              padding: 32, textAlign: \"center\", color: \"var(--color-dim)\", fontSize: 13,\n              border: \"1px dashed var(--color-border)\", borderRadius: 6,\n            }}><LocalizedText text={\"No calculations yet. New calculations will appear here.\"} /></div>\n          ) : (\n            <div style={{ overflowX: \"auto\", border: \"1px solid var(--color-border)\", borderRadius: 6, background: \"var(--color-card)\" }}>\n              <table style={{ width: \"100%\", borderCollapse: \"collapse\", fontSize: 13 }}>\n                <thead>\n                  <tr style={{ background: \"var(--color-bg)\", borderBottom: \"1px solid var(--color-border)\" }}>\n                    {[\"Date\", \"Workflow\", \"Case ID\", \"Model\", \"Dose\", \"Interval\", \"AUC₂₄\", \"Peak\", \"Trough\", \"Range\"].map(h => (\n                      <th key={h} style={{\n                        padding: \"10px 12px\", textAlign: \"left\", fontSize: 11, fontWeight: 700,\n                        color: \"var(--color-secondary)\", letterSpacing: \"0.06em\", textTransform: \"uppercase\",\n                      }}>\n                        <LocalizedText text={h} />\n                      </th>\n                    ))}\n                  </tr>\n                </thead>\n                <tbody>\n                  {rows.map(row => (\n                    <tr key={row.id} style={{ borderBottom: \"1px solid var(--color-border)\" }}>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", whiteSpace: \"nowrap\" }}>\n                        {formatDate(row.calculated_at)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-primary)\" }}>\n                        {workflowLabel(row.workflow_type)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", maxWidth: 180, overflow: \"hidden\", textOverflow: \"ellipsis\" }}>\n                        {row.case_id ?? <span style={{ color: \"var(--color-dim)\" }}>—</span>}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", whiteSpace: \"nowrap\" }}>\n                        {/* Historical rows may carry the retired custom obesity model; the registry labels it \"(retired)\". */}\n                        {modelShortName(row.pk_model)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-primary)\", fontWeight: 600 }}>\n                        {row.dose_mg != null ? `${row.dose_mg} mg` : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.interval_hours != null ? `q${row.interval_hours}h` : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.auc24 != null ? row.auc24.toFixed(0) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.peak != null ? fmt(row.peak, 1) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.trough != null ? fmt(row.trough, 1) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\" }}>\n                        {row.auc_in_range ? (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#ecfdf5\", color: \"#047857\", border: \"1px solid #6ee7b7\", borderRadius: 4 }}><LocalizedText text={\"In\"} /></span>\n                        ) : (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#fef3c7\", color: \"#92400e\", border: \"1px solid #fcd34d\", borderRadius: 4 }}><LocalizedText text={\"Out\"} /></span>\n                        )}\n                      </td>\n                    </tr>\n                  ))}\n                </tbody>\n              </table>\n            </div>\n          )}\n\n          {/* Pagination */}\n          {total > PAGE_SIZE && (\n            <div style={{ display: \"flex\", justifyContent: \"space-between\", alignItems: \"center\", marginTop: 16, fontSize: 13 }}>\n              <button\n                type=\"button\"\n                disabled={offset === 0 || loading}\n                onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}\n                style={{\n                  padding: \"6px 14px\",\n                  background: \"transparent\",\n                  border: \"1px solid var(--color-border)\",\n                  color: offset === 0 ? \"var(--color-dim)\" : \"var(--color-primary)\",\n                  borderRadius: 4,\n                  cursor: offset === 0 ? \"not-allowed\" : \"pointer\",\n                }}\n              ><LocalizedText text={\"Newer\"} /></button>\n              <span style={{ color: \"var(--color-dim)\" }}>\n                {offset + 1}–{Math.min(offset + PAGE_SIZE, total)}{\" \"}<LocalizedText text=\"of\" />{\" \"}{total}\n              </span>\n              <button\n                type=\"button\"\n                disabled={offset + PAGE_SIZE >= total || loading}\n                onClick={() => setOffset(offset + PAGE_SIZE)}\n                style={{\n                  padding: \"6px 14px\",\n                  background: \"transparent\",\n                  border: \"1px solid var(--color-border)\",\n                  color: offset + PAGE_SIZE >= total ? \"var(--color-dim)\" : \"var(--color-primary)\",\n                  borderRadius: 4,\n                  cursor: offset + PAGE_SIZE >= total ? \"not-allowed\" : \"pointer\",\n                }}\n              ><LocalizedText text={\"Older\"} /></button>\n            </div>\n          )}\n        </>\n      )",
+      "expression": "!allowed ? (\n        <HistoryUpgradeCard />\n      ) : (\n        <>\n          {/* Filters */}\n          <div style={{ display: \"flex\", gap: 12, marginBottom: 16, flexWrap: \"wrap\", alignItems: \"center\" }}>\n            <div>\n              <label style={{ display: \"block\", fontSize: 11, fontWeight: 600, color: \"var(--color-secondary)\", marginBottom: 4 }}><LocalizedText text={\"Workflow\"} /></label>\n              <select\n                value={workflowFilter}\n                onChange={e => { setOffset(0); setWorkflowFilter(e.target.value); }}\n                style={{\n                  padding: \"6px 10px\", fontSize: 13,\n                  border: \"1px solid var(--color-border)\", background: \"var(--color-card)\", color: \"var(--color-primary)\",\n                  borderRadius: 4,\n                }}\n              >\n                <option value=\"\"><LocalizedText text=\"All\" /></option>\n                <option value=\"empiric\"><LocalizedText text={\"Initial regimen\"} /></option>\n                <option value=\"existing\"><LocalizedText text={\"Adjustment\"} /></option>\n              </select>\n            </div>\n            <div style={{ flex: 1, minWidth: 200 }}>\n              <label style={{ display: \"block\", fontSize: 11, fontWeight: 600, color: \"var(--color-secondary)\", marginBottom: 4 }}><LocalizedText text={\"Case ID search\"} /></label>\n              <LocalizedInput\n                type=\"text\"\n                value={caseIdFilter}\n                onChange={e => { setOffset(0); setCaseIdFilter(e.target.value); }}\n                placeholder=\"e.g. ICU bed 12\"\n                style={{\n                  width: \"100%\", padding: \"6px 10px\", fontSize: 13,\n                  border: \"1px solid var(--color-border)\", background: \"var(--color-card)\", color: \"var(--color-primary)\",\n                  borderRadius: 4, boxSizing: \"border-box\",\n                }}\n              />\n            </div>\n            <div style={{ alignSelf: \"flex-end\", fontSize: 12, color: \"var(--color-dim)\" }}>\n              {total} <LocalizedText text={total === 1 ? \"entry\" : \"entries\"} />\n            </div>\n          </div>\n\n          {error && (\n            <div style={{\n              padding: \"10px 14px\", marginBottom: 16,\n              background: \"#fff5f5\", border: \"1px solid #fca5a5\", color: \"#991b1b\", fontSize: 13, borderRadius: 4,\n            }}>\n              <LocalizedText text={error} />\n            </div>\n          )}\n\n          {/* Table */}\n          {loading && rows.length === 0 ? (\n            <div style={{ padding: 40, textAlign: \"center\", color: \"var(--color-dim)\" }}><LocalizedText text={\"Loading history...\"} /></div>\n          ) : rows.length === 0 ? (\n            <div style={{\n              padding: 32, textAlign: \"center\", color: \"var(--color-dim)\", fontSize: 13,\n              border: \"1px dashed var(--color-border)\", borderRadius: 6,\n            }}><LocalizedText text={\"No calculations to display.\"} /></div>\n          ) : (\n            <div style={{ overflowX: \"auto\", border: \"1px solid var(--color-border)\", borderRadius: 6, background: \"var(--color-card)\" }}>\n              <table style={{ width: \"100%\", borderCollapse: \"collapse\", fontSize: 13 }}>\n                <thead>\n                  <tr style={{ background: \"var(--color-bg)\", borderBottom: \"1px solid var(--color-border)\" }}>\n                    {[\"Date\", \"Workflow\", \"Case ID\", \"Model\", \"Dose\", \"Interval\", \"AUC₂₄\", \"Peak\", \"Trough\", \"Range\"].map(h => (\n                      <th key={h} style={{\n                        padding: \"10px 12px\", textAlign: \"left\", fontSize: 11, fontWeight: 700,\n                        color: \"var(--color-secondary)\", letterSpacing: \"0.06em\", textTransform: \"uppercase\",\n                      }}>\n                        <LocalizedText text={h} />\n                      </th>\n                    ))}\n                  </tr>\n                </thead>\n                <tbody>\n                  {rows.map(row => (\n                    <tr key={row.id} style={{ borderBottom: \"1px solid var(--color-border)\" }}>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", whiteSpace: \"nowrap\" }}>\n                        {formatDate(row.calculated_at)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-primary)\" }}>\n                        {workflowLabel(row.workflow_type)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", maxWidth: 180, overflow: \"hidden\", textOverflow: \"ellipsis\" }}>\n                        {row.case_id ?? <span style={{ color: \"var(--color-dim)\" }}>—</span>}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", whiteSpace: \"nowrap\" }}>\n                        {/* Historical rows may carry the retired custom obesity model; the registry labels it \"(retired)\". */}\n                        {modelShortName(row.pk_model)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-primary)\", fontWeight: 600 }}>\n                        {row.dose_mg != null ? `${row.dose_mg} mg` : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.interval_hours != null ? `q${row.interval_hours}h` : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.auc24 != null ? row.auc24.toFixed(0) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.peak != null ? fmt(row.peak, 1) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.trough != null ? fmt(row.trough, 1) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\" }}>\n                        {row.auc_in_range ? (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#ecfdf5\", color: \"#047857\", border: \"1px solid #6ee7b7\", borderRadius: 4 }}><LocalizedText text={\"In\"} /></span>\n                        ) : (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#fef3c7\", color: \"#92400e\", border: \"1px solid #fcd34d\", borderRadius: 4 }}><LocalizedText text={\"Out\"} /></span>\n                        )}\n                      </td>\n                    </tr>\n                  ))}\n                </tbody>\n              </table>\n            </div>\n          )}\n\n          {/* Pagination */}\n          {total > PAGE_SIZE && (\n            <div style={{ display: \"flex\", justifyContent: \"space-between\", alignItems: \"center\", marginTop: 16, fontSize: 13 }}>\n              <button\n                type=\"button\"\n                disabled={offset === 0 || loading}\n                onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}\n                style={{\n                  padding: \"6px 14px\",\n                  background: \"transparent\",\n                  border: \"1px solid var(--color-border)\",\n                  color: offset === 0 ? \"var(--color-dim)\" : \"var(--color-primary)\",\n                  borderRadius: 4,\n                  cursor: offset === 0 ? \"not-allowed\" : \"pointer\",\n                }}\n              ><LocalizedText text={\"Newer\"} /></button>\n              <span style={{ color: \"var(--color-dim)\" }}>\n                {offset + 1}–{Math.min(offset + PAGE_SIZE, total)}{\" \"}<LocalizedText text=\"of\" />{\" \"}{total}\n              </span>\n              <button\n                type=\"button\"\n                disabled={offset + PAGE_SIZE >= total || loading}\n                onClick={() => setOffset(offset + PAGE_SIZE)}\n                style={{\n                  padding: \"6px 14px\",\n                  background: \"transparent\",\n                  border: \"1px solid var(--color-border)\",\n                  color: offset + PAGE_SIZE >= total ? \"var(--color-dim)\" : \"var(--color-primary)\",\n                  borderRadius: 4,\n                  cursor: offset + PAGE_SIZE >= total ? \"not-allowed\" : \"pointer\",\n                }}\n              ><LocalizedText text={\"Older\"} /></button>\n            </div>\n          )}\n        </>\n      )",
       "category": "structural JSX — descendants inventoried separately",
       "type": "Element"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 187,
+      "line": 184,
       "surface": "child",
       "expression": "total",
       "category": "typed numeric/boolean presentation",
@@ -774,7 +782,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 233,
+      "line": 230,
       "surface": "child",
       "expression": "row.case_id ?? <span style={{ color: \"var(--color-dim)\" }}>—</span>",
       "category": "structural JSX — descendants inventoried separately",
@@ -782,7 +790,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 240,
+      "line": 237,
       "surface": "child",
       "expression": "row.dose_mg != null ? `${row.dose_mg} mg` : \"—\"",
       "category": "formatted numeric or punctuation expression",
@@ -790,7 +798,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 243,
+      "line": 240,
       "surface": "child",
       "expression": "row.interval_hours != null ? `q${row.interval_hours}h` : \"—\"",
       "category": "formatted numeric or punctuation expression",
@@ -798,7 +806,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 246,
+      "line": 243,
       "surface": "child",
       "expression": "row.auc24 != null ? row.auc24.toFixed(0) : \"—\"",
       "category": "formatted numeric or punctuation expression",
@@ -806,7 +814,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 249,
+      "line": 246,
       "surface": "child",
       "expression": "row.peak != null ? fmt(row.peak, 1) : \"—\"",
       "category": "formatted numeric or punctuation expression",
@@ -814,7 +822,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 252,
+      "line": 249,
       "surface": "child",
       "expression": "row.trough != null ? fmt(row.trough, 1) : \"—\"",
       "category": "formatted numeric or punctuation expression",
@@ -822,7 +830,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 255,
+      "line": 252,
       "surface": "child",
       "expression": "row.auc_in_range ? (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#ecfdf5\", color: \"#047857\", border: \"1px solid #6ee7b7\", borderRadius: 4 }}><LocalizedText text={\"In\"} /></span>\n                        ) : (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#fef3c7\", color: \"#92400e\", border: \"1px solid #fcd34d\", borderRadius: 4 }}><LocalizedText text={\"Out\"} /></span>\n                        )",
       "category": "structural JSX — descendants inventoried separately",
@@ -830,7 +838,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 285,
+      "line": 282,
       "surface": "child",
       "expression": "offset + 1",
       "category": "typed numeric/boolean presentation",
@@ -838,7 +846,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 285,
+      "line": 282,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -850,7 +858,7 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 285,
+      "line": 282,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -862,11 +870,40 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 285,
+      "line": 282,
       "surface": "child",
       "expression": "total",
       "category": "typed numeric/boolean presentation",
       "type": "number"
+    },
+    {
+      "file": "src/app/(site)/settings/history/page.tsx",
+      "line": 184,
+      "surface": "bound",
+      "expression": "total === 1 ? \"entry\" : \"entries\"",
+      "category": "finite copy catalogued",
+      "type": "\"entries\" | \"entry\"",
+      "finiteValues": [
+        "entries",
+        "entry"
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/(site)/settings/history/page.tsx",
+      "line": 193,
+      "surface": "bound",
+      "expression": "error",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/(site)/settings/history/page.tsx",
+      "line": 215,
+      "surface": "bound",
+      "expression": "h",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
     },
     {
       "file": "src/app/(site)/settings/page.tsx",
@@ -1207,6 +1244,138 @@
       "expression": "row.auc_in_range ? (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 10, fontWeight: 600, background: \"#ecfdf5\", color: \"#047857\", border: \"1px solid #6ee7b7\", borderRadius: 4 }}><LocalizedText text={\"In\"} /></span>\n                        ) : (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 10, fontWeight: 600, background: \"#fef3c7\", color: \"#92400e\", border: \"1px solid #fcd34d\", borderRadius: 4 }}><LocalizedText text={\"Out\"} /></span>\n                        )",
       "category": "structural JSX — descendants inventoried separately",
       "type": "Element"
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 291,
+      "surface": "bound",
+      "expression": "loadError",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 349,
+      "surface": "bound",
+      "expression": "seats.allocated === 10 ? \"Up to 10 — $500/mo\" : seats.allocated === 20 ? \"Up to 20 — $1,000/mo\" : \"Custom plan\"",
+      "category": "finite copy catalogued",
+      "type": "\"Up to 10 — $500/mo\" | \"Up to 20 — $1,000/mo\" | \"Custom plan\"",
+      "finiteValues": [
+        "Up to 10 — $500/mo",
+        "Up to 20 — $1,000/mo",
+        "Custom plan"
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 373,
+      "surface": "bound",
+      "expression": "tierChanging ? \"Updating…\" : \"Upgrade to 20 seats \"",
+      "category": "finite copy catalogued",
+      "type": "\"Updating…\" | \"Upgrade to 20 seats \"",
+      "finiteValues": [
+        "Updating…",
+        "Upgrade to 20 seats "
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 393,
+      "surface": "bound",
+      "expression": "tierChanging ? \"Updating…\" : \" Downgrade to 10 seats\"",
+      "category": "finite copy catalogued",
+      "type": "\"Updating…\" | \" Downgrade to 10 seats\"",
+      "finiteValues": [
+        "Updating…",
+        " Downgrade to 10 seats"
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 412,
+      "surface": "bound",
+      "expression": "portalLoading ? \"Opening…\" : \"Manage billing \"",
+      "category": "finite copy catalogued",
+      "type": "\"Opening…\" | \"Manage billing \"",
+      "finiteValues": [
+        "Opening…",
+        "Manage billing "
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 426,
+      "surface": "bound",
+      "expression": "tierMsg.text",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 492,
+      "surface": "bound",
+      "expression": "inviting ? \"Sending...\" : \"Send invite\"",
+      "category": "finite copy catalogued",
+      "type": "\"Sending...\" | \"Send invite\"",
+      "finiteValues": [
+        "Sending...",
+        "Send invite"
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 505,
+      "surface": "bound",
+      "expression": "inviteMsg.text",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 523,
+      "surface": "bound",
+      "expression": "h",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 572,
+      "surface": "bound",
+      "expression": "m.institutional_role === \"admin\" ? \"ADMIN ⇄\" : \"USER ⇄\"",
+      "category": "finite copy catalogued",
+      "type": "\"ADMIN ⇄\" | \"USER ⇄\"",
+      "finiteValues": [
+        "ADMIN ⇄",
+        "USER ⇄"
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 618,
+      "surface": "bound",
+      "expression": "showAudit ? \"Hide\" : \"Show\"",
+      "category": "finite copy catalogued",
+      "type": "\"Hide\" | \"Show\"",
+      "finiteValues": [
+        "Hide",
+        "Show"
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/(site)/team/page.tsx",
+      "line": 629,
+      "surface": "bound",
+      "expression": "h",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
     },
     {
       "file": "src/app/(site)/transparent-dosing/cases/page.tsx",
@@ -3959,6 +4128,35 @@
       "type": "number"
     },
     {
+      "file": "src/app/admin/dashboard/calculations/page.tsx",
+      "line": 150,
+      "surface": "bound",
+      "expression": "total === 1 ? \"entry\" : \"entries\"",
+      "category": "finite copy catalogued",
+      "type": "\"entries\" | \"entry\"",
+      "finiteValues": [
+        "entries",
+        "entry"
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/admin/dashboard/calculations/page.tsx",
+      "line": 155,
+      "surface": "bound",
+      "expression": "error",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/admin/dashboard/calculations/page.tsx",
+      "line": 167,
+      "surface": "bound",
+      "expression": "h",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
       "file": "src/app/admin/dashboard/discounts/page.tsx",
       "line": 111,
       "surface": "child",
@@ -6609,7 +6807,7 @@
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 133,
       "surface": "child",
-      "expression": "currentPhase === 'PHASE_1' && !isExpired && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 1 — Familiarization (Days 1–14)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Every case you calculate is being logged automatically. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases.\"} /></p>\n          </>\n        )",
+      "expression": "currentPhase === 'PHASE_1' && !isExpired && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 1 — Familiarization (Days 1–14)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases.\"} /></p>\n          </>\n        )",
       "category": "structural JSX — descendants inventoried separately",
       "type": "false | Element"
     },
@@ -6617,7 +6815,7 @@
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 139,
       "surface": "child",
-      "expression": "currentPhase === 'PHASE_2' && !isExpired && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 2 — Active Use (Days 15–75)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"Use Vancomyzer as your primary dosing support tool. Your case data is accumulating. At day 75, a personalized summary report will be generated showing your AUC attainment rate, case volume and key insights from your logged cases — a document you can share with your pharmacy director for institutional review.\"} /></p>\n          </>\n        )",
+      "expression": "currentPhase === 'PHASE_2' && !isExpired && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 2 — Active Use (Days 15–75)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"Continue evaluating Vancomyzer alongside your current workflow.\"} /></p>\n          </>\n        )",
       "category": "structural JSX — descendants inventoried separately",
       "type": "false | Element"
     },
@@ -6625,7 +6823,7 @@
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 145,
       "surface": "child",
-      "expression": "(currentPhase === 'PHASE_3' || isExpired) && !isConverted && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 3 — Value Review (Days 76–90)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"Your pilot data is complete. Generate your personalized summary report below and share it with your pharmacy director or P&T committee. Contact us about continued access to your case log.\"} /></p>\n          </>\n        )",
+      "expression": "(currentPhase === 'PHASE_3' || isExpired) && !isConverted && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 3 — Value Review (Days 76–90)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"If available, generate your pilot summary report below for institutional review.\"} /></p>\n          </>\n        )",
       "category": "structural JSX — descendants inventoried separately",
       "type": "false | Element"
     },
@@ -6633,7 +6831,7 @@
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 151,
       "surface": "child",
-      "expression": "isConverted && (\n          <p style={{ fontSize: 13, color: GREEN, margin: 0 }}><LocalizedText text={\"You are an active subscriber. Your case history is fully preserved.\"} /></p>\n        )",
+      "expression": "isConverted && (\n          <p style={{ fontSize: 13, color: GREEN, margin: 0 }}><LocalizedText text={\"You are an active subscriber.\"} /></p>\n        )",
       "category": "structural JSX — descendants inventoried separately",
       "type": "false | Element"
     },
@@ -6677,13 +6875,13 @@
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 206,
       "surface": "child",
-      "expression": "!isConverted && (\n        <div style={{ border: '1px dashed #cbd5e1', padding: '20px 24px' }}>\n          <div style={{ fontSize: 13, fontWeight: 600, color: NAVY, marginBottom: 12 }}><LocalizedText text={\"What is included after the pilot\"} /></div>\n          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 16rem), 1fr))', gap: '8px 32px' }}>\n            {([\n              ['Calculation history (90-day retention)', true],\n              ['Pilot summary report PDF', true],\n              ['PDF export and clinical-note copy', true],\n              ['Email support', true],\n            ] as [string, boolean][]).map(([feature, included]) => (\n              <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: SLATE }}>\n                <span style={{ color: included ? GREEN : '#94a3b8', fontWeight: 700 }}><LocalizedText text={included ? 'Included' : 'Optional'} /></span>\n                <span><LocalizedText text={feature} /></span>\n                {!included && (\n                  <span style={{ fontSize: 10, border: `1px solid ${GREEN}50`, color: GREEN, padding: '1px 6px' }}>Pro</span>\n                )}\n              </div>\n            ))}\n          </div>\n        </div>\n      )",
+      "expression": "!isConverted && (\n        <div style={{ border: '1px dashed #cbd5e1', padding: '20px 24px' }}>\n          <div style={{ fontSize: 13, fontWeight: 600, color: NAVY, marginBottom: 12 }}><LocalizedText text={\"What is included after the pilot\"} /></div>\n          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 16rem), 1fr))', gap: '8px 32px' }}>\n            {([\n              ['Pilot summary report PDF', true],\n              ['PDF export and clinical-note copy', true],\n              ['Email support', true],\n            ] as [string, boolean][]).map(([feature, included]) => (\n              <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: SLATE }}>\n                <span style={{ color: included ? GREEN : '#94a3b8', fontWeight: 700 }}><LocalizedText text={included ? 'Included' : 'Optional'} /></span>\n                <span><LocalizedText text={feature} /></span>\n                {!included && (\n                  <span style={{ fontSize: 10, border: `1px solid ${GREEN}50`, color: GREEN, padding: '1px 6px' }}>Pro</span>\n                )}\n              </div>\n            ))}\n          </div>\n        </div>\n      )",
       "category": "structural JSX — descendants inventoried separately",
       "type": "false | Element"
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 219,
+      "line": 218,
       "surface": "child",
       "expression": "!included && (\n                  <span style={{ fontSize: 10, border: `1px solid ${GREEN}50`, color: GREEN, padding: '1px 6px' }}>Pro</span>\n                )",
       "category": "structural JSX — descendants inventoried separately",
@@ -6691,7 +6889,7 @@
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 229,
+      "line": 228,
       "surface": "child",
       "expression": "\" \"",
       "category": "literal spacing/symbol invariant",
@@ -6700,6 +6898,89 @@
         " "
       ],
       "uncatalogued": []
+    },
+    {
+      "file": "src/app/dashboard/pilot/page.tsx",
+      "line": 73,
+      "surface": "bound",
+      "expression": "isExpired ? 'Your pilot has ended.' : isConverted ? 'You are an active subscriber.' : `Day ${daysElapsed} of 90 · ${daysRemaining} days remaining`",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/dashboard/pilot/page.tsx",
+      "line": 82,
+      "surface": "bound",
+      "expression": "isConverted ? 'SUBSCRIBED' : isExpired ? 'EXPIRED' : `PHASE ${currentPhase.split('_')[1]} ACTIVE`",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/dashboard/pilot/page.tsx",
+      "line": 114,
+      "surface": "bound",
+      "expression": "phase.label",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/dashboard/pilot/page.tsx",
+      "line": 119,
+      "surface": "bound",
+      "expression": "phase.subtitle",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/dashboard/pilot/page.tsx",
+      "line": 161,
+      "surface": "bound",
+      "expression": "card.label",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/dashboard/pilot/page.tsx",
+      "line": 162,
+      "surface": "bound",
+      "expression": "card.sub",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
+    },
+    {
+      "file": "src/app/dashboard/pilot/page.tsx",
+      "line": 180,
+      "surface": "bound",
+      "expression": "reportLoading ? 'Generating…' : (reportUrl || existingReport) ? 'Re-generate Report' : 'Generate My Pilot Report'",
+      "category": "finite copy catalogued",
+      "type": "\"Generating…\" | \"Re-generate Report\" | \"Generate My Pilot Report\"",
+      "finiteValues": [
+        "Generating…",
+        "Re-generate Report",
+        "Generate My Pilot Report"
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/dashboard/pilot/page.tsx",
+      "line": 216,
+      "surface": "bound",
+      "expression": "included ? 'Included' : 'Optional'",
+      "category": "finite copy catalogued",
+      "type": "\"Included\" | \"Optional\"",
+      "finiteValues": [
+        "Included",
+        "Optional"
+      ],
+      "uncatalogued": []
+    },
+    {
+      "file": "src/app/dashboard/pilot/page.tsx",
+      "line": 217,
+      "surface": "bound",
+      "expression": "feature",
+      "category": "localized open text — runtime/source domain review",
+      "type": "string"
     },
     {
       "file": "src/app/launch/page.tsx",
@@ -11535,14 +11816,6 @@
       "type": "string"
     },
     {
-      "file": "src/app/(site)/privacy/page.tsx",
-      "line": 20,
-      "surface": "bound",
-      "expression": "{<span className=\"text-[15px]\"><LocalizedText text=\"Last updated: September 21, 2026\" /></span>}",
-      "category": "structural JSX — descendants inventoried separately",
-      "type": "Element"
-    },
-    {
       "file": "src/app/(site)/register/page.tsx",
       "line": 157,
       "surface": "bound",
@@ -11715,35 +11988,6 @@
       "uncatalogued": []
     },
     {
-      "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 187,
-      "surface": "bound",
-      "expression": "total === 1 ? \"entry\" : \"entries\"",
-      "category": "finite copy catalogued",
-      "type": "\"entries\" | \"entry\"",
-      "finiteValues": [
-        "entries",
-        "entry"
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 196,
-      "surface": "bound",
-      "expression": "error",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 218,
-      "surface": "bound",
-      "expression": "h",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
       "file": "src/app/(site)/settings/page.tsx",
       "line": 129,
       "surface": "bound",
@@ -11787,138 +12031,6 @@
         "Save Settings"
       ],
       "uncatalogued": []
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 291,
-      "surface": "bound",
-      "expression": "loadError",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 349,
-      "surface": "bound",
-      "expression": "seats.allocated === 10 ? \"Up to 10 — $500/mo\" : seats.allocated === 20 ? \"Up to 20 — $1,000/mo\" : \"Custom plan\"",
-      "category": "finite copy catalogued",
-      "type": "\"Up to 10 — $500/mo\" | \"Up to 20 — $1,000/mo\" | \"Custom plan\"",
-      "finiteValues": [
-        "Up to 10 — $500/mo",
-        "Up to 20 — $1,000/mo",
-        "Custom plan"
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 373,
-      "surface": "bound",
-      "expression": "tierChanging ? \"Updating…\" : \"Upgrade to 20 seats \"",
-      "category": "finite copy catalogued",
-      "type": "\"Updating…\" | \"Upgrade to 20 seats \"",
-      "finiteValues": [
-        "Updating…",
-        "Upgrade to 20 seats "
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 393,
-      "surface": "bound",
-      "expression": "tierChanging ? \"Updating…\" : \" Downgrade to 10 seats\"",
-      "category": "finite copy catalogued",
-      "type": "\"Updating…\" | \" Downgrade to 10 seats\"",
-      "finiteValues": [
-        "Updating…",
-        " Downgrade to 10 seats"
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 412,
-      "surface": "bound",
-      "expression": "portalLoading ? \"Opening…\" : \"Manage billing \"",
-      "category": "finite copy catalogued",
-      "type": "\"Opening…\" | \"Manage billing \"",
-      "finiteValues": [
-        "Opening…",
-        "Manage billing "
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 426,
-      "surface": "bound",
-      "expression": "tierMsg.text",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 492,
-      "surface": "bound",
-      "expression": "inviting ? \"Sending...\" : \"Send invite\"",
-      "category": "finite copy catalogued",
-      "type": "\"Sending...\" | \"Send invite\"",
-      "finiteValues": [
-        "Sending...",
-        "Send invite"
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 505,
-      "surface": "bound",
-      "expression": "inviteMsg.text",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 523,
-      "surface": "bound",
-      "expression": "h",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 572,
-      "surface": "bound",
-      "expression": "m.institutional_role === \"admin\" ? \"ADMIN ⇄\" : \"USER ⇄\"",
-      "category": "finite copy catalogued",
-      "type": "\"ADMIN ⇄\" | \"USER ⇄\"",
-      "finiteValues": [
-        "ADMIN ⇄",
-        "USER ⇄"
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 618,
-      "surface": "bound",
-      "expression": "showAudit ? \"Hide\" : \"Show\"",
-      "category": "finite copy catalogued",
-      "type": "\"Hide\" | \"Show\"",
-      "finiteValues": [
-        "Hide",
-        "Show"
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/(site)/team/page.tsx",
-      "line": 629,
-      "surface": "bound",
-      "expression": "h",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
     },
     {
       "file": "src/app/(site)/terms/page.tsx",
@@ -12637,35 +12749,6 @@
       "type": "string"
     },
     {
-      "file": "src/app/admin/dashboard/calculations/page.tsx",
-      "line": 150,
-      "surface": "bound",
-      "expression": "total === 1 ? \"entry\" : \"entries\"",
-      "category": "finite copy catalogued",
-      "type": "\"entries\" | \"entry\"",
-      "finiteValues": [
-        "entries",
-        "entry"
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/admin/dashboard/calculations/page.tsx",
-      "line": 155,
-      "surface": "bound",
-      "expression": "error",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/admin/dashboard/calculations/page.tsx",
-      "line": 167,
-      "surface": "bound",
-      "expression": "h",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
       "file": "src/app/admin/dashboard/discounts/page.tsx",
       "line": 115,
       "surface": "bound",
@@ -13198,89 +13281,6 @@
       "line": 148,
       "surface": "bound",
       "expression": "status",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 73,
-      "surface": "bound",
-      "expression": "isExpired ? 'Your pilot has ended.' : isConverted ? 'You are an active subscriber.' : `Day ${daysElapsed} of 90 · ${daysRemaining} days remaining`",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 82,
-      "surface": "bound",
-      "expression": "isConverted ? 'SUBSCRIBED' : isExpired ? 'EXPIRED' : `PHASE ${currentPhase.split('_')[1]} ACTIVE`",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 114,
-      "surface": "bound",
-      "expression": "phase.label",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 119,
-      "surface": "bound",
-      "expression": "phase.subtitle",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 161,
-      "surface": "bound",
-      "expression": "card.label",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 162,
-      "surface": "bound",
-      "expression": "card.sub",
-      "category": "localized open text — runtime/source domain review",
-      "type": "string"
-    },
-    {
-      "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 180,
-      "surface": "bound",
-      "expression": "reportLoading ? 'Generating…' : (reportUrl || existingReport) ? 'Re-generate Report' : 'Generate My Pilot Report'",
-      "category": "finite copy catalogued",
-      "type": "\"Generating…\" | \"Re-generate Report\" | \"Generate My Pilot Report\"",
-      "finiteValues": [
-        "Generating…",
-        "Re-generate Report",
-        "Generate My Pilot Report"
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 217,
-      "surface": "bound",
-      "expression": "included ? 'Included' : 'Optional'",
-      "category": "finite copy catalogued",
-      "type": "\"Included\" | \"Optional\"",
-      "finiteValues": [
-        "Included",
-        "Optional"
-      ],
-      "uncatalogued": []
-    },
-    {
-      "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 218,
-      "surface": "bound",
-      "expression": "feature",
       "category": "localized open text — runtime/source domain review",
       "type": "string"
     },

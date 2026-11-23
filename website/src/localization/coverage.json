@@ -1,9 +1,9 @@
 {
   "notice": "INCOMPLETE. Explicit bindings, unbound static text, and unreviewed child expressions are inventoried separately. No percentage is claimed. Dynamic API messages, report exports, imported datasets, metadata and rich text also require review. Article integrity is checked by articles.test.ts in Dosys. Citation language is retained. No clinical or legal review is implied.",
   "summary": {
-    "catalogEntries": 3456,
+    "catalogEntries": 3443,
     "files": 272,
-    "staticBindings": 1714,
+    "staticBindings": 1710,
     "dynamicBindingsRequiringRuntimeAudit": 444,
     "unboundCandidates": 294,
     "invariantCandidates": 15,
@@ -1516,103 +1516,109 @@
     {
       "file": "src/app/(site)/privacy/page.tsx",
       "line": 28,
-      "text": "Our server logs record only that a calculation ran, how long it took and which calculator version answered; they do not contain the clinical values you entered, the results or your account email. Fit-quality details are shown to you with the result and are not stored. If your plan includes calculation history, calculations you choose to save are kept with your account and an optional case label for 90 days. Earlier releases did record clinical values in server logs and fit-quality records; those older records and hosting backups are under a separate retention review and have not yet been confirmed deleted.",
+      "text": "Our server logs record only that a calculation ran, how long it took and which calculator version answered; they do not contain the clinical values you entered, the results or your account email. Fit-quality details are shown to you with the result and are not stored. Earlier releases did record clinical values in server logs and fit-quality records; those older records and hosting backups are under a separate retention review and have not yet been confirmed deleted.",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 29,
-      "text": "So that your work is not lost if the page is refreshed, the calculator also keeps the values you entered within that browser tab. They are cleared when you reset the calculator or close the tab, and they are not restored after eight hours.",
-      "translated": true
-    },
-    {
-      "file": "src/app/(site)/privacy/page.tsx",
-      "line": 33,
+      "line": 32,
       "text": "Important: Do Not Enter Identifiable Patient Information",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 34,
-      "text": "Because the values you enter are sent to our server and recorded as described above, users should treat this tool as they would any clinical software:",
+      "line": 33,
+      "text": "Because the values you enter are sent to our server for calculation, treat this tool as you would any clinical software:",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 34,
+      "line": 33,
       "text": "do not enter patient names, medical record numbers, dates of birth, or other personally identifiable information (PII) or protected health information (PHI)",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 34,
+      "line": 33,
       "text": "into any field. Clinical values and exact sample times can be identifiable in context. Do not use the public calculator for institutional patient-data research without an approved data arrangement.",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 38,
+      "line": 37,
       "text": "Cookies and Analytics",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 39,
+      "line": 38,
       "text": "When you choose a language, this site stores that preference in a first-party cookie named site-language for up to one year. It contains only the language choice, not patient data, and is not used for tracking.",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 40,
+      "line": 39,
       "text": "We use a privacy-focused analytics service to understand how the site is used. It does not use cookies. It records the pages visited, the website that referred you (if any), your browser and device type, your approximate location (country, region or city), and a small set of anonymous usage events: the calculator being opened, the disclaimer being accepted or declined, a calculation being run, and a first visit from a browser.",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 41,
+      "line": 40,
       "text": "We do not send names, email addresses, account details, the clinical values you enter, dosing results or any other patient information to the analytics service. As with any website, the analytics service receives your device's internet (IP) address when a page loads; it is used to estimate your location and to count visits, and it is not shown in our reports. To count a first visit only once, your browser keeps a simple marker on this device. The marker contains no identifier, is not a cookie, and is never sent to us or to the analytics service.",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 42,
+      "line": 41,
       "text": "Analytics reports are aggregated and are not linked to any name, email address or account. We do not use advertising, advertising pixels or tracking cookies. If you sign in to an account, the site uses cookies that keep you signed in.",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 46,
+      "line": 45,
       "text": "Third-Party Services",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 47,
+      "line": 46,
       "text": "This site may be hosted on third-party infrastructure. Hosting providers may collect standard server logs (IP addresses, access times) for operational purposes. How long hosting records and backups are kept must be reviewed for the service as it is configured; this policy does not certify that every historical record is anonymous.",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 51,
+      "line": 50,
       "text": "HIPAA Notice",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 52,
+      "line": 51,
       "text": "Whether a business-associate relationship or other data agreement is required depends on the actual data and institutional use. The absence of names does not automatically make clinical data anonymous. Do not submit PHI to this public service. Institutional patient-data processing requires prior privacy, security and contractual review; this page is not a compliance certification.",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 56,
+      "line": 55,
       "text": "Changes to This Policy",
       "translated": true
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 57,
+      "line": 56,
       "text": "This privacy policy may be updated as the tool evolves. The date at the top of this page reflects the most recent revision. Continued use after updates constitutes acceptance of the revised policy.",
+      "translated": true
+    },
+    {
+      "file": "src/app/(site)/privacy/page.tsx",
+      "line": 60,
+      "text": "Contact",
+      "translated": true
+    },
+    {
+      "file": "src/app/(site)/privacy/page.tsx",
+      "line": 61,
+      "text": "For privacy-related questions or concerns, please use the",
       "translated": true
     },
     {
@@ -1623,19 +1629,7 @@
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 62,
-      "text": "For privacy-related questions or concerns, please use the",
-      "translated": true
-    },
-    {
-      "file": "src/app/(site)/privacy/page.tsx",
-      "line": 62,
-      "text": "Contact",
-      "translated": true
-    },
-    {
-      "file": "src/app/(site)/privacy/page.tsx",
-      "line": 62,
+      "line": 61,
       "text": "page.",
       "translated": true
     },
@@ -2454,175 +2448,157 @@
     {
       "file": "src/app/(site)/settings/history/page.tsx",
       "line": 66,
-      "text": "Optional case IDs (do not enter patient identifiers)",
+      "text": "Filter previously saved calculations by type, date or case ID",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 67,
-      "text": "Filter by calculation type, date, case ID",
-      "translated": true
-    },
-    {
-      "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 68,
-      "text": "90-day retention, automatically purged",
-      "translated": true
-    },
-    {
-      "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 82,
+      "line": 80,
       "text": "Request restricted access",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 127,
+      "line": 125,
       "text": "Loading...",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 132,
+      "line": 130,
       "text": "Please",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 132,
+      "line": 130,
       "text": "sign in",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 132,
+      "line": 130,
       "text": "to view your calculation history.",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 140,
+      "line": 138,
       "text": "Institutional Settings",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 142,
+      "line": 140,
       "text": "Billing",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 144,
+      "line": 142,
       "text": "History",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 147,
+      "line": 145,
       "text": "Calculation History",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 148,
-      "text": "90-day de-identified record of your Vancomyzer™ calculations. No patient identifiers stored.",
-      "translated": true
-    },
-    {
-      "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 157,
+      "line": 154,
       "text": "Workflow",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 167,
+      "line": 164,
       "text": "All",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 168,
+      "line": 165,
       "text": "Initial regimen",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 169,
+      "line": 166,
       "text": "Adjustment",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 173,
+      "line": 170,
       "text": "Case ID search",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 178,
+      "line": 175,
       "kind": "Accessible attribute",
       "text": "e.g. ICU bed 12",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 187,
+      "line": 184,
       "text": "total === 1 ? \"entry\" : \"entries\"",
       "dynamic": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 196,
+      "line": 193,
       "text": "error",
       "dynamic": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 202,
+      "line": 199,
       "text": "Loading history...",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 207,
-      "text": "No calculations yet. New calculations will appear here.",
+      "line": 204,
+      "text": "No calculations to display.",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 218,
+      "line": 215,
       "text": "h",
       "dynamic": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 256,
+      "line": 253,
       "text": "In",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 258,
+      "line": 255,
       "text": "Out",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 283,
+      "line": 280,
       "text": "Newer",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 285,
+      "line": 282,
       "text": "of",
       "translated": true
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 299,
+      "line": 296,
       "text": "Older",
       "translated": true
     },
@@ -2821,7 +2797,7 @@
     {
       "file": "src/app/(site)/team/page.tsx",
       "line": 314,
-      "text": "Invite teammates, manage roles, and view your institution's calculation audit log. No PHI is stored.",
+      "text": "Invite teammates, manage roles, and review your institution's historical calculation audit records.",
       "translated": true
     },
     {
@@ -5945,7 +5921,7 @@
     {
       "file": "src/app/admin/dashboard/calculations/page.tsx",
       "line": 99,
-      "text": "System-wide feed of calculation events. De-identified — no patient data is stored. Department admins see their own subset at",
+      "text": "Historical calculation audit records. Department admins see their own subset at",
       "translated": true
     },
     {
@@ -8202,7 +8178,7 @@
     {
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 136,
-      "text": "Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Every case you calculate is being logged automatically. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases.",
+      "text": "Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases.",
       "translated": true
     },
     {
@@ -8214,7 +8190,7 @@
     {
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 142,
-      "text": "Use Vancomyzer as your primary dosing support tool. Your case data is accumulating. At day 75, a personalized summary report will be generated showing your AUC attainment rate, case volume and key insights from your logged cases — a document you can share with your pharmacy director for institutional review.",
+      "text": "Continue evaluating Vancomyzer alongside your current workflow.",
       "translated": true
     },
     {
@@ -8226,13 +8202,13 @@
     {
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 148,
-      "text": "Your pilot data is complete. Generate your personalized summary report below and share it with your pharmacy director or P&T committee. Contact us about continued access to your case log.",
+      "text": "If available, generate your pilot summary report below for institutional review.",
       "translated": true
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 152,
-      "text": "You are an active subscriber. Your case history is fully preserved.",
+      "text": "You are an active subscriber.",
       "translated": true
     },
     {
@@ -8273,19 +8249,19 @@
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 217,
+      "line": 216,
       "text": "included ? 'Included' : 'Optional'",
       "dynamic": true
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 218,
+      "line": 217,
       "text": "feature",
       "dynamic": true
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 229,
+      "line": 228,
       "text": "Back to Calculator",
       "translated": true
     },
@@ -14818,7 +14794,7 @@
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 220,
+      "line": 219,
       "kind": "Unbound JSX text",
       "text": "Pro"
     },
@@ -15519,28 +15495,28 @@
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 34,
+      "line": 33,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 34,
+      "line": 33,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 62,
+      "line": 61,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/privacy/page.tsx",
-      "line": 62,
+      "line": 61,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
@@ -15792,105 +15768,105 @@
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 132,
+      "line": 130,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 132,
+      "line": 130,
       "tag": "p",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 150,
+      "line": 147,
       "tag": "div",
-      "expression": "!allowed ? (\n        <HistoryUpgradeCard />\n      ) : (\n        <>\n          {/* Filters */}\n          <div style={{ display: \"flex\", gap: 12, marginBottom: 16, flexWrap: \"wrap\", alignItems: \"center\" }}>\n            <div>\n              <label style={{ display: \"block\", fontSize: 11, fontWeight: 600, color: \"var(--color-secondary)\", marginBottom: 4 }}><LocalizedText text={\"Workflow\"} /></label>\n              <select\n                value={workflowFilter}\n                onChange={e => { setOffset(0); setWorkflowFilter(e.target.value); }}\n                style={{\n                  padding: \"6px 10px\", fontSize: 13,\n                  border: \"1px solid var(--color-border)\", background: \"var(--color-card)\", color: \"var(--color-primary)\",\n                  borderRadius: 4,\n                }}\n              >\n                <option value=\"\"><LocalizedText text=\"All\" /></option>\n                <option value=\"empiric\"><LocalizedText text={\"Initial regimen\"} /></option>\n                <option value=\"existing\"><LocalizedText text={\"Adjustment\"} /></option>\n              </select>\n            </div>\n            <div style={{ flex: 1, minWidth: 200 }}>\n              <label style={{ display: \"block\", fontSize: 11, fontWeight: 600, color: \"var(--color-secondary)\", marginBottom: 4 }}><LocalizedText text={\"Case ID search\"} /></label>\n              <LocalizedInput\n                type=\"text\"\n                value={caseIdFilter}\n                onChange={e => { setOffset(0); setCaseIdFilter(e.target.value); }}\n                placeholder=\"e.g. ICU bed 12\"\n                style={{\n                  width: \"100%\", padding: \"6px 10px\", fontSize: 13,\n                  border: \"1px solid var(--color-border)\", background: \"var(--color-card)\", color: \"var(--color-primary)\",\n                  borderRadius: 4, boxSizing: \"border-box\",\n                }}\n              />\n            </div>\n            <div style={{ alignSelf: \"flex-end\", fontSize: 12, color: \"var(--color-dim)\" }}>\n              {total} <LocalizedText text={total === 1 ? \"entry\" : \"entries\"} />\n            </div>\n          </div>\n\n          {error && (\n            <div style={{\n              padding: \"10px 14px\", marginBottom: 16,\n              background: \"#fff5f5\", border: \"1px solid #fca5a5\", color: \"#991b1b\", fontSize: 13, borderRadius: 4,\n            }}>\n              <LocalizedText text={error} />\n            </div>\n          )}\n\n          {/* Table */}\n          {loading && rows.length === 0 ? (\n            <div style={{ padding: 40, textAlign: \"center\", color: \"var(--color-dim)\" }}><LocalizedText text={\"Loading history...\"} /></div>\n          ) : rows.length === 0 ? (\n            <div style={{\n              padding: 32, textAlign: \"center\", color: \"var(--color-dim)\", fontSize: 13,\n              border: \"1px dashed var(--color-border)\", borderRadius: 6,\n            }}><LocalizedText text={\"No calculations yet. New calculations will appear here.\"} /></div>\n          ) : (\n            <div style={{ overflowX: \"auto\", border: \"1px solid var(--color-border)\", borderRadius: 6, background: \"var(--color-card)\" }}>\n              <table style={{ width: \"100%\", borderCollapse: \"collapse\", fontSize: 13 }}>\n                <thead>\n                  <tr style={{ background: \"var(--color-bg)\", borderBottom: \"1px solid var(--color-border)\" }}>\n                    {[\"Date\", \"Workflow\", \"Case ID\", \"Model\", \"Dose\", \"Interval\", \"AUC₂₄\", \"Peak\", \"Trough\", \"Range\"].map(h => (\n                      <th key={h} style={{\n                        padding: \"10px 12px\", textAlign: \"left\", fontSize: 11, fontWeight: 700,\n                        color: \"var(--color-secondary)\", letterSpacing: \"0.06em\", textTransform: \"uppercase\",\n                      }}>\n                        <LocalizedText text={h} />\n                      </th>\n                    ))}\n                  </tr>\n                </thead>\n                <tbody>\n                  {rows.map(row => (\n                    <tr key={row.id} style={{ borderBottom: \"1px solid var(--color-border)\" }}>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", whiteSpace: \"nowrap\" }}>\n                        {formatDate(row.calculated_at)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-primary)\" }}>\n                        {workflowLabel(row.workflow_type)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", maxWidth: 180, overflow: \"hidden\", textOverflow: \"ellipsis\" }}>\n                        {row.case_id ?? <span style={{ color: \"var(--color-dim)\" }}>—</span>}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", whiteSpace: \"nowrap\" }}>\n                        {/* Historical rows may carry the retired custom obesity model; the registry labels it \"(retired)\". */}\n                        {modelShortName(row.pk_model)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-primary)\", fontWeight: 600 }}>\n                        {row.dose_mg != null ? `${row.dose_mg} mg` : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.interval_hours != null ? `q${row.interval_hours}h` : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.auc24 != null ? row.auc24.toFixed(0) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.peak != null ? fmt(row.peak, 1) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.trough != null ? fmt(row.trough, 1) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\" }}>\n                        {row.auc_in_range ? (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#ecfdf5\", color: \"#047857\", border: \"1px solid #6ee7b7\", borderRadius: 4 }}><LocalizedText text={\"In\"} /></span>\n                        ) : (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#fef3c7\", color: \"#92400e\", border: \"1px solid #fcd34d\", borderRadius: 4 }}><LocalizedText text={\"Out\"} /></span>\n                        )}\n                      </td>\n                    </tr>\n                  ))}\n                </tbody>\n              </table>\n            </div>\n          )}\n\n          {/* Pagination */}\n          {total > PAGE_SIZE && (\n            <div style={{ display: \"flex\", justifyContent: \"space-between\", alignItems: \"center\", marginTop: 16, fontSize: 13 }}>\n              <button\n                type=\"button\"\n                disabled={offset === 0 || loading}\n                onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}\n                style={{\n                  padding: \"6px 14px\",\n                  background: \"transparent\",\n                  border: \"1px solid var(--color-border)\",\n                  color: offset === 0 ? \"var(--color-dim)\" : \"var(--color-primary)\",\n                  borderRadius: 4,\n                  cursor: offset === 0 ? \"not-allowed\" : \"pointer\",\n                }}\n              ><LocalizedText text={\"Newer\"} /></button>\n              <span style={{ color: \"var(--color-dim)\" }}>\n                {offset + 1}–{Math.min(offset + PAGE_SIZE, total)}{\" \"}<LocalizedText text=\"of\" />{\" \"}{total}\n              </span>\n              <button\n                type=\"button\"\n                disabled={offset + PAGE_SIZE >= total || loading}\n                onClick={() => setOffset(offset + PAGE_SIZE)}\n                style={{\n                  padding: \"6px 14px\",\n                  background: \"transparent\",\n                  border: \"1px solid var(--color-border)\",\n                  color: offset + PAGE_SIZE >= total ? \"var(--color-dim)\" : \"var(--color-primary)\",\n                  borderRadius: 4,\n                  cursor: offset + PAGE_SIZE >= total ? \"not-allowed\" : \"pointer\",\n                }}\n              ><LocalizedText text={\"Older\"} /></button>\n            </div>\n          )}\n        </>\n      )",
+      "expression": "!allowed ? (\n        <HistoryUpgradeCard />\n      ) : (\n        <>\n          {/* Filters */}\n          <div style={{ display: \"flex\", gap: 12, marginBottom: 16, flexWrap: \"wrap\", alignItems: \"center\" }}>\n            <div>\n              <label style={{ display: \"block\", fontSize: 11, fontWeight: 600, color: \"var(--color-secondary)\", marginBottom: 4 }}><LocalizedText text={\"Workflow\"} /></label>\n              <select\n                value={workflowFilter}\n                onChange={e => { setOffset(0); setWorkflowFilter(e.target.value); }}\n                style={{\n                  padding: \"6px 10px\", fontSize: 13,\n                  border: \"1px solid var(--color-border)\", background: \"var(--color-card)\", color: \"var(--color-primary)\",\n                  borderRadius: 4,\n                }}\n              >\n                <option value=\"\"><LocalizedText text=\"All\" /></option>\n                <option value=\"empiric\"><LocalizedText text={\"Initial regimen\"} /></option>\n                <option value=\"existing\"><LocalizedText text={\"Adjustment\"} /></option>\n              </select>\n            </div>\n            <div style={{ flex: 1, minWidth: 200 }}>\n              <label style={{ display: \"block\", fontSize: 11, fontWeight: 600, color: \"var(--color-secondary)\", marginBottom: 4 }}><LocalizedText text={\"Case ID search\"} /></label>\n              <LocalizedInput\n                type=\"text\"\n                value={caseIdFilter}\n                onChange={e => { setOffset(0); setCaseIdFilter(e.target.value); }}\n                placeholder=\"e.g. ICU bed 12\"\n                style={{\n                  width: \"100%\", padding: \"6px 10px\", fontSize: 13,\n                  border: \"1px solid var(--color-border)\", background: \"var(--color-card)\", color: \"var(--color-primary)\",\n                  borderRadius: 4, boxSizing: \"border-box\",\n                }}\n              />\n            </div>\n            <div style={{ alignSelf: \"flex-end\", fontSize: 12, color: \"var(--color-dim)\" }}>\n              {total} <LocalizedText text={total === 1 ? \"entry\" : \"entries\"} />\n            </div>\n          </div>\n\n          {error && (\n            <div style={{\n              padding: \"10px 14px\", marginBottom: 16,\n              background: \"#fff5f5\", border: \"1px solid #fca5a5\", color: \"#991b1b\", fontSize: 13, borderRadius: 4,\n            }}>\n              <LocalizedText text={error} />\n            </div>\n          )}\n\n          {/* Table */}\n          {loading && rows.length === 0 ? (\n            <div style={{ padding: 40, textAlign: \"center\", color: \"var(--color-dim)\" }}><LocalizedText text={\"Loading history...\"} /></div>\n          ) : rows.length === 0 ? (\n            <div style={{\n              padding: 32, textAlign: \"center\", color: \"var(--color-dim)\", fontSize: 13,\n              border: \"1px dashed var(--color-border)\", borderRadius: 6,\n            }}><LocalizedText text={\"No calculations to display.\"} /></div>\n          ) : (\n            <div style={{ overflowX: \"auto\", border: \"1px solid var(--color-border)\", borderRadius: 6, background: \"var(--color-card)\" }}>\n              <table style={{ width: \"100%\", borderCollapse: \"collapse\", fontSize: 13 }}>\n                <thead>\n                  <tr style={{ background: \"var(--color-bg)\", borderBottom: \"1px solid var(--color-border)\" }}>\n                    {[\"Date\", \"Workflow\", \"Case ID\", \"Model\", \"Dose\", \"Interval\", \"AUC₂₄\", \"Peak\", \"Trough\", \"Range\"].map(h => (\n                      <th key={h} style={{\n                        padding: \"10px 12px\", textAlign: \"left\", fontSize: 11, fontWeight: 700,\n                        color: \"var(--color-secondary)\", letterSpacing: \"0.06em\", textTransform: \"uppercase\",\n                      }}>\n                        <LocalizedText text={h} />\n                      </th>\n                    ))}\n                  </tr>\n                </thead>\n                <tbody>\n                  {rows.map(row => (\n                    <tr key={row.id} style={{ borderBottom: \"1px solid var(--color-border)\" }}>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", whiteSpace: \"nowrap\" }}>\n                        {formatDate(row.calculated_at)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-primary)\" }}>\n                        {workflowLabel(row.workflow_type)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", maxWidth: 180, overflow: \"hidden\", textOverflow: \"ellipsis\" }}>\n                        {row.case_id ?? <span style={{ color: \"var(--color-dim)\" }}>—</span>}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\", whiteSpace: \"nowrap\" }}>\n                        {/* Historical rows may carry the retired custom obesity model; the registry labels it \"(retired)\". */}\n                        {modelShortName(row.pk_model)}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-primary)\", fontWeight: 600 }}>\n                        {row.dose_mg != null ? `${row.dose_mg} mg` : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.interval_hours != null ? `q${row.interval_hours}h` : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.auc24 != null ? row.auc24.toFixed(0) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.peak != null ? fmt(row.peak, 1) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\", color: \"var(--color-secondary)\" }}>\n                        {row.trough != null ? fmt(row.trough, 1) : \"—\"}\n                      </td>\n                      <td style={{ padding: \"10px 12px\" }}>\n                        {row.auc_in_range ? (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#ecfdf5\", color: \"#047857\", border: \"1px solid #6ee7b7\", borderRadius: 4 }}><LocalizedText text={\"In\"} /></span>\n                        ) : (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#fef3c7\", color: \"#92400e\", border: \"1px solid #fcd34d\", borderRadius: 4 }}><LocalizedText text={\"Out\"} /></span>\n                        )}\n                      </td>\n                    </tr>\n                  ))}\n                </tbody>\n              </table>\n            </div>\n          )}\n\n          {/* Pagination */}\n          {total > PAGE_SIZE && (\n            <div style={{ display: \"flex\", justifyContent: \"space-between\", alignItems: \"center\", marginTop: 16, fontSize: 13 }}>\n              <button\n                type=\"button\"\n                disabled={offset === 0 || loading}\n                onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}\n                style={{\n                  padding: \"6px 14px\",\n                  background: \"transparent\",\n                  border: \"1px solid var(--color-border)\",\n                  color: offset === 0 ? \"var(--color-dim)\" : \"var(--color-primary)\",\n                  borderRadius: 4,\n                  cursor: offset === 0 ? \"not-allowed\" : \"pointer\",\n                }}\n              ><LocalizedText text={\"Newer\"} /></button>\n              <span style={{ color: \"var(--color-dim)\" }}>\n                {offset + 1}–{Math.min(offset + PAGE_SIZE, total)}{\" \"}<LocalizedText text=\"of\" />{\" \"}{total}\n              </span>\n              <button\n                type=\"button\"\n                disabled={offset + PAGE_SIZE >= total || loading}\n                onClick={() => setOffset(offset + PAGE_SIZE)}\n                style={{\n                  padding: \"6px 14px\",\n                  background: \"transparent\",\n                  border: \"1px solid var(--color-border)\",\n                  color: offset + PAGE_SIZE >= total ? \"var(--color-dim)\" : \"var(--color-primary)\",\n                  borderRadius: 4,\n                  cursor: offset + PAGE_SIZE >= total ? \"not-allowed\" : \"pointer\",\n                }}\n              ><LocalizedText text={\"Older\"} /></button>\n            </div>\n          )}\n        </>\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 187,
+      "line": 184,
       "tag": "div",
       "expression": "total",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 233,
+      "line": 230,
       "tag": "td",
       "expression": "row.case_id ?? <span style={{ color: \"var(--color-dim)\" }}>—</span>",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 240,
+      "line": 237,
       "tag": "td",
       "expression": "row.dose_mg != null ? `${row.dose_mg} mg` : \"—\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 243,
+      "line": 240,
       "tag": "td",
       "expression": "row.interval_hours != null ? `q${row.interval_hours}h` : \"—\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 246,
+      "line": 243,
       "tag": "td",
       "expression": "row.auc24 != null ? row.auc24.toFixed(0) : \"—\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 249,
+      "line": 246,
       "tag": "td",
       "expression": "row.peak != null ? fmt(row.peak, 1) : \"—\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 252,
+      "line": 249,
       "tag": "td",
       "expression": "row.trough != null ? fmt(row.trough, 1) : \"—\"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 255,
+      "line": 252,
       "tag": "td",
       "expression": "row.auc_in_range ? (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#ecfdf5\", color: \"#047857\", border: \"1px solid #6ee7b7\", borderRadius: 4 }}><LocalizedText text={\"In\"} /></span>\n                        ) : (\n                          <span style={{ display: \"inline-block\", padding: \"2px 8px\", fontSize: 11, fontWeight: 600, background: \"#fef3c7\", color: \"#92400e\", border: \"1px solid #fcd34d\", borderRadius: 4 }}><LocalizedText text={\"Out\"} /></span>\n                        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 285,
+      "line": 282,
       "tag": "span",
       "expression": "offset + 1",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 285,
+      "line": 282,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 285,
+      "line": 282,
       "tag": "span",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/(site)/settings/history/page.tsx",
-      "line": 285,
+      "line": 282,
       "tag": "span",
       "expression": "total",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
@@ -20652,28 +20628,28 @@
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 133,
       "tag": "div",
-      "expression": "currentPhase === 'PHASE_1' && !isExpired && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 1 — Familiarization (Days 1–14)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Every case you calculate is being logged automatically. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases.\"} /></p>\n          </>\n        )",
+      "expression": "currentPhase === 'PHASE_1' && !isExpired && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 1 — Familiarization (Days 1–14)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases.\"} /></p>\n          </>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 139,
       "tag": "div",
-      "expression": "currentPhase === 'PHASE_2' && !isExpired && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 2 — Active Use (Days 15–75)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"Use Vancomyzer as your primary dosing support tool. Your case data is accumulating. At day 75, a personalized summary report will be generated showing your AUC attainment rate, case volume and key insights from your logged cases — a document you can share with your pharmacy director for institutional review.\"} /></p>\n          </>\n        )",
+      "expression": "currentPhase === 'PHASE_2' && !isExpired && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 2 — Active Use (Days 15–75)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"Continue evaluating Vancomyzer alongside your current workflow.\"} /></p>\n          </>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 145,
       "tag": "div",
-      "expression": "(currentPhase === 'PHASE_3' || isExpired) && !isConverted && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 3 — Value Review (Days 76–90)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"Your pilot data is complete. Generate your personalized summary report below and share it with your pharmacy director or P&T committee. Contact us about continued access to your case log.\"} /></p>\n          </>\n        )",
+      "expression": "(currentPhase === 'PHASE_3' || isExpired) && !isConverted && (\n          <>\n            <div style={{ fontWeight: 600, color: NAVY, fontSize: 13, marginBottom: 6 }}><LocalizedText text={\"Phase 3 — Value Review (Days 76–90)\"} /></div>\n            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, margin: 0 }}><LocalizedText text={\"If available, generate your pilot summary report below for institutional review.\"} /></p>\n          </>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 151,
       "tag": "div",
-      "expression": "isConverted && (\n          <p style={{ fontSize: 13, color: GREEN, margin: 0 }}><LocalizedText text={\"You are an active subscriber. Your case history is fully preserved.\"} /></p>\n        )",
+      "expression": "isConverted && (\n          <p style={{ fontSize: 13, color: GREEN, margin: 0 }}><LocalizedText text={\"You are an active subscriber.\"} /></p>\n        )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
@@ -20708,19 +20684,19 @@
       "file": "src/app/dashboard/pilot/page.tsx",
       "line": 206,
       "tag": "div",
-      "expression": "!isConverted && (\n        <div style={{ border: '1px dashed #cbd5e1', padding: '20px 24px' }}>\n          <div style={{ fontSize: 13, fontWeight: 600, color: NAVY, marginBottom: 12 }}><LocalizedText text={\"What is included after the pilot\"} /></div>\n          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 16rem), 1fr))', gap: '8px 32px' }}>\n            {([\n              ['Calculation history (90-day retention)', true],\n              ['Pilot summary report PDF', true],\n              ['PDF export and clinical-note copy', true],\n              ['Email support', true],\n            ] as [string, boolean][]).map(([feature, included]) => (\n              <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: SLATE }}>\n                <span style={{ color: included ? GREEN : '#94a3b8', fontWeight: 700 }}><LocalizedText text={included ? 'Included' : 'Optional'} /></span>\n                <span><LocalizedText text={feature} /></span>\n                {!included && (\n                  <span style={{ fontSize: 10, border: `1px solid ${GREEN}50`, color: GREEN, padding: '1px 6px' }}>Pro</span>\n                )}\n              </div>\n            ))}\n          </div>\n        </div>\n      )",
+      "expression": "!isConverted && (\n        <div style={{ border: '1px dashed #cbd5e1', padding: '20px 24px' }}>\n          <div style={{ fontSize: 13, fontWeight: 600, color: NAVY, marginBottom: 12 }}><LocalizedText text={\"What is included after the pilot\"} /></div>\n          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 16rem), 1fr))', gap: '8px 32px' }}>\n            {([\n              ['Pilot summary report PDF', true],\n              ['PDF export and clinical-note copy', true],\n              ['Email support', true],\n            ] as [string, boolean][]).map(([feature, included]) => (\n              <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: SLATE }}>\n                <span style={{ color: included ? GREEN : '#94a3b8', fontWeight: 700 }}><LocalizedText text={included ? 'Included' : 'Optional'} /></span>\n                <span><LocalizedText text={feature} /></span>\n                {!included && (\n                  <span style={{ fontSize: 10, border: `1px solid ${GREEN}50`, color: GREEN, padding: '1px 6px' }}>Pro</span>\n                )}\n              </div>\n            ))}\n          </div>\n        </div>\n      )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 219,
+      "line": 218,
       "tag": "div",
       "expression": "!included && (\n                  <span style={{ fontSize: 10, border: `1px solid ${GREEN}50`, color: GREEN, padding: '1px 6px' }}>Pro</span>\n                )",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
     },
     {
       "file": "src/app/dashboard/pilot/page.tsx",
-      "line": 229,
+      "line": 228,
       "tag": "Link",
       "expression": "\" \"",
       "notice": "May be numeric, invariant, rich content, or untranslated data; not counted as covered"
