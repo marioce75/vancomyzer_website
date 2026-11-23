@@ -90,7 +90,6 @@ export const TIERS: Record<TierId, TierConfig> = {
     features: [
       "Everything in Free",
       "Clinical note & PDF export for the medical record",
-      "Calculation history (90-day retention, de-identified)",
       "Custom institution name on exported notes",
       "Email support (info@dosys.health)",
     ],
@@ -101,12 +100,11 @@ export const TIERS: Record<TierId, TierConfig> = {
     id: "department",
     name: "Department",
     priceLabel: "$500/month (up to 10 seats) · $1,000/month (11–20 seats)",
-    audience: "Teams needing administration, audit logs and institutional agreements",
+    audience: "Teams needing administration and institutional agreements",
     features: [
       "Everything in Individual Pro",
       "5–20 user seats with shared workspace",
       "Admin panel & user management",
-      "Institution-scoped audit logs (90-day retention)",
       "Priority email support (service terms by contract)",
       "BAA subject to legal review and execution",
       "Multi-site departments: request a scoped quote",

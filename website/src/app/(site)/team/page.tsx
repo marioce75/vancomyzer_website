@@ -311,7 +311,7 @@ export default function TeamPage() {
 
       <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}><LocalizedText text="Team Management" />{" "}{institutionName && <span style={{ color: "var(--color-secondary)", fontWeight: 400 }}>· {institutionName}</span>}
       </h1>
-      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 24 }}><LocalizedText text={"Invite teammates, manage roles, and view your institution's calculation audit log. No PHI is stored."} /></p>
+      <p style={{ fontSize: 13, color: "var(--color-dim)", marginBottom: 24 }}><LocalizedText text={"Invite teammates, manage roles, and review your institution's historical calculation audit records."} /></p>
 
       {/* BAA pending banner — shown until Dōsys countersigns */}
       {baaStatus === "pending" && (

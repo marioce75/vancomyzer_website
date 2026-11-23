@@ -5489,25 +5489,20 @@
     "fr": "Le calcul posologique est effectué sur notre serveur, et non dans votre navigateur. Les valeurs cliniques saisies (âge, poids, taille, sexe, créatinine sérique, schéma posologique actuel et concentrations mesurées avec leurs horaires) sont envoyées par une connexion chiffrée (HTTPS) à notre serveur, qui calcule le résultat et le renvoie à votre écran. Cela peut se produire automatiquement pendant que vous saisissez encore des valeurs. Le calculateur ne demande pas de noms de patients, de numéros de dossier médical, de dates de naissance ni d’autres identifiants, et vous ne devez pas en saisir.",
     "pt-BR": "O cálculo da dosagem é realizado em nosso servidor, não em seu navegador. Os valores clínicos que você introduz (como idade, peso, altura, sexo, creatinina sérica, o esquema atual, e os níveis medidos com o seu tempo) são enviados sobre uma conexão criptografada (HTTPS) para o nosso servidor, que calcula o resultado e devolve-o para a sua tela. Isso pode acontecer automaticamente enquanto você ainda está digitando valores. A calculadora não pede nomes de pacientes, números de registros médicos, datas de nascimento ou outros identificadores, e você não deve inscrevê-los."
   },
-  "Our server logs record only that a calculation ran, how long it took and which calculator version answered; they do not contain the clinical values you entered, the results or your account email. Fit-quality details are shown to you with the result and are not stored. If your plan includes calculation history, calculations you choose to save are kept with your account and an optional case label for 90 days. Earlier releases did record clinical values in server logs and fit-quality records; those older records and hosting backups are under a separate retention review and have not yet been confirmed deleted.": {
-    "es": "Los registros de nuestro servidor solo indican que se realizó un cálculo, su duración y la versión de la calculadora que respondió; no contienen los valores clínicos introducidos, los resultados ni el correo electrónico de su cuenta. Los detalles de calidad del ajuste se muestran junto con el resultado y no se almacenan. Si su plan incluye historial de cálculos, los cálculos que decida guardar se conservan con su cuenta y una etiqueta de caso opcional durante 90 días. Las versiones anteriores sí registraban valores clínicos en los registros del servidor y de calidad del ajuste; esos registros antiguos y las copias de seguridad del alojamiento están sometidos a una revisión de conservación independiente y aún no se ha confirmado su eliminación.",
-    "fr": "Les journaux de notre serveur consignent uniquement l’exécution d’un calcul, sa durée et la version du calculateur ayant répondu ; ils ne contiennent ni les valeurs cliniques saisies, ni les résultats, ni l’adresse électronique de votre compte. Les détails de qualité de l’ajustement vous sont présentés avec le résultat et ne sont pas conservés. Si votre forfait comprend un historique des calculs, les calculs que vous choisissez d’enregistrer sont conservés avec votre compte et un libellé de cas facultatif pendant 90 jours. Les versions antérieures enregistraient des valeurs cliniques dans les journaux du serveur et les relevés de qualité de l’ajustement ; ces anciens enregistrements et les sauvegardes de l’hébergement font l’objet d’un examen distinct de leur conservation, et leur suppression n’a pas encore été confirmée.",
-    "pt-BR": "Nossos registros de servidor registram apenas que um cálculo foi executado, quanto tempo demorou e que versão da calculadora respondeu; eles não contêm os valores clínicos que você inseriu, os resultados ou o e-mail de sua conta. Detalhes de qualidade de ajuste são mostrados para você com o resultado e não são armazenados. Se o seu plano inclui histórico de cálculo, os cálculos que você optar por salvar são mantidos com sua conta e uma etiqueta de caso opcional por 90 dias. Releases anteriores registraram valores clínicos em registros de servidor e registros de qualidade de ajuste; esses registros mais antigos e backups de hospedagem estão sob uma revisão de retenção separada e ainda não foram confirmados excluídos."
-  },
-  "So that your work is not lost if the page is refreshed, the calculator also keeps the values you entered within that browser tab. They are cleared when you reset the calculator or close the tab, and they are not restored after eight hours.": {
-    "es": "Para evitar que pierda su trabajo al actualizar la página, la calculadora también conserva los valores introducidos dentro de esa pestaña del navegador. Se borran al restablecer la calculadora o cerrar la pestaña, y no se restauran transcurridas ocho horas.",
-    "fr": "Pour éviter de perdre votre travail si la page est actualisée, le calculateur conserve aussi les valeurs saisies dans cet onglet du navigateur. Elles sont effacées lorsque vous réinitialisez le calculateur ou fermez l’onglet, et ne sont plus restaurées après huit heures.",
-    "pt-BR": "Para que seu trabalho não seja perdido se a página for atualizada, a calculadora também mantém os valores que você inseriu dentro dessa guia do navegador. Eles são limpos quando você redefinir a calculadora ou fechar a aba, e eles não são restaurados após oito horas."
+  "Our server logs record only that a calculation ran, how long it took and which calculator version answered; they do not contain the clinical values you entered, the results or your account email. Fit-quality details are shown to you with the result and are not stored. Earlier releases did record clinical values in server logs and fit-quality records; those older records and hosting backups are under a separate retention review and have not yet been confirmed deleted.": {
+    "es": "Los registros de nuestro servidor solo indican que se realizó un cálculo, su duración y la versión de la calculadora que respondió; no contienen los valores clínicos introducidos, los resultados ni el correo electrónico de su cuenta. Los detalles de calidad del ajuste se muestran junto con el resultado y no se almacenan. Las versiones anteriores sí registraban valores clínicos en los registros del servidor y de calidad del ajuste; esos registros antiguos y las copias de seguridad del alojamiento están sometidos a una revisión de conservación independiente y aún no se ha confirmado su eliminación.",
+    "fr": "Les journaux de notre serveur consignent uniquement l’exécution d’un calcul, sa durée et la version du calculateur ayant répondu ; ils ne contiennent ni les valeurs cliniques saisies, ni les résultats, ni l’adresse électronique de votre compte. Les détails de qualité de l’ajustement vous sont présentés avec le résultat et ne sont pas conservés. Les versions antérieures enregistraient des valeurs cliniques dans les journaux du serveur et les relevés de qualité de l’ajustement ; ces anciens enregistrements et les sauvegardes de l’hébergement font l’objet d’un examen distinct de leur conservation, et leur suppression n’a pas encore été confirmée.",
+    "pt-BR": "Nossos registros de servidor registram apenas que um cálculo foi executado, quanto tempo demorou e que versão da calculadora respondeu; eles não contêm os valores clínicos que você inseriu, os resultados ou o e-mail de sua conta. Detalhes de qualidade de ajuste são mostrados para você com o resultado e não são armazenados. Releases anteriores registraram valores clínicos em registros de servidor e registros de qualidade de ajuste; esses registros mais antigos e backups de hospedagem estão sob uma revisão de retenção separada e ainda não foram confirmados excluídos."
   },
   "Important: Do Not Enter Identifiable Patient Information": {
     "es": "Importante: no introduzca información identificable de pacientes",
     "fr": "Important : ne saisissez pas d’informations permettant d’identifier un patient",
     "pt-BR": "Importante: Não insira informações identificáveis do paciente"
   },
-  "Because the values you enter are sent to our server and recorded as described above, users should treat this tool as they would any clinical software:": {
-    "es": "Como los valores introducidos se envían a nuestro servidor y se registran según lo descrito anteriormente, debe tratar esta herramienta como cualquier programa clínico:",
-    "fr": "Puisque les valeurs saisies sont envoyées à notre serveur et enregistrées comme décrit ci-dessus, les utilisateurs doivent traiter cet outil comme tout logiciel clinique :",
-    "pt-BR": "Como os valores que você digita são enviados para o nosso servidor e registrados como descrito acima, os usuários devem tratar esta ferramenta como qualquer software clínico:"
+  "Because the values you enter are sent to our server for calculation, treat this tool as you would any clinical software:": {
+    "es": "Como los valores que introduce se envían a nuestro servidor para el cálculo, trate esta herramienta como cualquier otro software clínico:",
+    "fr": "Puisque les valeurs saisies sont envoyées à notre serveur pour le calcul, traitez cet outil comme tout logiciel clinique :",
+    "pt-BR": "Como os valores inseridos são enviados ao nosso servidor para o cálculo, trate esta ferramenta como qualquer outro software clínico:"
   },
   "do not enter patient names, medical record numbers, dates of birth, or other personally identifiable information (PII) or protected health information (PHI)": {
     "es": "no introduzca nombres de pacientes, números de historia clínica, fechas de nacimiento ni otra información de identificación personal (PII) o información sanitaria protegida (PHI)",
@@ -9299,11 +9294,6 @@
     "fr": "Copie de notes cliniques",
     "pt-BR": "Cópia clínica da nota"
   },
-  "Calculation history (90-day retention)": {
-    "es": "Historial de cálculos (conservación de 90 días)",
-    "fr": "Historique des calculs (conservation de 90 jours)",
-    "pt-BR": "Histórico de cálculo (retenção de 90 dias)"
-  },
   "Email support": {
     "es": "Soporte por correo electrónico",
     "fr": "Assistance par courriel",
@@ -10079,25 +10069,10 @@
     "fr": "L’historique des calculs est une fonction Pro",
     "pt-BR": "O histórico de cálculos é um recurso Pro"
   },
-  "Pro users get 90 days of de-identified calculation history with optional case IDs for tracking — search, review, and export previous calculations again without re-entering patient data.": {
-    "es": "Los usuarios Pro disponen de 90 días de historial de cálculos desidentificados con identificadores opcionales de casos para seguimiento: busque, revise y exporte cálculos anteriores sin volver a introducir los datos del paciente.",
-    "fr": "Les utilisateurs Pro disposent de 90 jours d’historique de calculs dé-identifiés avec des identifiants de cas facultatifs pour le suivi : recherchez, consultez et exportez des calculs antérieurs sans ressaisir les données du patient.",
-    "pt-BR": "Usuários profissionais recebem 90 dias de histórico de cálculo desidentificado com IDs de caso opcionais para rastreamento — pesquisa, revisão e exportação de cálculos anteriores novamente sem reentrar em dados do paciente."
-  },
-  "Optional case IDs (do not enter patient identifiers)": {
-    "es": "Identificadores opcionales de casos (no introduzca identificadores de pacientes)",
-    "fr": "Identifiants de cas facultatifs (ne saisissez pas d’identifiants de patients)",
-    "pt-BR": "IDs de caso opcionais (não insira identificadores do paciente)"
-  },
-  "Filter by calculation type, date, case ID": {
-    "es": "Filtrar por tipo de cálculo, fecha e identificador de caso",
-    "fr": "Filtrer par type de calcul, date et identifiant de cas",
-    "pt-BR": "Filtrar por tipo de cálculo, data, caso ID"
-  },
-  "90-day retention, automatically purged": {
-    "es": "Conservación de 90 días, eliminación automática",
-    "fr": "Conservation de 90 jours, suppression automatique",
-    "pt-BR": "Retenção de 90 dias, automaticamente purgada"
+  "Filter previously saved calculations by type, date or case ID": {
+    "es": "Filtre los cálculos guardados anteriormente por tipo, fecha o identificador de caso",
+    "fr": "Filtrez les calculs précédemment enregistrés par type, date ou identifiant de dossier",
+    "pt-BR": "Filtre os cálculos salvos anteriormente por tipo, data ou ID do caso"
   },
   "to view your calculation history.": {
     "es": "para ver su historial de cálculos.",
@@ -10108,11 +10083,6 @@
     "es": "Historial",
     "fr": "Historique",
     "pt-BR": "Histórico"
-  },
-  "90-day de-identified record of your Vancomyzer™ calculations. No patient identifiers stored.": {
-    "es": "Registro desidentificado de 90 días de sus cálculos de Vancomyzer™. No se almacenan identificadores de pacientes.",
-    "fr": "Historique dé-identifié de 90 jours de vos calculs Vancomyzer™. Aucun identifiant de patient n’est conservé.",
-    "pt-BR": "Registro de 90 dias desidentificado de seus cálculos Vancomyzer™. Nenhum identificador de paciente armazenado."
   },
   "Workflow": {
     "es": "Tipo de cálculo",
@@ -10134,10 +10104,10 @@
     "fr": "Chargement de l’historique…",
     "pt-BR": "A carregar o histórico..."
   },
-  "No calculations yet. New calculations will appear here.": {
-    "es": "Aún no hay cálculos. Los nuevos cálculos aparecerán aquí.",
-    "fr": "Aucun calcul pour le moment. Les nouveaux calculs apparaîtront ici.",
-    "pt-BR": "Ainda não há cálculos. Novos cálculos aparecerão aqui."
+  "No calculations to display.": {
+    "es": "No hay cálculos para mostrar.",
+    "fr": "Aucun calcul à afficher.",
+    "pt-BR": "Não há cálculos para exibir."
   },
   "In": {
     "es": "Dentro del objetivo",
@@ -10209,10 +10179,10 @@
     "fr": "La gestion d’équipe nécessite un accord institutionnel existant et est réservée aux utilisateurs désignés comme administrateurs de l’établissement. Si votre équipe a besoin de cette fonction, consultez",
     "pt-BR": "A gestão de equipes requer um acordo institucional existente, e está disponível apenas para usuários designados como administradores institucionais. Se a sua equipa precisar deste recurso, consulte"
   },
-  "Invite teammates, manage roles, and view your institution's calculation audit log. No PHI is stored.": {
-    "es": "Invite a compañeros, gestione roles y consulte el registro de auditoría de cálculos de su institución. No se almacena información sanitaria protegida.",
-    "fr": "Invitez des collègues, gérez les rôles et consultez le journal d’audit des calculs de votre établissement. Aucune information de santé protégée n’est conservée.",
-    "pt-BR": "Convide colegas de equipe, gerencie funções e visualize o registro de auditoria de cálculo da sua instituição. Não está armazenado nenhum PHI."
+  "Invite teammates, manage roles, and review your institution's historical calculation audit records.": {
+    "es": "Invite a su equipo, gestione los roles y revise los registros históricos de auditoría de cálculos de su institución.",
+    "fr": "Invitez les membres de votre équipe, gérez les rôles et consultez les anciens registres d’audit des calculs de votre établissement.",
+    "pt-BR": "Convide sua equipe, gerencie funções e consulte os registros históricos de auditoria de cálculos da sua instituição."
   },
   "BAA awaiting countersign.": {
     "es": "BAA pendiente de contrafirma.",
@@ -10434,10 +10404,10 @@
     "fr": "Audit des calculs",
     "pt-BR": "Auditoria de Cálculos"
   },
-  "System-wide feed of calculation events. De-identified — no patient data is stored. Department admins see their own subset at": {
-    "es": "Registro de eventos de cálculo de todo el sistema. Desidentificado: no se almacenan datos de pacientes. Los administradores de departamento ven su propio subconjunto en",
-    "fr": "Journal des événements de calcul de l’ensemble du système. Dé-identifié : aucune donnée de patient n’est conservée. Les administrateurs de service voient leur propre sous-ensemble dans",
-    "pt-BR": "Alimentação de eventos de cálculo em todo o sistema. Não identificado — não são armazenados dados relativos aos pacientes. Os administradores do departamento vêem o seu próprio subconjunto em"
+  "Historical calculation audit records. Department admins see their own subset at": {
+    "es": "Registros históricos de auditoría de cálculos. Los administradores de departamento pueden consultar sus registros en",
+    "fr": "Anciens registres d’audit des calculs. Les administrateurs de service peuvent consulter leurs propres registres sur",
+    "pt-BR": "Registros históricos de auditoria de cálculos. Os administradores de departamento podem consultar seus próprios registros em"
   },
   "User email": {
     "es": "Correo del usuario",
@@ -11759,35 +11729,20 @@
     "fr": "Phase 1 — Familiarisation (jours 1–14)",
     "pt-BR": "Fase 1 — Familiarização (Dias 1–14)"
   },
-  "Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Every case you calculate is being logged automatically. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases.": {
-    "es": "Utilice Vancomyzer junto con su flujo de trabajo actual. Aún no necesita cambiar su práctica. Cada caso que calcula se registra automáticamente. Céntrese en aprender dónde aporta valor la calculadora para sus pacientes más complejos: obesidad, disfunción renal y casos de UCI.",
-    "fr": "Utilisez Vancomyzer en parallèle de votre organisation actuelle. Vous n’avez pas encore besoin de modifier votre pratique. Chaque cas calculé est enregistré automatiquement. Identifiez l’apport du calculateur pour vos patients les plus complexes : obésité, dysfonction rénale et soins intensifs.",
-    "pt-BR": "Execute Vancomyzer ao lado do seu fluxo de trabalho atual. Você não precisa mudar como você pratica ainda. Cada caso que você calcula está sendo registrado automaticamente. Foque em aprender onde a calculadora adiciona valor para seus pacientes mais complexos — obesidade, disfunção renal, casos de UTI."
+  "Run Vancomyzer alongside your current workflow. You do not need to change how you practice yet. Focus on learning where the calculator adds value for your most complex patients — obesity, renal dysfunction, ICU cases.": {
+    "es": "Utilice Vancomyzer en paralelo con su flujo de trabajo actual. Todavía no necesita cambiar su práctica. Concéntrese en aprender dónde aporta valor la calculadora para sus pacientes más complejos: obesidad, disfunción renal y casos de UCI.",
+    "fr": "Utilisez Vancomyzer en parallèle de votre méthode de travail actuelle. Vous n’avez pas encore besoin de modifier votre pratique. Cherchez à repérer où le calculateur est utile pour vos patients les plus complexes : obésité, insuffisance rénale ou soins intensifs.",
+    "pt-BR": "Use o Vancomyzer em paralelo com seu fluxo de trabalho atual. Ainda não é necessário mudar a sua prática. Veja em que situações a calculadora ajuda nos casos mais complexos: obesidade, disfunção renal e pacientes de UTI."
   },
   "Phase 2 — Active Use (Days 15–75)": {
     "es": "Fase 2 — Uso activo (días 15–75)",
     "fr": "Phase 2 — Utilisation active (jours 15–75)",
     "pt-BR": "Fase 2 — Utilização activa (Dias 15–75)"
   },
-  "Use Vancomyzer as your primary dosing support tool. Your case data is accumulating. At day 75, a personalized summary report will be generated showing your AUC attainment rate, case volume and key insights from your logged cases — a document you can share with your pharmacy director to make the case for an institutional subscription.": {
-    "es": "Utilice Vancomyzer como herramienta principal de apoyo a la dosificación. Los datos de sus casos se van acumulando. El día 75 se generará un informe de resumen personalizado con su tasa de consecución del AUC objetivo, volumen de casos y observaciones principales de los casos registrados: un documento que podrá compartir con su director de farmacia para justificar una suscripción institucional.",
-    "fr": "Utilisez Vancomyzer comme outil principal d’aide à la posologie. Les données de vos cas s’accumulent. Au jour 75, un rapport de synthèse personnalisé sera généré avec votre taux d’atteinte de l’AUC cible, le nombre de cas et les principaux enseignements des cas enregistrés : un document à partager avec votre responsable de pharmacie pour appuyer une demande d’abonnement institutionnel.",
-    "pt-BR": "Utilize Vancomyzer como sua principal ferramenta de suporte à dosagem. Os seus dados do caso estão a acumular-se. No dia 75, será gerado um relatório de resumo personalizado mostrando a taxa de obtenção da AUC, o volume do caso e os principais insights de seus casos registrados — um documento que você pode compartilhar com seu diretor de farmácia para fazer o caso para uma assinatura institucional."
-  },
   "Phase 3 — Value Review (Days 76–90)": {
     "es": "Fase 3 — Revisión del valor aportado (días 76–90)",
     "fr": "Phase 3 — Évaluation de l’apport (jours 76–90)",
     "pt-BR": "Fase 3 — Revisão do valor (Dias 76–90)"
-  },
-  "Your pilot data is complete. Generate your personalized summary report below and share it with your pharmacy director or P&T committee. Subscribe before day 90 to retain your full case log and continue without interruption.": {
-    "es": "Los datos de su piloto están completos. Genere su informe de resumen personalizado debajo y compártalo con su director de farmacia o comisión de farmacia y terapéutica. Suscríbase antes del día 90 para conservar todo su registro de casos y continuar sin interrupciones.",
-    "fr": "Les données de votre pilote sont complètes. Générez votre rapport de synthèse personnalisé ci-dessous et partagez-le avec votre responsable de pharmacie ou votre comité du médicament. Abonnez-vous avant le jour 90 pour conserver l’intégralité de vos cas et poursuivre sans interruption.",
-    "pt-BR": "Os seus dados de piloto estão completos. Gere seu relatório de resumo personalizado abaixo e compartilhe-o com seu diretor de farmácia ou comitê P&T. Inscreva-se antes do dia 90 para manter o seu registo completo e continue sem interrupção."
-  },
-  "You are an active subscriber. Your case history is fully preserved.": {
-    "es": "Tiene una suscripción activa. Su historial de casos se conserva íntegramente.",
-    "fr": "Votre abonnement est actif. Votre historique de cas est intégralement conservé.",
-    "pt-BR": "Você é um assinante ativo. O seu histórico de casos está totalmente preservado."
   },
   "Download Report PDF": {
     "es": "Descargar informe PDF",
@@ -12298,11 +12253,6 @@
     "es": "Comparta su enlace con sus compañeros. Cuando se suscriban a Pro, se aplicará automáticamente un crédito de recomendación de $9.99 a su próxima factura de Stripe. Si aún utiliza Free, el crédito se reserva hasta su primera suscripción de pago.",
     "fr": "Partagez votre lien avec vos collègues. Lorsqu’ils s’abonnent à Pro, un crédit de parrainage de $9.99 est automatiquement appliqué à votre prochaine facture Stripe. Si vous utilisez encore Free, le crédit est conservé jusqu’à votre premier abonnement payant.",
     "pt-BR": "Partilhe a sua ligação com colegas. Quando eles se inscrevem no Pro, um crédito de referência de $9.99 é aplicado à sua próxima fatura Stripe automaticamente. Se você ainda estiver no Free, o crédito é mantido até sua primeira assinatura paga."
-  },
-  "Export clinical notes for the chart & save calculation history.": {
-    "es": "Exporte notas clínicas para la historia clínica y guarde el historial de cálculos.",
-    "fr": "Exportez des notes cliniques pour le dossier et enregistrez l’historique des calculs.",
-    "pt-BR": "Exportar notas clínicas para o gráfico e salvar o histórico de cálculo."
   },
   "Vancomyzer™ Individual Pro · 14-day free trial · $49.99/year.": {
     "es": "Vancomyzer™ Individual Pro · prueba gratuita de 14 días · $49.99/año.",
@@ -13704,11 +13654,6 @@
     "fr": "Continuez sans interruption.",
     "pt-BR": "Continue sem interrupção."
   },
-  "Your case history is preserved and all Pro features are active.": {
-    "es": "Su historial de casos se conserva y todas las funciones Pro están activas.",
-    "fr": "Votre historique de cas est conservé et toutes les fonctionnalités Pro sont actives.",
-    "pt-BR": "Seu histórico de casos está preservado e todos os recursos Pro estão ativos."
-  },
   "Subscribe before your pilot ends to retain your full case history and use Pro features.": {
     "es": "Suscríbase antes de que termine su piloto para conservar todo su historial de casos y utilizar las funciones Pro.",
     "fr": "Abonnez-vous avant la fin de votre pilote pour conserver tout votre historique de cas et utiliser les fonctionnalités Pro.",
@@ -13818,11 +13763,6 @@
     "es": "Pro habilita la exportación PDF y de notas para la historia clínica; el plan Free solo incluye la calculadora.",
     "fr": "Pro donne accès à l’export PDF et de notes pour le dossier médical ; la formule Free inclut uniquement le calculateur.",
     "pt-BR": "Pro desbloqueia PDF e exportação de notas para o registro médico — A camada livre é apenas calculadora."
-  },
-  "Save 90 days of de-identified calculation history with optional case IDs. Search past calcs without re-entering patient data.": {
-    "es": "Guarde 90 días de historial de cálculos desidentificados con identificadores de caso opcionales. Busque cálculos anteriores sin volver a introducir los datos del paciente.",
-    "fr": "Conservez 90 jours d’historique de calculs désidentifiés avec des identifiants de cas facultatifs. Retrouvez les calculs précédents sans ressaisir les données du patient.",
-    "pt-BR": "Salve 90 dias de histórico de cálculos desidentificados com identificadores de caso opcionais. Pesquise cálculos anteriores sem inserir novamente os dados do paciente."
   },
   "Team management is a Department feature": {
     "es": "La gestión de equipos es una función Department",
@@ -16304,10 +16244,10 @@
     "fr": "Dōsys™ fournit Vancomyzer™, un calculateur de posologie de la vancomycine, pour examen par des professionnels de santé habilités. Il ne doit pas être utilisé pour prendre des décisions de soins sans examen clinique indépendant. L’accès à Vancomyzer est actuellement gratuit. Les abonnements et accords institutionnels existants conservent leurs conditions convenues. Le modèle pharmacocinétique, les équations et les contrôles de sécurité clinique sont identiques pour tous les forfaits.\n\nDōsys™ ne formule aucune déclaration ni garantie concernant l’exactitude, la qualité, l’exhaustivité, l’actualité, le caractère approprié ou l’adéquation de cet outil. Dōsys™ n’est tenue à aucune obligation de mettre à jour l’outil ni de communiquer de nouvelles informations concernant la posologie de la vancomycine. Les informations médicales évoluent rapidement. EN TANT QU’UTILISATEUR («UTILISATEUR»), VOUS RECONNAISSEZ QUE L’OUTIL EST FOURNI «EN L’ÉTAT» ET QUE TOUTE UTILISATION DE L’OUTIL OU TOUTE CONFIANCE ACCORDÉE À CELUI-CI RELÈVE DE VOTRE SEULE RESPONSABILITÉ.",
     "pt-BR": "Dōsys™ disponibiliza o Vancomyzer™, uma calculadora de doses de vancomicina, para revisão por profissionais de saúde legalmente habilitados. Não deve ser utilizado em decisões de assistência ao paciente sem revisão clínica independente. Atualmente, o acesso ao Vancomyzer é gratuito. As assinaturas e os acordos institucionais existentes mantêm os termos acordados. O modelo farmacocinético, as equações e as verificações de segurança clínica são idênticos em todos os planos.\n\nDōsys™ não faz declarações nem oferece garantias quanto à precisão, qualidade, completude, atualidade, adequação ou aplicabilidade desta ferramenta. Dōsys™ não assume a obrigação de atualizar a ferramenta ou informar novos avanços relativos à dosagem de vancomicina. As informações médicas mudam rapidamente. VOCÊ, NA QUALIDADE DE USUÁRIO (\"USUÁRIO\"), RECONHECE QUE A FERRAMENTA É FORNECIDA \"NO ESTADO EM QUE SE ENCONTRA\" E QUE QUALQUER USO OU CONFIANÇA NA FERRAMENTA SERÁ POR SUA CONTA E RISCO."
   },
-  "Your pilot data is complete. Generate your personalized summary report below and share it with your pharmacy director or P&T committee. Contact us about continued access to your case log.": {
-    "es": "Los datos de su piloto están completos. Genere su informe de resumen personalizado a continuación y compártalo con su director de farmacia o comité de farmacia y terapéutica. Contáctenos sobre la continuidad del acceso a su registro de casos.",
-    "fr": "Les données de votre pilote sont complètes. Générez votre rapport de synthèse personnalisé ci-dessous et partagez-le avec votre responsable de pharmacie ou votre comité du médicament. Contactez-nous au sujet du maintien de l’accès à votre registre de cas.",
-    "pt-BR": "Os dados do seu piloto estão completos. Gere seu relatório de resumo personalizado abaixo e compartilhe-o com o diretor de farmácia ou a comissão de farmácia e terapêutica. Entre em contato para tratar da continuidade do acesso ao seu registro de casos."
+  "If available, generate your pilot summary report below for institutional review.": {
+    "es": "Si está disponible, genere a continuación el informe resumido del piloto para revisión institucional.",
+    "fr": "S’il est disponible, générez ci-dessous le rapport de synthèse du pilote pour l’examen institutionnel.",
+    "pt-BR": "Se estiver disponível, gere abaixo o relatório resumido do piloto para análise institucional."
   },
   "Access to Vancomyzer is currently free. All plans use the same calculation method. Contact us about account access or institutional requirements.": {
     "es": "Actualmente, el acceso a Vancomyzer es gratuito. Todos los planes utilizan el mismo método de cálculo. Contáctenos sobre el acceso a la cuenta o los requisitos institucionales.",
@@ -16319,15 +16259,10 @@
     "fr": "Dōsys™ fournit Vancomyzer™, un calculateur de posologie de la vancomycine, pour examen par des professionnels de santé habilités. Il ne doit pas être utilisé pour prendre des décisions de soins sans examen clinique indépendant. L’accès à Vancomyzer est actuellement gratuit. Les engagements d’accès existants restent inchangés. Les abonnements et accords institutionnels existants conservent leurs conditions convenues. Le modèle pharmacocinétique, les équations et les contrôles de sécurité clinique sont identiques pour tous les forfaits.\n\nDōsys™ ne formule aucune déclaration ni garantie concernant l’exactitude, la qualité, l’exhaustivité, l’actualité, le caractère approprié ou l’adéquation de cet outil. Dōsys™ n’est tenue à aucune obligation de mettre à jour l’outil ni de communiquer de nouvelles informations concernant la posologie de la vancomycine. Les informations médicales évoluent rapidement. EN TANT QU’UTILISATEUR («UTILISATEUR»), VOUS RECONNAISSEZ QUE L’OUTIL EST FOURNI «EN L’ÉTAT» ET QUE TOUTE UTILISATION DE L’OUTIL OU TOUTE CONFIANCE ACCORDÉE À CELUI-CI RELÈVE DE VOTRE SEULE RESPONSABILITÉ.",
     "pt-BR": "Dōsys™ disponibiliza o Vancomyzer™, uma calculadora de doses de vancomicina, para revisão por profissionais de saúde legalmente habilitados. Não deve ser utilizado em decisões de assistência ao paciente sem revisão clínica independente. Atualmente, o acesso ao Vancomyzer é gratuito. Os compromissos de acesso existentes permanecem inalterados. As assinaturas e os acordos institucionais existentes mantêm os termos acordados. O modelo farmacocinético, as equações e as verificações de segurança clínica são idênticos em todos os planos.\n\nDōsys™ não faz declarações nem oferece garantias quanto à precisão, qualidade, completude, atualidade, adequação ou aplicabilidade desta ferramenta. Dōsys™ não assume a obrigação de atualizar a ferramenta ou informar novos avanços relativos à dosagem de vancomicina. As informações médicas mudam rapidamente. VOCÊ, NA QUALIDADE DE USUÁRIO (\"USUÁRIO\"), RECONHECE QUE A FERRAMENTA É FORNECIDA \"NO ESTADO EM QUE SE ENCONTRA\" E QUE QUALQUER USO OU CONFIANÇA NA FERRAMENTA SERÁ POR SUA CONTA E RISCO."
   },
-  "Saved history, institution details on exports and team administration depend on your account access. Contact us about availability.": {
-    "es": "El historial guardado, los datos institucionales en las exportaciones y la administración de equipos dependen del acceso de su cuenta. Contáctenos sobre su disponibilidad.",
-    "fr": "L’historique enregistré, les informations de l’établissement sur les exports et l’administration des équipes dépendent des droits d’accès de votre compte. Contactez-nous pour connaître leur disponibilité.",
-    "pt-BR": "O histórico salvo, os dados institucionais nas exportações e a administração de equipes dependem do acesso da sua conta. Entre em contato sobre a disponibilidade."
-  },
-  "Use Vancomyzer as your primary dosing support tool. Your case data is accumulating. At day 75, a personalized summary report will be generated showing your AUC attainment rate, case volume and key insights from your logged cases — a document you can share with your pharmacy director for institutional review.": {
-    "es": "Utilice Vancomyzer como herramienta principal de apoyo a la dosificación. Los datos de sus casos se van acumulando. El día 75 se generará un informe de resumen personalizado con su tasa de consecución del AUC objetivo, volumen de casos y observaciones principales de los casos registrados: un documento que podrá compartir con su director de farmacia para una revisión institucional.",
-    "fr": "Utilisez Vancomyzer comme outil principal d’aide à la posologie. Les données de vos cas s’accumulent. Au jour 75, un rapport de synthèse personnalisé sera généré avec votre taux d’atteinte de l’AUC cible, le nombre de cas et les principaux enseignements des cas enregistrés : un document à partager avec votre responsable de pharmacie pour un examen institutionnel.",
-    "pt-BR": "Utilize Vancomyzer como sua principal ferramenta de suporte à dosagem. Os seus dados do caso estão a acumular-se. No dia 75, será gerado um relatório de resumo personalizado mostrando a taxa de obtenção da AUC, o volume do caso e os principais insights de seus casos registrados — um documento que você pode compartilhar com seu diretor de farmácia para revisão institucional."
+  "Continue evaluating Vancomyzer alongside your current workflow.": {
+    "es": "Siga evaluando Vancomyzer en paralelo con su flujo de trabajo actual.",
+    "fr": "Poursuivez l’évaluation de Vancomyzer en parallèle de votre méthode de travail actuelle.",
+    "pt-BR": "Continue avaliando o Vancomyzer em paralelo com seu fluxo de trabalho atual."
   },
   "Request restricted access": {
     "es": "Solicitar acceso restringido",
