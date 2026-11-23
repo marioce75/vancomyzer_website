@@ -29,7 +29,7 @@ import { describeMeasuredLevels, describeSelectedCurve, singleDoseNoun as single
 import { buildClinicalNote, ONE_LEVEL_UNCERTAINTY_SUMMARY, resolveCandidate } from "@/components/calculator/clinicalNote";
 import { buildReportData } from "@/components/calculator/exportReport";
 import LevelEntryTable, { manualHoursCollectionTime } from "@/components/calculator/LevelEntryTable";
-import { isEnteredLevel, requestLevel, timingIsValid, restoreLevelDrafts, type LevelDraft } from "./levelTiming";
+import { isEnteredLevel, requestLevel, timingIsValid, type LevelDraft } from "./levelTiming";
 import { nextInputRevision, resultIsCurrent, responseIsCurrent } from "./inputRevision";
 import CalculatorActionBar from "@/components/calculator/CalculatorActionBar";
 import PrimaryMetricsCard from "@/components/calculator/PrimaryMetricsCard";
@@ -51,12 +51,11 @@ import PdfExportGate from "@/components/calculator/PdfExportGate";
 import UpgradeBanner from "@/components/UpgradeBanner";
 import { useMatrixSettings } from "@/contexts/MatrixSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useFeature } from "@/hooks/useFeature";
 import { translateGeneratedText } from "@/localization/generatedText";
 import { printReport } from "@/lib/generateReport";
 import { track } from "@/lib/analytics";
-import { parseClinicalNumber, hasInvalidNumericValues, INVALID_NUMBER, clinicalDraftReplacer, clinicalDraftReviver } from "@/lib/parseClinicalNumber";
-import { COLIN_2019, modelDisplayName, modelShortName } from "@/lib/pk/modelRegistry";
+import { parseClinicalNumber, hasInvalidNumericValues, INVALID_NUMBER } from "@/lib/parseClinicalNumber";
+import { COLIN_2019, modelShortName } from "@/lib/pk/modelRegistry";
 import { fmt } from "@/lib/formatNumber";
 const defaultPatient: CalculateRequestPatient = { age: 0, weight_kg: 0, height_cm: 0, sex: "", serum_creatinine_mg_dl: 0 };
 const defaultRegimen: CalculateRequestRegimen = { dose_mg: 0, interval_hours: 0, infusion_duration_hours: 0, steady_state_confirmed: false };
@@ -98,8 +97,8 @@ function useMediaQuery(query: string): boolean {
 const MISSING_COUNT_MESSAGE =
   "Enter the exact number of maintenance doses given (6 or more) before calculating. The doses you entered are kept.";
 
-const SESSION_KEY = "vancomyzer_calculator_state";
-const EIGHT_HOURS = 8 * 60 * 60 * 1000;
+// Kept only so the clinician’s existing Reset action can clear an old draft.
+const LEGACY_SESSION_KEY = "vancomyzer_calculator_state";
 
 export default function CalculatorWorkspace() {
   const { locale } = useLanguage();
@@ -147,16 +146,6 @@ export default function CalculatorWorkspace() {
   const [loadingPreview, setLoadingPreview] = useState(false);
   const pendingLoadingDoseCalc = useRef(false);
 
-  // Optional clinician-supplied tracking string for calculation history.
-  // Persisted only if the user has the history.calculation feature (Pro+).
-  // Held in a ref alongside state so updates don't churn the buildRequest
-  // callback identity — if it did, every keystroke would retrigger the
-  // auto-recalc useEffect and write a row per character typed.
-  const [caseId, setCaseId] = useState<string>("");
-  const caseIdRef = useRef<string>("");
-  useEffect(() => { caseIdRef.current = caseId; }, [caseId]);
-  const { allowed: canSaveHistory } = useFeature("history.calculation");
-
   // Layout State
   const [activeSection, setActiveSection] = useState<string>("patient");
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -168,7 +157,7 @@ export default function CalculatorWorkspace() {
   const { user, loading: authLoading, logout } = useAuth();
 
   // Workflow label for the "Calculation Run" analytics event. Read through a
-  // ref (like caseIdRef above) so handleCalculate's identity does not change
+  // ref so handleCalculate's identity does not change
   // with the view mode — a new identity would re-fire the empiric
   // auto-recalc effect and send an extra request.
   const viewModeRef = useRef<WorkspaceViewMode>(viewMode);
@@ -186,59 +175,7 @@ export default function CalculatorWorkspace() {
   const rrtRef = useRef<boolean | null>(null);
   useEffect(() => { rrtRef.current = rrt; }, [rrt]);
 
-  // ── Restore from sessionStorage on mount (client-only) ──
-  const didRestoreRef = useRef(false);
-  useEffect(() => {
-    if (didRestoreRef.current) return;
-    didRestoreRef.current = true;
-    try {
-      const raw = sessionStorage.getItem(SESSION_KEY);
-      if (!raw) return;
-      const s = JSON.parse(raw, clinicalDraftReviver);
-      if (Date.now() - (s.timestamp ?? 0) > EIGHT_HOURS) {
-        sessionStorage.removeItem(SESSION_KEY);
-        return;
-      }
-      if (s.patient) setPatient(s.patient);
-      if (s.rrt !== undefined) setRrt(s.rrt);
-      if (s.regimen) setRegimen(s.regimen);
-      if (s.levels) setLevels(restoreLevelDrafts(s.levels, s.timingDraftVersion));
-      if (s.bedbound !== undefined) setBedbound(s.bedbound);
-      if (s.viewMode) setViewMode(s.viewMode);
-      if (s.mode) setMode(s.viewMode === "empiric" ? "initial_regimen" : s.mode);
-      if (s.activeSection) setActiveSection(s.activeSection);
-      // Restore drafts only: cached results cannot prove they match these inputs.
-    } catch { /* corrupted — ignore */ }
-  }, []);
-
-  // ── Persist to sessionStorage on every relevant state change ──
-  const hasMountedRef = useRef(false);
-  useEffect(() => {
-    // Skip first render to avoid saving defaults before restore runs
-    if (!hasMountedRef.current) {
-      hasMountedRef.current = true;
-      return;
-    }
-    try {
-      // During an Empiric loading-dose preview, persist the history as it was
-      // before the preview: the suggested dose was not given.
-      const preview = loadingPreview ? preLoadingDoseState.current : null;
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-        patient, rrt,
-        regimen: preview ? preview.regimen : regimen,
-        levels: preview ? preview.levels : levels,
-        bedbound, timingDraftVersion: 1,
-        viewMode,
-        mode: preview ? preview.mode : mode,
-        activeSection,
-        result: preview ? null : result,
-        selectedFrequencyOption: preview ? null : selectedFrequencyOption,
-        timestamp: Date.now(),
-      }, clinicalDraftReplacer));
-    } catch { /* storage full — ignore */ }
-  }, [patient, rrt, regimen, levels, bedbound, viewMode, mode, activeSection, result, selectedFrequencyOption, loadingPreview]);
-
-  // Pre-fill patient state from URL query params (overrides session restore)
+  // Pre-fill patient state from URL query params
   const didPreFillRef = useRef(false);
   // Literature Reproducibility case loaded via ?case=<id>; banner stays
   // visible until the user resets or dismisses.
@@ -322,12 +259,10 @@ export default function CalculatorWorkspace() {
   }, [searchParams]);
 
   const buildRequest = useCallback((): CalculateRequest => {
-    const trimmedCaseId = caseIdRef.current.trim();
-    const caseIdField = canSaveHistory && trimmedCaseId.length > 0 ? { case_id: trimmedCaseId } : {};
     // The RRT toggle was collected and stored but never sent, so the API could
     // not withhold a recommendation for dialysis / renal replacement therapy the
     // way this site says it does. Send it as part of the patient contract.
-    const base = { mode, patient: { ...patient, dialysis_or_rrt: rrt === true }, ...caseIdField };
+    const base = { mode, patient: { ...patient, dialysis_or_rrt: rrt === true } };
     if (mode === "initial_regimen") return base;
     // Drop only completely untouched rows (loading-dose simulation has no measured
     // levels). A row with a time but an unreadable/zero value is sent as-is so the
@@ -344,7 +279,7 @@ export default function CalculatorWorkspace() {
       regimen: requestRegimen(regimen, { suggestedDoseNotGiven: loadingPreview && validLevels.length === 0 }),
       levels: validLevels,
     };
-  }, [mode, patient, rrt, regimen, levels, canSaveHistory, loadingPreview]);
+  }, [mode, patient, rrt, regimen, levels, loadingPreview]);
 
   const applyViewMode = useCallback((next: WorkspaceViewMode) => {
     // A tab switch ends an Empiric loading-dose preview. The suggested dose was
@@ -514,43 +449,6 @@ export default function CalculatorWorkspace() {
         track("Calculation Run", { mode: workflowMode });
       }
 
-      // ── PK Validation audit log ──
-      if (Array.isArray(data.curve) && data.curve.length > 1) {
-        const curveArr = data.curve as { time_hours: number; concentration: number }[];
-        // Find trough from curve (last local minimum)
-        let curveTrough = curveArr[curveArr.length - 1].concentration;
-        for (let i = 2; i < curveArr.length - 1; i++) {
-          if (curveArr[i].concentration <= curveArr[i - 1].concentration && curveArr[i].concentration <= curveArr[i + 1].concentration) {
-            curveTrough = curveArr[i].concentration;
-          }
-        }
-        // AUC by trapezoidal rule over last 24h
-        const tEnd = curveArr[curveArr.length - 1].time_hours;
-        const t24Start = Math.max(0, tEnd - 24);
-        const aucPts = curveArr.filter(p => p.time_hours >= t24Start);
-        let trapAuc = 0;
-        for (let i = 1; i < aucPts.length; i++) {
-          trapAuc += 0.5 * (aucPts[i - 1].concentration + aucPts[i].concentration) * (aucPts[i].time_hours - aucPts[i - 1].time_hours);
-        }
-        const panelTrough = data.trough ?? 0;
-        const panelAuc = data.auc24 ?? 0;
-        const troughMatch = Math.abs(panelTrough - curveTrough) < 0.5;
-        const aucDelta = Math.abs(panelAuc - trapAuc);
-        const aucMatch = aucDelta < 5;
-        console.log(
-          `\nVANCOMYZER PK VALIDATION\n========================\n` +
-          `Trough (panel):     ${fmt(Number(panelTrough), 2)} mg/L\n` +
-          `Trough (graph):     ${fmt(curveTrough, 2)} mg/L\n` +
-          `Match: ${troughMatch ? "PASS" : "✗ FAIL (Δ=" + fmt(Math.abs(panelTrough - curveTrough), 2) + ")"}\n\n` +
-          `AUC24 (panel):      ${fmt(Number(panelAuc), 1)} mg·h/L\n` +
-          `AUC24 (trapezoid):  ${fmt(trapAuc, 1)} mg·h/L\n` +
-          `Δ: ${fmt(aucDelta, 1)} mg·h/L${aucMatch ? " — within tolerance" : " — EXCEEDS tolerance"}\n` +
-          `Match: ${aucMatch ? "PASS" : "✗ FAIL"}\n\n` +
-          `Model: ${modelDisplayName(data.pk_parameters?.pk_model_name)}\n` +
-          `τ: ${data.recommended_interval_hours ?? "?"}h\n` +
-          `Infusion: ${data.recommended_infusion_duration_hours != null ? Number((data.recommended_infusion_duration_hours * 60).toFixed(6)) : "?"} min`
-        );
-      }
     } finally {
       if (seq === requestSeqRef.current) setLoading(false);
     }
@@ -619,7 +517,7 @@ export default function CalculatorWorkspace() {
   }, [patient, mode, rrt, handleCalculate]);
 
   const handleReset = useCallback(() => {
-    sessionStorage.removeItem(SESSION_KEY);
+    try { sessionStorage.removeItem(LEGACY_SESSION_KEY); } catch { /* storage may be blocked */ }
     setPatient({ ...defaultPatient });
     setRegimen({ ...defaultRegimen });
     setLevels([{ ...defaultLevel }]);
@@ -972,9 +870,6 @@ export default function CalculatorWorkspace() {
           disabled={loading || rrt === null || rrt === true}
           loading={loading}
           hideCalculate={hideCalculate}
-          showCaseId={canSaveHistory}
-          caseId={caseId}
-          onCaseIdChange={setCaseId}
         />
       </div>
     </div>

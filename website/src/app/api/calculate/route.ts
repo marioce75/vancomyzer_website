@@ -6,17 +6,15 @@ import { getSettingsForUser } from "@/lib/institutionalSettings";
 import { dosePolicyFromSettings } from "@/lib/pk/dosePolicy";
 import { runExistingRegimenPipeline } from "@/lib/pk/runExistingRegimenPipeline";
 import { logCalculation } from "@/lib/auditLog";
-import { logCalculationEntry, getUserTier, findUserByLogin } from "@/lib/db";
-import { hasFeature } from "@/lib/tiers";
-import { validateCaseId } from "@/lib/calculationHistory";
+import { findUserByLogin } from "@/lib/db";
 import { authOptions } from "@/lib/authOptions";
 import { checkRateLimit, getCalculateRateLimitConfig, getClientIp } from "@/lib/rateLimit";
-import { computeBmi, HIGH_BMI_THRESHOLD_KG_M2, MODEL_MANIFEST_VERSION } from "@/lib/pk/modelRegistry";
+import { MODEL_MANIFEST_VERSION } from "@/lib/pk/modelRegistry";
 import { createHash } from "node:crypto";
 
 /**
  * Immutable snapshot attached to every result so the client can bind a
- * rendered result, an export and a history row to exactly the inputs and model
+ * rendered result and an export to exactly the inputs and model
  * version that produced it (an out-of-order response can then be detected and
  * discarded by comparing digests — see CalculatorWorkspace).
  */
@@ -38,8 +36,6 @@ interface RequestBody {
   patient?: unknown;
   regimen?: unknown;
   levels?: unknown;
-  case_id?: unknown;
-  intent?: unknown;
 }
 
 function validateRequest(body: unknown): { ok: true; data: RequestBody; mode: Mode } | { ok: false; error: { error_type: "validation_error"; message: string; field_errors?: Record<string, string> } } {
@@ -189,6 +185,12 @@ function extractPKParams(result: Record<string, unknown>): { CL: number; V1: num
 // POST handler
 // ---------------------------------------------------------------------------
 
+const calculationResponse = (body: unknown, init?: ResponseInit) => {
+  const headers = new Headers(init?.headers);
+  headers.set("Cache-Control", "private, no-store");
+  return NextResponse.json(body, { ...init, headers });
+};
+
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
 
@@ -208,7 +210,7 @@ export async function POST(request: NextRequest) {
     const { max, windowMs } = getCalculateRateLimitConfig();
     const limit = checkRateLimit(`calculate:${getClientIp(request.headers)}`, max, windowMs);
     if (!limit.allowed) {
-      return NextResponse.json(
+      return calculationResponse(
         {
           error_type: "rate_limited",
           message: "Too many calculations from your network in a short time. Please wait a few minutes and try again.",
@@ -222,28 +224,11 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
+    return calculationResponse(
       { error_type: "validation_error", message: "Invalid JSON body." },
       { status: 400 }
     );
   }
-
-  // Validate optional case_id BEFORE doing any PK work — reject PHI-shaped
-  // input early so it never enters our processing pipeline.
-  const caseIdResult = validateCaseId((body as RequestBody | null | undefined)?.case_id);
-  if (!caseIdResult.ok) {
-    return NextResponse.json(
-      { error_type: "validation_error", message: caseIdResult.reason, field_errors: { case_id: caseIdResult.reason } },
-      { status: 400 },
-    );
-  }
-  const caseId = caseIdResult.value;
-
-  // History persistence is gated on explicit intent. Auto-debounced recalcs
-  // fired during data entry are not user-confirmed clinical actions, so we
-  // don't pollute history with them. Defaults to "explicit" when absent so
-  // older clients (or curl) still get logged.
-  const intent = (body as RequestBody | null | undefined)?.intent === "auto" ? "auto" : "explicit";
 
   const validated = validateRequest(body);
 
@@ -263,7 +248,7 @@ export async function POST(request: NextRequest) {
         field_errors: validated.error.field_errors,
       },
     });
-    return NextResponse.json(validated.error, { status: 400 });
+    return calculationResponse(validated.error, { status: 400 });
   }
 
   const inputs = extractInputs(validated.data, validated.mode);
@@ -306,7 +291,7 @@ export async function POST(request: NextRequest) {
           field_errors: error.field_errors,
         },
       });
-      return NextResponse.json(
+      return calculationResponse(
         { error_type: error.error_type, message: error.message, field_errors: error.field_errors },
         { status: 400 },
       );
@@ -322,15 +307,8 @@ export async function POST(request: NextRequest) {
       pk_parameters: extractPKParams(result),
     });
 
-    // Calculation history — gated on history.calculation feature
-    // (Pro+, no patient identifiers, includes optional case_id).
-    // Auto-recalc never persists; only explicit user action does.
-    if (intent === "explicit") {
-      persistCalculation(userEmail, "empiric", result, caseId, patient);
-    }
-
     result.result_snapshot = buildResultSnapshot("initial_regimen", validated.data);
-    return NextResponse.json(result);
+    return calculationResponse(result);
   }
 
   // Same institutional ceilings as the empiric path above. Recomputed here
@@ -356,7 +334,7 @@ export async function POST(request: NextRequest) {
         field_errors: result.field_errors as Record<string, string> | undefined,
       },
     });
-    return NextResponse.json(
+    return calculationResponse(
       {
         error_type: result.error_type,
         message: result.message,
@@ -382,61 +360,6 @@ export async function POST(request: NextRequest) {
   // Clinical fit diagnostics are returned to the caller, never written to
   // security logs. A research workflow needs its own approved data store.
 
-  // Calculation history — gated on history.calculation feature.
-  // Auto-recalc never persists; only explicit user action does.
-  if (intent === "explicit") {
-    persistCalculation(userEmail, "existing", resultObj, caseId, validated.data.patient as Record<string, unknown>);
-  }
-
   resultObj.result_snapshot = buildResultSnapshot("existing_regimen", validated.data);
-  return NextResponse.json(result);
-}
-
-function round2(v: unknown): number | null {
-  return typeof v === "number" && Number.isFinite(v) ? Math.round(v * 100) / 100 : null;
-}
-
-/**
- * Persist a single calculation to calculation_log for users with the
- * history.calculation feature (Individual Pro and above). Non-blocking —
- * errors are swallowed so a DB issue never breaks the calc response.
- * Stores derived fields only; no patient identifiers.
- */
-function persistCalculation(
-  userEmail: string,
-  workflowType: string,
-  result: Record<string, unknown>,
-  caseId: string | null,
-  patientInput?: { weight_kg?: unknown; height_cm?: unknown },
-) {
-  try {
-    if (userEmail === "anonymous") return;
-    const dbUser = findUserByLogin(userEmail);
-    if (!dbUser) return;
-    const tier = getUserTier(dbUser.id);
-    if (!hasFeature(tier, "history.calculation")) return;
-
-    const pk = result.pk_parameters as Record<string, unknown> | undefined;
-    const auc24 = result.auc24 as number | undefined;
-    const dose = parseInt(String(result.recommended_dose ?? "0"));
-    logCalculationEntry({
-      user_id: dbUser.id,
-      institutional_account_id: dbUser.institutional_account_id,
-      workflow_type: workflowType,
-      pk_model: (pk?.pk_model_name as string) ?? "colin_2019",
-      obesity_model_active: pk?.pk_model_name === "vancomyzer_obesity" ? 1 : 0,
-      // From measured BMI — the retired obesity model id no longer tracks body size.
-      bmi_above_40: (computeBmi(Number(patientInput?.weight_kg), Number(patientInput?.height_cm)) ?? 0) >= HIGH_BMI_THRESHOLD_KG_M2 ? 1 : 0,
-      dose_mg: Number.isFinite(dose) ? dose : null,
-      interval_hours: (result.recommended_interval_hours as number) ?? null,
-      auc24: typeof auc24 === "number" ? auc24 : null,
-      peak: (result.peak as number) ?? null,
-      trough: (result.trough as number) ?? null,
-      auc_in_range: typeof auc24 === "number" && auc24 >= 400 && auc24 <= 600 ? 1 : 0,
-      case_id: caseId,
-      tier_at_time: tier,
-    });
-  } catch (err) {
-    console.warn("[calculation-history] persist failed:", err);
-  }
+  return calculationResponse(result);
 }
