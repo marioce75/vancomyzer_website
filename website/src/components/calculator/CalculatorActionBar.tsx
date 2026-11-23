@@ -1,7 +1,7 @@
 
 import { LocalizedText } from "@/localization/LanguageProvider";
 
-import { LocalizedLabel, LocalizedInput, LocalizedButton } from "@/localization/LocalizedElements";
+import { LocalizedButton } from "@/localization/LocalizedElements";
 import React from "react";
 
 interface CalculatorActionBarProps {
@@ -12,10 +12,6 @@ interface CalculatorActionBarProps {
   hideCalculate?: boolean;
   /** A calculation is in flight — the button reads CALCULATING_. Other disabled reasons keep the CALCULATE label. */
   loading?: boolean;
-  /** When true, render the optional Case ID input (Pro+ users only). */
-  showCaseId?: boolean;
-  caseId?: string;
-  onCaseIdChange?: (value: string) => void;
 }
 
 export default function CalculatorActionBar({
@@ -24,37 +20,9 @@ export default function CalculatorActionBar({
   disabled,
   loading,
   hideCalculate,
-  showCaseId,
-  caseId,
-  onCaseIdChange,
 }: CalculatorActionBarProps) {
   return (
     <div className="flex flex-col items-stretch gap-1.5">
-      {showCaseId && (
-        <div className="flex w-full max-w-md items-center gap-2">
-          <LocalizedLabel
-            htmlFor="case-id-input"
-            className="text-[10px] uppercase tracking-[0.16em] shrink-0"
-            style={{ color: "var(--color-dim)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.16em" }}
-            title="Optional clinician-supplied tracking string. Saved to your calculation history. Do not enter PHI."
-          ><LocalizedText text="case id" /></LocalizedLabel>
-          <LocalizedInput
-            id="case-id-input"
-            type="text"
-            value={caseId ?? ""}
-            onChange={e => onCaseIdChange?.(e.target.value)}
-            placeholder="optional · e.g. ICU bed 12 · NO PHI"
-            maxLength={64}
-            className="min-w-0 flex-1 px-2 py-1 text-xs"
-            style={{
-              border: "1px solid var(--color-border)",
-              background: "var(--color-card)",
-              color: "var(--color-primary)",
-              fontFamily: "'Share Tech Mono', monospace",
-            }}
-          />
-        </div>
-      )}
       <div className="flex items-center justify-end gap-2">
       <div className="flex flex-1 flex-wrap justify-end gap-2">
         <button
