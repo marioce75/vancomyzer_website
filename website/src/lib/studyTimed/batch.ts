@@ -70,7 +70,7 @@ function table(text: string, allowed: ReadonlySet<string>, scope: string, requir
   const reasons: Reason[] = [];
   const seen = new Set<string>();
   for (const h of header) {
-    const r = screenFieldName(h, allowed, `${scope} column`);
+    const r = screenFieldName(h, allowed, scope);
     if (r) reasons.push(r);
     if (seen.has(h)) reasons.push({ code: "DUPLICATE_COLUMN", message: `${scope} column "${h}" appears twice.` });
     seen.add(h);
