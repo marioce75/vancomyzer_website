@@ -5,7 +5,7 @@
  * and the release calculator's unrounded output against the timed workflow.
  *
  * Run from website/ (needs ~500 MB free; nothing is sent off this machine):
- *   PLAYWRIGHT_MODULE=/path/to/node_modules/playwright node --import tsx scripts/study-hca/preview-http.test.ts
+ *   PLAYWRIGHT_MODULE=/path/to/node_modules/playwright node --import tsx scripts/study-hca/preview-http.test.mts
  * Set STUDY_PREVIEW_KEEP=1 to leave the owner preview running for a manual look.
  */
 import assert from "node:assert/strict";
@@ -15,12 +15,14 @@ import path from "node:path";
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { createRequire } from "node:module";
 import { randomBytes } from "node:crypto";
-import { FICTIONAL_CASES } from "../../src/lib/studyTimed/fictionalCases";
-import { predictAtDraw } from "../../src/lib/studyTimed/predictAtDraw";
+import fictionalModule from "../../src/lib/studyTimed/fictionalCases";
+import predictModule from "../../src/lib/studyTimed/predictAtDraw";
 
 const require = createRequire(path.join(process.cwd(), "package.json"));
 const Database = require("better-sqlite3");
 const { encode } = require("next-auth/jwt");
+const { FICTIONAL_CASES } = fictionalModule as unknown as typeof import("../../src/lib/studyTimed/fictionalCases");
+const { predictAtDraw } = predictModule as unknown as typeof import("../../src/lib/studyTimed/predictAtDraw");
 const source = process.cwd();
 assert(fs.existsSync(path.join(source, "src/lib/studyDemo/access.ts")), "run from website/");
 assert(!fs.existsSync("/data"), "Refuse fixture run when a production /data directory exists");
