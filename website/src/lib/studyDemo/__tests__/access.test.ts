@@ -2,6 +2,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { safePage } from "../../analytics-policy";
+import { FICTIONAL_CASES } from "../../studyTimed/fictionalCases";
+import { predictAtDraw } from "../../studyTimed/predictAtDraw";
+import { draftFromPreset, trainingCurve, trainingInput } from "../trainingDraft";
 import { readStudyDemoConfig, studyDemoOwnerAllowed } from "../access";
 
 const now = Date.UTC(2030, 0, 1, 12);
@@ -55,4 +59,23 @@ test("every demo entry point checks the owner on the server before serving anyth
   // No new role, no role/permission change, no public link.
   const access = readFileSync(join(root, "lib/studyDemo/access.ts"), "utf8");
   assert.doesNotMatch(access, /setUserRole|UPDATE users|role\s*=\s*["']/);
+});
+
+test("the browser editor retains pinned preset predictions and plots through the draw only", () => {
+  for (const { input } of FICTIONAL_CASES) {
+    const entered = trainingInput(input, draftFromPreset(input));
+    const preset = predictAtDraw(input);
+    const normalized = predictAtDraw(entered);
+    assert.equal(normalized.status, "predicted", input.study_case_id);
+    assert.ok(Math.abs(normalized.predicted_concentration_mg_l! - preset.predicted_concentration_mg_l!) < 1e-8, input.study_case_id);
+    assert.equal(normalized.doses_used, preset.doses_used, input.study_case_id);
+    const points = trainingCurve(entered, normalized);
+    assert.ok(points.length > 0);
+    assert.equal(points[points.length - 1].hour, normalized.draw_elapsed_hours);
+    assert.equal(points[points.length - 1].concentration, normalized.predicted_concentration_mg_l);
+  }
+});
+
+test("the private study editor route is excluded from usage analytics", () => {
+  assert.equal(safePage("https://vancomyzer.com/admin/dashboard/study-demo"), null);
 });
