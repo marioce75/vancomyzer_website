@@ -167,18 +167,21 @@ try {
         await context.route("**/*", (r: { request(): { url(): string }; continue(): unknown; abort(): unknown }) => (r.request().url().startsWith(base) ? r.continue() : r.abort()));
         await context.addCookies([{ name: "next-auth.session-token", value: token, url: base }]);
         const tab = await context.newPage();
-        await tab.goto(base + "/admin/dashboard", { waitUntil: "networkidle", timeout: 60000 });
+        const probe = tab.waitForResponse((r: { url(): string }) => r.url() === base + API, { timeout: 60000 });
+        await tab.goto(base + "/admin/dashboard", { waitUntil: "load", timeout: 60000 });
+        await probe;
+        await tab.waitForTimeout(500);
         const links = await tab.locator(`a[href="${PAGE}"]`).count();
         assert.equal(links > 0, expectLink, `${who} nav link count ${links}`);
         if (expectLink) {
-          await tab.goto(base + PAGE, { waitUntil: "networkidle" });
+          await tab.goto(base + PAGE, { waitUntil: "load" });
           await tab.getByRole("tab", { name: "FICT-A02" }).click();
           await tab.getByRole("button", { name: "Predict concentration at the draw" }).click();
           await tab.getByText("Reveal fictional lab result").click();
           await tab.getByText("Fictional lab result:").waitFor();
           await tab.screenshot({ path: path.join(fixture, "owner-study-demo.png"), fullPage: true });
         } else {
-          const r = await tab.goto(base + PAGE, { waitUntil: "networkidle" });
+          const r = await tab.goto(base + PAGE, { waitUntil: "load" });
           assert.equal(r?.status(), 404);
           assert.equal(await tab.getByText("Fictional case only").count(), 0);
         }
