@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p ${PORT:-10000}",
     "lint": "next lint",
-    "test": "npm run test:pk && npm run test:oracle && npm run test:horizon && npm run test:hmac && npm run test:baa && npm run test:cases && npm run test:safety-pattern && npm run test:predictive && npm run test:report-suite && npm run test:study-readiness && npm run test:market-intel && npm run test:timing && npm run test:dosing-history && npm run test:contact && npm run test:security-copy && npm run test:pediatric",
+    "test": "npm run test:pk && npm run test:oracle && npm run test:horizon && npm run test:hmac && npm run test:baa && npm run test:cases && npm run test:safety-pattern && npm run test:predictive && npm run test:report-suite && npm run test:study-readiness && npm run test:market-intel && npm run test:timing && npm run test:dosing-history && npm run test:contact && npm run test:security-copy && npm run test:pediatric && npm run test:study-hca",
     "test:pk": "node --import tsx src/lib/pk/__tests__/adultAutomaticDosePolicy.test.ts && node --import tsx src/lib/pk/__tests__/infusionSafety.test.ts && node --import tsx src/lib/pk/__tests__/existingRegimen.integration.test.ts && node --import tsx src/lib/pk/__tests__/initialRegimen.integration.test.ts && node --import tsx src/lib/pk/__tests__/credibleBand.test.ts && node --import tsx src/lib/pk/__tests__/loadingDose.test.ts",
     "test:report-suite": "node --import tsx src/lib/pk/__tests__/reportVerificationSuite.test.ts && node --import tsx src/lib/pk/__tests__/selectedRegimenReport.test.ts",
     "test:oracle": "node --import tsx src/lib/pk/__tests__/oracle/oracle.test.ts",
@@ -32,6 +32,9 @@
     "test:pediatric:synthetic": "node --import tsx scripts/pediatric/synthetic-performance.ts",
     "test:pediatric:http": "node scripts/pediatric/http-browser.mjs",
     "test:pediatric:coverage": "node --import tsx scripts/pediatric/coverage-diagnostics.ts",
+    "test:study-hca": "node --import tsx --test src/lib/studyTimed/__tests__/predictAtDraw.test.ts src/lib/studyTimed/__tests__/releaseOverlap.test.ts src/lib/studyDemo/__tests__/access.test.ts",
+    "test:study-hca:preview": "node --import tsx scripts/study-hca/preview-http.test.mts",
+    "package:study-hca": "node scripts/study-hca/package.mjs",
     "test:signin-navigation": "EXPECT_FIXED=1 node scripts/auth/signin-navigation.mjs",
     "test:admin-tier": "EXPECT_FIXED=1 node scripts/auth/admin-tier.mjs"
   },

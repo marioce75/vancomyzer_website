@@ -1,0 +1,182 @@
+{
+  "schema": "vancomyzer-hca-timed-draw",
+  "schema_version": 1,
+  "cases": [
+    {
+      "study_case_id": "FICT-A01",
+      "time_basis": "elapsed_hours",
+      "age_years": 58,
+      "weight_kg": 84,
+      "serum_creatinine_mg_dl": 0.9,
+      "scr_collected_at": -3,
+      "renal_replacement_therapy": false,
+      "history_complete_attested": true,
+      "draw_time": 11.5,
+      "doses": [
+        {
+          "start": 0,
+          "dose_mg": 1500,
+          "infusion_minutes": 90
+        },
+        {
+          "start": 12,
+          "dose_mg": 1250,
+          "infusion_minutes": 90
+        }
+      ]
+    },
+    {
+      "study_case_id": "FICT-A02",
+      "time_basis": "elapsed_hours",
+      "age_years": 71,
+      "weight_kg": 77,
+      "serum_creatinine_mg_dl": 1.2,
+      "scr_collected_at": -6,
+      "renal_replacement_therapy": false,
+      "history_complete_attested": true,
+      "draw_time": 47.5,
+      "doses": [
+        {
+          "start": 0,
+          "dose_mg": 2000,
+          "infusion_minutes": 120
+        },
+        {
+          "start": 12,
+          "dose_mg": 1000,
+          "infusion_minutes": 60
+        },
+        {
+          "start": 24,
+          "dose_mg": 1000,
+          "infusion_minutes": 60
+        },
+        {
+          "start": 36,
+          "dose_mg": 1000,
+          "infusion_minutes": 60
+        }
+      ]
+    },
+    {
+      "study_case_id": "FICT-A03",
+      "time_basis": "elapsed_hours",
+      "age_years": 46,
+      "weight_kg": 102,
+      "serum_creatinine_mg_dl": 1,
+      "scr_collected_at": -1.5,
+      "renal_replacement_therapy": false,
+      "history_complete_attested": true,
+      "draw_time": 39,
+      "doses": [
+        {
+          "start": 0,
+          "dose_mg": 1250,
+          "infusion_minutes": 90
+        },
+        {
+          "start": 12,
+          "dose_mg": 1250,
+          "infusion_minutes": 90
+        },
+        {
+          "start": 28,
+          "dose_mg": 1250,
+          "infusion_minutes": 90
+        }
+      ]
+    },
+    {
+      "study_case_id": "FICT-A04",
+      "time_basis": "elapsed_hours",
+      "age_years": 33,
+      "weight_kg": 68,
+      "serum_creatinine_mg_dl": 0.7,
+      "scr_collected_at": -2,
+      "renal_replacement_therapy": false,
+      "history_complete_attested": true,
+      "draw_time": 16.5,
+      "doses": [
+        {
+          "start": 0,
+          "dose_mg": 1000,
+          "infusion_minutes": 60
+        },
+        {
+          "start": 8,
+          "dose_mg": 1000,
+          "infusion_minutes": 60
+        },
+        {
+          "start": 16,
+          "dose_mg": 1000,
+          "infusion_minutes": 60
+        }
+      ]
+    },
+    {
+      "study_case_id": "FICT-A05",
+      "time_basis": "datetime",
+      "age_years": 64,
+      "weight_kg": 91,
+      "serum_creatinine_mg_dl": 1.4,
+      "scr_collected_at": "2030-11-02T18:10-05:00",
+      "renal_replacement_therapy": false,
+      "history_complete_attested": true,
+      "draw_time": "2030-11-03T19:30-06:00",
+      "doses": [
+        {
+          "start": "2030-11-02T20:00-05:00",
+          "dose_mg": 1750,
+          "end": "2030-11-02T22:00-05:00"
+        },
+        {
+          "start": "2030-11-03T08:00-06:00",
+          "dose_mg": 1250,
+          "infusion_minutes": 90
+        }
+      ]
+    },
+    {
+      "study_case_id": "FICT-R01",
+      "time_basis": "elapsed_hours",
+      "age_years": 52,
+      "weight_kg": 80,
+      "serum_creatinine_mg_dl": 1,
+      "scr_collected_at": -1,
+      "renal_replacement_therapy": false,
+      "history_complete_attested": true,
+      "draw_time": 11,
+      "doses": [
+        {
+          "start": 0,
+          "dose_mg": 1000,
+          "infusion_minutes": 60
+        },
+        {
+          "start": 0.5,
+          "dose_mg": 1000,
+          "infusion_minutes": 60
+        }
+      ]
+    },
+    {
+      "study_case_id": "FICT-R02",
+      "time_basis": "elapsed_hours",
+      "age_years": 60,
+      "weight_kg": 75,
+      "serum_creatinine_mg_dl": 4.2,
+      "scr_collected_at": -1,
+      "renal_replacement_therapy": true,
+      "history_complete_attested": true,
+      "draw_time": 20,
+      "doses": [
+        {
+          "start": 0,
+          "dose_mg": 1500,
+          "infusion_minutes": 90
+        }
+      ]
+    }
+  ]
+}

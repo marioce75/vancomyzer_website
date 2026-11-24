@@ -1,0 +1,8 @@
+study_case_id,status,draw_time,draw_elapsed_hours,predicted_concentration_mg_l,doses_used,warnings,reasons,release
+FICT-A01,predicted,11.5,11.5,9.472557501135597,1,DOSES_AFTER_DRAW_EXCLUDED: 1 dose(s) starting after the draw were excluded.,,"hca-timed-draw-1.0.0-research; calc feab091; model 2026-09-25.1 (Colin 2019 adult, article Eq. 6 / Table 3)"
+FICT-A02,predicted,47.5,47.5,23.566509112435668,4,,,"hca-timed-draw-1.0.0-research; calc feab091; model 2026-09-25.1 (Colin 2019 adult, article Eq. 6 / Table 3)"
+FICT-A03,predicted,39,39,11.565446561970571,3,,,"hca-timed-draw-1.0.0-research; calc feab091; model 2026-09-25.1 (Colin 2019 adult, article Eq. 6 / Table 3)"
+FICT-A04,predicted,16.5,16.5,21.93081113347474,3,INFUSION_IN_PROGRESS_AT_DRAW: Dose 3 was still infusing at the draw; only the 30 of 60 min infused before the draw is counted.,,"hca-timed-draw-1.0.0-research; calc feab091; model 2026-09-25.1 (Colin 2019 adult, article Eq. 6 / Table 3)"
+FICT-A05,predicted,2030-11-03T19:30-06:00,24.5,16.990761360150344,2,,,"hca-timed-draw-1.0.0-research; calc feab091; model 2026-09-25.1 (Colin 2019 adult, article Eq. 6 / Table 3)"
+FICT-R01,refused,11,,,0,,OVERLAPPING_INFUSIONS: Dose 2 starts before dose 1 has finished infusing; the record is ambiguous.,"hca-timed-draw-1.0.0-research; calc feab091; model 2026-09-25.1 (Colin 2019 adult, article Eq. 6 / Table 3)"
+FICT-R02,refused,20,,,0,,UNSUPPORTED_RRT: Renal replacement therapy is outside the Colin 2019 adult population; no prediction is made.,"hca-timed-draw-1.0.0-research; calc feab091; model 2026-09-25.1 (Colin 2019 adult, article Eq. 6 / Table 3)"

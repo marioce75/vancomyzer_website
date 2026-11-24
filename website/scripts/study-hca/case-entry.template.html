@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timed-draw case entry</title>
+<style>
+  :root { color-scheme: light; font-family: system-ui, -apple-system, Segoe UI, sans-serif; }
+  body { max-width: 900px; margin: 0 auto; padding: 16px; color: #111; background: #fff; }
+  .banner { border: 2px solid #b45309; background: #fffbeb; color: #78350f; font-weight: 700; text-align: center; padding: 10px; border-radius: 8px; }
+  fieldset { border: 1px solid #ccc; border-radius: 8px; margin: 12px 0; padding: 10px 12px; }
+  label { display: inline-block; margin: 4px 12px 4px 0; font-size: 14px; }
+  input, select { font: inherit; padding: 4px 6px; }
+  table { border-collapse: collapse; width: 100%; } td, th { padding: 4px; text-align: left; font-size: 14px; }
+  td input { width: 100%; box-sizing: border-box; }
+  button { font: inherit; padding: 6px 12px; margin: 4px 6px 4px 0; cursor: pointer; }
+  .big { font-size: 28px; font-weight: 700; margin: 4px 0; } .warn { color: #92400e; } .refused { color: #991b1b; } .small { font-size: 12px; color: #555; }
+  .hint { font-size: 13px; color: #444; }
+</style>
+</head>
+<body>
+<div class="banner">Fictional case only during development • Research use • Not for patient care • No dose recommendations</div>
+<h1>Timed-draw prediction: single case</h1>
+<p class="hint">Predicts the first vancomycin concentration at the actual draw time from characteristics at treatment start and the actual IV doses up to the draw. There is no field for a measured level and none may be entered. Nothing leaves this page; use "Save result" to write a CSV to a folder your institution authorizes. See FIELD_DICTIONARY.md.</p>
+<form id="form" autocomplete="off">
+  <fieldset><legend>Case</legend>
+    <label>Study case ID <input id="caseId" required pattern="[A-Za-z0-9][A-Za-z0-9_.\-]{0,63}" title="Study code only, never a medical record number"></label>
+    <label>Time basis <select id="basis"><option value="elapsed_hours">Elapsed hours</option><option value="datetime">Date-time with offset (e.g. 2030-01-05T08:00-06:00)</option></select></label>
+  </fieldset>
+  <fieldset><legend>At treatment start</legend>
+    <label>Age (years) <input id="age" type="number" step="any" required></label>
+    <label>Weight (kg) <input id="weight" type="number" step="any" required></label>
+    <label>Serum creatinine (mg/dL) <input id="scr" type="number" step="any" required></label>
+    <label>SCr collected at <input id="scrAt" required></label>
+    <label>Renal replacement therapy <select id="rrt" required><option value="">Select</option><option value="false">No</option><option value="true">Yes</option></select></label>
+  </fieldset>
+  <fieldset><legend>Actual IV doses (give infusion minutes OR end time)</legend>
+    <table id="doses"><thead><tr><th>Start</th><th>Dose (mg)</th><th>Infusion (min)</th><th>or End</th><th></th></tr></thead><tbody></tbody></table>
+    <button type="button" id="addDose">Add dose</button>
+    <p><label><input id="attest" type="checkbox"> Every vancomycin dose from the first dose up to the draw is listed with its actual times (including any loading dose).</label></p>
+  </fieldset>
+  <fieldset><legend>Draw</legend>
+    <label>Blood-draw time <input id="draw" required></label>
+  </fieldset>
+  <button type="submit">Predict</button>
+  <button type="button" id="save" disabled>Save result (CSV)</button>
+  <button type="button" id="clear">Clear</button>
+</form>
+<section id="result" aria-live="polite"></section>
+<p class="small" id="release"></p>
+<script>/*BUNDLE*/</script>
+</body>
+</html>

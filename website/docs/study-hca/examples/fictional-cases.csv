@@ -1,0 +1,8 @@
+study_case_id,time_basis,age_years,weight_kg,serum_creatinine_mg_dl,scr_collected_at,renal_replacement_therapy,history_complete_attested,draw_time
+FICT-A01,elapsed_hours,58,84,0.9,-3,false,true,11.5
+FICT-A02,elapsed_hours,71,77,1.2,-6,false,true,47.5
+FICT-A03,elapsed_hours,46,102,1,-1.5,false,true,39
+FICT-A04,elapsed_hours,33,68,0.7,-2,false,true,16.5
+FICT-A05,datetime,64,91,1.4,2030-11-02T18:10-05:00,false,true,2030-11-03T19:30-06:00
+FICT-R01,elapsed_hours,52,80,1,-1,false,true,11
+FICT-R02,elapsed_hours,60,75,4.2,-1,true,true,20

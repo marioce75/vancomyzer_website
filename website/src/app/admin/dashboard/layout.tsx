@@ -4,7 +4,7 @@ import { LocalizedText } from "@/localization/LanguageProvider";
 import { LocalizedButton } from "@/localization/LocalizedElements";
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -31,6 +31,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { data: session } = useSession();
   const username = (session?.user as Record<string, unknown> | undefined)?.username as string | undefined;
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // "Study demo" appears only when the server confirms the owner; everyone else gets a 404 and no entry.
+  const [showStudyDemo, setShowStudyDemo] = useState(false);
+  useEffect(() => {
+    let live = true;
+    fetch("/api/admin/study-demo", { cache: "no-store" })
+      .then((r) => { if (live) setShowStudyDemo(r.ok); })
+      .catch(() => {});
+    return () => { live = false; };
+  }, []);
+  const visibleNavItems = showStudyDemo
+    ? [...navItems.slice(0, navItems.findIndex((i) => i.href === "/admin/dashboard/research")), { label: "Study demo", href: "/admin/dashboard/study-demo", icon: "🧾" }, ...navItems.slice(navItems.findIndex((i) => i.href === "/admin/dashboard/research"))]
+    : navItems;
 
   const isActive = (href: string) => {
     if (href === "/admin/dashboard") return pathname === "/admin/dashboard";
@@ -50,7 +62,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         )}
         <nav className="flex flex-col gap-0.5 px-3">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
