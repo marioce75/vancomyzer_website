@@ -1,3 +1,4 @@
+import { EMPIRIC_PROFILE_HOLD, EMPIRIC_PROFILE_TITLE, EMPIRIC_PROFILE_MESSAGE, EMPIRIC_PROFILE_OPTIONS, EMPIRIC_PROFILE_ACTION, EMPIRIC_PROFILE_LIMIT, EMPIRIC_PROFILE_NO_EXPOSURE, shouldHoldEmpiricProfile } from "./empiricReview";
 import { validateRawInput } from "./pk/validate/validateRawInput";
 /**
  * First-pass initial regimen calculation for Vancomyzer.
@@ -52,7 +53,7 @@ export interface InitialRegimenResult {
   auc24: number;
   peak: number;
   trough: number;
-  auc_range_status: AucRangeStatus;
+  auc_range_status?: AucRangeStatus;
   arc_advisory?: ArcAdvisory;
   recommended_dose: string;
   recommended_interval_hours: number;
@@ -96,13 +97,7 @@ export interface InitialRegimenResult {
    * silent 2000mg q8h fallback emitted catastrophically wrong regimens for
    * patients with severe renal impairment.
    */
-  empiric_dosing_blocked?: {
-    review_required?: boolean;
-    reason: string;
-    recommended_pulse_dose_mg: number;
-    safety_message: string;
-    estimated_cl_l_h: number;
-  };
+  empiric_dosing_blocked?: import("@/types/calculator").CalculateResponse["empiric_dosing_blocked"];
 }
 
 const TARGET_AUC24_LOW = 400;
@@ -388,6 +383,10 @@ export function computeInitialRegimen(
       infusion_duration_hours: DEFAULT_INFUSION_HOURS,
     }
   );
+
+  // Bypass the search and the loading/pulse helper entirely. The model uses
+  // measured SCr as entered; clearance is returned for review context only.
+  if (shouldHoldEmpiricProfile(patient)) return buildEmpiricProfileResult(patient, prior);
 
   const { best: choice, candidates } = chooseInitialCandidate(prior.CL, prior.V1, prior.Q, prior.V2, prior.scr, patient.weight_kg, policy);
   const loadingDose = buildEmpiricLoadingDose({ actual_body_weight_kg: patient.weight_kg, policy });
@@ -784,4 +783,41 @@ function buildEmpiricReviewResult(args: Parameters<typeof buildEmpiricRefusalRes
     recommended_pulse_dose_mg: 0, estimated_cl_l_h: Math.round(args.prior.CL * 100) / 100,
   };
   return result;
+}
+
+/** Review only; neither candidate search nor loading/ARC fallback ran. Numeric
+ * zeros are the existing blocked-response sentinels, not calculated exposures. */
+function buildEmpiricProfileResult(patient: Patient, prior: ReturnType<typeof buildPriorParameters>): InitialRegimenResult {
+  const lines = [EMPIRIC_PROFILE_TITLE, EMPIRIC_PROFILE_MESSAGE, EMPIRIC_PROFILE_OPTIONS, EMPIRIC_PROFILE_ACTION, EMPIRIC_PROFILE_LIMIT];
+  const summary = lines.join("\n");
+  return {
+    recommendation_type: "initial_regimen",
+    auc24: 0, peak: 0, trough: 0,
+    recommended_dose: "", recommended_interval_hours: 0, recommended_infusion_duration_hours: 0,
+    interpretation_summary: EMPIRIC_PROFILE_MESSAGE,
+    assumptions: [], limitations: [EMPIRIC_PROFILE_LIMIT, EMPIRIC_PROFILE_NO_EXPOSURE],
+    curve: [], measured_levels: [], frequency_options: [],
+    calculation_details: {
+      method: EMPIRIC_PROFILE_TITLE,
+      evidence_strength: EMPIRIC_PROFILE_LIMIT,
+      data_quality_summary: EMPIRIC_PROFILE_MESSAGE,
+      key_inputs: [], caution_flags: [EMPIRIC_PROFILE_NO_EXPOSURE],
+      review_status: {
+        level: "caution", workflow_fit: "prior_only",
+        banner_title: EMPIRIC_PROFILE_TITLE, banner_body: EMPIRIC_PROFILE_MESSAGE,
+        next_actions: [EMPIRIC_PROFILE_ACTION],
+      },
+    },
+    documentation_preview: { quick_summary: summary, clinical_note: summary },
+    pk_parameters: {
+      CL: prior.CL, V1: prior.V1, Q: prior.Q, V2: prior.V2, used_posterior_refinement: false,
+      scr: patient.serum_creatinine_mg_dl, age: patient.age, weight_kg: patient.weight_kg,
+      pk_model_name: prior.model_name,
+    },
+    empiric_dosing_blocked: {
+      reason_code: EMPIRIC_PROFILE_HOLD, review_required: true,
+      reason: EMPIRIC_PROFILE_MESSAGE, safety_message: EMPIRIC_PROFILE_MESSAGE,
+      recommended_pulse_dose_mg: 0, estimated_cl_l_h: prior.CL,
+    },
+  };
 }

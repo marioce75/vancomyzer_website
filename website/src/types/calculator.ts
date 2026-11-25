@@ -231,6 +231,7 @@ export interface CalculateResponse {
    */
   empiric_dosing_blocked?: {
     review_required?: boolean;
+    reason_code?: "older_low_scr_severe_obesity";
     reason: string;
     recommended_pulse_dose_mg: number;
     safety_message: string;

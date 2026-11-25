@@ -21,6 +21,7 @@ interface PatientCharacteristicsFormProps {
   onRrtChange?: (rrt: boolean) => void;
   rrt?: boolean | null;
   bedbound: boolean;
+  suppressEmpiricObesityAdvice?: boolean;
   onBedboundChange: (val: boolean) => void;
   onBedboundLoadingDoseChange?: (data: BedboundDoseData | null) => void;
   /**
@@ -63,6 +64,7 @@ export default function PatientCharacteristicsForm({
   onRrtChange,
   rrt = null,
   bedbound,
+  suppressEmpiricObesityAdvice = false,
   onBedboundChange,
   onBedboundLoadingDoseChange,
   estimatedCrCl = null,
@@ -225,7 +227,7 @@ export default function PatientCharacteristicsForm({
             {unitsImplausible && (
               <p className="text-xs text-amber-700 font-medium" role="status"><LocalizedText text="⚠ Check units — weight in kg, height in cm" /></p>
             )}
-            {isHighBmi && (
+            {isHighBmi && !suppressEmpiricObesityAdvice && (
               <ObesityAdvisoryPanel
                 bmi={bmi}
                 sex={sex}

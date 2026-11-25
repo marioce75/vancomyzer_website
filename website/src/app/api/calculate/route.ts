@@ -1,3 +1,5 @@
+import { shouldHoldEmpiricProfile } from "@/lib/empiricReview";
+import type { CalculateRequestPatient } from "@/types/calculator";
 import { validateRawInput } from "@/lib/pk/validate/validateRawInput";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
@@ -253,7 +255,11 @@ export async function POST(request: NextRequest) {
 
   const inputs = extractInputs(validated.data, validated.mode);
 
-  if (validated.mode === "initial_regimen") {
+  // A direct request cannot obtain the loading/pulse preview by changing
+  // modes: this review rule applies to any validated zero-level request.
+  const noLevels = !Array.isArray(validated.data.levels) || validated.data.levels.length === 0;
+  const noLevelProfile = noLevels && shouldHoldEmpiricProfile(validated.data.patient as CalculateRequestPatient);
+  if (validated.mode === "initial_regimen" || noLevelProfile) {
     const p = validated.data.patient as Record<string, unknown>;
     const patient = {
       age: p.age as number,
@@ -307,7 +313,7 @@ export async function POST(request: NextRequest) {
       pk_parameters: extractPKParams(result),
     });
 
-    result.result_snapshot = buildResultSnapshot("initial_regimen", validated.data);
+    result.result_snapshot = buildResultSnapshot(validated.mode, validated.data);
     return calculationResponse(result);
   }
 

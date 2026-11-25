@@ -1,3 +1,4 @@
+import { shouldHoldEmpiricProfile } from "@/lib/empiricReview";
 import type { CalculateRequest } from "@/types/calculator";
 import { computeInitialRegimen, InitialRegimenInputError } from "@/lib/initialRegimen";
 import { validateRawInput } from "@/lib/pk/validate/validateRawInput";
@@ -12,7 +13,7 @@ export function calculateClassicInBrowser(request: CalculateRequest): Response {
   const input: CalculateRequest = JSON.parse(JSON.stringify(request));
   const errors = validateRawInput(input, input.mode !== "initial_regimen");
   if (Object.keys(errors).length) return fail("Invalid or unsupported inputs.", errors);
-  if (input.mode === "initial_regimen") {
+  if (input.mode === "initial_regimen" || ((input.levels?.length ?? 0) === 0 && shouldHoldEmpiricProfile(input.patient))) {
     try {
       return Response.json(computeInitialRegimen(input.patient));
     } catch (e) {
