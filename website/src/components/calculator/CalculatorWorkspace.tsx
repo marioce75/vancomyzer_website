@@ -1,4 +1,5 @@
 "use client";
+import { EMPIRIC_PROFILE_NO_EXPOSURE, isEmpiricProfileHold, shouldHoldEmpiricProfile } from "@/lib/empiricReview";
 import { isCalculationCompletion } from "@/lib/calculation-analytics";
 import { LocalizedSpan, LocalizedSection, LocalizedAside, LocalizedButton } from "@/localization/LocalizedElements";
 
@@ -577,7 +578,10 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
   const fieldErrors = getModeScopedFieldErrors(mode, error?.field_errors);
   const handleSwitchToInitialRegimen = useCallback(() => applyViewMode("empiric"), [applyViewMode]);
 
-  const hasStaleResult = Boolean(result && (!resultIsCurrent(resultRevision, inputRevision) || invalidTiming));
+  const shouldHoldDraft = shouldHoldEmpiricProfile(patient)
+    && (mode === "initial_regimen" || !levels.some(isEnteredLevel));
+  const hasStaleResult = Boolean(result && (!resultIsCurrent(resultRevision, inputRevision) || invalidTiming
+    || (shouldHoldDraft && !isEmpiricProfileHold(result))));
   const visibleResult = hasStaleResult ? null : result;
 
   // Single source of truth: the currently active frequency option.
@@ -667,12 +671,14 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
   // Layout continuity: while inputs are stale or the model is running, keep
   // the last result mounted (obscured and non-interactive) instead of
   // unmounting it, so the workspace never jumps during recalculation.
-  const displayResult = visibleResult ?? ((loading || hasStaleResult) ? result : null);
+  // Never mount a stale actionable result while a newly held draft awaits recalculation.
+  const displayResult = visibleResult ?? (!shouldHoldDraft && (loading || hasStaleResult) ? result : null);
+  const profileHold = isEmpiricProfileHold(displayResult);
   const resultObscured = displayResult != null && visibleResult == null;
   const autoRecalcArmed = mode === "initial_regimen" && patientReady && rrt === false;
 
   const handleApplyRecommendedRegimen = useCallback(() => {
-    if (!result?.recommended_dose || !result?.recommended_interval_hours) return;
+    if (shouldHoldDraft || isEmpiricProfileHold(result) || !result?.recommended_dose || !result?.recommended_interval_hours) return;
     const dose = Number.parseFloat(result.recommended_dose);
     if (!Number.isFinite(dose) || dose <= 0) return;
     setRegimen((current) => ({
@@ -683,7 +689,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
         result.recommended_infusion_duration_hours ??
         (current.infusion_duration_hours > 0 ? current.infusion_duration_hours : dose >= 1250 ? 1.5 : 1),
     }));
-  }, [result]);
+  }, [result, shouldHoldDraft]);
 
   const handleSelectFrequency = useCallback((option: FrequencyOption | null) => {
     // Only update the visual display — do NOT touch regimen state, which would
@@ -693,6 +699,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
   }, []);
 
   const handleSimulateLoadingDose = useCallback((doseMg: number, intervalHours: number, infusionHours: number) => {
+    if (shouldHoldDraft || isEmpiricProfileHold(result)) return;
     // Snapshot current state so we can undo back to initial regimen results
     preLoadingDoseState.current = {
       viewMode,
@@ -721,7 +728,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
     setResult(null);
     setError(null);
     pendingLoadingDoseCalc.current = true;
-  }, [viewMode, mode, regimen, levels, result, selectedFrequencyOption]);
+  }, [viewMode, mode, regimen, levels, result, selectedFrequencyOption, shouldHoldDraft]);
 
   const handleUndoLoadingDose = useCallback(() => {
     const snap = preLoadingDoseState.current;
@@ -766,6 +773,21 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
     setActiveSection("regimen");
   }, []);
 
+  // If the inputs change into the review profile while a previous preview is
+  // open, discard that preview and resume the ordinary empiric calculation.
+  useEffect(() => {
+    if (!loadingPreview || !shouldHoldDraft) return;
+    const snapshot = preLoadingDoseState.current;
+    preLoadingDoseState.current = null;
+    pendingLoadingDoseCalc.current = false;
+    setLoadingPreview(false);
+    setMode("initial_regimen");
+    if (snapshot) { setRegimen(snapshot.regimen); setLevels(snapshot.levels); }
+    setResult(null);
+    setResultRevision(null);
+    setSelectedFrequencyOption(null);
+  }, [loadingPreview, shouldHoldDraft]);
+
   // Auto-trigger calculation after loading dose state is set
   useEffect(() => {
     if (pendingLoadingDoseCalc.current && mode === "existing_regimen" && regimen.doses_given === 1) {
@@ -776,7 +798,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
 
   const handleCopyNote = useCallback(() => {
     if (ownerManualDemo || loadingPreview) return; // demo exports are not permitted
-    if (!visibleResult || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
+    if (!visibleResult || isEmpiricProfileHold(visibleResult) || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
     const { note } = composeNote(visibleResult);
     if (!note) return;
     navigator.clipboard.writeText(translateGeneratedText(note, locale)).catch(() => {/* clipboard not available */});
@@ -785,7 +807,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
 
   const handleExportPDF = useCallback(() => {
     if (ownerManualDemo || loadingPreview) return; // demo exports are not permitted
-    if (!visibleResult || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
+    if (!visibleResult || isEmpiricProfileHold(visibleResult) || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
     // One builder for the whole report (exportReport.ts): a proposed regimen's
     // dose, interval, infusion duration and exposure all come from one
     // candidate row of this response, or the report shows the history as entered.
@@ -826,6 +848,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
               }
             }}
             bedbound={bedbound}
+            suppressEmpiricObesityAdvice={shouldHoldDraft}
             onBedboundChange={(val) => {
               setBedbound(val);
               if (!val) setBedboundDoseData(null);
@@ -833,6 +856,9 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
             onBedboundLoadingDoseChange={setBedboundDoseData}
             estimatedCrCl={estimatedCrCl}
           />
+          {viewMode === "empiric" && patient.age >= 65 && patient.serum_creatinine_mg_dl > 0 && patient.serum_creatinine_mg_dl < 0.4 && !patient.height_cm && (
+            <p className="mt-1 text-xs" role="status"><LocalizedText text="Height is missing, so the BMI-based empiric review check could not run. Enter a measured height if available." /></p>
+          )}
         </InputSection>
 
         {/* Regimen — only in existing_regimen mode */}
@@ -954,7 +980,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
   const clinicalNote = translateGeneratedText(displayResult ? composeNote(displayResult).note : "", locale);
   // A suggested loading dose was never given: no clinical note or PDF can be
   // produced from the preview. Exports come back once the dose given is recorded.
-  const exportsDisabled = resultObscured || !visibleResult || loadingPreview;
+  const exportsDisabled = resultObscured || !visibleResult || loadingPreview || profileHold;
 
   const advisories: ReactNode[] = [];
   if (displayResult?.review_hold) {
@@ -1001,7 +1027,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
     );
   }
   const priorOnlyEmpiric = viewMode === "empiric" && displayResult?.calculation_details?.review_status.level === "prior_only";
-  if (displayResult?.calculation_details && !priorOnlyEmpiric) {
+  if (displayResult?.calculation_details && !priorOnlyEmpiric && !profileHold) {
     const rs = displayResult.calculation_details.review_status;
     const sev = rs.level === "supported" ? "success" : rs.level === "caution" ? "caution" : "info";
     // One measured level: say plainly what "limited certainty" means. Wording
@@ -1128,7 +1154,9 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
       })
     : null;
 
-  const detailTabs = displayResult ? [
+  const detailTabs = profileHold ? [{
+    id: "note", label: "Note", content: <pre className="m-0 whitespace-pre-wrap text-xs">{translateGeneratedText(clinicalNote, locale)}</pre>,
+  }] : displayResult ? [
     {
       id: "pk",
       label: "Drug handling",
@@ -1237,7 +1265,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
           <div className="vz-panel-head">
             <div className="flex min-w-0 items-center gap-2">
               <h2 id="vz-band-title" className="vz-panel-title m-0">
-                <LocalizedText text={displayResult?.recommendation_type === "existing_regimen" && !loadingPreview ? "Dosing adjustment" : "Dosing recommendation"} />
+                <LocalizedText text={profileHold ? "Review required" : displayResult?.recommendation_type === "existing_regimen" && !loadingPreview ? "Dosing adjustment" : "Dosing recommendation"} />
               </h2>
               {displayResult && (
                 <span className="hidden md:inline">
@@ -1257,7 +1285,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
               )}
             </div>
             <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-              {displayResult && (
+              {displayResult && !profileHold && (
                 <div className={exportsDisabled ? "pointer-events-none opacity-40" : ""} aria-disabled={exportsDisabled}>
                   <div className="flex flex-wrap items-center gap-1.5">
                     {/* Loading-dose preview is an Empiric-tab tool; on the level tabs a loading dose is entered as given in the dosing history. */}
@@ -1331,6 +1359,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
                     onUndoLoadingDose={loadingPreview ? handleUndoLoadingDose : undefined}
                     onConfirmLoadingDoseGiven={loadingPreview ? handleConfirmLoadingDoseGiven : null}
                     empiricDosingBlocked={displayResult.empiric_dosing_blocked}
+                    measuredScrMgDl={displayResult.pk_parameters?.scr}
                     adjustmentDosingBlocked={displayResult.adjustment_dosing_blocked}
                     metricsSlot={
                       <div className="flex-[1.4] min-w-[300px]">
@@ -1338,13 +1367,13 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
                       </div>
                     }
                   />
-                  <TeachingNote label="Why this dose?">
+                  {!profileHold && <TeachingNote label="Why this dose?">
                     {displayResult.recommendation_type === "existing_regimen" ? (
                       <><LocalizedText text="When the level data support an individualized fit, the calculator compares doses of 500–2000 mg in 250 mg increments at q6h, q8h, q12h, q18h, q24h, q36h or q48h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target. With sparse or weak level data (for example, a single level or a poor fit) it instead scales the current dose toward that midpoint at the current interval, within the same safety limits. Automatic adult maintenance suggestions exclude 250 mg doses by product policy; if no supported regimen meets the constraints and AUC target, pharmacy review is required." /></>
                     ) : (
                       <><LocalizedText text="The calculator compares doses of 500–2000 mg at q6h, q8h, q12h or q24h, discards candidates whose predicted peak, trough or AUC₂₄ exceed the safety limits, and picks the one whose predicted steady-state AUC₂₄ lands closest to the midpoint of the 400–600 target." /></>
-                    )}{" "}<LocalizedText text="Peak and trough are forward-predicted from the patient’s posterior PK (or population prior if no level is fit) using the two-compartment model. The recommendation always favors options that stay within target rather than ones that hit midpoint exactly outside the window." /></TeachingNote>
-                  {advisories.length > 0 && <div className="flex flex-col gap-1.5">{advisories}</div>}
+                    )}{" "}<LocalizedText text="Peak and trough are forward-predicted from the patient’s posterior PK (or population prior if no level is fit) using the two-compartment model. The recommendation always favors options that stay within target rather than ones that hit midpoint exactly outside the window." /></TeachingNote>}
+                  {!profileHold && advisories.length > 0 && <div className="flex flex-col gap-1.5">{advisories}</div>}
                 </div>
               ) : (
                 /* ── Empty state: zeroed band mirroring the populated layout ── */
@@ -1412,7 +1441,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
         <LocalizedSection className={`vz-area-graph vz-panel flex flex-col ${!manualActive && resultObscured ? "vz-obscured" : ""}`} aria-label="Concentration-time graph panel">
           {manualActive ? (
             <div className="flex min-h-0 flex-1 flex-col p-2">
-              {displayResult && !resultObscured && (
+              {displayResult && !resultObscured && !profileHold && (
                 <p role="note" className="m-0 mb-2 rounded border border-[var(--color-border)] px-2 py-1.5 text-xs">
                   AUC, peak and trough above are for the classic regimen, not this manual dose history.
                 </p>
@@ -1427,6 +1456,8 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
               />
               <p className="m-0 px-1 py-2 text-xs">Fictional research preview only. This graph is separate from the classic recommendations above.</p>
             </div>
+          ) : profileHold || shouldHoldDraft ? (
+            <div className="p-3 text-xs" role="status"><LocalizedText text={EMPIRIC_PROFILE_NO_EXPOSURE} /></div>
           ) : <>
           {isPulse && displayResult?.adjustment_dosing_blocked && (loadingPreview ? (
             // A suggested dose in the Empiric preview was not given, so it is not "recorded".
@@ -1462,7 +1493,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
           <section className={`vz-panel shrink-0 ${resultObscured ? "vz-obscured" : ""}`} aria-labelledby="vz-alt-title">
             <div className="vz-panel-head">
               <h2 id="vz-alt-title" className="vz-panel-title m-0"><LocalizedText text="Candidate regimens" /></h2>
-              {!manualActive && displayResult && (
+              {!manualActive && displayResult && !profileHold && (
                 <span className="text-[10px]" style={{ color: "var(--color-dim)" }}><LocalizedText text="select a row to preview" /></span>
               )}
             </div>

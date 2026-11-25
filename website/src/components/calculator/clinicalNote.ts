@@ -1,3 +1,4 @@
+import { EMPIRIC_PROFILE_MESSAGE, isEmpiricProfileHold } from "@/lib/empiricReview";
 /**
  * Clinical note and PDF exposure summary for the level workflows.
  *
@@ -108,6 +109,7 @@ type ResponseFields = Pick<
   | "recommended_dose"
   | "recommended_interval_hours"
   | "recommended_infusion_duration_hours"
+  | "empiric_dosing_blocked"
   | "adjustment_dosing_blocked"
   | "review_hold"
   | "frequency_options"
@@ -440,6 +442,9 @@ export interface ClinicalNoteInput {
 
 /** The note for the active row. Empiric results keep the engine's note untouched. */
 export function buildClinicalNote(input: ClinicalNoteInput): { summary: ExposureSummary | null; note: string } {
+  if (isEmpiricProfileHold(input.response)) {
+    return { summary: null, note: input.response.documentation_preview?.clinical_note ?? EMPIRIC_PROFILE_MESSAGE };
+  }
   if (input.response.recommendation_type !== "existing_regimen") {
     return { summary: null, note: input.activeOption?.clinical_note ?? input.response.documentation_preview?.clinical_note ?? "" };
   }

@@ -1,3 +1,4 @@
+import { EMPIRIC_PROFILE_MESSAGE, isEmpiricProfileHold } from "@/lib/empiricReview";
 /**
  * The data behind the PDF report, built in one place from the result and the
  * row selected on screen.
@@ -42,6 +43,17 @@ export function buildReportData(sel: ReportSelection): ReportData {
     singleDoseStatus: sel.singleDoseStatus,
     levels,
   });
+
+  // Shell exports are unavailable for this profile. This guard also ensures a
+  // direct report builder caller cannot use a stale selected regimen.
+  if (isEmpiricProfileHold(response)) {
+    return {
+      age: patient.age, weight_kg: patient.weight_kg, serum_creatinine_mg_dl: patient.serum_creatinine_mg_dl,
+      mode: "initial_regimen", recommendation_blocked: EMPIRIC_PROFILE_MESSAGE,
+      recommended_dose: "", recommended_interval_hours: 0, auc24: 0, peak: 0, trough: 0, clinical_note: note,
+      frequency_options: [],
+    };
+  }
 
   // Level workflows: the candidate row of this response, or the history as
   // entered. Empiric results have no entered history: the active option, else

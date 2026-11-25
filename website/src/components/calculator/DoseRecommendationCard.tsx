@@ -1,5 +1,6 @@
 "use client";
-import { LocalizedText } from "@/localization/LanguageProvider";
+import { EMPIRIC_PROFILE_HOLD, EMPIRIC_PROFILE_TITLE, EMPIRIC_PROFILE_OPTIONS, EMPIRIC_PROFILE_ACTION, EMPIRIC_PROFILE_LIMIT, EMPIRIC_PROFILE_SCR, EMPIRIC_PROFILE_CL } from "@/lib/empiricReview";
+import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
 
 import { LocalizedDiv } from "@/localization/LocalizedElements";
 
@@ -53,13 +54,8 @@ interface DoseRecommendationCardProps {
   /** Which row that curve belongs to (defaults from activeIsCurrent); "none" when no regimen is selected or proposed. */
   singleDoseView?: SingleDoseView;
   /** When set, replaces the standard dose card with a pulse-dose safety state. */
-  empiricDosingBlocked?: {
-    review_required?: boolean;
-    reason: string;
-    recommended_pulse_dose_mg: number;
-    safety_message: string;
-    estimated_cl_l_h: number;
-  } | null;
+  empiricDosingBlocked?: import("@/types/calculator").CalculateResponse["empiric_dosing_blocked"] | null;
+  measuredScrMgDl?: number;
   /** When set, replaces the standard dose card with a hold-and-recheck safety state. */
   adjustmentDosingBlocked?: {
     review_required?: boolean;
@@ -410,6 +406,7 @@ export default function DoseRecommendationCard({
   curveDescription,
   singleDoseView,
   empiricDosingBlocked,
+  measuredScrMgDl,
   adjustmentDosingBlocked,
   activeOption,
   activeIsCurrent = false,
@@ -443,6 +440,9 @@ export default function DoseRecommendationCard({
   //     for the patient (severe AKI, etc.)  pulse-then-level workflow
   //   - adjustment_dosing_blocked: existing patient on too-aggressive
   //     regimen, no safe adjustment exists  hold + recheck level
+  if (empiricDosingBlocked?.reason_code === EMPIRIC_PROFILE_HOLD) {
+    return <EmpiricProfileReviewCard data={empiricDosingBlocked} measuredScrMgDl={measuredScrMgDl} />;
+  }
   if (empiricDosingBlocked?.review_required || adjustmentDosingBlocked?.review_required) {
     const blocked = empiricDosingBlocked?.review_required ? empiricDosingBlocked : adjustmentDosingBlocked!;
     return <div role="alert" className="border-l-4 border-amber-600 bg-amber-50 p-4"><strong><LocalizedText text="Pharmacy review required — no automatic maintenance regimen" /></strong><p className="mt-2 text-sm"><LocalizedText text={blocked.safety_message} /></p></div>;
@@ -752,6 +752,26 @@ function AdjustmentDosingBlockedCard({
         </div>
       </div>
       <p className="text-[11px]" style={{ color: "#7f1d1d" }}><LocalizedText text="This is decision-support output only. Holding maintenance dosing is the calculator's safety recommendation when no acceptable dose-down or interval-extension exists in its search grid; clinical context (infection severity, hemodynamics, institutional protocol) remains the clinician's judgment." /></p>
+    </div>
+  );
+}
+
+
+function EmpiricProfileReviewCard({ data, measuredScrMgDl }: {
+  data: NonNullable<DoseRecommendationCardProps["empiricDosingBlocked"]>; measuredScrMgDl?: number;
+}) {
+  const { locale } = useLanguage();
+  const clearance = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(data.estimated_cl_l_h);
+  const scr = measuredScrMgDl == null ? null : new Intl.NumberFormat(locale, { maximumSignificantDigits: 15 }).format(measuredScrMgDl);
+  return (
+    <div role="alert" aria-labelledby="empiric-profile-review-title" className="border-l-4 border-amber-600 bg-amber-50 p-4">
+      <h3 id="empiric-profile-review-title" className="m-0 text-sm font-bold text-amber-950"><LocalizedText text={EMPIRIC_PROFILE_TITLE} /></h3>
+      <p className="mt-2 text-sm text-amber-950"><LocalizedText text={data.safety_message} />{" "}<LocalizedText text={EMPIRIC_PROFILE_OPTIONS} /></p>
+      <dl className="my-2 text-xs text-amber-950">
+        {scr != null && <div><dt className="mr-2 inline"><LocalizedText text={EMPIRIC_PROFILE_SCR} /></dt><dd className="inline font-semibold">{scr} mg/dL</dd></div>}
+        <div><dt className="mr-2 inline"><LocalizedText text={EMPIRIC_PROFILE_CL} /></dt><dd className="inline font-semibold">{clearance} L/h</dd></div>
+      </dl>
+      <p className="mt-2 text-xs text-amber-950"><LocalizedText text={EMPIRIC_PROFILE_ACTION} />{" "}<LocalizedText text={EMPIRIC_PROFILE_LIMIT} /></p>
     </div>
   );
 }

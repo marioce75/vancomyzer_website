@@ -8604,6 +8604,56 @@
     "fr": "Après la dose isolée, prélever une concentration (habituellement à 24–48 h selon la demi-vie estimée) et utiliser l’onglet 1 concentration pour calculer le moment de la nouvelle dose guidé par les concentrations.",
     "pt-BR": "Após a dose de pulso, desenhe um nível (normalmente 24-48 h, dependendo da semi-vida estimada) e use a guia de 1 nível para calcular o tempo de refazer guiado pelo nível."
   },
+  "Renal estimate uncertain: review required": {
+    "es": "Estimación de la función renal incierta: se requiere revisión",
+    "fr": "Estimation de la fonction rénale incertaine : réévaluation nécessaire",
+    "pt-BR": "Estimativa da função renal incerta: é necessária revisão"
+  },
+  "Older age, very low measured serum creatinine and severe obesity are combined here. The creatinine-based estimate may overstate clearance.": {
+    "es": "En este caso coinciden la edad avanzada, una creatinina sérica medida muy baja y la obesidad grave. La estimación basada en la creatinina puede sobrestimar el aclaramiento.",
+    "fr": "Ce cas associe un âge avancé, une créatininémie mesurée très basse et une obésité sévère. L’estimation fondée sur la créatinine peut surestimer la clairance.",
+    "pt-BR": "Neste caso, há idade avançada, creatinina sérica medida muito baixa e obesidade grave. A estimativa baseada na creatinina pode superestimar a depuração."
+  },
+  "Colin 2019 clearance (review only)": {
+    "es": "Aclaramiento según Colin 2019 (solo para revisión)",
+    "fr": "Clairance selon Colin 2019 (pour réévaluation uniquement)",
+    "pt-BR": "Depuração pelo modelo de Colin 2019 (apenas para avaliação)"
+  },
+  "No scheduled, loading or pulse dose is suggested.": {
+    "es": "No se sugiere ninguna dosis programada, de carga ni aislada.",
+    "fr": "Aucune dose programmée, de charge ou isolée n’est proposée.",
+    "pt-BR": "Não é sugerida nenhuma dose programada, de ataque ou em pulso."
+  },
+  "Verify the measured creatinine and renal trend with pharmacy before selecting a regimen. Follow your institutional protocol and consider early therapeutic monitoring when appropriate.": {
+    "es": "Antes de seleccionar una pauta, confirme con el equipo de farmacia la creatinina medida y la evolución de la función renal. Siga el protocolo de su institución y considere la monitorización terapéutica temprana cuando corresponda.",
+    "fr": "Avant de choisir un schéma posologique, vérifiez avec l’équipe de pharmacie la créatininémie mesurée et l’évolution de la fonction rénale. Suivez le protocole de votre établissement et envisagez un suivi thérapeutique pharmacologique précoce si cela est indiqué.",
+    "pt-BR": "Antes de selecionar um esquema posológico, confirme com a equipe de farmácia a creatinina medida e a evolução da função renal. Siga o protocolo da sua instituição e considere o monitoramento terapêutico precoce quando apropriado."
+  },
+  "This is a conservative product safeguard, not a validated clinical cutoff.": {
+    "es": "Esta es una medida de seguridad conservadora del producto, no un umbral clínico validado.",
+    "fr": "Il s’agit d’une mesure de sécurité prudente du produit, et non d’un seuil clinique validé.",
+    "pt-BR": "Esta é uma medida conservadora de segurança do produto, não um ponto de corte clínico validado."
+  },
+  "No regimen exposure or concentration curve is provided for this review-only case.": {
+    "es": "En este caso, que requiere revisión, no se proporciona ninguna estimación de la exposición asociada a una pauta ni una curva de concentración.",
+    "fr": "Pour ce cas qui nécessite une réévaluation, aucune estimation de l’exposition liée à un schéma posologique ni aucune courbe de concentration n’est fournie.",
+    "pt-BR": "Não é apresentada nenhuma estimativa de exposição associada ao esquema nem curva de concentração para este caso, que requer avaliação."
+  },
+  "Measured serum creatinine (as entered)": {
+    "es": "Creatinina sérica medida (valor introducido)",
+    "fr": "Créatininémie mesurée (valeur saisie)",
+    "pt-BR": "Creatinina sérica medida (valor informado)"
+  },
+  "Height is missing, so the BMI-based empiric review check could not run. Enter a measured height if available.": {
+    "es": "Falta la estatura, por lo que no se pudo realizar la comprobación basada en el IMC para la revisión de la pauta empírica. Si dispone de una estatura medida, introdúzcala.",
+    "fr": "La taille n’a pas été renseignée. Le contrôle du schéma empirique fondé sur l’IMC n’a donc pas pu être effectué. Saisissez la taille mesurée si elle est disponible.",
+    "pt-BR": "A altura não foi informada, por isso não foi possível realizar a verificação baseada no IMC para a revisão do esquema empírico. Informe a altura medida, se disponível."
+  },
+  "No empiric regimen to plot.": {
+    "es": "No hay una pauta empírica que se pueda representar en la gráfica.",
+    "fr": "Aucun schéma posologique empirique à tracer.",
+    "pt-BR": "Não há esquema empírico para exibir no gráfico."
+  },
   "Vancomycin: empiric fixed-interval dosing refused by calculator.": {
     "es": "Vancomicina: dosificación empírica a intervalo fijo rechazada por la calculadora.",
     "fr": "Vancomycine : posologie empirique à intervalle fixe refusée par le calculateur.",
