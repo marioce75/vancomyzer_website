@@ -22,6 +22,9 @@ interface CurvePoint {
 }
 
 interface ConcentrationTimeGraphProps {
+  /** Research-only finite history. A target timestamp is not a measured concentration. */
+  study?: { drawHour: number | null };
+  persistZoom?: boolean;
   curve?: CurvePoint[] | null;
   measured_levels?: CurvePoint[] | null;
   calculationDetails?: CalculationDetails | null;
@@ -207,8 +210,11 @@ function drawGraph(
   locale: Locale = "en",
   observed: CurvePoint[] = [],
   measuredOnReference: boolean = false,
+  // undefined = public clinical plot; null = research empty state.
+  studyDrawHour?: number | null,
 ) {
   const label = (source: string) => translate(source, locale);
+  const isStudy = studyDrawHour !== undefined;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -276,43 +282,46 @@ function drawGraph(
     ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gw, y); ctx.stroke();
   }
 
-  // ─── Trough reference band (10–20 mg/L). Not the dosing target: the engine doses to AUC24 400–600. ───
-  const yTargetTop = toY(TROUGH_REF_HIGH);
-  const yTargetBot = toY(TROUGH_REF_LOW);
-  ctx.fillStyle = aucFill;
-  ctx.fillRect(PAD.left, yTargetTop, gw, yTargetBot - yTargetTop);
-  ctx.font = `9px ${FONT}`;
-  ctx.fillStyle = dim;
-  ctx.textAlign = "right";
-  ctx.fillText(
-    fitCanvasLabel(ctx, [
-      label("TROUGH REF 10–20 mg/L · NOT THE DOSING TARGET (AUC 400–600)"),
-      label("TROUGH REF 10–20 · NOT DOSING TARGET"),
-      label("TROUGH REF 10–20"),
-    ], gw - 8),
-    PAD.left + gw - 4,
-    yTargetTop + 12,
-  );
+  if (!isStudy) {
+    // ─── Trough reference band (10–20 mg/L). Not the dosing target: the engine doses to AUC24 400–600. ───
+    const yTargetTop = toY(TROUGH_REF_HIGH);
+    const yTargetBot = toY(TROUGH_REF_LOW);
+    ctx.fillStyle = aucFill;
+    ctx.fillRect(PAD.left, yTargetTop, gw, yTargetBot - yTargetTop);
+    ctx.font = `9px ${FONT}`;
+    ctx.fillStyle = dim;
+    ctx.textAlign = "right";
+    ctx.fillText(
+      fitCanvasLabel(ctx, [
+        label("TROUGH REF 10–20 mg/L · NOT THE DOSING TARGET (AUC 400–600)"),
+        label("TROUGH REF 10–20 · NOT DOSING TARGET"),
+        label("TROUGH REF 10–20"),
+      ], gw - 8),
+      PAD.left + gw - 4,
+      yTargetTop + 12,
+    );
 
-  // ─── MIC line (fixed at an assumed MIC of 1 mg/L; not a patient-specific value) ───
-  const yMic = toY(MIC);
-  ctx.setLineDash([4, 3]);
-  ctx.strokeStyle = "rgba(255,100,100,0.4)";
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(PAD.left, yMic); ctx.lineTo(PAD.left + gw, yMic); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.font = `9px ${FONT}`;
-  ctx.fillStyle = "rgba(255,100,100,0.6)";
-  ctx.textAlign = "right";
-  ctx.fillText(label("MIC 1 mg/L (assumed)"), PAD.left + gw - 4, yMic - 3);
+    // ─── MIC line (fixed at an assumed MIC of 1 mg/L; not a patient-specific value) ───
+    const yMic = toY(MIC);
+    ctx.setLineDash([4, 3]);
+    ctx.strokeStyle = "rgba(255,100,100,0.4)";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD.left, yMic); ctx.lineTo(PAD.left + gw, yMic); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = `9px ${FONT}`;
+    ctx.fillStyle = "rgba(255,100,100,0.6)";
+    ctx.textAlign = "right";
+    ctx.fillText(label("MIC 1 mg/L (assumed)"), PAD.left + gw - 4, yMic - 3);
 
-  // ─── Trough reference lines ───
-  ctx.setLineDash([5, 3]);
-  ctx.strokeStyle = secondary;
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(PAD.left, toY(TROUGH_REF_HIGH)); ctx.lineTo(PAD.left + gw, toY(TROUGH_REF_HIGH)); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(PAD.left, toY(TROUGH_REF_LOW)); ctx.lineTo(PAD.left + gw, toY(TROUGH_REF_LOW)); ctx.stroke();
-  ctx.setLineDash([]);
+    // ─── Trough reference lines ───
+    ctx.setLineDash([5, 3]);
+    ctx.strokeStyle = secondary;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD.left, toY(TROUGH_REF_HIGH)); ctx.lineTo(PAD.left + gw, toY(TROUGH_REF_HIGH)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PAD.left, toY(TROUGH_REF_LOW)); ctx.lineTo(PAD.left + gw, toY(TROUGH_REF_LOW)); ctx.stroke();
+    ctx.setLineDash([]);
+
+  }
 
   // ─── Axes ───
   ctx.strokeStyle = axisLine;
@@ -344,7 +353,7 @@ function drawGraph(
   ctx.font = `9px ${FONT}`;
   ctx.fillStyle = dim;
   ctx.textAlign = "center";
-  ctx.fillText(label("TIME (HOURS POST-DOSE)"), PAD.left + gw / 2, h - 6);
+  ctx.fillText(label(isStudy ? "TIME (HOURS SINCE FIRST DOSE)" : "TIME (HOURS POST-DOSE)"), PAD.left + gw / 2, h - 6);
   ctx.save();
   ctx.translate(12, PAD.top + gh / 2);
   ctx.rotate(-Math.PI / 2);
@@ -357,13 +366,13 @@ function drawGraph(
     ctx.fillStyle = dim;
     ctx.textAlign = "center";
     ctx.fillText(
-      label("> AWAITING PATIENT DATA"),
+      label(isStudy ? "> AWAITING STUDY PREDICTION" : "> AWAITING PATIENT DATA"),
       PAD.left + gw / 2, PAD.top + gh / 2 - 8
     );
     ctx.font = `10px ${FONT}`;
     ctx.fillStyle = border;
     ctx.fillText(
-      label("Enter age, weight, SCr and dose to generate concentration profile"),
+      label(isStudy ? "Run the forecast to plot through the sample draw" : "Enter age, weight, SCr and dose to generate concentration profile"),
       PAD.left + gw / 2, PAD.top + gh / 2 + 10
     );
     return;
@@ -396,7 +405,7 @@ function drawGraph(
   }
 
   // ─── AUC shading (last 24h of curve) ───
-  if (curve.length > 2) {
+  if (!isStudy && curve.length > 2) {
     const tEnd = curve[curve.length - 1].time_hours;
     const tStart = Math.max(0, tEnd - 24);
     const aucPts = curve.filter((p) => p.time_hours >= tStart);
@@ -501,7 +510,7 @@ function drawGraph(
   }
 
   // ─── Peak and trough markers ───
-  if (curve.length > 5 && animProgress >= 1) {
+  if (!isStudy && curve.length > 5 && animProgress >= 1) {
     const landmarks = findLandmarks(curve);
     for (const lm of landmarks) {
       if (lm.time_hours > xMax) continue;
@@ -568,6 +577,21 @@ function drawGraph(
   // ─── Restore from clip ───
   ctx.restore();
 
+  // A time-only marker: no concentration dot that could look like a measured level.
+  if (typeof studyDrawHour === "number" && studyDrawHour <= xMax) {
+    const x = toX(studyDrawHour);
+    ctx.save();
+    ctx.strokeStyle = secondary;
+    ctx.setLineDash([4, 3]);
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + gh); ctx.stroke();
+    ctx.font = `9px ${FONT}`;
+    ctx.fillStyle = secondary;
+    ctx.textAlign = "right";
+    ctx.fillText(label("SAMPLE DRAW"), Math.max(PAD.left + 65, x - 4), PAD.top - 5);
+    ctx.restore();
+  }
+
   // ─── Crosshair + tooltip on hover ───
   if (mouse && mouse.x >= PAD.left && mouse.x <= PAD.left + gw && mouse.y >= PAD.top && mouse.y <= PAD.top + gh) {
     // Vertical hairline
@@ -578,8 +602,9 @@ function drawGraph(
     ctx.strokeStyle = crossH;
     ctx.beginPath(); ctx.moveTo(PAD.left, mouse.y); ctx.lineTo(PAD.left + gw, mouse.y); ctx.stroke();
 
-    if (curve.length > 0) {
-      const tHover = fromX(mouse.x);
+    const hoverTime = fromX(mouse.x);
+    if (curve.length > 0 && (!isStudy || (hoverTime >= curve[0].time_hours && hoverTime <= curve[curve.length - 1].time_hours + 1e-9))) {
+      const tHover = isStudy ? Math.min(hoverTime, curve[curve.length - 1].time_hours) : hoverTime;
       // Interpolate concentration
       let cInterp = 0;
       let loInterp: number | null = null;
@@ -600,15 +625,15 @@ function drawGraph(
           break;
         }
       }
-      const phase = phaseLabel(curve, tHover);
+      const phase = isStudy ? "" : phaseLabel(curve, tHover);
 
       // Tooltip box
       const bandLine = loInterp !== null && hiInterp !== null
         ? `${Math.round(bandLevel * 100)}% ${fmt(loInterp, 1)}–${fmt(hiInterp, 1)}`
         : null;
       const boxH = 36 + (bandLine ? 12 : 0) + (phase ? 12 : 0);
-      const tx = mouse.x + 12;
-      const ty = mouse.y - 50;
+      const tx = isStudy ? Math.min(mouse.x + 12, Math.max(0, w - 135)) : mouse.x + 12;
+      const ty = isStudy ? Math.max(0, mouse.y - 50) : mouse.y - 50;
       ctx.fillStyle = bgColor;
       ctx.fillRect(tx, ty, 130, boxH);
       ctx.strokeStyle = primary;
@@ -664,37 +689,50 @@ export default function ConcentrationTimeGraph({
   measured_label,
   measured_note,
   measured_anchors,
+  study,
+  persistZoom = true,
 }: ConcentrationTimeGraphProps) {
   const { locale } = useLanguage();
-  const band = bandDescription(band_info);
+  const isStudy = study !== undefined;
+  const drawHour = isStudy && typeof study.drawHour === "number" && Number.isFinite(study.drawHour) && study.drawHour > 0
+    ? study.drawHour : null;
+  const studyDrawHour = isStudy ? drawHour : undefined;
+  const band = isStudy ? null : bandDescription(band_info);
   const bandLevel = band && band_info && band_info.method !== "unavailable" ? band_info.level : 0;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Zoom window persists for the session so recalculating keeps the view.
   const [zoom, setZoomState] = useState(96);
+  const [toDraw, setToDraw] = useState(true);
+  const graphZoom = drawHour === null ? zoom : toDraw ? drawHour : Math.min(zoom, drawHour);
   useEffect(() => {
+    if (isStudy || !persistZoom) return;
     try {
       const stored = Number(sessionStorage.getItem(ZOOM_STORAGE_KEY));
       if ([24, 48, 96, 168].includes(stored)) setZoomState(stored);
     } catch { /* storage unavailable */ }
-  }, []);
+  }, [isStudy, persistZoom]);
   const setZoom = useCallback((z: number) => {
     setZoomState(z);
-    try { sessionStorage.setItem(ZOOM_STORAGE_KEY, String(z)); } catch { /* ignore */ }
-  }, []);
+    if (isStudy) { setToDraw(false); return; }
+    if (persistZoom) { try { sessionStorage.setItem(ZOOM_STORAGE_KEY, String(z)); } catch { /* ignore */ } }
+  }, [isStudy, persistZoom]);
   const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
   const animRef = useRef(0);
   const rafRef = useRef(0);
   const prevCurveLen = useRef(0);
 
   // Stable references so the draw-loop effect only restarts when data changes.
-  const curveData = useMemo(() => curve ?? [], [curve]);
+  const curveData = useMemo(() => !isStudy ? curve ?? []
+    : drawHour === null ? []
+      : (curve ?? []).filter(p => Number.isFinite(p.concentration) && p.time_hours >= 0 && p.time_hours <= drawHour),
+    [curve, drawHour, isStudy]);
   // Markers are drawn only where they belong: on the solid curve when it is
   // the entered history, on the dotted entered-history curve when the solid
   // curve is a projection, and not at all when that curve is unavailable.
-  const measuredOnReference = measured_placement === "reference" && (observed_curve?.length ?? 0) > 1;
-  const measuredHidden = measured_placement === "hidden" || (measured_placement === "reference" && !measuredOnReference);
+  const measuredOnReference = !isStudy && measured_placement === "reference" && (observed_curve?.length ?? 0) > 1;
+  const measuredHidden = isStudy || measured_placement === "hidden" || (measured_placement === "reference" && !measuredOnReference);
   const measuredData = useMemo(() => (measuredHidden ? [] : measured_levels ?? []), [measured_levels, measuredHidden]);
-  const comparisonData = useMemo(() => comparison_curve ?? [], [comparison_curve]);
+  const comparisonData = useMemo(() => isStudy ? [] : comparison_curve ?? [], [comparison_curve, isStudy]);
   const observedData = useMemo(() => (measuredOnReference ? observed_curve ?? [] : []), [observed_curve, measuredOnReference]);
 
   // Animate curve on new data
@@ -733,13 +771,13 @@ export default function ConcentrationTimeGraph({
       if (!running) return;
       const canvas = canvasRef.current;
       if (canvas) {
-        drawGraph(canvas, curveData, measuredData, zoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandLevel, comparisonData, locale, observedData, measuredOnReference);
+        drawGraph(canvas, curveData, measuredData, graphZoom, mouse, curveData.length > 0 ? (animRef.current || 1) : 0, bandLevel, comparisonData, locale, observedData, measuredOnReference, studyDrawHour);
       }
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
     return () => { running = false; };
-  }, [curveData, measuredData, zoom, mouse, bandLevel, comparisonData, locale, observedData, measuredOnReference]);
+  }, [curveData, measuredData, graphZoom, mouse, bandLevel, comparisonData, locale, observedData, measuredOnReference, studyDrawHour]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -749,7 +787,7 @@ export default function ConcentrationTimeGraph({
   const handleMouseLeave = useCallback(() => setMouse(null), []);
 
   const modelLabel = calculationDetails?.method ? modelShortName(pk_model_name) : "";
-  const evidenceLabel = calculationDetails?.evidence_strength ?? "";
+  const evidenceLabel = isStudy ? "" : calculationDetails?.evidence_strength ?? "";
 
   return (
     <LocalizedDiv className={`flex flex-col gap-0 w-full ${fill ? "vz-graph-fill" : ""}`} aria-label="Concentration-time graph">
@@ -776,40 +814,44 @@ export default function ConcentrationTimeGraph({
         )}
         </div>
         <LocalizedDiv className="flex shrink-0 items-center gap-1" role="group" aria-label="Time window">
-        {[24, 48, 96, 168].map((z) => (
+        {(isStudy ? [24, 48, 96, 168, 0] : [24, 48, 96, 168]).map((z) => {
+          const selected = isStudy && toDraw && drawHour !== null ? z === 0 : zoom === z;
+          return (
           <button
             key={z}
             type="button"
-            onClick={() => setZoom(z)}
+            onClick={() => z === 0 ? setToDraw(true) : setZoom(z)}
+            {...(isStudy ? { "aria-pressed": selected } : {})}
             style={{
               fontSize: 10,
               fontFamily: FONT,
               padding: "2px 8px",
               cursor: "pointer",
-              fontWeight: zoom === z ? 700 : 500,
-              border: zoom === z ? `1px solid ${getCSSColor("--color-primary", "#00ff41")}` : `1px solid ${getCSSColor("--color-border", "#004422")}`,
-              background: zoom === z ? getCSSColor("--color-primary", "#00ff41") : "transparent",
-              color: zoom === z ? getCSSColor("--color-card", "#000") : getCSSColor("--color-dim", "#009933"),
+              fontWeight: selected ? 700 : 500,
+              border: selected ? `1px solid ${getCSSColor("--color-primary", "#00ff41")}` : `1px solid ${getCSSColor("--color-border", "#004422")}`,
+              background: selected ? getCSSColor("--color-primary", "#00ff41") : "transparent",
+              color: selected ? getCSSColor("--color-card", "#000") : getCSSColor("--color-dim", "#009933"),
               transition: "background 0.15s, color 0.15s, border-color 0.15s",
             }}
             onMouseEnter={e => {
-              if (zoom !== z) {
+              if (!selected) {
                 (e.currentTarget as HTMLElement).style.background = getCSSColor("--color-primary", "#1f5e96");
                 (e.currentTarget as HTMLElement).style.color = getCSSColor("--color-card", "#fff");
                 (e.currentTarget as HTMLElement).style.borderColor = getCSSColor("--color-primary", "#1f5e96");
               }
             }}
             onMouseLeave={e => {
-              if (zoom !== z) {
+              if (!selected) {
                 (e.currentTarget as HTMLElement).style.background = "transparent";
                 (e.currentTarget as HTMLElement).style.color = getCSSColor("--color-dim", "#009933");
                 (e.currentTarget as HTMLElement).style.borderColor = getCSSColor("--color-border", "#004422");
               }
             }}
           >
-            {z}H
+            {z === 0 ? <LocalizedText text="Draw" /> : <>{z}H</>}
           </button>
-        ))}
+          );
+        })}
         </LocalizedDiv>
       </div>
 
@@ -820,6 +862,7 @@ export default function ConcentrationTimeGraph({
         style={{ height: fill ? undefined : "clamp(240px, 38vh, 320px)", background: "var(--color-card)", cursor: "crosshair" }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
+        {...(isStudy ? { role: "img", "aria-label": translate("Predicted concentration-time profile ending at the sample draw", locale) } : {})}
       />
 
       {/* Legend */}
@@ -841,10 +884,16 @@ export default function ConcentrationTimeGraph({
             <LocalizedText text={band.label} />
           </LocalizedSpan>
         )}
-        {band_info?.method === "unavailable" && curveData.length > 1 && (
+        {!isStudy && band_info?.method === "unavailable" && curveData.length > 1 && (
           <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} title={band_info.detail ?? band_info.reason}><LocalizedText text="No uncertainty band:" />{" "}<LocalizedText text={band_info.reason} />
           </span>
         )}
+        {isStudy ? (drawHour !== null && (
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} data-testid="graph-study-draw">
+            <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44") }} />{" "}
+            <LocalizedText text="Sample draw (time only, not a measured level)" />{": "}{fmt(drawHour, 3)}h
+          </span>
+        )) : <>
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span className="inline-block w-4 h-0.5 border-t border-dashed" style={{ borderColor: getCSSColor("--color-secondary", "#00cc44") }} />{" "}<LocalizedText text="Trough reference 10–20 mg/L (not the dosing target; target is AUC₂₄ 400–600)" /></span>
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
@@ -853,12 +902,13 @@ export default function ConcentrationTimeGraph({
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}><LocalizedText text="◆ Trough" /></span>
         <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }}>
           <span style={{ color: getCSSColor("--color-primary", "#00ff41") }}>▲</span>{" "}<LocalizedText text="Peak" /></span>
+        </>}
         {observedData.length > 1 && (
           <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} data-testid="graph-observed-legend">
             <span className="inline-block w-4 h-0.5 border-t border-dotted" style={{ borderColor: OBSERVED_COLOR, borderTopWidth: 2 }} />{" "}<LocalizedText text={MEASURED_REFERENCE_PREFIX} />{observed_label ? <>{": "}<LocalizedText text={observed_label} /></> : null}
           </span>
         )}
-        {(measured_levels?.length ?? 0) > 0 && (
+        {!isStudy && (measured_levels?.length ?? 0) > 0 && (
           <span className="flex items-center gap-1 text-[10px]" style={{ color: getCSSColor("--color-dim", "#009933") }} data-testid="graph-measured-legend">
             {!measuredHidden && (
               <span className="inline-block w-2 h-2 rounded-full" style={{ background: "#fff", border: `1px solid ${measuredOnReference ? OBSERVED_COLOR : getCSSColor("--color-primary", "#00ff41")}` }} />
@@ -866,7 +916,7 @@ export default function ConcentrationTimeGraph({
         )}
       </div>
       {/* Observations vs. projection: what the markers are, and when each was drawn */}
-      {(measured_levels?.length ?? 0) > 0 && (measured_note || (measured_anchors && measured_anchors.length > 0)) && (
+      {!isStudy && (measured_levels?.length ?? 0) > 0 && (measured_note || (measured_anchors && measured_anchors.length > 0)) && (
         <div
           className="px-1 pt-1 text-[10px] leading-4 shrink-0"
           style={{ fontFamily: FONT, color: getCSSColor("--color-dim", "#009933") }}

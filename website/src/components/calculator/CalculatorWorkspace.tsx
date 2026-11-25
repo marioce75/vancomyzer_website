@@ -6,6 +6,8 @@ import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
 
 
 import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
+import ManualDoseEditor, { type ManualDoseDraw, type ManualDoseRow } from "./ManualDoseEditor";
+import { exactUtc, manualProjection, type ManualProjection } from "@/lib/manualStudy/manualHistory";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import FeatureGate from "@/components/FeatureGate";
@@ -100,7 +102,7 @@ const MISSING_COUNT_MESSAGE =
 // Kept only so the clinician’s existing Reset action can clear an old draft.
 const LEGACY_SESSION_KEY = "vancomyzer_calculator_state";
 
-export default function CalculatorWorkspace() {
+export default function CalculatorWorkspace({ ownerManualDemo = false }: { ownerManualDemo?: boolean } = {}) {
   const { locale } = useLanguage();
   const searchParams = useSearchParams();
 
@@ -114,6 +116,15 @@ export default function CalculatorWorkspace() {
   const [error, setError] = useState<CalculateErrorResponse | null>(null);
   const [result, setResult] = useState<CalculateResponse | null>(null);
 
+  // Only the server-gated study route opts in. Its complete case, including the
+  // classic workflow, stays in component memory and never reaches the API.
+  const [manualOpen, setManualOpen] = useState(false);
+  const [manualRows, setManualRows] = useState<ManualDoseRow[]>([]);
+  const [manualDraw, setManualDraw] = useState<ManualDoseDraw>({ date: "", time: "" });
+  const [manualComplete, setManualComplete] = useState(false);
+  const [manualRun, setManualRun] = useState<{ revision: number; value: ManualProjection } | null>(null);
+  const manualActive = ownerManualDemo && manualOpen;
+
   const [bedbound, setBedbound] = useState(false);
   const [bedboundDoseData, setBedboundDoseData] = useState<BedboundDoseData | null>(null);
 
@@ -123,6 +134,21 @@ export default function CalculatorWorkspace() {
     mode, patient, rrt, ...(mode === "initial_regimen" ? {} : { regimen, levels }),
   });
   const inputRevision = inputRevisionRef.current.revision;
+  const currentManual = manualRun?.revision === inputRevision ? manualRun.value : null;
+  const resultManual = currentManual?.ok ? currentManual : null;
+  function runManual() {
+    const drawMs = exactUtc(manualDraw.date, manualDraw.time);
+    const rows = manualRows.map((row) => ({
+      start_ms: exactUtc(row.date, row.time) ?? NaN,
+      dose_mg: row.mg.trim() ? Number(row.mg) : NaN,
+      infusion_minutes: row.minutes.trim() ? Number(row.minutes) : NaN,
+    }));
+    const value = manualProjection({
+      patient, rrt, rows, drawMs: drawMs ?? NaN, complete: manualComplete,
+      basis: regimen, fitLevels: mode === "initial_regimen" ? [] : levels.filter(isEnteredLevel).map(requestLevel),
+    });
+    setManualRun({ revision: inputRevision, value });
+  }
   const invalidTiming = mode !== "initial_regimen" && levels.some(level => isEnteredLevel(level) && !timingIsValid(level));
   const [selectedFrequencyOption, setSelectedFrequencyOption] = useState<FrequencyOption | null>(null);
   // Existing-regimen path only: view the CURRENT regimen (as entered) instead
@@ -181,7 +207,7 @@ export default function CalculatorWorkspace() {
   // visible until the user resets or dismisses.
   const [loadedCase, setLoadedCase] = useState<{ id: string; reference: string } | null>(null);
   useEffect(() => {
-    if (didPreFillRef.current) return;
+    if (ownerManualDemo || didPreFillRef.current) return;
 
     // (1) Literature Reproducibility case deep-link — takes precedence over scalar params
     const caseId = searchParams.get("case");
@@ -338,11 +364,13 @@ export default function CalculatorWorkspace() {
     const submittedRevision = inputRevisionRef.current.revision;
 
     try {
-      const res = await fetch("/api/calculate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(request),
-      });
+      const res = ownerManualDemo
+        ? (await import("@/lib/manualStudy/localClassic")).calculateClassicInBrowser(request)
+        : await fetch("/api/calculate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(request),
+        });
       const data = await res.json().catch(() => ({}));
 
       // Superseded by a newer submission, or the patient was switched to RRT
@@ -445,14 +473,14 @@ export default function CalculatorWorkspace() {
       // (Calculate button, Cmd/Ctrl+Enter, loading-dose simulation), never the
       // debounced empiric auto-recalc (intent "auto"). The only prop is the
       // workflow label; no patient inputs or results are ever sent.
-      if (isCalculationCompletion(intent, data)) {
+      if (!ownerManualDemo && isCalculationCompletion(intent, data)) {
         track("Calculation Run", { mode: workflowMode });
       }
 
     } finally {
       if (seq === requestSeqRef.current) setLoading(false);
     }
-  }, [buildRequest, playSound, invalidTiming, levels]);
+  }, [buildRequest, playSound, invalidTiming, levels, ownerManualDemo]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -517,7 +545,7 @@ export default function CalculatorWorkspace() {
   }, [patient, mode, rrt, handleCalculate]);
 
   const handleReset = useCallback(() => {
-    try { sessionStorage.removeItem(LEGACY_SESSION_KEY); } catch { /* storage may be blocked */ }
+    try { if (!ownerManualDemo) sessionStorage.removeItem(LEGACY_SESSION_KEY); } catch { /* storage may be blocked */ }
     setPatient({ ...defaultPatient });
     setRegimen({ ...defaultRegimen });
     setLevels([{ ...defaultLevel }]);
@@ -738,7 +766,7 @@ export default function CalculatorWorkspace() {
   }, [mode, regimen, handleCalculate]);
 
   const handleCopyNote = useCallback(() => {
-    if (loadingPreview) return; // a suggested dose was never given
+    if (ownerManualDemo || loadingPreview) return; // demo exports are not permitted
     if (!visibleResult || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
     const { note } = composeNote(visibleResult);
     if (!note) return;
@@ -747,7 +775,7 @@ export default function CalculatorWorkspace() {
   }, [activeOption, activeIsCurrent, visibleResult, locale, resultRevision, loadingPreview, regimen, levels, singleDoseStatus]);
 
   const handleExportPDF = useCallback(() => {
-    if (loadingPreview) return; // a suggested dose was never given
+    if (ownerManualDemo || loadingPreview) return; // demo exports are not permitted
     if (!visibleResult || !resultIsCurrent(resultRevision, inputRevisionRef.current.revision)) return;
     // One builder for the whole report (exportReport.ts): a proposed regimen's
     // dose, interval, infusion duration and exposure all come from one
@@ -1227,8 +1255,8 @@ export default function CalculatorWorkspace() {
                     {viewMode === "empiric" && !isPulse && !displayResult.empiric_dosing_blocked && !displayResult.adjustment_dosing_blocked && (
                       <LoadingDosePopover weightKg={patient.weight_kg > 0 ? patient.weight_kg : null} onSimulate={handleSimulateLoadingDose} />
                     )}
-                    <PdfExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? "free"} onExport={handleExportPDF} />
-                    {clinicalNote && (
+                    {!ownerManualDemo && <PdfExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? "free"} onExport={handleExportPDF} />}
+                    {!ownerManualDemo && clinicalNote && (
                       <NoteExportGate disabled={exportsDisabled} tier={user?.subscriptionTier ?? "free"} onCopy={handleCopyNote} noteText={clinicalNote} />
                     )}
                   </div>
@@ -1372,7 +1400,25 @@ export default function CalculatorWorkspace() {
         </section>
 
         {/* ── Concentration-time graph ── */}
-        <LocalizedSection className={`vz-area-graph vz-panel flex flex-col ${resultObscured ? "vz-obscured" : ""}`} aria-label="Concentration-time graph panel">
+        <LocalizedSection className={`vz-area-graph vz-panel flex flex-col ${!manualActive && resultObscured ? "vz-obscured" : ""}`} aria-label="Concentration-time graph panel">
+          {manualActive ? (
+            <div className="flex min-h-0 flex-1 flex-col p-2">
+              {displayResult && !resultObscured && (
+                <p role="note" className="m-0 mb-2 rounded border border-[var(--color-border)] px-2 py-1.5 text-xs">
+                  AUC, peak and trough above are for the classic regimen, not this manual dose history.
+                </p>
+              )}
+              <ConcentrationTimeGraph
+                key="manual-research-profile"
+                fill={graphFill}
+                curve={resultManual?.curve}
+                measured_placement="hidden"
+                study={{ drawHour: resultManual?.drawHour ?? null }}
+                curve_label="Manual actual-dose timeline through the draw"
+              />
+              <p className="m-0 px-1 py-2 text-xs">Fictional research preview only. This graph is separate from the classic recommendations above.</p>
+            </div>
+          ) : <>
           {isPulse && displayResult?.adjustment_dosing_blocked && (loadingPreview ? (
             // A suggested dose in the Empiric preview was not given, so it is not "recorded".
             <p className="m-0 px-3 pt-2 text-xs"><LocalizedText text="Suggested dose only (not given) — no maintenance regimen suggested." /></p>
@@ -1382,6 +1428,7 @@ export default function CalculatorWorkspace() {
           <div className={`flex min-h-0 flex-1 flex-col p-2 ${resultObscured ? "vz-obscured-content" : ""}`}>
             <ConcentrationTimeGraph
               fill={graphFill}
+              persistZoom={!ownerManualDemo}
               curve={graphCurve}
               comparison_curve={comparisonCurve}
               comparison_label={comparisonLabel}
@@ -1398,6 +1445,7 @@ export default function CalculatorWorkspace() {
               band_info={displayResult?.parameter_uncertainty}
             />
           </div>
+          </>}
         </LocalizedSection>
 
         {/* ── Side rail: alternatives + secondary detail ── */}
@@ -1405,11 +1453,40 @@ export default function CalculatorWorkspace() {
           <section className={`vz-panel shrink-0 ${resultObscured ? "vz-obscured" : ""}`} aria-labelledby="vz-alt-title">
             <div className="vz-panel-head">
               <h2 id="vz-alt-title" className="vz-panel-title m-0"><LocalizedText text="Candidate regimens" /></h2>
-              {displayResult && (
+              {!manualActive && displayResult && (
                 <span className="text-[10px]" style={{ color: "var(--color-dim)" }}><LocalizedText text="select a row to preview" /></span>
               )}
             </div>
-            <div className={resultObscured ? "vz-obscured-content" : ""}>
+            {ownerManualDemo && (
+              <div role="tablist" aria-label="Regimen options" className="vz-seg vz-manual-study-tabs m-2 flex flex-wrap" onKeyDown={(event) => {
+                if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+                event.preventDefault();
+                const nextManual = event.key === "End" || (event.key !== "Home" && !manualActive);
+                setManualOpen(nextManual);
+                event.currentTarget.querySelector<HTMLButtonElement>(nextManual ? "#manual-study-tab" : "#classic-candidates-tab")?.focus();
+              }}>
+                <button type="button" role="tab" tabIndex={manualActive ? -1 : 0} id="classic-candidates-tab" aria-controls="classic-candidates" aria-selected={!manualActive} onClick={() => setManualOpen(false)}>Recommended doses</button>
+                <button type="button" role="tab" tabIndex={manualActive ? 0 : -1} id="manual-study-tab" aria-controls="manual-study-panel" aria-selected={manualActive} onClick={() => setManualOpen(true)}>Manual doses</button>
+              </div>
+            )}
+            {manualActive ? (
+              <div id="manual-study-panel" role="tabpanel" aria-labelledby="manual-study-tab" className="space-y-2 p-2">
+                <p className="m-0 text-xs">Fictional data only. These entries and the plotted forecast stay in this browser tab.</p>
+                <ManualDoseEditor rows={manualRows} onRowsChange={(rows) => { setManualRows(rows); setManualRun(null); }}
+                  draw={manualDraw} onDrawChange={(draw) => { setManualDraw(draw); setManualRun(null); }}
+                  complete={manualComplete} onCompleteChange={(complete) => { setManualComplete(complete); setManualRun(null); }} />
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" className="rounded bg-[var(--color-primary)] px-3 py-2 text-xs font-bold text-[var(--color-card)]" onClick={runManual}>
+                    Plot through the draw
+                  </button>
+                  <button type="button" className="rounded border border-[var(--color-border)] px-2 py-1 text-xs" onClick={() => {
+                    setManualRows([]); setManualDraw({ date: "", time: "" }); setManualComplete(false); setManualRun(null);
+                  }}>Reset manual doses</button>
+                </div>
+                {resultManual && <p role="status" className="m-0 text-xs"><strong>{resultManual.concentration.toFixed(2)} mg/L</strong> at the held-out draw · {resultManual.doses_used} actual doses · {resultManual.fit_levels_used} earlier levels. No target level or new recommendation.</p>}
+                {currentManual && !currentManual.ok && <p role="alert" className="m-0 rounded bg-amber-50 p-2 text-xs text-amber-900">{currentManual.reason}</p>}
+              </div>
+            ) : <div {...(ownerManualDemo ? { id: "classic-candidates", role: "tabpanel", "aria-labelledby": "classic-candidates-tab" } : {})} className={resultObscured ? "vz-obscured-content" : ""}>
               {displayResult ? (
                 <RegimenComparisonResult
                   result={displayResult}
@@ -1431,13 +1508,13 @@ export default function CalculatorWorkspace() {
                   <LocalizedText text={displayResult ? "No candidate regimens — see the safety state above." : "Candidate regimens with predicted AUC₂₄, peak and trough appear here after calculation."} />
                 </p>
               )}
-            </div>
+            </div>}
           </section>
 
           <LocalizedSection className={`vz-panel flex min-h-0 flex-1 flex-col ${resultObscured ? "vz-obscured" : ""}`} aria-label="Calculation details">
             <div className={`flex min-h-0 flex-1 flex-col ${resultObscured ? "vz-obscured-content" : ""}`}>
               {displayResult ? (
-                <ResultDetailTabs tabs={detailTabs} storageKey="vancomyzer_detail_tab" />
+                <ResultDetailTabs tabs={detailTabs} storageKey={ownerManualDemo ? undefined : "vancomyzer_detail_tab"} />
               ) : (
                 <div className="p-3 text-sm" style={{ color: "var(--color-secondary)" }}>
                   <h3 className="mb-2 font-semibold"><LocalizedText text="Calculation details" /></h3>
@@ -1459,7 +1536,23 @@ export default function CalculatorWorkspace() {
     <div className="vz-app relative" style={{ background: "var(--color-bg)", color: "var(--color-primary)" }}>
       {/* LOGOUT only when someone is signed in; open-access visitors get a
           SIGN IN link in the same slot once the session check has settled. */}
-      <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={() => setSettingsOpen(true)} userName={user?.username} userRole={user?.role} onLogout={user ? logout : undefined} showSignIn={!authLoading && !user} />
+      <CalculatorHeader viewMode={viewMode} onViewModeChange={applyViewMode} onSettingsOpen={ownerManualDemo ? undefined : () => setSettingsOpen(true)} userName={user?.username} userRole={user?.role} onLogout={user ? logout : undefined} showSignIn={!authLoading && !user} />
+      {ownerManualDemo && (
+        <div className="flex flex-wrap items-center gap-3 border-b px-3 py-1 text-xs" role="note">
+          <strong>Owner-only study demo · fictional data only · not for patient care</strong>
+          <span>Calculations stay in this browser tab. Nothing from this worksheet is saved or exported.</span>
+          <Link href="/admin/dashboard" prefetch={false} className="underline">Back to admin</Link>
+          <button type="button" className="rounded border px-2 py-1 font-semibold" onClick={() => {
+            applyViewMode("empiric");
+            setPatient({ ...defaultPatient, age: 58, weight_kg: 84, serum_creatinine_mg_dl: 0.9 });
+            setRrt(false);
+            setManualRows([{ key: 0, date: "2030-01-05", time: "14:00:00", mg: "1500", minutes: "90" }]);
+            setManualDraw({ date: "2030-01-06", time: "01:30:00" });
+            setManualComplete(false);
+            setManualRun(null);
+          }}>Load fictional example</button>
+        </div>
+      )}
       {loadedCase && (
         <div
           role="status"
@@ -1492,7 +1585,7 @@ export default function CalculatorWorkspace() {
         </div>
       )}
       <CalculatorLayout left={leftColumn} right={rightColumn} />
-      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      {!ownerManualDemo && <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />}
       <DisclaimerModal open={disclaimerOpen} onClose={() => setDisclaimerOpen(false)} />
     </div>
   );

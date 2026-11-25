@@ -52,7 +52,7 @@ export function LanguageSwitcher({ compact = false, hideOnCalculator = false }: 
   const id = useId();
   const label = { en: "Language", es: "Idioma", fr: "Langue", "pt-BR": "Idioma" }[locale];
   // The calculator owns its header selector; keep the disclaimer's selector.
-  if (hideOnCalculator && pathname === "/calculator") return null;
+  if (hideOnCalculator && (pathname === "/calculator" || pathname === "/admin/dashboard/study-demo")) return null;
   return <div className={`language-switcher${compact ? " language-switcher--compact" : ""}`} style={compact ? undefined : { display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: 8, padding: "8px 16px", fontSize: 14 }}>
     <label htmlFor={id} className={compact ? "sr-only" : undefined}>{label}</label>
     <select id={id} disabled={!hydrated} value={locale} onChange={event => setLocale(parseLocale(event.target.value))}
