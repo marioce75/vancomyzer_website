@@ -89,6 +89,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </>
   );
 
+  // The gated owner demo uses the exact full-width calculator layout. The
+  // study route itself still verifies the session on the server before rendering.
+  if (pathname === "/admin/dashboard/study-demo") return <>{children}</>;
+
   return (
     <div className="flex min-h-screen">
       {/* Mobile header with hamburger */}
