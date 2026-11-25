@@ -1,5 +1,6 @@
 "use client";
 import { EMPIRIC_PROFILE_NO_EXPOSURE, isEmpiricProfileHold, shouldHoldEmpiricProfile } from "@/lib/empiricReview";
+import { EmpiricReviewHeading, EmpiricReviewNote } from "./EmpiricReviewNote";
 import { isCalculationCompletion } from "@/lib/calculation-analytics";
 import { LocalizedSpan, LocalizedSection, LocalizedAside, LocalizedButton } from "@/localization/LocalizedElements";
 
@@ -977,7 +978,8 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
   const comparisonLabel = recommendedOption
     ? `Recommended ${recommendedOption.dose_mg} mg q${recommendedOption.interval_hours}h${isPulse ? ` after ${singleDoseNoun.toLowerCase()} ${regimen.dose_mg} mg` : " (steady state)"}`
     : null;
-  const clinicalNote = translateGeneratedText(displayResult ? composeNote(displayResult).note : "", locale);
+  const sourceClinicalNote = displayResult ? composeNote(displayResult).note : "";
+  const clinicalNote = profileHold ? "" : translateGeneratedText(sourceClinicalNote, locale);
   // A suggested loading dose was never given: no clinical note or PDF can be
   // produced from the preview. Exports come back once the dose given is recorded.
   const exportsDisabled = resultObscured || !visibleResult || loadingPreview || profileHold;
@@ -1155,7 +1157,7 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
     : null;
 
   const detailTabs = profileHold ? [{
-    id: "note", label: "Note", content: <pre className="m-0 whitespace-pre-wrap text-xs">{translateGeneratedText(clinicalNote, locale)}</pre>,
+    id: "note", label: "Note", content: <EmpiricReviewNote note={sourceClinicalNote} locale={locale} />,
   }] : displayResult ? [
     {
       id: "pk",
@@ -1264,9 +1266,11 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
         <section className="vz-area-band vz-panel" aria-labelledby="vz-band-title" aria-busy={loading}>
           <div className="vz-panel-head">
             <div className="flex min-w-0 items-center gap-2">
-              <h2 id="vz-band-title" className="vz-panel-title m-0">
-                <LocalizedText text={profileHold ? "Review required" : displayResult?.recommendation_type === "existing_regimen" && !loadingPreview ? "Dosing adjustment" : "Dosing recommendation"} />
-              </h2>
+              {profileHold ? <EmpiricReviewHeading locale={locale} /> : (
+                <h2 id="vz-band-title" className="vz-panel-title m-0">
+                  <LocalizedText text={displayResult?.recommendation_type === "existing_regimen" && !loadingPreview ? "Dosing adjustment" : "Dosing recommendation"} />
+                </h2>
+              )}
               {displayResult && (
                 <span className="hidden md:inline">
                   <LocalizedSpan className="vz-chip vz-chip--neutral" title="Population PK model">
