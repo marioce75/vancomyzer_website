@@ -8604,6 +8604,11 @@
     "fr": "Après la dose isolée, prélever une concentration (habituellement à 24–48 h selon la demi-vie estimée) et utiliser l’onglet 1 concentration pour calculer le moment de la nouvelle dose guidé par les concentrations.",
     "pt-BR": "Após a dose de pulso, desenhe um nível (normalmente 24-48 h, dependendo da semi-vida estimada) e use a guia de 1 nível para calcular o tempo de refazer guiado pelo nível."
   },
+  "Review required": {
+    "es": "Se requiere revisión",
+    "fr": "Réévaluation nécessaire",
+    "pt-BR": "Revisão necessária"
+  },
   "Renal estimate uncertain: review required": {
     "es": "Estimación de la función renal incierta: se requiere revisión",
     "fr": "Estimation de la fonction rénale incertaine : réévaluation nécessaire",
