@@ -3,6 +3,7 @@
 import { runExistingRegimenPipeline, type ExistingRegimenPipelineInput } from "../pk/runExistingRegimenPipeline";
 import { buildPriorParameters } from "../pk/posterior/buildPriorParameters";
 import { concentrationFromHistory } from "../pk/doseHistory";
+import { sameRecordedMinute } from "./centralClock";
 import { parseDatetimeHours } from "../studyTimed/predictAtDraw";
 import type { CalculateRequestLevel, CalculateRequestPatient } from "../../types/calculator";
 
@@ -69,12 +70,6 @@ export function manualRegimenFromRows(rows: ManualAdministration[], basis: Basis
   return { ok: true, regimen };
 }
 
-export function exactUtc(date: string, time: string) {
-  if (!date || !time) return null;
-  const elapsed = parseDatetimeHours(date + "T" + time + "Z");
-  return elapsed === null ? null : Math.round(elapsed * MS_H);
-}
-
 export type ManualProjection = Failed | {
   ok: true; method: "population" | "posted-earlier-levels"; drawHour: number; concentration: number;
   curve: { time_hours: number; concentration: number }[]; doses_used: number; fit_levels_used: number;
@@ -84,16 +79,21 @@ export type ManualProjection = Failed | {
  * doses, no target concentration and no steady-state projection on this plot. */
 export function manualProjection(input: {
   patient: CalculateRequestPatient; rrt: boolean | null; rows: ManualAdministration[];
-  drawMs: number; complete: boolean; basis: Basis; fitLevels: CalculateRequestLevel[];
+  drawMs: number; complete: boolean; minutePrecision?: boolean; basis: Basis; fitLevels: CalculateRequestLevel[];
 }): ManualProjection {
-  const { patient, rrt, rows, drawMs, complete, basis, fitLevels } = input;
+  const { patient, rrt, rows, drawMs, complete, minutePrecision = false, basis, fitLevels } = input;
   if (!complete) return failed("Confirm that all doses actually given through the draw are listed.");
   if (rrt !== false) return failed("Select No for renal replacement therapy. This adult research forecast does not support dialysis.");
   if (!bounded(patient.age,18,120) || !bounded(patient.weight_kg,30,400) || !bounded(patient.serum_creatinine_mg_dl,0.1,10))
     return failed("Complete age, weight and serum creatinine in the supported adult calculator range.");
-  if (!Number.isSafeInteger(drawMs) || rows.some(r => !Number.isSafeInteger(r.start_ms))) return failed("Select an exact UTC date and time for every start and the draw.");
+  if (!Number.isSafeInteger(drawMs) || rows.some(r => !Number.isSafeInteger(r.start_ms))) return failed("Select a valid date and time for every start and the draw.");
+  if (minutePrecision && rows.some(r => sameRecordedMinute(r.start_ms, drawMs)))
+    return failed("A dose starts in the same minute as the draw. Their ordering is ambiguous.");
   if (rows.some(r => r.start_ms === drawMs)) return failed("A dose starts exactly at the draw. Its ordering is ambiguous.");
-  const given = orderedValid(rows.filter(r => r.start_ms < drawMs));
+  const beforeDraw = rows.filter(r => r.start_ms < drawMs);
+  if (minutePrecision && new Set(beforeDraw.map(r => Math.floor(r.start_ms / MS_MIN))).size !== beforeDraw.length)
+    return failed("Two doses start in the same minute. Their ordering is ambiguous.");
+  const given = orderedValid(beforeDraw);
   if (!given) return failed("Provide a valid, non-overlapping actual dose history before the draw.");
   const first = given[0].start_ms;
   const drawHour = (drawMs - first) / MS_H;
@@ -108,6 +108,10 @@ export function manualProjection(input: {
     for (const sample of fitLevels) {
       const hours = parseDatetimeHours(sample.collection_time.replace(/\.000Z$/,"Z"));
       const ms = hours === null ? null : Math.round(hours * MS_H);
+      if (ms !== null && minutePrecision && sameRecordedMinute(ms, drawMs))
+        return failed("A fit level and the draw are in the same minute. Their ordering is ambiguous.");
+      if (ms !== null && minutePrecision && given.some(dose => sameRecordedMinute(ms, dose.start_ms)))
+        return failed("A fit level and a dose start are in the same minute. Their ordering is ambiguous.");
       if (ms === null || ms >= drawMs) return failed("Every fit level needs a real collection time strictly before the held-out draw. The target level is never used.");
       if (ms < last.start_ms) return failed("The current live posterior requires earlier fit samples from the same most recent dosing interval.");
       levels.push({ ...sample, time_since_last_dose_hours: (ms-last.start_ms)/MS_H });

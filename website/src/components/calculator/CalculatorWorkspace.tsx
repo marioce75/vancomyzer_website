@@ -7,7 +7,8 @@ import { LocalizedText, useLanguage } from "@/localization/LanguageProvider";
 
 import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
 import ManualDoseEditor, { type ManualDoseDraw, type ManualDoseRow } from "./ManualDoseEditor";
-import { exactUtc, manualProjection, type ManualProjection } from "@/lib/manualStudy/manualHistory";
+import { manualProjection, type ManualProjection, type ManualAdministration } from "@/lib/manualStudy/manualHistory";
+import { centralMinuteFromInstant, describeClockRefusal, resolveCentralMinute } from "@/lib/manualStudy/centralClock";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import FeatureGate from "@/components/FeatureGate";
@@ -137,14 +138,22 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
   const currentManual = manualRun?.revision === inputRevision ? manualRun.value : null;
   const resultManual = currentManual?.ok ? currentManual : null;
   function runManual() {
-    const drawMs = exactUtc(manualDraw.date, manualDraw.time);
-    const rows = manualRows.map((row) => ({
-      start_ms: exactUtc(row.date, row.time) ?? NaN,
-      dose_mg: row.mg.trim() ? Number(row.mg) : NaN,
-      infusion_minutes: row.minutes.trim() ? Number(row.minutes) : NaN,
-    }));
+    const refuse = (reason: string) => setManualRun({ revision: inputRevision, value: { ok: false, reason } });
+    const draw = resolveCentralMinute(manualDraw.date, manualDraw.time);
+    if (!draw.ok) return refuse(describeClockRefusal("The draw", draw.code));
+    const rows: ManualAdministration[] = [];
+    for (let index = 0; index < manualRows.length; index++) {
+      const row = manualRows[index];
+      const start = resolveCentralMinute(row.date, row.time);
+      if (!start.ok) return refuse(describeClockRefusal(`Dose ${index + 1} start`, start.code));
+      rows.push({
+        start_ms: start.instantMs,
+        dose_mg: row.mg.trim() ? Number(row.mg) : NaN,
+        infusion_minutes: row.minutes.trim() ? Number(row.minutes) : NaN,
+      });
+    }
     const value = manualProjection({
-      patient, rrt, rows, drawMs: drawMs ?? NaN, complete: manualComplete,
+      patient, rrt, rows, drawMs: draw.instantMs, complete: manualComplete, minutePrecision: true,
       basis: regimen, fitLevels: mode === "initial_regimen" ? [] : levels.filter(isEnteredLevel).map(requestLevel),
     });
     setManualRun({ revision: inputRevision, value });
@@ -1546,8 +1555,8 @@ export default function CalculatorWorkspace({ ownerManualDemo = false }: { owner
             applyViewMode("empiric");
             setPatient({ ...defaultPatient, age: 58, weight_kg: 84, serum_creatinine_mg_dl: 0.9 });
             setRrt(false);
-            setManualRows([{ key: 0, date: "2030-01-05", time: "14:00:00", mg: "1500", minutes: "90" }]);
-            setManualDraw({ date: "2030-01-06", time: "01:30:00" });
+            setManualRows([{ key: 0, ...centralMinuteFromInstant(Date.UTC(2030, 0, 5, 14)), mg: "1500", minutes: "90" }]);
+            setManualDraw(centralMinuteFromInstant(Date.UTC(2030, 0, 6, 1, 30)));
             setManualComplete(false);
             setManualRun(null);
           }}>Load fictional example</button>

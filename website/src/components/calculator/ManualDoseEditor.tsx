@@ -60,7 +60,7 @@ export default function ManualDoseEditor({
     </div>
     <div className="space-y-2.5 p-3 text-[var(--color-secondary)]">
       <p id={`${id}-clock`} className="m-0 text-xs">
-        Enter doses actually given from the start of treatment through the draw, including any loading dose. Use UTC for every date and time; this panel never assumes your device’s time zone.
+        Enter doses actually given from the start of treatment through the draw, including any loading dose. Enter the hospital clock time in Central Time (America/Chicago). Use hours and minutes. This panel does not use your device’s time zone.
       </p>
       {!rows.length && <p className="m-0 text-xs">No doses entered yet.</p>}
       {rows.map((row, index) => {
@@ -68,12 +68,12 @@ export default function ManualDoseEditor({
         return <fieldset key={row.key} className="min-w-0 space-y-1.5 rounded border border-[var(--color-border)] bg-[var(--color-bg)] p-2">
           <legend className="px-1 text-xs font-bold text-[var(--color-primary)]">Dose {n}</legend>
           <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] gap-1.5">
-            <Field label="Start date (UTC)">
-              <input className={inputClass} type="date" value={row.date} aria-label={`Dose ${n} start date (UTC)`} aria-describedby={`${id}-clock`}
+            <Field label="Start date (Central Time)">
+              <input className={inputClass} type="date" value={row.date} aria-label={`Dose ${n} start date (Central Time)`} aria-describedby={`${id}-clock`}
                 onChange={(e) => changeRow(row.key, "date", e.target.value)} />
             </Field>
-            <Field label="Start time (UTC)">
-              <input className={inputClass} type="time" step={1} value={row.time} aria-label={`Dose ${n} start time (UTC)`} aria-describedby={`${id}-clock`}
+            <Field label="Start time (Central Time)">
+              <input className={inputClass} type="time" step={60} value={row.time} aria-label={`Dose ${n} start time (Central Time)`} aria-describedby={`${id}-clock`}
                 onChange={(e) => changeRow(row.key, "time", e.target.value)} />
             </Field>
             <Field label="Dose (mg)">
@@ -98,12 +98,12 @@ export default function ManualDoseEditor({
       <fieldset className="min-w-0 rounded border border-[var(--color-border)] p-2">
         <legend className="px-1 text-xs font-bold text-[var(--color-primary)]">Held-out blood draw</legend>
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] gap-1.5">
-          <Field label="Draw date (UTC)">
-            <input className={inputClass} type="date" value={draw.date} aria-label="Held-out draw date (UTC)"
+          <Field label="Draw date (Central Time)">
+            <input className={inputClass} type="date" value={draw.date} aria-label="Held-out draw date (Central Time)"
               onChange={(e) => changeDraw("date", e.target.value)} />
           </Field>
-          <Field label="Draw time (UTC)">
-            <input className={inputClass} type="time" step={1} value={draw.time} aria-label="Held-out draw time (UTC)"
+          <Field label="Draw time (Central Time)">
+            <input className={inputClass} type="time" step={60} value={draw.time} aria-label="Held-out draw time (Central Time)"
               onChange={(e) => changeDraw("time", e.target.value)} />
           </Field>
         </div>
