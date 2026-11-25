@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { exactUtc, manualProjection, type ManualAdministration } from "./manualHistory";
+import { manualProjection, type ManualAdministration } from "./manualHistory";
+import { centralMinuteFromInstant, resolveCentralMinute } from "./centralClock";
+import { predictAtDraw, type TimedCaseInput } from "../studyTimed/predictAtDraw";
 import type { CalculateRequestLevel, CalculateRequestPatient, CalculateRequestRegimen } from "../../types/calculator";
 
 const HOUR_MS = 3_600_000;
@@ -99,39 +101,70 @@ test("only administrations before the held-out draw contribute; exact-time start
   refused(input([row(0, 1000, 100), row(1, 1200, 80)], 3), /non-overlapping/);
 });
 
-test("native clock input is treated as strict UTC with seconds, not local browser time", () => {
-  const priorTZ = process.env.TZ;
+function instant(date: string, time: string) {
+  const actual = resolveCentralMinute(date,time);
+  assert.ok(actual.ok, JSON.stringify(actual));
+  return actual.instantMs;
+}
+
+test("strict Central HH:mm does not depend on device time zone and rejects impossible dates", () => {
+  const previous = process.env.TZ;
   try {
-    for (const zone of ["America/Chicago", "Asia/Tokyo", "Pacific/Honolulu"]) {
+    for (const zone of ["America/Chicago","Asia/Tokyo","Pacific/Honolulu","Etc/UTC"]) {
       process.env.TZ = zone;
-      assert.equal(exactUtc("2030-11-03", "01:30:37"), Date.UTC(2030, 10, 3, 1, 30, 37));
-      assert.equal(exactUtc("2030-03-10", "02:00:09"), Date.UTC(2030, 2, 10, 2, 0, 9));
-      assert.equal(exactUtc("2030-01-05", "14:05"), Date.UTC(2030, 0, 5, 14, 5));
-      assert.equal(exactUtc("2030-02-30", "14:05:12"), null);
-      assert.equal(exactUtc("2030-01-05", ""), null);
+      assert.equal(instant("2030-01-05","08:00"), Date.UTC(2030,0,5,14));
+      assert.equal(instant("2030-07-05","08:00"), Date.UTC(2030,6,5,13));
+      assert.equal(instant("2030-01-05","19:30"), Date.UTC(2030,0,6,1,30));
+      assert.deepEqual(centralMinuteFromInstant(Date.UTC(2030,0,6,1,30)), { date:"2030-01-05",time:"19:30" });
+      for (const [d,t] of [["2030-02-30","08:00"],["2030-01-05","08:00:00"],["2030-01-05","24:00"],["2030-01-05","8:00"],["2030-01-05",""]]) {
+        assert.deepEqual(resolveCentralMinute(d,t),{ok:false,code:"invalid"});
+      }
     }
   } finally {
-    if (priorTZ === undefined) delete process.env.TZ; else process.env.TZ = priorTZ;
+    if (previous === undefined) delete process.env.TZ; else process.env.TZ = previous;
   }
 });
 
-test("native UTC midnight and offset-equivalent fall-back inputs keep draw and forecast aligned", () => {
-  const check = (startDate: string, startTime: string, drawDate: string, drawTime: string, minutes: number) => {
-    const start = exactUtc(startDate, startTime)!;
-    const draw = exactUtc(drawDate, drawTime)!;
-    assert.equal(draw - start, minutes * 60_000);
-    const actual = [{ start_ms: start, dose_mg: 1200, infusion_minutes: 90 }];
-    const forecast = predicted(input(actual, 0, { drawMs: draw }));
-    assert.equal(forecast.drawHour, minutes / 60);
-    const plottedDraw = forecast.curve.at(-1)!;
-    assert.equal(plottedDraw.time_hours, forecast.drawHour, "the graph marker uses the forecast endpoint");
-    assert.equal(plottedDraw.concentration, forecast.concentration);
-    assert.ok(Math.abs(forecast.concentration - rk4Reference(actual, draw, [minutes / 60])[0]) < 1e-8);
+test("Central DST gaps and repeated minutes refuse without correcting or guessing", () => {
+  for (const t of ["02:00","02:30","02:59"]) assert.deepEqual(resolveCentralMinute("2030-03-10",t),{ok:false,code:"gap"});
+  for (const t of ["01:00","01:30","01:59"]) assert.deepEqual(resolveCentralMinute("2030-11-03",t),{ok:false,code:"repeated"});
+  assert.equal(instant("2030-03-10","03:00")-instant("2030-03-10","01:59"),60_000);
+  assert.equal(instant("2030-11-03","02:00")-instant("2030-11-03","00:59"),121*60_000);
+});
+
+test("Central midnight and holiday-calendar input keep elapsed concentration and formal batch aligned", () => {
+  assert.equal(instant("2030-01-06","00:10")-instant("2030-01-05","23:55"),15*60_000);
+  const first = instant("2030-01-05","08:00");
+  const second = instant("2030-01-05","17:00");
+  const draw = instant("2030-01-05","19:30");
+  const rows = [{start_ms:first,dose_mg:1500,infusion_minutes:90},{start_ms:second,dose_mg:1250,infusion_minutes:90}];
+  const prior = predicted(input(rows,0,{drawMs:draw,minutePrecision:true}));
+  const exact: TimedCaseInput = {
+    study_case_id:"TEST-CENTRAL",time_basis:"datetime",age_years:patient.age,weight_kg:patient.weight_kg,
+    serum_creatinine_mg_dl:patient.serum_creatinine_mg_dl,scr_collected_at:"2030-01-05T06:00-06:00",
+    renal_replacement_therapy:false,history_complete_attested:true,draw_time:"2030-01-05T19:30-06:00",
+    doses:[{start:"2030-01-05T08:00-06:00",dose_mg:1500,infusion_minutes:90},{start:"2030-01-05T17:00-06:00",dose_mg:1250,infusion_minutes:90}],
   };
-  check("2030-01-05", "23:55", "2030-01-06", "00:10", 15);
-  assert.equal(Date.parse("2030-11-03T01:45:00-05:00"), exactUtc("2030-11-03", "06:45"));
-  assert.equal(Date.parse("2030-11-03T01:15:00-06:00"), exactUtc("2030-11-03", "07:15"));
-  check("2030-11-03", "06:45", "2030-11-03", "07:15", 30);
+  const batch = predictAtDraw(exact);
+  assert.equal(batch.status,"predicted");
+  assert.equal(batch.doses_used,prior.doses_used);
+  assert.equal(prior.drawHour,11.5);
+  assert.equal(prior.curve.at(-1)?.time_hours,11.5);
+  assert.ok(Math.abs(batch.predicted_concentration_mg_l!-prior.concentration)<1e-10);
+});
+
+test("minute-only study refuses uncertain ordering without changing exact-input formal computation", () => {
+  const day="2030-01-05", dose=instant(day,"08:00"), draw=instant(day,"19:30");
+  const rows=[{start_ms:dose,dose_mg:1500,infusion_minutes:90}];
+  const extra={drawMs:draw,minutePrecision:true};
+  const future = { ...rows[0], start_ms:draw+3*60_000 };
+  assert.deepEqual(predicted(input([...rows,future,{...future,start_ms:future.start_ms+20_000}],0,extra)),predicted(input(rows,0,extra)));
+  refused(input([...rows,{...rows[0],start_ms:draw+20_000}],0,extra),/same minute as the draw.*ambiguous/);
+  refused(input([...rows,{...rows[0],start_ms:dose+20_000}],0,extra),/Two doses.*same minute.*ambiguous/);
+  const one = {collection_time:"2030-01-06T01:30:30Z",time_since_last_dose_hours:11.5,value_mcg_ml:15};
+  const two = {...one,collection_time:"2030-01-05T14:00:30Z"};
+  refused(input(rows,0,{...extra,fitLevels:[one]}),/fit level and the draw.*same minute/);
+  refused(input(rows,0,{...extra,fitLevels:[two]}),/fit level and a dose start.*same minute/);
 });
 
 test("no-level research forecast does not borrow old regimen or steady-state assumptions", () => {
