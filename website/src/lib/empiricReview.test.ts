@@ -67,6 +67,10 @@ test("browser classic keeps no-level hold including direct single-dose and prese
     assert.equal(reply.status, 200);
     assert.deepEqual(await reply.json(), expected);
   }
+  const invalidBatch = calculateClassicInBrowser({
+    mode: "existing_regimen", patient: synthetic, regimen: { ...regimen, doses_given: 2 }, levels: [],
+  });
+  assert.equal(invalidBatch.status, 400);
   const later = calculateClassicInBrowser({ mode: "existing_regimen", patient: synthetic, regimen, levels: [measured] });
   const unchanged = wire(runExistingRegimenPipeline({ patient: { ...synthetic }, regimen, levels: [measured] }));
   assert.equal(later.status, 200);

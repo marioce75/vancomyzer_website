@@ -13,17 +13,19 @@ export function calculateClassicInBrowser(request: CalculateRequest): Response {
   const input: CalculateRequest = JSON.parse(JSON.stringify(request));
   const errors = validateRawInput(input, input.mode !== "initial_regimen");
   if (Object.keys(errors).length) return fail("Invalid or unsupported inputs.", errors);
-  if (input.mode === "initial_regimen" || ((input.levels?.length ?? 0) === 0 && shouldHoldEmpiricProfile(input.patient))) {
+  const levels = input.levels ?? [];
+  const empiric = () => {
     try {
       return Response.json(computeInitialRegimen(input.patient));
     } catch (e) {
       if (!(e instanceof InitialRegimenInputError)) throw e;
       return fail(e.message, e.field_errors);
     }
-  }
-  const levels = input.levels ?? [];
+  };
+  if (input.mode === "initial_regimen") return empiric();
   if (!input.regimen) return fail("A documented regimen is required.");
   if (input.regimen.doses_given !== 1 && levels.length === 0) return fail("At least one level is required for existing regimen evaluation.");
+  if (levels.length === 0 && shouldHoldEmpiricProfile(input.patient)) return empiric();
   const result = runExistingRegimenPipeline({
     patient: { ...input.patient }, regimen: { ...input.regimen }, levels: levels.map(level => ({ ...level })),
   });
