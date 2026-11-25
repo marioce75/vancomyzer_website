@@ -30,7 +30,7 @@ assert(!fs.existsSync("/data"), "Refuse fixture run when a production /data dire
 const OWNER = 7;
 const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "study-demo-preview-"));
 for (const name of ["src", "public", "package.json", "tsconfig.json", "next-env.d.ts", "next.config.js", "postcss.config.js", "tailwind.config.ts"]) {
-  if (fs.existsSync(path.join(source, name))) fs.cpSync(path.join(source, name), path.join(fixture, name), { recursive: true });
+  if (fs.existsSync(path.join(source, name))) fs.cpSync(path.join(source, name), path.join(fixture, name), { recursive: true, filter: f => !f.startsWith(path.join(source, "public/videos")) });
 }
 fs.symlinkSync(fs.realpathSync("node_modules"), path.join(fixture, "node_modules"), "dir");
 fs.mkdirSync(path.join(fixture, "data"));
@@ -175,11 +175,68 @@ try {
         assert.equal(links > 0, expectLink, `${who} nav link count ${links}`);
         if (expectLink) {
           await tab.goto(base + PAGE, { waitUntil: "load" });
-          await tab.getByRole("tab", { name: "FICT-A02" }).click();
-          await tab.getByRole("button", { name: "Predict concentration at the draw" }).click();
-          await tab.getByText("Reveal fictional lab result").click();
+          await tab.getByRole("combobox", { name: "Fictional case" }).selectOption("1");
+          assert.equal(await tab.getByLabel("Age (years)").getAttribute("readonly"), "");
+          assert.equal(await tab.locator("form").count(), 0, "no native form fallback");
+          await tab.getByRole("button", { name: "CALCULATE", exact: true }).click();
+          await tab.getByRole("img", { name: "Predicted concentration-time profile ending at the first draw" }).waitFor();
+          await tab.getByRole("button", { name: "Reveal fictional lab result" }).click();
           await tab.getByText("Fictional lab result:").waitFor();
           await tab.screenshot({ path: path.join(fixture, "owner-study-demo.png"), fullPage: true });
+
+          const requests: { url: string; body: string; method: string }[] = [];
+          tab.on("request", (r: { url(): string; postData(): string | null; method(): string }) => {
+            requests.push({ url: r.url(), body: r.postData() ?? "", method: r.method() });
+          });
+          const persisted = () => tab.evaluate(() => JSON.stringify({
+            local: Object.entries(localStorage).sort(),
+            session: Object.entries(sessionStorage).sort(),
+            cookies: document.cookie,
+          }));
+          const storageBefore = await persisted();
+          const mg = tab.getByLabel("Dose 1 amount (mg)", { exact: true });
+          const draw = tab.getByLabel("Draw date and time (UTC)", { exact: true });
+          const originalDraw = await draw.inputValue();
+          await mg.fill("1789.123");
+          await draw.fill("2030-01-07T13:31");
+          assert.equal(await tab.getByText("Fictional lab result:").count(), 0, "old lab clears as soon as dose changes");
+          await tab.getByRole("button", { name: "Add dose" }).click();
+          await tab.getByLabel("Dose 5 start date and time (UTC)", { exact: true }).fill("2030-01-07T16:11");
+          await tab.getByLabel("Dose 5 amount (mg)", { exact: true }).fill("501.789");
+          await tab.getByLabel("Dose 5 infusion duration (minutes)", { exact: true }).fill("73");
+          await tab.getByRole("button", { name: "Remove dose 4" }).click();
+          await tab.getByRole("checkbox", { name: "All administrations from the first dose through the draw are listed." }).check();
+          await tab.getByRole("button", { name: "CALCULATE", exact: true }).click();
+          await tab.getByRole("img", { name: "Predicted concentration-time profile ending at the first draw" }).waitFor();
+          await tab.getByText(/Edited training timeline. The preset lab result does not apply./).waitFor();
+          assert.equal(await tab.getByRole("button", { name: "Reveal fictional lab result" }).count(), 0);
+          assert.equal(await persisted(), storageBefore, "dose edits must not change browser storage");
+          assert.equal(new URL(tab.url()).search, "", "no query parameters");
+          const bytes = JSON.stringify(requests);
+          assert.doesNotMatch(bytes, /1789\.123|501\.789|2030-01-07|13%3A31|16%3A11/, "no draft fields in network traffic");
+          assert.equal(requests.some(r => r.method !== "GET" || r.url.endsWith(API) || r.url.endsWith("/api/calculate")), false,
+            "no calculation, reveal, or form traffic for an edited variant");
+          await tab.locator(".vz-rail").evaluate((el: HTMLElement) => { el.scrollTop = 0; });
+          await tab.screenshot({ path: path.join(fixture, "owner-study-demo-edited.png"), fullPage: true });
+          await tab.setViewportSize({ width: 390, height: 844 });
+          assert.equal(await tab.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "mobile must not scroll horizontally");
+          await tab.screenshot({ path: path.join(fixture, "owner-study-demo-mobile.png"), fullPage: true });
+          await tab.setViewportSize({ width: 1280, height: 900 });
+          await tab.reload({ waitUntil: "load" });
+          assert.equal(await tab.getByLabel("Dose 1 amount (mg)", { exact: true }).inputValue(), "1500", "reload restores original default preset only");
+          assert.notEqual(await tab.getByLabel("Draw date and time (UTC)", { exact: true }).inputValue(), originalDraw);
+          assert.equal(await tab.getByText("Fictional lab result:").count(), 0);
+
+          const publicContext = await browser.newContext({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 2 });
+          await publicContext.route("**/*", (r: { request(): { url(): string }; continue(): unknown; abort(): unknown }) => r.request().url().startsWith(base) ? r.continue() : r.abort());
+          await publicContext.addInitScript(() => {
+            localStorage.setItem("vmz_disclaimer_acceptance", JSON.stringify({ version: "2026-10-11", acceptedAt: new Date().toISOString() }));
+          });
+          const publicTab = await publicContext.newPage();
+          await publicTab.goto(base + "/calculator", { waitUntil: "load" });
+          await publicTab.getByPlaceholder("e.g. 65", { exact: true }).waitFor();
+          await publicTab.screenshot({ path: path.join(fixture, "public-calculator.png"), fullPage: true });
+          await publicContext.close();
         } else {
           const r = await tab.goto(base + PAGE, { waitUntil: "load" });
           assert.equal(r?.status(), 404);
@@ -187,7 +244,7 @@ try {
         }
         await context.close();
       }
-      browserNote = `owner sees the entry and completes predict + reveal; other admin has no entry and gets 404 (screenshot ${path.join(fixture, "owner-study-demo.png")})`;
+      browserNote = `owner predicts and reveals the unchanged preset; edited timeline requests/storage/lab guarded and resets on reload; other admin has no entry and gets 404 (screenshot ${path.join(fixture, "owner-study-demo.png")})`;
     } finally { await browser.close(); }
   }
   if (process.env.STUDY_PREVIEW_KEEP !== "1") { await stop(server); server = null; }
