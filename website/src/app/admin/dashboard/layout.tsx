@@ -33,17 +33,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // "Study demo" appears only when the server confirms the owner; everyone else gets a 404 and no entry.
   const [showStudyDemo, setShowStudyDemo] = useState(false);
-  const studyWorkspace = pathname === "/admin/dashboard/study-demo";
   useEffect(() => {
-    if (studyWorkspace) return;
     let live = true;
     fetch("/api/admin/study-demo", { cache: "no-store" })
       .then((r) => { if (live) setShowStudyDemo(r.ok); })
       .catch(() => {});
     return () => { live = false; };
-  }, [studyWorkspace]);
-  // Use the same full-width calculator frame only inside the private demo.
-  if (studyWorkspace) return <>{children}</>;
+  }, []);
   const visibleNavItems = showStudyDemo
     ? [...navItems.slice(0, navItems.findIndex((i) => i.href === "/admin/dashboard/research")), { label: "Study demo", href: "/admin/dashboard/study-demo", icon: "🧾" }, ...navItems.slice(navItems.findIndex((i) => i.href === "/admin/dashboard/research"))]
     : navItems;
