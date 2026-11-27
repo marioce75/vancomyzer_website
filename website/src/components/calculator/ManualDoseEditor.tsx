@@ -31,6 +31,24 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   </label>;
 }
 
+// A native time input may show AM/PM on a 12-hour device even when its value
+// uses HH:mm. Use explicit 24-hour entry independently of browser settings.
+function Time24Field({ label, descriptionId, value, onChange }: {
+  label: string; descriptionId: string; value: string; onChange: (value: string) => void;
+}) {
+  return <input className={inputClass} type="text" inputMode="numeric" placeholder="HH:MM"
+    pattern="([01][0-9]|2[0-3]):[0-5][0-9]" autoComplete="off" spellCheck={false}
+    value={value} aria-label={label} aria-describedby={descriptionId}
+    onChange={(e) => {
+      const next = e.target.value;
+      // Accept four digits from a phone's numeric keyboard, without guessing
+      // short times or trimming seconds/AM-PM from pasted values.
+      onChange(/^(?:[01][0-9]|2[0-3])[0-5][0-9]$/.test(next)
+        ? `${next.slice(0, 2)}:${next.slice(2)}`
+        : next);
+    }} />;
+}
+
 /** Controlled input surface only. Callers own all timing conversion and calculation policy. */
 export default function ManualDoseEditor({
   rows, onRowsChange, draw, onDrawChange, complete, onCompleteChange,
@@ -60,7 +78,7 @@ export default function ManualDoseEditor({
     </div>
     <div className="space-y-2.5 p-3 text-[var(--color-secondary)]">
       <p id={`${id}-clock`} className="m-0 text-xs">
-        Enter doses actually given from the start of treatment through the draw, including any loading dose. Enter the hospital clock time in Central Time (America/Chicago). Use hours and minutes. This panel does not use your device’s time zone.
+        Enter doses actually given from the start of treatment through the draw, including any loading dose. Enter the hospital clock time in Central Time (America/Chicago). Use 24-hour time (HH:MM), for example 17:00. This panel does not use your device’s time zone.
       </p>
       {!rows.length && <p className="m-0 text-xs">No doses entered yet.</p>}
       {rows.map((row, index) => {
@@ -73,8 +91,8 @@ export default function ManualDoseEditor({
                 onChange={(e) => changeRow(row.key, "date", e.target.value)} />
             </Field>
             <Field label="Start time (Central Time)">
-              <input className={inputClass} type="time" step={60} value={row.time} aria-label={`Dose ${n} start time (Central Time)`} aria-describedby={`${id}-clock`}
-                onChange={(e) => changeRow(row.key, "time", e.target.value)} />
+              <Time24Field value={row.time} label={`Dose ${n} start time (Central Time)`} descriptionId={`${id}-clock`}
+                onChange={(value) => changeRow(row.key, "time", value)} />
             </Field>
             <Field label="Dose (mg)">
               <input className={inputClass} type="number" inputMode="decimal" min={0.01} step="any" value={row.mg} aria-label={`Dose ${n} amount (mg)`}
@@ -103,8 +121,8 @@ export default function ManualDoseEditor({
               onChange={(e) => changeDraw("date", e.target.value)} />
           </Field>
           <Field label="Draw time (Central Time)">
-            <input className={inputClass} type="time" step={60} value={draw.time} aria-label="Held-out draw time (Central Time)"
-              onChange={(e) => changeDraw("time", e.target.value)} />
+            <Time24Field value={draw.time} label="Held-out draw time (Central Time)" descriptionId={`${id}-clock`}
+              onChange={(value) => changeDraw("time", value)} />
           </Field>
         </div>
         <p className="mb-0 mt-1 text-xs">Required to plot through the draw. Enter the date and time together. Do not enter the measured concentration here.</p>
