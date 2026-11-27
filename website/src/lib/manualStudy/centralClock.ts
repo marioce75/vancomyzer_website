@@ -36,9 +36,9 @@ export function resolveCentralMinute(date: string, time: string): ClockResult {
 }
 
 export function describeClockRefusal(field: string, code: Extract<ClockResult,{ok:false}>["code"]) {
-  if (code === "gap") return `${field} falls in the skipped hour when Central Time moves forward. Verify the source time; this worksheet cannot use it.`;
-  if (code === "repeated") return `${field} falls in the repeated hour when Central Time moves back. The worksheet cannot tell which occurrence was recorded.`;
-  return `Enter a valid Central Time date and time for ${field.toLowerCase()}, using hours and minutes.`;
+  if (code === "gap") return `${field} falls in the hour skipped when the clocks move forward. Verify the source time; this worksheet cannot use it.`;
+  if (code === "repeated") return `${field} falls in the hour repeated when the clocks move back. The worksheet cannot tell which occurrence was recorded.`;
+  return `Enter a valid date and 24-hour time (HH:MM) for ${field.toLowerCase()}.`;
 }
 
 export function sameRecordedMinute(a: number, b: number) {

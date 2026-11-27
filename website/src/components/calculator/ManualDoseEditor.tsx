@@ -78,7 +78,7 @@ export default function ManualDoseEditor({
     </div>
     <div className="space-y-2.5 p-3 text-[var(--color-secondary)]">
       <p id={`${id}-clock`} className="m-0 text-xs">
-        Enter doses actually given from the start of treatment through the draw, including any loading dose. Enter the hospital clock time in Central Time (America/Chicago). Use 24-hour time (HH:MM), for example 17:00. This panel does not use your device’s time zone.
+        Enter doses actually given from the start of treatment through the draw, including any loading dose. Use the date and time recorded in the hospital chart. Enter time in 24-hour format (HH:MM), for example 17:00.
       </p>
       {!rows.length && <p className="m-0 text-xs">No doses entered yet.</p>}
       {rows.map((row, index) => {
@@ -86,12 +86,12 @@ export default function ManualDoseEditor({
         return <fieldset key={row.key} className="min-w-0 space-y-1.5 rounded border border-[var(--color-border)] bg-[var(--color-bg)] p-2">
           <legend className="px-1 text-xs font-bold text-[var(--color-primary)]">Dose {n}</legend>
           <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] gap-1.5">
-            <Field label="Start date (Central Time)">
-              <input className={inputClass} type="date" value={row.date} aria-label={`Dose ${n} start date (Central Time)`} aria-describedby={`${id}-clock`}
+            <Field label="Start date">
+              <input className={inputClass} type="date" value={row.date} aria-label={`Dose ${n} start date`} aria-describedby={`${id}-clock`}
                 onChange={(e) => changeRow(row.key, "date", e.target.value)} />
             </Field>
-            <Field label="Start time (Central Time)">
-              <Time24Field value={row.time} label={`Dose ${n} start time (Central Time)`} descriptionId={`${id}-clock`}
+            <Field label="Start time">
+              <Time24Field value={row.time} label={`Dose ${n} start time`} descriptionId={`${id}-clock`}
                 onChange={(value) => changeRow(row.key, "time", value)} />
             </Field>
             <Field label="Dose (mg)">
@@ -116,12 +116,12 @@ export default function ManualDoseEditor({
       <fieldset className="min-w-0 rounded border border-[var(--color-border)] p-2">
         <legend className="px-1 text-xs font-bold text-[var(--color-primary)]">Held-out blood draw</legend>
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] gap-1.5">
-          <Field label="Draw date (Central Time)">
-            <input className={inputClass} type="date" value={draw.date} aria-label="Held-out draw date (Central Time)"
+          <Field label="Draw date">
+            <input className={inputClass} type="date" value={draw.date} aria-label="Held-out draw date"
               onChange={(e) => changeDraw("date", e.target.value)} />
           </Field>
-          <Field label="Draw time (Central Time)">
-            <Time24Field value={draw.time} label="Held-out draw time (Central Time)" descriptionId={`${id}-clock`}
+          <Field label="Draw time">
+            <Time24Field value={draw.time} label="Held-out draw time" descriptionId={`${id}-clock`}
               onChange={(value) => changeDraw("time", value)} />
           </Field>
         </div>
